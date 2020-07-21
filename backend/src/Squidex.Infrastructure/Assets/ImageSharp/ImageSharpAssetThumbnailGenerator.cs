@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
 using ISResizeMode = SixLabors.ImageSharp.Processing.ResizeMode;
 using ISResizeOptions = SixLabors.ImageSharp.Processing.ResizeOptions;
@@ -22,67 +23,68 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
         {
             Guard.NotNull(options, nameof(options));
 
-            return Task.Run(() =>
+            if (!options.IsValid)
             {
-                if (!options.IsValid)
-                {
-                    source.CopyTo(destination);
+                source.CopyTo(destination);
 
-                    return;
+                return Task.CompletedTask;
+            }
+
+            var w = options.Width ?? 0;
+            var h = options.Height ?? 0;
+
+            using (var image = Image.Load(source, out var format))
+            {
+                var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);
+
+                if (encoder == null)
+                {
+                    throw new NotSupportedException();
                 }
 
-                var w = options.Width ?? 0;
-                var h = options.Height ?? 0;
-
-                using (var sourceImage = Image.Load(source, out var format))
+                if (options.Quality.HasValue && (encoder is JpegEncoder || !options.KeepFormat))
                 {
-                    var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);
-
-                    if (options.Quality.HasValue && (encoder is JpegEncoder || !options.KeepFormat))
-                    {
-                        encoder = new JpegEncoder { Quality = options.Quality.Value };
-                    }
-
-                    if (encoder == null)
-                    {
-                        throw new NotSupportedException();
-                    }
-
-                    if (w > 0 || h > 0)
-                    {
-                        var isCropUpsize = options.Mode == ResizeMode.CropUpsize;
-
-                        if (!Enum.TryParse<ISResizeMode>(options.Mode.ToString(), true, out var resizeMode))
-                        {
-                            resizeMode = ISResizeMode.Max;
-                        }
-
-                        if (isCropUpsize)
-                        {
-                            resizeMode = ISResizeMode.Crop;
-                        }
-
-                        if (w >= sourceImage.Width && h >= sourceImage.Height && resizeMode == ISResizeMode.Crop && !isCropUpsize)
-                        {
-                            resizeMode = ISResizeMode.BoxPad;
-                        }
-
-                        var resizeOptions = new ISResizeOptions { Size = new Size(w, h), Mode = resizeMode };
-
-                        if (options.FocusX.HasValue && options.FocusY.HasValue)
-                        {
-                            resizeOptions.CenterCoordinates = new PointF(
-                                +(options.FocusX.Value / 2f) + 0.5f,
-                                -(options.FocusY.Value / 2f) + 0.5f
-                            );
-                        }
-
-                        sourceImage.Mutate(x => x.Resize(resizeOptions));
-                    }
-
-                    sourceImage.Save(destination, encoder);
+                    encoder = new JpegEncoder { Quality = options.Quality.Value };
                 }
-            });
+
+                image.Mutate(x => x.AutoOrient());
+
+                if (w > 0 || h > 0)
+                {
+                    var isCropUpsize = options.Mode == ResizeMode.CropUpsize;
+
+                    if (!Enum.TryParse<ISResizeMode>(options.Mode.ToString(), true, out var resizeMode))
+                    {
+                        resizeMode = ISResizeMode.Max;
+                    }
+
+                    if (isCropUpsize)
+                    {
+                        resizeMode = ISResizeMode.Crop;
+                    }
+
+                    if (w >= image.Width && h >= image.Height && resizeMode == ISResizeMode.Crop && !isCropUpsize)
+                    {
+                        resizeMode = ISResizeMode.BoxPad;
+                    }
+
+                    var resizeOptions = new ISResizeOptions { Size = new Size(w, h), Mode = resizeMode };
+
+                    if (options.FocusX.HasValue && options.FocusY.HasValue)
+                    {
+                        resizeOptions.CenterCoordinates = new PointF(
+                            +(options.FocusX.Value / 2f) + 0.5f,
+                            -(options.FocusY.Value / 2f) + 0.5f
+                        );
+                    }
+
+                    image.Mutate(x => x.Resize(resizeOptions));
+                }
+
+                image.Save(destination, encoder);
+            }
+
+            return Task.CompletedTask;
         }
 
         public Task<ImageInfo?> GetImageInfoAsync(Stream source)
@@ -95,7 +97,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
                 if (image != null)
                 {
-                    result = new ImageInfo(image.Width, image.Height);
+                    result = GetImageInfo(image);
                 }
             }
             catch
@@ -104,6 +106,39 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             }
 
             return Task.FromResult(result);
+        }
+
+        public Task<ImageInfo> FixOrientationAsync(Stream source, Stream destination)
+        {
+            using (var image = Image.Load(source, out var format))
+            {
+                var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);
+
+                if (encoder == null)
+                {
+                    throw new NotSupportedException();
+                }
+
+                image.Mutate(x => x.AutoOrient());
+
+                image.Save(destination, encoder);
+
+                return Task.FromResult(GetImageInfo(image));
+            }
+        }
+
+        private static ImageInfo GetImageInfo(IImageInfo image)
+        {
+            var isRotatedOrSwapped = false;
+
+            if (image.Metadata.ExifProfile != null)
+            {
+                var value = image.Metadata.ExifProfile.GetValue(ExifTag.Orientation);
+
+                isRotatedOrSwapped = value?.Value > 1;
+            }
+
+            return new ImageInfo(image.Width, image.Height, isRotatedOrSwapped);
         }
     }
 }

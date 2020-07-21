@@ -6,10 +6,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Infrastructure.Assets;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -34,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset
             {
-                File = new AssetFile("File.DOCX", "Mime", 100, () => new MemoryStream())
+                File = new NoopAssetFile("File.DOCX")
             };
 
             await sut.EnhanceAsync(command, tags);
@@ -47,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset
             {
-                File = new AssetFile("File", "Mime", 100, () => new MemoryStream())
+                File = new NoopAssetFile("File")
             };
 
             await sut.EnhanceAsync(command, tags);

@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\Images\logo-wide-rotated.jpg" />
     <None Remove="Assets\Images\logo.jpg" />
     <None Remove="Assets\Images\logo.png" />
   </ItemGroup>
@@ -41,6 +42,7 @@
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\Images\logo-wide-rotated.jpg" />
     <EmbeddedResource Include="Assets\Images\logo.jpg" />
     <EmbeddedResource Include="Assets\Images\logo.png" />
   </ItemGroup>

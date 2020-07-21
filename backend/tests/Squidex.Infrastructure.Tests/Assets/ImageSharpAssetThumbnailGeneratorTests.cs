@@ -65,6 +65,18 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
+        public async Task Should_auto_orient_image()
+        {
+            var source = GetRotatedJpeg();
+
+            var imageInfo = await sut.FixOrientationAsync(source, target);
+
+            Assert.Equal(135, imageInfo.PixelHeight);
+            Assert.Equal(600, imageInfo.PixelWidth);
+            Assert.False(imageInfo.IsRotatedOrSwapped);
+        }
+
+        [Fact]
         public async Task Should_return_image_information_if_image_is_valid()
         {
             var source = GetPng();
@@ -73,6 +85,19 @@ namespace Squidex.Infrastructure.Assets
 
             Assert.Equal(600, imageInfo!.PixelHeight);
             Assert.Equal(600, imageInfo!.PixelWidth);
+            Assert.False(imageInfo.IsRotatedOrSwapped);
+        }
+
+        [Fact]
+        public async Task Should_return_image_information_if_rotated()
+        {
+            var source = GetRotatedJpeg();
+
+            var imageInfo = await sut.GetImageInfoAsync(source);
+
+            Assert.Equal(600, imageInfo!.PixelHeight);
+            Assert.Equal(135, imageInfo!.PixelWidth);
+            Assert.True(imageInfo.IsRotatedOrSwapped);
         }
 
         [Fact]
@@ -93,6 +118,11 @@ namespace Squidex.Infrastructure.Assets
         private Stream GetJpeg()
         {
             return GetType().Assembly.GetManifestResourceStream("Squidex.Infrastructure.Assets.Images.logo.jpg")!;
+        }
+
+        private Stream GetRotatedJpeg()
+        {
+            return GetType().Assembly.GetManifestResourceStream("Squidex.Infrastructure.Assets.Images.logo-wide-rotated.jpg")!;
         }
     }
 }

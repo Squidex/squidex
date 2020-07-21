@@ -83,6 +83,21 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_fix_orientation()
+        {
+            var asset = await _.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpg");
+
+            // Should parse image metadata and fix orientation.
+            Assert.True(asset.IsImage);
+            Assert.Equal(135, asset.PixelHeight);
+            Assert.Equal(600, asset.PixelWidth);
+            Assert.Equal(135L, asset.Metadata["pixelHeight"]);
+            Assert.Equal(600L, asset.Metadata["pixelWidth"]);
+            Assert.Equal(79L, asset.Metadata["imageQuality"]);
+            Assert.Equal(AssetType.Image, asset.Type);
+        }
+
+        [Fact]
         public async Task Should_upload_audio_mp3()
         {
             var asset = await _.UploadFileAsync("Assets/SampleAudio_0.4mb.mp3", "audio/mp3");
