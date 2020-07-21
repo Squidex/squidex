@@ -5,14 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Xunit;
@@ -70,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUploadImage_should_not_throw_exception_if_app_name_is_valid()
         {
-            var command = new UploadAppImage { File = new AssetFile("file.png", "image/png", 100, () => new MemoryStream()) };
+            var command = new UploadAppImage { File = new NoopAssetFile() };
 
             GuardApp.CanUploadImage(command);
         }

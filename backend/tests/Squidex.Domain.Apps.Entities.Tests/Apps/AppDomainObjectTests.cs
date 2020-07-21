@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
@@ -18,7 +17,6 @@ using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
@@ -148,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task UploadImage_should_create_events_and_update_image()
         {
-            var command = new UploadAppImage { File = new AssetFile("image.png", "image/png", 100, () => new MemoryStream()) };
+            var command = new UploadAppImage { File = new NoopAssetFile() };
 
             await ExecuteCreateAsync();
 
@@ -691,7 +689,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private Task ExecuteUploadImage()
         {
-            return PublishAsync(new UploadAppImage { File = new AssetFile("image.png", "image/png", 100, () => new MemoryStream()) });
+            return PublishAsync(new UploadAppImage { File = new NoopAssetFile() });
         }
 
         private Task ExecuteAddPatternAsync()

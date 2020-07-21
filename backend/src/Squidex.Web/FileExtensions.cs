@@ -25,7 +25,7 @@ namespace Squidex.Web
                 throw new ValidationException("File name is not defined.");
             }
 
-            return new AssetFile(formFile.FileName, formFile.ContentType, formFile.Length, formFile.OpenReadStream);
+            return new DelegateAssetFile(formFile.FileName, formFile.ContentType, formFile.Length, formFile.OpenReadStream);
         }
     }
 }

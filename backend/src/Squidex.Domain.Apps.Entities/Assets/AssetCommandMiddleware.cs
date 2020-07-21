@@ -54,10 +54,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 case CreateAsset createAsset:
                     {
-                        await EnrichWithHashAndUploadAsync(createAsset, tempFile);
-
                         try
                         {
+                            await EnrichWithHashAndUploadAsync(createAsset, tempFile);
+
                             var ctx = contextProvider.Context.Clone().WithoutAssetEnrichment();
 
                             var existings = await assetQuery.QueryByHashAsync(ctx, createAsset.AppId.Id, createAsset.FileHash);
@@ -80,6 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         finally
                         {
                             await assetFileStore.DeleteAsync(tempFile);
+
+                            createAsset.File.Dispose();
                         }
 
                         break;
@@ -87,15 +89,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 case UpdateAsset updateAsset:
                     {
-                        await EnrichWithHashAndUploadAsync(updateAsset, tempFile);
-
                         try
                         {
+                            await EnrichWithHashAndUploadAsync(updateAsset, tempFile);
+
                             await UploadAsync(context, tempFile, updateAsset, null, false, next);
                         }
                         finally
                         {
                             await assetFileStore.DeleteAsync(tempFile);
+
+                            updateAsset.File.Dispose();
                         }
 
                         break;

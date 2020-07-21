@@ -7,15 +7,11 @@
 
 using System;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
 using FakeItEasy;
-using GraphQL;
-using Grpc.Core.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Xunit;
 

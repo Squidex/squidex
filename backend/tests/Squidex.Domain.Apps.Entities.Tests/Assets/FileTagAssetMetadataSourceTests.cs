@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             return new CreateAsset
             {
-                File = new AssetFile(file.Name, "mime", file.Length, file.OpenRead)
+                File = new DelegateAssetFile(file.Name, "mime", file.Length, file.OpenRead)
             };
         }
 
@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             return new CreateAsset
             {
-                File = new AssetFile(name, "mime", stream.Length, () => stream)
+                File = new DelegateAssetFile(name, "mime", stream.Length, () => stream)
             };
         }
     }
