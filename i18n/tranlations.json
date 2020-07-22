@@ -40,6 +40,14 @@
         "Frontend"
       ]
     },
+    "apps.nameValidationMessage": {
+      "texts": {
+        "en": "Name can contain lower case letters (a-z), numbers and dashes between."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "apps.removeImageFailed": {
       "texts": {
         "en": "Failed to remove app image. Please reload."
@@ -80,9 +88,25 @@
         "Frontend"
       ]
     },
+    "assets.duplicateFile": {
+      "texts": {
+        "en": "Asset has already been uploaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "assets.fileTooBig": {
       "texts": {
         "en": "Asset is too big."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.focusPoint": {
+      "texts": {
+        "en": "Focus Point"
       },
       "origins": [
         "Frontend"
@@ -112,9 +136,33 @@
         "Frontend"
       ]
     },
+    "assets.reloaded": {
+      "texts": {
+        "en": "Assets reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.replaceConfirm": {
+      "texts": {
+        "en": "Replace asset?"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "assets.replaceFailed": {
       "texts": {
         "en": "Failed to replace asset. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.updated": {
+      "texts": {
+        "en": "Asset has been updated."
       },
       "origins": [
         "Frontend"
@@ -152,6 +200,14 @@
         "Frontend"
       ]
     },
+    "backups.deleted": {
+      "texts": {
+        "en": "Backup is about to be deleted."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "backups.deleteFailed": {
       "texts": {
         "en": "Failed to delete backup."
@@ -168,9 +224,33 @@
         "Frontend"
       ]
     },
+    "backups.nameValidationMessage": {
+      "texts": {
+        "en": "Name can contain lower case letters (a-z), numbers and dashes (not at the end)."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "backups.reloaded": {
+      "texts": {
+        "en": "Backups reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "backups.restoreFailed": {
       "texts": {
         "en": "Failed to start restore."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "backups.started": {
+      "texts": {
+        "en": "Backup started, it can take several minutes to complete."
       },
       "origins": [
         "Frontend"
@@ -200,6 +280,14 @@
         "Frontend"
       ]
     },
+    "clients.reloaded": {
+      "texts": {
+        "en": "Clients reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "clients.revokeFailed": {
       "texts": {
         "en": "Failed to revoke client. Please reload."
@@ -219,6 +307,22 @@
     "comments.createFailed": {
       "texts": {
         "en": "Failed to create comment."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "comments.deleteConfirmText": {
+      "texts": {
+        "en": "Do you really want to delete the comment?"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "comments.deleteConfirmTitle": {
+      "texts": {
+        "en": "Delete comment"
       },
       "origins": [
         "Frontend"
@@ -275,6 +379,22 @@
     "common.clients": {
       "texts": {
         "en": "Clients"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.clipboardAdded": {
+      "texts": {
+        "en": "Value has been added to your clipboard."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.clipboardFailed": {
+      "texts": {
+        "en": "Copy failed"
       },
       "origins": [
         "Frontend"
@@ -408,6 +528,14 @@
         "Frontend"
       ]
     },
+    "common.for asset changes like uploaded, updated (reuploaded), renamed, deleted...": {
+      "texts": {
+        "en": "For asset changes like uploaded, updated (reuploaded), renamed, deleted..."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "common.for content changes like created, updated, published, unpublished...": {
       "texts": {
         "en": "For content changes like created, updated, published, unpublished..."
@@ -424,6 +552,30 @@
         "Frontend"
       ]
     },
+    "common.httpConflict": {
+      "texts": {
+        "en": "Failed to make the update. Another user has made a change. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.httpLimit": {
+      "texts": {
+        "en": "You have exceeded the maximum limit of API calls."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.invalidColor": {
+      "texts": {
+        "en": "Color is not in a valid format."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "common.languages": {
       "texts": {
         "en": "Languages"
@@ -435,6 +587,14 @@
     "common.manually triggered": {
       "texts": {
         "en": "Manually triggered"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.nothingChanged": {
+      "texts": {
+        "en": "Nothing has been changed."
       },
       "origins": [
         "Frontend"
@@ -560,9 +720,33 @@
         "Frontend"
       ]
     },
+    "contents.created": {
+      "texts": {
+        "en": "Content created successfully."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.createdByFieldDescription": {
+      "texts": {
+        "en": "The user who created the content item."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "contents.createFailed": {
       "texts": {
         "en": "Failed to create content. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.createFieldDescription": {
+      "texts": {
+        "en": "The date time when the content item was created."
       },
       "origins": [
         "Frontend"
@@ -579,6 +763,30 @@
     "contents.deleteVersionFailed": {
       "texts": {
         "en": "Failed to delete version. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.empty": {
+      "texts": {
+        "en": "- No Value -"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.lastModifiedByFieldDescription": {
+      "texts": {
+        "en": "The user who modified the content item the last time."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.lastModifiedFieldDescription": {
+      "texts": {
+        "en": "The date time when the content item was modified the last time."
       },
       "origins": [
         "Frontend"
@@ -616,9 +824,41 @@
         "Frontend"
       ]
     },
+    "contents.reloaded": {
+      "texts": {
+        "en": "Contents reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.statusFieldDescription": {
+      "texts": {
+        "en": "The status of the content item."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.updated": {
+      "texts": {
+        "en": "Content updated successfully."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "contents.updateFailed": {
       "texts": {
         "en": "Failed to update content. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.versionFieldDescription": {
+      "texts": {
+        "en": "The version of the content item"
       },
       "origins": [
         "Frontend"
@@ -648,9 +888,233 @@
         "Frontend"
       ]
     },
+    "contributors.reloaded": {
+      "texts": {
+        "en": "Contributors reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contributors.userNotFound": {
+      "texts": {
+        "en": "The user does not exist."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "dashboard.apiCallsChart": {
+      "texts": {
+        "en": "API Calls Chart"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "dashboard.apiCallsSummary": {
+      "texts": {
+        "en": "API Calls Summary"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "dashboard.apiDocumentation": {
+      "texts": {
+        "en": "API Documentation"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "dashboard.apiPerformanceChart": {
+      "texts": {
+        "en": "API Performance Chart"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "dashboard.assetTotalSize": {
+      "texts": {
+        "en": "Asset Total Storage Size"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "dashboard.assetUpdloadsCountChart": {
+      "texts": {
+        "en": "Asset Uploads Count Chart"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "dashboard.assetUploadsSizeChart": {
+      "texts": {
+        "en": "Asset Uploads Size Chart"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "dashboard.configSaved": {
+      "texts": {
+        "en": "Configuration saved."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "dashboard.trafficChart": {
+      "texts": {
+        "en": "API Traffic Chart"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "eventConsumers.loadFailed": {
+      "texts": {
+        "en": "Failed to load event consumers. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "eventConsumers.reloaded": {
+      "texts": {
+        "en": "Event Consumers reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "eventConsumers.resetFailed": {
+      "texts": {
+        "en": "Failed to reset event consumer. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "eventConsumers.startFailed": {
+      "texts": {
+        "en": "Failed to start event consumer. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "eventConsumers.stopFailed": {
+      "texts": {
+        "en": "Failed to stop event consumer. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "events.enqueued": {
+      "texts": {
+        "en": "Events enqueued. Will be resend in a few seconds."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "features.loadFailed": {
       "texts": {
         "en": "Failed to load features. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.arrayDescription": {
+      "texts": {
+        "en": "List of embedded objects."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.assetsDescription": {
+      "texts": {
+        "en": "Images, videos, documents."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.booleanDescription": {
+      "texts": {
+        "en": "Yes or no, true or false."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.dateTimeDescription": {
+      "texts": {
+        "en": "Events date, opening hours."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.geolocationDescription": {
+      "texts": {
+        "en": "Coordinates: latitude and longitude."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.jsonDescription": {
+      "texts": {
+        "en": "Data in JSON format, for developers."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.numberDescription": {
+      "texts": {
+        "en": "ID, order number, rating, quantity."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.referencesDescription": {
+      "texts": {
+        "en": "Links to other content items."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.stringDescription": {
+      "texts": {
+        "en": "Titles, names, paragraphs."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.tagsDescription": {
+      "texts": {
+        "en": "Special format for tags."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "fieldTypes.uiDescription": {
+      "texts": {
+        "en": "Separator for editing UI."
       },
       "origins": [
         "Frontend"
@@ -667,6 +1131,14 @@
     "languages.loadFailed": {
       "texts": {
         "en": "Failed to load languages. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "languages.reloaded": {
+      "texts": {
+        "en": "Languages reloaded."
       },
       "origins": [
         "Frontend"
@@ -704,6 +1176,22 @@
         "Frontend"
       ]
     },
+    "patterns.nameValidationMessage": {
+      "texts": {
+        "en": "Name can only contain letters, numbers, dashes and spaces."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "patterns.reloaded": {
+      "texts": {
+        "en": "Patterns reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "patterns.updateFailed": {
       "texts": {
         "en": "Failed to update pattern. Please reload."
@@ -723,6 +1211,30 @@
     "plans.loadFailed": {
       "texts": {
         "en": "Failed to load plans. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "plans.reloaded": {
+      "texts": {
+        "en": "Plans reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "queries.allNewestFirst": {
+      "texts": {
+        "en": "All (newest first)"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "queries.allOldestFirst": {
+      "texts": {
+        "en": "All (oldest first)"
       },
       "origins": [
         "Frontend"
@@ -752,6 +1264,14 @@
         "Frontend"
       ]
     },
+    "roles.reloaded": {
+      "texts": {
+        "en": "Roles reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "roles.revokeFailed": {
       "texts": {
         "en": "Failed to revoke role. Please reload."
@@ -760,9 +1280,113 @@
         "Frontend"
       ]
     },
+    "ruleEvents.reloaded": {
+      "texts": {
+        "en": "RuleEvents reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "rules.enqueued": {
+      "texts": {
+        "en": "Rule has been added to the queue."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "rules.reloaded": {
+      "texts": {
+        "en": "Rules reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "rules.restarted": {
+      "texts": {
+        "en": "Rule will start to run in a few seconds."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "rules.stop": {
+      "texts": {
+        "en": "Rule will stop soon."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.addFieldFailed": {
+      "texts": {
+        "en": "Failed to add field. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.changeCategoryFailed": {
+      "texts": {
+        "en": "Failed to change category. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "schemas.createFailed": {
       "texts": {
         "en": "Failed to create schema. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.deleteFailed": {
+      "texts": {
+        "en": "Failed to delete schema. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.deleteFieldFailed": {
+      "texts": {
+        "en": "Failed to delete field. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.disableFieldFailed": {
+      "texts": {
+        "en": "Failed to disable field. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.enableFieldFailed": {
+      "texts": {
+        "en": "Failed to enable field. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.fieldNameValidationMessage": {
+      "texts": {
+        "en": "Name must be a valid javascript name in camel case."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.hideFieldFailed": {
+      "texts": {
+        "en": "Failed to hide field. Please reload."
       },
       "origins": [
         "Frontend"
@@ -784,9 +1408,273 @@
         "Frontend"
       ]
     },
+    "schemas.lockFieldFailed": {
+      "texts": {
+        "en": "Failed to lock field. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.publishFailed": {
+      "texts": {
+        "en": "Failed to publish schema. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.reloaded": {
+      "texts": {
+        "en": "Schemas reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.reorderFieldsFailed": {
+      "texts": {
+        "en": "Failed to reorder fields. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.saved": {
+      "texts": {
+        "en": "Schema saved successfully."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.showFieldFailed": {
+      "texts": {
+        "en": "Failed to show field. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.synchronized": {
+      "texts": {
+        "en": "Schema synchronized successfully."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.synchronizeFailed": {
+      "texts": {
+        "en": "Failed to synchronize schema. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.unpublishFailed": {
+      "texts": {
+        "en": "Failed to unpublish schema. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.updateFailed": {
+      "texts": {
+        "en": "Failed to update schema. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.updateFieldFailed": {
+      "texts": {
+        "en": "Failed to update field. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.updatePreviewUrlsFailed": {
+      "texts": {
+        "en": "Failed to configure preview urls. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.updateRulesFailed": {
+      "texts": {
+        "en": "Failed to update schema rules. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "schemas.updateScriptsFailed": {
       "texts": {
         "en": "Failed to update schema scripts. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.updateUIFieldsFailed": {
+      "texts": {
+        "en": "Failed to update UI fields. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "search.searchFailed": {
+      "texts": {
+        "en": "Failed to make search. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "translate.translateFailed": {
+      "texts": {
+        "en": "Failed to translate text. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "usages.loadCallsFailed": {
+      "texts": {
+        "en": "Failed to load calls usage. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "usages.loadMonthlyCallsFailed": {
+      "texts": {
+        "en": "Failed to load monthly api calls. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "usages.loadStorageFailed": {
+      "texts": {
+        "en": "Failed to load storage usage. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "usages.loadTodayStorageFailed": {
+      "texts": {
+        "en": "Failed to load todays storage size. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.createFailed": {
+      "texts": {
+        "en": "Failed to create user. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.loadFailed": {
+      "texts": {
+        "en": "Failed to load users. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.loadUserFailed": {
+      "texts": {
+        "en": "Failed to load user. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.passwordConfirmValidationMessage": {
+      "texts": {
+        "en": "Passwords must be the same."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.reloaded": {
+      "texts": {
+        "en": "Users reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.updateFailed": {
+      "texts": {
+        "en": "Failed to update user. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "workflows.createFailed": {
+      "texts": {
+        "en": "Failed to create workflow. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "workflows.deleteFailed": {
+      "texts": {
+        "en": "Failed to delete Workflow. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "workflows.loadFailed": {
+      "texts": {
+        "en": "Failed to load workflows. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "workflows.notNamed": {
+      "texts": {
+        "en": "Unnamed Workflow"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "workflows.reloaded": {
+      "texts": {
+        "en": "Workflows reloaded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "workflows.saved": {
+      "texts": {
+        "en": "Workflow has been saved."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "workflows.updateFailed": {
+      "texts": {
+        "en": "Failed to update Workflow. Please reload."
       },
       "origins": [
         "Frontend"
@@ -806,7 +1694,50 @@
     "0 =\u003E 1",
     "[sqxResized], [sqxResizeCondition]",
     "squidex-api openid profile email squidex-profile role permissions",
-    "id_token token"
+    "id_token token",
+    "Invalid properties type",
+    "yyyy-MM-dd HH:mm:ss",
+    "\u003CJson /\u003E",
+    "[A-z0-9]\u002B[A-z0-9\\- ]*[A-z0-9]",
+    "is equals to",
+    "is not equals to",
+    "is less than",
+    "is less than or equals to",
+    "is greater than",
+    "is greater than or equals to",
+    "starts with",
+    "ends with",
+    "is empty",
+    "matchValidator(): other control is not found in parent group",
+    "dd. MMM",
+    "dd. LLL yyyy",
+    "\u003Cspan class=\u0022decimal\u0022\u003E",
+    " kMGTPEZY",
+    "\u0026copy; \u003Ca href=\u0022http://osm.org/copyright\u0022\u003EOpenStreetMap\u003C/a\u003E contributors",
+    "fa fa-bold",
+    "fa fa-italic",
+    "fa fa-header",
+    "fa fa-quote-left",
+    "fa fa-list-ul",
+    "Generic List",
+    "fa fa-list-ol",
+    "Numbered List",
+    "fa fa-link",
+    "Create Link",
+    "fa fa-picture-o",
+    "Insert Image",
+    "fa fa-eye no-disable",
+    "Toggle Preview",
+    "fa fa-arrows-alt no-disable no-mobile",
+    "Toggle Fullscreen",
+    "fa fa-columns no-disable no-mobile",
+    "Toggle Side by Side",
+    "fa fa-question-circle",
+    "Markdown Guide",
+    "icon-assets icon-bold",
+    "Insert Assets",
+    ")\u0060;\r\n                    break;\r\n                default:\r\n                    content \u002B= \u0060[${asset.fileName}](${asset.fullUrl(this.apiUrl)}",
+    "No value"
   ],
   "todos": {
     "/framework/angular/pager.component.html": [
@@ -814,6 +1745,14 @@
     ],
     "/shared/components/app-form.component.html": [
       "Create {{template}} Sample"
+    ],
+    "/shared/components/forms/markdown-editor.component.ts": [
+      "Insert Assets",
+      "Insert Image",
+      "Markdown Guide",
+      "Toggle Fullscreen",
+      "Toggle Preview",
+      "Toggle Side by Side"
     ]
   }
 }

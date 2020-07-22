@@ -16,7 +16,7 @@ export class EditPatternForm extends Form<FormGroup, EditPatternDto, PatternDto>
                 [
                     Validators.required,
                     Validators.maxLength(100),
-                    ValidatorsEx.pattern('[A-z0-9]+[A-z0-9\- ]*[A-z0-9]', 'Name can only contain letters, numbers, dashes and spaces.')
+                    ValidatorsEx.pattern('[A-z0-9]+[A-z0-9\- ]*[A-z0-9]', 'i18n:patterns.nameValidationMessage')
                 ]
             ],
             pattern: ['',

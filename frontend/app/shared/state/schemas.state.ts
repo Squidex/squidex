@@ -137,7 +137,7 @@ export class SchemasState extends State<Snapshot> {
         return this.schemasService.getSchemas(this.appName).pipe(
             tap(({ items, canCreate }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Schemas reloaded.');
+                    this.dialogs.notifyInfo('i18n:schemas.reloaded');
                 }
 
                 const schemas = items.sortedByString(x => x.displayName);
@@ -227,7 +227,7 @@ export class SchemasState extends State<Snapshot> {
     public configurePreviewUrls(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
         return this.schemasService.putPreviewUrls(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -251,7 +251,7 @@ export class SchemasState extends State<Snapshot> {
     public synchronize(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
         return this.schemasService.putSchemaSync(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'Schema synchronized successfully.');
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.synchronized');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -365,7 +365,7 @@ export class SchemasState extends State<Snapshot> {
             });
         } else {
             if (updateText) {
-                this.dialogs.notifyInfo('Nothing has been changed.');
+                this.dialogs.notifyInfo('i18n:common.nothingChanged');
             }
         }
     }

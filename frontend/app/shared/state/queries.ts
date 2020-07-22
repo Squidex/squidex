@@ -34,8 +34,8 @@ export class Queries {
     public queriesUser: Observable<ReadonlyArray<SavedQuery>>;
 
     public defaultQueries: ReadonlyArray<SavedQuery> = [
-        { name: 'All (newest first)' },
-        { name: 'All (oldest first)', query: OLDEST_FIRST }
+        { name: 'i18n:queries.allNewestFirst' },
+        { name: 'i18n:queries.allOldestFirst', query: OLDEST_FIRST }
     ];
 
     constructor(

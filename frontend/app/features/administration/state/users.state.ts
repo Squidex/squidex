@@ -119,7 +119,7 @@ export class UsersState extends State<Snapshot> {
                 this.snapshot.usersQuery).pipe(
             tap(({ total, items: users, canCreate }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Users reloaded.');
+                    this.dialogs.notifyInfo('i18n:users.reloaded');
                 }
 
                 this.next(s => {

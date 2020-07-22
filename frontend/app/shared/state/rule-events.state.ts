@@ -79,7 +79,7 @@ export class RuleEventsState extends State<Snapshot> {
                 this.snapshot.ruleId).pipe(
             tap(({ total, items: ruleEvents }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('RuleEvents reloaded.');
+                    this.dialogs.notifyInfo('i18n:ruleEvents.reloaded');
                 }
 
                 return this.next(s => {
@@ -103,7 +103,7 @@ export class RuleEventsState extends State<Snapshot> {
     public enqueue(event: RuleEventDto): Observable<any> {
         return this.rulesService.enqueueEvent(this.appsState.appName, event).pipe(
             tap(() => {
-                this.dialogs.notifyInfo('Events enqueued. Will be resend in a few seconds.');
+                this.dialogs.notifyInfo('i18n:events.enqueued');
             }),
             shareSubscribed(this.dialogs));
     }

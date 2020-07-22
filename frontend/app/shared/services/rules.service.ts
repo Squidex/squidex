@@ -32,42 +32,42 @@ export type TriggersDto = Record<TriggerType, RuleElementMetadataDto>;
 export const ALL_TRIGGERS: TriggersDto = {
     AssetChanged: {
         description: 'For asset changes like uploaded, updated (reuploaded), renamed, deleted...',
-        display: 'i18n:assets.updatedInfo',
+        display: 'Asset changed',
         iconColor: '#3389ff',
         iconCode: 'assets',
         title: 'Asset changed'
     },
     Comment: {
-        description: 'i18n:common.when a user is mentioned in any comment...',
-        display: 'i18n:common.user mentioned',
+        description: 'When a user is mentioned in any comment...',
+        display: 'User mentioned',
         iconColor: '#3389ff',
         iconCode: 'comments',
         title: 'User mentioned'
     },
     ContentChanged: {
-        description: 'i18n:common.for content changes like created, updated, published, unpublished...',
-        display: 'i18n:common.content changed',
+        description: 'For content changes like created, updated, published, unpublished...',
+        display: 'Content changed',
         iconColor: '#3389ff',
         iconCode: 'contents',
         title: 'Content changed'
     },
     Manual: {
-        description: 'i18n:common.to invoke processes manually, for example to update your static site...',
-        display: 'i18n:common.manually triggered',
+        description: 'To invoke processes manually, for example to update your static site...',
+        display: 'Manually triggered',
         iconColor: '#3389ff',
         iconCode: 'play-line',
         title: 'Manually triggered'
     },
     SchemaChanged: {
-        description: 'i18n:common.when a schema definition has been created, updated, published or deleted...',
-        display: 'i18n:common.schema changed',
+        description: 'When a schema definition has been created, updated, published or deleted...',
+        display: 'Schema changed',
         iconColor: '#3389ff',
         iconCode: 'schemas',
         title: 'Schema changed'
     },
     Usage: {
-        description: 'i18n:common.when monthly api calls exceed a specified limit for one time a month...',
-        display: 'i18n:common.usage exceeded',
+        description: 'When monthly API calls exceed a specified limit for one time a month...',
+        display: 'Usage exceeded',
         iconColor: '#3389ff',
         iconCode: 'dashboard',
         title: 'Usage'
@@ -243,7 +243,7 @@ export class RulesService {
 
                 return actions;
             }),
-            pretifyError('i18n:common.failed to load rules. please reload.'));
+            pretifyError('Failed to load Rules. Please reload.'));
     }
 
     public getRules(appName: string): Observable<RulesDto> {
@@ -268,7 +268,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Created', appName);
             }),
-            pretifyError('i18n:common.failed to create rule. please reload.'));
+            pretifyError('Failed to create rule. Please reload.'));
     }
 
     public putRule(appName: string, resource: Resource, dto: Partial<UpsertRuleDto>, version: Version): Observable<RuleDto> {
@@ -283,7 +283,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Updated', appName);
             }),
-            pretifyError('i18n:common.failed to update rule. please reload.'));
+            pretifyError('Failed to update rule. Please reload.'));
     }
 
     public enableRule(appName: string, resource: Resource, version: Version): Observable<RuleDto> {
@@ -298,7 +298,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Enabled', appName);
             }),
-            pretifyError('i18n:common.failed to enable rule. please reload.'));
+            pretifyError('Failed to enable rule. Please reload.'));
     }
 
     public disableRule(appName: string, resource: Resource, version: Version): Observable<RuleDto> {
@@ -313,7 +313,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Disabled', appName);
             }),
-            pretifyError('i18n:common.failed to disable rule. please reload.'));
+            pretifyError('Failed to disable rule. Please reload.'));
     }
 
     public deleteRule(appName: string, resource: Resource, version: Version): Observable<any> {
@@ -325,7 +325,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Deleted', appName);
             }),
-            pretifyError('i18n:common.failed to delete rule. please reload.'));
+            pretifyError('Failed to delete rule. Please reload.'));
     }
 
     public runRule(appName: string, resource: Resource): Observable<any> {
@@ -337,7 +337,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Run', appName);
             }),
-            pretifyError('i18n:common.failed to run rule. please reload.'));
+            pretifyError('Failed to run rule. Please reload.'));
     }
 
     public runCancel(appName: string): Observable<any> {
@@ -347,7 +347,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'RunCancel', appName);
             }),
-            pretifyError('i18n:common.failed to cancel rule. please reload.'));
+            pretifyError('Failed to cancel rule. Please reload.'));
     }
 
     public triggerRule(appName: string, resource: Resource): Observable<any> {
@@ -359,7 +359,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Triggered', appName);
             }),
-            pretifyError('i18n:common.failed to trigger rule. please reload.'));
+            pretifyError('Failed to trigger rule. Please reload.'));
     }
 
     public getEvents(appName: string, take: number, skip: number, ruleId?: string): Observable<RuleEventsDto> {
@@ -385,7 +385,7 @@ export class RulesService {
 
                 return ruleEvents;
             }),
-            pretifyError('i18n:common.failed to load events. please reload.'));
+            pretifyError('Failed to load events. Please reload.'));
     }
 
     public enqueueEvent(appName: string, resource: Resource): Observable<any> {
@@ -397,7 +397,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'EventEnqueued', appName);
             }),
-            pretifyError('i18n:common.failed to enqueue rule event. please reload.'));
+            pretifyError('Failed to enqueue rule event. Please reload.'));
     }
 
     public cancelEvent(appName: string, resource: Resource): Observable<any> {
@@ -409,7 +409,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'EventDequeued', appName);
             }),
-            pretifyError('i18n:common.failed to cancel rule event. please reload.'));
+            pretifyError('Failed to cancel rule event. Please reload.'));
     }
 }
 

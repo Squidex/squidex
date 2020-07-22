@@ -106,7 +106,7 @@ export class AssetDialogComponent implements OnChanges {
                         } else {
                             this.changed.emit(dto);
 
-                            this.dialogs.notifyInfo('Asset has been updated.');
+                            this.dialogs.notifyInfo('i18n:assets.updated');
                         }
                     }, error => {
                         if (!Types.is(error, UploadCanceled)) {
@@ -116,7 +116,7 @@ export class AssetDialogComponent implements OnChanges {
                         this.setProgress(0);
                     });
             } else {
-                this.dialogs.notifyInfo('Nothing has changed.');
+                this.dialogs.notifyInfo('i18n:common.nothingChanged');
             }
         });
     }
@@ -148,7 +148,7 @@ export class AssetDialogComponent implements OnChanges {
                     this.annotateForm.submitFailed(error);
                 });
         } else {
-            this.dialogs.notifyInfo('Nothing has changed.');
+            this.dialogs.notifyInfo('i18n:common.nothingChanged');
         }
     }
 

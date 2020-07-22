@@ -60,7 +60,7 @@ export class EventConsumersService {
 
                 return new EventConsumersDto(eventConsumers, _links);
             }),
-            pretifyError('Failed to load event consumers. Please reload.'));
+            pretifyError('i18n:eventConsumers.loadFailed'));
     }
 
     public putStart(eventConsumer: Resource): Observable<EventConsumerDto> {
@@ -72,7 +72,7 @@ export class EventConsumersService {
             map(body => {
                 return parseEventConsumer(body);
             }),
-            pretifyError('Failed to start event consumer. Please reload.'));
+            pretifyError('i18n:eventConsumers.startFailed'));
     }
 
     public putStop(eventConsumer: Resource): Observable<EventConsumerDto> {
@@ -84,7 +84,7 @@ export class EventConsumersService {
             map(body => {
                 return parseEventConsumer(body);
             }),
-            pretifyError('Failed to stop event consumer. Please reload.'));
+            pretifyError('i18n:eventConsumers.stopFailed'));
     }
 
     public putReset(eventConsumer: Resource): Observable<EventConsumerDto> {
@@ -96,7 +96,7 @@ export class EventConsumersService {
             map(body => {
                 return parseEventConsumer(body);
             }),
-            pretifyError('Failed to reset event consumer. Please reload.'));
+            pretifyError('i18n:eventConsumers.resetFailed'));
     }
 }
 

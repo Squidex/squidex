@@ -170,7 +170,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.contentsService.getContents(this.appName, this.schemaName, query).pipe(
             tap(({ total, items: contents, canCreate, canCreateAndPublish, statuses }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Contents reloaded.');
+                    this.dialogs.notifyInfo('i18n:contents.reloaded');
                 }
 
                 return this.next(s => {
@@ -209,7 +209,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public create(request: any, publish: boolean): Observable<ContentDto> {
         return this.contentsService.postContent(this.appName, this.schemaName, request, publish).pipe(
             tap(payload => {
-                this.dialogs.notifyInfo('Content created successfully.');
+                this.dialogs.notifyInfo('i18n:contents.created');
 
                 return this.next(s => {
                     const contents = [payload, ...s.contents];
@@ -260,7 +260,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public changeStatus(content: ContentDto, status: string, dueTime: string | null): Observable<ContentDto> {
         return this.contentsService.putStatus(this.appName, content, status, dueTime, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs));
     }

@@ -71,7 +71,7 @@ export class WorkflowsState extends State<Snapshot> {
         return this.workflowsService.getWorkflows(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Workflows reloaded.');
+                    this.dialogs.notifyInfo('i18n:workflows.reloaded');
                 }
 
                 this.replaceWorkflows(payload, version);
@@ -93,7 +93,7 @@ export class WorkflowsState extends State<Snapshot> {
     public update(workflow: WorkflowDto): Observable<any> {
         return this.workflowsService.putWorkflow(this.appName, workflow, workflow.serialize(), this.version).pipe(
             tap(({ version, payload }) => {
-                this.dialogs.notifyInfo('Workflow has been saved.');
+                this.dialogs.notifyInfo('i18n:workflows.saved');
 
                 this.replaceWorkflows(payload, version);
             }),
