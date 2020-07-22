@@ -9,17 +9,17 @@
         </li>
         <li class="nav-item" *ngIf="uiState.canReadUsers | async">
             <a class="nav-link" routerLink="users" routerLinkActive="active">
-                <i class="nav-icon icon-user-o"></i> <div class="nav-text">Users</div>
+                <i class="nav-icon icon-user-o"></i> <div class="nav-text">{{ 'common.users' | translate }}</div>
             </a>
         </li>
         <li class="nav-item" *ngIf="uiState.canRestore | async">
             <a class="nav-link" routerLink="restore" routerLinkActive="active">
-                <i class="nav-icon icon-backup"></i> <div class="nav-text">Restore</div>
+                <i class="nav-icon icon-backup"></i> <div class="nav-text">{{ 'common.restore' | translate }}</div>
             </a>
         </li>
         <li class="nav-item" *ngIf="uiState.canUseOrleans | async">
             <a class="nav-link" routerLink="cluster" routerLinkActive="active">
-                <i class="nav-icon icon-orleans"></i> <div class="nav-text">Cluster</div>
+                <i class="nav-icon icon-orleans"></i> <div class="nav-text">{{ 'common.cluster' | translate }}</div>
             </a>
         </li>
     </ul>

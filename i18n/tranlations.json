@@ -1,0 +1,172 @@
+{
+  "texts": {
+    "common.administration": {
+      "texts": {
+        "en": "Administration"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.api": {
+      "texts": {
+        "en": "API"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.backups": {
+      "texts": {
+        "en": "Backups"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.clients": {
+      "texts": {
+        "en": "Clients"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.cluster": {
+      "texts": {
+        "en": "Cluster"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.consumers": {
+      "texts": {
+        "en": "Consumers"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.contributors": {
+      "texts": {
+        "en": "Contributors"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.graphql": {
+      "texts": {
+        "en": "GraphQL"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.languages": {
+      "texts": {
+        "en": "Languages"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.patterns": {
+      "texts": {
+        "en": "Patterns"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.restore": {
+      "texts": {
+        "en": "Restore"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.roles": {
+      "texts": {
+        "en": "Roles"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.settings": {
+      "texts": {
+        "en": "Settings"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.subscription": {
+      "texts": {
+        "en": "Subscription"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.users": {
+      "texts": {
+        "en": "Users"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.workflows": {
+      "texts": {
+        "en": "Workflows"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contentApi": {
+      "texts": {
+        "en": "Content API"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "generalApi": {
+      "texts": {
+        "en": "General API"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "loading": {
+      "texts": {
+        "en": "Loading Squidex"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    }
+  },
+  "ignores": [
+    "10",
+    "20",
+    "30",
+    "50",
+    "{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}",
+    "Create {{template}} Sample"
+  ],
+  "todos": {
+    "/framework/angular/pager.component.html": [
+      "{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}"
+    ],
+    "/shared/components/app-form.component.html": [
+      "Create {{template}} Sample"
+    ]
+  }
+}
