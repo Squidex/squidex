@@ -101,7 +101,7 @@ export class AppsService {
 
                 return apps;
             }),
-            pretifyError('Failed to load apps. Please reload.'));
+            pretifyError('i18n:apps.loadFailed'));
     }
 
     public getApp(name: string): Observable<AppDto> {
@@ -113,7 +113,7 @@ export class AppsService {
 
                 return app;
             }),
-            pretifyError('Failed to load app. Please reload.'));
+            pretifyError('i18n:apps.appLoadFailed'));
     }
 
     public postApp(dto: CreateAppDto): Observable<AppDto> {
@@ -126,7 +126,7 @@ export class AppsService {
             tap(() => {
                 this.analytics.trackEvent('App', 'Created', dto.name);
             }),
-            pretifyError('Failed to create app. Please reload.'));
+            pretifyError('i18n:apps.createFailed'));
     }
 
     public putApp(resource: Resource, dto: UpdateAppDto, version: Version): Observable<AppDto> {
@@ -141,7 +141,7 @@ export class AppsService {
             tap(() => {
                 this.analytics.trackEvent('App', 'Updated');
             }),
-            pretifyError('Failed to update app. Please reload.'));
+            pretifyError('i18n:apps.updateFailed'));
     }
 
     public postAppImage(resource: Resource, file: File, version: Version): Observable<number | AppDto> {
@@ -166,7 +166,7 @@ export class AppsService {
             }),
             catchError(error => {
                 if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                    return throwError(new ErrorDto(413, 'App image is too big.'));
+                    return throwError(new ErrorDto(413, 'i18n:apps.imageTooBig'));
                 } else {
                     return throwError(error);
                 }
@@ -176,7 +176,7 @@ export class AppsService {
                     this.analytics.trackEvent('AppImage', 'Uploaded');
                 }
             }),
-            pretifyError('Failed to upload image. Please reload.'));
+            pretifyError('i18n:apps.uploadImageFailed'));
     }
 
     public deleteAppImage(resource: Resource, version: Version): Observable<any> {
@@ -191,7 +191,7 @@ export class AppsService {
             tap(() => {
                 this.analytics.trackEvent('AppImage', 'Removed');
             }),
-            pretifyError('Failed to remove app image. Please reload.'));
+            pretifyError('i18n:apps.removeImageFailed'));
     }
 
     public deleteApp(resource: Resource): Observable<any> {
@@ -203,7 +203,7 @@ export class AppsService {
             tap(() => {
                 this.analytics.trackEvent('App', 'Archived');
             }),
-            pretifyError('Failed to archive app. Please reload.'));
+            pretifyError('i18n:apps.archiveFailed'));
     }
 }
 

@@ -230,7 +230,7 @@ export class AssetsService {
 
                     return new AssetsDto(total, assets, _links);
                 }),
-                pretifyError('Failed to load assets. Please reload.'));
+                pretifyError('i18n:assets.loadFailed'));
         } else {
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
@@ -254,7 +254,7 @@ export class AssetsService {
 
                 return new AssetFoldersDto(total, assetFolders, assetPath, _links);
             }),
-            pretifyError('Failed to load asset folders. Please reload.'));
+            pretifyError('i18n:assets.loadFoldersFailed'));
     }
 
     public getAsset(appName: string, id: string): Observable<AssetDto> {
@@ -289,7 +289,7 @@ export class AssetsService {
             }),
             catchError((error: any) => {
                 if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                    return throwError(new ErrorDto(413, 'Asset is too big.'));
+                    return throwError(new ErrorDto(413, 'i18n:assets.fileTooBig'));
                 } else {
                     return throwError(error);
                 }
@@ -299,7 +299,7 @@ export class AssetsService {
                     this.analytics.trackEvent('Asset', 'Uploaded', appName);
                 }
             }),
-            pretifyError('Failed to upload asset. Please reload.'));
+            pretifyError('i18n:assets.uploadFailed'));
     }
 
     public putAssetFile(appName: string, resource: Resource, file: Blob, version: Version): Observable<number | AssetDto> {
@@ -334,7 +334,7 @@ export class AssetsService {
                     this.analytics.trackEvent('Asset', 'Replaced', appName);
                 }
             }),
-            pretifyError('Failed to replace asset. Please reload.'));
+            pretifyError('i18n:assets.replaceFailed'));
     }
 
     public postAssetFolder(appName: string, dto: CreateAssetFolderDto): Observable<AssetFolderDto> {
@@ -347,7 +347,7 @@ export class AssetsService {
             tap(() => {
                 this.analytics.trackEvent('AssetFolder', 'Updated', appName);
             }),
-            pretifyError('Failed to create asset folder. Please reload.'));
+            pretifyError('i18n:assets.createFolderFailed'));
     }
 
     public putAsset(appName: string, resource: Resource, dto: AnnotateAssetDto, version: Version): Observable<AssetDto> {
@@ -362,7 +362,7 @@ export class AssetsService {
             tap(() => {
                 this.analytics.trackEvent('Asset', 'Updated', appName);
             }),
-            pretifyError('Failed to update asset. Please reload.'));
+            pretifyError('i18n:assets.updateFailed'));
     }
 
     public putAssetFolder(appName: string, resource: Resource, dto: RenameAssetFolderDto, version: Version): Observable<AssetFolderDto> {
@@ -377,7 +377,7 @@ export class AssetsService {
             tap(() => {
                 this.analytics.trackEvent('AssetFolder', 'Updated', appName);
             }),
-            pretifyError('Failed to update asset folder. Please reload.'));
+            pretifyError('i18n:assets.updateFolderFailed'));
     }
 
     public putAssetItemParent(appName: string, resource: Resource, dto: MoveAssetItemDto, version: Version): Observable<Versioned<any>> {
@@ -389,7 +389,7 @@ export class AssetsService {
             tap(() => {
                 this.analytics.trackEvent('Asset', 'Moved', appName);
             }),
-            pretifyError('Failed to move asset. Please reload.'));
+            pretifyError('i18n:assets.moveFailed'));
     }
 
     public deleteAssetItem(appName: string, asset: Resource, version: Version): Observable<Versioned<any>> {
@@ -401,7 +401,7 @@ export class AssetsService {
             tap(() => {
                 this.analytics.trackEvent('Asset', 'Deleted', appName);
             }),
-            pretifyError('Failed to delete asset. Please reload.'));
+            pretifyError('i18n:assets.deleteFailed'));
     }
 }
 

@@ -1,5 +1,253 @@
 {
   "texts": {
+    "apps.appLoadFailed": {
+      "texts": {
+        "en": "Failed to load app. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.archiveFailed": {
+      "texts": {
+        "en": "Failed to archive app. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.createFailed": {
+      "texts": {
+        "en": "Failed to create app. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.imageTooBig": {
+      "texts": {
+        "en": "App image is too big."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.loadFailed": {
+      "texts": {
+        "en": "Failed to load apps. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.removeImageFailed": {
+      "texts": {
+        "en": "Failed to remove app image. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.updateFailed": {
+      "texts": {
+        "en": "Failed to update app. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.uploadImageFailed": {
+      "texts": {
+        "en": "Failed to upload image. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.createFolderFailed": {
+      "texts": {
+        "en": "Failed to create asset folder. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.deleteFailed": {
+      "texts": {
+        "en": "Failed to delete asset. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.fileTooBig": {
+      "texts": {
+        "en": "Asset is too big."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.loadFailed": {
+      "texts": {
+        "en": "Failed to load assets. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.loadFoldersFailed": {
+      "texts": {
+        "en": "Failed to load asset folders. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.moveFailed": {
+      "texts": {
+        "en": "Failed to move asset. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.replaceFailed": {
+      "texts": {
+        "en": "Failed to replace asset. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.updatedInfo": {
+      "texts": {
+        "en": "Asset changed"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.updateFailed": {
+      "texts": {
+        "en": "Failed to update asset. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.updateFolderFailed": {
+      "texts": {
+        "en": "Failed to update asset folder. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.uploadFailed": {
+      "texts": {
+        "en": "Failed to upload asset. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "backups.deleteFailed": {
+      "texts": {
+        "en": "Failed to delete backup."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "backups.loadFailed": {
+      "texts": {
+        "en": "Failed to load backups."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "backups.restoreFailed": {
+      "texts": {
+        "en": "Failed to start restore."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "backups.startFailed": {
+      "texts": {
+        "en": "Failed to start backup."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "clients.addFailed": {
+      "texts": {
+        "en": "Failed to add client. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "clients.loadFailed": {
+      "texts": {
+        "en": "Failed to load clients. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "clients.revokeFailed": {
+      "texts": {
+        "en": "Failed to revoke client. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "clients.tokenFailed": {
+      "texts": {
+        "en": "Failed to create token. Please retry."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "comments.createFailed": {
+      "texts": {
+        "en": "Failed to create comment."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "comments.deleteFailed": {
+      "texts": {
+        "en": "Failed to delete comment."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "comments.loadFailed": {
+      "texts": {
+        "en": "Failed to load comments."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "comments.updateFailed": {
+      "texts": {
+        "en": "Failed to update comment."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "common.administration": {
       "texts": {
         "en": "Administration"
@@ -48,9 +296,121 @@
         "Frontend"
       ]
     },
+    "common.content changed": {
+      "texts": {
+        "en": "Content changed"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "common.contributors": {
       "texts": {
         "en": "Contributors"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to cancel rule event. please reload.": {
+      "texts": {
+        "en": "Failed to cancel rule event. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to cancel rule. please reload.": {
+      "texts": {
+        "en": "Failed to cancel rule. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to create rule. please reload.": {
+      "texts": {
+        "en": "Failed to create rule. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to delete rule. please reload.": {
+      "texts": {
+        "en": "Failed to delete rule. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to disable rule. please reload.": {
+      "texts": {
+        "en": "Failed to disable rule. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to enable rule. please reload.": {
+      "texts": {
+        "en": "Failed to enable rule. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to enqueue rule event. please reload.": {
+      "texts": {
+        "en": "Failed to enqueue rule event. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to load events. please reload.": {
+      "texts": {
+        "en": "Failed to load events. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to load rules. please reload.": {
+      "texts": {
+        "en": "Failed to load Rules. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to run rule. please reload.": {
+      "texts": {
+        "en": "Failed to run rule. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to trigger rule. please reload.": {
+      "texts": {
+        "en": "Failed to trigger rule. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.failed to update rule. please reload.": {
+      "texts": {
+        "en": "Failed to update rule. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.for content changes like created, updated, published, unpublished...": {
+      "texts": {
+        "en": "For content changes like created, updated, published, unpublished..."
       },
       "origins": [
         "Frontend"
@@ -72,6 +432,14 @@
         "Frontend"
       ]
     },
+    "common.manually triggered": {
+      "texts": {
+        "en": "Manually triggered"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "common.patterns": {
       "texts": {
         "en": "Patterns"
@@ -88,9 +456,25 @@
         "Frontend"
       ]
     },
+    "common.retryExceeded": {
+      "texts": {
+        "en": "Retry limit exceeded."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "common.roles": {
       "texts": {
         "en": "Roles"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.schema changed": {
+      "texts": {
+        "en": "Schema changed"
       },
       "origins": [
         "Frontend"
@@ -112,9 +496,57 @@
         "Frontend"
       ]
     },
+    "common.to invoke processes manually, for example to update your static site...": {
+      "texts": {
+        "en": "To invoke processes manually, for example to update your static site..."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.usage exceeded": {
+      "texts": {
+        "en": "Usage exceeded"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.user mentioned": {
+      "texts": {
+        "en": "User mentioned"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
     "common.users": {
       "texts": {
         "en": "Users"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.when a schema definition has been created, updated, published or deleted...": {
+      "texts": {
+        "en": "When a schema definition has been created, updated, published or deleted..."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.when a user is mentioned in any comment...": {
+      "texts": {
+        "en": "When a user is mentioned in any comment..."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.when monthly api calls exceed a specified limit for one time a month...": {
+      "texts": {
+        "en": "When monthly API calls exceed a specified limit for one time a month..."
       },
       "origins": [
         "Frontend"
@@ -128,25 +560,233 @@
         "Frontend"
       ]
     },
-    "contentApi": {
+    "contents.createFailed": {
       "texts": {
-        "en": "Content API"
+        "en": "Failed to create content. Please reload."
       },
       "origins": [
         "Frontend"
       ]
     },
-    "generalApi": {
+    "contents.deleteFailed": {
       "texts": {
-        "en": "General API"
+        "en": "Failed to delete content. Please reload."
       },
       "origins": [
         "Frontend"
       ]
     },
-    "loading": {
+    "contents.deleteVersionFailed": {
       "texts": {
-        "en": "Loading Squidex"
+        "en": "Failed to delete version. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.loadContentFailed": {
+      "texts": {
+        "en": "Failed to load content. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.loadDataFailed": {
+      "texts": {
+        "en": "Failed to load data. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.loadFailed": {
+      "texts": {
+        "en": "Failed to load contents. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.loadVersionFailed": {
+      "texts": {
+        "en": "Failed to version a new version. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.updateFailed": {
+      "texts": {
+        "en": "Failed to update content. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contributors.addFailed": {
+      "texts": {
+        "en": "Failed to add contributors. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contributors.deleteFailed": {
+      "texts": {
+        "en": "Failed to delete contributors. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contributors.loadFailed": {
+      "texts": {
+        "en": "Failed to load contributors. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "features.loadFailed": {
+      "texts": {
+        "en": "Failed to load features. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.loadFailed": {
+      "texts": {
+        "en": "Failed to load history. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "languages.loadFailed": {
+      "texts": {
+        "en": "Failed to load languages. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "languages.updateFailed": {
+      "texts": {
+        "en": "Failed to change language. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "loadings.addFailed": {
+      "texts": {
+        "en": "Failed to add language. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "patterns.deleteFailed": {
+      "texts": {
+        "en": "Failed to remove pattern. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "patterns.loadFailed": {
+      "texts": {
+        "en": "Failed to add pattern. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "patterns.updateFailed": {
+      "texts": {
+        "en": "Failed to update pattern. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "plans.changeFailed": {
+      "texts": {
+        "en": "Failed to change plan. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "plans.loadFailed": {
+      "texts": {
+        "en": "Failed to load plans. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "roles.addFailed": {
+      "texts": {
+        "en": "Failed to add role. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "roles.loadFailed": {
+      "texts": {
+        "en": "Failed to load roles. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "roles.loadPermissionsFailed": {
+      "texts": {
+        "en": "Failed to load permissions. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "roles.revokeFailed": {
+      "texts": {
+        "en": "Failed to revoke role. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.createFailed": {
+      "texts": {
+        "en": "Failed to create schema. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.loadFailed": {
+      "texts": {
+        "en": "Failed to load schemas. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.loadSchemaFailed": {
+      "texts": {
+        "en": "Failed to load schema. Please reload."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.updateScriptsFailed": {
+      "texts": {
+        "en": "Failed to update schema scripts. Please reload."
       },
       "origins": [
         "Frontend"
@@ -159,7 +799,14 @@
     "30",
     "50",
     "{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}",
-    "Create {{template}} Sample"
+    "Create {{template}} Sample",
+    "Squidex Headless CMS",
+    "Application element not found",
+    "1 =\u003E 0",
+    "0 =\u003E 1",
+    "[sqxResized], [sqxResizeCondition]",
+    "squidex-api openid profile email squidex-profile role permissions",
+    "id_token token"
   ],
   "todos": {
     "/framework/angular/pager.component.html": [

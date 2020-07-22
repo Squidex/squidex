@@ -79,7 +79,7 @@ export class BackupsService {
 
                 return new BackupsDto(backups.length, backups, _links);
             }),
-            pretifyError('Failed to load backups.'));
+            pretifyError('i18n:backups.loadFailed'));
     }
 
     public getRestore(): Observable<RestoreDto | null> {
@@ -108,7 +108,7 @@ export class BackupsService {
             tap(() => {
                 this.analytics.trackEvent('Backup', 'Started', appName);
             }),
-            pretifyError('Failed to start backup.'));
+            pretifyError('i18n:backups.startFailed'));
     }
 
     public postRestore(dto: StartRestoreDto): Observable<any> {
@@ -118,7 +118,7 @@ export class BackupsService {
             tap(() => {
                 this.analytics.trackEvent('Restore', 'Started');
             }),
-            pretifyError('Failed to start restore.'));
+            pretifyError('i18n:backups.restoreFailed'));
     }
 
     public deleteBackup(appName: string, resource: Resource): Observable<any> {
@@ -130,7 +130,7 @@ export class BackupsService {
             tap(() => {
                 this.analytics.trackEvent('Backup', 'Deleted', appName);
             }),
-            pretifyError('Failed to delete backup.'));
+            pretifyError('i18n:backups.deleteFailed'));
     }
 }
 
