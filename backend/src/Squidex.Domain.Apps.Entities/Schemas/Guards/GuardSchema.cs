@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot create schema.", e =>
+            Validate.It(e =>
             {
                 if (!command.Name.IsSlug())
                 {
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot synchronize schema.", e =>
+            Validate.It(e =>
             {
                 ValidateUpsert(command, e);
             });
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value, false);
             }
 
-            Validate.It(() => "Cannot reorder schema fields.", e =>
+            Validate.It(e =>
             {
                 if (command.FieldIds == null)
                 {
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot configure preview urls.", e =>
+            Validate.It(e =>
             {
                 if (command.PreviewUrls == null)
                 {
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot configure UI fields.", e =>
+            Validate.It(e =>
             {
                 ValidateFieldNames(schema, command.FieldsInLists, nameof(command.FieldsInLists), e, IsMetaField);
                 ValidateFieldNames(schema, command.FieldsInReferences, nameof(command.FieldsInReferences), e, IsNotAllowed);
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot configure field rules.", e =>
+            Validate.It(e =>
             {
                 ValidateFieldRules(command.FieldRules, nameof(command.FieldRules), e);
             });

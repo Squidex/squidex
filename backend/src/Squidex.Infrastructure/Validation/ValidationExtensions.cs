@@ -46,17 +46,5 @@ namespace Squidex.Infrastructure.Validation
                 return false;
             }
         }
-
-        public static void Validate(this IValidatable target, Func<string> message)
-        {
-            var errors = new List<ValidationError>();
-
-            target.Validate(errors);
-
-            if (errors.Any())
-            {
-                throw new ValidationException(message(), errors);
-            }
-        }
     }
 }

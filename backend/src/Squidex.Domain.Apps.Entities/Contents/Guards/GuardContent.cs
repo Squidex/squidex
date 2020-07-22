@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                 throw new DomainException("Content workflow prevents publishing.");
             }
 
-            Validate.It(() => "Cannot created content.", e =>
+            Validate.It(e =>
             {
                 ValidateData(command, e);
             });
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot update content.", e =>
+            Validate.It(e =>
             {
                 ValidateData(command, e);
             });
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot patch content.", e =>
+            Validate.It(e =>
             {
                 ValidateData(command, e);
             });
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                 return Task.CompletedTask;
             }
 
-            return Validate.It(() => "Cannot change status.", async e =>
+            return Validate.It(async e =>
             {
                 if (!await contentWorkflow.CanMoveToAsync(content, content.EditingStatus, command.Status, command.User))
                 {
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             if (command.Data == null)
             {
-                e(Not.Defined("Data"), nameof(command.Data));
+                e(Not.Defined(nameof(command.Data)), nameof(command.Data));
             }
         }
 

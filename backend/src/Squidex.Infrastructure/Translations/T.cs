@@ -5,15 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-
-namespace FluentValidation
+namespace Squidex.Infrastructure.Translations
 {
-    public static class CustomValidators
+    public static class T
     {
-        public static IRuleBuilderOptions<T, string> Slug<T>(this IRuleBuilder<T, string> ruleBuilder)
+        public static string Get(string key)
         {
-            return ruleBuilder.Must(x => x.IsSlug()).WithMessage("{PropertyName} must be a valid slug.");
+            return key;
+        }
+
+        public static string Get(string key, object args)
+        {
+            return key;
         }
     }
 }

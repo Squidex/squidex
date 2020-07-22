@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
@@ -20,55 +21,55 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             : base(typeNameRegistry)
         {
             AddEventMessage<SchemaFieldsReordered>(
-                "reordered fields of schema {[Name]}.");
+                T.Get("history.schemas.fieldsReordered"));
 
             AddEventMessage<SchemaCreated>(
-                "created schema {[Name]}.");
+                T.Get("history.schemas.created"));
 
             AddEventMessage<SchemaUpdated>(
-                "updated schema {[Name]}.");
+                T.Get("history.schemas.updated"));
 
             AddEventMessage<SchemaDeleted>(
-                "deleted schema {[Name]}.");
+                T.Get("history.schemas.deleted"));
 
             AddEventMessage<SchemaPublished>(
-                "published schema {[Name]}.");
+                T.Get("history.schemas.published"));
 
             AddEventMessage<SchemaUnpublished>(
-                "unpublished schema {[Name]}.");
+                T.Get("history.schemas.unpublished"));
 
             AddEventMessage<SchemaFieldsReordered>(
                 "reordered fields of schema {[Name]}.");
 
             AddEventMessage<SchemaScriptsConfigured>(
-                "configured script of schema {[Name]}.");
+                T.Get("history.schemas.scriptsConfigured"));
 
             AddEventMessage<FieldAdded>(
-                "added field {[Field]} to schema {[Name]}.");
+                T.Get("history.schemas.fieldAdded"));
 
             AddEventMessage<FieldDeleted>(
-                "deleted field {[Field]} from schema {[Name]}.");
+                T.Get("history.schemas.fieldDeleted"));
 
             AddEventMessage<FieldLocked>(
-                "has locked field {[Field]} of schema {[Name]}.");
+                T.Get("history.schemas.fieldLocked"));
 
             AddEventMessage<FieldHidden>(
-                "has hidden field {[Field]} of schema {[Name]}.");
+                T.Get("history.schemas.fieldHidden"));
 
             AddEventMessage<FieldShown>(
-                "has shown field {[Field]} of schema {[Name]}.");
+                T.Get("history.schemas.fieldShown"));
 
             AddEventMessage<FieldDisabled>(
-                "disabled field {[Field]} of schema {[Name]}.");
+                T.Get("history.schemas.fieldDisabled"));
 
             AddEventMessage<FieldEnabled>(
                 "disabled field {[Field]} of schema {[Name]}.");
 
             AddEventMessage<FieldUpdated>(
-                "has updated field {[Field]} of schema {[Name]}.");
+                T.Get("history.schemas.fieldUpdated"));
 
             AddEventMessage<FieldDeleted>(
-                "deleted field {[Field]} of schema {[Name]}.");
+                T.Get("history.schemas.fieldDeleted"));
         }
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)

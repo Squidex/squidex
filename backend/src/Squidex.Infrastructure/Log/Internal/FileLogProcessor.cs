@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.Log.Internal
 
                             if (i == Retries)
                             {
-                                Console.WriteLine($"Failed to write to log file '{path}': {ex}");
+                                Console.WriteLine($T.Get("common.ii"));
                             }
                         }
                     }

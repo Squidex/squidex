@@ -310,7 +310,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             {
                 var error = new ValidationError($"Can only upload one file, found {Request.Form.Files.Count} files.");
 
-                throw new ValidationException("Cannot upload image.", error);
+                throw new ValidationException(error);
             }
 
             return new UploadAppImage { File = file.ToAssetFile() };

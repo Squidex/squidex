@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -162,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (existing.Total > 1)
                 {
-                    throw new DomainException("More than one content matches to the query.");
+                    throw new DomainException(T.Get("contents.bulkInsertQueryNotUnique"));
                 }
 
                 id = existing.FirstOrDefault()?.Id;

@@ -19,11 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot create rule.", async e =>
+            return Validate.It(async e =>
             {
                 if (command.Trigger == null)
                 {
-                   e(Not.Defined("Trigger"), nameof(command.Trigger));
+                    e(Not.Defined(nameof(command.Trigger)), nameof(command.Trigger));
                 }
                 else
                 {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 if (command.Action == null)
                 {
-                   e(Not.Defined("Action"), nameof(command.Action));
+                    e(Not.Defined(nameof(command.Action)), nameof(command.Action));
                 }
                 else
                 {
@@ -49,11 +49,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot update rule.", async e =>
+            return Validate.It(async e =>
             {
                 if (command.Trigger == null && command.Action == null && command.Name == null)
                 {
-                   e(Not.Defined("Either trigger, action or name"), nameof(command.Trigger), nameof(command.Action));
+                    e(Not.Defined("Either trigger, action or name"), nameof(command.Trigger), nameof(command.Action));
                 }
 
                 if (command.Trigger != null)

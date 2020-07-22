@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -152,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             }
             catch (NotSupportedException)
             {
-                throw new ValidationException($"Language '{language}' is not valid.");
+                throw new DomainObjectNotFoundException(language, typeof(AppLanguageDto));
             }
         }
     }

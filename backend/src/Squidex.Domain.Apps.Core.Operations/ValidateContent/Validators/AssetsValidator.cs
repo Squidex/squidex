@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -54,32 +55,32 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (asset == null)
                     {
-                        addError(path, $"Id '{assetId}' not found.");
+                        addError(path, T.Get("contents.validation.assetNotFound", new { id= assetId }));
                         continue;
                     }
 
                     if (properties.MinSize.HasValue && asset.FileSize < properties.MinSize)
                     {
-                        addError(path, $"'{asset.FileSize.ToReadableSize()}' less than minimum of '{properties.MinSize.Value.ToReadableSize()}'.");
+                        addError(path, T.Get("contents.validation.minimumSize", new { minSize = properties.MinSize }));
                     }
 
                     if (properties.MaxSize.HasValue && asset.FileSize > properties.MaxSize)
                     {
-                        addError(path, $"'{asset.FileSize.ToReadableSize()}' greater than maximum of '{properties.MaxSize.Value.ToReadableSize()}'.");
+                        addError(path, T.Get("contents.validation.maximumSize", new { minSize = properties.MaxSize }));
                     }
 
                     if (properties.AllowedExtensions != null &&
                         properties.AllowedExtensions.Count > 0 &&
                        !properties.AllowedExtensions.Any(x => asset.FileName.EndsWith("." + x, StringComparison.OrdinalIgnoreCase)))
                     {
-                        addError(path, "Invalid file extension.");
+                        addError(path, T.Get("contents.validation.extension"));
                     }
 
                     if (asset.Type != AssetType.Image)
                     {
                         if (properties.MustBeImage)
                         {
-                            addError(path, "Not an image.");
+                            addError(path, T.Get("contents.validation.image"));
                         }
 
                         continue;
@@ -97,22 +98,22 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                         if (properties.MinWidth.HasValue && w < properties.MinWidth)
                         {
-                            addError(path, $"Width '{w}px' less than minimum of '{properties.MinWidth}px'.");
+                            addError(path, T.Get("contents.validation.minimumWidth", new { min = properties.MinWidth }));
                         }
 
                         if (properties.MaxWidth.HasValue && w > properties.MaxWidth)
                         {
-                            addError(path, $"Width '{w}px' greater than maximum of '{properties.MaxWidth}px'.");
+                            addError(path, T.Get("contents.validation.maximumWidth", new { max = properties.MaxWidth }));
                         }
 
                         if (properties.MinHeight.HasValue && h < properties.MinHeight)
                         {
-                            addError(path, $"Height '{h}px' less than minimum of '{properties.MinHeight}px'.");
+                            addError(path, T.Get("contents.validation.minimumHeight", new { min = properties.MinHeight }));
                         }
 
                         if (properties.MaxHeight.HasValue && h > properties.MaxHeight)
                         {
-                            addError(path, $"Height '{h}px' greater than maximum of '{properties.MaxHeight}px'.");
+                            addError(path, T.Get("contents.validation.maximumHeight", new { max = properties.MaxHeight }));
                         }
 
                         if (properties.AspectHeight.HasValue && properties.AspectWidth.HasValue)
@@ -121,7 +122,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                             if (Math.Abs(expectedRatio - actualRatio) > double.Epsilon)
                             {
-                                addError(path, $"Aspect ratio not '{properties.AspectWidth}:{properties.AspectHeight}'.");
+                                addError(path, T.Get("contents.validation.aspectRatio", new { width = properties.AspectWidth, height = properties.AspectHeight }));
                             }
                         }
                     }

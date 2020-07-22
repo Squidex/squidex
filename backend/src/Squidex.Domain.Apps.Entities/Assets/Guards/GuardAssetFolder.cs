@@ -19,11 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot upload asset.", async e =>
+            return Validate.It(async e =>
             {
                 if (string.IsNullOrWhiteSpace(command.FolderName))
                 {
-                    e(Not.Defined("Folder name"), nameof(command.FolderName));
+                    e(Not.Defined(nameof(command.FolderName)), nameof(command.FolderName));
                 }
 
                 await CheckPathAsync(command.ParentId, assetQuery, Guid.Empty, e);
@@ -34,11 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot rename asset.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.FolderName))
                 {
-                    e(Not.Defined("Folder name"), nameof(command.FolderName));
+                    e(Not.Defined(nameof(command.FolderName)), nameof(command.FolderName));
                 }
             });
         }
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot move asset.", async e =>
+            return Validate.It(async e =>
             {
                 if (command.ParentId != oldParentId)
                 {

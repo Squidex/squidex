@@ -23,16 +23,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot assign contributor.", async e =>
+            return Validate.It(async e =>
             {
                 if (!roles.Contains(command.Role))
                 {
-                    e(Not.Valid("role"), nameof(command.Role));
+                    e(Not.Valid(nameof(command.Role)), nameof(command.Role));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
-                    e(Not.Defined("Contributor id"), nameof(command.ContributorId));
+                    e(Not.Defined(nameof(command.ContributorId)), nameof(command.ContributorId));
                 }
                 else
                 {
@@ -66,11 +66,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot remove contributor.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
-                    e(Not.Defined("Contributor id"), nameof(command.ContributorId));
+                    e(Not.Defined(nameof(command.ContributorId)), nameof(command.ContributorId));
                 }
 
                 var ownerIds = contributors.Where(x => x.Value == Role.Owner).Select(x => x.Key).ToList();

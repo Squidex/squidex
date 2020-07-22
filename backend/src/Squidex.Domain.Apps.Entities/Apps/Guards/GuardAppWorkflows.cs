@@ -19,11 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add workflow.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                    e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined(nameof(command.Name)), nameof(command.Name));
                 }
             });
         }
@@ -34,11 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             CheckWorkflowExists(workflows, command.WorkflowId);
 
-            Validate.It(() => "Cannot update workflow.", e =>
+            Validate.It(e =>
             {
                 if (command.Workflow == null)
                 {
-                    e(Not.Defined("Workflow"), nameof(command.Workflow));
+                    e(Not.Defined(nameof(command.Workflow)), nameof(command.Workflow));
                     return;
                 }
 
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (!workflow.Steps.ContainsKey(workflow.Initial))
                 {
-                    e(Not.Defined("Initial step"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
+                    e(Not.Defined("InitialStep"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
                 }
 
                 if (workflow.Initial == Status.Published)

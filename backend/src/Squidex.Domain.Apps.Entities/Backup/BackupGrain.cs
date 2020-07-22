@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -20,6 +20,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -92,12 +93,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (currentJobToken != null)
             {
-                throw new DomainException("Another backup process is already running.");
+                throw new DomainException(T.Get("backups.alreadyRunning"));
             }
 
             if (state.Value.Jobs.Count >= MaxBackups)
             {
-                throw new DomainException($"You cannot have more than {MaxBackups} backups.");
+                throw new DomainException(T.Get("backups.maxReached", new { max = MaxBackups }));
             }
 
             var job = new BackupJob

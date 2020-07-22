@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -21,6 +21,7 @@ using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
@@ -91,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 }
                 catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
                 {
-                    throw new DomainException("Result set is too large to be retrieved. Use $take parameter to reduce the number of items.");
+                    throw new DomainException(T.Get("common.resultTooLarge"));
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Users
@@ -131,12 +132,16 @@ namespace Squidex.Domain.Users
 
             try
             {
-                await DoChecked(() => userManager.CreateAsync(user), "Cannot create user.");
-                await DoChecked(() => values.SyncClaims(userManager, user), "Cannot add user.");
+                await DoChecked(() => userManager.CreateAsync(user),
+                    T.Get("users.createFailed"));
+
+                await DoChecked(() => values.SyncClaims(userManager, user),
+                    T.Get("users.updateFailed"));
 
                 if (!string.IsNullOrWhiteSpace(values.Password))
                 {
-                    await DoChecked(() => userManager.AddPasswordAsync(user, values.Password), "Cannot create user.");
+                    await DoChecked(() => userManager.AddPasswordAsync(user, values.Password),
+                        T.Get("users.updatePasswordFailed"));
                 }
             }
             catch
@@ -196,16 +201,23 @@ namespace Squidex.Domain.Users
 
             if (!string.IsNullOrWhiteSpace(values.Email) && values.Email != user.Email)
             {
-                await DoChecked(() => userManager.SetEmailAsync(user, values.Email), "Cannot update email.");
-                await DoChecked(() => userManager.SetUserNameAsync(user, values.Email), "Cannot update email.");
+                await DoChecked(() => userManager.SetEmailAsync(user, values.Email),
+                    T.Get("users.updateEmailFailed"));
+
+                await DoChecked(() => userManager.SetUserNameAsync(user, values.Email),
+                    T.Get("users.updateEmailFailed"));
             }
 
-            await DoChecked(() => values.SyncClaims(userManager, user), "Cannot update user.");
+            await DoChecked(() => values.SyncClaims(userManager, user),
+                T.Get("users.updateFailed"));
 
             if (!string.IsNullOrWhiteSpace(values.Password))
             {
-                await DoChecked(() => userManager.RemovePasswordAsync(user), "Cannot replace password.");
-                await DoChecked(() => userManager.AddPasswordAsync(user, values.Password), "Cannot replace password.");
+                await DoChecked(() => userManager.RemovePasswordAsync(user),
+                    T.Get("users.updatePasswordFailed"));
+
+                await DoChecked(() => userManager.AddPasswordAsync(user, values.Password),
+                    T.Get("users.updatePasswordFailed"));
             }
         }
 
@@ -218,7 +230,8 @@ namespace Squidex.Domain.Users
                 throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
             }
 
-            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)), "Cannot lock user.");
+            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)),
+                T.Get("users.lockFailed"));
 
             return (await userManager.ResolveUserAsync(user))!;
         }
@@ -232,7 +245,8 @@ namespace Squidex.Domain.Users
                 throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
             }
 
-            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, null), "Cannot unlock user.");
+            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, null),
+                T.Get("users.unlockFailed"));
 
             return (await userManager.ResolveUserAsync(user))!;
         }

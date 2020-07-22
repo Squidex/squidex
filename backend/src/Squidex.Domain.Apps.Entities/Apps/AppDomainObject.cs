@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -21,6 +21,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -462,7 +463,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (Snapshot.IsArchived)
             {
-                throw new DomainException("App has already been archived.");
+                throw new DomainException(T.Get("apps.alreadyArchieved"));
             }
         }
 

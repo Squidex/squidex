@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Web
 {
@@ -17,12 +18,12 @@ namespace Squidex.Web
         {
             if (string.IsNullOrWhiteSpace(formFile.ContentType))
             {
-                throw new ValidationException("File content-type is not defined.");
+                throw new ValidationException(T.Get("common.httpContentTypeNotDefined"));
             }
 
             if (string.IsNullOrWhiteSpace(formFile.FileName))
             {
-                throw new ValidationException("File name is not defined.");
+                throw new ValidationException(T.Get("common.httpFileNameNotDefined"));
             }
 
             return new DelegateAssetFile(formFile.FileName, formFile.ContentType, formFile.Length, formFile.OpenReadStream);

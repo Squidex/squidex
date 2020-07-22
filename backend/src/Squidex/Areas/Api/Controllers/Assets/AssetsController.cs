@@ -318,7 +318,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             {
                 var error = new ValidationError($"Can only upload one file, found {Request.Form.Files.Count} files.");
 
-                throw new ValidationException("Cannot create asset.", error);
+                throw new ValidationException(error);
             }
 
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
@@ -329,7 +329,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             {
                 var error = new ValidationError("You have reached your max asset size.");
 
-                throw new ValidationException("Cannot create asset.", error);
+                throw new ValidationException(error);
             }
 
             return file.ToAssetFile();

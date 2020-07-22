@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -21,6 +21,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
@@ -429,7 +430,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             if (Snapshot.IsDeleted)
             {
-                throw new DomainException("Schema has already been deleted.");
+                throw new DomainException(T.Get("schemas.alreadyDeleted"));
             }
         }
 

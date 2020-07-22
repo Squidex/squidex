@@ -16,61 +16,47 @@ namespace Squidex.Infrastructure.Validation
     [Serializable]
     public class ValidationException : DomainException
     {
-        private static readonly char[] TrimChars = { ' ', '.', ':' };
-        private static readonly List<ValidationError> FallbackErrors = new List<ValidationError>();
         private readonly IReadOnlyList<ValidationError> errors;
 
         public IReadOnlyList<ValidationError> Errors
         {
-            get { return errors ?? FallbackErrors; }
+            get { return errors; }
         }
 
-        public string Summary { get; }
-
-        public ValidationException(string summary, params ValidationError[]? errors)
-            : this(summary, errors?.ToList())
+        public ValidationException(string error, Exception? inner = null)
+            : this(new List<ValidationError> { new ValidationError(error) }, inner)
         {
         }
 
-        public ValidationException(string summary, IReadOnlyList<ValidationError>? errors)
-            : this(summary, null, errors)
+        public ValidationException(ValidationError error, Exception? inner = null)
+            : this(new List<ValidationError> { error }, inner)
         {
         }
 
-        public ValidationException(string summary, Exception? inner, params ValidationError[]? errors)
-            : this(summary, inner, errors?.ToList())
+        public ValidationException(IReadOnlyList<ValidationError> errors, Exception? inner = null)
+            : base(FormatMessage(errors), inner)
         {
-        }
+            Guard.NotEmpty(errors, nameof(errors));
 
-        public ValidationException(string summary, Exception? inner, IReadOnlyList<ValidationError>? errors)
-            : base(FormatMessage(summary, errors), inner!)
-        {
-            Summary = summary;
-
-            this.errors = errors ?? FallbackErrors;
+            this.errors = errors;
         }
 
         protected ValidationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            Summary = info.GetString(nameof(Summary))!;
-
             errors = (List<ValidationError>)info.GetValue(nameof(errors), typeof(List<ValidationError>))!;
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(Summary), Summary);
             info.AddValue(nameof(errors), errors.ToList());
 
             base.GetObjectData(info, context);
         }
 
-        private static string FormatMessage(string summary, IReadOnlyList<ValidationError>? errors)
+        private static string FormatMessage(IReadOnlyList<ValidationError>? errors)
         {
             var sb = new StringBuilder();
-
-            sb.Append(summary.TrimEnd(TrimChars));
 
             if (errors?.Count > 0)
             {

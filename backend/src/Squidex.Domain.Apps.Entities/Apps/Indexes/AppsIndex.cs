@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                                 await RemoveContributorAsync(removeContributor);
                                 break;
 
-                            case ArchiveApp archiveApp:
+                            case ArchiveApp _:
                                 await ArchiveAppAsync(app);
                                 break;
                         }
@@ -256,9 +256,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 if (token == null)
                 {
-                    var error = new ValidationError("An app with this already exists.");
-
-                    throw new ValidationException("Cannot create app.", error);
+                    throw new ValidationException("An app with this already exists.");
                 }
 
                 return token;

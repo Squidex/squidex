@@ -19,16 +19,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add pattern.", e =>
+            Validate.It(e =>
             {
                 if (command.PatternId == Guid.Empty)
                 {
-                   e(Not.Defined("Id"), nameof(command.PatternId));
+                    e(Not.Defined(nameof(command.PatternId)), nameof(command.PatternId));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined(nameof(command.Name)), nameof(command.Name));
                 }
 
                 if (patterns.Values.Any(x => x.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
@@ -38,11 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
                 {
-                   e(Not.Defined("Pattern"), nameof(command.Pattern));
+                    e(Not.Defined(nameof(command.Pattern)), nameof(command.Pattern));
                 }
                 else if (!command.Pattern.IsValidRegex())
                 {
-                    e(Not.Valid("Pattern"), nameof(command.Pattern));
+                    e(Not.Valid(nameof(command.Pattern)), nameof(command.Pattern));
                 }
 
                 if (patterns.Values.Any(x => x.Pattern == command.Pattern))
@@ -71,11 +71,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
             }
 
-            Validate.It(() => "Cannot update pattern.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined(nameof(command.Name)), nameof(command.Name));
                 }
 
                 if (patterns.Any(x => x.Key != command.PatternId && x.Value.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
@@ -85,11 +85,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
                 {
-                   e(Not.Defined("Pattern"), nameof(command.Pattern));
+                    e(Not.Defined(nameof(command.Pattern)), nameof(command.Pattern));
                 }
                 else if (!command.Pattern.IsValidRegex())
                 {
-                    e(Not.Valid("Pattern"), nameof(command.Pattern));
+                    e(Not.Valid(nameof(command.Pattern)), nameof(command.Pattern));
                 }
 
                 if (patterns.Any(x => x.Key != command.PatternId && x.Value.Pattern == command.Pattern))

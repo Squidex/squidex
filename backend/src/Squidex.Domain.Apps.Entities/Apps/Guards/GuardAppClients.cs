@@ -18,11 +18,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot attach client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e(Not.Defined("Client id"), nameof(command.Id));
+                    e(Not.Defined("ClientId"), nameof(command.Id));
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
@@ -37,11 +37,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot revoke client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e(Not.Defined("Client id"), nameof(command.Id));
+                    e(Not.Defined("ClientId"), nameof(command.Id));
                 }
             });
         }
@@ -52,16 +52,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot update client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e(Not.Defined("Client id"), nameof(command.Id));
+                    e(Not.Defined("Clientd"), nameof(command.Id));
                 }
 
                 if (command.Role != null && !roles.Contains(command.Role))
                 {
-                    e(Not.Valid("role"), nameof(command.Role));
+                    e(Not.Valid("Role"), nameof(command.Role));
                 }
             });
         }

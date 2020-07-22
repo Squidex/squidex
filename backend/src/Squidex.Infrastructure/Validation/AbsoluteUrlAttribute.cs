@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,14 +7,15 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure.Validation
 {
     public sealed class AbsoluteUrlAttribute : ValidationAttribute
     {
-        public AbsoluteUrlAttribute()
-            : base(() => "The {0} field must be an absolute URL.")
+        public override string FormatErrorMessage(string name)
         {
+            return T.Get("validation.absoluteUrl", new { property = name });
         }
 
         public override bool IsValid(object value)

@@ -1,0 +1,1365 @@
+{
+  "texts": {
+    "apps.alreadyArchieved": {
+      "texts": {
+        "en": "App has already been archived."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.attachClientFailed": {
+      "texts": {
+        "en": "Cannot attach client."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.changePlanFailed": {
+      "texts": {
+        "en": "Cannot change plan."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.clientAlreadyExists": {
+      "texts": {
+        "en": "A client with the same id already exists."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.createFailed": {
+      "texts": {
+        "en": "Cannot create app."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.notPlanOwner": {
+      "texts": {
+        "en": "Plan can only changed from the user who configured the plan initially."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.planNotFound": {
+      "texts": {
+        "en": "A plan with this id does not exist."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.uploadImageFailed": {
+      "texts": {
+        "en": "Cannot upload image."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "apps.uploadImageFailed_notImage": {
+      "texts": {
+        "en": "File is not an image."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.assetAlreadyDeleted": {
+      "texts": {
+        "en": "Asset has already been deleted"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "assets.assetFolderAlreadyDeleted": {
+      "texts": {
+        "en": "Asset folder has already been deleted"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "backups.alreadyRunning": {
+      "texts": {
+        "en": "Another backup process is already running."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "backups.maxReached": {
+      "texts": {
+        "en": "You cannot have more than {max} backups."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "backups.restoreRunning": {
+      "texts": {
+        "en": "A restore operation is already running."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.clientId": {
+      "texts": {
+        "en": "Client id"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.httpContentTypeNotDefined": {
+      "texts": {
+        "en": "File content-type is not defined."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.httpFileNameNotDefined": {
+      "texts": {
+        "en": "File name is not defined."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.httpInvalidRequest": {
+      "texts": {
+        "en": "The model is not valid."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.httpInvalidRequestFormat": {
+      "texts": {
+        "en": "Request body has an invalid format."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.httpUnknownError": {
+      "texts": {
+        "en": "An unexpected exception has occurred."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.ii": {
+      "texts": {
+        "en": "Failed to write to log file \u0027{path}\u0027: {ex}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.jsError": {
+      "texts": {
+        "en": "Failed to execute script with javascript error: {ex.Message}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.jsNotAlloweed": {
+      "texts": {
+        "en": "Not allowed"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.jsParseError": {
+      "texts": {
+        "en": "Failed to execute script with javascript syntax error: {ex.Message}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.jsRejected": {
+      "texts": {
+        "en": "Script rejected the operation."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.maxLength": {
+      "texts": {},
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.readonlyMode": {
+      "texts": {
+        "en": "Application is in readonly mode at the moment."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.referenceNotFound": {
+      "texts": {
+        "en": "Contains invalid reference {id}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.referenceToInvalidSchema": {
+      "texts": {
+        "en": "Contains reference {id} to invalid schema."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "common.resultTooLarge": {
+      "texts": {
+        "en": "Result set is too large to be retrieved. Use $take parameter to reduce the number of items."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.alreadyDeleted": {
+      "texts": {
+        "en": "Content has already been deleted."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.bulkInsertQueryNotUnique": {
+      "texts": {
+        "en": "More than one content matches to the query."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.changeStatusFailed": {
+      "texts": {
+        "en": "Failed to change content."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.contents.validation": {
+      "texts": {
+        "en": "Id \u0027{assetId}\u0027 not found."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.createDraftFailed": {
+      "texts": {
+        "en": "Failed to create draft."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.createFailed": {
+      "texts": {
+        "en": "Failed to create content."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.deleteDraftFailed": {
+      "texts": {
+        "en": "Failed to delete draft."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.deleteFailed": {
+      "texts": {
+        "en": "Failed to delete content."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.fieldInvalidBoolean": {
+      "texts": {
+        "en": "Invalid json type, expected boolean."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.invalidArrayOfIds": {
+      "texts": {
+        "en": "Invalid json type, expected array of guid strings."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.invalidArrayOfObjects": {
+      "texts": {
+        "en": "Invalid json type, expected array of objects."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.invalidArrayOfStrings": {
+      "texts": {
+        "en": "Invalid json type, expected array of strings."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.invalidGeolocation": {
+      "texts": {
+        "en": "Invalid json type, expected latitude/longitude object."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.invalidGeolocationLatitude": {
+      "texts": {
+        "en": "Latitude must be between -90 and 90."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.invalidGeolocationLongitude": {
+      "texts": {
+        "en": "Longitude must be between -180 and 180."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.invalidGeolocationMoreProperties": {
+      "texts": {
+        "en": "Geolocation can only have latitude and longitude property."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.invalidNumber": {
+      "texts": {
+        "en": "Invalid json type, expected number."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.invalidString": {
+      "texts": {
+        "en": "Invalid json type, expected string."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.updateFailed": {
+      "texts": {
+        "en": "Failed to update content."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.aspectRatio": {
+      "texts": {
+        "en": "Aspect ratio not \u0027{properties.AspectWidth}:{properties.AspectHeight}\u0027."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.between": {
+      "texts": {
+        "en": "Must be between {min} and {max}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.characterCount": {
+      "texts": {
+        "en": "Must have exactly {count} character(s)."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.charactersBetween": {
+      "texts": {
+        "en": "Must have between {min} and {max} character(s)."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.duplicates": {
+      "texts": {
+        "en": "Must not contain duplicate values."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.exactValue": {
+      "texts": {
+        "en": "Must be exactly {value}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.extension": {
+      "texts": {
+        "en": "Invalid file extension."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.image": {
+      "texts": {
+        "en": "Not an image."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.invalid": {
+      "texts": {
+        "en": "Not a valid value."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.itemCount": {
+      "texts": {
+        "en": "Must have exactly {maxItems} item(s)."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.itemCountBetween": {
+      "texts": {
+        "en": "Must have between {minItems} and {maxItems} item(s)."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.max": {
+      "texts": {
+        "en": "Must be less or equal to {max}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.maximumHeight": {
+      "texts": {
+        "en": "Height \u0027{h}px\u0027 greater than maximum of \u0027{properties.MaxHeight}px\u0027."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.maximumSize": {
+      "texts": {
+        "en": "\u0027{asset.FileSize.ToReadableSize()}\u0027 greater than maximum of \u0027{properties.MaxSize.Value.ToReadableSize()}\u0027."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.maximumWidth": {
+      "texts": {
+        "en": "Width \u0027{w}px\u0027 greater than maximum of \u0027{properties.MaxWidth}px\u0027."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.maxItems": {
+      "texts": {
+        "en": "Must not have more than {maxItems} item(s)."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.min": {
+      "texts": {
+        "en": "Must be greater or equal to {min}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.minimumHeight": {
+      "texts": {
+        "en": "Height \u0027{h}px\u0027 less than minimum of \u0027{properties.MinHeight}px\u0027."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.minimumSize": {
+      "texts": {
+        "en": "\u0027{asset.FileSize.ToReadableSize()}\u0027 less than minimum of \u0027{properties.MinSize.Value.ToReadableSize()}\u0027."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.minimumWidth": {
+      "texts": {
+        "en": "Width \u0027{w}px\u0027 less than minimum of \u0027{properties.MinWidth}px\u0027."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.minItems": {
+      "texts": {
+        "en": "Must have at least {minItems} item(s)."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.minLength": {
+      "texts": {
+        "en": "Must have at least {min} character(s)."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.mustBeEmpty": {
+      "texts": {
+        "en": "Value must not be defined."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.notAllowed": {
+      "texts": {
+        "en": "Not an allowed value."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.pattern": {
+      "texts": {
+        "en": "Does not match to the pattern."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.regexTooSlow": {
+      "texts": {
+        "en": "Regex is too slow."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.required": {
+      "texts": {
+        "en": "Field is required."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.unique": {
+      "texts": {
+        "en": "Another content with the same value exists."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "contents.validation.unknownField": {
+      "texts": {
+        "en": "Not a known {fieldType}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.clientAdded": {
+      "texts": {
+        "en": "added client {[Id]} to app"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.clientRevoked": {
+      "texts": {
+        "en": "revoked client {[Id]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.clientUpdated": {
+      "texts": {
+        "en": "updated client {[Id]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.contributoreAssigned": {
+      "texts": {
+        "en": "assigned {user:[Contributor]} as {[Role]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.contributoreRemoved": {
+      "texts": {
+        "en": "removed {user:[Contributor]} from app"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.languagedAdded": {
+      "texts": {
+        "en": "added language {[Language]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.languagedRemoved": {
+      "texts": {
+        "en": "removed language {[Language]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.languagedSetToMaster": {
+      "texts": {
+        "en": "changed master language to {[Language]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.languagedUpdated": {
+      "texts": {
+        "en": "updated language {[Language]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.patternAdded": {
+      "texts": {
+        "en": "added pattern {[Name]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.patternDeleted": {
+      "texts": {
+        "en": "deleted pattern {[PatternId]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.patternUpdated": {
+      "texts": {
+        "en": "updated pattern {[Name]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.planChanged": {
+      "texts": {
+        "en": "changed plan to {[Plan]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.planReset": {
+      "texts": {
+        "en": "resetted plan"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.roleAdded": {
+      "texts": {
+        "en": "added role {[Name]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.roleDeleted": {
+      "texts": {
+        "en": "deleted role {[Name]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.apps.roleUpdated": {
+      "texts": {
+        "en": "updated role {[Name]}"
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.assets.replaced": {
+      "texts": {
+        "en": "replaced asset."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.assets.updated": {
+      "texts": {
+        "en": "updated asset."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.assets.uploaded": {
+      "texts": {
+        "en": "uploaded asset."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.contents.created": {
+      "texts": {
+        "en": "created {[Schema]} content."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.contents.deleted": {
+      "texts": {
+        "en": "deleted {[Schema]} content."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.contents.draftCreated": {
+      "texts": {
+        "en": "created new draft."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.contents.draftDeleted": {
+      "texts": {
+        "en": "deleted draft."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.contents.scheduleCompleted": {
+      "texts": {
+        "en": "scheduled to change status of {[Schemra]} content to {[Status]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.contents.scheduleFailed": {
+      "texts": {
+        "en": "failed to schedule status change for {[Schema]} content."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.contents.updated": {
+      "texts": {
+        "en": "updated {[Schema]} content."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.created": {
+      "texts": {
+        "en": "created schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.deleted": {
+      "texts": {
+        "en": "deleted schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.fieldAdded": {
+      "texts": {
+        "en": "added field {[Field]} to schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.fieldDeleted": {
+      "texts": {
+        "en": "deleted field {[Field]} from schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.fieldDisabled": {
+      "texts": {
+        "en": "disabled field {[Field]} of schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.fieldHidden": {
+      "texts": {
+        "en": "has hidden field {[Field]} of schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.fieldLocked": {
+      "texts": {
+        "en": "has locked field {[Field]} of schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.fieldShown": {
+      "texts": {
+        "en": "has shown field {[Field]} of schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.fieldsReordered": {
+      "texts": {
+        "en": "reordered fields of schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.fieldUpdated": {
+      "texts": {
+        "en": "has updated field {[Field]} of schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.published": {
+      "texts": {
+        "en": "published schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.scriptsConfigured": {
+      "texts": {
+        "en": "configured script of schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.unpublished": {
+      "texts": {
+        "en": "unpublished schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.schemas.updated": {
+      "texts": {
+        "en": "updated schema {[Name]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "history.statusChanged": {
+      "texts": {
+        "en": "changed status of {[Schema]} content to {[Status]}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "login.githubPrivateEmail": {
+      "texts": {
+        "en": "Your email address is set to private in Github. Please set it to public to use Github login."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "rules.alreadyDeleted": {
+      "texts": {
+        "en": "Rule has already been deleted."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "schemas.alreadyDeleted": {
+      "texts": {
+        "en": "Schema has already been deleted."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.addFailed": {
+      "texts": {
+        "en": "Cannot add user."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.createFailed": {
+      "texts": {
+        "en": "Cannot create user."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.lockFailed": {
+      "texts": {
+        "en": "Cannot lock user."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.unlockFailed": {
+      "texts": {
+        "en": "Cannot unlock user."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.updateEmailFailed": {
+      "texts": {
+        "en": "Cannot update email."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.updateFailed": {
+      "texts": {
+        "en": "Cannot update user."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "users.updatePasswordFailed": {
+      "texts": {
+        "en": "Cannot replace password."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.absoluteUrl": {
+      "texts": {
+        "en": "{property:upper} must be an absolute URL."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.between": {
+      "texts": {
+        "en": "{property:translate:upper} must be between {min} and {max}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.greaterEqualsOther": {
+      "texts": {
+        "en": "{property:translate:upper} must be greater or equal to {other:translate:lower}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.greaterThanOther": {
+      "texts": {
+        "en": "{property:translate:upper} must be greater than {other:translate:lower}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.javascriptPropertyOther": {
+      "texts": {
+        "en": "{property:translate:lower} is not a Javascript property name."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.lessEqualsOther": {
+      "texts": {
+        "en": "{property:translate:lower} must be less or equal to {other:translate:lower}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.lessThanOther": {
+      "texts": {
+        "en": "{property:translate:upper} must be less than {other:translate:lower}."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.required": {
+      "texts": {
+        "en": "{property:translate:upper} is required."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.requiredBoth": {
+      "texts": {
+        "en": "If {property1:translate:upper} or {property2:translate:lower} is used both must be defined."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.slug": {
+      "texts": {
+        "en": "{property:translate:upper} is not a valid slug."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "validation.valid": {
+      "texts": {
+        "en": "{property:translate:upper} is not a valid value."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "workflows.overlap": {
+      "texts": {
+        "en": "Multiple workflows cover all schemas."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    },
+    "workflows.schemaOverlap": {
+      "texts": {
+        "en": "The schema {schema} is covered by multiple workflows."
+      },
+      "origins": [
+        "Frontend"
+      ]
+    }
+  },
+  "ignores": [
+    "Object is frozen",
+    "invariant value",
+    "This password has previously appeared in a data breach and should never be used. If you\u0027ve ever used it anywhere before, change it!",
+    "Cannot read key.",
+    "Domain object \\\u0027{id}\\\u0027 (type {type}) already deleted.",
+    "Domain object \\\u0027{id}\\\u0027 (type {type}) is not found.",
+    "Domain object \\\u0027{id}\\\u0027 not found on {type}.{collection}",
+    "Requested version {expectedVersion} for object \u0027{id}\u0027 (type {type}), but found {currentVersion}.",
+    "{Math.Round(d, 1).ToString(CultureInfo.InvariantCulture)} {Extensions[u]}",
+    "Named id must have at least 2 parts divided by commata.",
+    "Ref token must have more than 2 parts divided by colon.",
+    "Redis connection failed to connect to database {redis.Configuration}",
+    "Not in a app context.",
+    ", e.PropertyNames)}: {e.Message}",
+    "Id of the created entity.",
+    "The new version of the entity.",
+    "The links.",
+    "The link url.",
+    "The link method.",
+    "Additional data about the link.",
+    "Configure BaseUrl with \u0027urls:baseUrl\u0027.",
+    "event.type == \u0027{EnrichedAssetEventType.Created}\u0027",
+    "event.type == \u0027{EnrichedAssetEventType.Updated}\u0027",
+    "event.type == \u0027{EnrichedAssetEventType.Annotated}\u0027",
+    "event.type == \u0027{EnrichedContentEventType.Created}\u0027",
+    "event.type == \u0027{EnrichedContentEventType.Updated}\u0027",
+    "event.type == \u0027{EnrichedContentEventType.Published}\u0027",
+    "event.status == \u0027Archived\u0027",
+    "Id already exists.",
+    "New trigger has another type.",
+    "New action has another type.",
+    "Ids must cover all fields.",
+    "A field with name \u0027{field.Name}\u0027 already exists.",
+    "A field with id {field.Id} already exists.",
+    "Field must be of type {typeof(T)}",
+    "Properties must be of type \u0027{typeof(T)}",
+    "{lat}, {lon}",
+    "\u003CJson /\u003E",
+    "{array.Count} {pluralName}",
+    "1 {singularName}",
+    "0 {pluralName}",
+    ", CultureInfo.InvariantCulture)}T00:00:00Z",
+    "{field.Name} ({field.RawProperties.Hints})",
+    "Action timed out.",
+    "Error: ",
+    "Elapsed {0}.",
+    "Failed to create job",
+    "CanReject={CanReject}, CanDisallow={CanDisallow}, AsContext={AsContext}",
+    "Failed to parse template",
+    "Path does not lead to an object.",
+    "The app id or name is not available.",
+    "Cannot find attachment.",
+    "event.type == \u0027{EnrichedAssetEventType.Deleted}\u0027",
+    "Failed due application restart",
+    "Started. The restore process has the following steps:",
+    "  * Download backup",
+    "  * Restore events and attachments.",
+    "  * Restore all objects like app, schemas and contents",
+    "  * Complete the restore operation for all objects",
+    "Restored {handler.Name}",
+    "Completed {handler.Name}",
+    "Completed, Yeah!",
+    "Failed with internal error",
+    "Assigned current user.",
+    "Failed to assign contributor: {ex.Message}",
+    "Current user not assigned because restore was triggered by client.",
+    "Downloading Backup",
+    "Downloaded Backup",
+    "Reading {reader.ReadEvents} events and {reader.ReadAttachments} attachments completed.",
+    "Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.",
+    "Creating Users",
+    "Created Users",
+    "{clock.GetCurrentInstant()}: {message}",
+    "Cannot download the archive: {ex.Message}.",
+    "Cannot download the archive. Got status code: {response?.StatusCode}.",
+    "The backup archive is corrupt and cannot be opened.",
+    "Cannot resolve app with id {appId}.",
+    "Cannot resolve schema with id id {schemaId}.",
+    "No email subject configured for {template}",
+    "No email body configured for {template}",
+    "{name} Schema",
+    "{name} Content",
+    "{name} Contents",
+    "An asset with name \u0027{fileName}\u0027 already exists.",
+    "An asset with name \u0027{fileName}\u0027 does not exist.",
+    "Cannot access directory {directory.FullName}",
+    "Inner stream must be readable.",
+    "Configure the {name} with \u0027{path}\u0027.",
+    "Unsupported value \u0027{value}\u0027 for \u0027{path}\u0027, supported: {string.Join(",
+    ", options.Keys)}.",
+    "Application must consume less than {threshold.ToReadableSize()} memory.",
+    "Orleans must have at least one activation.",
+    "Failed to establish a connection to {options.Server}:{options.Port}",
+    "Migration should return new event.",
+    "All event consumers failed",
+    "One or more event consumers failed",
+    "Requested version {expectedVersion}, but found {currentVersion}.",
+    "{method}: {request.RequestUri} HTTP/{request.Version}",
+    "HTTP/{response.Version} {responseCode} {responseText}",
+    "Elapsed: {elapsed}",
+    "Timeout after {elapsed}",
+    "An error occurred while writing to logger(s).",
+    "Failed to run migration \u0027{name}\u0027",
+    "Waiting {LockWaitMs}ms to acquire lock.",
+    "Wrapping exception of type {exceptionType}, because original exception is not serialized.",
+    "Original exception:",
+    "Cannot find plugin at {path}",
+    ", list.OfType\u003Cobject\u003E().Select(ToStringDelegate).ToArray())}]",
+    "contains({Path}, {Value})",
+    "endsWith({Path}, {Value})",
+    "startsWith({Path}, {Value})",
+    "{Path} == {Value}",
+    "{Path} != {Value}",
+    "{Path} \u003E {Value}",
+    "{Path} \u003E= {Value}",
+    "{Path} \u003C {Value}",
+    "{Path} \u003C= {Value}",
+    "{Path} in {Value}",
+    "({string.Join(Type == LogicalFilterType.And ? ",
+    ", Filters)})",
+    "Path cannot be empty.",
+    "Filter: {Filter}",
+    "FullText: \u0027{FullText.Replace(",
+    "Skip: {Skip}",
+    "Take: {Take}",
+    "Sort: {string.Join(",
+    ", Sort)}",
+    "{path} {Order}",
+    "The name \u0027{name}\u0027 is already registered with type \u0027{typesByName[name]}\u0027",
+    "The type \u0027{type}\u0027 is already registered with name \u0027{namesByType[type]}\u0027",
+    "There is no name for type \u0027{type}",
+    "There is no type for name \u0027{name}",
+    "{aggregateType.TypeName(true, Suffixes)}-{id}",
+    "{streamName.Substring(0, positionOfDash)}-{newId}",
+    "Events must follow the snapshot version in consecutive order with no gaps.",
+    "Cannot connect to Amazon S3 bucket \u0027{options.Bucket}\u0027.",
+    "Cannot connect to blob container \u0027{containerName}\u0027.",
+    "Copy of temporary file failed: {targetBlob.CopyState.Status}",
+    "Application must query data from CosmosDB.",
+    "Could not acquire a free slot for the commit within the provided time.",
+    "Change feed observer failed.",
+    "SELECT TOP 1 ",
+    "  e.id,",
+    "  e.eventsCount ",
+    "FROM {Constants.Collection} e ",
+    "WHERE ",
+    "    e.eventStream = @name ",
+    "ORDER BY e.eventStreamOffset DESC",
+    "  e.eventStreamOffset,",
+    "SELECT * ",
+    "AND e.eventStreamOffset \u003E= @position ",
+    "ORDER BY e.eventStreamOffset ASC",
+    "SELECT TOP {count}* ",
+    "SELECT * FROM {Constants.Collection} e WHERE {string.Join(",
+    ", filters)} ORDER BY e.timestamp",
+    "ARRAY_CONTAINS(e.events, {{ \\",
+    ": @value }} }}, true)",
+    "STARTSWITH(e.eventStream, @filter)",
+    "e.eventStream = @filter",
+    "e.timestamp \u003E @time",
+    "e.timestamp \u003E= @time",
+    "Application must query data from EventStore.",
+    "Cannot connect to event store.",
+    "Subscription closed with reason {reason}.",
+    "fromAll()\r\n                    .when({{\r\n                        $any: function (s, e) {{\r\n                            if (e.streamId.indexOf(\u0027{prefix}\u0027) === 0 \u0026\u0026 e.metadata.{property}) {{\r\n                                linkTo(\u0027{name}-\u0027 \u002B e.metadata.{property}, e);\r\n                            }}\r\n                        }}\r\n                    }});",
+    "fromAll()\r\n                    .when({{\r\n                        $any: function (s, e) {{\r\n                            if (e.streamId.indexOf(\u0027{prefix}\u0027) === 0 \u0026\u0026 /{streamFilter}/.test(e.streamId.substring({prefix.Length \u002B 1}))) {{\r\n                                linkTo(\u0027{name}\u0027, e);\r\n                            }}\r\n                        }}\r\n                    }});",
+    "Cannot connect to event store projections: {projectionHost}.",
+    "Cannot connect to google cloud bucket \u0027{bucketName}\u0027.",
+    "Cannot connect to Mongo GridFS bucket \u0027{bucket.Options.BucketName}\u0027.",
+    "Application must query data from MongoDB",
+    "Collection has not been initialized yet.",
+    "MongoDb connection failed to connect to database {Database.DatabaseNamespace.DatabaseName}",
+    "Unknown Error",
+    "No actor with subject or client id available.",
+    "Cannot resolve app.",
+    "Cannot resolve schema.",
+    "Could not find subtype of \u0027{objectType.Name}\u0027 with discriminator \u0027{discriminatorValue}\u0027.",
+    "Failed to send result.",
+    "CPU iPhone OS 12",
+    "iPad; CPU OS 12",
+    "Macintosh; Intel Mac OS X 10_14",
+    "Configure EventPublisher type with \u0027eventPublishers:{child.Key}:type\u0027.",
+    "Configure EventPublisher RabbitMq configuration with \u0027eventPublishers:{child.Key}:configuration\u0027.",
+    "Configure EventPublisher RabbitMq exchange with \u0027eventPublishers:{child.Key}:configuration\u0027.",
+    "Unsupported value \u0027{child.Key}\u0027 for \u0027eventPublishers:{child.Key}:type\u0027, supported: RabbitMq.",
+    "Hostname {addressOrHost} with family {family} is not a valid IP address or DNS name",
+    "Application started",
+    "Squidex API for {appName} App",
+    "OH DAMN!",
+    "OH YEAH!",
+    "public, max-age=604800",
+    "Unexpected end when reading Object.",
+    "You can only assign objects to content data.",
+    "Invalid json type.",
+    "Url must be an absolute URL",
+    "Min length must be greater than max length.",
+    "Min value must be greater than max value.",
+    "NOT DEFINED",
+    "Orleans must establish communication.",
+    "Not a valid date time, expected String or Date, but got {reader.TokenType}.",
+    "Named id must have more than 2 parts divided by commata.",
+    "Named id must have at least 2 parts divided by colon.",
+    ", this.Select(x =\u003E x.ToJsonString()))}]",
+    ", this.Select(x =\u003E $",
+    "Invalid json type",
+    "Failed to enqueue log message: {ex}.",
+    "Failed to shutdown log queue grateful: {ex}.",
+    "--- Started Logging {SystemClock.Instance.GetCurrentInstant()} ---",
+    "Log directory \u0027{fileInfo.Directory.FullName}\u0027 does not exist or cannot be created.",
+    "Expected StartObject, but got {reader.TokenType}.",
+    "Unexpected end when reading filter.",
+    "Unexpected property {propertyName}"
+  ],
+  "todos": {
+    "/Squidex.Domain.Users/PwnedPasswordValidator.cs": [
+      "This password has previously appeared in a data breach and should never be used. If you\u0027ve ever used it anywhere before, change it!"
+    ]
+  }
+}

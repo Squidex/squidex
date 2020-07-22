@@ -208,11 +208,21 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Valid(IValidatable? target, [CallerArgumentExpression("target")] string parameterName, Func<string> message)
+        public static void Valid(IValidatable? target, [CallerArgumentExpression("target")] string parameterName)
         {
             NotNull(target, parameterName);
 
-            target?.Validate(message);
+            if (target != null)
+            {
+                var errors = new List<ValidationError>();
+
+                target.Validate(errors);
+
+                if (errors.Any())
+                {
+                    throw new ValidationException(errors);
+                }
+            }
         }
     }
 }

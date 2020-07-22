@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -34,23 +35,23 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     if (minLength == maxLength && minLength != stringValue.Length)
                     {
-                        addError(context.Path, $"Must have exactly {maxLength} character(s).");
+                        addError(context.Path, T.Get("common.characterCount", new { count = minLength }));
                     }
                     else if (stringValue.Length < minLength || stringValue.Length > maxLength)
                     {
-                        addError(context.Path, $"Must have between {minLength} and {maxLength} character(s).");
+                        addError(context.Path, T.Get("common.charactersBetween", new { min = minLength, max = maxLength }));
                     }
                 }
                 else
                 {
                     if (minLength.HasValue && stringValue.Length < minLength.Value)
                     {
-                        addError(context.Path, $"Must have at least {minLength} character(s).");
+                        addError(context.Path, T.Get("common.minLength", new { min = minLength }));
                     }
 
                     if (maxLength.HasValue && stringValue.Length > maxLength.Value)
                     {
-                        addError(context.Path, $"Must not have more than {maxLength} character(s).");
+                        addError(context.Path, T.Get("common.maxLength", new { max = maxLength }));
                     }
                 }
             }

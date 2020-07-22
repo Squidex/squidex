@@ -31,7 +31,7 @@ namespace Squidex.Web
         [Fact]
         public void Should_generate_400_for_ValidationException()
         {
-            var ex = new ValidationException("NotAllowed",
+            var ex = new ValidationException(
                 new ValidationError("Error1"),
                 new ValidationError("Error2", "P"),
                 new ValidationError("Error3", "P1", "P2"));
@@ -44,8 +44,6 @@ namespace Squidex.Web
 
             Assert.Equal(400, result.StatusCode);
             Assert.Equal(400, (result.Value as ErrorDto)?.StatusCode);
-
-            Assert.Equal(ex.Summary, ((ErrorDto)result.Value).Message);
 
             Assert.Equal(new[] { "Error1", "P: Error2", "P1, P2: Error3" }, ((ErrorDto)result.Value).Details);
 
