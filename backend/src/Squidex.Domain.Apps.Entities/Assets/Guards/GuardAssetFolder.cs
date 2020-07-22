@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot upload asset.", async e =>
+            return Validate.It(async e =>
             {
                 if (string.IsNullOrWhiteSpace(command.FolderName))
                 {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot rename asset.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.FolderName))
                 {
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot move asset.", async e =>
+            return Validate.It(async e =>
             {
                 if (command.ParentId != oldParentId)
                 {

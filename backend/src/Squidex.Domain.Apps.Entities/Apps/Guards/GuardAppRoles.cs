@@ -20,11 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add role.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined("Name"), nameof(command.Name));
                 }
                 else if (roles.Contains(command.Name))
                 {
@@ -39,11 +39,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             CheckRoleExists(roles, command.Name);
 
-            Validate.It(() => "Cannot delete role.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined("Name"), nameof(command.Name));
                 }
                 else if (Roles.IsDefault(command.Name))
                 {
@@ -68,11 +68,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             CheckRoleExists(roles, command.Name);
 
-            Validate.It(() => "Cannot delete role.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined("Name"), nameof(command.Name));
                 }
                 else if (Roles.IsDefault(command.Name))
                 {
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (command.Permissions == null)
                 {
-                   e(Not.Defined("Permissions"), nameof(command.Permissions));
+                    e(Not.Defined("Permissions"), nameof(command.Permissions));
                 }
             });
         }
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!roles.ContainsCustom(name))
             {
-                throw new DomainObjectNotFoundException(name, "Roles", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(name);
             }
         }
     }

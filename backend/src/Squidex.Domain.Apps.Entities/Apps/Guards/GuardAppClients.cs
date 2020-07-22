@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot attach client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot revoke client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot update client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!clients.TryGetValue(id, out var client))
             {
-                throw new DomainObjectNotFoundException(id, "Clients", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(id);
             }
 
             return client;

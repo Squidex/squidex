@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add language.", e =>
+            Validate.It(e =>
             {
                 var language = command.Language;
 
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot remove language.", e =>
+            Validate.It(e =>
             {
                 var language = command.Language;
 
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot update language.", e =>
+            Validate.It(e =>
             {
                 var language = command.Language;
 
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             if (!languages.Contains(language))
             {
-                throw new DomainObjectNotFoundException(language, "Languages", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(language);
             }
         }
     }

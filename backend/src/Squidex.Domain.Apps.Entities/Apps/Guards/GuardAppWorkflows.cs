@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add workflow.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             CheckWorkflowExists(workflows, command.WorkflowId);
 
-            Validate.It(() => "Cannot update workflow.", e =>
+            Validate.It(e =>
             {
                 if (command.Workflow == null)
                 {
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             if (!workflows.ContainsKey(id))
             {
-                throw new DomainObjectNotFoundException(id.ToString(), "Workflows", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(id.ToString());
             }
         }
     }

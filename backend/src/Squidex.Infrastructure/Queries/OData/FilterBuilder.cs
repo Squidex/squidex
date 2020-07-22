@@ -22,7 +22,9 @@ namespace Squidex.Infrastructure.Queries.OData
             }
             catch (ODataException ex)
             {
-                throw new ValidationException("Query $search clause not valid.", new ValidationError(ex.Message));
+                var error = $"OData $search clause not valid: {ex.Message}";
+
+                throw new ValidationException(error, ex);
             }
 
             if (searchClause != null)
@@ -37,7 +39,9 @@ namespace Squidex.Infrastructure.Queries.OData
             }
             catch (ODataException ex)
             {
-                throw new ValidationException("Query $filter clause not valid.", new ValidationError(ex.Message));
+                var error = $"OData $filter clause not valid: {ex.Message}";
+
+                throw new ValidationException(error, ex);
             }
 
             if (filterClause != null)

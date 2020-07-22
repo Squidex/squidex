@@ -19,16 +19,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add pattern.", e =>
+            Validate.It(e =>
             {
                 if (command.PatternId == Guid.Empty)
                 {
-                   e(Not.Defined("Id"), nameof(command.PatternId));
+                    e(Not.Defined("Id"), nameof(command.PatternId));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined("Name"), nameof(command.Name));
                 }
 
                 if (patterns.Values.Any(x => x.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
                 {
-                   e(Not.Defined("Pattern"), nameof(command.Pattern));
+                    e(Not.Defined("Pattern"), nameof(command.Pattern));
                 }
                 else if (!command.Pattern.IsValidRegex())
                 {
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!patterns.ContainsKey(command.PatternId))
             {
-                throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
+                throw new DomainObjectNotFoundException(command.PatternId.ToString());
             }
         }
 
@@ -68,14 +68,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!patterns.ContainsKey(command.PatternId))
             {
-                throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
+                throw new DomainObjectNotFoundException(command.PatternId.ToString());
             }
 
-            Validate.It(() => "Cannot update pattern.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined("Name"), nameof(command.Name));
                 }
 
                 if (patterns.Any(x => x.Key != command.PatternId && x.Value.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
                 {
-                   e(Not.Defined("Pattern"), nameof(command.Pattern));
+                    e(Not.Defined("Pattern"), nameof(command.Pattern));
                 }
                 else if (!command.Pattern.IsValidRegex())
                 {

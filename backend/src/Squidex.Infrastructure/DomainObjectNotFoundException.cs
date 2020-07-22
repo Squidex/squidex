@@ -13,13 +13,8 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainObjectNotFoundException : DomainObjectException
     {
-        public DomainObjectNotFoundException(string id, Type type)
-            : base(FormatMessage(id, type), id, type)
-        {
-        }
-
-        public DomainObjectNotFoundException(string id, string collection, Type type)
-            : base(FormatMessage(id, collection, type), id, type)
+        public DomainObjectNotFoundException(string id, Exception? inner = null)
+            : base(FormatMessage(id), id, inner)
         {
         }
 
@@ -28,14 +23,9 @@ namespace Squidex.Infrastructure
         {
         }
 
-        private static string FormatMessage(string id, Type type)
+        private static string FormatMessage(string id)
         {
-            return $"Domain object \'{id}\' (type {type}) is not found.";
-        }
-
-        private static string FormatMessage(string id, string collection, Type type)
-        {
-            return $"Domain object \'{id}\' not found on {type}.{collection}";
+            return $"Entity ({id}) does not exist.";
         }
     }
 }

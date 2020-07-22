@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot create app.", e =>
+            Validate.It(e =>
             {
                 if (!command.Name.IsSlug())
                 {
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot upload image.", e =>
+            Validate.It(e =>
             {
                 if (command.File == null)
                 {
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot change plan.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.PlanId))
                 {

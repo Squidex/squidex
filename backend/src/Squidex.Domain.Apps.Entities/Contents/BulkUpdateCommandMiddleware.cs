@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     {
                                         if (id == null || id == default)
                                         {
-                                            throw new DomainObjectNotFoundException("NOT DEFINED", typeof(IContentEntity));
+                                            throw new DomainObjectNotFoundException("undefined");
                                         }
 
                                         var command = SimpleMapper.Map(bulkUpdates, new ChangeContentStatus { ContentId = id.Value });
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     {
                                         if (id == null || id == default)
                                         {
-                                            throw new DomainObjectNotFoundException("NOT DEFINED", typeof(IContentEntity));
+                                            throw new DomainObjectNotFoundException("undefined");
                                         }
 
                                         var command = SimpleMapper.Map(bulkUpdates, new DeleteContent { ContentId = id.Value });

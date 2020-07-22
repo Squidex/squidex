@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -16,89 +15,61 @@ namespace Squidex.Infrastructure.Validation
     [Serializable]
     public class ValidationException : DomainException
     {
-        private static readonly char[] TrimChars = { ' ', '.', ':' };
-        private static readonly List<ValidationError> FallbackErrors = new List<ValidationError>();
-        private readonly IReadOnlyList<ValidationError> errors;
+        public IReadOnlyList<ValidationError> Errors { get; }
 
-        public IReadOnlyList<ValidationError> Errors
-        {
-            get { return errors ?? FallbackErrors; }
-        }
-
-        public string Summary { get; }
-
-        public ValidationException(string summary, params ValidationError[]? errors)
-            : this(summary, errors?.ToList())
+        public ValidationException(string error, Exception? inner = null)
+            : this(new ValidationError(error), inner)
         {
         }
 
-        public ValidationException(string summary, IReadOnlyList<ValidationError>? errors)
-            : this(summary, null, errors)
+        public ValidationException(ValidationError error, Exception? inner = null)
+            : this(new List<ValidationError> { error }, inner)
         {
         }
 
-        public ValidationException(string summary, Exception? inner, params ValidationError[]? errors)
-            : this(summary, inner, errors?.ToList())
+        public ValidationException(IReadOnlyList<ValidationError> errors, Exception? inner = null)
+            : base(FormatMessage(errors), inner)
         {
-        }
-
-        public ValidationException(string summary, Exception? inner, IReadOnlyList<ValidationError>? errors)
-            : base(FormatMessage(summary, errors), inner!)
-        {
-            Summary = summary;
-
-            this.errors = errors ?? FallbackErrors;
+            Errors = errors;
         }
 
         protected ValidationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            Summary = info.GetString(nameof(Summary))!;
-
-            errors = (List<ValidationError>)info.GetValue(nameof(errors), typeof(List<ValidationError>))!;
+            Errors = (List<ValidationError>)info.GetValue(nameof(Errors), typeof(List<ValidationError>))!;
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(Summary), Summary);
-            info.AddValue(nameof(errors), errors.ToList());
+            info.AddValue(nameof(Errors), Errors);
 
             base.GetObjectData(info, context);
         }
 
-        private static string FormatMessage(string summary, IReadOnlyList<ValidationError>? errors)
+        private static string FormatMessage(IReadOnlyList<ValidationError> errors)
         {
+            Guard.NotNull(errors, nameof(errors));
+
             var sb = new StringBuilder();
 
-            sb.Append(summary.TrimEnd(TrimChars));
-
-            if (errors?.Count > 0)
+            for (var i = 0; i < errors.Count; i++)
             {
-                sb.Append(": ");
+                var error = errors[i]?.Message;
 
-                for (var i = 0; i < errors.Count; i++)
+                if (!string.IsNullOrWhiteSpace(error))
                 {
-                    var error = errors[i]?.Message;
+                    sb.Append(error);
 
-                    if (!string.IsNullOrWhiteSpace(error))
+                    if (!error.EndsWith(".", StringComparison.OrdinalIgnoreCase))
                     {
-                        sb.Append(error);
+                        sb.Append(".");
+                    }
 
-                        if (!error.EndsWith(".", StringComparison.OrdinalIgnoreCase))
-                        {
-                            sb.Append(".");
-                        }
-
-                        if (i < errors.Count - 1)
-                        {
-                            sb.Append(" ");
-                        }
+                    if (i < errors.Count - 1)
+                    {
+                        sb.Append(" ");
                     }
                 }
-            }
-            else
-            {
-                sb.Append(".");
             }
 
             return sb.ToString();

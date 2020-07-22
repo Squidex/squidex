@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (content == null || content.SchemaId.Id != schema.Id)
                 {
-                    throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
+                    throw new DomainObjectNotFoundException(id.ToString());
                 }
 
                 return await TransformAsync(context, content);
@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (schema == null)
             {
-                throw new DomainObjectNotFoundException(schemaIdOrName, typeof(ISchemaEntity));
+                throw new DomainObjectNotFoundException(schemaIdOrName);
             }
 
             return schema;

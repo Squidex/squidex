@@ -17,8 +17,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public long ExpectedVersion { get; }
 
-        public WrongEventVersionException(long currentVersion, long expectedVersion)
-            : base(FormatMessage(currentVersion, expectedVersion))
+        public WrongEventVersionException(long currentVersion, long expectedVersion, Exception? inner = null)
+            : base(FormatMessage(currentVersion, expectedVersion), inner)
         {
             CurrentVersion = currentVersion;
 

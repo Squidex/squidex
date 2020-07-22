@@ -205,14 +205,5 @@ namespace Squidex.Infrastructure
                 throw new ArgumentException("Value contains an invalid character.", parameterName);
             }
         }
-
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Valid(IValidatable? target, [CallerArgumentExpression("target")] string parameterName, Func<string> message)
-        {
-            NotNull(target, parameterName);
-
-            target?.Validate(message);
-        }
     }
 }

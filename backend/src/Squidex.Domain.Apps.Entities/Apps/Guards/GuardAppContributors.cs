@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot assign contributor.", async e =>
+            return Validate.It(async e =>
             {
                 if (!roles.Contains(command.Role))
                 {
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                     if (user == null)
                     {
-                        throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
+                        throw new DomainObjectNotFoundException(command.ContributorId);
                     }
 
                     if (!command.Restoring)
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot remove contributor.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!contributors.ContainsKey(command.ContributorId))
             {
-                throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(command.ContributorId);
             }
         }
     }

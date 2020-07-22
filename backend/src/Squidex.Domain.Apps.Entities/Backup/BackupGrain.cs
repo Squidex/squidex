@@ -231,7 +231,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (job == null)
             {
-                throw new DomainObjectNotFoundException(id.ToString(), typeof(IBackupJob));
+                throw new DomainObjectNotFoundException(id.ToString());
             }
 
             if (currentJob == job)

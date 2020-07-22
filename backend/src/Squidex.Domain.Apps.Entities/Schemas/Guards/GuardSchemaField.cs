@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add a new field.", e =>
+            Validate.It(e =>
             {
                 if (!command.Name.IsPropertyName())
                 {
@@ -28,13 +28,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                 if (command.Properties == null)
                 {
-                   e(Not.Defined("Properties"), nameof(command.Properties));
+                    e(Not.Defined("Properties"), nameof(command.Properties));
                 }
                 else
                 {
                     var errors = FieldPropertiesValidator.Validate(command.Properties);
 
-                    errors.Foreach(x => x.WithPrefix(nameof(command.Properties)).AddTo(e));
+                    errors.Foreach((x, _) => x.WithPrefix(nameof(command.Properties)).AddTo(e));
                 }
 
                 if (command.ParentFieldId.HasValue)
@@ -67,17 +67,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId, false);
 
-            Validate.It(() => "Cannot update field.", e =>
+            Validate.It(e =>
             {
                 if (command.Properties == null)
                 {
-                   e(Not.Defined("Properties"), nameof(command.Properties));
+                    e(Not.Defined("Properties"), nameof(command.Properties));
                 }
                 else
                 {
                     var errors = FieldPropertiesValidator.Validate(command.Properties);
 
-                    errors.Foreach(x => x.WithPrefix(nameof(command.Properties)).AddTo(e));
+                    errors.Foreach((x, _) => x.WithPrefix(nameof(command.Properties)).AddTo(e));
                 }
             });
         }

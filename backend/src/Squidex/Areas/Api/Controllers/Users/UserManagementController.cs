@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Validation;
@@ -104,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             if (this.IsUser(id))
             {
-                throw new ValidationException("Locking user failed.", new ValidationError("You cannot lock yourself."));
+                throw new DomainForbiddenException("You cannot lock yourself.");
             }
 
             var user = await userManager.LockAsync(id);
@@ -122,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             if (this.IsUser(id))
             {
-                throw new ValidationException("Unlocking user failed.", new ValidationError("You cannot unlock yourself."));
+                throw new DomainForbiddenException("You cannot unlock yourself.");
             }
 
             var user = await userManager.UnlockAsync(id);

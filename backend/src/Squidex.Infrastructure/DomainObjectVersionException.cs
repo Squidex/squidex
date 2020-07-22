@@ -17,8 +17,8 @@ namespace Squidex.Infrastructure
 
         public long ExpectedVersion { get; }
 
-        public DomainObjectVersionException(string id, Type type, long currentVersion, long expectedVersion)
-            : base(FormatMessage(id, type, currentVersion, expectedVersion), id, type)
+        public DomainObjectVersionException(string id, long currentVersion, long expectedVersion, Exception? inner = null)
+            : base(FormatMessage(id, currentVersion, expectedVersion), id, inner)
         {
             CurrentVersion = currentVersion;
 
@@ -41,9 +41,9 @@ namespace Squidex.Infrastructure
             base.GetObjectData(info, context);
         }
 
-        private static string FormatMessage(string id, Type type, long currentVersion, long expectedVersion)
+        private static string FormatMessage(string id, long currentVersion, long expectedVersion)
         {
-            return $"Requested version {expectedVersion} for object '{id}' (type {type}), but found {currentVersion}.";
+            return $"Entity ({id}) requested version {expectedVersion}, but found {currentVersion}.";
         }
     }
 }

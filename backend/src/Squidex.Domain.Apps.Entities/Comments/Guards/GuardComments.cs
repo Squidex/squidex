@@ -21,11 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot create comment.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                   e(Not.Defined("Text"), nameof(command.Text));
+                    e(Not.Defined("Text"), nameof(command.Text));
                 }
             });
         }
@@ -41,11 +41,11 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 throw new DomainException("Comment is created by another user.");
             }
 
-            Validate.It(() => "Cannot update comment.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                   e(Not.Defined("Text"), nameof(command.Text));
+                    e(Not.Defined("Text"), nameof(command.Text));
                 }
             });
         }
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
             if (result == null)
             {
-                throw new DomainObjectNotFoundException(commentId.ToString(), "Comments", typeof(CommentsGrain));
+                throw new DomainObjectNotFoundException(commentId.ToString());
             }
 
             return result;

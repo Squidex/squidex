@@ -17,16 +17,16 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         private static readonly MessageDelegate Disallow = new MessageDelegate(message =>
         {
-            message = !string.IsNullOrWhiteSpace(message) ? message : "Not allowed";
+            message = !string.IsNullOrWhiteSpace(message) ? message : "Script has forbidden the operation.";
 
             throw new DomainForbiddenException(message);
         });
 
         private static readonly MessageDelegate Reject = new MessageDelegate(message =>
         {
-            var errors = !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null;
+            message = !string.IsNullOrWhiteSpace(message) ? message : "Script rejected the operation.";
 
-            throw new ValidationException("Script rejected the operation.", errors);
+            throw new ValidationException(message);
         });
 
         public static Engine AddDisallow(this Engine engine)

@@ -55,7 +55,7 @@ namespace Squidex.Web
 
                 if (errors.Count > 0)
                 {
-                    throw new ValidationException("The model is not valid.", errors);
+                    throw new ValidationException(errors);
                 }
             }
         }
