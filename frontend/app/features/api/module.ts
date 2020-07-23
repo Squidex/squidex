@@ -28,9 +28,9 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
+        RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule,
-        RouterModule.forChild(routes)
+        SqxSharedModule
     ],
     declarations: [
         ApiAreaComponent,

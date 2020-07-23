@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = ClrFilter.Eq("data.tags2.iv", "name1");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.tags2.iv == 'id1'", result!.ToString());
         }
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = ClrFilter.Eq("data.tags2.iv", "name1");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.tags2.iv == 'name1'", result!.ToString());
         }
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var source = ClrFilter.Eq("data.tags1.iv", "value");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.tags1.iv == 'value'", result!.ToString());
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var source = ClrFilter.Eq("data.string.iv", "value");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.string.iv == 'value'", result!.ToString());
 
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var source = ClrFilter.Eq("no.data", "value");
 
-            var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
+            var result = FilterTagTransformer.TransformAsync(source, appId.Id, schema, tagService);
 
             Assert.Equal("no.data == 'value'", result!.ToString());
 

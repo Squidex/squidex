@@ -9,10 +9,10 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.LoadTests
 {
-    public sealed class ReadingFixture : ContentFixture
+    public sealed class ReadingFixture : ContentQueryFixture
     {
         public ReadingFixture()
-            : base("benchmark_reading")
+            : base("benchmark-reading")
         {
         }
     }

@@ -14,6 +14,7 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using ClaimsPermissions = Squidex.Infrastructure.Security.PermissionSet;
+using P = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Entities
 {
@@ -25,17 +26,19 @@ namespace Squidex.Domain.Apps.Entities
 
         public ClaimsPrincipal User { get; }
 
-        public ClaimsPermissions Permissions { get; private set; } = ClaimsPermissions.Empty;
+        public ClaimsPermissions Permissions { get; } = ClaimsPermissions.Empty;
 
         public bool IsFrontendClient { get; private set; }
 
         public Context(ClaimsPrincipal user)
         {
-            Guard.NotNull(user);
+            Guard.NotNull(user, nameof(user));
 
             User = user;
 
-            UpdatePermissions();
+            Permissions = User.Permissions();
+
+            IsFrontendClient = User.IsInClient(DefaultClients.Frontend);
         }
 
         public Context(ClaimsPrincipal user, IAppEntity app)
@@ -46,14 +49,20 @@ namespace Squidex.Domain.Apps.Entities
 
         public static Context Anonymous()
         {
-            return new Context(new ClaimsPrincipal(new ClaimsIdentity()));
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            return new Context(claimsPrincipal);
         }
 
-        public void UpdatePermissions()
+        public static Context Admin()
         {
-            Permissions = User.Permissions();
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-            IsFrontendClient = User.IsInClient(DefaultClients.Frontend);
+            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, P.All));
+
+            return new Context(claimsPrincipal);
         }
 
         public Context Clone()

@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public TempFolderBackupArchiveLocation(IJsonSerializer jsonSerializer)
         {
-            Guard.NotNull(jsonSerializer);
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
 
             this.jsonSerializer = jsonSerializer;
         }
@@ -52,6 +52,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     using (var client = new HttpClient())
                     {
+                        client.Timeout = TimeSpan.FromHours(1);
+
                         response = await client.GetAsync(url);
                         response.EnsureSuccessStatusCode();
 

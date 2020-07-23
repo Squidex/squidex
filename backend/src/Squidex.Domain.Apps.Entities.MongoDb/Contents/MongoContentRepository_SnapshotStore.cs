@@ -53,6 +53,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 {
                     var schema = await GetSchemaAsync(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
 
+                    if (schema == null)
+                    {
+                        return (null!, EtagVersion.NotFound);
+                    }
+
                     contentEntity.ParseData(schema.SchemaDef, converter);
 
                     return (SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
@@ -73,15 +78,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
 
-                await Task.WhenAll(
-                    UpsertDraftContentAsync(value, oldVersion, newVersion, schema),
-                    UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, schema));
+                if (schema == null)
+                {
+                    return;
+                }
+
+                var saveDraft = UpsertDraftContentAsync(value, oldVersion, newVersion, schema);
+                var savePublic = UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, schema);
+
+                await Task.WhenAll(saveDraft, savePublic);
             }
         }
 
         private async Task UpsertOrDeletePublishedAsync(ContentState value, long oldVersion, long newVersion, ISchemaEntity schema)
         {
-            if (value.Status == Status.Published)
+            if (value.Status == Status.Published && !value.IsDeleted)
             {
                 await UpsertPublishedContentAsync(value, oldVersion, newVersion, schema);
             }
@@ -132,14 +143,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collectionPublished.UpsertVersionedAsync(content.Id, oldVersion, content);
         }
 
-        private async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid schemaId)
+        private async Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid schemaId)
         {
             var schema = await appProvider.GetSchemaAsync(appId, schemaId, true);
-
-            if (schema == null)
-            {
-                throw new DomainObjectNotFoundException(schemaId.ToString(), typeof(ISchemaEntity));
-            }
 
             return schema;
         }

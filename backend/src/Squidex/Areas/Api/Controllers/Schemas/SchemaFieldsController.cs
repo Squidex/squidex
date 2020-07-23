@@ -42,13 +42,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 201)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name }, response);
         }
@@ -69,13 +69,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 201)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostNestedField(string app, string name, long parentId, [FromBody] AddFieldDto request)
         {
             var command = request.ToCommand(parentId);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name }, response);
         }
@@ -94,13 +94,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/ui/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchemaUIFields(string app, string name, [FromBody] ConfigureUIFieldsDto request)
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -119,13 +119,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/ordering/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchemaFieldOrdering(string app, string name, [FromBody] ReorderFieldsDto request)
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -145,13 +145,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/ordering/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutNestedFieldOrdering(string app, string name, long parentId, [FromBody] ReorderFieldsDto request)
         {
             var command = request.ToCommand(parentId);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -171,13 +171,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] UpdateFieldDto request)
         {
             var command = request.ToCommand(id);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -198,13 +198,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutNestedField(string app, string name, long parentId, long id, [FromBody] UpdateFieldDto request)
         {
             var command = request.ToCommand(id, parentId);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -225,13 +225,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/lock/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> LockField(string app, string name, long id)
         {
             var command = new LockField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -253,13 +253,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/lock/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> LockNestedField(string app, string name, long parentId, long id)
         {
             var command = new LockField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -280,13 +280,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/hide/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> HideField(string app, string name, long id)
         {
             var command = new HideField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -308,13 +308,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/hide/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> HideNestedField(string app, string name, long parentId, long id)
         {
             var command = new HideField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -335,13 +335,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/show/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> ShowField(string app, string name, long id)
         {
             var command = new ShowField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -363,13 +363,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/show/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> ShowNestedField(string app, string name, long parentId, long id)
         {
             var command = new ShowField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -390,13 +390,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/enable/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> EnableField(string app, string name, long id)
         {
             var command = new EnableField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -418,13 +418,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/enable/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> EnableNestedField(string app, string name, long parentId, long id)
         {
             var command = new EnableField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -445,13 +445,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/disable/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableField(string app, string name, long id)
         {
             var command = new DisableField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -473,13 +473,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/disable/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableNestedField(string app, string name, long parentId, long id)
         {
             var command = new DisableField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -498,13 +498,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteField(string app, string name, long id)
         {
             var command = new DeleteField { FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -524,23 +524,23 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteNestedField(string app, string name, long parentId, long id)
         {
             var command = new DeleteField { ParentFieldId = parentId, FieldId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
 
-        private async Task<SchemaDetailsDto> InvokeCommandAsync(string app, ICommand command)
+        private async Task<SchemaDetailsDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ISchemaEntity>();
-            var response = SchemaDetailsDto.FromSchemaWithDetails(result, this, app);
+            var response = SchemaDetailsDto.FromSchemaWithDetails(result, Resources);
 
             return response;
         }

@@ -165,6 +165,7 @@ describe('ClientsService', () => {
                 name: `Client ${id}`,
                 role: `Role${id}`,
                 secret: `secret${id}`,
+                allowAnonymous: true,
                 _links: {
                     update: { method: 'PUT', href: `/clients/id${id}` }
                 }
@@ -191,5 +192,5 @@ export function createClient(id: number) {
         update: { method: 'PUT', href: `/clients/id${id}` }
     };
 
-    return new ClientDto(links, `id${id}`,  `Client ${id}`, `secret${id}`, `Role${id}`);
+    return new ClientDto(links, `id${id}`,  `Client ${id}`, `secret${id}`, `Role${id}`, true);
 }

@@ -1,0 +1,38 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
+import { Directive, HostListener, Input } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+
+@Directive({
+    selector: '[sqxTabRouterLink]'
+})
+export class TabRouterlinkDirective {
+    @Input('sqxTabRouterLink')
+    public commands: any;
+
+    constructor(
+        private readonly router: Router,
+        private readonly route: ActivatedRoute
+    ) {
+    }
+
+    @HostListener('click', ['$event'])
+    public onClick(event: MouseEvent) {
+        const urlTree = this.router.createUrlTree(this.commands, {
+            relativeTo: this.route
+        });
+
+        if (event.ctrlKey) {
+            const url = this.router.serializeUrl(urlTree);
+
+            window.open(url, '_blank');
+        } else {
+            this.router.navigateByUrl(urlTree);
+        }
+    }
+}

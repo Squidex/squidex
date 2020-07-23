@@ -7,7 +7,7 @@
             <div class="col">
                 <div class="truncate">
                     <span class="header-index">#{{index + 1}}</span>
-                    <span class="header-title">{{title}}</span>
+                    <span class="header-title">{{title | async }}</span>
                 </div>
             </div>
             <div class="col-auto pr-4">
@@ -23,10 +23,10 @@
                 <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()" title="Move this item to bottom">
                     <i class="icon-caret-bottom"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isHidden" (click)="expand()" title="Expand this item">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isCollapsed" (click)="expand()" title="Expand this item">
                     <i class="icon-plus-square"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="isHidden" (click)="collapse()" title="Collapse this item">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="isCollapsed" (click)="collapse()" title="Collapse this item">
                     <i class="icon-minus-square"></i>
                 </button>
             </div>
@@ -42,16 +42,15 @@
         </div>
     </div>
     
-    <div class="card-body" [class.hidden]="isHidden">
-        <div class="form-group" *ngFor="let fieldControl of fieldControls; trackBy: trackByField">
-            <sqx-field-editor
+    <div class="card-body" [class.hidden]="isCollapsed">
+        <div class="form-group" *ngFor="let section of formModel.sections">
+            <sqx-array-section
                 [form]="form"
                 [formContext]="formContext"
-                [field]="fieldControl.field"
+                [formSection]="section"
                 [language]="language"
-                [languages]="languages"
-                [control]="fieldControl.control">
-            </sqx-field-editor>
+                [languages]="languages">
+            </sqx-array-section>
         </div>
     </div>
 </div>

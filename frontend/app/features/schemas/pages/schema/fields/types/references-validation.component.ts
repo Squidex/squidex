@@ -16,7 +16,7 @@ import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/sh
 })
 export class ReferencesValidationComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -30,16 +30,16 @@ export class ReferencesValidationComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.editForm.setControl('allowDuplicates',
+        this.fieldForm.setControl('allowDuplicates',
             new FormControl(this.properties.allowDuplicates));
 
-        this.editForm.setControl('maxItems',
+        this.fieldForm.setControl('maxItems',
             new FormControl(this.properties.maxItems));
 
-        this.editForm.setControl('minItems',
+        this.fieldForm.setControl('minItems',
             new FormControl(this.properties.minItems));
 
-        this.editForm.setControl('schemaIds',
+        this.fieldForm.setControl('schemaIds',
             new FormControl(this.properties.schemaIds));
     }
 }

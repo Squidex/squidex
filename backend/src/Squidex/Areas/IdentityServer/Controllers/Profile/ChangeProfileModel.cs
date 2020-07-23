@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -12,10 +12,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public class ChangeProfileModel
     {
-        [Required(ErrorMessage = "Email is required.")]
+        [Required]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "DisplayName is required.")]
+        [Required]
         public string DisplayName { get; set; }
 
         public bool IsHidden { get; set; }

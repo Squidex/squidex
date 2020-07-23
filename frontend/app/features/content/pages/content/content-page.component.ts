@@ -9,7 +9,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldDto, LanguagesState, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, valueAll$, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { debounceTime, filter, onErrorResumeNext, tap } from 'rxjs/operators';
 
@@ -69,7 +69,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 .subscribe(schema => {
                     this.schema = schema;
 
-                    this.contentForm = new EditContentForm(this.languages, this.schema);
+                    this.contentForm = new EditContentForm(this.languages, this.schema, this.formContext.user);
                 }));
 
         this.own(
@@ -110,7 +110,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }));
 
         this.own(
-            this.contentForm.form.valueChanges.pipe(
+            valueAll$(this.contentForm.form).pipe(
                     filter(_ => !this.isLoadingContent),
                     filter(_ => this.contentForm.form.enabled),
                     debounceTime(2000)
@@ -219,7 +219,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.contentsState.loadVersion(content, version)
                 .subscribe(dto => {
                     if (compare) {
-                        this.contentFormCompare = new EditContentForm(this.languages, this.schema);
+                        this.contentFormCompare = new EditContentForm(this.languages, this.schema, this.formContext.user);
 
                         this.contentFormCompare.load(dto.payload);
                         this.contentFormCompare.setEnabled(false);
@@ -249,8 +249,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public trackByField(field: FieldDto) {
-        return field.fieldId;
+    public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {
+        return section.separator?.fieldId;
     }
 }
 

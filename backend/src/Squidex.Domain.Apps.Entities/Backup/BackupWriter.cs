@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public BackupWriter(IJsonSerializer serializer, Stream stream, bool keepOpen = false, BackupVersion version = BackupVersion.V2)
         {
-            Guard.NotNull(serializer);
+            Guard.NotNull(serializer, nameof(serializer));
 
             this.serializer = serializer;
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Task WriteJsonAsync(string name, object value)
         {
-            Guard.NotNullOrEmpty(name);
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             var attachmentEntry = archive.CreateEntry(ArchiveHelper.GetAttachmentPath(name));
 
@@ -75,8 +75,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task WriteBlobAsync(string name, Func<Stream, Task> handler)
         {
-            Guard.NotNullOrEmpty(name);
-            Guard.NotNull(handler);
+            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNull(handler, nameof(handler));
 
             var attachmentEntry = archive.CreateEntry(ArchiveHelper.GetAttachmentPath(name));
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public void WriteEvent(StoredEvent storedEvent)
         {
-            Guard.NotNull(storedEvent);
+            Guard.NotNull(storedEvent, nameof(storedEvent));
 
             var eventEntry = archive.CreateEntry(ArchiveHelper.GetEventPath(writtenEvents));
 

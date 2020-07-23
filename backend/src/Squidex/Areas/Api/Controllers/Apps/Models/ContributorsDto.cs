@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
-using Squidex.Shared;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
@@ -36,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [JsonProperty("_meta")]
         public ContributorsMetadata Metadata { get; set; }
 
-        public static async Task<ContributorsDto> FromAppAsync(IAppEntity app, ApiController controller, IUserResolver userResolver, IAppPlansProvider plans, bool invited)
+        public static async Task<ContributorsDto> FromAppAsync(IAppEntity app, Resources resources, IUserResolver userResolver, IAppPlansProvider plans, bool invited)
         {
             var users = await userResolver.QueryManyAsync(app.Contributors.Keys.ToArray());
 
@@ -46,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     app.Contributors
                         .Select(x => ContributorDto.FromIdAndRole(x.Key, x.Value))
                         .Select(x => x.WithUser(users))
-                        .Select(x => x.WithLinks(controller, app.Name))
+                        .Select(x => x.WithLinks(resources))
                         .OrderBy(x => x.ContributorName)
                         .ToArray()
             };
@@ -54,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             result.WithInvited(invited);
             result.WithPlan(app, plans);
 
-            return result.CreateLinks(controller, app.Name);
+            return result.CreateLinks(resources, app.Name);
         }
 
         private void WithPlan(IAppEntity app, IAppPlansProvider plans)
@@ -73,15 +72,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             }
         }
 
-        private ContributorsDto CreateLinks(ApiController controller, string app)
+        private ContributorsDto CreateLinks(Resources resources, string app)
         {
             var values = new { app };
 
-            AddSelfLink(controller.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
+            AddSelfLink(resources.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
 
-            if (controller.HasPermission(Permissions.AppContributorsAssign, app) && (MaxContributors < 0 || Items.Length < MaxContributors))
+            if (resources.CanAssignContributor && (MaxContributors < 0 || Items.Length < MaxContributors))
             {
-                AddPostLink("create", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
+                AddPostLink("create", resources.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
             }
 
             return this;

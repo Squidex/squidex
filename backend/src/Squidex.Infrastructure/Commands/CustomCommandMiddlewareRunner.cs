@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Commands
 
         public CustomCommandMiddlewareRunner(IEnumerable<ICustomCommandMiddleware> extensions)
         {
-            Guard.NotNull(extensions);
+            Guard.NotNull(extensions, nameof(extensions));
 
             this.extensions = extensions.Reverse().ToList();
         }

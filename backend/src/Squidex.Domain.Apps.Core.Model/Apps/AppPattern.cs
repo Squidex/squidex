@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         public AppPattern(string name, string pattern, string? message = null)
             : base(name)
         {
-            Guard.NotNullOrEmpty(pattern);
+            Guard.NotNullOrEmpty(pattern, nameof(pattern));
 
             Pattern = pattern;
 
@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppPattern Update(string newName, string newPattern, string? newMessage)
+        public AppPattern Update(string? name, string? pattern, string? message)
         {
-            return new AppPattern(newName, newPattern, newMessage);
+            return new AppPattern(name.Or(Name), pattern.Or(Pattern), message);
         }
     }
 }

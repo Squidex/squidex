@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -18,6 +18,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
@@ -29,8 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleDomainObject(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
             : base(store, log)
         {
-            Guard.NotNull(appProvider);
-            Guard.NotNull(ruleEnqueuer);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(ruleEnqueuer, nameof(ruleEnqueuer));
 
             this.appProvider = appProvider;
 
@@ -95,6 +96,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private async Task<object?> Trigger(TriggerRule command)
         {
+            await EnsureLoadedAsync();
+
             var @event = SimpleMapper.Map(command, new RuleManuallyTriggered { RuleId = Snapshot.Id, AppId = Snapshot.AppId });
 
             await ruleEnqueuer.Enqueue(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
@@ -141,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             if (Snapshot.IsDeleted)
             {
-                throw new DomainException("Rule has already been deleted.");
+                throw new DomainException(T.Get("rules.alreadyDeleted"));
             }
         }
     }

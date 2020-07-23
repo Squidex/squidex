@@ -9,8 +9,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 
 namespace Squidex.Infrastructure.Assets
 {
@@ -22,8 +22,8 @@ namespace Squidex.Infrastructure.Assets
 
         public AzureBlobAssetStore(string connectionString, string containerName)
         {
-            Guard.NotNullOrEmpty(containerName);
-            Guard.NotNullOrEmpty(connectionString);
+            Guard.NotNullOrEmpty(containerName, nameof(containerName));
+            Guard.NotNullOrEmpty(connectionString, nameof(connectionString));
 
             this.connectionString = connectionString;
             this.containerName = containerName;
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Assets
 
         public string? GeneratePublicUrl(string fileName)
         {
-            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
             if (blobContainer.Properties.PublicAccess != BlobContainerPublicAccessType.Blob)
             {
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task<long> GetSizeAsync(string fileName, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
             try
             {
@@ -82,8 +82,8 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(sourceFileName);
-            Guard.NotNullOrEmpty(targetFileName);
+            Guard.NotNullOrEmpty(sourceFileName, nameof(sourceFileName));
+            Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
 
             try
             {
@@ -118,8 +118,8 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string fileName, Stream stream, BytesRange range = default, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName);
-            Guard.NotNull(stream);
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNull(stream, nameof(stream));
 
             try
             {
@@ -138,7 +138,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
             try
             {
@@ -154,7 +154,7 @@ namespace Squidex.Infrastructure.Assets
 
         public Task DeleteAsync(string fileName)
         {
-            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
             var blob = blobContainer.GetBlockBlobReference(fileName);
 

@@ -23,8 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
         public RuleEnricher(IRuleEventRepository ruleEventRepository, IRequestCache requestCache)
         {
-            Guard.NotNull(ruleEventRepository);
-            Guard.NotNull(requestCache);
+            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
+            Guard.NotNull(requestCache, nameof(requestCache));
 
             this.ruleEventRepository = ruleEventRepository;
 
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
         public async Task<IEnrichedRuleEntity> EnrichAsync(IRuleEntity rule, Context context)
         {
-            Guard.NotNull(rule);
+            Guard.NotNull(rule, nameof(rule));
 
             var enriched = await EnrichAsync(Enumerable.Repeat(rule, 1), context);
 
@@ -42,8 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
         public async Task<IReadOnlyList<IEnrichedRuleEntity>> EnrichAsync(IEnumerable<IRuleEntity> rules, Context context)
         {
-            Guard.NotNull(rules);
-            Guard.NotNull(context);
+            Guard.NotNull(rules, nameof(rules));
+            Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<RuleEnricher>())
             {

@@ -34,6 +34,7 @@ export * from './pages/schema/fields/types/string-validation.component';
 export * from './pages/schema/fields/types/tags-ui.component';
 export * from './pages/schema/fields/types/tags-validation.component';
 export * from './pages/schema/preview/schema-preview-urls-form.component';
+export * from './pages/schema/rules/schema-field-rules-form.component';
 export * from './pages/schema/schema-page.component';
 export * from './pages/schema/scripts/schema-scripts-form.component';
 export * from './pages/schema/ui/field-list.component';

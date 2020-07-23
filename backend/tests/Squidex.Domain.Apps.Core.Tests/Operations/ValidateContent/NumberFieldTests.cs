@@ -9,13 +9,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
-    public class NumberFieldTests
+    public class NumberFieldTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 
@@ -56,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(5), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must be greater or equal to '10'." });
+                new[] { "Must be greater or equal to 10." });
         }
 
         [Fact]
@@ -67,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(20), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must be less or equal to '10'." });
+                new[] { "Must be less or equal to 10." });
         }
 
         [Fact]

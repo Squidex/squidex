@@ -50,15 +50,15 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="close.emit()">Cancel</button>
+            <button type="button" class="btn btn-secondary" (click)="close.emit()">Cancel</button>
 
             <ng-container [ngSwitch]="importStage">
                 <ng-container *ngSwitchCase="'Start'">
-                    <button type="submit" class="float-right btn btn-success" [disabled]="importForm.hasNoUser | async">Add Contributors</button>
+                    <button type="submit" class="btn btn-success" [disabled]="importForm.hasNoUser | async">Add Contributors</button>
                 </ng-container>
 
                 <ng-container *ngSwitchCase="'Change'">
-                    <button type="button" class="float-right btn btn-success" [disabled]="importStatus.length === 0" (click)="import()">Import</button>
+                    <button type="button" class="btn btn-success" [disabled]="importStatus.length === 0" (click)="import()">Import</button>
                 </ng-container>
             </ng-container>
         </ng-container>

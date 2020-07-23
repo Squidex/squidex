@@ -7,27 +7,15 @@ services:
     networks:
       - internal
 
-  squidex2:
-    image: "squidex-local"
-    environment:
-      - URLS__BASEURL=http://localhost
-      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
-      - ORLEANS__HOSTNAMEORIPADDRESS=FirstOfHost
-      - STORE__MONGODB__CONFIGURATION=mongodb://mongo
-      - STORE__TYPE=MongoDB
-    networks:
-      - internal
-    depends_on:
-      - mongo
-
-  squidex1:
-    image: "squidex-local"
+  squidex:
+    image: squidex
     ports:
-      - "80:80"
+      - "8080:80"
     environment:
-      - URLS__BASEURL=http://localhost
+      - URLS__BASEURL=http://localhost:8080
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
-      - ORLEANS__HOSTNAMEORIPADDRESS=FirstOfHost
+      - IDENTITY__ADMINCLIENTID=root
+      - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
       - STORE__TYPE=MongoDB
     networks:

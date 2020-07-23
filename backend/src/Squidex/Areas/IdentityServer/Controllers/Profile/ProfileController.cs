@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -21,6 +21,8 @@ using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -33,6 +35,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserPictureStore userPictureStore;
+        private readonly IUserEvents userEvents;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly MyIdentityOptions identityOptions;
 
@@ -40,6 +43,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             IUserPictureStore userPictureStore,
+            IUserEvents userEvents,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IOptions<MyIdentityOptions> identityOptions)
         {
@@ -47,6 +51,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             this.identityOptions = identityOptions.Value;
             this.userManager = userManager;
             this.userPictureStore = userPictureStore;
+            this.userEvents = userEvents;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
@@ -77,23 +82,23 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> AddLoginCallback()
         {
             return MakeChangeAsync<None>(u => AddLoginAsync(u),
-                "Login added successfully.");
+                T.Get("users.profile.addLoginDone"));
         }
 
         [HttpPost]
         [Route("/account/profile/update/")]
         public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
-            return MakeChangeAsync(u => userManager.UpdateSafeAsync(u, model.ToValues()),
-                "Account updated successfully.", model);
+            return MakeChangeAsync(u => UpdateAsync(u, model.ToValues()),
+                T.Get("users.profile.updateProfileDone"), model);
         }
 
         [HttpPost]
         [Route("/account/profile/properties/")]
         public Task<IActionResult> UpdateProperties(ChangePropertiesModel model)
         {
-            return MakeChangeAsync(u => userManager.UpdateSafeAsync(u, model.ToValues()),
-                "Account updated successfully.", model);
+            return MakeChangeAsync(u => UpdateAsync(u, model.ToValues()),
+                T.Get("users.profile.updatePropertiesDone"), model);
         }
 
         [HttpPost]
@@ -101,7 +106,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> RemoveLogin(RemoveLoginModel model)
         {
             return MakeChangeAsync(u => userManager.RemoveLoginAsync(u, model.LoginProvider, model.ProviderKey),
-                "Login provider removed successfully.", model);
+                T.Get("users.profile.removeLoginDone"), model);
         }
 
         [HttpPost]
@@ -109,7 +114,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> SetPassword(SetPasswordModel model)
         {
             return MakeChangeAsync(u => userManager.AddPasswordAsync(u, model.Password),
-                "Password set successfully.", model);
+                T.Get("users.profile.setPasswordDone"), model);
         }
 
         [HttpPost]
@@ -117,7 +122,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             return MakeChangeAsync(u => userManager.ChangePasswordAsync(u, model.OldPassword, model.Password),
-                "Password changed successfully.", model);
+                T.Get("users.profile.changePasswordDone"), model);
         }
 
         [HttpPost]
@@ -125,7 +130,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> GenerateClientSecret()
         {
             return MakeChangeAsync<None>(user => userManager.GenerateClientSecretAsync(user),
-                "Client secret generated successfully.");
+                T.Get("users.profile.generateClientDone"));
         }
 
         [HttpPost]
@@ -133,7 +138,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> UploadPicture(List<IFormFile> file)
         {
             return MakeChangeAsync<None>(user => UpdatePictureAsync(file, user),
-                "Picture uploaded successfully.");
+                T.Get("users.profile.uploadPictureDone"));
         }
 
         private async Task<IdentityResult> AddLoginAsync(IdentityUser user)
@@ -143,11 +148,28 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             return await userManager.AddLoginAsync(user, externalLogin);
         }
 
+        private async Task<IdentityResult> UpdateAsync(IdentityUser user, UserValues values)
+        {
+            var result = await userManager.UpdateSafeAsync(user, values);
+
+            if (result.Succeeded)
+            {
+                var resolved = await userManager.ResolveUserAsync(user);
+
+                if (resolved != null)
+                {
+                    userEvents.OnUserUpdated(resolved);
+                }
+            }
+
+            return result;
+        }
+
         private async Task<IdentityResult> UpdatePictureAsync(List<IFormFile> file, IdentityUser user)
         {
             if (file.Count != 1)
             {
-                return IdentityResult.Failed(new IdentityError { Description = "Please upload a single file." });
+                return IdentityResult.Failed(new IdentityError { Description = T.Get("validation.onlyOneFile") });
             }
 
             using (var thumbnailStream = new MemoryStream())
@@ -160,7 +182,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 }
                 catch
                 {
-                    return IdentityResult.Failed(new IdentityError { Description = "Picture is not a valid image." });
+                    return IdentityResult.Failed(new IdentityError { Description = T.Get("valiodation.notAnImage") });
                 }
 
                 await userPictureStore.UploadAsync(user.Id, thumbnailStream);
@@ -169,13 +191,13 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             return await userManager.UpdateSafeAsync(user, new UserValues { PictureUrl = SquidexClaimTypes.PictureUrlStore });
         }
 
-        private async Task<IActionResult> MakeChangeAsync<T>(Func<IdentityUser, Task<IdentityResult>> action, string successMessage, T? model = null) where T : class
+        private async Task<IActionResult> MakeChangeAsync<TModel>(Func<IdentityUser, Task<IdentityResult>> action, string successMessage, TModel? model = null) where TModel : class
         {
             var user = await userManager.GetUserWithClaimsAsync(User);
 
             if (user == null)
             {
-                throw new DomainException("Cannot find user.");
+                throw new DomainException(T.Get("users.userNotFound"));
             }
 
             if (!ModelState.IsValid)
@@ -199,24 +221,23 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             }
             catch
             {
-                errorMessage = "An unexpected exception occurred.";
+                errorMessage = T.Get("users.errorHappened");
             }
 
             return View(nameof(Profile), await GetProfileVM(user, model, errorMessage));
         }
 
-        private async Task<ProfileVM> GetProfileVM<T>(UserWithClaims? user, T? model = null, string? errorMessage = null, string? successMessage = null) where T : class
+        private async Task<ProfileVM> GetProfileVM<TModel>(UserWithClaims? user, TModel? model = null, string? errorMessage = null, string? successMessage = null) where TModel : class
         {
             if (user == null)
             {
-                throw new DomainException("Cannot find user.");
+                throw new DomainException(T.Get("users.userNotFound"));
             }
 
-            var taskForProviders = signInManager.GetExternalProvidersAsync();
-            var taskForPassword = userManager.HasPasswordAsync(user.Identity);
-            var taskForLogins = userManager.GetLoginsAsync(user.Identity);
-
-            await Task.WhenAll(taskForProviders, taskForPassword, taskForLogins);
+            var (providers, hasPassword, logins) = await AsyncHelper.WhenAll(
+                signInManager.GetExternalProvidersAsync(),
+                userManager.HasPasswordAsync(user.Identity),
+                userManager.GetLoginsAsync(user.Identity));
 
             var result = new ProfileVM
             {
@@ -224,10 +245,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 ClientSecret = user.ClientSecret()!,
                 Email = user.Email,
                 ErrorMessage = errorMessage,
-                ExternalLogins = taskForLogins.Result,
-                ExternalProviders = taskForProviders.Result,
+                ExternalLogins = logins,
+                ExternalProviders = providers,
                 DisplayName = user.DisplayName()!,
-                HasPassword = taskForPassword.Result,
+                HasPassword = hasPassword,
                 HasPasswordAuth = identityOptions.AllowPasswordAuth,
                 IsHidden = user.IsHidden(),
                 SuccessMessage = successMessage

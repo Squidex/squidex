@@ -34,7 +34,7 @@ export class UserForm extends Form<FormGroup, UpdateUserDto, UserDto> {
             ],
             passwordConfirm: ['',
                 [
-                    ValidatorsEx.match('password', 'Passwords must be the same.')
+                    ValidatorsEx.match('password', 'i18n:users.passwordConfirmValidationMessage')
                 ]
             ],
             permissions: ['']

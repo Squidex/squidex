@@ -20,7 +20,7 @@ namespace Squidex.Web.CommandMiddlewares
 
         public EnrichWithActorCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(httpContextAccessor);
+            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
             this.httpContextAccessor = httpContextAccessor;
         }

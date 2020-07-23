@@ -25,6 +25,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
+        protected ContentData(ContentData<T> source, IEqualityComparer<T> comparer)
+            : base(source, comparer)
+        {
+        }
+
         protected ContentData(int capacity, IEqualityComparer<T> comparer)
             : base(capacity, comparer)
         {
@@ -32,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         protected static TResult MergeTo<TResult>(TResult target, params TResult[] sources) where TResult : ContentData<T>
         {
-            Guard.NotEmpty(sources);
+            Guard.NotEmpty(sources, nameof(sources));
 
             if (sources.Length == 1 || sources.Skip(1).All(x => ReferenceEquals(x, sources[0])))
             {

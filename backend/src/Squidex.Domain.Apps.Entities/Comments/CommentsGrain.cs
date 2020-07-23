@@ -36,8 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentsGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter)
         {
-            Guard.NotNull(eventStore);
-            Guard.NotNull(eventDataFormatter);
+            Guard.NotNull(eventStore, nameof(eventStore));
+            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
 
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
@@ -107,12 +107,12 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         private async Task<object> Upsert<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : CommentsCommand
         {
-            Guard.NotNull(command);
-            Guard.NotNull(handler);
+            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(handler, nameof(handler));
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {
-                throw new DomainObjectVersionException(Key, GetType(), Version, command.ExpectedVersion);
+                throw new DomainObjectVersionException(Key, Version, command.ExpectedVersion);
             }
 
             var prevVersion = version;

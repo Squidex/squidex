@@ -16,7 +16,7 @@ import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
 })
 export class AssetsUIComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -25,7 +25,10 @@ export class AssetsUIComponent implements OnInit {
     public properties: AssetsFieldPropertiesDto;
 
     public ngOnInit() {
-        this.editForm.setControl('resolveFirst',
+        this.fieldForm.setControl('previewMode',
+            new FormControl(this.properties.previewMode));
+
+        this.fieldForm.setControl('resolveFirst',
             new FormControl(this.properties.resolveFirst));
     }
 }

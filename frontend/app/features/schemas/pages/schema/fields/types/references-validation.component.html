@@ -1,10 +1,10 @@
-<div [formGroup]="editForm">
+<div [formGroup]="fieldForm">
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldSchemaId">Schemas</label>
 
         <div class="col-6">
             <sqx-tag-editor placeholder=", to add schema" formControlName="schemaIds"
-                [converter]="schemasSource.converter | async" [suggestedValues]="(schemasSource.converter | async)?.suggestions">
+                [converter]="schemasSource.converter | async" [suggestions]="(schemasSource.converter | async)?.suggestions">
             </sqx-tag-editor>
         </div>
     </div>

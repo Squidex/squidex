@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Core.Comments
 
         public Comment(Guid id, Instant time, RefToken user, string text, Uri? url = null)
         {
-            Guard.NotEmpty(id);
-            Guard.NotNull(user);
-            Guard.NotNull(text);
+            Guard.NotEmpty(id, nameof(id));
+            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(text, nameof(text));
 
             Id = id;
             Text = text;

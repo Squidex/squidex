@@ -6,13 +6,12 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using P = Squidex.Domain.Apps.Core.Partitioning;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public sealed class UpsertSchemaField : UpsertSchemaFieldBase
     {
-        public string Partitioning { get; set; } = P.Invariant.Key;
+        public string Partitioning { get; set; }
 
         public List<UpsertSchemaNestedField> Nested { get; set; }
     }

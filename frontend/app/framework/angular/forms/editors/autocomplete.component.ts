@@ -216,6 +216,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                 }
 
                 this.callChange(selection);
+                this.callTouched();
             } finally {
                 this.resetState();
             }

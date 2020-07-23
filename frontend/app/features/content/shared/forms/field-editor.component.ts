@@ -5,16 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormControl } from '@angular/forms';
-import { AppLanguageDto, EditContentForm, FieldDto, MathHelper, RootFieldDto, Types } from '@app/shared';
+import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, MathHelper, RootFieldDto, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-editor',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html'
 })
-export class FieldEditorComponent {
+export class FieldEditorComponent implements OnChanges {
     @Input()
     public form: EditContentForm;
 
@@ -22,10 +22,7 @@ export class FieldEditorComponent {
     public formContext: any;
 
     @Input()
-    public field: FieldDto;
-
-    @Input()
-    public control: AbstractControl;
+    public formModel: AbstractContentForm<FieldDto, AbstractControl>;
 
     @Input()
     public language: AppLanguageDto;
@@ -39,27 +36,43 @@ export class FieldEditorComponent {
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
 
+    public get field() {
+        return this.formModel.field;
+    }
+
     public get arrayControl() {
-        return this.control as FormArray;
+        return this.formModel.form as FormArray;
     }
 
     public get editorControl() {
-        return this.control as FormControl;
+        return this.formModel.form as FormControl;
     }
 
     public get rootField() {
-        return this.field as RootFieldDto;
+        return this.formModel.field as RootFieldDto;
     }
 
     public uniqueId = MathHelper.guid();
 
-    public reset() {
-        if (this.editor.nativeElement && Types.isFunction(this.editor.nativeElement['reset'])) {
-            this.editor.nativeElement['reset']();
-        }
+    public ngOnChanges(changes: SimpleChanges) {
+        const previousControl = changes['control']?.previousValue;
 
-        if (this.editor && Types.isFunction(this.editor['reset'])) {
-            this.editor['reset']();
+        if (previousControl && Types.isFunction(previousControl['_clearChangeFns'])) {
+            previousControl['_clearChangeFns']();
+        }
+    }
+
+    public reset() {
+        if (this.editor) {
+            const nativeElement = this.editor.nativeElement;
+
+            if (nativeElement && Types.isFunction(nativeElement['reset'])) {
+                nativeElement['reset']();
+            }
+
+            if (this.editor && Types.isFunction(this.editor['reset'])) {
+                this.editor['reset']();
+            }
         }
     }
 }

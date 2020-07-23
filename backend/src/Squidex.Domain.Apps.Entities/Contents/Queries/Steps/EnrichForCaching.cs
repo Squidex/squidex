@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public EnrichForCaching(IRequestCache requestCache)
         {
-            Guard.NotNull(requestCache);
+            Guard.NotNull(requestCache, nameof(requestCache));
 
             this.requestCache = requestCache;
         }

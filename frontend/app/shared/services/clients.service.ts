@@ -29,7 +29,8 @@ export class ClientDto {
         public readonly id: string,
         public readonly name: string,
         public readonly secret: string,
-        public readonly role: string
+        public readonly role: string,
+        public readonly allowAnonymous: boolean
     ) {
         this._links = links;
 
@@ -53,6 +54,7 @@ export interface CreateClientDto {
 export interface UpdateClientDto {
     readonly name?: string;
     readonly role?: string;
+    readonly allowAnonymous?: boolean;
 }
 
 @Injectable()
@@ -71,7 +73,7 @@ export class ClientsService {
             mapVersioned(({ body }) => {
                 return parseClients(body);
             }),
-            pretifyError('Failed to load clients. Please reload.'));
+            pretifyError('i18n:clients.loadFailed'));
     }
 
     public postClient(appName: string, dto: CreateClientDto, version: Version): Observable<ClientsDto> {
@@ -84,7 +86,7 @@ export class ClientsService {
             tap(() => {
                 this.analytics.trackEvent('Client', 'Created', appName);
             }),
-            pretifyError('Failed to add client. Please reload.'));
+            pretifyError('i18n:clients.addFailed'));
     }
 
     public putClient(appName: string, resource: Resource, dto: UpdateClientDto, version: Version): Observable<ClientsDto> {
@@ -99,7 +101,7 @@ export class ClientsService {
             tap(() => {
                 this.analytics.trackEvent('Client', 'Updated', appName);
             }),
-            pretifyError('Failed to revoke client. Please reload.'));
+            pretifyError('i18n:clients.revokeFailed'));
     }
 
     public deleteClient(appName: string, resource: Resource, version: Version): Observable<ClientsDto> {
@@ -132,7 +134,7 @@ export class ClientsService {
             map((response: any) => {
                 return new AccessTokenDto(response.access_token, response.token_type);
             }),
-            pretifyError('Failed to create token. Please retry.'));
+            pretifyError('i18n:clients.tokenFailed'));
     }
 }
 
@@ -144,7 +146,8 @@ function parseClients(response: any): ClientsPayload {
             item.id,
             item.name || item.id,
             item.secret,
-            item.role));
+            item.role,
+            item.allowAnonymous));
 
     const _links = response._links;
 

@@ -15,6 +15,8 @@ namespace Squidex.Infrastructure.EventSourcing
         private static readonly ObjectPool<StringBuilder> StringBuilderPool =
             new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
 
+        public static readonly StreamPosition Empty = new StreamPosition(0, -1, -1);
+
         public long Timestamp { get; }
 
         public long CommitOffset { get; }
@@ -59,13 +61,16 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var parts = position.Split('-');
 
-                return new StreamPosition(
+                if (parts.Length == 3)
+                {
+                    return new StreamPosition(
                     long.Parse(parts[0]),
                     long.Parse(parts[1]),
                     long.Parse(parts[2]));
+                }
             }
 
-            return new StreamPosition(0, -1, -1);
+            return Empty;
         }
     }
 }

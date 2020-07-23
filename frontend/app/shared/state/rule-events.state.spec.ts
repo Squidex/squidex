@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DialogService, LocalStoreService, Pager, RuleEventsDto, RuleEventsState, RulesService } from '@app/shared/internal';
+import { DialogService, Pager, RuleEventsDto, RuleEventsState, RulesService } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -26,18 +26,15 @@ describe('RuleEventsState', () => {
     let dialogs: IMock<DialogService>;
     let rulesService: IMock<RulesService>;
     let ruleEventsState: RuleEventsState;
-    let localStore: IMock<LocalStoreService>;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        localStore = Mock.ofType<LocalStoreService>();
 
         rulesService = Mock.ofType<RulesService>();
         rulesService.setup(x => x.getEvents(app, 10, 0, undefined))
             .returns(() => of(new RuleEventsDto(200, oldRuleEvents)));
 
-        ruleEventsState = new RuleEventsState(appsState.object, dialogs.object, localStore.object, rulesService.object);
+        ruleEventsState = new RuleEventsState(appsState.object, dialogs.object, rulesService.object);
         ruleEventsState.load().subscribe();
     });
 
@@ -59,15 +56,6 @@ describe('RuleEventsState', () => {
         expect(ruleEventsState.snapshot.isLoading).toBeFalsy();
     });
 
-    it('should load page size from local store', () => {
-        localStore.setup(x => x.getInt('rule-events.pageSize', 10))
-            .returns(() => 25);
-
-        const state = new RuleEventsState(appsState.object, dialogs.object, localStore.object, rulesService.object);
-
-        expect(state.snapshot.ruleEventsPager.pageSize).toBe(25);
-    });
-
     it('should show notification on load when reload is true', () => {
         ruleEventsState.load(true).subscribe();
 
@@ -86,17 +74,6 @@ describe('RuleEventsState', () => {
 
         rulesService.verify(x => x.getEvents(app, 10, 10, undefined), Times.once());
         rulesService.verify(x => x.getEvents(app, 10, 0, undefined), Times.once());
-    });
-
-    it('should update page size in local store', () => {
-        rulesService.setup(x => x.getEvents(app, 50, 0, undefined))
-            .returns(() => of(new RuleEventsDto(200, [])));
-
-        ruleEventsState.setPager(new Pager(200, 0, 50)).subscribe();
-
-        localStore.verify(x => x.setInt('rule-events.pageSize', 50), Times.atLeastOnce());
-
-        expect().nothing();
     });
 
     it('should load with rule id when filtered', () => {

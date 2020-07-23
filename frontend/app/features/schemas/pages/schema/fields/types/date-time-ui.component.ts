@@ -16,8 +16,10 @@ import { Observable } from 'rxjs';
     templateUrl: 'date-time-ui.component.html'
 })
 export class DateTimeUIComponent implements OnInit {
+    public readonly converter = FloatConverter.INSTANCE;
+
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -25,12 +27,10 @@ export class DateTimeUIComponent implements OnInit {
     @Input()
     public properties: NumberFieldPropertiesDto;
 
-    public converter = new FloatConverter();
-
     public hideAllowedValues: Observable<boolean>;
 
     public ngOnInit() {
-        this.editForm.setControl('editor',
+        this.fieldForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));

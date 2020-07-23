@@ -31,9 +31,9 @@ namespace Squidex.Infrastructure.Commands
             IEventStore eventStore,
             IServiceProvider serviceProvider)
         {
-            Guard.NotNull(localCache);
-            Guard.NotNull(store);
-            Guard.NotNull(eventStore);
+            Guard.NotNull(localCache, nameof(localCache));
+            Guard.NotNull(store, nameof(store));
+            Guard.NotNull(eventStore, nameof(eventStore));
 
             this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Commands
 
         public virtual async Task RebuildAsync<T, TState>(IdSource source, CancellationToken ct = default) where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
         {
-            Guard.NotNull(source);
+            Guard.NotNull(source, nameof(source));
 
             await store.GetSnapshotStore<TState>().ClearAsync();
 
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.Commands
 
         public virtual async Task InsertManyAsync<T, TState>(IdSource source, CancellationToken ct = default) where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
         {
-            Guard.NotNull(source);
+            Guard.NotNull(source, nameof(source));
 
             var worker = new ActionBlock<Guid>(async id =>
             {

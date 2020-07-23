@@ -68,7 +68,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
                     this.schema = schema;
 
                     this.contentsState.schema = schema;
-                    this.contentForm = new EditContentForm(this.languages, this.schema);
+                    this.contentForm = new EditContentForm(this.languages, this.schema, this.contentFormContext.user);
 
                     this.changeDetector.markForCheck();
                 }

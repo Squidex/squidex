@@ -114,7 +114,7 @@ export class UsersService {
             map(body => {
                 return parseUser(body);
             }),
-            pretifyError('Failed to load users. Please retry.'));
+            pretifyError('i18n:users.loadFailed'));
     }
 
     public unlockUser(user: Resource): Observable<UserDto> {
@@ -126,7 +126,7 @@ export class UsersService {
             map(body => {
                 return parseUser(body);
             }),
-            pretifyError('Failed to load users. Please retry.'));
+            pretifyError('i18n:users.loadFailed'));
     }
 }
 

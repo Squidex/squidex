@@ -16,7 +16,7 @@ import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
 })
 export class AssetsValidationComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -25,43 +25,43 @@ export class AssetsValidationComponent implements OnInit {
     public properties: AssetsFieldPropertiesDto;
 
     public ngOnInit() {
-        this.editForm.setControl('minItems',
+        this.fieldForm.setControl('minItems',
             new FormControl(this.properties.minItems));
 
-        this.editForm.setControl('maxItems',
+        this.fieldForm.setControl('maxItems',
             new FormControl(this.properties.maxItems));
 
-        this.editForm.setControl('minSize',
+        this.fieldForm.setControl('minSize',
             new FormControl(this.properties.minSize));
 
-        this.editForm.setControl('maxSize',
+        this.fieldForm.setControl('maxSize',
             new FormControl(this.properties.maxSize));
 
-        this.editForm.setControl('allowedExtensions',
+        this.fieldForm.setControl('allowedExtensions',
             new FormControl(this.properties.allowedExtensions));
 
-        this.editForm.setControl('mustBeImage',
+        this.fieldForm.setControl('mustBeImage',
             new FormControl(this.properties.mustBeImage));
 
-        this.editForm.setControl('minWidth',
+        this.fieldForm.setControl('minWidth',
             new FormControl(this.properties.minWidth));
 
-        this.editForm.setControl('maxWidth',
+        this.fieldForm.setControl('maxWidth',
             new FormControl(this.properties.maxWidth));
 
-        this.editForm.setControl('minHeight',
+        this.fieldForm.setControl('minHeight',
             new FormControl(this.properties.minHeight));
 
-        this.editForm.setControl('maxHeight',
+        this.fieldForm.setControl('maxHeight',
             new FormControl(this.properties.maxHeight));
 
-        this.editForm.setControl('aspectWidth',
+        this.fieldForm.setControl('aspectWidth',
             new FormControl(this.properties.aspectWidth));
 
-        this.editForm.setControl('aspectHeight',
+        this.fieldForm.setControl('aspectHeight',
             new FormControl(this.properties.aspectHeight));
 
-        this.editForm.setControl('allowDuplicates',
+        this.fieldForm.setControl('allowDuplicates',
             new FormControl(this.properties.allowDuplicates));
     }
 }

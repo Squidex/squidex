@@ -35,10 +35,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             ITextIndex contentTextIndexer,
             IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(appProvider);
-            Guard.NotNull(contentQuery);
-            Guard.NotNull(contentTextIndexer);
-            Guard.NotNull(urlGenerator);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(contentQuery, nameof(contentQuery));
+            Guard.NotNull(contentTextIndexer, nameof(contentTextIndexer));
+            Guard.NotNull(urlGenerator, nameof(urlGenerator));
 
             this.appProvider = appProvider;
             this.contentQuery = contentQuery;

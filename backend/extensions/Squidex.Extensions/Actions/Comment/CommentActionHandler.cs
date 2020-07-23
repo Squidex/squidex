@@ -25,16 +25,16 @@ namespace Squidex.Extensions.Actions.Comment
         public CommentActionHandler(RuleEventFormatter formatter, ICommandBus commandBus)
             : base(formatter)
         {
-            Guard.NotNull(commandBus);
+            Guard.NotNull(commandBus, nameof(commandBus));
 
             this.commandBus = commandBus;
         }
 
-        protected override (string Description, CommentJob Data) CreateJob(EnrichedEvent @event, CommentAction action)
+        protected override async Task<(string Description, CommentJob Data)> CreateJobAsync(EnrichedEvent @event, CommentAction action)
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
-                var text = Format(action.Text, @event);
+                var text = await FormatAsync(action.Text, @event);
 
                 var actor = contentEvent.Actor;
 

@@ -37,11 +37,15 @@ export class ClientComponent {
         this.clientsState.update(this.client, { role });
     }
 
+    public updateAccess(allowAnonymous: boolean) {
+        this.clientsState.update(this.client, { allowAnonymous });
+    }
+
     public rename(name: string) {
         this.clientsState.update(this.client, { name });
     }
 
-    public trackByRole(role: RoleDto) {
+    public trackByRole(_index: number, role: RoleDto) {
         return role.name;
     }
 }

@@ -23,8 +23,8 @@ namespace Squidex.Web.Services
 
         public UrlGenerator(IOptions<UrlsOptions> urlsOptions, IAssetFileStore assetFileStore, bool allowAssetSourceUrl)
         {
-            Guard.NotNull(assetFileStore);
-            Guard.NotNull(urlsOptions);
+            Guard.NotNull(assetFileStore, nameof(assetFileStore));
+            Guard.NotNull(urlsOptions, nameof(urlsOptions));
 
             this.assetFileStore = assetFileStore;
 

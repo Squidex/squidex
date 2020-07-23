@@ -16,7 +16,7 @@
             <div class="form-group">
                 <label for="appName">Name <small class="hint">(required)</small></label>
                 
-                <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="name"></sqx-control-errors>
         
                 <input type="text" class="form-control" id="name" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit />
                     
@@ -33,8 +33,9 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
-            <button type="submit" class="float-right btn btn-success">Create</button>
+            <button type="button" class="btn btn-secondary" (click)="emitComplete()">Cancel</button>
+
+            <button type="submit" class="btn btn-success">Create</button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

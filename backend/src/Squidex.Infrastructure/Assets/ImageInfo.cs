@@ -13,13 +13,17 @@ namespace Squidex.Infrastructure.Assets
 
         public int PixelHeight { get; }
 
-        public ImageInfo(int pixelWidth, int pixelHeight)
+        public bool IsRotatedOrSwapped { get; }
+
+        public ImageInfo(int pixelWidth, int pixelHeight, bool isRotatedOrSwapped)
         {
-            Guard.GreaterThan(pixelWidth, 0);
-            Guard.GreaterThan(pixelHeight, 0);
+            Guard.GreaterThan(pixelWidth, 0, nameof(pixelWidth));
+            Guard.GreaterThan(pixelHeight, 0, nameof(pixelHeight));
 
             PixelWidth = pixelWidth;
             PixelHeight = pixelHeight;
+
+            IsRotatedOrSwapped = isRotatedOrSwapped;
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task DeleteStreamAsync(string streamName)
         {
-            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
             ThrowIfDisposed();
 
@@ -49,9 +49,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.NotEmpty(commitId);
-            Guard.NotNullOrEmpty(streamName);
-            Guard.NotNull(events);
+            Guard.NotEmpty(commitId, nameof(commitId));
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNull(events, nameof(events));
             Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
 
             ThrowIfDisposed();

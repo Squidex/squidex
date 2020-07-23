@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,7 +7,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Squidex.Shared;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
@@ -15,8 +15,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class ContributorDto : Resource
     {
-        private const string NotFound = "- not found -";
-
         /// <summary>
         /// The id of the user that contributes to the app.
         /// </summary>
@@ -56,24 +54,26 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             }
             else
             {
-                ContributorName = NotFound;
+                ContributorName = T.Get("common.notFoundValue");
             }
 
             return this;
         }
 
-        public ContributorDto WithLinks(ApiController controller, string app)
+        public ContributorDto WithLinks(Resources resources)
         {
-            if (!controller.IsUser(ContributorId))
+            if (!resources.IsUser(ContributorId))
             {
-                if (controller.HasPermission(Permissions.AppContributorsAssign, app))
+                var app = resources.App;
+
+                if (resources.CanAssignContributor)
                 {
-                    AddPostLink("update", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), new { app }));
+                    AddPostLink("update", resources.Url<AppContributorsController>(x => nameof(x.PostContributor), new { app }));
                 }
 
-                if (controller.HasPermission(Permissions.AppContributorsRevoke, app))
+                if (resources.CanRevokeContributor)
                 {
-                    AddDeleteLink("delete", controller.Url<AppContributorsController>(x => nameof(x.DeleteContributor), new { app, id = ContributorId }));
+                    AddDeleteLink("delete", resources.Url<AppContributorsController>(x => nameof(x.DeleteContributor), new { app, id = ContributorId }));
                 }
             }
 

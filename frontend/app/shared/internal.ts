@@ -49,6 +49,7 @@ export * from './state/clients.state';
 export * from './state/comments.form';
 export * from './state/comments.state';
 export * from './state/contents.forms';
+export * from './state/contents.forms.visitors';
 export * from './state/contents.state';
 export * from './state/contributors.forms';
 export * from './state/contributors.state';

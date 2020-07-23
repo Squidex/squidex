@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -14,6 +14,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Web
@@ -34,11 +35,20 @@ namespace Squidex.Web
             [500] = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
         };
 
+        public static (ErrorDto Error, bool WellKnown) ToErrorDto(int statusCode, HttpContext? httpContext)
+        {
+            var error = new ErrorDto { StatusCode = statusCode };
+
+            Enrich(httpContext, error);
+
+            return (error, true);
+        }
+
         public static (ErrorDto Error, bool WellKnown) ToErrorDto(this ProblemDetails problem, HttpContext? httpContext)
         {
-            Guard.NotNull(problem);
+            Guard.NotNull(problem, nameof(problem));
 
-            var error = new ErrorDto { Message = problem.Title, StatusCode = problem.Status };
+            var error = CreateError(problem.Status ?? 500, problem.Title);
 
             Enrich(httpContext, error);
 
@@ -47,7 +57,7 @@ namespace Squidex.Web
 
         public static (ErrorDto Error, bool WellKnown) ToErrorDto(this Exception exception, HttpContext? httpContext)
         {
-            Guard.NotNull(exception);
+            Guard.NotNull(exception, nameof(exception));
 
             var result = CreateError(exception);
 
@@ -60,10 +70,12 @@ namespace Squidex.Web
         {
             error.TraceId = Activity.Current?.Id ?? httpContext?.TraceIdentifier;
 
-            if (error.StatusCode.HasValue)
+            if (error.StatusCode == 0)
             {
-                error.Type = Links.GetOrDefault(error.StatusCode.Value);
+                error.StatusCode = 500;
             }
+
+            error.Type = Links.GetOrDefault(error.StatusCode);
         }
 
         private static (ErrorDto Error, bool WellKnown) CreateError(Exception exception)
@@ -71,71 +83,77 @@ namespace Squidex.Web
             switch (exception)
             {
                 case ValidationException ex:
-                    return (new ErrorDto
-                    {
-                        StatusCode = 400,
-                        Message = ex.Summary,
-                        Details = ToDetails(ex)
-                    }, true);
+                    return (CreateError(400, T.Get("common.httpValidationError"), ToDetails(ex)), true);
 
                 case DomainObjectNotFoundException _:
-                    return (new ErrorDto
-                    {
-                        StatusCode = 404,
-                        Message = null!
-                    }, true);
+                    return (CreateError(404), true);
 
                 case DomainObjectVersionException _:
-                    return (new ErrorDto
-                    {
-                        StatusCode = 412,
-                        Message = exception.Message
-                    }, true);
+                    return (CreateError(412, exception.Message), true);
 
                 case DomainForbiddenException _:
-                    return (new ErrorDto
-                    {
-                        StatusCode = 403,
-                        Message = exception.Message
-                    }, true);
+                    return (CreateError(403, exception.Message), true);
 
                 case DomainException _:
-                    return (new ErrorDto
-                    {
-                        StatusCode = 400,
-                        Message = exception.Message
-                    }, true);
+                    return (CreateError(400, exception.Message), true);
 
                 case SecurityException _:
-                    return (new ErrorDto
-                    {
-                        StatusCode = 403,
-                        Message = "Forbidden"
-                    }, false);
+                    return (CreateError(403), false);
 
                 case DecoderFallbackException _:
-                    return (new ErrorDto
-                    {
-                        StatusCode = 400,
-                        Message = exception.Message
-                    }, true);
+                    return (CreateError(400, exception.Message), true);
 
                 default:
-                    return (new ErrorDto
-                    {
-                        StatusCode = 500,
-                        Message = "Server Error"
-                    }, false);
+                    return (CreateError(500), false);
             }
+        }
+
+        private static ErrorDto CreateError(int status, string? message = null, string[]? details = null)
+        {
+            var error = new ErrorDto { StatusCode = status, Message = message, Details = details };
+
+            return error;
         }
 
         private static string[] ToDetails(ValidationException ex)
         {
+            static string FixPropertyName(string property)
+            {
+                property = property.Trim();
+
+                if (property.Length == 0)
+                {
+                    return property;
+                }
+
+                var prevChar = 0;
+
+                var builder = new StringBuilder(property.Length);
+
+                builder.Append(char.ToLower(property[0]));
+
+                foreach (var character in property.Skip(1))
+                {
+                    if (prevChar == '.')
+                    {
+                        builder.Append(char.ToLower(character));
+                    }
+                    else
+                    {
+                        builder.Append(character);
+                    }
+
+                    prevChar = character;
+                }
+
+                return builder.ToString();
+            }
+
             return ex.Errors.Select(e =>
             {
                 if (e.PropertyNames?.Any() == true)
                 {
-                    return $"{string.Join(", ", e.PropertyNames)}: {e.Message}";
+                    return $"{string.Join(", ", e.PropertyNames.Select(FixPropertyName))}: {e.Message}";
                 }
                 else
                 {

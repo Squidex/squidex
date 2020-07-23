@@ -47,7 +47,7 @@ export class UsersService {
 
                 return users;
             }),
-            pretifyError('Failed to load users. Please reload.'));
+            pretifyError('i18n:users.loadFailed'));
     }
 
     public getUser(id: string): Observable<UserDto> {
@@ -61,7 +61,7 @@ export class UsersService {
 
                 return user;
             }),
-            pretifyError('Failed to load user. Please reload.'));
+            pretifyError('i18n:users.loadUserFailed'));
     }
 
     public getResources(): Observable<ResourcesDto> {

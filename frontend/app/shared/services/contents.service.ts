@@ -142,7 +142,7 @@ export class ContentsService {
             }
         }
 
-        let fullQuery = [...queryParts, ...queryOdataParts].join('&');
+        const fullQuery = [...queryParts, ...queryOdataParts].join('&');
 
         if (fullQuery.length > (maxLength || 2000)) {
             const body: any = {};
@@ -165,7 +165,7 @@ export class ContentsService {
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
-                pretifyError('Failed to load contents. Please reload.'));
+                pretifyError('i18n:contents.loadFailed'));
         } else {
             const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
@@ -215,7 +215,7 @@ export class ContentsService {
             map(({ payload }) => {
                 return parseContent(payload.body);
             }),
-            pretifyError('Failed to load content. Please reload.'));
+            pretifyError('i18n:contents.loadContentFailed'));
     }
 
     public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
@@ -225,7 +225,7 @@ export class ContentsService {
             mapVersioned(({ body }) => {
                 return body;
             }),
-            pretifyError('Failed to load data. Please reload.'));
+            pretifyError('i18n:contents.loadDataFailed'));
     }
 
     public postContent(appName: string, schemaName: string, dto: any, publish: boolean): Observable<ContentDto> {
@@ -238,7 +238,7 @@ export class ContentsService {
             tap(() => {
                 this.analytics.trackEvent('Content', 'Created', appName);
             }),
-            pretifyError('Failed to create content. Please reload.'));
+            pretifyError('i18n:contents.createFailed'));
     }
 
     public putContent(appName: string, resource: Resource, dto: any, version: Version): Observable<ContentDto> {
@@ -253,7 +253,7 @@ export class ContentsService {
             tap(() => {
                 this.analytics.trackEvent('Content', 'Updated', appName);
             }),
-            pretifyError('Failed to update content. Please reload.'));
+            pretifyError('i18n:contents.updateFailed'));
     }
 
     public patchContent(appName: string, resource: Resource, dto: any, version: Version): Observable<ContentDto> {
@@ -283,7 +283,7 @@ export class ContentsService {
             tap(() => {
                 this.analytics.trackEvent('Content', 'VersioNCreated', appName);
             }),
-            pretifyError('Failed to version a new version. Please reload.'));
+            pretifyError('i18n:contents.loadVersionFailed'));
     }
 
     public deleteVersion(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
@@ -298,7 +298,7 @@ export class ContentsService {
             tap(() => {
                 this.analytics.trackEvent('Content', 'VersionDeleted', appName);
             }),
-            pretifyError('Failed to delete version. Please reload.'));
+            pretifyError('i18n:contents.deleteVersionFailed'));
     }
 
     public putStatus(appName: string, resource: Resource, status: string, dueTime: string | null, version: Version): Observable<ContentDto> {
@@ -325,7 +325,7 @@ export class ContentsService {
             tap(() => {
                 this.analytics.trackEvent('Content', 'Deleted', appName);
             }),
-            pretifyError('Failed to delete content. Please reload.'));
+            pretifyError('i18n:contents.deleteFailed'));
     }
 }
 

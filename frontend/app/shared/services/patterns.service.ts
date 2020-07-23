@@ -62,7 +62,7 @@ export class PatternsService {
             mapVersioned(({ body }) => {
                 return parsePatterns(body);
             }),
-            pretifyError('Failed to add pattern. Please reload.'));
+            pretifyError('i18n:patterns.loadFailed'));
     }
 
     public postPattern(appName: string, dto: EditPatternDto, version: Version): Observable<PatternsDto> {
@@ -90,7 +90,7 @@ export class PatternsService {
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Updated', appName);
             }),
-            pretifyError('Failed to update pattern. Please reload.'));
+            pretifyError('i18n:patterns.updateFailed'));
     }
 
     public deletePattern(appName: string, resource: Resource, version: Version): Observable<PatternsDto> {
@@ -105,7 +105,7 @@ export class PatternsService {
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Configured', appName);
             }),
-            pretifyError('Failed to remove pattern. Please reload.'));
+            pretifyError('i18n:patterns.deleteFailed'));
     }
 }
 

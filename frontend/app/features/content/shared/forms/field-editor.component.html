@@ -1,13 +1,11 @@
-<div [class.ui]="!field.properties.isContentField" *ngIf="field">
-    <ng-container *ngIf="field.properties.isContentField">
-        <label>
-            {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
-        </label> 
-    
-        <small class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</small>
-    
-        <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
-    </ng-container>
+<div *ngIf="formModel">
+    <label>
+        {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+    </label> 
+
+    <small class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</small>
+
+    <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName"></sqx-control-errors>
 
 	<div>
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
@@ -21,11 +19,9 @@
 		<ng-template #noEditor>
 			<ng-container [ngSwitch]="field.properties.fieldType">
                 <ng-container *ngSwitchCase="'Array'">
-                    <sqx-array-editor 
-                        [arrayControl]="arrayControl"
-                        [form]="form"
+                    <sqx-array-editor
+                        [formModel]="formModel"
                         [formContext]="formContext"
-                        [field]="rootField"
                         [language]="language"
                         [languages]="languages">
                     </sqx-array-editor>
@@ -101,6 +97,13 @@
 								[schemaId]="field.rawProperties.singleId">
                             </sqx-references-tags>
                         </ng-container>
+                        <ng-container *ngSwitchCase="'Checkboxes'">
+                            <sqx-references-checkboxes
+                                [formControl]="editorControl" 
+                                [language]="language"
+								[schemaId]="field.rawProperties.singleId">
+                            </sqx-references-checkboxes>
+                        </ng-container>
                     </ng-container>
 				</ng-container>
 				<ng-container *ngSwitchCase="'String'">
@@ -165,11 +168,9 @@
                 </ng-container>
 			</ng-container>
 		</ng-template>
-	</div>
+    </div>
 
-	<ng-container *ngIf="field.properties.hints; let hints">
-		<sqx-form-hint *ngIf="hints.length > 0">
-			{{hints}}
-		</sqx-form-hint>
-	</ng-container>
+    <sqx-form-hint *ngIf="field.properties.hints?.length > 0">
+        {{field.properties.hints}}
+    </sqx-form-hint>
 </div>

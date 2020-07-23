@@ -45,6 +45,10 @@ export class AssetFolderComponent {
         }
     }
 
+    public emitDelete() {
+        this.delete.emit(this.assetFolder);
+    }
+
     public emitNavigate() {
         this.navigate.emit(this.assetFolder);
     }

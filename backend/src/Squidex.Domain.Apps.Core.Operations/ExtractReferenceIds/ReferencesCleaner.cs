@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public ReferencesCleaner(HashSet<Guid> validIds)
         {
-            Guard.NotNull(validIds);
+            Guard.NotNull(validIds, nameof(validIds));
 
             this.validIds = validIds;
         }
@@ -89,12 +89,17 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             if (value is JsonArray array)
             {
-                var result = new JsonArray(array);
+                var result = array;
 
                 for (var i = 0; i < result.Count; i++)
                 {
                     if (!IsValidReference(result[i]))
                     {
+                        if (ReferenceEquals(result, array))
+                        {
+                            result = new JsonArray(array);
+                        }
+
                         result.RemoveAt(i);
                         i--;
                     }

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { compareStrings, defined, DialogService, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
 import { empty, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { AddFieldDto, CreateSchemaDto, FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
+import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 
 type AnyFieldDto = NestedFieldDto | RootFieldDto;
@@ -137,7 +137,7 @@ export class SchemasState extends State<Snapshot> {
         return this.schemasService.getSchemas(this.appName).pipe(
             tap(({ items, canCreate }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Schemas reloaded.');
+                    this.dialogs.notifyInfo('i18n:schemas.reloaded');
                 }
 
                 const schemas = items.sortedByString(x => x.displayName);
@@ -227,6 +227,14 @@ export class SchemasState extends State<Snapshot> {
     public configurePreviewUrls(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
         return this.schemasService.putPreviewUrls(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public configureFieldRules(schema: SchemaDto, request: ReadonlyArray<FieldRule>): Observable<SchemaDetailsDto> {
+        return this.schemasService.putFieldRules(this.appName, schema, request, schema.version).pipe(
+            tap(updated => {
                 this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
             }),
             shareSubscribed(this.dialogs));
@@ -243,7 +251,7 @@ export class SchemasState extends State<Snapshot> {
     public synchronize(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
         return this.schemasService.putSchemaSync(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'Schema synchronized successfully.');
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.synchronized');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -357,7 +365,7 @@ export class SchemasState extends State<Snapshot> {
             });
         } else {
             if (updateText) {
-                this.dialogs.notifyInfo('Nothing has been changed.');
+                this.dialogs.notifyInfo('i18n:common.nothingChanged');
             }
         }
     }

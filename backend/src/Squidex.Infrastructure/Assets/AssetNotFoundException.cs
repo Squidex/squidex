@@ -13,12 +13,7 @@ namespace Squidex.Infrastructure.Assets
     [Serializable]
     public class AssetNotFoundException : Exception
     {
-        public AssetNotFoundException(string fileName)
-            : base(FormatMessage(fileName))
-        {
-        }
-
-        public AssetNotFoundException(string fileName, Exception inner)
+        public AssetNotFoundException(string fileName, Exception? inner = null)
             : base(FormatMessage(fileName), inner)
         {
         }
@@ -30,7 +25,7 @@ namespace Squidex.Infrastructure.Assets
 
         private static string FormatMessage(string fileName)
         {
-            Guard.NotNullOrEmpty(fileName);
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
             return $"An asset with name '{fileName}' does not exist.";
         }

@@ -32,6 +32,8 @@ export class WorkflowComponent implements OnChanges {
     public isEditing = false;
     public isEditable = false;
 
+    public selectedTab = 0;
+
     constructor(
         private readonly workflowsState: WorkflowsState
     ) {
@@ -111,7 +113,11 @@ export class WorkflowComponent implements OnChanges {
         this.workflow = this.workflow.removeStep(step.name);
     }
 
-    public trackByStep(index: number, step: WorkflowStep) {
+    public selectTab(tab: number) {
+        this.selectedTab = tab;
+    }
+
+    public trackByStep(_index: number, step: WorkflowStep) {
         return step.name;
     }
 }

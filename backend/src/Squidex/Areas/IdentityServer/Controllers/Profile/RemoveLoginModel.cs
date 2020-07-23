@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -11,10 +11,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public class RemoveLoginModel
     {
-        [Required(ErrorMessage = "Login provider is required.")]
+        [Required]
         public string LoginProvider { get; set; }
 
-        [Required(ErrorMessage = "Provider key.")]
+        [Required]
         public string ProviderKey { get; set; }
     }
 }

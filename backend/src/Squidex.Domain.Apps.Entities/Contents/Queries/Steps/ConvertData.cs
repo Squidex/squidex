@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
@@ -26,9 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public ConvertData(IUrlGenerator urlGenerator, IAssetRepository assetRepository, IContentRepository contentRepository)
         {
-            Guard.NotNull(urlGenerator);
-            Guard.NotNull(assetRepository);
-            Guard.NotNull(contentRepository);
+            Guard.NotNull(urlGenerator, nameof(urlGenerator));
+            Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.urlGenerator = urlGenerator;
             this.assetRepository = assetRepository;
@@ -72,12 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 if (ids.Count > 0)
                 {
-                    var taskForAssets = QueryAssetIdsAsync(context, ids);
-                    var taskForContents = QueryContentIdsAsync(context, ids);
+                    var (assets, refContents) = await AsyncHelper.WhenAll(
+                        QueryAssetIdsAsync(context, ids),
+                        QueryContentIdsAsync(context, ids));
 
-                    await Task.WhenAll(taskForAssets, taskForContents);
-
-                    var foundIds = new HashSet<Guid>(taskForAssets.Result.Union(taskForContents.Result));
+                    var foundIds = new HashSet<Guid>(assets.Union(refContents));
 
                     return ValueReferencesConverter.CleanReferences(foundIds);
                 }
@@ -104,17 +104,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             if (!context.IsFrontendClient)
             {
-                yield return FieldConverters.ExcludeHidden();
-                yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeHidden());
+                yield return FieldConverters.ExcludeHidden;
+                yield return FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeHidden));
             }
 
-            yield return FieldConverters.ExcludeChangedTypes();
-            yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeChangedTypes());
+            yield return FieldConverters.ExcludeChangedTypes;
+            yield return FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeChangedTypes));
 
             if (cleanReferences != null)
             {
                 yield return FieldConverters.ForValues(cleanReferences);
-                yield return FieldConverters.ForNestedName2Name(cleanReferences);
+                yield return FieldConverters.ForValues(ValueConverters.ForNested(cleanReferences));
             }
 
             yield return FieldConverters.ResolveInvariant(context.App.LanguagesConfig);
@@ -134,11 +134,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     yield return FieldConverters.FilterLanguages(context.App.LanguagesConfig, languages);
                 }
 
-                var assetUrls = context.AssetUrls();
+                var assetUrls = context.AssetUrls().ToList();
 
-                if (assetUrls.Any())
+                if (assetUrls.Count > 0)
                 {
-                    yield return FieldConverters.ResolveAssetUrls(assetUrls.ToList(), urlGenerator);
+                    var resolveAssetUrls = ValueConverters.ResolveAssetUrls(assetUrls, urlGenerator);
+
+                    yield return FieldConverters.ForValues(resolveAssetUrls);
+                    yield return FieldConverters.ForValues(ValueConverters.ForNested(resolveAssetUrls));
                 }
             }
         }

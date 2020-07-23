@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        private readonly ILocalCache localCache = A.Fake<ILocalCache>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -43,6 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             sut = new RuleEnqueuer(
                 appProvider,
                 cache,
+                localCache,
                 ruleEventRepository,
                 ruleService);
         }
@@ -74,12 +77,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var job = new RuleJob { Created = now };
 
-            A.CallTo(() => ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event, false))
-                .Returns(new List<RuleJob> { job });
+            A.CallTo(() => ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event, true))
+                .Returns(new List<(RuleJob, Exception?)> { (job, null) });
 
             await sut.Enqueue(rule.RuleDef, rule.Id, @event);
 
             A.CallTo(() => ruleEventRepository.EnqueueAsync(job, now, default))
+                .MustHaveHappened();
+
+            A.CallTo(() => localCache.StartContext())
                 .MustHaveHappened();
         }
 
@@ -96,11 +102,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
             A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
                 .Returns(new List<IRuleEntity> { rule1, rule2 });
 
-            A.CallTo(() => ruleService.CreateJobsAsync(rule1.RuleDef, rule1.Id, @event, false))
-                .Returns(new List<RuleJob> { job1 });
+            A.CallTo(() => ruleService.CreateJobsAsync(rule1.RuleDef, rule1.Id, @event, true))
+                .Returns(new List<(RuleJob, Exception?)> { (job1, null) });
 
-            A.CallTo(() => ruleService.CreateJobsAsync(rule2.RuleDef, rule2.Id, @event, false))
-                .Returns(new List<RuleJob>());
+            A.CallTo(() => ruleService.CreateJobsAsync(rule2.RuleDef, rule2.Id, @event, true))
+                .Returns(new List<(RuleJob, Exception?)>());
 
             await sut.On(@event);
 

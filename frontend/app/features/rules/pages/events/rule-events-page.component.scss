@@ -2,6 +2,10 @@ h3 {
     margin-bottom: 1rem;
 }
 
+.expanded {
+    border-bottom: 0;
+}
+
 .event {
     &-stats {
         font-size: .8rem;
@@ -17,7 +21,7 @@ h3 {
 
     &-header {
         & {
-            background: $color-border;
+            background: $color-table-footer;
             border: 0;
             margin: -.75rem -1.25rem;
             margin-bottom: 1rem;
@@ -26,7 +30,7 @@ h3 {
         }
 
         &::before {
-            @include caret-top($color-border);
+            @include caret-top($color-table-footer);
             @include absolute(-1.1rem, 1.8rem, auto, auto);
         }
 

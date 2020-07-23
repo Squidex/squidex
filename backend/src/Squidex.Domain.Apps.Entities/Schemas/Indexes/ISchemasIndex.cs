@@ -13,11 +13,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
     public interface ISchemasIndex
     {
-        Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false);
+        Task<ISchemaEntity?> GetSchemaAsync(Guid appId, Guid id, bool canCache);
 
-        Task<ISchemaEntity?> GetSchemaByNameAsync(Guid appId, string name, bool allowDeleted = false);
+        Task<ISchemaEntity?> GetSchemaByNameAsync(Guid appId, string name, bool canCache);
 
-        Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId, bool allowDeleted = false);
+        Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId);
 
         Task RebuildAsync(Guid appId, Dictionary<string, Guid> schemas);
     }

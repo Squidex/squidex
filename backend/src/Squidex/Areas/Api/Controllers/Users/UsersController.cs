@@ -72,7 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission]
         public IActionResult GetUserResources()
         {
-            var response = ResourcesDto.FromController(this);
+            var response = ResourcesDto.FromResources(Resources);
 
             return Ok(response);
         }
@@ -97,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             {
                 var users = await userResolver.QueryByEmailAsync(query);
 
-                var response = users.Where(x => !x.IsHidden()).Select(x => UserDto.FromUser(x, this)).ToArray();
+                var response = users.Where(x => !x.IsHidden()).Select(x => UserDto.FromUser(x, Resources)).ToArray();
 
                 return Ok(response);
             }
@@ -127,11 +127,11 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var entity = await userResolver.FindByIdOrEmailAsync(id);
+                var entity = await userResolver.FindByIdAsync(id);
 
                 if (entity != null)
                 {
-                    var response = UserDto.FromUser(entity, this);
+                    var response = UserDto.FromUser(entity, Resources);
 
                     return Ok(response);
                 }
@@ -162,7 +162,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var entity = await userResolver.FindByIdOrEmailAsync(id);
+                var entity = await userResolver.FindByIdAsync(id);
 
                 if (entity != null)
                 {

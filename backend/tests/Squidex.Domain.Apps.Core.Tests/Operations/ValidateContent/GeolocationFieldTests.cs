@@ -9,12 +9,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
-    public class GeolocationFieldTests
+    public class GeolocationFieldTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 

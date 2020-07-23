@@ -21,37 +21,37 @@ export type FieldType =
 export const fieldTypes: ReadonlyArray<{ type: FieldType, description: string }> = [
     {
         type: 'String',
-        description: 'Titles, names, paragraphs.'
+        description: 'i18n:fieldTypes.stringDescription'
     }, {
         type: 'Assets',
-        description: 'Images, videos, documents.'
+        description: 'i18n:fieldTypes.assetsDescription'
     }, {
         type: 'Boolean',
-        description: 'Yes or no, true or false.'
+        description: 'i18n:fieldTypes.booleanDescription'
     }, {
         type: 'DateTime',
-        description: 'Events date, opening hours.'
+        description: 'i18n:fieldTypes.dateTimeDescription'
     }, {
         type: 'Geolocation',
-        description: 'Coordinates: latitude and longitude.'
+        description: 'i18n:fieldTypes.geolocationDescription'
     }, {
         type: 'Json',
-        description: 'Data in JSON format, for developers.'
+        description: 'i18n:fieldTypes.jsonDescription'
     }, {
         type: 'Number',
-        description: 'ID, order number, rating, quantity.'
+        description: 'i18n:fieldTypes.numberDescription'
     }, {
         type: 'References',
-        description: 'Links to other content items.'
+        description: 'i18n:fieldTypes.referencesDescription'
     }, {
         type: 'Tags',
-        description: 'Special format for tags.'
+        description: 'i18n:fieldTypes.tagsDescription'
     }, {
         type: 'Array',
-        description: 'List of embedded objects.'
+        description: 'i18n:fieldTypes.arrayDescription'
     }, {
         type: 'UI',
-        description: 'Separator for editing UI.'
+        description: 'i18n:fieldTypes.uiDescription'
     }
 ];
 
@@ -139,10 +139,6 @@ export abstract class FieldPropertiesDto {
     public readonly placeholder?: string;
     public readonly tags?: ReadonlyArray<string>;
 
-    public get isTranslateable() {
-        return false;
-    }
-
     public get isComplexUI() {
         return true;
     }
@@ -172,6 +168,7 @@ export class ArrayFieldPropertiesDto extends FieldPropertiesDto {
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Assets';
 
+    public readonly previewMode: 'ImageAndFileName' | 'Image' | 'FileName';
     public readonly allowDuplicates?: boolean;
     public readonly allowedExtensions?: ReadonlyArray<string>;
     public readonly resolveFirst: boolean;
@@ -284,7 +281,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     }
 }
 
-export type ReferencesFieldEditor = 'List' | 'Dropdown';
+export type ReferencesFieldEditor = 'List' | 'Dropdown' | 'Checkboxes' | 'Tags';
 
 export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'References';
@@ -326,10 +323,6 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
 
     public get isComplexUI() {
         return this.editor !== 'Input' && this.editor !== 'Color' && this.editor !== 'Radio' && this.editor !== 'Slug' && this.editor !== 'TextArea';
-    }
-
-    public get isTranslateable() {
-        return this.editor === 'Input' || this.editor === 'TextArea';
     }
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {

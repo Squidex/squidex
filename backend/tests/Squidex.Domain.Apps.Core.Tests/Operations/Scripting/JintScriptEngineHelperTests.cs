@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
@@ -22,18 +23,19 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting
 {
-    public class JintScriptEngineHelperTests
+    public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         private readonly IHttpClientFactory httpClientFactory = A.Fake<IHttpClientFactory>();
         private readonly JintScriptEngine sut;
 
         public JintScriptEngineHelperTests()
         {
-            var extensions = new IScriptExtension[]
+            var extensions = new IJintExtension[]
             {
-                new DateTimeScriptExtension(),
-                new HttpScriptExtension(httpClientFactory),
-                new StringScriptExtension()
+                new DateTimeJintExtension(),
+                new HttpJintExtension(httpClientFactory),
+                new StringJintExtension(),
+                new StringWordsJintExtension()
             };
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
@@ -45,18 +47,86 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
+        public void Should_convert_html_to_text()
+        {
+            const string script = @"
+                return html2Text(value);
+            ";
+
+            var vars = new ScriptVars
+            {
+                ["value"] = "<script>Invalid</script><STYLE>Invalid</STYLE><p>Hello World</p>"
+            };
+
+            var result = sut.Execute(vars, script).ToString();
+
+            Assert.Equal("Hello World", result);
+        }
+
+        [Fact]
+        public void Should_convert_markdown_to_text()
+        {
+            const string script = @"
+                return markdown2Text(value);
+            ";
+
+            var vars = new ScriptVars
+            {
+                ["value"] = "## Hello World"
+            };
+
+            var result = sut.Execute(vars, script).ToString();
+
+            Assert.Equal("Hello World", result);
+        }
+
+        [Fact]
+        public void Should_count_words()
+        {
+            const string script = @"
+                return wordCount(value);
+            ";
+
+            var vars = new ScriptVars
+            {
+                ["value"] = "Hello, World"
+            };
+
+            var result = ((JsonNumber)sut.Execute(vars, script)).Value;
+
+            Assert.Equal(2, result);
+        }
+
+        [Fact]
+        public void Should_count_characters()
+        {
+            const string script = @"
+                return characterCount(value);
+            ";
+
+            var vars = new ScriptVars
+            {
+                ["value"] = "Hello, World"
+            };
+
+            var result = ((JsonNumber)sut.Execute(vars, script)).Value;
+
+            Assert.Equal(10, result);
+        }
+
+        [Fact]
         public void Should_camel_case_value()
         {
             const string script = @"
                 return toCamelCase(value);
             ";
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["value"] = "Hello World"
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("helloWorld", result);
         }
@@ -68,12 +138,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return toPascalCase(value);
             ";
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["value"] = "Hello World"
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("HelloWorld", result);
         }
@@ -85,12 +155,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return slugify(value);
             ";
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["value"] = "4 Häuser"
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("4-haeuser", result);
         }
@@ -102,12 +172,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return slugify(value, true);
             ";
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["value"] = "4 Häuser"
             };
 
-            var result = sut.Interpolate(context, script);
+            var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("4-hauser", result);
         }
@@ -119,9 +189,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 reject()
             ";
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptContext(), script));
+            var options = new ScriptOptions
+            {
+                CanReject = true
+            };
 
-            Assert.Empty(ex.Errors);
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
+
+            Assert.NotEmpty(ex.Errors);
         }
 
         [Fact]
@@ -131,7 +206,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 reject('Not valid')
             ";
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptContext(), script));
+            var options = new ScriptOptions
+            {
+                CanReject = true
+            };
+
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
             Assert.Equal("Not valid", ex.Errors.Single().Message);
         }
@@ -143,9 +223,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 disallow()
             ";
 
-            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptContext(), script));
+            var options = new ScriptOptions
+            {
+                CanDisallow = true
+            };
 
-            Assert.Equal("Not allowed", ex.Message);
+            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
+
+            Assert.Equal("Script has forbidden the operation.", ex.Message);
         }
 
         [Fact]
@@ -155,7 +240,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 disallow('Operation not allowed')
             ";
 
-            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptContext(), script));
+            var options = new ScriptOptions
+            {
+                CanDisallow = true
+            };
+
+            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
             Assert.Equal("Operation not allowed", ex.Message);
         }
@@ -173,7 +263,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 });
             ";
 
-            var result = await sut.GetAsync(new ScriptContext(), script);
+            var result = await sut.ExecuteAsync(new ScriptVars(), script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");
@@ -201,7 +291,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 }, headers);
             ";
 
-            var result = await sut.GetAsync(new ScriptContext(), script);
+            var result = await sut.ExecuteAsync(new ScriptVars(), script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");

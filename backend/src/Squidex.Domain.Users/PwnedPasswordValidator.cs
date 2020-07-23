@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -11,21 +11,18 @@ using Microsoft.AspNetCore.Identity;
 using SharpPwned.NET;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Users
 {
     public sealed class PwnedPasswordValidator : IPasswordValidator<IdentityUser>
     {
-        private const string ErrorCode = "PwnedError";
-        private const string ErrorText = "This password has previously appeared in a data breach and should never be used. If you've ever used it anywhere before, change it!";
-        private static readonly IdentityResult Error = IdentityResult.Failed(new IdentityError { Code = ErrorCode, Description = ErrorText });
-
         private readonly HaveIBeenPwnedRestClient client = new HaveIBeenPwnedRestClient();
         private readonly ISemanticLog log;
 
         public PwnedPasswordValidator(ISemanticLog log)
         {
-            Guard.NotNull(log);
+            Guard.NotNull(log, nameof(log));
 
             this.log = log;
         }
@@ -38,7 +35,9 @@ namespace Squidex.Domain.Users
 
                 if (isBreached)
                 {
-                    return Error;
+                    var errorText = T.Get("security.passwordStolen");
+
+                    return IdentityResult.Failed(new IdentityError { Code = "PwnedError", Description = errorText });
                 }
             }
             catch (Exception ex)

@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure
 
         public LanguagesInitializer(IOptions<LanguagesOptions> options)
         {
-            Guard.NotNull(options);
+            Guard.NotNull(options, nameof(options));
 
             this.options = options.Value;
         }

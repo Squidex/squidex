@@ -41,14 +41,13 @@ export class FileSizePipe implements PipeTransform {
     }
 }
 
-export function calculateFileSize(value: number) {
-    let u = 0, s = 1024;
+export function calculateFileSize(value: number, factor = 1024) {
+    let u = 0;
 
-    while (value >= s || -value >= s) {
-        value /= s;
+    while (value >= factor || -value >= factor) {
+        value /= factor;
         u++;
     }
 
     return (u ? value.toFixed(1) + ' ' : value) + ' kMGTPEZY'[u] + 'B';
-
 }

@@ -70,6 +70,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
             this.valueControl.valueChanges
                 .subscribe(value => {
                     this.callChange(value);
+                    this.callTouched();
                 }));
     }
 
@@ -111,7 +112,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
         return photo.url === this.valueControl.value;
     }
 
-    public trackByPhoto(index: number, photo: StockPhotoDto) {
+    public trackByPhoto(_index: number, photo: StockPhotoDto) {
         return photo.thumbUrl;
     }
 }

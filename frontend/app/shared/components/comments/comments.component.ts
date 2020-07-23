@@ -89,7 +89,7 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
         this.commentForm.submitCompleted();
     }
 
-    public trackByComment(index: number, comment: CommentDto) {
+    public trackByComment(_index: number, comment: CommentDto) {
         return comment.id;
     }
 }

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Users
 
         public DefaultUserPictureStore(IAssetStore assetStore)
         {
-            Guard.NotNull(assetStore);
+            Guard.NotNull(assetStore, nameof(assetStore));
 
             this.assetStore = assetStore;
         }

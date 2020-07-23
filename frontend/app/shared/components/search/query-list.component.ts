@@ -37,7 +37,7 @@ export class QueryListComponent {
         return equalsQuery(saved.query, this.queryUsed);
     }
 
-    public trackByQuery(index: number, query: SavedQuery) {
+    public trackByQuery(_index: number, query: SavedQuery) {
         return query.name;
     }
 }

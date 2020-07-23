@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Caching
 
         protected CachingProviderBase(IMemoryCache cache)
         {
-            Guard.NotNull(cache);
+            Guard.NotNull(cache, nameof(cache));
 
             this.cache = cache;
         }

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Guards
@@ -21,19 +22,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
     {
         public static async Task CanCreate(ISchemaEntity schema, IContentWorkflow contentWorkflow, CreateContent command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             if (schema.SchemaDef.IsSingleton && command.ContentId != schema.Id)
             {
-                throw new DomainException("Singleton content cannot be created.");
+                throw new DomainException(T.Get("contents.singletonNotCreatable"));
             }
 
             if (command.Publish && !await contentWorkflow.CanPublishOnCreateAsync(schema, command.Data, command.User))
             {
-                throw new DomainException("Content workflow prevents publishing.");
+                throw new DomainException(T.Get("contents.workflowErorPublishing"));
             }
 
-            Validate.It(() => "Cannot created content.", e =>
+            Validate.It(e =>
             {
                 ValidateData(command, e);
             });
@@ -41,9 +42,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
         public static async Task CanUpdate(ContentState content, IContentWorkflow contentWorkflow, UpdateContent command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot update content.", e =>
+            Validate.It(e =>
             {
                 ValidateData(command, e);
             });
@@ -53,9 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
         public static async Task CanPatch(ContentState content, IContentWorkflow contentWorkflow, PatchContent command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot patch content.", e =>
+            Validate.It(e =>
             {
                 ValidateData(command, e);
             });
@@ -63,71 +64,61 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             await ValidateCanUpdate(content, contentWorkflow, command.User);
         }
 
-        public static void CanDeleteDraft(DeleteContentDraft command, ISchemaEntity schema, ContentState content)
+        public static void CanDeleteDraft(DeleteContentDraft command, ContentState content)
         {
-            Guard.NotNull(command);
-
-            if (schema.SchemaDef.IsSingleton)
-            {
-                throw new DomainException("Singleton content cannot be updated.");
-            }
+            Guard.NotNull(command, nameof(command));
 
             if (content.NewStatus == null)
             {
-                throw new DomainException("There is nothing to delete.");
+                throw new DomainException(T.Get("contents.draftToDeleteNotFound"));
             }
         }
 
-        public static void CanCreateDraft(CreateContentDraft command, ISchemaEntity schema, ContentState content)
+        public static void CanCreateDraft(CreateContentDraft command, ContentState content)
         {
-            Guard.NotNull(command);
-
-            if (schema.SchemaDef.IsSingleton)
-            {
-                throw new DomainException("Singleton content cannot be updated.");
-            }
+            Guard.NotNull(command, nameof(command));
 
             if (content.Status != Status.Published)
             {
-                throw new DomainException("You can only create a new version when the content is published.");
+                throw new DomainException(T.Get("contents.draftNotCreateForUnpublished"));
             }
         }
 
         public static Task CanChangeStatus(ISchemaEntity schema, ContentState content, IContentWorkflow contentWorkflow, ChangeContentStatus command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             if (schema.SchemaDef.IsSingleton)
             {
                 if (content.NewVersion == null || command.Status != Status.Published)
                 {
-                    throw new DomainException("Singleton content cannot be updated.");
+                    throw new DomainException(T.Get("contents.singletonNotChangeable"));
                 }
 
                 return Task.CompletedTask;
             }
 
-            return Validate.It(() => "Cannot change status.", async e =>
+            return Validate.It(async e =>
             {
                 if (!await contentWorkflow.CanMoveToAsync(content, content.EditingStatus, command.Status, command.User))
                 {
-                    e($"Cannot change status from {content.Status} to {command.Status}.", nameof(command.Status));
+                    e(T.Get("contents.statusTransitionNotAllowed", new { oldStatus = content.EditingStatus, newStatus = command.Status }), nameof(command.Status));
                 }
 
                 if (command.DueTime.HasValue && command.DueTime.Value < SystemClock.Instance.GetCurrentInstant())
                 {
-                    e("Due time must be in the future.", nameof(command.DueTime));
+                    e(T.Get("contents.statusSchedulingNotInFuture"), nameof(command.DueTime));
                 }
             });
         }
 
         public static void CanDelete(ISchemaEntity schema, DeleteContent command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             if (schema.SchemaDef.IsSingleton)
             {
-                throw new DomainException("Singleton content cannot be deleted.");
+                throw new DomainException(T.Get("contents.singletonNotDeletable"));
             }
         }
 
@@ -135,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             if (command.Data == null)
             {
-                e(Not.Defined("Data"), nameof(command.Data));
+                e(Not.Defined(nameof(command.Data)), nameof(command.Data));
             }
         }
 
@@ -143,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             if (!await contentWorkflow.CanUpdateAsync(content, content.EditingStatus, user))
             {
-                throw new DomainException($"The workflow does not allow updates at status {content.Status}");
+                throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status = content.EditingStatus }));
             }
         }
     }

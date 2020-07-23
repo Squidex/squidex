@@ -25,6 +25,7 @@ namespace Squidex.Areas.Frontend
             var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
             app.UseMiddleware<SquidMiddleware>();
+            app.UseMiddleware<NotifoMiddleware>();
 
             app.Use((context, next) =>
             {

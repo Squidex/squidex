@@ -15,8 +15,6 @@ using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Comments
@@ -29,8 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentsCommandMiddleware(IGrainFactory grainFactory, IUserResolver userResolver)
         {
-            Guard.NotNull(grainFactory);
-            Guard.NotNull(userResolver);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(userResolver, nameof(userResolver));
 
             this.grainFactory = grainFactory;
 
@@ -43,34 +41,13 @@ namespace Squidex.Domain.Apps.Entities.Comments
             {
                 if (commentsCommand is CreateComment createComment && !IsMention(createComment))
                 {
-                    await ReplicateCommandAsync(context, createComment);
+                    await MentionUsersAsync(createComment);
                 }
 
                 await ExecuteCommandAsync(context, commentsCommand);
             }
 
             await next(context);
-        }
-
-        private async Task ReplicateCommandAsync(CommandContext context, CommentTextCommand command)
-        {
-            await MentionUsersAsync(command);
-
-            if (command.Mentions != null)
-            {
-                foreach (var userId in command.Mentions)
-                {
-                    var notificationCommand = SimpleMapper.Map(command, new CreateComment());
-
-                    notificationCommand.AppId = null!;
-                    notificationCommand.Mentions = null;
-                    notificationCommand.CommentsId = userId;
-                    notificationCommand.ExpectedVersion = EtagVersion.Any;
-                    notificationCommand.IsMention = true;
-
-                    context.CommandBus.PublishAsync(notificationCommand).Forget();
-                }
-            }
         }
 
         private async Task ExecuteCommandAsync(CommandContext context, CommentsCommand commentsCommand)

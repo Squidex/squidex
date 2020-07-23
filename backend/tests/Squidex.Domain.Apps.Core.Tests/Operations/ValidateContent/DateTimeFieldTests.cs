@@ -10,13 +10,14 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
-    public class DateTimeFieldTests
+    public class DateTimeFieldTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(FutureDays(0)), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"Must be greater or equal to '{sut.Properties.MinValue}'." });
+                new[] { $"Must be greater or equal to {sut.Properties.MinValue}." });
         }
 
         [Fact]
@@ -68,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(FutureDays(20)), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"Must be less or equal to '{FutureDays(10)}'." });
+                new[] { $"Must be less or equal to {FutureDays(10)}." });
         }
 
         [Fact]

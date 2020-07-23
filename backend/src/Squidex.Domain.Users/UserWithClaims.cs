@@ -43,8 +43,8 @@ namespace Squidex.Domain.Users
 
         public UserWithClaims(IdentityUser user, IEnumerable<Claim> claims)
         {
-            Guard.NotNull(user);
-            Guard.NotNull(claims);
+            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(claims, nameof(claims));
 
             Identity = user;
 

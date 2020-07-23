@@ -52,6 +52,6 @@ export class NewsService {
 
                 return features;
             }),
-            pretifyError('Failed to load features. Please reload.'));
+            pretifyError('i18n:features.loadFailed'));
     }
 }

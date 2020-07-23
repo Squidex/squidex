@@ -21,7 +21,7 @@ namespace Squidex.Web.Pipeline
 
         public ApiCostsFilter(UsageGate usageGate)
         {
-            Guard.NotNull(usageGate);
+            Guard.NotNull(usageGate, nameof(usageGate));
 
             this.usageGate = usageGate;
         }

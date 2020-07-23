@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -175,7 +176,7 @@ namespace Squidex.Areas.Api.Controllers.UI
 
             if (string.IsNullOrWhiteSpace(subject))
             {
-                throw new DomainForbiddenException("Not allowed for clients.");
+                throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
             }
 
             return subject;

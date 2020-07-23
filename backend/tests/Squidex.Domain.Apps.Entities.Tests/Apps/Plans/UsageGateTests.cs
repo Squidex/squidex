@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             A.CallTo(() => appPlan.BlockingApiCalls)
                 .ReturnsLazily(x => apiCallsBlocking);
 
-            A.CallTo(() => usageTracker.GetMonthCostsAsync(appId.Id.ToString(), today))
+            A.CallTo(() => usageTracker.GetMonthCallsAsync(appId.Id.ToString(), today))
                 .ReturnsLazily(x => Task.FromResult(apiCallsCurrent));
 
             sut = new UsageGate(appPlansProvider, usageTracker, grainFactory);

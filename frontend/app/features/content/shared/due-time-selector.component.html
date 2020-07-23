@@ -23,8 +23,8 @@
         </ng-container>
     
         <ng-container footer>
-            <button type="button" class="float-left btn btn-secondary" (click)="cancelStatusChange()">Cancel</button>
-            <button type="button" class="float-right btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()" sqxFocusOnInit>Confirm</button>
+            <button type="button" class="btn btn-secondary" (click)="cancelStatusChange()">Cancel</button>
+            <button type="button" class="btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()" sqxFocusOnInit>Confirm</button>
         </ng-container>
     </sqx-modal-dialog>
 </ng-container>

@@ -43,6 +43,11 @@ namespace Squidex.Infrastructure.Json.Objects
             return 0;
         }
 
+        public IJsonValue Clone()
+        {
+            return this;
+        }
+
         public string ToJsonString()
         {
             return ToString();

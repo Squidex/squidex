@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -9,6 +9,7 @@ using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
@@ -17,28 +18,28 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static void CanAdd(AddWorkflow command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add workflow.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                    e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined(nameof(command.Name)), nameof(command.Name));
                 }
             });
         }
 
         public static void CanUpdate(Workflows workflows, UpdateWorkflow command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             CheckWorkflowExists(workflows, command.WorkflowId);
 
-            Validate.It(() => "Cannot update workflow.", e =>
+            Validate.It(e =>
             {
                 if (command.Workflow == null)
                 {
-                    e(Not.Defined("Workflow"), nameof(command.Workflow));
+                    e(Not.Defined(nameof(command.Workflow)), nameof(command.Workflow));
                     return;
                 }
 
@@ -46,19 +47,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (!workflow.Steps.ContainsKey(workflow.Initial))
                 {
-                    e(Not.Defined("Initial step"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
+                    e(Not.Defined("InitialStep"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
                 }
 
                 if (workflow.Initial == Status.Published)
                 {
-                    e("Initial step cannot be published step.", $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
+                    e(T.Get("workflows.initialNotPublished"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
                 }
 
                 var stepsPrefix = $"{nameof(command.Workflow)}.{nameof(workflow.Steps)}";
 
                 if (!workflow.Steps.ContainsKey(Status.Published))
                 {
-                    e("Workflow must have a published step.", stepsPrefix);
+                    e(T.Get("apps.workflows.initialNotPublished"), stepsPrefix);
                 }
 
                 foreach (var step in workflow.Steps)
@@ -77,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                             if (!workflow.Steps.ContainsKey(status))
                             {
-                                e("Transition has an invalid target.", transitionPrefix);
+                                e(T.Get("apps.workflows.publishedStepNotFound"), transitionPrefix);
                             }
 
                             if (transition == null)
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public static void CanDelete(Workflows workflows, DeleteWorkflow command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             CheckWorkflowExists(workflows, command.WorkflowId);
         }
@@ -101,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             if (!workflows.ContainsKey(id))
             {
-                throw new DomainObjectNotFoundException(id.ToString(), "Workflows", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(id.ToString());
             }
         }
     }

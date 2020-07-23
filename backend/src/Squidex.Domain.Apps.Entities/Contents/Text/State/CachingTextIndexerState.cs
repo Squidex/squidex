@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
         public CachingTextIndexerState(ITextIndexerState inner)
         {
-            Guard.NotNull(inner);
+            Guard.NotNull(inner, nameof(inner));
 
             this.inner = inner;
         }
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
         public Task SetAsync(TextContentState state)
         {
-            Guard.NotNull(state);
+            Guard.NotNull(state, nameof(state));
 
             cache.Set(state.ContentId, Tuple.Create<TextContentState?>(state));
 

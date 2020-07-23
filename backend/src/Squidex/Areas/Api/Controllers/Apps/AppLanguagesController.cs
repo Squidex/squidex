@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -42,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(AppLanguagesDto), 200)]
-        [ApiPermission(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
         [ApiCosts(0)]
         public IActionResult GetLanguages(string app)
         {
@@ -69,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(AppLanguagesDto), 201)]
-        [ApiPermission(Permissions.AppLanguagesCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppLanguagesCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostLanguage(string app, [FromBody] AddLanguageDto request)
         {
@@ -94,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/languages/{language}/")]
         [ProducesResponseType(typeof(AppLanguagesDto), 200)]
-        [ApiPermission(Permissions.AppLanguagesUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppLanguagesUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutLanguage(string app, string language, [FromBody] UpdateLanguageDto request)
         {
@@ -118,7 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/languages/{language}/")]
         [ProducesResponseType(typeof(AppLanguagesDto), 200)]
-        [ApiPermission(Permissions.AppLanguagesDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppLanguagesDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteLanguage(string app, string language)
         {
@@ -141,7 +140,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private AppLanguagesDto GetResponse(IAppEntity result)
         {
-            return AppLanguagesDto.FromApp(result, this);
+            return AppLanguagesDto.FromApp(result, Resources);
         }
 
         private static Language ParseLanguage(string language)
@@ -152,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             }
             catch (NotSupportedException)
             {
-                throw new ValidationException($"Language '{language}' is not valid.");
+                throw new DomainObjectNotFoundException(language);
             }
         }
     }

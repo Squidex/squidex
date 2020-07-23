@@ -65,7 +65,7 @@ export class AppLanguagesService {
             mapVersioned(({ body }) => {
                 return parseLanguages(body);
             }),
-            pretifyError('Failed to load languages. Please reload.'));
+            pretifyError('i18n:languages.loadFailed'));
     }
 
     public postLanguage(appName: string, dto: AddAppLanguageDto, version: Version): Observable<AppLanguagesDto> {
@@ -78,7 +78,7 @@ export class AppLanguagesService {
             tap(() => {
                 this.analytics.trackEvent('Language', 'Added', appName);
             }),
-            pretifyError('Failed to add language. Please reload.'));
+            pretifyError('i18n:loadings.addFailed'));
     }
 
     public putLanguage(appName: string, resource: Resource, dto: UpdateAppLanguageDto, version: Version): Observable<AppLanguagesDto> {
@@ -93,7 +93,7 @@ export class AppLanguagesService {
             tap(() => {
                 this.analytics.trackEvent('Language', 'Updated', appName);
             }),
-            pretifyError('Failed to change language. Please reload.'));
+            pretifyError('i18n:languages.updateFailed'));
     }
 
     public deleteLanguage(appName: string, resource: Resource, version: Version): Observable<AppLanguagesDto> {

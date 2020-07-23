@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -21,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public FieldValidator(IEnumerable<IValidator> validators, IField field)
         {
-            Guard.NotNull(field);
+            Guard.NotNull(field, nameof(field));
 
             this.validators = validators.ToArray();
 
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             }
             catch
             {
-                addError(context.Path, "Not a valid value.");
+                addError(context.Path, T.Get("contents.validation.invalid"));
             }
         }
     }

@@ -8,10 +8,11 @@
 using System;
 using System.Linq;
 using IdentityServer4.Stores;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Migrate_01.Migrations.MongoDb;
+using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -101,6 +102,9 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs<MongoUserStore>()
                         .As<IUserStore<IdentityUser>>().As<IUserFactory>();
+
+                    services.AddSingletonAs<MongoXmlRepository>()
+                        .As<IXmlRepository>();
 
                     services.AddSingletonAs<MongoKeyStore>()
                         .As<ISigningCredentialStore>().As<IValidationKeysStore>();

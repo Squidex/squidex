@@ -13,6 +13,7 @@ using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -47,18 +48,20 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpGet]
         [Route("apps/{app}/assets/folders", Order = -1)]
         [ProducesResponseType(typeof(AssetsDto), 200)]
-        [ApiPermission(Permissions.AppAssetsRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] Guid parentId)
         {
-            var assetFolders = await assetQuery.QueryAssetFoldersAsync(Context, parentId);
+            var (folders, path) = await AsyncHelper.WhenAll(
+                assetQuery.QueryAssetFoldersAsync(Context, parentId),
+                assetQuery.FindAssetFolderAsync(parentId));
 
             var response = Deferred.Response(() =>
             {
-                return AssetFoldersDto.FromAssets(assetFolders, this, app);
+                return AssetFoldersDto.FromAssets(folders, path, Resources);
             });
 
-            Response.Headers[HeaderNames.ETag] = assetFolders.ToEtag();
+            Response.Headers[HeaderNames.ETag] = folders.ToEtag();
 
             return Ok(response);
         }
@@ -76,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/folders", Order = -1)]
         [ProducesResponseType(typeof(AssetDto), 201)]
         [AssetRequestSizeLimit]
-        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostAssetFolder(string app, [FromBody] CreateAssetFolderDto request)
         {
@@ -102,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
         [ProducesResponseType(typeof(AssetDto), 200)]
         [AssetRequestSizeLimit]
-        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetFolder(string app, Guid id, [FromBody] RenameAssetFolderDto request)
         {
@@ -127,7 +130,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/folders/{id}/parent", Order = -1)]
         [ProducesResponseType(typeof(AssetDto), 200)]
         [AssetRequestSizeLimit]
-        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetFolderParent(string app, Guid id, [FromBody] MoveAssetItemDto request)
         {
@@ -149,7 +152,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
-        [ApiPermission(Permissions.AppAssetsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteAssetFolder(string app, Guid id)
         {
@@ -162,7 +165,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = await CommandBus.PublishAsync(command);
 
-            return AssetFolderDto.FromAssetFolder(context.Result<IAssetFolderEntity>(), this, app);
+            return AssetFolderDto.FromAssetFolder(context.Result<IAssetFolderEntity>(), Resources);
         }
     }
 }

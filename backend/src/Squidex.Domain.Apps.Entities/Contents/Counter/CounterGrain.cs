@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 
         public CounterGrain(IGrainState<State> state)
         {
-            Guard.NotNull(state);
+            Guard.NotNull(state, nameof(state));
 
             this.state = state;
         }

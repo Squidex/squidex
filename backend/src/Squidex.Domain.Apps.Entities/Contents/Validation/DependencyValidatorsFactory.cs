@@ -23,8 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
 
         public DependencyValidatorsFactory(IAssetRepository assetRepository, IContentRepository contentRepository)
         {
-            Guard.NotNull(assetRepository);
-            Guard.NotNull(contentRepository);
+            Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.assetRepository = assetRepository;
             this.contentRepository = contentRepository;

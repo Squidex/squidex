@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public DefaultBackupArchiveStore(IAssetStore assetStore)
         {
-            Guard.NotNull(assetStore);
+            Guard.NotNull(assetStore, nameof(assetStore));
 
             this.assetStore = assetStore;
         }

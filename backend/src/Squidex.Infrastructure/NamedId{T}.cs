@@ -25,8 +25,8 @@ namespace Squidex.Infrastructure
 
         public NamedId(T id, string name)
         {
-            Guard.NotNull(id);
-            Guard.NotNull(name);
+            Guard.NotNull(id, nameof(id));
+            Guard.NotNull(name, nameof(name));
 
             Id = id;
 

@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal
 
         public Parser(IMemoryCache memoryCache)
         {
-            Guard.NotNull(memoryCache);
+            Guard.NotNull(memoryCache, nameof(memoryCache));
 
             this.memoryCache = memoryCache;
         }

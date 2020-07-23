@@ -21,6 +21,8 @@ namespace Squidex.Web
     [ApiModelValidation(false)]
     public abstract class ApiController : Controller
     {
+        private readonly Lazy<Resources> resources;
+
         protected ICommandBus CommandBus { get; }
 
         protected IAppEntity App
@@ -38,6 +40,11 @@ namespace Squidex.Web
             }
         }
 
+        protected Resources Resources
+        {
+            get { return resources.Value; }
+        }
+
         protected Context Context
         {
             get { return HttpContext.Context(); }
@@ -50,9 +57,11 @@ namespace Squidex.Web
 
         protected ApiController(ICommandBus commandBus)
         {
-            Guard.NotNull(commandBus);
+            Guard.NotNull(commandBus, nameof(commandBus));
 
             CommandBus = commandBus;
+
+            resources = new Lazy<Resources>(() => new Resources(this));
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)

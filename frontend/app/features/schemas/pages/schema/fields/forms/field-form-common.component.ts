@@ -18,10 +18,7 @@ export class FieldFormCommonComponent {
     public readonly standalone = { standalone: true };
 
     @Input()
-    public editForm: FormGroup;
-
-    @Input()
-    public editFormSubmitted = false;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;

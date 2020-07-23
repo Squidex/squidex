@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure.Collections;
@@ -19,7 +20,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 {
-    public class AssetsValidatorTests
+    public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 
@@ -98,7 +99,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateValue(assetId), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"[1]: Id '{assetId}' not found." });
+                new[] { $"[1]: Id {assetId} not found." });
         }
 
         [Fact]
@@ -121,7 +122,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "[1]: \'4 kB\' less than minimum of \'5 kB\'." });
+                new[] { "[1]: Size of 4 kB must be greater than 5 kB." });
         }
 
         [Fact]
@@ -132,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "[2]: \'8 kB\' greater than maximum of \'5 kB\'." });
+                new[] { "[2]: Size of 8 kB must be less than 5 kB." });
         }
 
         [Fact]
@@ -154,7 +155,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "[2]: Width \'800px\' less than minimum of \'1000px\'." });
+                new[] { "[2]: Width 800px must be greater than 1000px." });
         }
 
         [Fact]
@@ -165,7 +166,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "[2]: Width \'800px\' greater than maximum of \'700px\'." });
+                new[] { "[2]: Width 800px must be less than 700px." });
         }
 
         [Fact]
@@ -176,7 +177,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "[2]: Height \'600px\' less than minimum of \'800px\'." });
+                new[] { "[2]: Height 600px must be greater than 800px." });
         }
 
         [Fact]
@@ -187,7 +188,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "[2]: Height \'600px\' greater than maximum of \'500px\'." });
+                new[] { "[2]: Height 600px must be less than 500px." });
         }
 
         [Fact]
@@ -198,7 +199,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "[2]: Aspect ratio not '1:1'." });
+                new[] { "[2]: Must have aspect ratio 1:1." });
         }
 
         [Fact]
@@ -211,8 +212,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             errors.Should().BeEquivalentTo(
                 new[]
                 {
-                    "[1]: Invalid file extension.",
-                    "[2]: Invalid file extension."
+                    "[1]: Must be an allowed extension.",
+                    "[2]: Must be an allowed extension."
                 });
         }
 

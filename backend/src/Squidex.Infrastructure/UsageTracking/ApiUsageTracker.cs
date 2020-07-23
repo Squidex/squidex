@@ -23,13 +23,22 @@ namespace Squidex.Infrastructure.UsageTracking
             this.usageTracker = usageTracker;
         }
 
-        public async Task<long> GetMonthCostsAsync(string key, DateTime date)
+        public async Task<long> GetMonthCallsAsync(string key, DateTime date)
         {
             var apiKey = GetKey(key);
 
             var counters = await usageTracker.GetForMonthAsync(apiKey, date);
 
             return counters.GetInt64(CounterTotalCalls);
+        }
+
+        public async Task<long> GetMonthBytesAsync(string key, DateTime date)
+        {
+            var apiKey = GetKey(key);
+
+            var counters = await usageTracker.GetForMonthAsync(apiKey, date);
+
+            return counters.GetInt64(CounterTotalBytes);
         }
 
         public Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsedMs, long bytes)
@@ -93,7 +102,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         private static string GetKey(string key)
         {
-            Guard.NotNullOrEmpty(key);
+            Guard.NotNullOrEmpty(key, nameof(key));
 
             return $"{key}_API";
         }

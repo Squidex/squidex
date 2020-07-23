@@ -47,8 +47,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         protected NestedField(long id, string name, IFieldSettings? settings = null)
         {
-            Guard.NotNullOrEmpty(name);
-            Guard.GreaterThan(id, 0);
+            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.GreaterThan(id, 0, nameof(id));
 
             fieldId = id;
             fieldName = name;

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -20,6 +20,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -31,8 +32,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public AssetDomainObject(IStore<Guid> store, ITagService tagService, IAssetQueryService assetQuery, ISemanticLog log)
             : base(store, log)
         {
-            Guard.NotNull(tagService);
-            Guard.NotNull(assetQuery);
+            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
 
             this.tagService = tagService;
 
@@ -172,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             if (Snapshot.IsDeleted)
             {
-                throw new DomainException("Asset has already been deleted");
+                throw new DomainException(T.Get("assets.assetAlreadyDeleted"));
             }
         }
     }

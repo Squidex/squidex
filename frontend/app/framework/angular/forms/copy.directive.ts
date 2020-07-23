@@ -65,7 +65,7 @@ export class CopyDirective {
         try {
             document.execCommand('copy');
 
-            this.dialogs.notify(Notification.info('Value has been added to your clipboard.'));
+            this.dialogs.notifyInfo('i18n:common.clipboardAdded'));
         } catch (e) {
             console.log('Copy failed');
         }

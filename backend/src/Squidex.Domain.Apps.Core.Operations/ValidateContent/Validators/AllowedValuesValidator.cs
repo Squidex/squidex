@@ -9,30 +9,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public sealed class AllowedValuesValidator<T> : IValidator
+    public sealed class AllowedValuesValidator<TValue> : IValidator
     {
-        private readonly IEnumerable<T> allowedValues;
+        private readonly IEnumerable<TValue> allowedValues;
 
-        public AllowedValuesValidator(params T[] allowedValues)
-            : this((IEnumerable<T>)allowedValues)
+        public AllowedValuesValidator(params TValue[] allowedValues)
+            : this((IEnumerable<TValue>)allowedValues)
         {
         }
 
-        public AllowedValuesValidator(IEnumerable<T> allowedValues)
+        public AllowedValuesValidator(IEnumerable<TValue> allowedValues)
         {
-            Guard.NotNull(allowedValues);
+            Guard.NotNull(allowedValues, nameof(allowedValues));
 
             this.allowedValues = allowedValues;
         }
 
         public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
-            if (value != null && value is T typedValue && !allowedValues.Contains(typedValue))
+            if (value != null && value is TValue typedValue && !allowedValues.Contains(typedValue))
             {
-                addError(context.Path, "Not an allowed value.");
+                addError(context.Path, T.Get("contents.validation.notAllowed"));
             }
 
             return Task.CompletedTask;

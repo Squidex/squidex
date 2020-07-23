@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         public RulesIndex(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory);
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
                 var rules =
                     await Task.WhenAll(
-                        ids.Select(GetRuleAsync));
+                        ids.Select(GetRuleCoreAsync));
 
                 return rules.NotNull().ToList();
             }
@@ -51,14 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             using (Profiler.TraceMethod<RulesIndex>())
             {
-                var ruleEntity = await grainFactory.GetGrain<IRuleGrain>(id).GetStateAsync();
-
-                if (IsFound(ruleEntity.Value))
-                {
-                    return ruleEntity.Value;
-                }
-
-                return null;
+                return await GetRuleCoreAsync(id);
             }
         }
 
@@ -95,13 +88,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private async Task DeleteRuleAsync(DeleteRule command)
         {
-            var id = command.RuleId;
+            var rule = await GetRuleAsync(command.RuleId);
 
-            var rule = await grainFactory.GetGrain<IRuleGrain>(id).GetStateAsync();
-
-            if (IsFound(rule.Value))
+            if (rule != null)
             {
-                await Index(rule.Value.AppId.Id).RemoveAsync(id);
+                await Index(rule.AppId.Id).RemoveAsync(rule.Id);
             }
         }
 
@@ -110,9 +101,16 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             return grainFactory.GetGrain<IRulesByAppIndexGrain>(appId);
         }
 
-        private static bool IsFound(IRuleEntity rule)
+        private async Task<IRuleEntity?> GetRuleCoreAsync(Guid ruleId)
         {
-            return rule.Version > EtagVersion.Empty && !rule.IsDeleted;
+            var rule = (await grainFactory.GetGrain<IRuleGrain>(ruleId).GetStateAsync()).Value;
+
+            if (rule.Version <= EtagVersion.Empty)
+            {
+                return null;
+            }
+
+            return rule;
         }
     }
 }

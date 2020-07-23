@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppSettingsSearchSource(IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(urlGenerator);
+            Guard.NotNull(urlGenerator, nameof(urlGenerator));
 
             this.urlGenerator = urlGenerator;
         }

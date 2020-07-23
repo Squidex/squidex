@@ -2,7 +2,7 @@
     <form [formGroup]="addClientForm.form" (ngSubmit)="addClient()">
         <div class="row no-gutters">
             <div class="col">
-                <sqx-control-errors for="name" [submitted]="addClientForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="name"></sqx-control-errors>
 
                 <input type="text" class="form-control" formControlName="id" maxlength="40" placeholder="Enter client name" autocomplete="off" sqxTransformInput="LowerCase" />
             </div>

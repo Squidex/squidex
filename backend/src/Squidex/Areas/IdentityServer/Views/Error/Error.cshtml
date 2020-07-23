@@ -1,12 +1,14 @@
 ﻿@model Squidex.Areas.IdentityServer.Controllers.Error.ErrorViewModel
 
 @{
-    ViewBag.Title = "Error";
+    ViewBag.Theme = "white";
+
+    ViewBag.Title = @T.Get("users.error.title");
 }
 
 <img class="splash-image" src="@Url.RootContentUrl("~/squid.svg?title=OH%20DAMN&text=I%20am%20sorry%2C%20that%20something%20went%20wrong")" />
 
-<h1 class="splash-h1">Operation failed</h1>
+<h1 class="splash-h1">@T.Get("users.error.headline")</h1>
 
 <p class="splash-text">
     @if (Model.Error?.ErrorDescription != null)
@@ -15,6 +17,6 @@
     }
     else
     {
-        <span>We are really sorry that something went wrong.</span>
+        <span>@T.Get("users.error.text")</span>
     }
 </p>

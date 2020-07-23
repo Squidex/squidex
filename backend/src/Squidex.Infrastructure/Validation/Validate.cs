@@ -8,12 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure.Validation
 {
     public static class Validate
     {
-        public static void It(Func<string> message, Action<AddValidation> action)
+        public static void It(Action<AddValidation> action)
         {
             List<ValidationError>? errors = null;
 
@@ -31,11 +32,11 @@ namespace Squidex.Infrastructure.Validation
 
             if (errors != null)
             {
-                throw new ValidationException(message(), errors);
+                throw new ValidationException(errors);
             }
         }
 
-        public static async Task It(Func<string> message, Func<AddValidation, Task> action)
+        public static async Task It(Func<AddValidation, Task> action)
         {
             List<ValidationError>? errors = null;
 
@@ -53,7 +54,7 @@ namespace Squidex.Infrastructure.Validation
 
             if (errors != null)
             {
-                throw new ValidationException(message(), errors);
+                throw new ValidationException(errors);
             }
         }
     }

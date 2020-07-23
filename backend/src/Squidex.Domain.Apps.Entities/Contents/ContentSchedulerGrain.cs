@@ -33,10 +33,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IClock clock,
             ISemanticLog log)
         {
-            Guard.NotNull(contentRepository);
-            Guard.NotNull(commandBus);
-            Guard.NotNull(clock);
-            Guard.NotNull(log);
+            Guard.NotNull(contentRepository, nameof(contentRepository));
+            Guard.NotNull(commandBus, nameof(commandBus));
+            Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(log, nameof(log));
 
             this.clock = clock;
 
@@ -77,7 +77,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         if (job != null)
                         {
-                            var command = new ChangeContentStatus { ContentId = content.Id, Status = job.Status, Actor = job.ScheduledBy, JobId = job.Id };
+                            var command = new ChangeContentStatus { ContentId = content.Id, Status = job.Status, JobId = job.Id };
+
+                            command.Actor = job.ScheduledBy;
 
                             await commandBus.PublishAsync(command);
                         }

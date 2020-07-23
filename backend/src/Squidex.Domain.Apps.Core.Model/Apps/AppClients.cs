@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Revoke(string id)
         {
-            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             return Without<AppClients>(id);
         }
@@ -37,8 +37,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Add(string id, AppClient client)
         {
-            Guard.NotNullOrEmpty(id);
-            Guard.NotNull(client);
+            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNull(client, nameof(client));
 
             return With<AppClients>(id, client);
         }
@@ -46,40 +46,27 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Add(string id, string secret)
         {
-            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             if (ContainsKey(id))
             {
                 throw new ArgumentException("Id already exists.", nameof(id));
             }
 
-            return With<AppClients>(id, new AppClient(id, secret, Role.Editor));
+            return With<AppClients>(id, new AppClient(id, secret, Role.Editor, false));
         }
 
         [Pure]
-        public AppClients Rename(string id, string newName)
+        public AppClients Update(string id, string? name = null, string? role = null, bool? allowAnonymous = false)
         {
-            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(id, nameof(id));
 
             if (!TryGetValue(id, out var client))
             {
                 return this;
             }
 
-            return With<AppClients>(id, client.Rename(newName));
-        }
-
-        [Pure]
-        public AppClients Update(string id, string role)
-        {
-            Guard.NotNullOrEmpty(id);
-
-            if (!TryGetValue(id, out var client))
-            {
-                return this;
-            }
-
-            return With<AppClients>(id, client.Update(role));
+            return With<AppClients>(id, client.Update(name, role, allowAnonymous));
         }
     }
 }

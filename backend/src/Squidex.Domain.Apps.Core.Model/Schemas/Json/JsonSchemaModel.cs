@@ -43,6 +43,9 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public FieldNames? FieldsInReferences { get; set; }
 
         [JsonProperty]
+        public FieldRules? FieldRules { get; set; }
+
+        [JsonProperty]
         public JsonFieldModel[] Fields { get; set; }
 
         [JsonProperty]
@@ -116,6 +119,11 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
             if (FieldsInReferences?.Count > 0)
             {
                 schema = schema.SetFieldsInReferences(FieldsInReferences);
+            }
+
+            if (FieldRules?.Count > 0)
+            {
+                schema = schema.SetFieldRules(FieldRules);
             }
 
             if (PreviewUrls?.Count > 0)

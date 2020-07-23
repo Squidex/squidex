@@ -37,8 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextIndexingProcess(ITextIndex textIndexer, ITextIndexerState textIndexerState)
         {
-            Guard.NotNull(textIndexer);
-            Guard.NotNull(textIndexerState);
+            Guard.NotNull(textIndexer, nameof(textIndexer));
+            Guard.NotNull(textIndexerState, nameof(textIndexerState));
 
             this.textIndexer = textIndexer;
             this.textIndexerState = textIndexerState;
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     DocId = state.DocIdCurrent,
                     ServeAll = true,
                     ServePublished = false,
-                    Texts = data.ToTexts(),
+                    Texts = data.ToTexts()
                 });
 
             await textIndexerState.SetAsync(state);
@@ -245,7 +245,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     },
                     new DeleteIndexEntry
                     {
-                        DocId = state.DocIdNew,
+                        DocId = state.DocIdNew
                     });
 
                 state.DocIdNew = null;
@@ -267,7 +267,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     },
                     new DeleteIndexEntry
                     {
-                        DocId = state.DocIdNew ?? NotFound,
+                        DocId = state.DocIdNew ?? NotFound
                     });
 
                 await textIndexerState.RemoveAsync(state.ContentId);

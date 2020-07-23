@@ -66,6 +66,10 @@ export class PlansState extends State<Snapshot> {
 
     public window = window;
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly authState: AuthService,
@@ -89,7 +93,7 @@ export class PlansState extends State<Snapshot> {
         return this.plansService.getPlans(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Plans reloaded.');
+                    this.dialogs.notifyInfo('i18n:plans.reloaded');
                 }
 
                 const planId = overridePlanId || payload.currentPlanId;

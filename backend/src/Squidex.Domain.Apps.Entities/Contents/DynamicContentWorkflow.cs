@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvider appProvider)
         {
-            Guard.NotNull(scriptEngine);
-            Guard.NotNull(appProvider);
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.scriptEngine = scriptEngine;
 
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private bool IsTrue(WorkflowCondition condition, NamedContentData data, ClaimsPrincipal user)
         {
-            if (condition?.Roles != null)
+            if (condition?.Roles != null && user != null)
             {
                 if (!user.Claims.Any(x => x.Type == ClaimTypes.Role && condition.Roles.Contains(x.Value)))
                 {
@@ -115,12 +115,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!string.IsNullOrWhiteSpace(condition?.Expression))
             {
-                var context = new ScriptContext
+                var vars = new ScriptVars
                 {
                     ["data"] = data
                 };
 
-                return scriptEngine.Evaluate(context, condition.Expression);
+                return scriptEngine.Evaluate(vars, condition.Expression);
             }
 
             return true;
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             Workflow? result = null;
 
-            var app = await appProvider.GetAppAsync(appId);
+            var app = await appProvider.GetAppAsync(appId, false);
 
             if (app != null)
             {

@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
@@ -27,26 +27,34 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [Required]
         public AssetFolderDto[] Items { get; set; }
 
-        public static AssetFoldersDto FromAssets(IResultList<IAssetFolderEntity> assetFolders, ApiController controller, string app)
+        /// <summary>
+        /// The path to the current folder.
+        /// </summary>
+        [Required]
+        public AssetFolderDto[] Path { get; set; }
+
+        public static AssetFoldersDto FromAssets(IResultList<IAssetFolderEntity> assetFolders, IEnumerable<IAssetFolderEntity> path, Resources resources)
         {
             var response = new AssetFoldersDto
             {
                 Total = assetFolders.Total,
-                Items = assetFolders.Select(x => AssetFolderDto.FromAssetFolder(x, controller, app)).ToArray()
+                Items = assetFolders.Select(x => AssetFolderDto.FromAssetFolder(x, resources)).ToArray(),
             };
 
-            return CreateLinks(response, controller, app);
+            response.Path = path.Select(x => AssetFolderDto.FromAssetFolder(x, resources)).ToArray();
+
+            return CreateLinks(response, resources);
         }
 
-        private static AssetFoldersDto CreateLinks(AssetFoldersDto response, ApiController controller, string app)
+        private static AssetFoldersDto CreateLinks(AssetFoldersDto response, Resources resources)
         {
-            var values = new { app };
+            var values = new { app = resources.App };
 
-            response.AddSelfLink(controller.Url<AssetFoldersController>(x => nameof(x.GetAssetFolders), values));
+            response.AddSelfLink(resources.Url<AssetFoldersController>(x => nameof(x.GetAssetFolders), values));
 
-            if (controller.HasPermission(Permissions.AppAssetsUpdate))
+            if (resources.CanUpdateAsset)
             {
-                response.AddPostLink("create", controller.Url<AssetFoldersController>(x => nameof(x.PostAssetFolder), values));
+                response.AddPostLink("create", resources.Url<AssetFoldersController>(x => nameof(x.PostAssetFolder), values));
             }
 
             return response;

@@ -8,15 +8,17 @@
     <ProjectReference Include="..\..\src\Squidex.Web\Squidex.Web.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="6.5.1" />
-    <PackageReference Include="Confluent.Kafka" Version="1.3.0" />
+    <PackageReference Include="Algolia.Search" Version="6.6.0" />
+    <PackageReference Include="Confluent.Apache.Avro" Version="1.7.7.7" />
+    <PackageReference Include="Confluent.Kafka" Version="1.4.3" />
+    <PackageReference Include="Confluent.SchemaRegistry.Serdes" Version="1.3.0" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
-    <PackageReference Include="Datadog.Trace" Version="1.14.2" />
-    <PackageReference Include="Elasticsearch.Net" Version="7.6.1" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.2" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.6.3" />
+    <PackageReference Include="Datadog.Trace" Version="1.17.0" />
+    <PackageReference Include="Elasticsearch.Net" Version="7.7.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.4" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.6.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NodaTime" Version="2.4.7" />
+    <PackageReference Include="NodaTime" Version="3.0.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />

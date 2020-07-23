@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>@ViewBag.Title - Squidex Headless CMS</title>
+    <title>@ViewBag.Title - @T.Get("common.product")</title>
 
     <environment names="Production">
         <link rel="stylesheet" asp-append-version="true" href="@Url.RootContentUrl("~/build/app.css")" />
@@ -19,7 +19,7 @@
 </head>
 <body class="white">
     <div class="profile @ViewBag.Class">
-        <img class="profile-logo" src="@Url.RootContentUrl("~/images/logo.svg")" />
+        <img class="profile-logo" alt="@T.Get("common.product")S" title="@T.Get("common.product")" src="@Url.RootContentUrl("~/images/logo.svg")" />
 
         @RenderBody()
     </div>

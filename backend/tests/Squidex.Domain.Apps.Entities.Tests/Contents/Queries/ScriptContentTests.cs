@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
                 else
                 {
-                    throw new DomainObjectNotFoundException(x.ToString(), typeof(ISchemaEntity));
+                    throw new DomainObjectNotFoundException(x.ToString());
                 }
             };
 
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(A<ScriptContext>._, A<string>._))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(A<ScriptContext>._, A<string>._))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = new ContentEntity { SchemaId = schemaWithScriptId, Data = oldData };
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptContext>._, "my-query"))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", ScriptOptions()))
                 .Returns(new NamedContentData());
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
@@ -101,12 +101,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.NotSame(oldData, content.Data);
 
             A.CallTo(() => scriptEngine.TransformAsync(
-                    A<ScriptContext>.That.Matches(x =>
+                    A<ScriptVars>.That.Matches(x =>
                         ReferenceEquals(x.User, ctx.User) &&
                         ReferenceEquals(x.Data, oldData) &&
                         x.ContentId == content.Id),
-                    "my-query"))
+                    "my-query",
+                    ScriptOptions()))
                 .MustHaveHappened();
+        }
+
+        private ScriptOptions ScriptOptions()
+        {
+            return A<ScriptOptions>.That.Matches(x => x.AsContext);
         }
     }
 }

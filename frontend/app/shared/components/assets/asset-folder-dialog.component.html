@@ -15,7 +15,7 @@
             <div class="form-group">
                 <label for="folderName">Folder Name <small class="hint">(required)</small></label>
                 
-                <sqx-control-errors for="folderName" submitOnly="true" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="folderName"></sqx-control-errors>
         
                 <input type="text" class="form-control" id="folderName" formControlName="folderName" autocomplete="off" sqxFocusOnInit />
             </div>
@@ -28,9 +28,9 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
+            <button type="button" class="btn btn-secondary" (click)="emitComplete()">Cancel</button>
             
-            <button type="submit" class="float-right btn btn-success">
+            <button type="submit" class="btn btn-success">
                 <ng-container *ngIf="assetFolder; else noAssetFolderButton">
                     Rename
                 </ng-container>

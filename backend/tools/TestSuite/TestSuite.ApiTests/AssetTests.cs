@@ -16,6 +16,7 @@ using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
+#pragma warning disable SA1133 // Do not combine attributes
 
 namespace TestSuite.ApiTests
 {
@@ -188,7 +189,7 @@ namespace TestSuite.ApiTests
             Assert.Contains(assets_2.Items, x => x.Id == asset_1.Id);
         }
 
-        [Fact]
+        [Fact, Trait("Category", "NotAutomated")]
         public async Task Should_delete_recursively()
         {
             // STEP 1: Create asset folder

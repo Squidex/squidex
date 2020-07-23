@@ -23,8 +23,8 @@ namespace Squidex.Infrastructure.Timers
 
         public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {
-            Guard.NotNull(callback);
-            Guard.GreaterThan(delayInMs, 0);
+            Guard.NotNull(callback, nameof(callback));
+            Guard.GreaterThan(delayInMs, 0, nameof(delayInMs));
 
             runTask = RunInternalAsync(delayInMs, initialDelay, callback);
         }
@@ -42,7 +42,14 @@ namespace Squidex.Infrastructure.Timers
             {
                 Interlocked.CompareExchange(ref oneCallState, OneCallRequested, OneCallNotExecuted);
 
-                wakeupToken?.Cancel();
+                try
+                {
+                    wakeupToken?.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
             }
         }
 
@@ -76,9 +83,19 @@ namespace Squidex.Infrastructure.Timers
             {
                 wakeupToken = new CancellationTokenSource();
 
-                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(stopToken.Token, wakeupToken.Token))
+                try
                 {
-                    await Task.Delay(intervall, cts.Token).ConfigureAwait(false);
+                    using (wakeupToken)
+                    {
+                        using (var cts = CancellationTokenSource.CreateLinkedTokenSource(stopToken.Token, wakeupToken.Token))
+                        {
+                            await Task.Delay(intervall, cts.Token).ConfigureAwait(false);
+                        }
+                    }
+                }
+                finally
+                {
+                    wakeupToken = null;
                 }
             }
             catch (OperationCanceledException)

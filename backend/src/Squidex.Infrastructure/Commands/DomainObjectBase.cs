@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected DomainObjectBase(ISemanticLog log)
         {
-            Guard.NotNull(log);
+            Guard.NotNull(log, nameof(log));
 
             this.log = log;
         }
@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected virtual void RaiseEvent(Envelope<IEvent> @event)
         {
-            Guard.NotNull(@event);
+            Guard.NotNull(@event, nameof(@event));
 
             @event.SetAggregateId(id);
 
@@ -143,8 +143,8 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task<object?> InvokeAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler, bool isUpdate) where TCommand : class, IAggregateCommand
         {
-            Guard.NotNull(command);
-            Guard.NotNull(handler);
+            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(handler, nameof(handler));
 
             if (isUpdate)
             {
@@ -153,12 +153,12 @@ namespace Squidex.Infrastructure.Commands
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {
-                throw new DomainObjectVersionException(id.ToString(), GetType(), Version, command.ExpectedVersion);
+                throw new DomainObjectVersionException(id.ToString(), Version, command.ExpectedVersion);
             }
 
             if (isUpdate && Version < 0)
             {
-                throw new DomainObjectNotFoundException(id.ToString(), GetType());
+                throw new DomainObjectNotFoundException(id.ToString());
             }
 
             var previousSnapshot = Snapshot;

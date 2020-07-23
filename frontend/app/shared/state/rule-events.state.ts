@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, LocalStoreService, Pager, shareSubscribed, State } from '@app/framework';
+import { DialogService, Pager, Router2State, shareSubscribed, State } from '@app/framework';
 import { empty, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { RuleEventDto, RulesService } from './../services/rules.service';
@@ -46,17 +46,20 @@ export class RuleEventsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly localStore: LocalStoreService,
         private readonly rulesService: RulesService
     ) {
         super({
             ruleEvents: [],
-            ruleEventsPager: Pager.fromLocalStore('rule-events', localStore)
+            ruleEventsPager: new Pager(0)
         });
+    }
 
-        this.ruleEventsPager.subscribe(pager => {
-            pager.saveTo('rule-events', this.localStore);
-        });
+    public loadAndListen(route: Router2State) {
+        route.mapTo(this)
+            .withPager('ruleEventsPager', 'ruleEvents', 30)
+            .withString('ruleId', 'ruleId')
+            .whenSynced(() => this.loadInternal(false))
+            .build();
     }
 
     public load(isReload = false): Observable<any> {
@@ -76,7 +79,7 @@ export class RuleEventsState extends State<Snapshot> {
                 this.snapshot.ruleId).pipe(
             tap(({ total, items: ruleEvents }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('RuleEvents reloaded.');
+                    this.dialogs.notifyInfo('i18n:ruleEvents.reloaded');
                 }
 
                 return this.next(s => {
@@ -100,7 +103,7 @@ export class RuleEventsState extends State<Snapshot> {
     public enqueue(event: RuleEventDto): Observable<any> {
         return this.rulesService.enqueueEvent(this.appsState.appName, event).pipe(
             tap(() => {
-                this.dialogs.notifyInfo('Events enqueued. Will be resend in a few seconds.');
+                this.dialogs.notifyInfo('i18n:events.enqueued');
             }),
             shareSubscribed(this.dialogs));
     }

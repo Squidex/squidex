@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -20,6 +20,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly ISemanticLog log;
         private readonly IGrainState<BackupState> state;
         private readonly IUserResolver userResolver;
-        private CancellationTokenSource? currentTaskToken;
+        private CancellationTokenSource? currentJobToken;
         private BackupJob? currentJob;
 
         public BackupGrain(
@@ -52,15 +53,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IUserResolver userResolver,
             ISemanticLog log)
         {
-            Guard.NotNull(backupArchiveLocation);
-            Guard.NotNull(backupArchiveStore);
-            Guard.NotNull(clock);
-            Guard.NotNull(eventDataFormatter);
-            Guard.NotNull(eventStore);
-            Guard.NotNull(serviceProvider);
-            Guard.NotNull(state);
-            Guard.NotNull(userResolver);
-            Guard.NotNull(log);
+            Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
+            Guard.NotNull(backupArchiveStore, nameof(backupArchiveStore));
+            Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
+            Guard.NotNull(eventStore, nameof(eventStore));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(state, nameof(state));
+            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(log, nameof(log));
 
             this.backupArchiveLocation = backupArchiveLocation;
             this.backupArchiveStore = backupArchiveStore;
@@ -90,14 +91,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task BackupAsync(RefToken actor)
         {
-            if (currentTaskToken != null)
+            if (currentJobToken != null)
             {
-                throw new DomainException("Another backup process is already running.");
+                throw new DomainException(T.Get("backups.alreadyRunning"));
             }
 
             if (state.Value.Jobs.Count >= MaxBackups)
             {
-                throw new DomainException($"You cannot have more than {MaxBackups} backups.");
+                throw new DomainException(T.Get("backups.maxReached", new { max = MaxBackups }));
             }
 
             var job = new BackupJob
@@ -107,14 +108,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Status = JobStatus.Started
             };
 
-            currentTaskToken = new CancellationTokenSource();
+            currentJobToken = new CancellationTokenSource();
             currentJob = job;
 
             state.Value.Jobs.Insert(0, job);
 
             await state.WriteAsync();
 
-            Process(job, actor, currentTaskToken.Token);
+            Process(job, actor, currentJobToken.Token);
         }
 
         private void Process(BackupJob job, RefToken actor, CancellationToken ct)
@@ -205,7 +206,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 await state.WriteAsync();
 
-                currentTaskToken = null;
+                currentJobToken?.Dispose();
+                currentJobToken = null;
                 currentJob = null;
             }
         }
@@ -230,12 +232,19 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (job == null)
             {
-                throw new DomainObjectNotFoundException(id.ToString(), typeof(IBackupJob));
+                throw new DomainObjectNotFoundException(id.ToString());
             }
 
             if (currentJob == job)
             {
-                currentTaskToken?.Cancel();
+                try
+                {
+                    currentJobToken?.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
             }
             else
             {

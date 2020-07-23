@@ -10,12 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
-    public class ReferencesValidatorTests
+    public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
         private readonly Guid schemaId = Guid.NewGuid();

@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public EventStoreInitializer(IEventStore eventStore)
         {
-            Guard.NotNull(eventStore);
+            Guard.NotNull(eventStore, nameof(eventStore));
 
             this.eventStore = eventStore;
         }

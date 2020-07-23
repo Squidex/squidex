@@ -81,7 +81,7 @@ export class CommentsService {
 
                 return comments;
             }),
-            pretifyError('Failed to load comments.'));
+            pretifyError('i18n:comments.loadFailed'));
     }
 
     public postComment(commentsUrl: string, dto: UpsertCommentDto): Observable<CommentDto> {
@@ -98,20 +98,20 @@ export class CommentsService {
 
                 return comment;
             }),
-            pretifyError('Failed to create comment.'));
+            pretifyError('i18n:comments.createFailed'));
     }
 
     public putComment(commentsUrl: string, commentId: string, dto: UpsertCommentDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/${commentsUrl}/${commentId}`);
 
         return this.http.put(url, dto).pipe(
-            pretifyError('Failed to update comment.'));
+            pretifyError('i18n:comments.updateFailed'));
     }
 
     public deleteComment(commentsUrl: string, commentId: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/${commentsUrl}/${commentId}`);
 
         return this.http.delete(url).pipe(
-            pretifyError('Failed to delete comment.'));
+            pretifyError('i18n:comments.deleteFailed'));
     }
 }

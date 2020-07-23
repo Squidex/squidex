@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public SearchFilter(IReadOnlyList<Guid> schemaIds, bool must)
         {
-            Guard.NotNull(schemaIds);
+            Guard.NotNull(schemaIds, nameof(schemaIds));
 
             SchemaIds = schemaIds;
 

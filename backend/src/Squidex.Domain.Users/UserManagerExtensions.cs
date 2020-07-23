@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Users
@@ -131,12 +132,12 @@ namespace Squidex.Domain.Users
 
             try
             {
-                await DoChecked(() => userManager.CreateAsync(user), "Cannot create user.");
-                await DoChecked(() => values.SyncClaims(userManager, user), "Cannot add user.");
+                await DoChecked(() => userManager.CreateAsync(user));
+                await DoChecked(() => values.SyncClaims(userManager, user));
 
                 if (!string.IsNullOrWhiteSpace(values.Password))
                 {
-                    await DoChecked(() => userManager.AddPasswordAsync(user, values.Password), "Cannot create user.");
+                    await DoChecked(() => userManager.AddPasswordAsync(user, values.Password));
                 }
             }
             catch
@@ -155,7 +156,7 @@ namespace Squidex.Domain.Users
 
             if (user == null)
             {
-                throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
+                throw new DomainObjectNotFoundException(id);
             }
 
             await UpdateAsync(userManager, user, values);
@@ -189,23 +190,21 @@ namespace Squidex.Domain.Users
 
         public static async Task UpdateAsync(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)
         {
-            if (user == null)
-            {
-                throw new DomainObjectNotFoundException("Id", typeof(IdentityUser));
-            }
+            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(values, nameof(values));
 
             if (!string.IsNullOrWhiteSpace(values.Email) && values.Email != user.Email)
             {
-                await DoChecked(() => userManager.SetEmailAsync(user, values.Email), "Cannot update email.");
-                await DoChecked(() => userManager.SetUserNameAsync(user, values.Email), "Cannot update email.");
+                await DoChecked(() => userManager.SetEmailAsync(user, values.Email));
+                await DoChecked(() => userManager.SetUserNameAsync(user, values.Email));
             }
 
-            await DoChecked(() => values.SyncClaims(userManager, user), "Cannot update user.");
+            await DoChecked(() => values.SyncClaims(userManager, user));
 
             if (!string.IsNullOrWhiteSpace(values.Password))
             {
-                await DoChecked(() => userManager.RemovePasswordAsync(user), "Cannot replace password.");
-                await DoChecked(() => userManager.AddPasswordAsync(user, values.Password), "Cannot replace password.");
+                await DoChecked(() => userManager.RemovePasswordAsync(user));
+                await DoChecked(() => userManager.AddPasswordAsync(user, values.Password));
             }
         }
 
@@ -215,10 +214,10 @@ namespace Squidex.Domain.Users
 
             if (user == null)
             {
-                throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
+                throw new DomainObjectNotFoundException(id);
             }
 
-            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)), "Cannot lock user.");
+            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)));
 
             return (await userManager.ResolveUserAsync(user))!;
         }
@@ -229,21 +228,21 @@ namespace Squidex.Domain.Users
 
             if (user == null)
             {
-                throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
+                throw new DomainObjectNotFoundException(id);
             }
 
-            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, null), "Cannot unlock user.");
+            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, null));
 
             return (await userManager.ResolveUserAsync(user))!;
         }
 
-        private static async Task DoChecked(Func<Task<IdentityResult>> action, string message)
+        private static async Task DoChecked(Func<Task<IdentityResult>> action)
         {
             var result = await action();
 
             if (!result.Succeeded)
             {
-                throw new ValidationException(message, result.Errors.Select(x => new ValidationError(x.Description)).ToArray());
+                throw new ValidationException(result.Errors.Select(x => new ValidationError(x.Description)).ToList());
             }
         }
 

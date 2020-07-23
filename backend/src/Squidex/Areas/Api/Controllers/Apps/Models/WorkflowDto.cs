@@ -11,7 +11,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -57,18 +56,18 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return result;
         }
 
-        public WorkflowDto WithLinks(ApiController controller, string app)
+        public WorkflowDto WithLinks(Resources resources)
         {
-            var values = new { app, id = Id };
+            var values = new { app = resources.App, id = Id };
 
-            if (controller.HasPermission(Permissions.AppWorkflowsUpdate, app))
+            if (resources.CanUpdateWorkflow)
             {
-                AddPutLink("update", controller.Url<AppWorkflowsController>(x => nameof(x.PutWorkflow), values));
+                AddPutLink("update", resources.Url<AppWorkflowsController>(x => nameof(x.PutWorkflow), values));
             }
 
-            if (controller.HasPermission(Permissions.AppWorkflowsDelete, app))
+            if (resources.CanDeleteWorkflow)
             {
-                AddDeleteLink("delete", controller.Url<AppWorkflowsController>(x => nameof(x.DeleteWorkflow), values));
+                AddDeleteLink("delete", resources.Url<AppWorkflowsController>(x => nameof(x.DeleteWorkflow), values));
             }
 
             return this;

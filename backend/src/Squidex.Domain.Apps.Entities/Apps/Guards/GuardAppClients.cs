@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
@@ -16,57 +17,52 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         public static void CanAttach(AppClients clients, AttachClient command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot attach client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e(Not.Defined("Client id"), nameof(command.Id));
+                    e(Not.Defined("ClientId"), nameof(command.Id));
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
-                    e("A client with the same id already exists.");
+                    e(T.Get("apps.clients.idAlreadyExists"));
                 }
             });
         }
 
         public static void CanRevoke(AppClients clients, RevokeClient command)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot revoke client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e(Not.Defined("Client id"), nameof(command.Id));
+                    e(Not.Defined("ClientId"), nameof(command.Id));
                 }
             });
         }
 
         public static void CanUpdate(AppClients clients, UpdateClient command, Roles roles)
         {
-            Guard.NotNull(command);
+            Guard.NotNull(command, nameof(command));
 
             GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot update client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e(Not.Defined("Client id"), nameof(command.Id));
-                }
-
-                if (string.IsNullOrWhiteSpace(command.Name) && command.Role == null)
-                {
-                    e(Not.DefinedOr("name", "role"), nameof(command.Name), nameof(command.Role));
+                    e(Not.Defined("Clientd"), nameof(command.Id));
                 }
 
                 if (command.Role != null && !roles.Contains(command.Role))
                 {
-                    e(Not.Valid("role"), nameof(command.Role));
+                    e(Not.Valid("Role"), nameof(command.Role));
                 }
             });
         }
@@ -80,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!clients.TryGetValue(id, out var client))
             {
-                throw new DomainObjectNotFoundException(id, "Clients", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(id);
             }
 
             return client;

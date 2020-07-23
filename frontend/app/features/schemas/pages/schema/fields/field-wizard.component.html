@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="form-group">
-                    <sqx-control-errors for="name" submitOnly="true" [submitted]="addFieldForm.submitted | async"></sqx-control-errors>
+                    <sqx-control-errors for="name" submitOnly="true"></sqx-control-errors>
 
                     <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput
                         placeholder="Enter field name" sqxFocusOnInit />
@@ -66,10 +66,9 @@
             <form [formGroup]="editForm.form" class="edit-form" (ngSubmit)="save()">
                 <sqx-field-form
                     [isEditable]="true"
-                    [patterns]="patternsState.patterns | async"
-                    [editForm]="editForm.form"
-                    [editFormSubmitted]="editForm.submitted | async"
-                    [field]="field">
+                    [field]="field"
+                    [fieldForm]="editForm.form"
+                    [patterns]="patternsState.patterns | async">
                 </sqx-field-form>
             </form>
         </ng-template>
@@ -78,13 +77,13 @@
     <ng-container footer>
         <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
 
-        <div class="float-right" *ngIf="!editing">
+        <div *ngIf="!editing">
             <button type="button" class="btn btn-outline-success" (click)="addField(false)">Create and close</button>
             <button type="button" class="btn btn-success ml-1" (click)="addField(true)">Create and add field</button>
             <button type="button" class="btn btn-success ml-1" (click)="addField(false, true)">Create and edit field</button>
         </div>
 
-        <div class="float-right" *ngIf="editing">
+        <div *ngIf="editing">
             <button type="button" class="btn btn-success" (click)="save(true)">Save and add field</button>
             <button type="button" class="btn btn-primary ml-1" (click)="save()">Save and close</button>
         </div>

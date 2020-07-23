@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -21,6 +21,7 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
@@ -73,15 +74,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
         public async Task<IActionResult> GetApps()
         {
             var userOrClientId = HttpContext.User.UserOrClientId()!;
-            var userPermissions = HttpContext.Permissions();
+            var userPermissions = Resources.Permissions;
 
             var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions);
 
             var response = Deferred.Response(() =>
             {
-                var userPermissions = HttpContext.Permissions();
-
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this)).ToArray();
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, appPlansProvider, Resources)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -107,9 +106,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var response = Deferred.Response(() =>
             {
                 var userOrClientId = HttpContext.User.UserOrClientId()!;
-                var userPermissions = HttpContext.Permissions();
+                var userPermissions = Resources.Permissions;
 
-                return AppDto.FromApp(App, userOrClientId, userPermissions, appPlansProvider, this);
+                return AppDto.FromApp(App, userOrClientId, appPlansProvider, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -154,7 +153,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/")]
         [ProducesResponseType(typeof(AppDto), 200)]
-        [ApiPermission(Permissions.AppUpdateGeneral)]
+        [ApiPermissionOrAnonymous(Permissions.AppUpdateGeneral)]
         [ApiCosts(0)]
         public async Task<IActionResult> UpdateApp(string app, [FromBody] UpdateAppDto request)
         {
@@ -175,7 +174,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/image")]
         [ProducesResponseType(typeof(AppDto), 200)]
-        [ApiPermission(Permissions.AppUpdateImage)]
+        [ApiPermissionOrAnonymous(Permissions.AppUpdateImage)]
         [ApiCosts(0)]
         public async Task<IActionResult> UploadImage(string app, IFormFile file)
         {
@@ -266,7 +265,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/image")]
         [ProducesResponseType(typeof(AppDto), 200)]
-        [ApiPermission(Permissions.AppUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppUpdate)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteImage(string app)
         {
@@ -285,7 +284,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/")]
-        [ApiPermission(Permissions.AppDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppDelete)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteApp(string app)
         {
@@ -299,10 +298,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var userOrClientId = HttpContext.User.UserOrClientId()!;
-            var userPermissions = HttpContext.Permissions();
 
             var result = context.Result<IAppEntity>();
-            var response = AppDto.FromApp(result, userOrClientId, userPermissions, appPlansProvider, this);
+            var response = AppDto.FromApp(result, userOrClientId, appPlansProvider, Resources);
 
             return response;
         }
@@ -311,9 +309,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             if (file == null || Request.Form.Files.Count != 1)
             {
-                var error = new ValidationError($"Can only upload one file, found {Request.Form.Files.Count} files.");
+                var error = T.Get("validation.onlyOneFile");
 
-                throw new ValidationException("Cannot upload image.", error);
+                throw new ValidationException(error);
             }
 
             return new UploadAppImage { File = file.ToAssetFile() };

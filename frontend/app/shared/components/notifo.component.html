@@ -1,0 +1,7 @@
+<span #element></span>
+
+<ng-container *ngIf="showOnboarding">
+    <sqx-onboarding-tooltip helpId="notifo" [for]="element" position="left-top" after="30000">
+        Click this button to subscribe to all changes and to receive push notifications.
+    </sqx-onboarding-tooltip>
+</ng-container>

@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Log
 
         public void Measured(string name, long elapsed)
         {
-            Guard.NotNullOrEmpty(name);
+            Guard.NotNullOrEmpty(name, nameof(name));
 
             traces.AddOrUpdate(name, x =>
             {
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Log
 
         public void Write(IObjectWriter writer)
         {
-            Guard.NotNull(writer);
+            Guard.NotNull(writer, nameof(writer));
 
             if (traces.Count > 0)
             {

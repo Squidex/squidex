@@ -28,6 +28,10 @@ export class Profile {
         return this.user.profile['urn:squidex:picture'];
     }
 
+    public get notifoToken(): string | undefined {
+        return this.user.profile['urn:squidex:notifo'];
+    }
+
     public get isExpired(): boolean {
         return this.user.expired || false;
     }
@@ -165,7 +169,7 @@ export class AuthService {
                 mergeMap(e => Types.is(e, TimeoutError) ? of(e) : throwError(e)),
                 delay(500),
                 take(5),
-                concat(throwError(new Error('Retry limit exceeded.'))))));
+                concat(throwError(new Error('i18n:common.retryExceeded'))))));
     }
 
     private createProfile(user: User): Profile {

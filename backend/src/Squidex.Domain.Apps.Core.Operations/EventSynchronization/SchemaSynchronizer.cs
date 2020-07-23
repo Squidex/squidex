@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
         public static IEnumerable<IEvent> Synchronize(this Schema source, Schema? target, Func<long> idGenerator,
             SchemaSynchronizationOptions? options = null)
         {
-            Guard.NotNull(source);
-            Guard.NotNull(idGenerator);
+            Guard.NotNull(source, nameof(source));
+            Guard.NotNull(idGenerator, nameof(idGenerator));
 
             if (target == null)
             {
@@ -80,6 +80,11 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                 {
                     yield return E(new SchemaUIFieldsConfigured { FieldsInReferences = target.FieldsInReferences });
                 }
+
+                if (!source.FieldRules.SetEquals(target.FieldRules))
+                {
+                    yield return E(new SchemaFieldRulesConfigured { FieldRules = target.FieldRules });
+                }
             }
         }
 
@@ -128,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                     if (canUpdate(sourceField, targetField))
                     {
-                        if (!sourceField.RawProperties.Equals(targetField.RawProperties))
+                        if (!sourceField.RawProperties.Equals(targetField.RawProperties as object))
                         {
                             yield return E(new FieldUpdated { FieldId = id, Properties = targetField.RawProperties });
                         }

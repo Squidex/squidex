@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models
@@ -22,25 +21,25 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         [Required]
         public BackupJobDto[] Items { get; set; }
 
-        public static BackupJobsDto FromBackups(IEnumerable<IBackupJob> backups, ApiController controller, string app)
+        public static BackupJobsDto FromBackups(IEnumerable<IBackupJob> backups, Resources resources)
         {
             var result = new BackupJobsDto
             {
-                Items = backups.Select(x => BackupJobDto.FromBackup(x, controller, app)).ToArray()
+                Items = backups.Select(x => BackupJobDto.FromBackup(x, resources)).ToArray()
             };
 
-            return result.CreateLinks(controller, app);
+            return result.CreateLinks(resources);
         }
 
-        private BackupJobsDto CreateLinks(ApiController controller, string app)
+        private BackupJobsDto CreateLinks(Resources resources)
         {
-            var values = new { app };
+            var values = new { app = resources.App };
 
-            AddSelfLink(controller.Url<BackupsController>(x => nameof(x.GetBackups), values));
+            AddSelfLink(resources.Url<BackupsController>(x => nameof(x.GetBackups), values));
 
-            if (controller.HasPermission(Permissions.AppBackupsCreate, app))
+            if (resources.CanCreateBackup)
             {
-                AddPostLink("create", controller.Url<BackupsController>(x => nameof(x.PostBackup), values));
+                AddPostLink("create", resources.Url<BackupsController>(x => nameof(x.PostBackup), values));
             }
 
             return this;

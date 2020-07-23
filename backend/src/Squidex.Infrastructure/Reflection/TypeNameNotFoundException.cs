@@ -13,16 +13,7 @@ namespace Squidex.Infrastructure.Reflection
     [Serializable]
     public class TypeNameNotFoundException : Exception
     {
-        public TypeNameNotFoundException()
-        {
-        }
-
-        public TypeNameNotFoundException(string message)
-            : base(message)
-        {
-        }
-
-        public TypeNameNotFoundException(string message, Exception inner)
+        public TypeNameNotFoundException(string? message = null, Exception? inner = null)
             : base(message, inner)
         {
         }

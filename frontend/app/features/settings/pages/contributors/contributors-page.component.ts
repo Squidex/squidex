@@ -6,17 +6,21 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ContributorDto, ContributorsState, DialogModel, RolesState } from '@app/shared';
+import { ContributorDto, ContributorsState, DialogModel, RolesState, Router2State } from '@app/shared';
 
 @Component({
     selector: 'sqx-contributors-page',
     styleUrls: ['./contributors-page.component.scss'],
-    templateUrl: './contributors-page.component.html'
+    templateUrl: './contributors-page.component.html',
+    providers: [
+        Router2State
+    ]
 })
 export class ContributorsPageComponent implements OnInit {
     public importDialog = new DialogModel();
 
     constructor(
+        public readonly contributorsRoute: Router2State,
         public readonly contributorsState: ContributorsState,
         public readonly rolesState: RolesState
     ) {
@@ -25,7 +29,7 @@ export class ContributorsPageComponent implements OnInit {
     public ngOnInit() {
         this.rolesState.load();
 
-        this.contributorsState.load();
+        this.contributorsState.loadAndListen(this.contributorsRoute);
     }
 
     public reload() {
@@ -36,7 +40,7 @@ export class ContributorsPageComponent implements OnInit {
         this.contributorsState.search(query);
     }
 
-    public trackByContributor(index: number, contributor: ContributorDto) {
+    public trackByContributor(_index: number, contributor: ContributorDto) {
         return contributor.contributorId;
     }
 }

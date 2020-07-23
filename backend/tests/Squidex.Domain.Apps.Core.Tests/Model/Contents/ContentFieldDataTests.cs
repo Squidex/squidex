@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents
@@ -61,6 +62,25 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             var serialized = fieldData.SerializeAndDeserialize();
 
             Assert.Null(string.IsInterned(serialized.Keys.First()));
+        }
+
+        [Fact]
+        public void Should_clone_value_and_also_children()
+        {
+            var source = new ContentFieldData
+            {
+                ["en"] = JsonValue.Array(),
+                ["de"] = JsonValue.Array()
+            };
+
+            var clone = source.Clone();
+
+            Assert.NotSame(source, clone);
+
+            foreach (var (key, value) in clone)
+            {
+                Assert.NotSame(value, source[key]);
+            }
         }
     }
 }

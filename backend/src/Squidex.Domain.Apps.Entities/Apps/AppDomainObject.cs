@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -21,6 +21,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -41,10 +42,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
             IUserResolver userResolver)
             : base(store, log)
         {
-            Guard.NotNull(initialPatterns);
-            Guard.NotNull(userResolver);
-            Guard.NotNull(appPlansProvider);
-            Guard.NotNull(appPlansBillingManager);
+            Guard.NotNull(initialPatterns, nameof(initialPatterns));
+            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
+            Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
 
             this.userResolver = userResolver;
             this.appPlansProvider = appPlansProvider;
@@ -341,19 +342,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public void UpdateClient(UpdateClient command)
-        {
-            if (!string.IsNullOrWhiteSpace(command.Name))
-            {
-                RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
-            }
-
-            if (command.Role != null)
-            {
-                RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated { Role = command.Role }));
-            }
-        }
-
         public void ChangePlan(ChangePlan command)
         {
             if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId))
@@ -369,6 +357,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void Update(UpdateApp command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppUpdated()));
+        }
+
+        public void UpdateClient(UpdateClient command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated()));
         }
 
         public void UploadImage(UploadAppImage command)
@@ -470,7 +463,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (Snapshot.IsArchived)
             {
-                throw new DomainException("App has already been archived.");
+                throw new DomainException(T.Get("apps.alreadyArchieved"));
             }
         }
 

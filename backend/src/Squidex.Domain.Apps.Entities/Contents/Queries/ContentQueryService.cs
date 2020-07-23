@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
 #pragma warning disable RECS0147
@@ -36,11 +37,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             IContentLoader contentVersionLoader,
             ContentQueryParser queryParser)
         {
-            Guard.NotNull(appProvider);
-            Guard.NotNull(contentEnricher);
-            Guard.NotNull(contentRepository);
-            Guard.NotNull(contentVersionLoader);
-            Guard.NotNull(queryParser);
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(contentEnricher, nameof(contentEnricher));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
+            Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
+            Guard.NotNull(queryParser, nameof(queryParser));
 
             this.appProvider = appProvider;
             this.contentEnricher = contentEnricher;
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IEnrichedContentEntity> FindContentAsync(Context context, string schemaIdOrName, Guid id, long version = -1)
         {
-            Guard.NotNull(context);
+            Guard.NotNull(context, nameof(context));
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
@@ -73,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (content == null || content.SchemaId.Id != schema.Id)
                 {
-                    throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
+                    throw new DomainObjectNotFoundException(id.ToString());
                 }
 
                 return await TransformAsync(context, content);
@@ -82,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query)
         {
-            Guard.NotNull(context);
+            Guard.NotNull(context, nameof(context));
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
@@ -107,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, IReadOnlyList<Guid> ids)
         {
-            Guard.NotNull(context);
+            Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
@@ -156,19 +157,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             ISchemaEntity? schema = null;
 
+            var canCache = !context.IsFrontendClient;
+
             if (Guid.TryParse(schemaIdOrName, out var id))
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, id);
+                schema = await appProvider.GetSchemaAsync(context.App.Id, id, false, canCache);
             }
 
             if (schema == null)
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName);
+                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache);
             }
 
             if (schema == null)
             {
-                throw new DomainObjectNotFoundException(schemaIdOrName, typeof(ISchemaEntity));
+                throw new DomainObjectNotFoundException(schemaIdOrName);
             }
 
             return schema;
@@ -180,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (!HasPermission(context, schema))
                 {
-                    throw new DomainForbiddenException("You do not have permission for this schema.");
+                    throw new DomainForbiddenException(T.Get("schemas.noPermission"));
                 }
             }
         }
@@ -208,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, ISchemaEntity schema, Q query)
         {
-            var parsedQuery = queryParser.ParseQuery(context, schema, query);
+            var parsedQuery = await queryParser.ParseQueryAsync(context, schema, query);
 
             return await QueryCoreAsync(context, schema, parsedQuery);
         }

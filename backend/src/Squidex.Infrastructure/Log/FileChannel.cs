@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Log
 
         public FileChannel(string path)
         {
-            Guard.NotNullOrEmpty(path);
+            Guard.NotNullOrEmpty(path, nameof(path));
 
             processor = new FileLogProcessor(path);
         }

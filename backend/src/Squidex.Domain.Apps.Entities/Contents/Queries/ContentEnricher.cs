@@ -28,28 +28,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public ContentEnricher(IEnumerable<IContentEnricherStep> steps, Lazy<IContentQueryService> contentQuery)
         {
-            Guard.NotNull(steps);
-            Guard.NotNull(contentQuery);
+            Guard.NotNull(steps, nameof(steps));
+            Guard.NotNull(contentQuery, nameof(contentQuery));
 
             this.steps = steps;
 
             this.contentQuery = contentQuery;
         }
 
-        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, Context context)
+        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context)
         {
-            Guard.NotNull(content);
+            Guard.NotNull(content, nameof(content));
 
-            var enriched = await EnrichAsync(Enumerable.Repeat(content, 1), context);
+            var enriched = await EnrichInternalAsync(Enumerable.Repeat(content, 1), cloneData, context);
 
             return enriched[0];
         }
 
-        public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context)
+        public Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context)
         {
-            Guard.NotNull(contents);
-            Guard.NotNull(context);
+            Guard.NotNull(contents, nameof(contents));
+            Guard.NotNull(context, nameof(context));
 
+            return EnrichInternalAsync(contents, false, context);
+        }
+
+        private async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichInternalAsync(IEnumerable<IContentEntity> contents, bool cloneData, Context context)
+        {
             using (Profiler.TraceMethod<ContentEnricher>())
             {
                 var results = new List<ContentEntity>();
@@ -64,6 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     foreach (var content in contents)
                     {
                         var result = SimpleMapper.Map(content, new ContentEntity());
+
+                        if (cloneData)
+                        {
+                            result.Data = result.Data.Clone();
+                        }
 
                         results.Add(result);
                     }

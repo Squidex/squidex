@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public ReferencesExtractor(HashSet<Guid> result, int take)
         {
-            Guard.NotNull(result);
+            Guard.NotNull(result, nameof(result));
 
             this.result = result;
 

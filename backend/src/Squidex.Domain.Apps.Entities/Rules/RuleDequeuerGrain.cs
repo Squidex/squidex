@@ -32,10 +32,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public RuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
         {
-            Guard.NotNull(ruleEventRepository);
-            Guard.NotNull(ruleService);
-            Guard.NotNull(clock);
-            Guard.NotNull(log);
+            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
+            Guard.NotNull(ruleService, nameof(ruleService));
+            Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(log, nameof(log));
 
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                     ExecutionResult = response.Status,
                     Finished = now,
                     JobNext = jobDelay,
-                    JobResult = ComputeJobResult(response.Status, jobDelay),
+                    JobResult = ComputeJobResult(response.Status, jobDelay)
                 };
 
                 await ruleEventRepository.UpdateAsync(@event.Job, update);

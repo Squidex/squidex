@@ -175,6 +175,24 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         }
 
         [Fact]
+        public void Should_create_events_if_field_rules_changed_changed()
+        {
+            var sourceSchema =
+                new Schema("source")
+                    .SetFieldRules(FieldRule.Hide("2"));
+
+            var targetSchema =
+                new Schema("target")
+                    .SetFieldRules(FieldRule.Hide("1"));
+
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
+
+            events.ShouldHaveSameEvents(
+                new SchemaFieldRulesConfigured { FieldRules = new FieldRules(FieldRule.Hide("1")) }
+            );
+        }
+
+        [Fact]
         public void Should_create_events_if_nested_field_deleted()
         {
             var sourceSchema =
@@ -235,7 +253,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_field_updated()
         {
-            var properties = new StringFieldProperties { IsRequired = true };
+            var properties = new StringFieldProperties { Pattern = "a-z" };
 
             var sourceSchema =
                 new Schema("source")
@@ -625,6 +643,28 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             events.ShouldHaveSameEvents(
                 new FieldAdded { FieldId = NamedId.Of(50L, "f3"), Name = "f3", Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },
                 new SchemaFieldsReordered { FieldIds = new List<long> { 10, 50, 11 } }
+            );
+        }
+
+        [Fact]
+        public void Should_create_events_if_field_renamed()
+        {
+            var sourceSchema =
+                new Schema("source")
+                    .AddString(10, "f1", Partitioning.Invariant)
+                    .AddString(11, "f2", Partitioning.Invariant);
+
+            var targetSchema =
+                new Schema("target")
+                    .AddString(1, "f3", Partitioning.Invariant)
+                    .AddString(2, "f2", Partitioning.Invariant);
+
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
+
+            events.ShouldHaveSameEvents(
+                new FieldDeleted { FieldId = NamedId.Of(10L, "f1") },
+                new FieldAdded { FieldId = NamedId.Of(50L, "f3"), Name = "f3", Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },
+                new SchemaFieldsReordered { FieldIds = new List<long> { 50, 11 } }
             );
         }
     }

@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
@@ -26,7 +28,7 @@ namespace Squidex.Web.Pipeline
 
         public AppResolver(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider);
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
         }
@@ -39,7 +41,9 @@ namespace Squidex.Web.Pipeline
 
             if (!string.IsNullOrWhiteSpace(appName))
             {
-                var app = await appProvider.GetAppAsync(appName);
+                var canCache = !user.IsInClient(DefaultClients.Frontend);
+
+                var app = await appProvider.GetAppAsync(appName, canCache);
 
                 if (app == null)
                 {
@@ -52,6 +56,11 @@ namespace Squidex.Web.Pipeline
                 if (permissions == null)
                 {
                     (role, permissions) = FindByOpenIdClient(app, user);
+                }
+
+                if (permissions == null)
+                {
+                    (role, permissions) = FindAnonymousClient(app);
                 }
 
                 if (permissions != null)
@@ -69,22 +78,48 @@ namespace Squidex.Web.Pipeline
                     }
                 }
 
-                var requestContext = context.HttpContext.Context();
-
-                requestContext.App = app;
-                requestContext.UpdatePermissions();
+                var requestContext = SetContext(context.HttpContext, app);
 
                 if (!AllowAnonymous(context) && !HasPermission(appName, requestContext))
                 {
-                    context.Result = new NotFoundResult();
+                    if (string.IsNullOrWhiteSpace(user.Identity.AuthenticationType))
+                    {
+                        context.Result = new UnauthorizedResult();
+                    }
+                    else
+                    {
+                        context.Result = new NotFoundResult();
+                    }
+
                     return;
                 }
 
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app.NamedId()));
                 context.HttpContext.Response.Headers.Add("X-AppId", app.Id.ToString());
             }
+            else
+            {
+                SetContext(context.HttpContext, null!);
+            }
 
             await next();
+        }
+
+        private Context SetContext(HttpContext httpContext, IAppEntity app)
+        {
+            var requestContext = new Context(httpContext.User, app);
+
+            foreach (var (key, value) in httpContext.Request.Headers)
+            {
+                if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
+                {
+                    requestContext.Headers.Add(key, value.ToString());
+                }
+            }
+
+            httpContext.Features.Set(requestContext);
+
+            return requestContext;
         }
 
         private static bool HasPermission(string appName, Context requestContext)
@@ -99,9 +134,26 @@ namespace Squidex.Web.Pipeline
 
         private static (string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
         {
-            var clientId = user.GetClientId();
+            var (appName, clientId) = user.GetClient();
+
+            if (app.Name != appName)
+            {
+                return (null, null);
+            }
 
             if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, out var role))
+            {
+                return (client.Role, role.Permissions);
+            }
+
+            return (null, null);
+        }
+
+        private static (string?, PermissionSet?) FindAnonymousClient(IAppEntity app)
+        {
+            var client = app.Clients.Values.FirstOrDefault(x => x.AllowAnonymous);
+
+            if (client != null && app.Roles.TryGet(app.Name, client.Role, out var role))
             {
                 return (client.Role, role.Permissions);
             }

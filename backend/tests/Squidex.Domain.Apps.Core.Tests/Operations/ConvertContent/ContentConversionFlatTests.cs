@@ -31,7 +31,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         .AddValue("en", 6))
                 .AddField("field4",
                     new ContentFieldData()
-                        .AddValue("it", 7));
+                        .AddValue("it", 7))
+                .AddField("field5",
+                    new ContentFieldData());
 
         [Fact]
         public void Should_return_flatten_value()

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -23,6 +23,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -58,16 +59,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IUserResolver userResolver,
             ISemanticLog log)
         {
-            Guard.NotNull(backupArchiveLocation);
-            Guard.NotNull(clock);
-            Guard.NotNull(commandBus);
-            Guard.NotNull(eventDataFormatter);
-            Guard.NotNull(eventStore);
-            Guard.NotNull(serviceProvider);
-            Guard.NotNull(state);
-            Guard.NotNull(streamNameResolver);
-            Guard.NotNull(userResolver);
-            Guard.NotNull(log);
+            Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
+            Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(commandBus, nameof(commandBus));
+            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
+            Guard.NotNull(eventStore, nameof(eventStore));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(state, nameof(state));
+            Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
+            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(log, nameof(log));
 
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
@@ -102,17 +103,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName)
         {
-            Guard.NotNull(url);
-            Guard.NotNull(actor);
+            Guard.NotNull(url, nameof(url));
+            Guard.NotNull(actor, nameof(actor));
 
             if (!string.IsNullOrWhiteSpace(newAppName))
             {
-                Guard.ValidSlug(newAppName);
+                Guard.ValidSlug(newAppName, nameof(newAppName));
             }
 
             if (CurrentJob?.Status == JobStatus.Started)
             {
-                throw new DomainException("A restore operation is already running.");
+                throw new DomainException(T.Get("backups.restoreRunning"));
             }
 
             state.Value.Job = new RestoreJob

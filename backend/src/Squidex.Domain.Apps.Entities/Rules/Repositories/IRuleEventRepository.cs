@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Repositories
     {
         Task UpdateAsync(RuleJob job, RuleJobUpdate update);
 
-        Task EnqueueAsync(RuleJob job, Instant nextAttempt, CancellationToken ct = default);
+        Task EnqueueAsync(RuleJob job, Instant? nextAttempt, CancellationToken ct = default);
 
         Task EnqueueAsync(Guid id, Instant nextAttempt);
 

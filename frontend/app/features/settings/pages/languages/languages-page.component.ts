@@ -27,7 +27,7 @@ export class LanguagesPageComponent implements OnInit {
         this.languagesState.load(true);
     }
 
-    public trackByLanguage(index: number, language: { language: AppLanguageDto }) {
+    public trackByLanguage(_index: number, language: { language: AppLanguageDto }) {
         return language.language.iso2Code;
     }
 }

@@ -62,7 +62,9 @@
         </ng-container>
         
         <ng-container footer>
-            <button type="button" class="float-right btn btn-primary" (click)="search(true)">
+            <span></span>
+
+            <button type="button" class="btn btn-primary" (click)="search(true)">
                 Submit
             </button>
         </ng-container>
@@ -78,7 +80,7 @@
         
             <ng-container content>    
                 <div class="form-group">            
-                    <sqx-control-errors for="name" submitOnly="true" [submitted]="saveQueryForm.submitted | async"></sqx-control-errors>
+                    <sqx-control-errors for="name"></sqx-control-errors>
             
                     <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxFocusOnInit />
                 </div>
@@ -92,8 +94,9 @@
             </ng-container>
         
             <ng-container footer>
-                <button type="reset" class="float-left btn btn-secondary" (click)="saveQueryDialog.hide()" [disabled]="saveQueryForm.submitted | async">Cancel</button>
-                <button type="submit" class="float-right btn btn-success">Create</button>
+                <button type="button" class="btn btn-secondary" (click)="saveQueryDialog.hide()">Cancel</button>
+               
+                <button type="submit" class="btn-success">Create</button>
             </ng-container>
         </sqx-modal-dialog>
     </form>

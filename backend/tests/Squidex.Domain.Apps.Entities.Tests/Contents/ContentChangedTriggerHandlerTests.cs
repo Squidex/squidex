@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -31,6 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public class ContentChangedTriggerHandlerTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+        private readonly ILocalCache localCache = new AsyncLocalCache();
         private readonly IContentLoader contentLoader = A.Fake<IContentLoader>();
         private readonly IRuleTriggerHandler sut;
         private readonly Guid ruleId = Guid.NewGuid();
@@ -39,10 +41,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentChangedTriggerHandlerTests()
         {
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "true"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
                 .Returns(true);
 
-            A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, "false"))
+            A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
                 .Returns(false);
 
             sut = new ContentChangedTriggerHandler(scriptEngine, contentLoader);
@@ -249,12 +251,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (string.IsNullOrWhiteSpace(condition))
             {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, A<string>._))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, A<string>._, default))
                     .MustNotHaveHappened();
             }
             else
             {
-                A.CallTo(() => scriptEngine.Evaluate(A<ScriptContext>._, condition))
+                A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                     .MustHaveHappened();
             }
         }

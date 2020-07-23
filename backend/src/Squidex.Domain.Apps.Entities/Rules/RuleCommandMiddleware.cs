@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleCommandMiddleware(IGrainFactory grainFactory, IRuleEnricher ruleEnricher, IContextProvider contextProvider)
             : base(grainFactory)
         {
-            Guard.NotNull(ruleEnricher);
-            Guard.NotNull(contextProvider);
+            Guard.NotNull(ruleEnricher, nameof(ruleEnricher));
+            Guard.NotNull(contextProvider, nameof(contextProvider));
 
             this.ruleEnricher = ruleEnricher;
 

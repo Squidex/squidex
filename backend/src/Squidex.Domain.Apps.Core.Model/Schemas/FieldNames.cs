@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         private static readonly List<string> EmptyNames = new List<string>();
 
-        public static readonly FieldNames Empty = new FieldNames(new List<string>());
+        public static readonly FieldNames Empty = new FieldNames(EmptyNames);
 
         public FieldNames(params string[] fields)
             : base(fields?.ToList() ?? EmptyNames)

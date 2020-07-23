@@ -29,8 +29,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public GetEventStore(IEventStoreConnection connection, IJsonSerializer serializer, string prefix, string projectionHost)
         {
-            Guard.NotNull(connection);
-            Guard.NotNull(serializer);
+            Guard.NotNull(connection, nameof(connection));
+            Guard.NotNull(serializer, nameof(serializer));
 
             this.connection = connection;
             this.serializer = serializer;
@@ -56,23 +56,23 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
-            Guard.NotNull(streamFilter);
+            Guard.NotNull(streamFilter, nameof(streamFilter));
 
             return new GetEventStoreSubscription(connection, subscriber, serializer, projectionClient, position, prefix, streamFilter);
         }
 
         public Task CreateIndexAsync(string property)
         {
-            Guard.NotNullOrEmpty(property);
+            Guard.NotNullOrEmpty(property, nameof(property));
 
             return projectionClient.CreateProjectionAsync(property, string.Empty);
         }
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string? position = null, CancellationToken ct = default)
         {
-            Guard.NotNull(callback);
-            Guard.NotNullOrEmpty(property);
-            Guard.NotNull(value);
+            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNullOrEmpty(property, nameof(property));
+            Guard.NotNull(value, nameof(value));
 
             using (Profiler.TraceMethod<GetEventStore>())
             {
@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
         {
-            Guard.NotNull(callback);
+            Guard.NotNull(callback, nameof(callback));
 
             using (Profiler.TraceMethod<GetEventStore>())
             {
@@ -122,7 +122,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count)
         {
-            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
             if (count <= 0)
             {
@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
         {
-            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
             using (Profiler.TraceMethod<GetEventStore>())
             {
@@ -200,7 +200,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task DeleteStreamAsync(string streamName)
         {
-            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
             return connection.DeleteStreamAsync(GetStreamName(streamName), ExpectedVersion.Any);
         }
@@ -212,15 +212,15 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.GreaterEquals(expectedVersion, -1);
+            Guard.GreaterEquals(expectedVersion, -1, nameof(expectedVersion));
 
             return AppendEventsInternalAsync(streamName, expectedVersion, events);
         }
 
         private async Task AppendEventsInternalAsync(string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.NotNullOrEmpty(streamName);
-            Guard.NotNull(events);
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNull(events, nameof(events));
 
             using (Profiler.TraceMethod<GetEventStore>(nameof(AppendAsync)))
             {

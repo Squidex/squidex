@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
-    public sealed class EnrichedManualEvent : EnrichedEvent
+    public sealed class EnrichedManualEvent : EnrichedUserEventBase
     {
         public override long Partition
         {

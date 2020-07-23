@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public EnrichWithWorkflows(IContentWorkflow contentWorkflow)
         {
-            Guard.NotNull(contentWorkflow);
+            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
 
             this.contentWorkflow = contentWorkflow;
         }

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -32,7 +32,8 @@ namespace Squidex.Infrastructure.Log.Internal
 
             outputThread = new Thread(ProcessLogQueue)
             {
-                IsBackground = true, Name = "Logging"
+                IsBackground = true,
+                Name = "Logging"
             };
         }
 

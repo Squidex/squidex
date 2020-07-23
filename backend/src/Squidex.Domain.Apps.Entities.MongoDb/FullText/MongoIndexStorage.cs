@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         public MongoIndexStorage(IGridFSBucket<string> bucket)
         {
-            Guard.NotNull(bucket);
+            Guard.NotNull(bucket, nameof(bucket));
 
             this.bucket = bucket;
         }

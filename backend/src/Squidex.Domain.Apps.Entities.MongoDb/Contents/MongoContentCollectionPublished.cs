@@ -75,11 +75,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids)
         {
-            Guard.NotNull(app);
+            Guard.NotNull(app, nameof(app));
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
             {
-                var result = await queryContentsById.DoAsync(app.Id, schema, ids);
+                var result = await queryContentsById.DoAsync(app.Id, schema, ids, true);
 
                 return ResultList.Create(result.Count, result.Select(x => x.Content));
             }
@@ -87,11 +87,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<Guid> ids)
         {
-            Guard.NotNull(app);
+            Guard.NotNull(app, nameof(app));
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIdsWithoutSchema"))
             {
-                var result = await queryContentsById.DoAsync(app.Id, null, ids);
+                var result = await queryContentsById.DoAsync(app.Id, null, ids, true);
 
                 return result;
             }

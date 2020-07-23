@@ -76,6 +76,8 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
     }
 
     public submit(): TOut | null {
+        this.form.markAllAsTouched();
+
         this.state.next({ submitted: true, error: null });
 
         if (this.form.valid) {
@@ -132,7 +134,7 @@ export class Model<T> {
 
         for (const key in values) {
             if (values.hasOwnProperty(key)) {
-                let value = values[key];
+                const value = values[key];
 
                 if (value || !validOnly) {
                     clone[key] = value;

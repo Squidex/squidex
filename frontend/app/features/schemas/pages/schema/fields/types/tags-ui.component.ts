@@ -16,7 +16,7 @@ import { FieldDto, TagsFieldPropertiesDto } from '@app/shared';
 })
 export class TagsUIComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -25,12 +25,12 @@ export class TagsUIComponent implements OnInit {
     public properties: TagsFieldPropertiesDto;
 
     public ngOnInit() {
-        this.editForm.setControl('editor',
+        this.fieldForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));
 
-        this.editForm.setControl('allowedValues',
+        this.fieldForm.setControl('allowedValues',
             new FormControl(this.properties.allowedValues));
     }
 }

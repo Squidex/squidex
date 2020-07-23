@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -20,20 +22,71 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public ImageAssetMetadataSource(IAssetThumbnailGenerator assetThumbnailGenerator)
         {
-            Guard.NotNull(assetThumbnailGenerator);
+            Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
 
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
+        private sealed class TempAssetFile : AssetFile, IDisposable
+        {
+            public Stream Stream { get; }
+
+            public TempAssetFile(AssetFile source)
+                : base(source.FileName, source.MimeType, source.FileSize)
+            {
+                var tempPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
+
+                var tempStream = new FileStream(tempPath,
+                    FileMode.Create,
+                    FileAccess.ReadWrite,
+                    FileShare.None, 4096,
+                    FileOptions.DeleteOnClose);
+
+                Stream = tempStream;
+            }
+
+            public override void Dispose()
+            {
+                Stream.Dispose();
+            }
+
+            public override Stream OpenRead()
+            {
+                Stream.Position = 0;
+
+                return Stream;
+            }
+        }
+
         public async Task EnhanceAsync(UploadAssetCommand command, HashSet<string>? tags)
         {
-            if (command.Type == AssetType.Unknown)
+            if (command.Type == AssetType.Unknown || command.Type == AssetType.Image)
             {
+                ImageInfo? imageInfo = null;
+
                 using (var uploadStream = command.File.OpenRead())
                 {
-                    var imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream);
+                    imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream);
+                }
 
-                    if (imageInfo != null)
+                if (imageInfo != null)
+                {
+                    var isSwapped = imageInfo.IsRotatedOrSwapped;
+
+                    if (isSwapped)
+                    {
+                        var tempFile = new TempAssetFile(command.File);
+
+                        using (var uploadStream = command.File.OpenRead())
+                        {
+                            imageInfo = await assetThumbnailGenerator.FixOrientationAsync(uploadStream, tempFile.Stream);
+                        }
+
+                        command.File.Dispose();
+                        command.File = tempFile;
+                    }
+
+                    if (command.Type == AssetType.Unknown || isSwapped)
                     {
                         command.Type = AssetType.Image;
 

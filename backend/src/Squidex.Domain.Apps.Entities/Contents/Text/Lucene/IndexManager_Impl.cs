@@ -11,7 +11,6 @@ using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 {
@@ -23,11 +22,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             private static readonly MergeScheduler MergeScheduler = new ConcurrentMergeScheduler();
             private static readonly Analyzer SharedAnalyzer = new MultiLanguageAnalyzer(Version);
             private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
-            private Directory directory;
+            private readonly Directory directory;
             private IndexWriter indexWriter;
             private IndexSearcher? indexSearcher;
             private DirectoryReader? indexReader;
-            private bool isReleased;
+            private bool isDisposed;
 
             public Analyzer Analyzer
             {
@@ -39,11 +38,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 get { return snapshotter; }
             }
 
+            public Directory Directory
+            {
+                get { return directory; }
+            }
+
             public IndexWriter Writer
             {
                 get
                 {
                     ThrowIfReleased();
+
+                    if (indexWriter == null)
+                    {
+                        throw new InvalidOperationException("Index writer has not been created yet. Call Open()");
+                    }
 
                     return indexWriter;
                 }
@@ -71,20 +80,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             public Guid Id { get; }
 
-            public IndexHolder(Guid id)
+            public IndexHolder(Guid id, Directory directory)
             {
                 Id = id;
-            }
-
-            public void Dispose()
-            {
-                indexReader?.Dispose();
-                indexWriter?.Dispose();
-            }
-
-            public void Open(Directory directory)
-            {
-                Guard.NotNull(directory);
 
                 this.directory = directory;
 
@@ -96,7 +94,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 }
             }
 
-            private void RecreateIndexWriter()
+            public void Dispose()
+            {
+                if (!isDisposed)
+                {
+                    indexReader?.Dispose();
+                    indexReader = null;
+
+                    indexWriter.Dispose();
+
+                    isDisposed = true;
+                }
+            }
+
+            private IndexWriter RecreateIndexWriter()
             {
                 var config = new IndexWriterConfig(Version, Analyzer)
                 {
@@ -108,13 +119,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 indexWriter = new IndexWriter(directory, config);
 
                 MarkStale();
+
+                return indexWriter;
             }
 
             public void EnsureReader()
             {
                 ThrowIfReleased();
 
-                if (indexReader == null)
+                if (indexReader == null && indexWriter != null)
                 {
                     indexReader = indexWriter.GetReader(true);
                     indexSearcher = new IndexSearcher(indexReader);
@@ -156,20 +169,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
             private void ThrowIfReleased()
             {
-                if (isReleased)
+                if (indexWriter == null)
                 {
-                    throw new InvalidOperationException("Index is already released.");
+                    throw new InvalidOperationException("Index is already released or not open yet.");
                 }
-            }
-
-            internal void Release()
-            {
-                isReleased = true;
-            }
-
-            internal IndexWriter GetUnsafeWriter()
-            {
-                return indexWriter;
             }
         }
     }

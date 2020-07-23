@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly Dictionary<string, string> texts = new Dictionary<string, string>();
         private readonly List<IHistoryEventsCreator> creators;
         private readonly IHistoryEventRepository repository;
+        private readonly NotifoService notifo;
 
         public string Name
         {
@@ -32,10 +33,11 @@ namespace Squidex.Domain.Apps.Entities.History
             get { return ".*"; }
         }
 
-        public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators)
+        public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators, NotifoService notifo)
         {
-            Guard.NotNull(repository);
-            Guard.NotNull(creators);
+            Guard.NotNull(repository, nameof(repository));
+            Guard.NotNull(creators, nameof(creators));
+            Guard.NotNull(notifo, nameof(notifo));
 
             this.creators = creators.ToList();
 
@@ -48,6 +50,8 @@ namespace Squidex.Domain.Apps.Entities.History
             }
 
             this.repository = repository;
+
+            this.notifo = notifo;
         }
 
         public bool Handles(StoredEvent @event)
@@ -62,16 +66,20 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public async Task On(Envelope<IEvent> @event)
         {
+            await notifo.HandleEventAsync(@event);
+
             foreach (var creator in creators)
             {
                 var historyEvent = await creator.CreateEventAsync(@event);
 
                 if (historyEvent != null)
                 {
-                    var appEvent = (AppEvent)@event.Payload;
+                    var appEvent = @event.To<AppEvent>();
 
-                    historyEvent.Actor = appEvent.Actor;
-                    historyEvent.AppId = appEvent.AppId.Id;
+                    await notifo.HandleHistoryEventAsync(appEvent, historyEvent);
+
+                    historyEvent.Actor = appEvent.Payload.Actor;
+                    historyEvent.AppId = appEvent.Payload.AppId.Id;
                     historyEvent.Created = @event.Headers.Timestamp();
                     historyEvent.Version = @event.Headers.EventStreamNumber();
 

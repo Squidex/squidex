@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public RestoreContext(Guid appId, IUserMapping userMapping, IBackupReader reader)
             : base(appId, userMapping)
         {
-            Guard.NotNull(reader);
+            Guard.NotNull(reader, nameof(reader));
 
             Reader = reader;
         }

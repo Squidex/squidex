@@ -94,14 +94,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             schema = Mocks.Schema(AppNamedId, SchemaNamedId, schemaDef);
 
-            A.CallTo(() => appProvider.GetAppAsync(AppName))
+            A.CallTo(() => appProvider.GetAppAsync(AppName, false))
                 .Returns(app);
 
-            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId))
+            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId, false))
                 .Returns((app, schema));
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(A<ScriptContext>._, A<string>._))
-                .ReturnsLazily(x => Task.FromResult(x.GetArgument<ScriptContext>(0)!.Data!));
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))
+                .ReturnsLazily(x => Task.FromResult(x.GetArgument<ScriptVars>(0)!.Data!));
 
             patched = patch.MergeInto(data);
 
@@ -137,9 +137,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(ScriptContext(data, null, Status.Draft), "<create-script>"))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Draft), "<create-script>", ScriptOptions()))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptContext>._, "<change-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -160,9 +160,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Published, Change = StatusChange.Published })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(ScriptContext(data, null, Status.Draft), "<create-script>"))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Draft), "<create-script>", ScriptOptions()))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Published), "<change-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Published), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentUpdated { Data = otherData })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(ScriptContext(otherData, data, Status.Draft), "<update-script>"))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(otherData, data, Status.Draft), "<update-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -216,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentUpdated { Data = otherData })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(ScriptContext(otherData, data, Status.Draft), "<update-script>"))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(otherData, data, Status.Draft), "<update-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -233,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Single(LastEvents);
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(A<ScriptContext>._, "<update-script>"))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "<update-script>", ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -265,7 +265,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentUpdated { Data = patched })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(ScriptContext(patched, data, Status.Draft), "<update-script>"))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(patched, data, Status.Draft), "<update-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -289,7 +289,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentUpdated { Data = patched })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(ScriptContext(patched, data, Status.Draft), "<update-script>"))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(patched, data, Status.Draft), "<update-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -306,7 +306,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Single(LastEvents);
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransformAsync(A<ScriptContext>._, "<update-script>"))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "<update-script>", ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -328,7 +328,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Published, Change = StatusChange.Published })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Published, Status.Draft), "<change-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Published, Status.Draft), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -350,7 +350,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -373,7 +373,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Draft, Status.Published), "<change-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -397,7 +397,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Change, Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -424,7 +424,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusScheduled { Status = Status.Published, DueTime = dueTime })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptContext>._, "<change-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -452,7 +452,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptContext>._, "<change-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -480,7 +480,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentSchedulingCancelled())
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptContext>._, "<change-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions()))
                 .MustNotHaveHappened();
         }
 
@@ -502,7 +502,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentDeleted())
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Draft), "<delete-script>"))
+            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Draft), "<delete-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -577,17 +577,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return PublishAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
         }
 
-        private ScriptContext ScriptContext(NamedContentData? newData, NamedContentData? oldData, Status newStatus)
+        private ScriptVars ScriptContext(NamedContentData? newData, NamedContentData? oldData, Status newStatus)
         {
-            return A<ScriptContext>.That.Matches(x => M(x, newData, oldData, newStatus, default));
+            return A<ScriptVars>.That.Matches(x => M(x, newData, oldData, newStatus, default));
         }
 
-        private ScriptContext ScriptContext(NamedContentData? newData, NamedContentData? oldData, Status newStatus, Status oldStatus)
+        private ScriptVars ScriptContext(NamedContentData? newData, NamedContentData? oldData, Status newStatus, Status oldStatus)
         {
-            return A<ScriptContext>.That.Matches(x => M(x, newData, oldData, newStatus, oldStatus));
+            return A<ScriptVars>.That.Matches(x => M(x, newData, oldData, newStatus, oldStatus));
         }
 
-        private bool M(ScriptContext x, NamedContentData? newData, NamedContentData? oldData, Status newStatus, Status oldStatus)
+        private ScriptOptions ScriptOptions()
+        {
+            return A<ScriptOptions>.That.Matches(x => x.CanDisallow && x.CanReject && x.AsContext);
+        }
+
+        private bool M(ScriptVars x, NamedContentData? newData, NamedContentData? oldData, Status newStatus, Status oldStatus)
         {
             return
                 Equals(x.Data, newData) &&

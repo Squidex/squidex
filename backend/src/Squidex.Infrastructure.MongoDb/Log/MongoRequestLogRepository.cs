@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Log
         public MongoRequestLogRepository(IMongoDatabase database, IOptions<RequestLogStoreOptions> options)
             : base(database)
         {
-            Guard.NotNull(options);
+            Guard.NotNull(options, nameof(options));
 
             this.options = options.Value;
         }
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Log
 
         public Task InsertManyAsync(IEnumerable<Request> items)
         {
-            Guard.NotNull(items);
+            Guard.NotNull(items, nameof(items));
 
             var documents = items.Select(x => new MongoRequest { Key = x.Key, Timestamp = x.Timestamp, Properties = x.Properties });
 
@@ -65,8 +65,8 @@ namespace Squidex.Infrastructure.Log
 
         public Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default)
         {
-            Guard.NotNull(callback);
-            Guard.NotNullOrEmpty(key);
+            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNullOrEmpty(key, nameof(key));
 
             var timestampStart = Instant.FromDateTimeUtc(fromDate);
             var timestampEnd = Instant.FromDateTimeUtc(toDate.AddDays(1));

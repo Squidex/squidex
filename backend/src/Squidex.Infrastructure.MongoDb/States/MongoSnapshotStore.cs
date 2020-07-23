@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.States
 
         private static bool Register(JsonSerializer jsonSerializer)
         {
-            Guard.NotNull(jsonSerializer);
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
 
             BsonJsonConvention.Register(jsonSerializer);
 

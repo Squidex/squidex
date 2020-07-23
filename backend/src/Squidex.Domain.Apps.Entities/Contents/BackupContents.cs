@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public BackupContents(Rebuilder rebuilder)
         {
-            Guard.NotNull(rebuilder);
+            Guard.NotNull(rebuilder, nameof(rebuilder));
 
             this.rebuilder = rebuilder;
         }

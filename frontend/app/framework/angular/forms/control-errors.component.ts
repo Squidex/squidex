@@ -39,11 +39,9 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     @Input()
     public errors: string;
 
-    @Input()
-    public submitted: boolean;
-
-    @Input()
-    public submitOnly = false;
+    public get isTouched() {
+        return this.control.touched || Types.is(this.control, FormArray);
+    }
 
     constructor(changeDetector: ChangeDetectorRef,
         @Optional() @Host() private readonly formGroupDirective: FormGroupDirective
@@ -117,7 +115,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     private createMessages() {
         const errors: string[] = [];
 
-        if (this.control && this.control.invalid && ((this.isTouched() && !this.submitOnly) || this.submitted) && this.control.errors) {
+        if (this.control && this.control.invalid && this.isTouched && this.control.errors) {
             for (const key in <any>this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
                     const message = formatError(this.displayFieldName, key, this.control.errors[key], this.control.value, this.errors);
@@ -132,9 +130,5 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         if (errors.length !== this.snapshot.errorMessages.length || errors.length > 0) {
             this.next(s => ({ ...s, errorMessages: errors }));
         }
-    }
-
-    private isTouched() {
-        return this.control.touched || Types.is(this.control, FormArray);
     }
 }

@@ -59,37 +59,32 @@
                         <ng-container *ngSwitchCase="'AssetChanged'">
                             <sqx-asset-changed-trigger
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-asset-changed-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Comment'">
                             <sqx-comment-trigger
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-comment-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'ContentChanged'">
                             <sqx-content-changed-trigger
                                 [schemas]="schemas"
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-content-changed-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'SchemaChanged'">
                             <sqx-schema-changed-trigger
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-schema-changed-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Usage'">
                             <sqx-usage-trigger
                                 [trigger]="trigger"
-                                [triggerForm]="triggerForm.form"
-                                [triggerFormSubmitted]="triggerForm.submitted | async">
+                                [triggerForm]="triggerForm.form">
                             </sqx-usage-trigger>
                         </ng-container>
                     </ng-container>
@@ -117,8 +112,7 @@
                     <sqx-generic-action
                         [definition]="actionElement"
                         [action]="action"
-                        [actionForm]="actionForm.form"
-                        [actionFormSubmitted]="actionForm.submitted | async">
+                        [actionForm]="actionForm.form">
                     </sqx-generic-action>
                 </form>
             </ng-container>
@@ -126,16 +120,15 @@
     </ng-container>
 
     <ng-container footer>
-        <div>            
-            <ng-container *ngIf="step === 2">
-                <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
-                <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()" *ngIf="isEditable">Save</button>
-            </ng-container>
+        <ng-container *ngIf="step === 2 || step === 4">
+            <button type="button" class="btn btn-secondary" (click)="emitComplete()">Cancel</button>
+        </ng-container>
 
-            <ng-container *ngIf="step === 4">
-                <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
-                <button type="submit" class="float-right btn btn-primary" (click)="saveAction()" *ngIf="isEditable">Save</button>
-            </ng-container>
-        </div>
+        <ng-container *ngIf="isEditable">
+            <button *ngIf="step === 2 &&  isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">Next</button>
+            <button *ngIf="step === 2 && !isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">Save</button>
+
+            <button *ngIf="step === 4" type="submit" class="btn btn-primary" (click)="saveAction()">Save</button>
+        </ng-container>
     </ng-container>
 </sqx-modal-dialog>

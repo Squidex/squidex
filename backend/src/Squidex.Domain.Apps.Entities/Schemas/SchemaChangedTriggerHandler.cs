@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemaChangedTriggerHandler(IScriptEngine scriptEngine)
         {
-            Guard.NotNull(scriptEngine);
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
 
             this.scriptEngine = scriptEngine;
         }
@@ -76,12 +76,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 return true;
             }
 
-            var context = new ScriptContext
+            var vars = new ScriptVars
             {
                 ["event"] = @event
             };
 
-            return scriptEngine.Evaluate(context, trigger.Condition);
+            return scriptEngine.Evaluate(vars, trigger.Condition);
         }
     }
 }

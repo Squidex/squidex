@@ -16,6 +16,8 @@ namespace Squidex.Infrastructure.Json.Objects
 
         bool TryGet(string pathSegment, [MaybeNullWhen(false)] out IJsonValue result);
 
+        IJsonValue Clone();
+
         string ToJsonString();
 
         string ToString();

@@ -13,12 +13,7 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainException : Exception
     {
-        public DomainException(string message)
-            : base(message)
-        {
-        }
-
-        public DomainException(string message, Exception? inner)
+        public DomainException(string message, Exception? inner = null)
             : base(message, inner)
         {
         }

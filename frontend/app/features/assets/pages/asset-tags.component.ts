@@ -35,7 +35,7 @@ export class AssetTagsComponent {
         return this.tagsSelected[tag.name] === true;
     }
 
-    public trackByTag(index: number, tag: Tag) {
+    public trackByTag(_index: number, tag: Tag) {
         return tag.name;
     }
 }

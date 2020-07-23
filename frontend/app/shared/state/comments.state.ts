@@ -37,6 +37,7 @@ export class CommentsState extends State<Snapshot> {
         private readonly commentsUrl: string,
         private readonly commentsService: CommentsService,
         private readonly dialogs: DialogService,
+        private readonly orderDescending = false,
         initialVersion = -1
     ) {
         super({ comments: [], version: new Version(initialVersion.toString()) });
@@ -50,7 +51,11 @@ export class CommentsState extends State<Snapshot> {
 
                     for (const created of payload.createdComments) {
                         if (!comments.find(x => x.id === created.id)) {
-                            comments = [...comments, created];
+                            if (this.orderDescending) {
+                                comments = [created, ...comments];
+                            } else {
+                                comments = [...comments, created];
+                            }
                         }
                     }
 

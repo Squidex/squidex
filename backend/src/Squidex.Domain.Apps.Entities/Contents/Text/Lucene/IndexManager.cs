@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
         public IndexManager(IIndexStorage indexStorage, ISemanticLog log)
         {
-            Guard.NotNull(indexStorage);
-            Guard.NotNull(log);
+            Guard.NotNull(indexStorage, nameof(indexStorage));
+            Guard.NotNull(log, nameof(log));
 
             this.indexStorage = indexStorage;
 
@@ -62,7 +62,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                     await CommitInternalAsync(indexHolder, true);
                 }
 
-                indexHolder = new IndexHolder(ownerId);
+                var directory = await indexStorage.CreateDirectoryAsync(ownerId);
+
+                indexHolder = new IndexHolder(ownerId, directory);
                 indices[ownerId] = indexHolder;
             }
             finally
@@ -70,16 +72,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                 lockObject.Release();
             }
 
-            var directory = await indexStorage.CreateDirectoryAsync(ownerId);
-
-            indexHolder.Open(directory);
-
             return indexHolder;
         }
 
         public async Task ReleaseAsync(IIndex index)
         {
-            Guard.NotNull(index);
+            Guard.NotNull(index, nameof(index));
 
             var indexHolder = (IndexHolder)index;
 
@@ -87,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
             {
                 lockObject.Wait();
 
-                indexHolder.Release();
+                indexHolder.Dispose();
                 indices.Remove(indexHolder.Id);
             }
             finally
@@ -100,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
 
         public Task CommitAsync(IIndex index)
         {
-            Guard.NotNull(index);
+            Guard.NotNull(index, nameof(index));
 
             return CommitInternalAsync(index, false);
         }
@@ -118,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
                     holder.Commit();
                 }
 
-                await indexStorage.WriteAsync(holder.GetUnsafeWriter().Directory, holder.Snapshotter);
+                await indexStorage.WriteAsync(holder.Directory, holder.Snapshotter);
             }
         }
 

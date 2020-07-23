@@ -7,7 +7,6 @@
 
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
@@ -24,31 +23,31 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
 
         public string? Position { get; set; }
 
-        public static EventConsumerDto FromEventConsumerInfo(EventConsumerInfo eventConsumerInfo, ApiController controller)
+        public static EventConsumerDto FromEventConsumerInfo(EventConsumerInfo eventConsumerInfo, Resources resources)
         {
             var result = SimpleMapper.Map(eventConsumerInfo, new EventConsumerDto());
 
-            return result.CreateLinks(controller);
+            return result.CreateLinks(resources);
         }
 
-        private EventConsumerDto CreateLinks(ApiController controller)
+        private EventConsumerDto CreateLinks(Resources resources)
         {
-            if (controller.HasPermission(Permissions.AdminEventsManage))
+            if (resources.CanManageEvents)
             {
-                var values = new { name = Name };
+                var values = new { consumerName = Name };
 
                 if (!IsResetting)
                 {
-                    AddPutLink("reset", controller.Url<EventConsumersController>(x => nameof(x.ResetEventConsumer), values));
+                    AddPutLink("reset", resources.Url<EventConsumersController>(x => nameof(x.ResetEventConsumer), values));
                 }
 
                 if (IsStopped)
                 {
-                    AddPutLink("start", controller.Url<EventConsumersController>(x => nameof(x.StartEventConsumer), values));
+                    AddPutLink("start", resources.Url<EventConsumersController>(x => nameof(x.StartEventConsumer), values));
                 }
                 else
                 {
-                    AddPutLink("stop", controller.Url<EventConsumersController>(x => nameof(x.StopEventConsumer), values));
+                    AddPutLink("stop", resources.Url<EventConsumersController>(x => nameof(x.StopEventConsumer), values));
                 }
             }
 
