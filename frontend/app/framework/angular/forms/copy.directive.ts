@@ -6,7 +6,7 @@
  */
 
 import { Directive, HostListener, Input, Renderer2 } from '@angular/core';
-import { DialogService, Notification, Types } from '@app/framework/internal';
+import { DialogService, Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxCopy]'
@@ -65,7 +65,7 @@ export class CopyDirective {
         try {
             document.execCommand('copy');
 
-            this.dialogs.notifyInfo('i18n:common.clipboardAdded'));
+            this.dialogs.notifyInfo('i18n:common.clipboardAdded');
         } catch (e) {
             console.log('Copy failed');
         }
