@@ -59,11 +59,11 @@
     </div>
 
     <div class="form-group">
-        <label for="displayName">Display Name</label>
+        <label for="displayName">@T.Get("common.displayName")</label>
 
         @{ RenderValidation("DisplayName"); }
 
-        <input type="text" class="form-control" asp-for="@T.Get("common.displayName")" />
+        <input type="text" class="form-control" asp-for="DisplayName" />
     </div>
 
     <div class="form-group">

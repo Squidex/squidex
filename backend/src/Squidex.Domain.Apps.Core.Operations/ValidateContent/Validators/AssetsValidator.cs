@@ -61,12 +61,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (properties.MinSize.HasValue && asset.FileSize < properties.MinSize)
                     {
-                        addError(path, T.Get("contents.validation.minimumSize", new { size = asset.FileSize.ToReadableSize(), minSize = properties.MinSize.Value.ToReadableSize() }));
+                        addError(path, T.Get("contents.validation.minimumSize", new { size = asset.FileSize.ToReadableSize(), min = properties.MinSize.Value.ToReadableSize() }));
                     }
 
                     if (properties.MaxSize.HasValue && asset.FileSize > properties.MaxSize)
                     {
-                        addError(path, T.Get("contents.validation.maximumSize", new { size = asset.FileSize.ToReadableSize(), maxSize = properties.MaxSize.Value.ToReadableSize() }));
+                        addError(path, T.Get("contents.validation.maximumSize", new { size = asset.FileSize.ToReadableSize(), max = properties.MaxSize.Value.ToReadableSize() }));
                     }
 
                     if (properties.AllowedExtensions != null &&
@@ -98,22 +98,22 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                         if (properties.MinWidth.HasValue && w < properties.MinWidth)
                         {
-                            addError(path, T.Get("contents.validation.minimumWidth", new { min = properties.MinWidth }));
+                            addError(path, T.Get("contents.validation.minimumWidth", new { width = w, min = properties.MinWidth }));
                         }
 
                         if (properties.MaxWidth.HasValue && w > properties.MaxWidth)
                         {
-                            addError(path, T.Get("contents.validation.maximumWidth", new { max = properties.MaxWidth }));
+                            addError(path, T.Get("contents.validation.maximumWidth", new { width = w, max = properties.MaxWidth }));
                         }
 
                         if (properties.MinHeight.HasValue && h < properties.MinHeight)
                         {
-                            addError(path, T.Get("contents.validation.minimumHeight", new { min = properties.MinHeight }));
+                            addError(path, T.Get("contents.validation.minimumHeight", new { height = h, min = properties.MinHeight }));
                         }
 
                         if (properties.MaxHeight.HasValue && h > properties.MaxHeight)
                         {
-                            addError(path, T.Get("contents.validation.maximumHeight", new { max = properties.MaxHeight }));
+                            addError(path, T.Get("contents.validation.maximumHeight", new { height = h, max = properties.MaxHeight }));
                         }
 
                         if (properties.AspectHeight.HasValue && properties.AspectWidth.HasValue)

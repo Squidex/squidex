@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 if (minItems == maxItems && minItems != items.Count)
                 {
-                    addError(context.Path, T.Get("contents.validation.itemCount", new { count = items.Count }));
+                    addError(context.Path, T.Get("contents.validation.itemCount", new { count = minItems }));
                 }
                 else if (items.Count < minItems || items.Count > maxItems)
                 {

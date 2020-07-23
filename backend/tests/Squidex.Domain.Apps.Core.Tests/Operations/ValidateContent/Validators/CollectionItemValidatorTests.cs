@@ -8,12 +8,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 {
-    public class CollectionItemValidatorTests
+    public class CollectionItemValidatorTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 
@@ -47,8 +48,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             errors.Should().BeEquivalentTo(
                 new[]
                 {
-                    "[2]: Must be between '2' and '4'.",
-                    "[4]: Must be between '2' and '4'."
+                    "[2]: Must be between 2 and 4.",
+                    "[4]: Must be between 2 and 4."
                 });
         }
     }
