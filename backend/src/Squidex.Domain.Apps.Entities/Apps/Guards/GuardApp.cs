@@ -66,12 +66,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (appPlans.GetPlan(command.PlanId) == null)
                 {
-                    e(T.Get("apps.planNotFound"), nameof(command.PlanId));
+                    e(T.Get("apps.plan.notFound"), nameof(command.PlanId));
                 }
 
                 if (!string.IsNullOrWhiteSpace(command.PlanId) && plan != null && !plan.Owner.Equals(command.Actor))
                 {
-                    e(T.Get("apps.notPlanOwner"));
+                    e(T.Get("apps.plans.notPlanOwner"));
                 }
             });
         }

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Guards
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
                 if (path.Count == 0)
                 {
-                    e("Asset folder does not exist.", nameof(MoveAssetFolder.ParentId));
+                    e(T.Get("assets.folderNotFound"), nameof(MoveAssetFolder.ParentId));
                 }
                 else if (id != default)
                 {
@@ -78,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
                     if (indexOfThis >= 0 && indexOfParent > indexOfThis)
                     {
-                        e("Cannot add folder to its own child.", nameof(MoveAssetFolder.ParentId));
+                        e(T.Get("assets.folderRecursion"), nameof(MoveAssetFolder.ParentId));
                     }
                 }
             }

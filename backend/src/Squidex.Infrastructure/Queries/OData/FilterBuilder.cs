@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,6 +7,7 @@
 
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.Queries.OData
@@ -22,7 +23,7 @@ namespace Squidex.Infrastructure.Queries.OData
             }
             catch (ODataException ex)
             {
-                var error = $"OData $search clause not valid: {ex.Message}";
+                var error = T.Get("common.odataSearchNotValid", new { message = ex.Message });
 
                 throw new ValidationException(error, ex);
             }
@@ -39,7 +40,7 @@ namespace Squidex.Infrastructure.Queries.OData
             }
             catch (ODataException ex)
             {
-                var error = $"OData $filter clause not valid: {ex.Message}";
+                var error = T.Get("common.odataFilterNotValid", new { message = ex.Message });
 
                 throw new ValidationException(error, ex);
             }

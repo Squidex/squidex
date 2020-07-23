@@ -55,18 +55,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (asset == null)
                     {
-                        addError(path, T.Get("contents.validation.assetNotFound", new { id= assetId }));
+                        addError(path, T.Get("contents.validation.assetNotFound", new { id = assetId }));
                         continue;
                     }
 
                     if (properties.MinSize.HasValue && asset.FileSize < properties.MinSize)
                     {
-                        addError(path, T.Get("contents.validation.minimumSize", new { minSize = properties.MinSize }));
+                        addError(path, T.Get("contents.validation.minimumSize", new { size = asset.FileSize.ToReadableSize(), minSize = properties.MinSize.Value.ToReadableSize() }));
                     }
 
                     if (properties.MaxSize.HasValue && asset.FileSize > properties.MaxSize)
                     {
-                        addError(path, T.Get("contents.validation.maximumSize", new { minSize = properties.MaxSize }));
+                        addError(path, T.Get("contents.validation.maximumSize", new { size = asset.FileSize.ToReadableSize(), maxSize = properties.MaxSize.Value.ToReadableSize() }));
                     }
 
                     if (properties.AllowedExtensions != null &&

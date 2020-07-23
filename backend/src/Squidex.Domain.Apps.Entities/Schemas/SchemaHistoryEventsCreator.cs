@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 T.Get("history.schemas.unpublished"));
 
             AddEventMessage<SchemaFieldsReordered>(
-                "reordered fields of schema {[Name]}.");
+                T.Get("history.schemas.fieldsReordered"));
 
             AddEventMessage<SchemaScriptsConfigured>(
                 T.Get("history.schemas.scriptsConfigured"));
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 T.Get("history.schemas.fieldDisabled"));
 
             AddEventMessage<FieldEnabled>(
-                "disabled field {[Field]} of schema {[Name]}.");
+                T.Get("history.schemas.fieldDisabled"));
 
             AddEventMessage<FieldUpdated>(
                 T.Get("history.schemas.fieldUpdated"));

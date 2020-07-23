@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -9,6 +9,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
@@ -43,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                     if (arrayField.FieldsByName.ContainsKey(command.Name))
                     {
-                        e("A field with the same name already exists.");
+                        e(T.Get("schemas.fieldNameAlreadyExists"));
                     }
                 }
                 else
@@ -55,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                     if (schema.FieldsByName.ContainsKey(command.Name))
                     {
-                        e("A field with the same name already exists.");
+                        e(T.Get("schemas.fieldNameAlreadyExists"));
                     }
                 }
             });
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (!field.IsForApi(true))
             {
-                throw new DomainException("UI field cannot be hidden.");
+                throw new DomainException(T.Get("schemas.uiFieldCannotBeHidden"));
             }
         }
 
@@ -102,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (!field.IsForApi(true))
             {
-                throw new DomainException("UI field cannot be diabled.");
+                throw new DomainException(T.Get("schemas.uiFieldCannotBeDisabled"));
             }
         }
 
@@ -114,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (!field.IsForApi(true))
             {
-                throw new DomainException("UI field cannot be shown.");
+                throw new DomainException(T.Get("schemas.uiFieldCannotBeShown"));
             }
         }
 
@@ -126,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (!field.IsForApi(true))
             {
-                throw new DomainException("UI field cannot be enabled.");
+                throw new DomainException(T.Get("schemas.uiFieldCannotBeEnabled"));
             }
         }
 

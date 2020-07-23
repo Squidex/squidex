@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards
@@ -100,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             if (await SchemaProvider(schema.SchemaId) == null)
             {
-                return new ValidationError($"Schema {schema.SchemaId} does not exist.", nameof(ContentChangedTriggerV2.Schemas));
+                return new ValidationError(T.Get("schemas.notFoundId", new { id = schema.SchemaId }), nameof(ContentChangedTriggerV2.Schemas));
             }
 
             return null;

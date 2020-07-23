@@ -143,11 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         try
                         {
-<<<<<<< HEAD
-                            await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c, () => T.Get("contents.changeStatusFailed"));
-=======
                             await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
->>>>>>> refactoring/validation
 
                             await GuardContent.CanChangeStatus(context.Schema, Snapshot, contentWorkflow, c);
 

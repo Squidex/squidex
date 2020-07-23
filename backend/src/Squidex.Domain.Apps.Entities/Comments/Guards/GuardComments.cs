@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Comments.Guards
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
             if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
             {
-                throw new DomainException("Comment is created by another user.");
+                throw new DomainException(T.Get("comments.notUserComment"));
             }
 
             Validate.It(e =>
@@ -58,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
             if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
             {
-                throw new DomainException("Comment is created by another user.");
+                throw new DomainException(T.Get("comments.notUserComment"));
             }
         }
 

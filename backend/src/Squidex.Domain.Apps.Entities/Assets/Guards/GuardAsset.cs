@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Guards
@@ -18,23 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         public static void CanAnnotate(AnnotateAsset command)
         {
             Guard.NotNull(command, nameof(command));
-
-            Validate.It(e =>
-            {
-                if (string.IsNullOrWhiteSpace(command.FileName) &&
-                    string.IsNullOrWhiteSpace(command.Slug) &&
-                    command.IsProtected == null &&
-                    command.Metadata == null &&
-                    command.Tags == null)
-                {
-                    e("At least one property must be defined.",
-                        nameof(command.FileName),
-                        nameof(command.IsProtected),
-                        nameof(command.Metadata),
-                        nameof(command.Slug),
-                        nameof(command.Tags));
-                }
-            });
         }
 
         public static Task CanCreate(CreateAsset command, IAssetQueryService assetQuery)
@@ -78,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
                 if (path.Count == 0)
                 {
-                    e("Asset folder does not exist.", nameof(MoveAsset.ParentId));
+                    e(T.Get("assets.folderNotFound"), nameof(MoveAsset.ParentId));
                 }
             }
         }

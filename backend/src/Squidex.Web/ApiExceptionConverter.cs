@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -14,6 +14,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Web
@@ -82,7 +83,7 @@ namespace Squidex.Web
             switch (exception)
             {
                 case ValidationException ex:
-                    return (CreateError(400, "Validation error", ToDetails(ex)), true);
+                    return (CreateError(400, T.Get("common.httpValidationError"), ToDetails(ex)), true);
 
                 case DomainObjectNotFoundException _:
                     return (CreateError(404), true);
@@ -116,7 +117,7 @@ namespace Squidex.Web
 
         private static string[] ToDetails(ValidationException ex)
         {
-            string FixPropertyName(string property)
+            static string FixPropertyName(string property)
             {
                 property = property.Trim();
 

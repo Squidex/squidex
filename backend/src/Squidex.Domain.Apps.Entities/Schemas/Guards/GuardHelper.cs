@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {
@@ -58,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (field.IsLocked)
             {
-                throw new DomainException("Schema field is locked.");
+                throw new DomainException(T.Get("schemas.fieldIsLocked"));
             }
         }
     }

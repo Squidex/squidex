@@ -151,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             }
             catch (NotSupportedException)
             {
-                throw new DomainObjectNotFoundException(language, typeof(AppLanguageDto));
+                throw new DomainObjectNotFoundException(language);
             }
         }
     }

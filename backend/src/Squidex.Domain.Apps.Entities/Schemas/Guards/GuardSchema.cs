@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 #pragma warning disable IDE0060 // Remove unused parameter
@@ -29,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (!command.Name.IsSlug())
                 {
-                    e(Not.ValidSlug("Name"), nameof(command.Name));
+                    e(Not.ValidSlug(nameof(command.Name)), nameof(command.Name));
                 }
 
                 ValidateUpsert(command, e);
@@ -61,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (command.FieldIds == null)
                 {
-                    e(Not.Defined("Field ids"), nameof(command.FieldIds));
+                    e(Not.Defined(nameof(command.FieldIds)), nameof(command.FieldIds));
                 }
 
                 if (arrayField == null)
@@ -83,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (command.PreviewUrls == null)
                 {
-                    e(Not.Defined("Preview Urls"), nameof(command.PreviewUrls));
+                    e(Not.Defined(nameof(command.PreviewUrls)), nameof(command.PreviewUrls));
                 }
             });
         }
@@ -154,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     if (fieldName.IsPropertyName())
                     {
-                        e($"Field '{fieldName}' has been added twice.", nameof(command.Fields));
+                        e(T.Get("schemas.duplicateFieldName", new { field = fieldName }), nameof(command.Fields));
                     }
                 }
             }
@@ -175,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (!field.Partitioning.IsValidPartitioning())
                 {
-                    e(Not.Valid("Partitioning"), $"{prefix}.{nameof(field.Partitioning)}");
+                    e(Not.Valid(nameof(field.Partitioning)), $"{prefix}.{nameof(field.Partitioning)}");
                 }
 
                 ValidateField(field, prefix, e);
@@ -193,14 +194,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                     else if (field.Nested.Count > 0)
                     {
-                        e("Only array fields can have nested fields.", $"{prefix}.{nameof(field.Partitioning)}");
+                        e(T.Get("schemas.onlyArraysHaveNested"), $"{prefix}.{nameof(field.Partitioning)}");
                     }
 
                     foreach (var fieldName in field.Nested.Duplicates(x => x.Name))
                     {
                         if (fieldName.IsPropertyName())
                         {
-                            e($"Field '{fieldName}' has been added twice.", $"{prefix}.Nested");
+                            e(T.Get("schemas.duplicateFieldName", new { field = fieldName }), $"{prefix}.Nested");
                         }
                     }
                 }
@@ -217,7 +218,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (nestedField.Properties is ArrayFieldProperties)
                 {
-                    e("Nested field cannot be array fields.", $"{prefix}.{nameof(nestedField.Properties)}");
+                    e(T.Get("schemas.onylArraysInRoot"), $"{prefix}.{nameof(nestedField.Properties)}");
                 }
 
                 ValidateField(nestedField, prefix, e);
@@ -228,12 +229,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!field.Name.IsPropertyName())
             {
-                e(Not.ValidPropertyName("Field name"), $"{prefix}.{nameof(field.Name)}");
+                e(Not.ValidPropertyName("FieldName"), $"{prefix}.{nameof(field.Name)}");
             }
 
             if (field.Properties == null)
             {
-               e(Not.Defined("Field properties"), $"{prefix}.{nameof(field.Properties)}");
+               e(Not.Defined(nameof(field.Properties)), $"{prefix}.{nameof(field.Properties)}");
             }
             else
             {
@@ -241,12 +242,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     if (field.IsHidden)
                     {
-                        e("UI field cannot be hidden.", $"{prefix}.{nameof(field.IsHidden)}");
+                        e(T.Get("schemas.uiFieldCannotBeHidden"), $"{prefix}.{nameof(field.IsHidden)}");
                     }
 
                     if (field.IsDisabled)
                     {
-                        e("UI field cannot be disabled.", $"{prefix}.{nameof(field.IsDisabled)}");
+                        e(T.Get("schemas.uiFieldCannotBeDisabled"), $"{prefix}.{nameof(field.IsDisabled)}");
                     }
                 }
 
@@ -272,11 +273,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                     else if (field == null && !isAllowed(fieldName))
                     {
-                        e("Field is not part of the schema.", fieldPrefix);
+                        e(T.Get("schemas.fieldNotInSchema"), fieldPrefix);
                     }
                     else if (field?.IsUI() == true)
                     {
-                        e("Field cannot be an UI field.", fieldPrefix);
+                        e(T.Get("schemas.fieldCannotBeUIField"), fieldPrefix);
                     }
                 });
 
@@ -284,7 +285,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     if (!string.IsNullOrWhiteSpace(duplicate))
                     {
-                        e($"Field '{duplicate}' has been added twice.", path);
+                        e(T.Get("schemas.duplicateFieldName", new { fieldName = duplicate }), path);
                     }
                 }
             }
@@ -324,11 +325,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                     else if (field == null && !isAllowed(fieldName))
                     {
-                        e("Field is not part of the schema.", fieldPrefix);
+                        e(T.Get("schemas.fieldNotInSchema"), fieldPrefix);
                     }
                     else if (field?.Properties?.IsUIProperty() == true)
                     {
-                        e("Field cannot be an UI field.", fieldPrefix);
+                        e(T.Get("schemas.fieldCannotBeUIField"), fieldPrefix);
                     }
                 });
 
@@ -336,7 +337,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     if (!string.IsNullOrWhiteSpace(duplicate))
                     {
-                        e($"Field '{duplicate}' has been added twice.", path);
+                        e(T.Get("schemas.duplicateFieldName", new { fieldName = duplicate }), path);
                     }
                 }
             }
@@ -352,11 +353,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             return false;
         }
 
-        private static void ValidateFieldIds<T>(ReorderFields c, IReadOnlyDictionary<long, T> fields, AddValidation e)
+        private static void ValidateFieldIds<TField>(ReorderFields c, IReadOnlyDictionary<long, TField> fields, AddValidation e)
         {
             if (c.FieldIds != null && (c.FieldIds.Count != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
             {
-                e("Field ids do not cover all fields.", nameof(c.FieldIds));
+                e(T.Get("schemas.fieldsNotCovered"), nameof(c.FieldIds));
             }
         }
     }

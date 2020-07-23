@@ -35,8 +35,7 @@ namespace Squidex.Web
             {
                 var log = context.HttpContext.RequestServices.GetService<ISemanticLog>();
 
-                log.LogError(context.Exception, w => w
-                    .WriteProperty("message", "An unexpected exception has occurred."));
+                log.LogError(context.Exception, w => w.WriteProperty("message", "An unexpected exception has occurred."));
             }
 
             context.Result = GetResult(error);

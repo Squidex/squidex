@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
@@ -66,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var schemaUrl = urlGenerator.SchemaUI(appId, schemaId);
 
-            result.Add($"{name} Schema", SearchResultType.Schema, schemaUrl);
+            result.Add(T.Get("search.schemaResult", new { name }), SearchResultType.Schema, schemaUrl);
         }
 
         private void AddContentsUrl(SearchResults result, NamedId<Guid> appId, ISchemaEntity schema, NamedId<Guid> schemaId, string name)
@@ -75,13 +76,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
 
-                result.Add($"{name} Content", SearchResultType.Content, contentUrl, name);
+                result.Add(T.Get("search.contentResult", new { name }), SearchResultType.Content, contentUrl, name);
             }
             else
             {
                 var contentUrl = urlGenerator.ContentsUI(appId, schemaId);
 
-                result.Add($"{name} Contents", SearchResultType.Content, contentUrl, name);
+                result.Add(T.Get("search.contentsResult", new { name }), SearchResultType.Content, contentUrl, name);
             }
         }
 

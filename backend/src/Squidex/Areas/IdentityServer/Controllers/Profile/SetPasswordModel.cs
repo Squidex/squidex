@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -11,10 +11,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public class SetPasswordModel
     {
-        [Required(ErrorMessage = "Password is required.")]
+        [Required]
         public string Password { get; set; }
 
-        [Compare(nameof(Password), ErrorMessage = "Passwords must be identitical.")]
+        [Required]
         public string PasswordConfirm { get; set; }
     }
 }

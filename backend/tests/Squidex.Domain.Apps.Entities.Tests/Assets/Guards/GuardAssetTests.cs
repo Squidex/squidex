@@ -91,12 +91,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         }
 
         [Fact]
-        public void CanAnnotate_should_throw_exception_if_nothing_defined()
+        public void CanAnnotate_should_not_throw_exception_if_empty()
         {
             var command = new AnnotateAsset();
 
-            ValidationAssert.Throws(() => GuardAsset.CanAnnotate(command),
-                new ValidationError("At least one property must be defined.", "FileName", "IsProtected", "Metadata", "Slug", "Tags"));
+            GuardAsset.CanAnnotate(command);
         }
 
         [Fact]

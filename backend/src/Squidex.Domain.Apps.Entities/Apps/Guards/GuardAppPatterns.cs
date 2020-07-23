@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -9,6 +9,7 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
@@ -33,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (patterns.Values.Any(x => x.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    e("A pattern with the same name already exists.");
+                    e(T.Get("apps.patterns.nameAlreadyExists"));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
@@ -47,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (patterns.Values.Any(x => x.Pattern == command.Pattern))
                 {
-                    e("This pattern already exists but with another name.");
+                    e(T.Get("apps.patterns.patternAlreadyExists"));
                 }
             });
         }
@@ -80,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (patterns.Any(x => x.Key != command.PatternId && x.Value.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    e("A pattern with the same name already exists.");
+                    e(T.Get("apps.patterns.nameAlreadyExists"));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
@@ -94,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (patterns.Any(x => x.Key != command.PatternId && x.Value.Pattern == command.Pattern))
                 {
-                    e("This pattern already exists but with another name.");
+                    e(T.Get("apps.patterns.patternAlreadyExists"));
                 }
             });
         }

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Guards
@@ -25,12 +26,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             if (schema.SchemaDef.IsSingleton && command.ContentId != schema.Id)
             {
-                throw new DomainException("Singleton content cannot be created.");
+                throw new DomainException(T.Get("contents.singletonNotCreatable"));
             }
 
             if (command.Publish && !await contentWorkflow.CanPublishOnCreateAsync(schema, command.Data, command.User))
             {
-                throw new DomainException("Content workflow prevents publishing.");
+                throw new DomainException(T.Get("contents.workflowErorPublishing"));
             }
 
             Validate.It(e =>
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             if (content.NewStatus == null)
             {
-                throw new DomainException("There is nothing to delete.");
+                throw new DomainException(T.Get("contents.draftToDeleteNotFound"));
             }
         }
 
@@ -79,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             if (content.Status != Status.Published)
             {
-                throw new DomainException("You can only create a new version when the content is published.");
+                throw new DomainException(T.Get("contents.draftNotCreateForUnpublished"));
             }
         }
 
@@ -91,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             {
                 if (content.NewVersion == null || command.Status != Status.Published)
                 {
-                    throw new DomainException("Singleton content cannot be updated.");
+                    throw new DomainException(T.Get("contents.singletonNotChangeable"));
                 }
 
                 return Task.CompletedTask;
@@ -101,12 +102,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             {
                 if (!await contentWorkflow.CanMoveToAsync(content, content.EditingStatus, command.Status, command.User))
                 {
-                    e($"Cannot change status from {content.Status} to {command.Status}.", nameof(command.Status));
+                    e(T.Get("contents.statusTransitionNotAllowed", new { oldStatus = content.EditingStatus, newStatus = command.Status }), nameof(command.Status));
                 }
 
                 if (command.DueTime.HasValue && command.DueTime.Value < SystemClock.Instance.GetCurrentInstant())
                 {
-                    e("Due time must be in the future.", nameof(command.DueTime));
+                    e(T.Get("contents.statusSchedulingNotInFuture"), nameof(command.DueTime));
                 }
             });
         }
@@ -117,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             if (schema.SchemaDef.IsSingleton)
             {
-                throw new DomainException("Singleton content cannot be deleted.");
+                throw new DomainException(T.Get("contents.singletonNotDeletable"));
             }
         }
 
@@ -133,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             if (!await contentWorkflow.CanUpdateAsync(content, content.EditingStatus, user))
             {
-                throw new DomainException($"The workflow does not allow updates at status {content.Status}");
+                throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status = content.EditingStatus }));
             }
         }
     }

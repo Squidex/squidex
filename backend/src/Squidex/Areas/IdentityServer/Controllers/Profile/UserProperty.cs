@@ -11,10 +11,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public sealed class UserProperty
     {
-        [Required(ErrorMessage = "Name is required.")]
+        [Required]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Value is required.")]
+        [Required]
         public string Value { get; set; }
 
         public (string Name, string Value) ToTuple()

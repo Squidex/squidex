@@ -32,7 +32,8 @@ namespace Squidex.Infrastructure.Log.Internal
 
             outputThread = new Thread(ProcessLogQueue)
             {
-                IsBackground = true, Name = "Logging"
+                IsBackground = true,
+                Name = "Logging"
             };
         }
 
@@ -87,7 +88,7 @@ namespace Squidex.Infrastructure.Log.Internal
 
                             if (i == Retries)
                             {
-                                Console.WriteLine($T.Get("common.ii"));
+                                Console.WriteLine($"Failed to write to log file '{path}': {ex}");
                             }
                         }
                     }

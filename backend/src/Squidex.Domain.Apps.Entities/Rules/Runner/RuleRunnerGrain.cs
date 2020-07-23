@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -20,6 +20,7 @@ using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
@@ -109,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         {
             if (currentJobToken != null)
             {
-                throw new DomainException("Another rule is already running.");
+                throw new DomainException(T.Get("rules.ruleAlreadyRunning"));
             }
 
             state.Value = new State

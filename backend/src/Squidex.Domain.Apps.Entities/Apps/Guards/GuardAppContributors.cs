@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 
@@ -47,14 +48,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     {
                         if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
                         {
-                            throw new DomainForbiddenException("You cannot change your own role.");
+                            throw new DomainForbiddenException(T.Get("apps.contributors.cannotChangeYourself"));
                         }
 
                         if (!contributors.TryGetValue(command.ContributorId, out var role))
                         {
                             if (plan != null && plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
                             {
-                                e("You have reached the maximum number of contributors for your plan.");
+                                e(T.Get("apps.contributors.maxReached"));
                             }
                         }
                     }
@@ -77,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (ownerIds.Count == 1 && ownerIds.Contains(command.ContributorId))
                 {
-                    e("Cannot remove the only owner.");
+                    e(T.Get("apps.contributors.onlyOneOwner"));
                 }
             });
 

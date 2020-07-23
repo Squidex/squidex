@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,6 +7,7 @@
 
 using System;
 using System.Runtime.Serialization;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure
 {
@@ -43,7 +44,7 @@ namespace Squidex.Infrastructure
 
         private static string FormatMessage(string id, long currentVersion, long expectedVersion)
         {
-            return $"Entity ({id}) requested version {expectedVersion}, but found {currentVersion}.";
+            return T.Get("xceptions.domainObjectVersion", new { id, currentVersion, expectedVersion });
         }
     }
 }

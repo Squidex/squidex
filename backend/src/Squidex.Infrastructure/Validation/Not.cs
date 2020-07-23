@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Validation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Defined()
         {
-            return $"Value must be defined.";
+            return T.Get("validation.requiredValue");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -45,25 +45,25 @@ namespace Squidex.Infrastructure.Validation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GreaterThan(string property, string other)
         {
-            return T.Get("validation.greaterThanOver", new { property, other });
+            return T.Get("validation.greaterThan", new { property, other });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GreaterEquals(string property, string other)
+        public static string GreaterEqualsThan(string property, string other)
         {
-            return T.Get("validation.greaterEqualsOver", new { property, other });
+            return T.Get("validation.greaterEqualsThan", new { property, other });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string LessThan(string property, string other)
+        public static string LessOther(string property, string other)
         {
-            return T.Get("validation.lessThanOver", new { property, other });
+            return T.Get("validation.lessOther", new { property, other });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string LessEquals(string property, string other)
+        public static string LessEqualsOther(string property, string other)
         {
-            return T.Get("validation.lessEqualsOver", new { property, other });
+            return T.Get("validation.lessEqualsOther", new { property, other });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

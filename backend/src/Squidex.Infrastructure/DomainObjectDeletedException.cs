@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,6 +7,7 @@
 
 using System;
 using System.Runtime.Serialization;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure
 {
@@ -25,7 +26,7 @@ namespace Squidex.Infrastructure
 
         private static string FormatMessage(string id)
         {
-            return $"Entity ({id}) has been deleted.";
+            return T.Get("xceptions.domainObjectDeleted", new { id });
         }
     }
 }

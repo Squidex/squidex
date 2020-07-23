@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
@@ -26,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
-                    e("A client with the same id already exists.");
+                    e(T.Get("apps.clients.idAlreadyExists"));
                 }
             });
         }

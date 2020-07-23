@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
 #pragma warning disable RECS0147
@@ -182,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (!HasPermission(context, schema))
                 {
-                    throw new DomainForbiddenException("You do not have permission for this schema.");
+                    throw new DomainForbiddenException(T.Get("schemas.noPermission"));
                 }
             }
         }
