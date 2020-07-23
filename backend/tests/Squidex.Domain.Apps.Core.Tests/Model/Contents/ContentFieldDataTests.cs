@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 

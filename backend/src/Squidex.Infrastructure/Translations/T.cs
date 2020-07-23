@@ -8,6 +8,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Resources;
 using System.Text;
 
@@ -27,12 +28,7 @@ namespace Squidex.Infrastructure.Translations
         {
             Guard.NotNullOrEmpty(key, nameof(key));
 
-            if (resources == null)
-            {
-                return key;
-            }
-
-            var translation = resources.GetString(key);
+            var translation = GetCore(key);
 
             if (translation == null)
             {
@@ -120,10 +116,19 @@ namespace Squidex.Infrastructure.Translations
 
                     if (shouldTranslate)
                     {
-                        variableValue = Get(variableValue);
+                        var converted = variableValue.ToCamelCase();
+
+                        variableValue = GetCore(converted);
+
+                        if (variableValue == null)
+                        {
+                            variableValue = GetCore($"common.{converted}");
+                        }
                     }
 
-                    if (variableValue.Length > 0)
+                    variableValue ??= variableName;
+
+                    if (variableValue!.Length > 0)
                     {
                         if (shouldLower && !char.IsLower(variableValue[0]))
                         {
@@ -150,12 +155,39 @@ namespace Squidex.Infrastructure.Translations
 
                 return sb.ToString();
             }
-            else
+
+            return translation;
+        }
+
+        private static string? GetCore(string key)
+        {
+            if (resources == null)
+            {
+                return null;
+            }
+
+            var translation = resources.GetString(key);
+
+            if (translation == null)
             {
 #if DEBUG
                 lock (LockObject)
                 {
-                    File.AppendAllLines("Missing.txt", new string[] { key });
+                    const string missingFileName = "__missing.txt";
+
+                    if (File.Exists(missingFileName))
+                    {
+                        var missing = File.ReadAllLines(missingFileName);
+
+                        if (!missing.Contains(key))
+                        {
+                            File.AppendAllLines(missingFileName, new string[] { key });
+                        }
+                    }
+                    else
+                    {
+                        File.AppendAllLines(missingFileName, new string[] { key });
+                    }
                 }
 #endif
             }

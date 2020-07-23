@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Validation
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Defined2(string property1, string property2)
+        public static string BothDefined(string property1, string property2)
         {
             return T.Get("validation.requiredBoth", new { property1, property2 });
         }
@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.Validation
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ValidPropertyName(string property)
+        public static string ValidJavascriptName(string property)
         {
             return T.Get("validation.javascriptProperty", new { property });
         }
@@ -55,13 +55,13 @@ namespace Squidex.Infrastructure.Validation
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string LessOther(string property, string other)
+        public static string LessThan(string property, string other)
         {
             return T.Get("validation.lessThan", new { property, other });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string LessEqualsOther(string property, string other)
+        public static string LessEqualsThan(string property, string other)
         {
             return T.Get("validation.lessEqualsThan", new { property, other });
         }

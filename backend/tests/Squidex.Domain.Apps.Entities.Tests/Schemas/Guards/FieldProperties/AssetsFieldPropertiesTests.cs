@@ -9,12 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 {
-    public class AssetsFieldPropertiesTests
+    public class AssetsFieldPropertiesTests : IClassFixture<TranslationsFixture>
     {
         [Fact]
         public void Should_add_error_if_min_items_greater_than_max_items()

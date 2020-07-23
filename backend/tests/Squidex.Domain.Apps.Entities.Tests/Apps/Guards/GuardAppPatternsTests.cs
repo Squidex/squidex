@@ -7,6 +7,7 @@
 
 using System;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -17,7 +18,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
-    public class GuardAppPatternsTests
+    public class GuardAppPatternsTests : IClassFixture<TranslationsFixture>
     {
         private readonly Guid patternId = Guid.NewGuid();
         private readonly AppPatterns patterns_0 = AppPatterns.Empty;

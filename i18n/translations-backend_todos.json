@@ -9,7 +9,7 @@
     "*"
   ],
   "/Squidex.Domain.Users/PwnedPasswordValidator.cs": [
-    "This password has previously appeared in a data breach and should never be used. If you\u0027ve ever used it anywhere before, change it!"
+    "This password has previously appeared in a data breach and should never be used. If you've ever used it anywhere before, change it!"
   ],
   "/Squidex.Infrastructure/FileExtensions.cs": [
     "*"

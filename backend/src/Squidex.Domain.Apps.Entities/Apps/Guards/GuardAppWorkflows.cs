@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                     if (step.Value == null)
                     {
-                        e(Not.Defined("Step"), stepPrefix);
+                        e(Not.Defined("WorkflowStep"), stepPrefix);
                     }
                     else
                     {
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                             if (transition == null)
                             {
-                                e(Not.Defined("Transition"), transitionPrefix);
+                                e(Not.Defined("WorkflowTransition"), transitionPrefix);
                             }
                         }
                     }

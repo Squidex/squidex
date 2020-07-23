@@ -32,7 +32,7 @@
   "/Squidex.Domain.Apps.Core.Operations/ConvertContent/StringFormatter.cs": [
     "{array.Count} {pluralName}",
     "{lat}, {lon}",
-    "\u003CJson /\u003E",
+    "<Json />",
     "0 {pluralName}",
     "1 {singularName}"
   ],

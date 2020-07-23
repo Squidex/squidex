@@ -74,7 +74,7 @@
     <value>Cannot remove the only owner.</value>
   </data>
   <data name="apps.languages.fallbackNotFound" xml:space="preserve">
-    <value>App does not have fallback language {fallback}.</value>
+    <value>App does not have fallback language '{fallback}'.</value>
   </data>
   <data name="apps.languages.languageAlreadyAdded" xml:space="preserve">
     <value>Language has already been added.</value>
@@ -107,6 +107,9 @@
     <value>Plan can only changed from the user who configured the plan initially.</value>
   </data>
   <data name="apps.roles.defaultRoleNotRemovable" xml:space="preserve">
+    <value>Cannot delete a default role.</value>
+  </data>
+  <data name="apps.roles.defaultRoleNotUpdateable" xml:space="preserve">
     <value>Cannot update a default role.</value>
   </data>
   <data name="apps.roles.nameAlreadyExists" xml:space="preserve">
@@ -154,17 +157,56 @@
   <data name="comments.notUserComment" xml:space="preserve">
     <value>Comment is created by another user.</value>
   </data>
+  <data name="common.action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="common.aspectHeight" xml:space="preserve">
+    <value>Aspect height</value>
+  </data>
+  <data name="common.aspectWidth" xml:space="preserve">
+    <value>Aspect width</value>
+  </data>
+  <data name="common.calculatedDefaultValue" xml:space="preserve">
+    <value>Calculated default value</value>
+  </data>
+  <data name="common.clientd" xml:space="preserve">
+    <value>Client ID</value>
+  </data>
   <data name="common.clientId" xml:space="preserve">
-    <value>Client id</value>
+    <value>Client ID</value>
   </data>
   <data name="common.clientSecret" xml:space="preserve">
     <value>Client Secret</value>
   </data>
+  <data name="common.contributorId" xml:space="preserve">
+    <value>Contributor ID or email</value>
+  </data>
+  <data name="common.data" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="common.defaultValue" xml:space="preserve">
+    <value>Default value</value>
+  </data>
   <data name="common.displayName" xml:space="preserve">
     <value>Display name</value>
   </data>
+  <data name="common.editor" xml:space="preserve">
+    <value>Editor</value>
+  </data>
   <data name="common.email" xml:space="preserve">
     <value>Email</value>
+  </data>
+  <data name="common.field" xml:space="preserve">
+    <value>Field</value>
+  </data>
+  <data name="common.fieldIds" xml:space="preserve">
+    <value>Field IDs</value>
+  </data>
+  <data name="common.file" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="common.folderName" xml:space="preserve">
+    <value>Folder name</value>
   </data>
   <data name="common.fullTextNotSupported" xml:space="preserve">
     <value>Query search clause not supported.</value>
@@ -187,17 +229,23 @@
   <data name="common.httpValidationError" xml:space="preserve">
     <value>Validation error</value>
   </data>
+  <data name="common.initialStep" xml:space="preserve">
+    <value>Initial step</value>
+  </data>
   <data name="common.jsError" xml:space="preserve">
-    <value>Failed to execute script with javascript error: {message}</value>
+    <value>Failed to execute script with Javascript error: {message}</value>
   </data>
   <data name="common.jsNotAlloweed" xml:space="preserve">
     <value>Script has forbidden the operation.</value>
   </data>
   <data name="common.jsParseError" xml:space="preserve">
-    <value>Failed to execute script with javascript syntax error: {message}</value>
+    <value>Failed to execute script with Javascript syntax error: {message}</value>
   </data>
   <data name="common.jsRejected" xml:space="preserve">
     <value>Script rejected the operation.</value>
+  </data>
+  <data name="common.language" xml:space="preserve">
+    <value>Language code</value>
   </data>
   <data name="common.login" xml:space="preserve">
     <value>Login</value>
@@ -205,8 +253,50 @@
   <data name="common.logout" xml:space="preserve">
     <value>Logout</value>
   </data>
+  <data name="common.maxHeight" xml:space="preserve">
+    <value>Max height</value>
+  </data>
+  <data name="common.maxItems" xml:space="preserve">
+    <value>Max items</value>
+  </data>
+  <data name="common.maxLength" xml:space="preserve">
+    <value>Max length</value>
+  </data>
+  <data name="common.maxSize" xml:space="preserve">
+    <value>Max size</value>
+  </data>
+  <data name="common.maxValue" xml:space="preserve">
+    <value>Max value</value>
+  </data>
+  <data name="common.maxWidth" xml:space="preserve">
+    <value>Max width</value>
+  </data>
+  <data name="common.minHeight" xml:space="preserve">
+    <value>Min height</value>
+  </data>
+  <data name="common.minItems" xml:space="preserve">
+    <value>Min items</value>
+  </data>
+  <data name="common.minLength" xml:space="preserve">
+    <value>Min length</value>
+  </data>
+  <data name="common.minSize" xml:space="preserve">
+    <value>Min size</value>
+  </data>
+  <data name="common.minValue" xml:space="preserve">
+    <value>Min value</value>
+  </data>
+  <data name="common.minWidth" xml:space="preserve">
+    <value>Min width</value>
+  </data>
+  <data name="common.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
   <data name="common.notFoundValue" xml:space="preserve">
     <value>- not found -</value>
+  </data>
+  <data name="common.numDays" xml:space="preserve">
+    <value>Num days</value>
   </data>
   <data name="common.odataFailure" xml:space="preserve">
     <value>Failed to parse query: {message}</value>
@@ -223,11 +313,35 @@
   <data name="common.oldPassword" xml:space="preserve">
     <value>Old password</value>
   </data>
+  <data name="common.other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="common.partitioning" xml:space="preserve">
+    <value>Partitioning</value>
+  </data>
   <data name="common.password" xml:space="preserve">
     <value>Password</value>
   </data>
+  <data name="common.pattern" xml:space="preserve">
+    <value>Pattern</value>
+  </data>
+  <data name="common.permissions" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="common.planId" xml:space="preserve">
+    <value>Plan ID</value>
+  </data>
+  <data name="common.previewUrls" xml:space="preserve">
+    <value>Preview URLs</value>
+  </data>
   <data name="common.product" xml:space="preserve">
     <value>Squidex Headless CMS</value>
+  </data>
+  <data name="common.properties" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="common.property" xml:space="preserve">
+    <value>Property</value>
   </data>
   <data name="common.readonlyMode" xml:space="preserve">
     <value>Application is in readonly mode at the moment.</value>
@@ -244,11 +358,38 @@
   <data name="common.resultTooLarge" xml:space="preserve">
     <value>Result set is too large to be retrieved. Use $take parameter to reduce the number of items.</value>
   </data>
+  <data name="common.role" xml:space="preserve">
+    <value>Role</value>
+  </data>
   <data name="common.save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="common.schemaId" xml:space="preserve">
+    <value>Schema ID</value>
+  </data>
   <data name="common.signup" xml:space="preserve">
     <value>Signup</value>
+  </data>
+  <data name="common.text" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="common.trigger" xml:space="preserve">
+    <value>Trigger</value>
+  </data>
+  <data name="common.workflow" xml:space="preserve">
+    <value>Workflow</value>
+  </data>
+  <data name="common.workflowStep" xml:space="preserve">
+    <value>Step</value>
+  </data>
+  <data name="common.WorkflowStep" xml:space="preserve">
+    <value>Workflow step</value>
+  </data>
+  <data name="common.workflowTransition" xml:space="preserve">
+    <value>Transition</value>
+  </data>
+  <data name="common.WorkflowTransition" xml:space="preserve">
+    <value>Worflow transition</value>
   </data>
   <data name="contents.alreadyDeleted" xml:space="preserve">
     <value>Content has already been deleted.</value>
@@ -566,13 +707,16 @@
     <value>Calculated default value and default value cannot be used together.</value>
   </data>
   <data name="schemas.duplicateFieldName" xml:space="preserve">
-    <value>Field '{fieldName}' has been added twice.</value>
+    <value>Field '{field}' has been added twice.</value>
   </data>
   <data name="schemas.fieldCannotBeUIField" xml:space="preserve">
     <value>Field cannot be an UI field.</value>
   </data>
   <data name="schemas.fieldIsLocked" xml:space="preserve">
     <value>Schema field is locked.</value>
+  </data>
+  <data name="schemas.fieldName" xml:space="preserve">
+    <value>Field name</value>
   </data>
   <data name="schemas.fieldNameAlreadyExists" xml:space="preserve">
     <value>A field with the same name already exists.</value>
@@ -821,43 +965,43 @@
     <value>Cannot find user.</value>
   </data>
   <data name="validation.absoluteUrl" xml:space="preserve">
-    <value>{property:upper} must be an absolute URL.</value>
+    <value>{!property|upper} must be an absolute URL.</value>
   </data>
   <data name="validation.between" xml:space="preserve">
-    <value>{property:translate:upper} must be between {min} and {max}.</value>
+    <value>{!property|upper} must be between {min} and {max}.</value>
   </data>
   <data name="validation.greaterEqualsThan" xml:space="preserve">
-    <value>{property:translate:upper} must be greater or equal to {other:translate:lower}.</value>
+    <value>{!property|upper} must be greater or equal to {!other|lower}.</value>
   </data>
   <data name="validation.greaterThan" xml:space="preserve">
-    <value>{property:translate:upper} must be greater than {other:translate:lower}.</value>
+    <value>{!property|upper} must be greater than {!other|lower}.</value>
   </data>
   <data name="validation.javascriptProperty" xml:space="preserve">
-    <value>{property:translate:lower} is not a javascript property name.</value>
+    <value>{!property|upper} is not a Javascript property name.</value>
   </data>
   <data name="validation.lessEqualsThan" xml:space="preserve">
-    <value>{property:translate:lower} must be less or equal to {other:translate:lower}.</value>
+    <value>{!property|upper} must be less or equal to {!other|lower}.</value>
   </data>
   <data name="validation.lessThan" xml:space="preserve">
-    <value>{property:translate:upper} must be less than {other:translate:lower}.</value>
+    <value>{!property|upper} must be less than {!other|lower}.</value>
   </data>
   <data name="validation.onlyOneFile" xml:space="preserve">
     <value>Can only upload one file.</value>
   </data>
   <data name="validation.required" xml:space="preserve">
-    <value>{property:translate:upper} is required.</value>
+    <value>{!property|upper} is required.</value>
   </data>
   <data name="validation.requiredBoth" xml:space="preserve">
-    <value>If {property1:translate:upper} or {property2:translate:lower} is used both must be defined.</value>
+    <value>If {!property1|lower} or {!property2|lower} is used both must be defined.</value>
   </data>
   <data name="validation.requiredValue" xml:space="preserve">
     <value>Value must be defined.</value>
   </data>
   <data name="validation.slug" xml:space="preserve">
-    <value>{property:translate:upper} is not a valid slug.</value>
+    <value>{!property|upper} is not a valid slug.</value>
   </data>
   <data name="validation.valid" xml:space="preserve">
-    <value>{property:translate:upper} is not a valid value.</value>
+    <value>{!property|upper} is not a valid value.</value>
   </data>
   <data name="valiodation.notAnImage" xml:space="preserve">
     <value>Picture is not a valid image.</value>
@@ -869,6 +1013,6 @@
     <value>Multiple workflows cover all schemas.</value>
   </data>
   <data name="workflows.schemaOverlap" xml:space="preserve">
-    <value>The schema {schema} is covered by multiple workflows.</value>
+    <value>The schema '{schema}' is covered by multiple workflows.</value>
   </data>
 </root>
