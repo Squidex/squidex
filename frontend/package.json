@@ -26,6 +26,8 @@
     "@angular/platform-browser-dynamic": "9.0.6",
     "@angular/platform-server": "9.0.6",
     "@angular/router": "9.0.6",
+    "@ngx-translate/core": "^13.0.0",
+    "@ngx-translate/http-loader": "^6.0.0",
     "angular-mentions": "1.1.4",
     "angular2-chartjs": "0.5.1",
     "babel-polyfill": "6.26.0",

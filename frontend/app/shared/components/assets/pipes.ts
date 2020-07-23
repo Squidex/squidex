@@ -7,6 +7,7 @@
 
 import { Pipe, PipeTransform } from '@angular/core';
 import { ApiUrlConfig, AssetDto, AuthService, MathHelper, StringHelper, Types } from '@app/shared/internal';
+import { TranslateService } from '@app/shared/services/translate.service';
 
 @Pipe({
     name: 'sqxAssetUrl',
@@ -81,3 +82,19 @@ export class FileIconPipe implements PipeTransform {
         return `./images/asset_${mimeIcon}.svg`;
     }
 }
+
+
+@Pipe({
+    name: 'sqxTranslate',
+    pure: true
+  })
+  export class SqxTranslatePipe implements PipeTransform {
+
+    constructor(translateService: TranslateService) {
+        console.log(translateService.getTranslation());
+    }
+
+    public transform(value: string): string {
+      return value + '123';
+    }
+  }
