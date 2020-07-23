@@ -90,11 +90,9 @@ export class FileIconPipe implements PipeTransform {
   })
   export class SqxTranslatePipe implements PipeTransform {
 
-    constructor(translateService: TranslateService) {
-        console.log(translateService.getTranslation());
-    }
+    constructor(private translateService: TranslateService) {}
 
     public transform(value: string): string {
-      return value + '123';
+      return this.translateService.getTranslation();
     }
   }

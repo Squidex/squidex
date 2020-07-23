@@ -4,14 +4,18 @@ import {TranslateService as NgxTranslateService} from '@ngx-translate/core';
 
 @Injectable()
 export class TranslateService {
-    constructor(
-    ngxTranslateService: NgxTranslateService
-    ) {
-        console.log(ngxTranslateService.get('HELLO'));
-    }
+    public res: string;
 
-    public getTranslation(): string { 
-        return 'test';
+    constructor(
+    private ngxTranslateService: NgxTranslateService
+    ) {}
+
+    public getTranslation(): string {
+        this.ngxTranslateService.get('test', {value: 'world'}).subscribe((res: string) => {
+            this.res = res;
+        });
+
+        return this.res;
     }
 
 }
