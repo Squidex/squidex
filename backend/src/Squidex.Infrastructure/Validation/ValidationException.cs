@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -16,15 +15,10 @@ namespace Squidex.Infrastructure.Validation
     [Serializable]
     public class ValidationException : DomainException
     {
-        private readonly IReadOnlyList<ValidationError> errors;
-
-        public IReadOnlyList<ValidationError> Errors
-        {
-            get { return errors; }
-        }
+        public IReadOnlyList<ValidationError> Errors { get; }
 
         public ValidationException(string error, Exception? inner = null)
-            : this(new List<ValidationError> { new ValidationError(error) }, inner)
+            : this(new ValidationError(error), inner)
         {
         }
 
@@ -36,55 +30,46 @@ namespace Squidex.Infrastructure.Validation
         public ValidationException(IReadOnlyList<ValidationError> errors, Exception? inner = null)
             : base(FormatMessage(errors), inner)
         {
-            Guard.NotEmpty(errors, nameof(errors));
-
-            this.errors = errors;
+            Errors = errors;
         }
 
         protected ValidationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            errors = (List<ValidationError>)info.GetValue(nameof(errors), typeof(List<ValidationError>))!;
+            Errors = (List<ValidationError>)info.GetValue(nameof(Errors), typeof(List<ValidationError>))!;
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(nameof(errors), errors.ToList());
+            info.AddValue(nameof(Errors), Errors);
 
             base.GetObjectData(info, context);
         }
 
-        private static string FormatMessage(IReadOnlyList<ValidationError>? errors)
+        private static string FormatMessage(IReadOnlyList<ValidationError> errors)
         {
+            Guard.NotNull(errors, nameof(errors));
+
             var sb = new StringBuilder();
 
-            if (errors?.Count > 0)
+            for (var i = 0; i < errors.Count; i++)
             {
-                sb.Append(": ");
+                var error = errors[i]?.Message;
 
-                for (var i = 0; i < errors.Count; i++)
+                if (!string.IsNullOrWhiteSpace(error))
                 {
-                    var error = errors[i]?.Message;
+                    sb.Append(error);
 
-                    if (!string.IsNullOrWhiteSpace(error))
+                    if (!error.EndsWith(".", StringComparison.OrdinalIgnoreCase))
                     {
-                        sb.Append(error);
+                        sb.Append(".");
+                    }
 
-                        if (!error.EndsWith(".", StringComparison.OrdinalIgnoreCase))
-                        {
-                            sb.Append(".");
-                        }
-
-                        if (i < errors.Count - 1)
-                        {
-                            sb.Append(" ");
-                        }
+                    if (i < errors.Count - 1)
+                    {
+                        sb.Append(" ");
                     }
                 }
-            }
-            else
-            {
-                sb.Append(".");
             }
 
             return sb.ToString();

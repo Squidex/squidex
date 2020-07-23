@@ -178,9 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (token == null)
                 {
-                    var error = new ValidationError("A schema with this name already exists.");
-
-                    throw new ValidationException("Cannot create schema.", error);
+                    throw new ValidationException("A schema with the same name already exists.");
                 }
 
                 return token;

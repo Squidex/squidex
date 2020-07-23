@@ -123,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             if (this.IsUser(id))
             {
-                throw new ValidationException("Unlocking user failed.", new ValidationError("You cannot unlock yourself."));
+                throw new DomainForbiddenException("You cannot unlock yourself.");
             }
 
             var user = await userManager.UnlockAsync(id);

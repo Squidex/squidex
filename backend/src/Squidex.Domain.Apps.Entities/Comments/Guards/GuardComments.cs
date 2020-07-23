@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                    e(Not.Defined(nameof(command.Text)), nameof(command.Text));
+                    e(Not.Defined("Text"), nameof(command.Text));
                 }
             });
         }
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                    e(Not.Defined(nameof(command.Text)), nameof(command.Text));
+                    e(Not.Defined("Text"), nameof(command.Text));
                 }
             });
         }
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
             if (result == null)
             {
-                throw new DomainObjectNotFoundException(commentId.ToString(), "Comments", typeof(CommentsGrain));
+                throw new DomainObjectNotFoundException(commentId.ToString());
             }
 
             return result;

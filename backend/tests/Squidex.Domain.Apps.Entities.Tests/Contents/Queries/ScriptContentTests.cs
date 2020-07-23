@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
                 else
                 {
-                    throw new DomainObjectNotFoundException(x.ToString(), typeof(ISchemaEntity));
+                    throw new DomainObjectNotFoundException(x.ToString());
                 }
             };
 

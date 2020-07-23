@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
             if (errors.Count > 0)
             {
-                throw new ValidationException("Failed to parse json query", errors.Select(x => new ValidationError(x)).ToArray());
+                throw new ValidationException(errors.Select(x => new ValidationError($"Json query not valid: {x}")).ToList());
             }
 
             return result;
@@ -84,7 +84,9 @@ namespace Squidex.Infrastructure.Queries.Json
             }
             catch (JsonException ex)
             {
-                throw new ValidationException("Failed to parse json query.", new ValidationError(ex.Message));
+                var error = $"Json query not valid json: {ex.Message}";
+
+                throw new ValidationException(error);
             }
         }
     }

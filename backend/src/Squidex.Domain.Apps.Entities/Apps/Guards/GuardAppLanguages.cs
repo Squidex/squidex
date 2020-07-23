@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             if (!languages.Contains(language))
             {
-                throw new DomainObjectNotFoundException(language, "Languages", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(language);
             }
         }
     }

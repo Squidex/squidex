@@ -13,6 +13,12 @@ namespace Squidex.Infrastructure.Validation
     public static class Not
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Defined()
+        {
+            return $"Value must be defined.";
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Defined(string property)
         {
             return T.Get("validation.required", new { property });

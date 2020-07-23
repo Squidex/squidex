@@ -132,16 +132,12 @@ namespace Squidex.Domain.Users
 
             try
             {
-                await DoChecked(() => userManager.CreateAsync(user),
-                    T.Get("users.createFailed"));
-
-                await DoChecked(() => values.SyncClaims(userManager, user),
-                    T.Get("users.updateFailed"));
+                await DoChecked(() => userManager.CreateAsync(user));
+                await DoChecked(() => values.SyncClaims(userManager, user));
 
                 if (!string.IsNullOrWhiteSpace(values.Password))
                 {
-                    await DoChecked(() => userManager.AddPasswordAsync(user, values.Password),
-                        T.Get("users.updatePasswordFailed"));
+                    await DoChecked(() => userManager.AddPasswordAsync(user, values.Password));
                 }
             }
             catch
@@ -160,7 +156,7 @@ namespace Squidex.Domain.Users
 
             if (user == null)
             {
-                throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
+                throw new DomainObjectNotFoundException(id);
             }
 
             await UpdateAsync(userManager, user, values);
@@ -194,30 +190,21 @@ namespace Squidex.Domain.Users
 
         public static async Task UpdateAsync(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)
         {
-            if (user == null)
-            {
-                throw new DomainObjectNotFoundException("Id", typeof(IdentityUser));
-            }
+            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(values, nameof(values));
 
             if (!string.IsNullOrWhiteSpace(values.Email) && values.Email != user.Email)
             {
-                await DoChecked(() => userManager.SetEmailAsync(user, values.Email),
-                    T.Get("users.updateEmailFailed"));
-
-                await DoChecked(() => userManager.SetUserNameAsync(user, values.Email),
-                    T.Get("users.updateEmailFailed"));
+                await DoChecked(() => userManager.SetEmailAsync(user, values.Email));
+                await DoChecked(() => userManager.SetUserNameAsync(user, values.Email));
             }
 
-            await DoChecked(() => values.SyncClaims(userManager, user),
-                T.Get("users.updateFailed"));
+            await DoChecked(() => values.SyncClaims(userManager, user));
 
             if (!string.IsNullOrWhiteSpace(values.Password))
             {
-                await DoChecked(() => userManager.RemovePasswordAsync(user),
-                    T.Get("users.updatePasswordFailed"));
-
-                await DoChecked(() => userManager.AddPasswordAsync(user, values.Password),
-                    T.Get("users.updatePasswordFailed"));
+                await DoChecked(() => userManager.RemovePasswordAsync(user));
+                await DoChecked(() => userManager.AddPasswordAsync(user, values.Password));
             }
         }
 
@@ -227,11 +214,10 @@ namespace Squidex.Domain.Users
 
             if (user == null)
             {
-                throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
+                throw new DomainObjectNotFoundException(id);
             }
 
-            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)),
-                T.Get("users.lockFailed"));
+            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)));
 
             return (await userManager.ResolveUserAsync(user))!;
         }
@@ -242,22 +228,21 @@ namespace Squidex.Domain.Users
 
             if (user == null)
             {
-                throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
+                throw new DomainObjectNotFoundException(id);
             }
 
-            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, null),
-                T.Get("users.unlockFailed"));
+            await DoChecked(() => userManager.SetLockoutEndDateAsync(user, null));
 
             return (await userManager.ResolveUserAsync(user))!;
         }
 
-        private static async Task DoChecked(Func<Task<IdentityResult>> action, string message)
+        private static async Task DoChecked(Func<Task<IdentityResult>> action)
         {
             var result = await action();
 
             if (!result.Succeeded)
             {
-                throw new ValidationException(message, result.Errors.Select(x => new ValidationError(x.Description)).ToArray());
+                throw new ValidationException(result.Errors.Select(x => new ValidationError(x.Description)).ToList());
             }
         }
 

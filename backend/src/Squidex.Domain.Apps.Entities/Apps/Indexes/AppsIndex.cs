@@ -256,7 +256,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 if (token == null)
                 {
-                    throw new ValidationException("An app with this already exists.");
+                    throw new ValidationException("An app with the same name already exists.");
                 }
 
                 return token;

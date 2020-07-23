@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             if (!workflows.ContainsKey(id))
             {
-                throw new DomainObjectNotFoundException(id.ToString(), "Workflows", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(id.ToString());
             }
         }
     }

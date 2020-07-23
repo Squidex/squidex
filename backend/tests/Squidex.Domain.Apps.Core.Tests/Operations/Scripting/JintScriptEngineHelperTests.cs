@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
-            Assert.Empty(ex.Errors);
+            Assert.NotEmpty(ex.Errors);
         }
 
         [Fact]
@@ -229,7 +229,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
-            Assert.Equal("Not allowed", ex.Message);
+            Assert.Equal("Script has forbidden the operation.", ex.Message);
         }
 
         [Fact]

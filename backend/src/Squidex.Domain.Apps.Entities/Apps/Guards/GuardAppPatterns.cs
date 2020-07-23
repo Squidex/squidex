@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!patterns.ContainsKey(command.PatternId))
             {
-                throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
+                throw new DomainObjectNotFoundException(command.PatternId.ToString());
             }
         }
 
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!patterns.ContainsKey(command.PatternId))
             {
-                throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
+                throw new DomainObjectNotFoundException(command.PatternId.ToString());
             }
 
             Validate.It(e =>

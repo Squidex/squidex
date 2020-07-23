@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case CreateContent createContent:
                     return CreateReturnAsync(createContent, async c =>
                     {
-                        await LoadContext(c.AppId, c.SchemaId, c, () => T.Get("contents.createFailed"), c.OptimizeValidation);
+                        await LoadContext(c.AppId, c.SchemaId, c, c.OptimizeValidation);
 
                         await GuardContent.CanCreate(context.Schema, contentWorkflow, c);
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case CreateContentDraft createContentDraft:
                     return UpdateReturnAsync(createContentDraft, async c =>
                     {
-                        await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c, () => T.Get("contents.createDraftFailed"));
+                        await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
 
                         GuardContent.CanCreateDraft(c, Snapshot);
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case DeleteContentDraft deleteContentDraft:
                     return UpdateReturnAsync(deleteContentDraft, async c =>
                     {
-                        await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c, () => T.Get("contents.deleteDraftFailed"));
+                        await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
 
                         GuardContent.CanDeleteDraft(c, Snapshot);
 
@@ -143,7 +143,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         try
                         {
+<<<<<<< HEAD
                             await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c, () => T.Get("contents.changeStatusFailed"));
+=======
+                            await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
+>>>>>>> refactoring/validation
 
                             await GuardContent.CanChangeStatus(context.Schema, Snapshot, contentWorkflow, c);
 
@@ -188,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c, () => T.Get("contents.deleteFailed"));
+                        await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
 
                         GuardContent.CanDelete(context.Schema, c);
 
@@ -220,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!currentData!.Equals(newData))
             {
-                await LoadContext(Snapshot.AppId, Snapshot.SchemaId, command, () => T.Get("contents.updateFailed"), command.OptimizeValidation);
+                await LoadContext(Snapshot.AppId, Snapshot.SchemaId, command, command.OptimizeValidation);
 
                 if (!command.DoNotValidate)
                 {
@@ -342,9 +346,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private Task LoadContext(NamedId<Guid> appId, NamedId<Guid> schemaId, ContentCommand command, Func<string> message, bool optimized = false)
+        private Task LoadContext(NamedId<Guid> appId, NamedId<Guid> schemaId, ContentCommand command, bool optimized = false)
         {
-            return context.LoadAsync(appId, schemaId, command, message, optimized);
+            return context.LoadAsync(appId, schemaId, command, optimized);
         }
     }
 }

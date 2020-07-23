@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!roles.ContainsCustom(name))
             {
-                throw new DomainObjectNotFoundException(name, "Roles", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(name);
             }
         }
     }

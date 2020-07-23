@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                     if (user == null)
                     {
-                        throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
+                        throw new DomainObjectNotFoundException(command.ContributorId);
                     }
 
                     if (!command.Restoring)
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!contributors.ContainsKey(command.ContributorId))
             {
-                throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(command.ContributorId);
             }
         }
     }

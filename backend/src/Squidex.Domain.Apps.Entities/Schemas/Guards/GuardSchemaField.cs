@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     var errors = FieldPropertiesValidator.Validate(command.Properties);
 
-                    errors.Foreach(x => x.WithPrefix(nameof(command.Properties)).AddTo(e));
+                    errors.Foreach((x, _) => x.WithPrefix(nameof(command.Properties)).AddTo(e));
                 }
 
                 if (command.ParentFieldId.HasValue)
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     var errors = FieldPropertiesValidator.Validate(command.Properties);
 
-                    errors.Foreach(x => x.WithPrefix(nameof(command.Properties)).AddTo(e));
+                    errors.Foreach((x, _) => x.WithPrefix(nameof(command.Properties)).AddTo(e));
                 }
             });
         }

@@ -143,16 +143,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (command.Fields?.Count > 0)
             {
-                var fieldIndex = 0;
-                var fieldPrefix = string.Empty;
-
-                foreach (var field in command.Fields)
+                command.Fields.Foreach((field, fieldIndex) =>
                 {
-                    fieldIndex++;
-                    fieldPrefix = $"Fields[{fieldIndex}]";
+                    var fieldPrefix = $"Fields[{fieldIndex}]";
 
                     ValidateRootField(field, fieldPrefix, e);
-                }
+                });
 
                 foreach (var fieldName in command.Fields.Duplicates(x => x.Name))
                 {
@@ -188,16 +184,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     if (field.Properties is ArrayFieldProperties)
                     {
-                        var nestedIndex = 0;
-                        var nestedPrefix = string.Empty;
-
-                        foreach (var nestedField in field.Nested)
+                        field.Nested.Foreach((nestedField, nestedIndex) =>
                         {
-                            nestedIndex++;
-                            nestedPrefix = $"{prefix}.Nested[{nestedIndex}]";
+                            var nestedPrefix = $"{prefix}.Nested[{nestedIndex}]";
 
                             ValidateNestedField(nestedField, nestedPrefix, e);
-                        }
+                        });
                     }
                     else if (field.Nested.Count > 0)
                     {
@@ -260,7 +252,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                 var errors = FieldPropertiesValidator.Validate(field.Properties);
 
-                errors.Foreach(x => x.WithPrefix($"{prefix}.{nameof(field.Properties)}").AddTo(e));
+                errors.Foreach((x, _) => x.WithPrefix($"{prefix}.{nameof(field.Properties)}").AddTo(e));
             }
         }
 
@@ -268,13 +260,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (fields != null)
             {
-                var fieldIndex = 0;
-                var fieldPrefix = string.Empty;
-
-                foreach (var fieldName in fields)
+                fields.Foreach((fieldName, fieldIndex) =>
                 {
-                    fieldIndex++;
-                    fieldPrefix = $"{path}[{fieldIndex}]";
+                    var fieldPrefix = $"{path}[{fieldIndex}]";
 
                     var field = schema.FieldsByName.GetOrDefault(fieldName ?? string.Empty);
 
@@ -290,7 +278,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     {
                         e("Field cannot be an UI field.", fieldPrefix);
                     }
-                }
+                });
 
                 foreach (var duplicate in fields.Duplicates())
                 {
@@ -304,40 +292,29 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         private static void ValidateFieldRules(List<FieldRuleCommand>? fieldRules, string path, AddValidation e)
         {
-            if (fieldRules != null)
+            fieldRules?.Foreach((rule, ruleIndex) =>
             {
-                var ruleIndex = 0;
-                var rulePrefix = string.Empty;
+                var rulePrefix = $"{path}[{ruleIndex}]";
 
-                foreach (var fieldRule in fieldRules)
+                if (string.IsNullOrWhiteSpace(rule.Field))
                 {
-                    ruleIndex++;
-                    rulePrefix = $"{path}[{ruleIndex}]";
-
-                    if (string.IsNullOrWhiteSpace(fieldRule.Field))
-                    {
-                        e(Not.Defined(nameof(fieldRule.Field)), $"{rulePrefix}.{nameof(fieldRule.Field)}");
-                    }
-
-                    if (!fieldRule.Action.IsEnumValue())
-                    {
-                        e(Not.Valid(nameof(fieldRule.Action)), $"{rulePrefix}.{nameof(fieldRule.Action)}");
-                    }
+                    e(Not.Defined(nameof(rule.Field)), $"{rulePrefix}.{nameof(rule.Field)}");
                 }
-            }
+
+                if (!rule.Action.IsEnumValue())
+                {
+                    e(Not.Valid(nameof(rule.Action)), $"{rulePrefix}.{nameof(rule.Action)}");
+                }
+            });
         }
 
         private static void ValidateFieldNames(UpsertCommand command, FieldNames? fields, string path, AddValidation e, Func<string, bool> isAllowed)
         {
             if (fields != null)
             {
-                var fieldIndex = 0;
-                var fieldPrefix = string.Empty;
-
-                foreach (var fieldName in fields)
+                fields.Foreach((fieldName, fieldIndex) =>
                 {
-                    fieldIndex++;
-                    fieldPrefix = $"{path}[{fieldIndex}]";
+                    var fieldPrefix = $"{path}[{fieldIndex}]";
 
                     var field = command?.Fields?.Find(x => x.Name == fieldName);
 
@@ -353,7 +330,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     {
                         e("Field cannot be an UI field.", fieldPrefix);
                     }
-                }
+                });
 
                 foreach (var duplicate in fields.Duplicates())
                 {

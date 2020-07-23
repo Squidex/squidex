@@ -23,24 +23,24 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 if (command.Trigger == null)
                 {
-                    e(Not.Defined(nameof(command.Trigger)), nameof(command.Trigger));
+                    e(Not.Defined("Trigger"), nameof(command.Trigger));
                 }
                 else
                 {
                     var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Id, command.Trigger, appProvider);
 
-                    errors.Foreach(x => x.AddTo(e));
+                    errors.Foreach((x, _) => x.AddTo(e));
                 }
 
                 if (command.Action == null)
                 {
-                    e(Not.Defined(nameof(command.Action)), nameof(command.Action));
+                    e(Not.Defined("Action"), nameof(command.Action));
                 }
                 else
                 {
                     var errors = command.Action.Validate();
 
-                    errors.Foreach(x => x.AddTo(e));
+                    errors.Foreach((x, _) => x.AddTo(e));
                 }
             });
         }
@@ -60,14 +60,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 {
                     var errors = await RuleTriggerValidator.ValidateAsync(appId, command.Trigger, appProvider);
 
-                    errors.Foreach(x => x.AddTo(e));
+                    errors.Foreach((x, _) => x.AddTo(e));
                 }
 
                 if (command.Action != null)
                 {
                     var errors = command.Action.Validate();
 
-                    errors.Foreach(x => x.AddTo(e));
+                    errors.Foreach((x, _) => x.AddTo(e));
                 }
             });
         }
