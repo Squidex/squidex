@@ -176,6 +176,7 @@ export class DateTime {
     public toISODate(): string {
         return format(this.value, DATE_FORMAT);
     }
+
     public toStringFormat(pattern: string): string {
         return format(this.value, pattern);
     }
