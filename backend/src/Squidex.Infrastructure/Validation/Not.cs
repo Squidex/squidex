@@ -57,13 +57,13 @@ namespace Squidex.Infrastructure.Validation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string LessOther(string property, string other)
         {
-            return T.Get("validation.lessOther", new { property, other });
+            return T.Get("validation.lessThan", new { property, other });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string LessEqualsOther(string property, string other)
         {
-            return T.Get("validation.lessEqualsOther", new { property, other });
+            return T.Get("validation.lessEqualsThan", new { property, other });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

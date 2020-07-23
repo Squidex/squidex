@@ -3,7 +3,7 @@
 @{
     ViewBag.Class = "profile-lg";
 
-    ViewBag.Title = @T.Get("users.profile.hideProfile");
+    ViewBag.Title = @T.Get("users.profile.title");
 
     void RenderValidation(string field)
     {
@@ -16,9 +16,9 @@
     }
 }
 
-<h1>@T.Get("users.profile.hideProfile")</h1>
+<h1>@T.Get("users.profile.headline")</h1>
 
-<h2>@T.Get("users.profile.hideProfile")</h2>
+<h2>@T.Get("users.profile.pii")</h2>
 
 @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
 {
@@ -41,7 +41,7 @@
     <div class="col">
         <form id="pictureForm" class="profile-picture-form" asp-controller="Profile" asp-action="UploadPicture" method="post" enctype="multipart/form-data">
             <span class="btn btn-secondary" id="pictureButton">
-                <span>@T.Get("users.profile.hideProfile")</span>
+                <span>@T.Get("users.profile.uploadPicture")</span>
 
                 <input class="profile-picture-input" name="file" type="file" id="pictureInput" />
             </span>
@@ -160,7 +160,7 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Change Password</button>
+                    <button type="submit" class="btn btn-primary">@T.Get("users.profile.changePassword")</button>
                 </div>
             </form>
         }
@@ -184,7 +184,7 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">@T.Get("users.profile.setPassword")d</button>
+                    <button type="submit" class="btn btn-primary">@T.Get("users.profile.setPassword")</button>
                 </div>
             </form>
         }
@@ -256,7 +256,7 @@
             </button>
         </div>
 
-        <button type="submit" class="btn btn-primary">@T.Get("comm.save")</button>
+        <button type="submit" class="btn btn-primary">@T.Get("common.save")</button>
     </form>
 </div>
 

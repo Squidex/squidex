@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure
 
         private static string FormatMessage(string id)
         {
-            return T.Get("xceptions.domainObjectNotFound", new { id });
+            return T.Get("exceptions.domainObjectNotFound", new { id });
         }
     }
 }

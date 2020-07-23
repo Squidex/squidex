@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 if (image == null)
                 {
-                    throw new ValidationException(T.Get("apps.uploadImageFailed_notImage"));
+                    throw new ValidationException(T.Get("apps.notImage"));
                 }
             }
 

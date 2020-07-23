@@ -35,23 +35,23 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     if (minLength == maxLength && minLength != stringValue.Length)
                     {
-                        addError(context.Path, T.Get("common.characterCount", new { count = minLength }));
+                        addError(context.Path, T.Get("contents.validation.characterCount", new { count = minLength }));
                     }
                     else if (stringValue.Length < minLength || stringValue.Length > maxLength)
                     {
-                        addError(context.Path, T.Get("common.charactersBetween", new { min = minLength, max = maxLength }));
+                        addError(context.Path, T.Get("contents.validation.charactersBetween", new { min = minLength, max = maxLength }));
                     }
                 }
                 else
                 {
                     if (minLength.HasValue && stringValue.Length < minLength.Value)
                     {
-                        addError(context.Path, T.Get("common.minLength", new { min = minLength }));
+                        addError(context.Path, T.Get("contents.validation.minLength", new { min = minLength }));
                     }
 
                     if (maxLength.HasValue && stringValue.Length > maxLength.Value)
                     {
-                        addError(context.Path, T.Get("common.maxLength", new { max = maxLength }));
+                        addError(context.Path, T.Get("contents.validation.maxLength", new { max = maxLength }));
                     }
                 }
             }

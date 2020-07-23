@@ -112,12 +112,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         {
             if (!model.ConsentToCookies)
             {
-                ModelState.AddModelError(nameof(model.ConsentToCookies), T.Get("users.consentNeeded"));
+                ModelState.AddModelError(nameof(model.ConsentToCookies), T.Get("users.consent.needed""));
             }
 
             if (!model.ConsentToPersonalInformation)
             {
-                ModelState.AddModelError(nameof(model.ConsentToPersonalInformation), T.Get("users.consentNeeded"));
+                ModelState.AddModelError(nameof(model.ConsentToPersonalInformation), T.Get("users.consent.needed""));
             }
 
             if (!ModelState.IsValid)

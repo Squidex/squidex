@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure
 
         private static string FormatMessage(string id, long currentVersion, long expectedVersion)
         {
-            return T.Get("xceptions.domainObjectVersion", new { id, currentVersion, expectedVersion });
+            return T.Get("exceptions.domainObjectVersion", new { id, currentVersion, expectedVersion });
         }
     }
 }

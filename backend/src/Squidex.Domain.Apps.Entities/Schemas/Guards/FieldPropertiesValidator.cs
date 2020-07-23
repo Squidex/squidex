@@ -189,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (properties.InlineEditable && properties.Editor == NumberFieldEditor.Radio)
             {
-                yield return new ValidationError(T.Get("schemas.number.inlineEditingError"),
+                yield return new ValidationError(T.Get("schemas.number.inlineEditorError"),
                     nameof(properties.InlineEditable),
                     nameof(properties.Editor));
             }

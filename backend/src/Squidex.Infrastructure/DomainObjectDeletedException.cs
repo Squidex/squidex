@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure
 
         private static string FormatMessage(string id)
         {
-            return T.Get("xceptions.domainObjectDeleted", new { id });
+            return T.Get("exceptions.domainObjectDeleted", new { id });
         }
     }
 }

@@ -82,7 +82,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> AddLoginCallback()
         {
             return MakeChangeAsync<None>(u => AddLoginAsync(u),
-                T.Get("users.loginAdded"));
+                T.Get("users.profile.addLoginDone"));
         }
 
         [HttpPost]
@@ -90,7 +90,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
             return MakeChangeAsync(u => UpdateAsync(u, model.ToValues()),
-                T.Get("users.profileUpdated"), model);
+                T.Get("users.profile.updateProfileDone"), model);
         }
 
         [HttpPost]
@@ -98,7 +98,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> UpdateProperties(ChangePropertiesModel model)
         {
             return MakeChangeAsync(u => UpdateAsync(u, model.ToValues()),
-                T.Get("users.profileUpdated"), model);
+                T.Get("users.profile.updatePropertiesDone"), model);
         }
 
         [HttpPost]
@@ -106,7 +106,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> RemoveLogin(RemoveLoginModel model)
         {
             return MakeChangeAsync(u => userManager.RemoveLoginAsync(u, model.LoginProvider, model.ProviderKey),
-                T.Get("users.loginRemoved"), model);
+                T.Get("users.profile.removeLoginDone"), model);
         }
 
         [HttpPost]
@@ -114,7 +114,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> SetPassword(SetPasswordModel model)
         {
             return MakeChangeAsync(u => userManager.AddPasswordAsync(u, model.Password),
-                T.Get("users.profilePasswordUpdated"), model);
+                T.Get("users.profile.setPasswordDone"), model);
         }
 
         [HttpPost]
@@ -122,7 +122,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             return MakeChangeAsync(u => userManager.ChangePasswordAsync(u, model.OldPassword, model.Password),
-                T.Get("users.profilePasswordChanged"), model);
+                T.Get("users.profile.changePasswordDone"), model);
         }
 
         [HttpPost]
@@ -130,7 +130,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> GenerateClientSecret()
         {
             return MakeChangeAsync<None>(user => userManager.GenerateClientSecretAsync(user),
-                T.Get("users.userClientGenerated"));
+                T.Get("users.profile.generateClientDone"));
         }
 
         [HttpPost]
@@ -138,7 +138,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public Task<IActionResult> UploadPicture(List<IFormFile> file)
         {
             return MakeChangeAsync<None>(user => UpdatePictureAsync(file, user),
-                T.Get("users.profilePictureUploaded"));
+                T.Get("users.profile.uploadPictureDone"));
         }
 
         private async Task<IdentityResult> AddLoginAsync(IdentityUser user)
