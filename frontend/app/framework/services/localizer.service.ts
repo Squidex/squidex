@@ -15,5 +15,5 @@ export const LocalizerServiceServiceFactory = () => {
 export class LocalizerService {
     public get(key: string, args?: any) {
         return key;
-    };
+    }
 }

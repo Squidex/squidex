@@ -6,7 +6,7 @@
  */
 
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule} from '@angular/common/http';
 import { ApplicationRef, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -16,8 +16,8 @@ import { AppComponent } from './app.component';
 import { routing } from './app.routes';
 import { ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
-import {TranslateHttpLoader} from '@ngx-translate/http-loader';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { TranslateLoader, TranslateModule} from '@ngx-translate/core';
 
 export function configApiUrl() {
     const baseElements = document.getElementsByTagName('base');
