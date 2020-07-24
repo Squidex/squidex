@@ -394,14 +394,8 @@
   <data name="common.workflowStep" xml:space="preserve">
     <value>Step</value>
   </data>
-  <data name="common.WorkflowStep" xml:space="preserve">
-    <value>Workflow step</value>
-  </data>
   <data name="common.workflowTransition" xml:space="preserve">
     <value>Transition</value>
-  </data>
-  <data name="common.WorkflowTransition" xml:space="preserve">
-    <value>Worflow transition</value>
   </data>
   <data name="contents.alreadyDeleted" xml:space="preserve">
     <value>Content has already been deleted.</value>
