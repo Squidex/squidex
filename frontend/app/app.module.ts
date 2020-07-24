@@ -56,7 +56,7 @@ export function configCurrency() {
 }
 
 export function HttpLoaderFactory(http: HttpClient) {
-    return new TranslateHttpLoader(http, './locale/', '.json');
+    return new TranslateHttpLoader(http, './i18n/texts.', '.json');
 }
 
 @NgModule({

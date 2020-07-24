@@ -7,13 +7,13 @@
 
 import { Injectable } from '@angular/core';
 
-export const TranslationsServiceFactory = () => {
-    return new TranslationsService();
+export const LocalizerServiceServiceFactory = () => {
+    return new LocalizerService();
 };
 
 @Injectable()
-export class TranslationsService {
+export class LocalizerService {
     public get(key: string, args?: any) {
         return key;
-    }
+    };
 }
