@@ -1,4 +1,4 @@
-<sqx-title message="{{ 'common.api' | translate }}"></sqx-title>
+<sqx-title message="{{ 'common.api' | sqxTranslate }}"></sqx-title>
 
 <sqx-panel theme="dark" desiredWidth="12rem">
     <ng-container title>
@@ -9,18 +9,18 @@
         <ul class="nav nav-panel nav-dark flex-column">
             <li class="nav-item">
                 <a class="nav-link" routerLink="graphql" routerLinkActive="active">
-                    {{ 'common.graphql' | translate }}
+                    {{ 'common.graphql' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/api/content/{{appsState.appName}}/docs" sqxExternalLink>
-                    {{ 'contentApi' | translate }}
+                    {{ 'contentApi' | sqxTranslate }}
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/api/docs" sqxExternalLink>
-                    {{ 'generalApi' | translate }}
+                    {{ 'generalApi' | sqxTranslate }}
                 </a>
             </li>
         </ul>
