@@ -1,20 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Translations;
+using System.Globalization;
 
-namespace Squidex.Areas.IdentityServer.Controllers.Account
+namespace Squidex.Infrastructure.Translations
 {
-    public sealed class LoginModel
+    public interface ITranslationService
     {
-        [LocalizedRequired]
-        public string Email { get; set; }
-
-        [LocalizedRequired]
-        public string Password { get; set; }
+        (string Result, bool NotFound) Get(CultureInfo culture, string key, object? args = null);
     }
 }

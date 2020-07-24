@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,20 +7,15 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Infrastructure.Validation
+namespace Squidex.Infrastructure.Translations
 {
-    public sealed class AbsoluteUrlAttribute : ValidationAttribute
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class LocalizedRequired : RequiredAttribute
     {
         public override string FormatErrorMessage(string name)
         {
-            return T.Get("annotations_absoluteUrl", new { name });
-        }
-
-        public override bool IsValid(object value)
-        {
-            return !(value is Uri uri) || uri.IsAbsoluteUri;
+            return T.Get("annotations_Required", new { name });
         }
     }
 }

@@ -5,39 +5,33 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Xunit;
 
 namespace Squidex.Infrastructure.Translations
 {
     public class TTests
     {
+        private readonly ITranslationService sut;
+
         public TTests()
         {
-            T.Setup(SampleResources.ResourceManager);
-        }
-
-        [Fact]
-        public void Should_return_key_if_not_initialized()
-        {
-            T.Setup(null!);
-
-            var result = T.Get("key");
-
-            Assert.Equal("key", result);
+            sut = new ResourcesTranslationService(SampleResources.ResourceManager);
         }
 
         [Fact]
         public void Should_return_key_if_not_found()
         {
-            var result = T.Get("key");
+            var (result, notFound) = sut.Get(CultureInfo.CurrentUICulture, "key");
 
             Assert.Equal("key", result);
+            Assert.True(notFound);
         }
 
         [Fact]
         public void Should_return_simple_key()
         {
-            var result = T.Get("simple");
+            var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "simple");
 
             Assert.Equal("Simple Result", result);
         }
@@ -45,7 +39,7 @@ namespace Squidex.Infrastructure.Translations
         [Fact]
         public void Should_return_text_with_variable()
         {
-            var result = T.Get("withVar", new { var = 5 });
+            var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "withVar", new { var = 5 });
 
             Assert.Equal("Var: 5.", result);
         }
@@ -53,7 +47,7 @@ namespace Squidex.Infrastructure.Translations
         [Fact]
         public void Should_return_text_with_translated_variable()
         {
-            var result = T.Get("withTranslatedVar", new { var = "simple" });
+            var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "withTranslatedVar", new { var = "simple" });
 
             Assert.Equal("Var: Simple Result.", result);
         }
@@ -61,7 +55,7 @@ namespace Squidex.Infrastructure.Translations
         [Fact]
         public void Should_return_text_with_lower_var()
         {
-            var result = T.Get("withLowerVar", new { var = "Lower" });
+            var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "withLowerVar", new { var = "Lower" });
 
             Assert.Equal("Var: lower.", result);
         }
@@ -69,7 +63,7 @@ namespace Squidex.Infrastructure.Translations
         [Fact]
         public void Should_return_text_with_upper_var()
         {
-            var result = T.Get("withUpperVar", new { var = "upper" });
+            var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "withUpperVar", new { var = "upper" });
 
             Assert.Equal("Var: Upper.", result);
         }

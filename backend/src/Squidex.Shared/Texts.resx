@@ -58,6 +58,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="annotations_AbsoluteUrl" xml:space="preserve">
+    <value>The {!name|lower} must be an absolute URL.</value>
+  </data>
+  <data name="annotations_Compare" xml:space="preserve">
+    <value>The {!name|lower} must be the same as {!other|lower}.</value>
+  </data>
+  <data name="annotations_Required" xml:space="preserve">
+    <value>The {!name|lower} field is required.</value>
+  </data>
   <data name="apps.alreadyArchieved" xml:space="preserve">
     <value>App has already been archived.</value>
   </data>
@@ -321,6 +330,9 @@
   </data>
   <data name="common.password" xml:space="preserve">
     <value>Password</value>
+  </data>
+  <data name="common.passwordConfirm" xml:space="preserve">
+    <value>Confirm</value>
   </data>
   <data name="common.pattern" xml:space="preserve">
     <value>Pattern</value>
@@ -899,7 +911,7 @@
     <value>Client</value>
   </data>
   <data name="users.profile.confirmPassword" xml:space="preserve">
-    <value>Comfirm</value>
+    <value>Confirm</value>
   </data>
   <data name="users.profile.generateClient" xml:space="preserve">
     <value>Generate</value>
@@ -963,9 +975,6 @@
   </data>
   <data name="users.userNotFound" xml:space="preserve">
     <value>Cannot find user.</value>
-  </data>
-  <data name="validation.absoluteUrl" xml:space="preserve">
-    <value>{!property|upper} must be an absolute URL.</value>
   </data>
   <data name="validation.between" xml:space="preserve">
     <value>{!property|upper} must be between {min} and {max}.</value>

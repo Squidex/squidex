@@ -11,7 +11,6 @@ using FluentAssertions;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Xunit;

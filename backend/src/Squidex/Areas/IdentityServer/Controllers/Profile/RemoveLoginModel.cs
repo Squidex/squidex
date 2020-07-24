@@ -5,16 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public class RemoveLoginModel
     {
-        [Required]
+        [LocalizedRequired]
         public string LoginProvider { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         public string ProviderKey { get; set; }
     }
 }

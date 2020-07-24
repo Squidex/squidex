@@ -77,11 +77,12 @@ namespace Squidex
             app.UseCookiePolicy();
 
             app.UseSquidexForwardingRules(config);
-            app.UseSquidexTracking();
-            app.UseSquidexLocalCache();
-            app.UseSquidexCors();
             app.UseSquidexHealthCheck();
             app.UseSquidexRobotsTxt();
+            app.UseSquidexTracking();
+            app.UseSquidexLocalization();
+            app.UseSquidexLocalCache();
+            app.UseSquidexCors();
 
             app.ConfigureApi();
             app.ConfigurePortal();

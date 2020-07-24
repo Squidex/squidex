@@ -6,15 +6,16 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public sealed class UserProperty
     {
-        [Required]
+        [LocalizedRequired]
         public string Name { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         public string Value { get; set; }
 
         public (string Name, string Value) ToTuple()
