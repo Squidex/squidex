@@ -5,19 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public class ChangePasswordModel
     {
-        [Required]
+        [LocalizedRequired]
         public string OldPassword { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         public string Password { get; set; }
 
-        [Compare(nameof(Password))]
+        [LocalizedCompare(nameof(Password))]
         public string PasswordConfirm { get; set; }
     }
 }

@@ -11,19 +11,19 @@
         <div class="btn-group profile-headline">
             @if (Model.IsLogin)
             {
-                <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">@action</a>
+                <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">@T.Get("common.login")</a>
             }
             else
             {
-                <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">@action</a>
+                <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">@T.Get("common.login")</a>
             }
             @if (!Model.IsLogin)
             {
-                <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">@action</a>
+                <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">@T.Get("common.signup")</a>
             }
             else
             {
-                <a class="btn btn-toggle" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">@action</a>
+                <a class="btn btn-toggle" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">@T.Get("common.signup")</a>
             }
         </div>
     </div>

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -19,7 +20,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {
-    public class GuardSchemaTests
+    public class GuardSchemaTests : IClassFixture<TranslationsFixture>
     {
         private readonly Schema schema_0;
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -61,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field name is not a Javascript property name.",
+                new ValidationError("Name is not a Javascript property name.",
                     "Fields[0].Name"));
         }
 
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field properties is required.",
+                new ValidationError("Properties is required.",
                     "Fields[0].Properties"));
         }
 
@@ -191,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field name is not a Javascript property name.",
+                new ValidationError("Name is not a Javascript property name.",
                     "Fields[0].Nested[0].Name"));
         }
 
@@ -222,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field properties is required.",
+                new ValidationError("Properties is required.",
                     "Fields[0].Nested[0].Properties"));
         }
 
@@ -654,7 +655,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new ReorderFields { FieldIds = null! };
 
             ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
-                new ValidationError("Field ids is required.", "FieldIds"));
+                new ValidationError("Field IDs is required.", "FieldIds"));
         }
 
         [Fact]
@@ -679,7 +680,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new ConfigurePreviewUrls { PreviewUrls = null! };
 
             ValidationAssert.Throws(() => GuardSchema.CanConfigurePreviewUrls(command),
-                new ValidationError("Preview Urls is required.", "PreviewUrls"));
+                new ValidationError("Preview URLs is required.", "PreviewUrls"));
         }
 
         [Fact]

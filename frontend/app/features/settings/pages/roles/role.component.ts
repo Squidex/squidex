@@ -10,10 +10,10 @@ import { FormBuilder } from '@angular/forms';
 import { AddPermissionForm, AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState } from '@app/shared';
 
 const Descriptions = {
-    Developer: 'Can use the API view, edit assets, contents, schemas, rules, workflows and patterns.',
-    Editor: 'Can edit assets and contents and view workflows.',
-    Owner: 'Can do everything, including deleting the app.',
-    Reader: 'Can only read assets and contents.'
+    Developer: 'i18n:roles.defaults.developer',
+    Editor: 'i18n:roles.defaults.editor',
+    Owner: 'i18n:roles.default.owner',
+    Reader: 'i18n:roles.default.reader'
 };
 
 @Component({

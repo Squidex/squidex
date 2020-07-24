@@ -229,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!field.Name.IsPropertyName())
             {
-                e(Not.ValidPropertyName("FieldName"), $"{prefix}.{nameof(field.Name)}");
+                e(Not.ValidJavascriptName(nameof(field.Name)), $"{prefix}.{nameof(field.Name)}");
             }
 
             if (field.Properties == null)
@@ -285,7 +285,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     if (!string.IsNullOrWhiteSpace(duplicate))
                     {
-                        e(T.Get("schemas.duplicateFieldName", new { fieldName = duplicate }), path);
+                        e(T.Get("schemas.duplicateFieldName", new { field = duplicate }), path);
                     }
                 }
             }
@@ -337,7 +337,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     if (!string.IsNullOrWhiteSpace(duplicate))
                     {
-                        e(T.Get("schemas.duplicateFieldName", new { fieldName = duplicate }), path);
+                        e(T.Get("schemas.duplicateFieldName", new { field = duplicate }), path);
                     }
                 }
             }

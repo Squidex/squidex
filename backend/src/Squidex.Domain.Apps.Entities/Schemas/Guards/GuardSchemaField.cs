@@ -24,12 +24,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (!command.Name.IsPropertyName())
                 {
-                    e(Not.ValidPropertyName("Name"), nameof(command.Name));
+                    e(Not.ValidJavascriptName(nameof(command.Name)), nameof(command.Name));
                 }
 
                 if (command.Properties == null)
                 {
-                    e(Not.Defined("Properties"), nameof(command.Properties));
+                    e(Not.Defined(nameof(command.Properties)), nameof(command.Properties));
                 }
                 else
                 {

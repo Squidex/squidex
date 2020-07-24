@@ -70,7 +70,7 @@ export class UsersService {
 
                 return new UsersDto(total, users, _links);
             }),
-            pretifyError('Failed to load users. Please reload.'));
+            pretifyError('i18n:users.loadFailed'));
     }
 
     public getUser(id: string): Observable<UserDto> {
@@ -80,7 +80,7 @@ export class UsersService {
             map(body => {
                 return parseUser(body);
             }),
-            pretifyError('Failed to load user. Please reload.'));
+            pretifyError('i18n:users.loadUserFailed'));
     }
 
     public postUser(dto: CreateUserDto): Observable<UserDto> {
@@ -90,7 +90,7 @@ export class UsersService {
             map(body => {
                 return parseUser(body);
             }),
-            pretifyError('Failed to create user. Please reload.'));
+            pretifyError('i18n:users.createFailed'));
     }
 
     public putUser(user: Resource, dto: UpdateUserDto): Observable<UserDto> {
@@ -102,7 +102,7 @@ export class UsersService {
             map(body => {
                 return parseUser(body);
             }),
-            pretifyError('Failed to update user. Please reload.'));
+            pretifyError('i18n:users.updateFailed'));
     }
 
     public lockUser(user: Resource): Observable<UserDto> {

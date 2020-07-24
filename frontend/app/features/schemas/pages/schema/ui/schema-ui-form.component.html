@@ -2,7 +2,7 @@
     <div class="inner-header">
         <ul class="nav nav-tabs2">
             <li class="nav-item" *ngFor="let tab of selectableTabs">
-                <a class="nav-link" [class.active]="selectedTab === tab" (click)="selectTab(tab)">{{tab}}</a>
+                <a class="nav-link" [class.active]="selectedTab === tab" (click)="selectTab(tab)">{{tab | sqxTranslate}}</a>
             </li>
         </ul>
 

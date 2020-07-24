@@ -108,7 +108,7 @@ export class AppLanguagesService {
             tap(() => {
                 this.analytics.trackEvent('Language', 'Deleted', appName);
             }),
-            pretifyError('Failed to add language. Please reload.'));
+            pretifyError('i18n:loadings.addFailed'));
     }
 }
 

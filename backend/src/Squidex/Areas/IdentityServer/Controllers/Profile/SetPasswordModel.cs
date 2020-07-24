@@ -6,15 +6,16 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public class SetPasswordModel
     {
-        [Required]
+        [LocalizedRequired]
         public string Password { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         public string PasswordConfirm { get; set; }
     }
 }

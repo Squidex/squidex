@@ -5,16 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     public sealed class LoginModel
     {
-        [Required]
+        [LocalizedRequired]
         public string Email { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         public string Password { get; set; }
     }
 }

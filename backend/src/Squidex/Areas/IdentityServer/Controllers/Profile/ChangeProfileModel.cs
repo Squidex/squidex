@@ -5,17 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public class ChangeProfileModel
     {
-        [Required]
+        [LocalizedRequired]
         public string Email { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         public string DisplayName { get; set; }
 
         public bool IsHidden { get; set; }

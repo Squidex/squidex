@@ -44,7 +44,7 @@ export function configUIOptions() {
 }
 
 export function configTitles() {
-    return new TitlesConfig(undefined, 'Squidex Headless CMS');
+    return new TitlesConfig(undefined, 'i18n:common.product');
 }
 
 export function configDecimalSeparator() {

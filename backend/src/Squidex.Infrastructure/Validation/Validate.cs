@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure.Validation
 {

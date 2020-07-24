@@ -1,0 +1,16 @@
+{
+  "/framework/angular/pager.component.html": [
+    "{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}"
+  ],
+  "/shared/components/app-form.component.html": [
+    "Create {{template}} Sample"
+  ],
+  "/shared/components/forms/markdown-editor.component.ts": [
+    "Insert Assets",
+    "Insert Image",
+    "Markdown Guide",
+    "Toggle Fullscreen",
+    "Toggle Preview",
+    "Toggle Side by Side"
+  ]
+}

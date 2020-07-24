@@ -75,7 +75,7 @@ export class PatternsService {
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Created', appName);
             }),
-            pretifyError('Failed to add pattern. Please reload.'));
+            pretifyError('i18n:patterns.loadFailed'));
     }
 
     public putPattern(appName: string, resource: Resource, dto: EditPatternDto, version: Version): Observable<PatternsDto> {

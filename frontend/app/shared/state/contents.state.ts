@@ -268,7 +268,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public update(content: ContentDto, request: any): Observable<ContentDto> {
         return this.contentsService.putContent(this.appName, content, request, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -276,7 +276,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public createDraft(content: ContentDto): Observable<ContentDto> {
         return this.contentsService.createVersion(this.appName, content, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -284,7 +284,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public deleteDraft(content: ContentDto): Observable<ContentDto> {
         return this.contentsService.deleteVersion(this.appName, content, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -292,7 +292,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public patch(content: ContentDto, request: any): Observable<ContentDto> {
         return this.contentsService.patchContent(this.appName, content, request, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs));
     }

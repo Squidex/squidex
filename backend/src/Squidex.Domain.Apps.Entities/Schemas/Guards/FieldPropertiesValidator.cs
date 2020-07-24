@@ -66,14 +66,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (properties.MaxSize.HasValue && properties.MinSize.HasValue && properties.MinSize.Value >= properties.MaxSize.Value)
             {
-                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxSize), nameof(properties.MinSize)),
+                yield return new ValidationError(Not.GreaterThan(nameof(properties.MaxSize), nameof(properties.MinSize)),
                     nameof(properties.MaxSize),
                     nameof(properties.MinSize));
             }
 
             if (properties.AspectWidth.HasValue != properties.AspectHeight.HasValue)
             {
-                yield return new ValidationError(Not.Defined2(nameof(properties.AspectWidth), nameof(properties.AspectHeight)),
+                yield return new ValidationError(Not.BothDefined(nameof(properties.AspectWidth), nameof(properties.AspectHeight)),
                     nameof(properties.AspectWidth),
                     nameof(properties.AspectHeight));
             }
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (properties.DefaultValue.HasValue && properties.MaxValue.HasValue && properties.DefaultValue.Value > properties.MaxValue.Value)
             {
-                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.DefaultValue), nameof(properties.MaxValue)),
+                yield return new ValidationError(Not.LessEqualsThan(nameof(properties.DefaultValue), nameof(properties.MaxValue)),
                     nameof(properties.DefaultValue));
             }
 
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (properties.DefaultValue.HasValue && properties.MaxValue.HasValue && properties.DefaultValue.Value > properties.MaxValue.Value)
             {
-                yield return new ValidationError(Not.LessEqualsOther(nameof(properties.DefaultValue), nameof(properties.MaxValue)),
+                yield return new ValidationError(Not.LessEqualsThan(nameof(properties.DefaultValue), nameof(properties.MaxValue)),
                     nameof(properties.DefaultValue));
             }
 

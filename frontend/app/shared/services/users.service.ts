@@ -71,6 +71,6 @@ export class UsersService {
             map(({ _links }) => {
                 return new ResourcesDto(_links);
             }),
-            pretifyError('Failed to load user. Please reload.'));
+            pretifyError('i18n:users.loadUserFailed'));
     }
 }

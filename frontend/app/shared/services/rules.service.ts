@@ -243,7 +243,7 @@ export class RulesService {
 
                 return actions;
             }),
-            pretifyError('Failed to load Rules. Please reload.'));
+            pretifyError('i18n:rules.loadFailed'));
     }
 
     public getRules(appName: string): Observable<RulesDto> {
@@ -255,7 +255,7 @@ export class RulesService {
 
                 return new RulesDto(rules, _links, runningRuleId);
             }),
-            pretifyError('Failed to load Rules. Please reload.'));
+            pretifyError('i18n:rules.loadFailed'));
     }
 
     public postRule(appName: string, dto: UpsertRuleDto): Observable<RuleDto> {
@@ -268,7 +268,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Created', appName);
             }),
-            pretifyError('Failed to create rule. Please reload.'));
+            pretifyError('i18n:rules.createFailed'));
     }
 
     public putRule(appName: string, resource: Resource, dto: Partial<UpsertRuleDto>, version: Version): Observable<RuleDto> {
@@ -283,7 +283,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Updated', appName);
             }),
-            pretifyError('Failed to update rule. Please reload.'));
+            pretifyError('i18n:rules.updateFailed'));
     }
 
     public enableRule(appName: string, resource: Resource, version: Version): Observable<RuleDto> {
@@ -298,7 +298,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Enabled', appName);
             }),
-            pretifyError('Failed to enable rule. Please reload.'));
+            pretifyError('i18n:rules.enableFailed'));
     }
 
     public disableRule(appName: string, resource: Resource, version: Version): Observable<RuleDto> {
@@ -313,7 +313,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Disabled', appName);
             }),
-            pretifyError('Failed to disable rule. Please reload.'));
+            pretifyError('i18n:rules.disableFailed'));
     }
 
     public deleteRule(appName: string, resource: Resource, version: Version): Observable<any> {
@@ -325,7 +325,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Deleted', appName);
             }),
-            pretifyError('Failed to delete rule. Please reload.'));
+            pretifyError('i18n:rules.deleteFailed'));
     }
 
     public runRule(appName: string, resource: Resource): Observable<any> {
@@ -337,7 +337,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Run', appName);
             }),
-            pretifyError('Failed to run rule. Please reload.'));
+            pretifyError('i18n:rules.runFailed'));
     }
 
     public runCancel(appName: string): Observable<any> {
@@ -347,7 +347,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'RunCancel', appName);
             }),
-            pretifyError('Failed to cancel rule. Please reload.'));
+            pretifyError('i18n:rules.cancelFailed'));
     }
 
     public triggerRule(appName: string, resource: Resource): Observable<any> {
@@ -359,7 +359,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Triggered', appName);
             }),
-            pretifyError('Failed to trigger rule. Please reload.'));
+            pretifyError('i18n:rules.triggerFailed'));
     }
 
     public getEvents(appName: string, take: number, skip: number, ruleId?: string): Observable<RuleEventsDto> {
@@ -385,7 +385,7 @@ export class RulesService {
 
                 return ruleEvents;
             }),
-            pretifyError('Failed to load events. Please reload.'));
+            pretifyError('i18n:rules.loadEventsFailed'));
     }
 
     public enqueueEvent(appName: string, resource: Resource): Observable<any> {
@@ -397,7 +397,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'EventEnqueued', appName);
             }),
-            pretifyError('Failed to enqueue rule event. Please reload.'));
+            pretifyError('i18n:rules.enqueueEventFailed'));
     }
 
     public cancelEvent(appName: string, resource: Resource): Observable<any> {
@@ -409,7 +409,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'EventDequeued', appName);
             }),
-            pretifyError('Failed to cancel rule event. Please reload.'));
+            pretifyError('i18n:rules.cancelEventFailed'));
     }
 }
 

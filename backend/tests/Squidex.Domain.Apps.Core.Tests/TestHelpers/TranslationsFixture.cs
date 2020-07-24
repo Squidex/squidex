@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
     {
         public TranslationsFixture()
         {
-            T.Setup(Texts.ResourceManager);
+            T.Setup(new ResourcesTranslationService(Texts.ResourceManager));
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Validation
     {
         public override string FormatErrorMessage(string name)
         {
-            return T.Get("validation.absoluteUrl", new { property = name });
+            return T.Get("annotations_absoluteUrl", new { name });
         }
 
         public override bool IsValid(object value)

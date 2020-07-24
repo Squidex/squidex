@@ -55,7 +55,7 @@
 
                 <ng-template #defaultRole>
                     <sqx-form-alert>
-                        {{descriptions[role.name]}}
+                        {{descriptions[role.name] | sqxTranslate}}
                     </sqx-form-alert>
                     
                     <div class="form-group" *ngFor="let control of editForm.controls">

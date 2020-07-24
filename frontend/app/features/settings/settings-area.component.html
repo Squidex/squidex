@@ -1,4 +1,4 @@
-<sqx-title message="{{ 'common.settings' | translate }}"></sqx-title>
+<sqx-title message="{{ 'common.settings' | sqxTranslate }}"></sqx-title>
 
 <sqx-panel theme="dark" desiredWidth="16rem">
     <ng-container title>
@@ -11,49 +11,49 @@
         <ul class="nav nav-panel nav-dark flex-column" *ngIf="appsState.selectedApp | async; let app">
             <li class="nav-item" *ngIf="app.canReadBackups">
                 <a class="nav-link" routerLink="backups" routerLinkActive="active">
-                    {{ 'common.backups' | translate }}
+                    {{ 'common.backups' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadClients">
                 <a class="nav-link" routerLink="clients" routerLinkActive="active">
-                    {{ 'common.clients' | translate }}
+                    {{ 'common.clients' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadContributors">
                 <a class="nav-link" routerLink="contributors" routerLinkActive="active">
-                    {{ 'common.contributors' | translate }}
+                    {{ 'common.contributors' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadRoles">
                 <a class="nav-link" routerLink="roles" routerLinkActive="active">
-                    {{ 'common.roles' | translate }}
+                    {{ 'common.roles' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadLanguages">
                 <a class="nav-link" routerLink="languages" routerLinkActive="active">
-                    {{ 'common.languages' | translate }}
+                    {{ 'common.languages' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadPatterns">
                 <a class="nav-link" routerLink="patterns" routerLinkActive="active">
-                    {{ 'common.patterns' | translate }}
+                    {{ 'common.patterns' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadWorkflows">
                 <a class="nav-link" routerLink="workflows" routerLinkActive="active">
-                    {{ 'common.workflows' | translate }}
+                    {{ 'common.workflows' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadPlans">
                 <a class="nav-link" routerLink="plans" routerLinkActive="active">
-                    {{ 'common.subscription' | translate }}
+                    {{ 'common.subscription' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>

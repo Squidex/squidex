@@ -7,11 +7,12 @@
 
 using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 {
-    public class JsonFieldPropertiesTests
+    public class JsonFieldPropertiesTests : IClassFixture<TranslationsFixture>
     {
         [Fact]
         public void Should_add_error_if_editor_is_not_valid()

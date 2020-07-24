@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 }
                 else if (Roles.IsDefault(command.Name))
                 {
-                    e(T.Get("apps.roles.defaultRoleNotRemovable"));
+                    e(T.Get("apps.roles.defaultRoleNotUpdateable"));
                 }
 
                 if (command.Permissions == null)

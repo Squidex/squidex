@@ -8,6 +8,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -20,7 +21,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
-    public class GuardAppContributorsTests
+    public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
         private readonly IUser user1 = A.Fake<IUser>();
         private readonly IUser user2 = A.Fake<IUser>();
@@ -53,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new AssignContributor();
 
             await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan),
-                new ValidationError("Contributor id is required.", "ContributorId"));
+                new ValidationError("Contributor ID or email is required.", "ContributorId"));
         }
 
         [Fact]
@@ -171,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new RemoveContributor();
 
             ValidationAssert.Throws(() => GuardAppContributors.CanRemove(contributors_0, command),
-                new ValidationError("Contributor id is required.", "ContributorId"));
+                new ValidationError("Contributor ID or email is required.", "ContributorId"));
         }
 
         [Fact]

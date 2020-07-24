@@ -1,0 +1,88 @@
+{
+  "/app.module.ts": [
+    "Application element not found"
+  ],
+  "/features/content/pages/content/content-page.component.ts": [
+    "close the current content view"
+  ],
+  "/features/settings/pages/clients/client-connect-form.component.ts": [
+    "Content-Type: application/x-www-form-urlencoded",
+    "grant_type=client_credentials&\r\n        client_id=${app}:${client.id}&\r\n        client_secret=${client.secret}&\r\n        scope=squidex-api"
+  ],
+  "/framework/angular/forms/validators.ts": [
+    "matchValidator(): other control is not found in parent group"
+  ],
+  "/framework/angular/pipes/colors.pipes.ts": [
+    "*"
+  ],
+  "/framework/angular/pipes/date-time.pipes.ts": [
+    "dd. LLL yyyy",
+    "dd. MMM"
+  ],
+  "/framework/angular/pipes/money.pipe.ts": [
+    "<span class=\"decimal\">"
+  ],
+  "/framework/angular/pipes/numbers.pipes.ts": [
+    " kMGTPEZY"
+  ],
+  "/framework/angular/resized.directive.ts": [
+    "*"
+  ],
+  "/shared/components/forms/geolocation-editor.component.ts": [
+    "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
+  ],
+  "/shared/components/forms/markdown-editor.component.ts": [
+    "*",
+    "fa fa-bold",
+    "fa fa-header",
+    "fa fa-italic",
+    "fa fa-list-ul",
+    "fa fa-quote-left",
+    "Generic List"
+  ],
+  "/shared/components/forms/rich-editor.component.ts": [
+    "code image media link lists advlist paste",
+    "undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets"
+  ],
+  "/shared/components/search/search-form.component.ts": [
+    "form-inline search-form"
+  ],
+  "/shared/services/auth.service.ts": [
+    "*"
+  ],
+  "/shared/services/rules.service.ts": [
+    "Asset changed",
+    "Content changed",
+    "For asset changes like uploaded, updated (reuploaded), renamed, deleted...",
+    "For content changes like created, updated, published, unpublished...",
+    "Manually triggered",
+    "Schema changed",
+    "To invoke processes manually, for example to update your static site...",
+    "Usage exceeded",
+    "User mentioned",
+    "When a schema definition has been created, updated, published or deleted...",
+    "When a user is mentioned in any comment...",
+    "When monthly API calls exceed a specified limit for one time a month..."
+  ],
+  "/shared/services/schemas.types.ts": [
+    "Invalid properties type"
+  ],
+  "/shared/state/contents.forms.visitors.ts": [
+    "<Json />",
+    "yyyy-MM-dd HH:mm:ss"
+  ],
+  "/shared/state/patterns.forms.ts": [
+    "[A-z0-9]+[A-z0-9\\- ]*[A-z0-9]"
+  ],
+  "/shared/state/query.ts": [
+    "ends with",
+    "is empty",
+    "is equals to",
+    "is greater than",
+    "is greater than or equals to",
+    "is less than",
+    "is less than or equals to",
+    "is not equals to",
+    "starts with"
+  ]
+}

@@ -375,7 +375,7 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchemas(payload.body);
             }),
-            pretifyError('Failed to load schemas. Please reload.'));
+            pretifyError('i18n:schemas.loadFailed'));
     }
 
     public getSchema(appName: string, name: string): Observable<SchemaDetailsDto> {
@@ -385,7 +385,7 @@ export class SchemasService {
             map(({ payload }) => {
                 return parseSchemaWithDetails(payload.body);
             }),
-            pretifyError('Failed to load schema. Please reload.'));
+            pretifyError('i18n:schemas.loadSchemaFailed'));
     }
 
     public postSchema(appName: string, dto: CreateSchemaDto): Observable<SchemaDetailsDto> {
@@ -398,7 +398,7 @@ export class SchemasService {
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Created', appName);
             }),
-            pretifyError('Failed to create schema. Please reload.'));
+            pretifyError('i18n:schemas.createFailed'));
     }
 
     public putScripts(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDetailsDto> {
@@ -413,7 +413,7 @@ export class SchemasService {
             tap(() => {
                 this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
             }),
-            pretifyError('Failed to update schema scripts. Please reload.'));
+            pretifyError('i18n:schemas.updateScriptsFailed'));
     }
 
     public putFieldRules(appName: string, resource: Resource, dto: ReadonlyArray<FieldRule>, version: Version): Observable<SchemaDetailsDto> {

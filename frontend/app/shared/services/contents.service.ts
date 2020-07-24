@@ -175,7 +175,7 @@ export class ContentsService {
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
-                pretifyError('Failed to load contents. Please reload.'));
+                pretifyError('i18n:contents.loadFailed'));
         }
     }
 
@@ -193,7 +193,7 @@ export class ContentsService {
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
-                pretifyError('Failed to load contents. Please reload.'));
+                pretifyError('i18n:contents.loadFailed'));
 
         } else {
             const url = this.apiUrl.buildUrl(`/api/content/${appName}?${fullQuery}`);
@@ -204,7 +204,7 @@ export class ContentsService {
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
-                pretifyError('Failed to load contents. Please reload.'));
+                pretifyError('i18n:contents.loadFailed'));
         }
     }
 
@@ -268,7 +268,7 @@ export class ContentsService {
             tap(() => {
                 this.analytics.trackEvent('Content', 'Updated', appName);
             }),
-            pretifyError('Failed to update content. Please reload.'));
+            pretifyError('i18n:contents.updateFailed'));
     }
 
     public createVersion(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
