@@ -17,7 +17,7 @@ namespace Squidex.Web.Services
 {
     public sealed class StringLocalizer : IStringLocalizer, IStringLocalizerFactory
     {
-        private readonly ITranslationService translationService;
+        private readonly ILocalizer translationService;
         private readonly CultureInfo? culture;
 
         public LocalizedString this[string name]
@@ -64,12 +64,12 @@ namespace Squidex.Web.Services
             }
         }
 
-        public StringLocalizer(ITranslationService translationService)
+        public StringLocalizer(ILocalizer translationService)
             : this(translationService, null)
         {
         }
 
-        private StringLocalizer(ITranslationService translationService, CultureInfo? culture)
+        private StringLocalizer(ILocalizer translationService, CultureInfo? culture)
         {
             Guard.NotNull(translationService, nameof(translationService));
 

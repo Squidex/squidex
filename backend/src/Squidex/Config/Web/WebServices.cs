@@ -29,7 +29,7 @@ namespace Squidex.Config.Web
     {
         public static void AddSquidexMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
-            var translator = new ResourcesTranslationService(Texts.ResourceManager);
+            var translator = new ResourcesLocalizer(Texts.ResourceManager);
 
             T.Setup(translator);
 
@@ -67,7 +67,7 @@ namespace Squidex.Config.Web
                 .AsSelf();
 
             services.AddSingletonAs(c => translator)
-                .As<ITranslationService>();
+                .As<ILocalizer>();
 
             services.AddSingletonAs<StringLocalizer>()
                 .As<IStringLocalizer>().As<IStringLocalizerFactory>();

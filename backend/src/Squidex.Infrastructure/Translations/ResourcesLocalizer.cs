@@ -14,7 +14,7 @@ using System.Text;
 
 namespace Squidex.Infrastructure.Translations
 {
-    public sealed class ResourcesTranslationService : ITranslationService
+    public sealed class ResourcesLocalizer : ILocalizer
     {
         private const string MissingFileName = "__missing.txt";
 
@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Translations
         private readonly HashSet<string> missingTranslations;
         private readonly object lockObject = new object();
 
-        public ResourcesTranslationService(ResourceManager resourceManager)
+        public ResourcesLocalizer(ResourceManager resourceManager)
         {
             Guard.NotNull(resourceManager, nameof(resourceManager));
 

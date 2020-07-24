@@ -9,7 +9,7 @@ using System.Globalization;
 
 namespace Squidex.Infrastructure.Translations
 {
-    public interface ITranslationService
+    public interface ILocalizer
     {
         (string Result, bool NotFound) Get(CultureInfo culture, string key, object? args = null);
     }
