@@ -31,7 +31,6 @@ export * from './services/schemas.types';
 export * from './services/search.service';
 export * from './services/stock-photo.service';
 export * from './services/translations.service';
-export * from './services/translate.service';
 export * from './services/ui.service';
 export * from './services/usages.service';
 export * from './services/users-provider.service';

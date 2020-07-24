@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ContentDto, getContentValue, LanguageDto, TagConverter, TagValue, LocalizerService } from '@app/shared/internal';
+import { ContentDto, getContentValue, LanguageDto, LocalizerService, TagConverter, TagValue } from '@app/shared/internal';
 
 export class ReferencesTagsConverter implements TagConverter {
     public suggestions: ReadonlyArray<TagValue> = [];

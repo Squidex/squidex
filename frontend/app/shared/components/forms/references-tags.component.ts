@@ -7,6 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { LocalizerService } from '@app/framework';
 import { AppsState, ContentDto, ContentsService, LanguageDto, StatefulControlComponent, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
@@ -48,9 +49,10 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
         private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService
+        private readonly contentsService: ContentsService,
+        private readonly localizer: LocalizerService
     ) {
-        super(changeDetector, { converter: new ReferencesTagsConverter(null!, []) });
+        super(changeDetector, { converter: new ReferencesTagsConverter(null!, [], new LocalizerService()) });
 
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
@@ -110,11 +112,11 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         let converter: ReferencesTagsConverter;
 
         if (this.isValid && this.contentItems && this.contentItems.length > 0) {
-            converter = new ReferencesTagsConverter(this.language, this.contentItems);
+            converter = new ReferencesTagsConverter(this.language, this.contentItems, this.localizer);
 
             this.selectionControl.enable(NO_EMIT);
         } else {
-            converter = new ReferencesTagsConverter(null!, []);
+            converter = new ReferencesTagsConverter(null!, [], this.localizer);
 
             this.selectionControl.disable(NO_EMIT);
         }

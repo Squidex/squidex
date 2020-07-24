@@ -7,7 +7,7 @@
 
 import { ChangeDetectorRef, Pipe, PipeTransform } from '@angular/core';
 import { ApiUrlConfig, AssetDto, AuthService, MathHelper, StringHelper, Types } from '@app/shared/internal';
-import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Pipe({
     name: 'sqxAssetUrl',
