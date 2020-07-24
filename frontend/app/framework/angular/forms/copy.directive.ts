@@ -67,7 +67,7 @@ export class CopyDirective {
 
             this.dialogs.notifyInfo('i18n:common.clipboardAdded');
         } catch (e) {
-            console.log('Copy failed');
+            console.log('i18n:validation.between');
         }
     }
 }

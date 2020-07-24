@@ -91,7 +91,7 @@ export class RolesService {
             tap(() => {
                 this.analytics.trackEvent('Role', 'Updated', appName);
             }),
-            pretifyError('i18n:roles.revokeFailed'));
+            pretifyError('i18n:roles.updateFailed'));
     }
 
     public deleteRole(appName: string, resource: Resource, version: Version): Observable<RolesDto> {
@@ -106,7 +106,7 @@ export class RolesService {
             tap(() => {
                 this.analytics.trackEvent('Role', 'Deleted', appName);
             }),
-            pretifyError('Failed to revoke role. Please reload.'));
+            pretifyError('i18n:roles.revokeFailed'));
     }
 
     public getPermissions(appName: string): Observable<ReadonlyArray<string>> {

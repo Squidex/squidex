@@ -98,7 +98,7 @@ export class BackupsService {
                     return throwError(error);
                 }
             }),
-            pretifyError('Failed to load backups.'));
+            pretifyError('i18n:backups.loadFailed'));
     }
 
     public postBackup(appName: string): Observable<any> {

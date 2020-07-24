@@ -66,7 +66,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                     }
                 }
             } else {
-                value = formatted = 'i18n:contents.empty';
+                value = formatted = '-';
             }
 
             return { value, formatted };

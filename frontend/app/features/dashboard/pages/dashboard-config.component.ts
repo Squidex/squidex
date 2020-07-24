@@ -107,10 +107,10 @@ export class DashboardConfigComponent implements OnChanges {
 }
 
 const DEFAULT_CONFIG: GridsterItem[] = [
-    { cols: 1, rows: 1, x: 0, y: 0, type: 'schemas', name: 'Schema' },
+    { cols: 1, rows: 1, x: 0, y: 0, type: 'schemas', name: 'i18n:dashboard.schemas' },
     { cols: 1, rows: 1, x: 1, y: 0, type: 'api', name: 'i18n:dashboard.apiDocumentation' },
-    { cols: 1, rows: 1, x: 2, y: 0, type: 'support', name: 'Support' },
-    { cols: 1, rows: 1, x: 3, y: 0, type: 'github', name: 'Github' },
+    { cols: 1, rows: 1, x: 2, y: 0, type: 'support', name: 'i18n:dashboard.schemas' },
+    { cols: 1, rows: 1, x: 3, y: 0, type: 'github', name: 'i18n:dashboard.github' },
 
     { cols: 2, rows: 1, x: 0, y: 1, type: 'api-calls', name: 'i18n:dashboard.apiCallsChart' },
     { cols: 2, rows: 1, x: 2, y: 1, type: 'api-performance', name: 'i18n:dashboard.apiPerformanceChart' },
@@ -122,5 +122,5 @@ const DEFAULT_CONFIG: GridsterItem[] = [
     { cols: 2, rows: 1, x: 0, y: 3, type: 'asset-uploads-size', name: 'i18n:dashboard.assetTotalSize' },
     { cols: 2, rows: 1, x: 2, y: 3, type: 'api-traffic', name: 'i18n:dashboard.trafficChart' },
 
-    { cols: 2, rows: 1, x: 0, y: 4, type: 'history', name: 'History' }
+    { cols: 2, rows: 1, x: 0, y: 4, type: 'history', name: 'i18n:dashboard.history' }
 ];

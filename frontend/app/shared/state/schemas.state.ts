@@ -235,7 +235,7 @@ export class SchemasState extends State<Snapshot> {
     public configureFieldRules(schema: SchemaDto, request: ReadonlyArray<FieldRule>): Observable<SchemaDetailsDto> {
         return this.schemasService.putFieldRules(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -243,7 +243,7 @@ export class SchemasState extends State<Snapshot> {
     public configureScripts(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
         return this.schemasService.putScripts(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -259,7 +259,7 @@ export class SchemasState extends State<Snapshot> {
     public update(schema: SchemaDto, request: UpdateSchemaDto): Observable<SchemaDetailsDto> {
         return this.schemasService.putSchema(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -275,7 +275,7 @@ export class SchemasState extends State<Snapshot> {
     public configureUIFields(schema: SchemaDto, request: UpdateUIFields): Observable<SchemaDetailsDto> {
         return this.schemasService.putUIFields(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -283,7 +283,7 @@ export class SchemasState extends State<Snapshot> {
     public orderFields(schema: SchemaDto, fields: ReadonlyArray<any>, parent?: RootFieldDto): Observable<SchemaDetailsDto> {
         return this.schemasService.putFieldOrdering(this.appName, parent || schema, fields.map(t => t.fieldId), schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -331,7 +331,7 @@ export class SchemasState extends State<Snapshot> {
     public updateField<T extends FieldDto>(schema: SchemaDto, field: T, request: UpdateFieldDto): Observable<SchemaDetailsDto> {
         return this.schemasService.putField(this.appName, field, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'Schema saved successfully.');
+                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
             }),
             shareSubscribed(this.dialogs));
     }

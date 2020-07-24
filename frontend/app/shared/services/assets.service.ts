@@ -240,7 +240,7 @@ export class AssetsService {
 
                     return new AssetsDto(total, assets, _links);
                 }),
-                pretifyError('Failed to load assets. Please reload.'));
+                pretifyError('i18n:assets.loadFailed'));
         }
     }
 
@@ -266,7 +266,7 @@ export class AssetsService {
 
                 return parseAsset(body);
             }),
-            pretifyError('Failed to load assets. Please reload.'));
+            pretifyError('i18n:assets.loadFailed'));
     }
 
     public postAssetFile(appName: string, file: Blob, parentId?: string): Observable<number | AssetDto> {
@@ -324,7 +324,7 @@ export class AssetsService {
             }),
             catchError(error => {
                 if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                    return throwError(new ErrorDto(413, 'Asset is too big.'));
+                    return throwError(new ErrorDto(413, 'i18n:assets.fileTooBig'));
                 } else {
                     return throwError(error);
                 }

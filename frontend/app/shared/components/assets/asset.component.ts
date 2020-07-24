@@ -96,7 +96,7 @@ export class AssetComponent implements OnInit {
 
     public updateFile(files: FileList) {
         if (files.length === 1 && this.asset.canUpload) {
-            this.dialogs.confirm('i18n:assets.replaceConfirm', `Do you really want to replace asset **${this.asset.fileName}** with a newer version`)
+            this.dialogs.confirm('i18n:assets.replaceConfirmTitle', 'i18n:assets.replaceConfirmText')
                 .subscribe(confirmed => {
                     if (confirmed) {
                         this.setProgress(1);

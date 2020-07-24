@@ -169,7 +169,7 @@ export class AuthService {
                 mergeMap(e => Types.is(e, TimeoutError) ? of(e) : throwError(e)),
                 delay(500),
                 take(5),
-                concat(throwError(new Error('i18n:common.retryExceeded'))))));
+                concat(throwError(new Error('Retry limit exceeded.'))))));
     }
 
     private createProfile(user: User): Profile {

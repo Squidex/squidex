@@ -12,7 +12,7 @@
                         (ngModelChange)="addOrRemove(item)" />
     
                     <label class="form-check-label" for="field_{{item.type}}">
-                        {{item.name}}
+                        {{item.name | sqxTranslate}}
                     </label>
                 </div>
             </div>

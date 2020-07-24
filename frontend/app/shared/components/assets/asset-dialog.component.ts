@@ -11,8 +11,17 @@ import { AnnotateAssetDto, AnnotateAssetForm, AssetDto, AssetsState, AssetUpload
 import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
-const TABS_IMAGE: ReadonlyArray<string> = ['Metadata', 'Image', 'Focus Point', 'History'];
-const TABS_DEFAULT: ReadonlyArray<string> = ['Metadata', 'History'];
+const TABS_IMAGE: ReadonlyArray<string> = [
+    'i18n:assets.metadata',
+    'i18n:assets.image',
+    'i18n:assets.focusPoint',
+    'i18n:assets.history'
+];
+
+const TABS_DEFAULT: ReadonlyArray<string> = [
+    'i18n:assets.metadata',
+    'i18n:assets.history'
+];
 
 @Component({
     selector: 'sqx-asset-dialog',
@@ -143,7 +152,7 @@ export class AssetDialogComponent implements OnChanges {
                 .subscribe(() => {
                     this.annotateForm.submitCompleted({ noReset: true });
 
-                    this.dialogs.notifyInfo('Asset has been updated.');
+                    this.dialogs.notifyInfo('i18n:assets.updated');
                 }, error => {
                     this.annotateForm.submitFailed(error);
                 });

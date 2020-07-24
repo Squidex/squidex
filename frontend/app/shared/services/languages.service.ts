@@ -39,6 +39,6 @@ export class LanguagesService {
 
                 return languages;
             }),
-            pretifyError('Failed to load languages. Please reload.'));
+            pretifyError('i18n:languages.loadFailed'));
     }
 }

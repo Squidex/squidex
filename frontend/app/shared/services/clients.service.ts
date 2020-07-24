@@ -116,7 +116,7 @@ export class ClientsService {
             tap(() => {
                 this.analytics.trackEvent('Client', 'Deleted', appName);
             }),
-            pretifyError('Failed to revoke client. Please reload.'));
+            pretifyError('i18n:clients.revokeFailed'));
     }
 
     public createToken(appName: string, client: ClientDto): Observable<AccessTokenDto> {
