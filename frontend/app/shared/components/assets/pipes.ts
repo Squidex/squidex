@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 import { ApiUrlConfig, AssetDto, AuthService, MathHelper, StringHelper, Types } from '@app/shared/internal';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Pipe({
     name: 'sqxAssetUrl',
@@ -82,19 +81,3 @@ export class FileIconPipe implements PipeTransform {
         return `./images/asset_${mimeIcon}.svg`;
     }
 }
-
-@Pipe({
-    name: 'sqxTranslate',
-    pure: true
-  })
-  export class SqxTranslatePipe implements PipeTransform {
-    private translatePipe: TranslatePipe;
-
-    constructor(readonly translateService: TranslateService, readonly changeDetector: ChangeDetectorRef) {
-        this.translatePipe = new TranslatePipe(translateService, changeDetector);
-    }
-
-    public transform(value: string): string {
-        return this.translatePipe.transform(value);
-    }
-  }
