@@ -11,9 +11,9 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { LocalizerService, SqxFrameworkModule } from '@app/framework';
+import { SqxFrameworkModule } from '@app/framework';
 import { MentionModule } from 'angular-mentions';
-import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetsDialogState, AssetsListComponent, AssetsSelectorComponent, AssetsService, AssetsState, AssetUploaderComponent, AssetUploaderState, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, ClientsService, ClientsState, CommentComponent, CommentsComponent, CommentsService, ContentMustExistGuard, ContentsService, ContentsState, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, GeolocationEditorComponent, GraphQlService, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, ImageCropperComponent, ImageFocusPointComponent, LanguageSelectorComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PatternsService, PatternsState, PlansService, PlansState, QueryComponent, QueryListComponent, QueryPathComponent, ReferencesCheckboxesComponent, ReferencesDropdownComponent, ReferencesTagsComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, SearchFormComponent, SortingComponent, SqxTranslatePipe, StockPhotoService, TableHeaderComponent, TranslationsService, UIService, UIState, UnsetAppGuard, UnsetContentGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WorkflowsService, WorkflowsState } from './declarations';
+import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetsDialogState, AssetsListComponent, AssetsSelectorComponent, AssetsService, AssetsState, AssetUploaderComponent, AssetUploaderState, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, ClientsService, ClientsState, CommentComponent, CommentsComponent, CommentsService, ContentMustExistGuard, ContentsService, ContentsState, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, GeolocationEditorComponent, GraphQlService, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, ImageCropperComponent, ImageFocusPointComponent, LanguageSelectorComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PatternsService, PatternsState, PlansService, PlansState, QueryComponent, QueryListComponent, QueryPathComponent, ReferencesCheckboxesComponent, ReferencesDropdownComponent, ReferencesTagsComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, SearchFormComponent, SortingComponent, StockPhotoService, TableHeaderComponent, TranslationsService, UIService, UIState, UnsetAppGuard, UnsetContentGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WorkflowsService, WorkflowsState } from './declarations';
 import { SearchService } from './services/search.service';
 
 @NgModule({
@@ -64,7 +64,6 @@ import { SearchService } from './services/search.service';
         SchemaCategoryComponent,
         SearchFormComponent,
         SortingComponent,
-        SqxTranslatePipe,
         TableHeaderComponent,
         UserDtoPicture,
         UserIdPicturePipe,
@@ -107,7 +106,6 @@ import { SearchService } from './services/search.service';
         SavedQueriesComponent,
         SchemaCategoryComponent,
         SearchFormComponent,
-        SqxTranslatePipe,
         TableHeaderComponent,
         UserDtoPicture,
         UserIdPicturePipe,
@@ -172,7 +170,6 @@ export class SqxSharedModule {
                 SearchService,
                 StockPhotoService,
                 TranslationsService,
-                LocalizerService,
                 UIService,
                 UIState,
                 UnsetAppGuard,

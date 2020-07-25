@@ -8,7 +8,7 @@
 // tslint:disable: no-pipe-impure
 
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
-import { ApiUrlConfig, LocalizerService, UserDto, UsersProviderService } from '@app/shared/internal';
+import { ApiUrlConfig, UserDto, UsersProviderService } from '@app/shared/internal';
 import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -178,17 +178,3 @@ function split(token: string) {
 
     return { type: token, id: token };
 }
-
-@Pipe({
-    name: 'sqxTranslate',
-    pure: true
-  })
-  export class SqxTranslatePipe implements PipeTransform {
-
-    constructor(private readonly localizer: LocalizerService) {
-    }
-
-    public transform(value: string, args?: readonly any[]): string {
-        return this.localizer.get(value, args);
-    }
-  }
