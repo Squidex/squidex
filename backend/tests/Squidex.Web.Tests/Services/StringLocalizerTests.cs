@@ -17,7 +17,7 @@ namespace Squidex.Web.Services
 
         public StringLocalizerTests()
         {
-            var translations = new ResourcesTranslationService(Texts.ResourceManager);
+            var translations = new ResourcesLocalizer(Texts.ResourceManager);
 
             sut = new StringLocalizer(translations);
         }

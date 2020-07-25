@@ -11,23 +11,23 @@ namespace Squidex.Infrastructure.Translations
 {
     public static class T
     {
-        private static ITranslationService? translationService;
+        private static ILocalizer? localizer;
 
-        public static void Setup(ITranslationService service)
+        public static void Setup(ILocalizer newLocalizer)
         {
-            translationService = service;
+            localizer = newLocalizer;
         }
 
         public static string Get(string key, object? args = null)
         {
             Guard.NotNullOrEmpty(key, nameof(key));
 
-            if (translationService == null)
+            if (localizer == null)
             {
                 return key;
             }
 
-            var (result, _) = translationService.Get(CultureInfo.CurrentUICulture, key, args);
+            var (result, _) = localizer.Get(CultureInfo.CurrentUICulture, key, args);
 
             return result;
         }

@@ -12,11 +12,11 @@ namespace Squidex.Infrastructure.Translations
 {
     public class TTests
     {
-        private readonly ITranslationService sut;
+        private readonly ILocalizer sut;
 
         public TTests()
         {
-            sut = new ResourcesTranslationService(SampleResources.ResourceManager);
+            sut = new ResourcesLocalizer(SampleResources.ResourceManager);
         }
 
         [Fact]
