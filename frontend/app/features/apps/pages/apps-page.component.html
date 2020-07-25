@@ -11,7 +11,7 @@
 <ng-container *ngIf="appsState.apps | async; let apps">
     <div class="apps-section">
         <div class="empty" *ngIf="apps.length === 0">
-            <h3 class="empty-headline">{{ 'You are not collaborating to any app yet' | sqxTranslate}}</h3>
+            <h3 class="empty-headline">{{'You are not collaborating to any app yet' | sqxTranslate:['replaceVar1', 'replacevar2']}}</h3>
         </div>
 
         <div class="card card-href card-app" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">

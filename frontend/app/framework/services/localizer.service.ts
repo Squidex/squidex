@@ -16,8 +16,7 @@ export class LocalizerService {
 
     public get(key: string, args?: readonly any[]): any {
         let text: string;
-
-        text = key + ' {{test}} {{234324}}';
+        text = key;
 
         if (args) {
            text = this.replaceVariables(text, args);
@@ -32,5 +31,16 @@ export class LocalizerService {
             i++;
             return args[i];
           });
+    }
+
+    public getTranslatedValue(text: string): string {
+        if (this.doesStringStartWithi18n(text)) {
+            return this.get(text.substring(5));
+        }
+        return text;
+    }
+
+    public doesStringStartWithi18n(text: string): boolean {
+        return text.startsWith('i18n:');
     }
 }
