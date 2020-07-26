@@ -18,7 +18,7 @@ export class ErrorDto {
         public readonly inner?: any
     ) {
         this.displayMessage = formatMessage(message, details);
-        this.localizer = new LocalizerService();
+        this.localizer = LocalizerService.getInstance();
     }
 
     public toString() {

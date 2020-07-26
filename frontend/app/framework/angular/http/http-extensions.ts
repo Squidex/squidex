@@ -80,7 +80,7 @@ export module HTTP {
 
 export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
     source.pipe(catchError((response: HttpErrorResponse) => {
-        const localizer = new LocalizerService();
+        const localizer = LocalizerService.getInstance();
         message = localizer.get(message);
 
         const error = parseError(response, message);

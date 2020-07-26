@@ -65,7 +65,7 @@ export class DialogService {
     private readonly requestStream$ = new Subject<DialogRequest>();
     private readonly notificationsStream$ = new Subject<Notification>();
     private readonly tooltipStream$ = new Subject<Tooltip>();
-    private readonly localizer = new LocalizerService();
+    private readonly localizer = LocalizerService.getInstance();
 
     public get dialogs(): Observable<DialogRequest> {
         return this.requestStream$;

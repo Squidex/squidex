@@ -52,7 +52,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         private readonly contentsService: ContentsService,
         private readonly localizer: LocalizerService
     ) {
-        super(changeDetector, { converter: new ReferencesTagsConverter(null!, [], new LocalizerService()) });
+        super(changeDetector, { converter: new ReferencesTagsConverter(null!, [], LocalizerService.getInstance()) });
 
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
