@@ -90,7 +90,7 @@ export class DialogService {
     }
 
     public notifyInfo(text: string) {
-        text = this.localizer.getTranslatedValue(text);
+        text = this.localizer.get(text);
         this.notificationsStream$.next(Notification.info(text));
     }
 
@@ -103,7 +103,7 @@ export class DialogService {
     }
 
     public confirm(title: string, text: string): Observable<boolean> {
-        const request = new DialogRequest(title, text);
+        const request = new DialogRequest(this.localizer.get(title), this.localizer.get(text));
 
         this.requestStream$.next(request);
 

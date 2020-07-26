@@ -16,6 +16,11 @@ export class LocalizerService {
 
     public get(key: string, args?: readonly any[]): any {
         let text: string;
+
+        if (this.doesStringStartWithi18n(key)) {
+            return this.get(key.substring(5), args);
+        }
+
         text = key;
 
         if (args) {
@@ -33,14 +38,7 @@ export class LocalizerService {
           });
     }
 
-    public getTranslatedValue(text: string): string {
-        if (this.doesStringStartWithi18n(text)) {
-            return this.get(text.substring(5));
-        }
-        return text;
-    }
-
-    public doesStringStartWithi18n(text: string): boolean {
-        return text.startsWith('i18n:');
+    public doesStringStartWithi18n(key: string): boolean {
+        return key.startsWith('i18n:');
     }
 }

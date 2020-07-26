@@ -53,7 +53,7 @@ export class TitleService {
 
     private updateTitle() {
         const { prefix, separator } = this.titles;
-        const suffix = (this.titles.suffix) ? this.localizer.getTranslatedValue(this.titles.suffix) : undefined;
+        const suffix = (this.titles.suffix) ? this.localizer.get(this.titles.suffix) : undefined;
 
         let title = '';
 
