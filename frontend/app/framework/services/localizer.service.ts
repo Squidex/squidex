@@ -87,12 +87,10 @@ export class LocalizerService {
         switch (foundPipeOption[1]) {
             case PipeOptions.TRANSLATE: {
                 return this.get(arg);
-                break;
             }
 
             case PipeOptions.LOWER: {
                 return arg.charAt(0).toLowerCase() + arg.slice(1);
-                break;
             }
 
             case PipeOptions.UPPER: {
@@ -101,7 +99,6 @@ export class LocalizerService {
             default: {
                 console.log('default');
                 return arg;
-                break;
             }
         }
     }
