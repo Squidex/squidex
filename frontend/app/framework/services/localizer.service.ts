@@ -11,6 +11,13 @@ export const LocalizerServiceServiceFactory = () => {
     return new LocalizerService();
 };
 
+enum PipeOptions {
+    TRANSLATE = 'translate',
+    LOWER =  'lower',
+    UPPER = 'upper'
+}
+
+// TODO refactor this file, substract helper functions
 @Injectable()
 export class LocalizerService {
     private static instance: LocalizerService;
@@ -37,8 +44,12 @@ export class LocalizerService {
     public get(key: string, args?: readonly any[]): any {
         let text: string;
 
-        if (this.doesStringStartWithi18n(key)) {
+        if (key.startsWith('i18n:')) {
             return this.get(key.substring(5), args);
+        }
+
+        if (!this.translations[key]) {
+            return key;
         }
 
         text = this.translations[key];
@@ -48,18 +59,51 @@ export class LocalizerService {
         }
 
         return text;
-
     }
+
     private replaceVariables(text: string, args: readonly any[]): string {
-        const reggex = new RegExp('\{{(.*?)\}}', 'g');
+        const regex = new RegExp('\{(.*?)\}', 'g');
         let index = -1;
-        return text.replace(reggex, () => {
+        return text.replace(regex, match => {
             index++;
-            return args[index];
-          });
+
+            let replaceValue = args[index];
+            if (match.includes('|')) {
+                replaceValue = this.handlePipeOption(match, args[index]);
+            }
+            return replaceValue;
+        });
     }
 
-    public doesStringStartWithi18n(key: string): boolean {
-        return key.startsWith('i18n:');
+    private handlePipeOption(match: string, arg: string) {
+        const regex = new RegExp('\\|(.*?)\}', 'g');
+
+        const foundPipeOption = regex.exec(match);
+
+        if (!foundPipeOption) {
+            return arg;
+        }
+
+        switch (foundPipeOption[1]) {
+            case PipeOptions.TRANSLATE: {
+                return this.get(arg);
+                break;
+            }
+
+            case PipeOptions.LOWER: {
+                return arg.charAt(0).toLowerCase() + arg.slice(1);
+                break;
+            }
+
+            case PipeOptions.UPPER: {
+                return arg.charAt(0).toUpperCase() + arg.slice(1);
+            }
+            default: {
+                console.log('default');
+                return arg;
+                break;
+            }
+        }
     }
+
 }
