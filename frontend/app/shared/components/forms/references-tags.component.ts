@@ -7,8 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { LocalizerService } from '@app/framework';
-import { AppsState, ContentDto, ContentsService, LanguageDto, StatefulControlComponent, UIOptions } from '@app/shared/internal';
+import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
@@ -52,7 +51,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         private readonly contentsService: ContentsService,
         private readonly localizer: LocalizerService
     ) {
-        super(changeDetector, { converter: new ReferencesTagsConverter(null!, [], LocalizerService.getInstance()) });
+        super(changeDetector, { converter: new ReferencesTagsConverter(null!, [], localizer) });
 
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 

@@ -329,10 +329,7 @@ module.exports = function (env) {
                 entryModule: 'app/app.module#AppModule',
                 skipCodeGeneration: !isAot,
                 sourceMap: !isProduction,
-                tsConfigPath: configFile,
-                i18nOutFile: root('app', 'i18n', 'messages.xlf'),
-                i18nOutFormat: 'xlf',
-                locale: 'en',
+                tsConfigPath: configFile
             })
         );
     }

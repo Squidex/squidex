@@ -10,7 +10,7 @@ import { LocalizerService } from '@app/framework/services/localizer.service';
     constructor(private readonly localizer: LocalizerService) {
     }
 
-    public transform(value: string, args?: readonly any[]): string {
+    public transform(value: string, args?: ReadonlyArray<object>): string {
         return this.localizer.get(value, args);
     }
   }

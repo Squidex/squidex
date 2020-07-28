@@ -5,27 +5,32 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { IMock, Mock } from 'typemoq';
+import { LocalizerService } from '..';
 import { TitlesConfig, TitleService, TitleServiceFactory } from './title.service';
 
 describe('TitleService', () => {
+    let localizerService: IMock<LocalizerService>;
+
     beforeEach(() => {
         document.title = '';
+        localizerService = Mock.ofType<LocalizerService>();
     });
 
     it('should instantiate from factory', () => {
-        const titleService = TitleServiceFactory(new TitlesConfig());
+        const titleService = TitleServiceFactory(new TitlesConfig(), localizerService.object);
 
         expect(titleService).toBeDefined();
     });
 
     it('should instantiate', () => {
-        const titleService = new TitleService(new TitlesConfig());
+        const titleService = new TitleService(new TitlesConfig(), localizerService.object);
 
         expect(titleService).toBeDefined();
     });
 
     it('should use single part when title element is pushed', () => {
-        const titleService = new TitleService(new TitlesConfig());
+        const titleService = new TitleService(new TitlesConfig(), localizerService.object);
 
         titleService.push('my-title');
 
@@ -33,7 +38,7 @@ describe('TitleService', () => {
     });
 
     it('should concatenate multiple parts when title elements are pushed', () => {
-        const titleService = new TitleService(new TitlesConfig());
+        const titleService = new TitleService(new TitlesConfig(), localizerService.object);
 
         titleService.push('my-title1');
         titleService.push('my-title2');
@@ -42,7 +47,7 @@ describe('TitleService', () => {
     });
 
     it('should replace previous element when found', () => {
-        const titleService = new TitleService(new TitlesConfig());
+        const titleService = new TitleService(new TitlesConfig(), localizerService.object);
 
         titleService.push('my-title1');
         titleService.push('my-title2');
@@ -52,7 +57,7 @@ describe('TitleService', () => {
     });
 
     it('should concatenate remainging parts when title elements are popped', () => {
-        const titleService = new TitleService(new TitlesConfig());
+        const titleService = new TitleService(new TitlesConfig(), localizerService.object);
 
         titleService.push('my-title1');
         titleService.pop();
@@ -61,7 +66,7 @@ describe('TitleService', () => {
     });
 
     it('should prepand prefix to title', () => {
-        const titleService = new TitleService(new TitlesConfig('prefix'));
+        const titleService = new TitleService(new TitlesConfig('prefix'), localizerService.object);
 
         titleService.push('my-title');
 
@@ -69,7 +74,7 @@ describe('TitleService', () => {
     });
 
     it('should append suffix to title', () => {
-        const titleService = new TitleService(new TitlesConfig( undefined, 'suffix'));
+        const titleService = new TitleService(new TitlesConfig( undefined, 'suffix'), localizerService.object);
 
         titleService.push('my-title');
 
@@ -77,7 +82,7 @@ describe('TitleService', () => {
     });
 
     it('should use suffix when stack is empty', () => {
-        const titleService = new TitleService(new TitlesConfig('prefix', 'suffix'));
+        const titleService = new TitleService(new TitlesConfig('prefix', 'suffix'), localizerService.object);
 
         titleService.pop();
 
@@ -85,7 +90,7 @@ describe('TitleService', () => {
     });
 
     it('should use suffix when stack is empty and no suffix is set', () => {
-        const titleService = new TitleService(new TitlesConfig('prefix'));
+        const titleService = new TitleService(new TitlesConfig('prefix'), localizerService.object);
 
         titleService.pop();
 

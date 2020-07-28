@@ -51,7 +51,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         private readonly contentsService: ContentsService,
         private readonly localizer: LocalizerService
     ) {
-        super(changeDetector, { converter: new ReferencesTagsConverter(null!, [], LocalizerService.getInstance()) });
+        super(changeDetector, { converter: new ReferencesTagsConverter(null!, [], localizer) });
 
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 

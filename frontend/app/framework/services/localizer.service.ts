@@ -11,7 +11,7 @@ export const LocalizerServiceServiceFactory = () => {
     return new LocalizerService();
 };
 
-enum PipeOptions {
+export enum PipeOptions {
     TRANSLATE = 'translate',
     LOWER =  'lower',
     UPPER = 'upper'
@@ -20,7 +20,6 @@ enum PipeOptions {
 // TODO refactor this file, substract helper functions
 @Injectable()
 export class LocalizerService {
-    private static instance: LocalizerService;
     public translations: Object;
 
     constructor() {
@@ -33,15 +32,7 @@ export class LocalizerService {
         }
     }
 
-    public static getInstance(): LocalizerService {
-        if (!LocalizerService.instance) {
-            LocalizerService.instance = new LocalizerService();
-        }
-
-        return LocalizerService.instance;
-    }
-
-    public get(key: string, args?: readonly any[]): any {
+    public get(key: string, args?: ReadonlyArray<object>): any {
         let text: string;
 
         if (key.startsWith('i18n:')) {
@@ -54,51 +45,48 @@ export class LocalizerService {
 
         text = this.translations[key];
 
-        if (args && args?.length > 0) {
+        if (args && Object.keys(args).length > 0) {
            text = this.replaceVariables(text, args);
         }
 
         return text;
     }
 
-    private replaceVariables(text: string, args: readonly any[]): string {
-        const regex = new RegExp('\{(.*?)\}', 'g');
-        let index = -1;
-        return text.replace(regex, match => {
-            index++;
+    private replaceVariables(text: string, args: ReadonlyArray<object>): string {
+        const regex = new RegExp(Object.keys(args).join('|'), 'g');
 
-            let replaceValue = args[index];
-            if (match.includes('|')) {
-                replaceValue = this.handlePipeOption(match, args[index]);
+        return text.replace(regex, (matched: string) => {
+            let replaceValue = args[matched];
+            if (matched.includes('|')) {
+                replaceValue = this.handlePipeOption(matched, args[matched]);
             }
             return replaceValue;
         });
     }
 
-    private handlePipeOption(match: string, arg: string) {
-        const regex = new RegExp('\\|(.*?)\}', 'g');
-
-        const foundPipeOption = regex.exec(match);
+    private handlePipeOption(match: string, argument: string) {
+        const foundPipeOption = match.split('|')[1];
+        foundPipeOption.substring(0, foundPipeOption.length - 1);
 
         if (!foundPipeOption) {
-            return arg;
+            return argument;
         }
 
         switch (foundPipeOption[1]) {
             case PipeOptions.TRANSLATE: {
-                return this.get(arg);
+                return this.get(argument);
             }
 
             case PipeOptions.LOWER: {
-                return arg.charAt(0).toLowerCase() + arg.slice(1);
+                return argument.charAt(0).toLowerCase() + argument.slice(1);
             }
 
             case PipeOptions.UPPER: {
-                return arg.charAt(0).toUpperCase() + arg.slice(1);
+                return argument.charAt(0).toUpperCase() + argument.slice(1);
             }
             default: {
                 console.log('default');
-                return arg;
+                return argument;
             }
         }
     }

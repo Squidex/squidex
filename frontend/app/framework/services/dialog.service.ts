@@ -11,8 +11,8 @@ import { ErrorDto } from './../utils/error';
 import { Types } from './../utils/types';
 import { LocalizerService } from './localizer.service';
 
-export const DialogServiceFactory = () => {
-    return new DialogService();
+export const DialogServiceFactory = (localizer: LocalizerService) => {
+    return new DialogService(localizer);
 };
 
 export class DialogRequest {
@@ -62,10 +62,12 @@ export class Notification {
 
 @Injectable()
 export class DialogService {
+
+    constructor(private readonly localizer: LocalizerService) {}
+
     private readonly requestStream$ = new Subject<DialogRequest>();
     private readonly notificationsStream$ = new Subject<Notification>();
     private readonly tooltipStream$ = new Subject<Tooltip>();
-    private readonly localizer = LocalizerService.getInstance();
 
     public get dialogs(): Observable<DialogRequest> {
         return this.requestStream$;

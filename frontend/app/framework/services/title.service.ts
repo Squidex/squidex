@@ -27,7 +27,9 @@ export const TitleServiceFactory = (titles: TitlesConfig, localizer: LocalizerSe
 export class TitleService {
     private readonly stack: any[] = [];
 
-    constructor(private readonly titles: TitlesConfig, private readonly localizer: LocalizerService) {
+    constructor(
+        private readonly titles: TitlesConfig,
+        private readonly localizer: LocalizerService) {
         this.updateTitle();
     }
 

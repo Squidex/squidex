@@ -95,7 +95,6 @@ export class AppsService {
     public getApps(): Observable<ReadonlyArray<AppDto>> {
         const url = this.apiUrl.buildUrl('/api/apps');
 
-        pretifyError('i18n:apps.loadFailed');
         return this.http.get<any[]>(url).pipe(
             map(body => {
                 const apps = body.map(item => parseApp(item));

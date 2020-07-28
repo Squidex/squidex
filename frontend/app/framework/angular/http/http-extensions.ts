@@ -6,7 +6,7 @@
  */
 
 import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
-import { ErrorDto, LocalizerService, Types, Version, Versioned } from '@app/framework/internal';
+import { ErrorDto, Types, Version, Versioned } from '@app/framework/internal';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -80,9 +80,6 @@ export module HTTP {
 
 export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
     source.pipe(catchError((response: HttpErrorResponse) => {
-        const localizer = LocalizerService.getInstance();
-        message = localizer.get(message);
-
         const error = parseError(response, message);
         return throwError(error);
     }));
