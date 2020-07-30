@@ -53,40 +53,54 @@ export class LocalizerService {
     }
 
     private replaceVariables(text: string, args: ReadonlyArray<object>): string {
-        const regex = new RegExp(Object.keys(args).join('|'), 'g');
+        while (true) {
+            const indexOfStart = text.indexOf('{');
 
-        return text.replace(regex, (matched: string) => {
-            let replaceValue = args[matched];
-            if (matched.includes('|')) {
-                replaceValue = this.handlePipeOption(matched, args[matched]);
+            if (indexOfStart < 0) {
+                break;
             }
-            return replaceValue;
-        });
-    }
 
-    private handlePipeOption(match: string, argument: string) {
-        const foundPipeOption = match.split('|')[1];
-        foundPipeOption.substring(0, foundPipeOption.length - 1);
+            const indexOfEnd = text.indexOf('}');
+            const replace = text.substring(indexOfStart, indexOfEnd + 1);
 
-        if (!foundPipeOption) {
-            return argument;
+            text = text.replace(replace, (matched: string) => {
+                    let replaceValue: string;
+                    if (matched.includes('|')) {
+                        const splittedValue = matched.split('|');
+                        replaceValue = this.handlePipeOption(args[splittedValue[0].substr(1)], splittedValue[1].slice(0, -1));
+                    } else {
+                        const key = matched.substring(1, matched.length - 1);
+                        replaceValue = args[key];
+                    }
+
+                    return replaceValue;
+                });
         }
 
-        switch (foundPipeOption[1]) {
+        return text;
+    }
+
+    private handlePipeOption(value: string, pipeOption: string) {
+
+        if (!pipeOption) {
+            return value;
+        }
+
+        switch (pipeOption) {
             case PipeOptions.TRANSLATE: {
-                return this.get(argument);
+                return this.get(value);
             }
 
             case PipeOptions.LOWER: {
-                return argument.charAt(0).toLowerCase() + argument.slice(1);
+                return value.charAt(0).toLowerCase() + value.slice(1);
             }
 
             case PipeOptions.UPPER: {
-                return argument.charAt(0).toUpperCase() + argument.slice(1);
+                return value.charAt(0).toUpperCase() + value.slice(1);
             }
             default: {
                 console.log('default');
-                return argument;
+                return value;
             }
         }
     }
