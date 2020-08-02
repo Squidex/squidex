@@ -79,15 +79,6 @@ namespace Squidex.Infrastructure.Translations {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Var: {!var}..
-        /// </summary>
-        internal static string withTranslatedVar {
-            get {
-                return ResourceManager.GetString("withTranslatedVar", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Var: {var|upper}..
         /// </summary>
         internal static string withUpperVar {

@@ -18,7 +18,11 @@ namespace Squidex.Infrastructure.Translations
 
         public override string FormatErrorMessage(string name)
         {
-            return T.Get("annotations_Compare", new { name, other = OtherProperty });
+            var property = T.Get($"common.{name.ToCamelCase()}", name);
+
+            var other = T.Get($"common.{OtherProperty.ToCamelCase()}", OtherProperty);
+
+            return T.Get("annotations_Compare", new { property, other });
         }
     }
 }

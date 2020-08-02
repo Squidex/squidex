@@ -123,9 +123,6 @@
   <data name="withLowerVar" xml:space="preserve">
     <value>Var: {var|lower}.</value>
   </data>
-  <data name="withTranslatedVar" xml:space="preserve">
-    <value>Var: {!var}.</value>
-  </data>
   <data name="withUpperVar" xml:space="preserve">
     <value>Var: {var|upper}.</value>
   </data>

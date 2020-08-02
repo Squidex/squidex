@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile

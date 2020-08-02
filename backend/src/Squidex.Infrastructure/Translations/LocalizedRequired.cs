@@ -15,7 +15,9 @@ namespace Squidex.Infrastructure.Translations
     {
         public override string FormatErrorMessage(string name)
         {
-            return T.Get("annotations_Required", new { name });
+            var property = T.Get($"common.{name.ToCamelCase()}", name);
+
+            return T.Get("annotations_Required", new { property });
         }
     }
 }

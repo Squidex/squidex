@@ -18,9 +18,9 @@ namespace Squidex.Infrastructure.Translations
     {
         private const string MissingFileName = "__missing.txt";
 
+        private static readonly object LockObject = new object();
         private readonly ResourceManager resourceManager;
         private readonly HashSet<string> missingTranslations;
-        private readonly object lockObject = new object();
 
         public ResourcesLocalizer(ResourceManager resourceManager)
         {
@@ -41,16 +41,17 @@ namespace Squidex.Infrastructure.Translations
 #endif
         }
 
-        public (string Result, bool NotFound) Get(CultureInfo culture, string key, object? args = null)
+        public (string Result, bool NotFound) Get(CultureInfo culture, string key, string fallback, object? args = null)
         {
             Guard.NotNull(culture, nameof(culture));
             Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNull(fallback, nameof(fallback));
 
             var translation = GetCore(culture, key);
 
             if (translation == null)
             {
-                return (key, true);
+                return (fallback, true);
             }
 
             if (args != null)
@@ -85,18 +86,11 @@ namespace Squidex.Infrastructure.Translations
 
                     var variable = span[indexOfStart..indexOfEnd];
 
-                    var shouldTranslate = false;
                     var shouldLower = false;
                     var shouldUpper = false;
 
                     if (variable.Length > 0)
                     {
-                        if (variable.StartsWith("!"))
-                        {
-                            variable = variable.Slice(1);
-                            shouldTranslate = true;
-                        }
-
                         if (variable.EndsWith("|lower"))
                         {
                             variable = variable[0..^6];
@@ -130,18 +124,6 @@ namespace Squidex.Infrastructure.Translations
                     if (variableValue == null)
                     {
                         variableValue = variableName;
-                    }
-
-                    if (shouldTranslate)
-                    {
-                        var converted = variableValue.ToCamelCase();
-
-                        variableValue = GetCore(culture, converted);
-
-                        if (variableValue == null)
-                        {
-                            variableValue = GetCore(culture, $"common.{converted}");
-                        }
                     }
 
                     variableValue ??= variableName;
@@ -184,7 +166,7 @@ namespace Squidex.Infrastructure.Translations
             if (translation == null)
             {
 #if DEBUG
-                lock (lockObject)
+                lock (LockObject)
                 {
                     if (!missingTranslations.Add(key))
                     {

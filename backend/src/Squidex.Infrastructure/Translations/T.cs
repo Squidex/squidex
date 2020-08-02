@@ -20,6 +20,11 @@ namespace Squidex.Infrastructure.Translations
 
         public static string Get(string key, object? args = null)
         {
+            return Get(key, key, args);
+        }
+
+        public static string Get(string key, string fallback, object? args = null)
+        {
             Guard.NotNullOrEmpty(key, nameof(key));
 
             if (localizer == null)
@@ -27,7 +32,7 @@ namespace Squidex.Infrastructure.Translations
                 return key;
             }
 
-            var (result, _) = localizer.Get(CultureInfo.CurrentUICulture, key, args);
+            var (result, _) = localizer.Get(CultureInfo.CurrentUICulture, key, fallback, args);
 
             return result;
         }

@@ -15,7 +15,9 @@ namespace Squidex.Infrastructure.Validation
     {
         public override string FormatErrorMessage(string name)
         {
-            return T.Get("annotations_absoluteUrl", new { name });
+            var property = T.Get($"common.{name.ToCamelCase()}", name);
+
+            return T.Get("annotations_absoluteUrl", new { property });
         }
 
         public override bool IsValid(object value)

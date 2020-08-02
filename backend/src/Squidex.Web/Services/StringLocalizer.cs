@@ -38,7 +38,7 @@ namespace Squidex.Web.Services
 
                 TranslateProperty(name, arguments, currentCulture);
 
-                var (result, notFound) = translationService.Get(currentCulture, $"aspnet_{name}");
+                var (result, notFound) = translationService.Get(currentCulture, $"aspnet_{name}", name);
 
                 if (arguments != null && !notFound)
                 {
@@ -55,7 +55,7 @@ namespace Squidex.Web.Services
             {
                 var key = $"common.{arguments[0].ToString()?.ToCamelCase()}";
 
-                var (result, notFound) = translationService.Get(currentCulture, key);
+                var (result, notFound) = translationService.Get(currentCulture, key, name);
 
                 if (!notFound)
                 {

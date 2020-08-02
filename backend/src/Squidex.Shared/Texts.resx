@@ -59,13 +59,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="annotations_AbsoluteUrl" xml:space="preserve">
-    <value>The {!name|lower} must be an absolute URL.</value>
+    <value>The {property|lower} must be an absolute URL.</value>
   </data>
   <data name="annotations_Compare" xml:space="preserve">
-    <value>The {!name|lower} must be the same as {!other|lower}.</value>
+    <value>The {property|lower} must be the same as {other|lower}.</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
-    <value>The {!name|lower} field is required.</value>
+    <value>The {property|lower} field is required.</value>
   </data>
   <data name="apps.alreadyArchieved" xml:space="preserve">
     <value>App has already been archived.</value>
@@ -971,40 +971,40 @@
     <value>Cannot find user.</value>
   </data>
   <data name="validation.between" xml:space="preserve">
-    <value>{!property|upper} must be between {min} and {max}.</value>
+    <value>{property|upper} must be between {min} and {max}.</value>
   </data>
   <data name="validation.greaterEqualsThan" xml:space="preserve">
-    <value>{!property|upper} must be greater or equal to {!other|lower}.</value>
+    <value>{property|upper} must be greater or equal to {other|lower}.</value>
   </data>
   <data name="validation.greaterThan" xml:space="preserve">
-    <value>{!property|upper} must be greater than {!other|lower}.</value>
+    <value>{property|upper} must be greater than {other|lower}.</value>
   </data>
   <data name="validation.javascriptProperty" xml:space="preserve">
-    <value>{!property|upper} is not a Javascript property name.</value>
+    <value>{property|upper} is not a Javascript property name.</value>
   </data>
   <data name="validation.lessEqualsThan" xml:space="preserve">
-    <value>{!property|upper} must be less or equal to {!other|lower}.</value>
+    <value>{property|upper} must be less or equal to {other|lower}.</value>
   </data>
   <data name="validation.lessThan" xml:space="preserve">
-    <value>{!property|upper} must be less than {!other|lower}.</value>
+    <value>{property|upper} must be less than {other|lower}.</value>
   </data>
   <data name="validation.onlyOneFile" xml:space="preserve">
     <value>Can only upload one file.</value>
   </data>
   <data name="validation.required" xml:space="preserve">
-    <value>{!property|upper} is required.</value>
+    <value>{property|upper} is required.</value>
   </data>
   <data name="validation.requiredBoth" xml:space="preserve">
-    <value>If {!property1|lower} or {!property2|lower} is used both must be defined.</value>
+    <value>If {property1|lower} or {property2|lower} is used both must be defined.</value>
   </data>
   <data name="validation.requiredValue" xml:space="preserve">
     <value>Value must be defined.</value>
   </data>
   <data name="validation.slug" xml:space="preserve">
-    <value>{!property|upper} is not a valid slug.</value>
+    <value>{property|upper} is not a valid slug.</value>
   </data>
   <data name="validation.valid" xml:space="preserve">
-    <value>{!property|upper} is not a valid value.</value>
+    <value>{property|upper} is not a valid value.</value>
   </data>
   <data name="valiodation.notAnImage" xml:space="preserve">
     <value>Picture is not a valid image.</value>
