@@ -25,31 +25,31 @@ namespace Squidex.Web.Services
         [Fact]
         public void Should_provide_translation()
         {
-            var key = "ValidationAttribute_ValidationError";
+            var key = "annotations_Required";
 
             var name = sut[key];
 
-            Assert.Equal("The field {0} is invalid.", name);
+            Assert.Equal("The field {0} is required.", name);
         }
 
         [Fact]
         public void Should_format_translation()
         {
-            var key = "ValidationAttribute_ValidationError";
+            var key = "annotations_Required";
 
             var name = sut[key, "MyField"];
 
-            Assert.Equal("The field MyField is invalid.", name);
+            Assert.Equal("The field MyField is required.", name);
         }
 
         [Fact]
         public void Should_translate_property_name()
         {
-            var key = "ValidationAttribute_ValidationError";
+            var key = "annotations_Required";
 
             var name = sut[key, "ClientId"];
 
-            Assert.Equal("The field Client ID is invalid.", name);
+            Assert.Equal("The field Client ID is required.", name);
         }
     }
 }

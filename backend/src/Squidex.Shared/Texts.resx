@@ -59,13 +59,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="annotations_AbsoluteUrl" xml:space="preserve">
-    <value>The {property|lower} must be an absolute URL.</value>
+    <value>The field {name|lower} must be an absolute URL.</value>
   </data>
   <data name="annotations_Compare" xml:space="preserve">
-    <value>The {property|lower} must be the same as {other|lower}.</value>
+    <value>The field {name|lower} must be the same as {other|lower}.</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
-    <value>The {property|lower} field is required.</value>
+    <value>The field {name|lower} is required.</value>
   </data>
   <data name="apps.alreadyArchieved" xml:space="preserve">
     <value>App has already been archived.</value>
@@ -135,6 +135,15 @@
   </data>
   <data name="apps.workflows.publishedStepNotFound" xml:space="preserve">
     <value>Transition has an invalid target.</value>
+  </data>
+  <data name="aspnet_annotations_AbsoluteUrl" xml:space="preserve">
+    <value>The field {0} must be an absolute URL.</value>
+  </data>
+  <data name="aspnet_annotations_Compare" xml:space="preserve">
+    <value>The field {0} must be the same as {1}.</value>
+  </data>
+  <data name="aspnet_annotations_Required" xml:space="preserve">
+    <value>The field {0} is required.</value>
   </data>
   <data name="assets.assetAlreadyDeleted" xml:space="preserve">
     <value>Asset has already been deleted</value>

@@ -100,7 +100,7 @@ namespace Squidex.Web.Services
 
         private static bool IsValidationError(string name)
         {
-            return name.Contains("Attribute_", StringComparison.OrdinalIgnoreCase);
+            return name.Contains("annotations_", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
