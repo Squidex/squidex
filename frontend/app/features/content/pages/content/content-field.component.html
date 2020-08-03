@@ -1,27 +1,29 @@
 <div class="row no-gutters" [class.compare]="formModelCompare">
     <div [class.col-12]="!formModelCompare" [class.col-6]="formModelCompare">
         <div class="table-items-row" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
-            <div class="languages-buttons">
-                <button *ngIf="canTranslate" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="Autotranslate from master language">
-                    <i class="icon-translate"></i>
-                </button>
-
-                <sqx-field-languages 
-                    [field]="formModel.field"
-                    (languageChange)="languageChange.emit($event)"
-                    [language]="language"
-                    [languages]="languages"
-                    [showAllControls]="showAllControls"
-                    (showAllControlsChange)="changeShowAllControls($event)">
-                </sqx-field-languages>
+            <div class="languages-container">
+                <div class="languages-buttons">
+                    <button *ngIf="canTranslate" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="Autotranslate from master language">
+                        <i class="icon-translate"></i>
+                    </button>
+    
+                    <sqx-field-languages 
+                        [field]="formModel.field"
+                        (languageChange)="languageChange.emit($event)"
+                        [language]="language"
+                        [languages]="languages"
+                        [showAllControls]="showAllControls"
+                        (showAllControlsChange)="changeShowAllControls($event)">
+                    </sqx-field-languages>
+                </div>
             </div>
             
             <ng-container *ngIf="showAllControls; else singleControl">
-                <div class="form-group" *ngFor="let language of formModel; trackBy: trackByLanguage">
+                <div class="form-group" *ngFor="let language of languages">
                     <sqx-field-editor
                         [form]="form"
                         [formContext]="formContext"
-                        [formModel="formModel.getField(language.iso2Code)"
+                        [formModel]="formModel.get(language)"
                         [language]="language"
                         [languages]="languages"
                         [displaySuffix]="prefix(language)">
@@ -59,11 +61,11 @@
             </div>
 
             <ng-container *ngIf="showAllControls; else singleControlCompare">
-                <div class="form-group" *ngFor="let language of languages; trackBy: trackByLanguage">
+                <div class="form-group" *ngFor="let language of languages">
                     <sqx-field-editor
                         [form]="formCompare"
                         [formContext]="formContext"
-                        [formModel="formModelCompare.getField(language.iso2Code)"
+                        [formModel]="formModelCompare.get(language)"
                         [language]="language"
                         [languages]="languages"
                         [displaySuffix]="prefix(language)">

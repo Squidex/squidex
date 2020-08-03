@@ -1,4 +1,8 @@
 .field {
+    & {
+        position: relative;
+    }
+
     &-required {
         color: $color-theme-error;
     }
@@ -7,6 +11,14 @@
         color: $color-border-dark;
         font-size: .8rem;
         font-weight: normal;
+    }
+}
+
+.unset {
+    @include absolute(-.5rem, 0);
+
+    i {
+        font-size: 80%;
     }
 }
 

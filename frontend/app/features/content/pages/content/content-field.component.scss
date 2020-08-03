@@ -3,8 +3,15 @@
     position: relative;
 }
 
-.languages-buttons {
-    @include absolute(.25rem, 1.25rem);
+.languages {
+    &-container {
+        position: relative;
+    }
+
+    &-buttons {
+        @include absolute(-.5rem, 2rem);
+        z-index: 1000;
+    }
 }
 
 .col-6 {
