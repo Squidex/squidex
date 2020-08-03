@@ -107,6 +107,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<CreateIdentityCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<CreateIdentityV2CommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<CreateProfileCommandMiddleware>()
                 .As<ICommandMiddleware>();
 

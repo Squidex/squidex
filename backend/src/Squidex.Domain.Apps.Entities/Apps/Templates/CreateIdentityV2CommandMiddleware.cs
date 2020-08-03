@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Fluid;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
 using Squidex.Infrastructure;
@@ -14,9 +15,9 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
-    public sealed class CreateIdentityCommandMiddleware : ICommandMiddleware
+    public sealed class CreateIdentityV2CommandMiddleware : ICommandMiddleware
     {
-        private const string TemplateName = "Identity";
+        private const string TemplateName = "IdentityV2";
 
         public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
@@ -24,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 var appId = NamedId.Of(createApp.AppId, createApp.Name);
 
-                var publish = new Func<ICommand, Task>(command =>
+                var publish = new Func<ICommand, Task<CommandContext>>(command =>
                 {
                     if (command is IAppCommand appCommand)
                     {
@@ -34,8 +35,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     return context.CommandBus.PublishAsync(command);
                 });
 
+                var apiScopeId = await CreateApiScopesSchemaAsync(publish);
+
                 await Task.WhenAll(
-                    CreateApiResourcesSchemaAsync(publish),
+                    CreateApiResourcesSchemaAsync(publish, apiScopeId),
                     CreateAuthenticationSchemeSchemaAsync(publish),
                     CreateClientsSchemaAsync(publish),
                     CreateIdentityResourcesSchemaAsync(publish),
@@ -57,6 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                 SchemaBuilder.Create("Authentication Schemes")
                     .AddString("Provider", f => f
                         .AsDropDown("Facebook", "Google", "Microsoft", "Twitter")
+                        .Unique()
                         .Required()
                         .ShowInList()
                         .Hints("The name and type of the provider."))
@@ -79,6 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             var schema =
                 SchemaBuilder.Create("Clients")
                     .AddString("Client Id", f => f
+                        .Unique()
                         .Required()
                         .Hints("Unique id of the client."))
                     .AddString("Client Name", f => f
@@ -90,24 +95,28 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     .AddAssets("Logo", f => f
                         .MustBeImage()
                         .Hints("URI to client logo (used on consent screen)."))
+                    .AddBoolean("Require Consent", f => f
+                        .AsToggle()
+                        .Hints("Specifies whether a consent screen is required."))
+                    .AddBoolean("Disabled", f => f
+                        .AsToggle()
+                        .Hints("Enable or disable the client."))
+                    .AddBoolean("Allow Offline Access", f => f
+                        .AsToggle()
+                        .Hints("Gets or sets a value indicating whether to allow offline access."))
+                    .AddTags("Allowed Grant Types", f => f
+                        .WithAllowedValues("implicit", "hybrid", "authorization_code", "client_credentials")
+                        .Hints("Specifies the allowed grant types."))
                     .AddTags("Client Secrets", f => f
                         .Hints("Client secrets - only relevant for flows that require a secret."))
                     .AddTags("Allowed Scopes", f => f
                         .Hints("Specifies the api scopes that the client is allowed to request."))
-                    .AddTags("Allowed Grant Types", f => f
-                        .Hints("Specifies the allowed grant types (legal combinations of AuthorizationCode, Implicit, Hybrid, ResourceOwner, ClientCredentials)."))
                     .AddTags("Redirect Uris", f => f
                         .Hints("Specifies allowed URIs to return tokens or authorization codes to"))
                     .AddTags("Post Logout Redirect Uris", f => f
                         .Hints("Specifies allowed URIs to redirect to after logout."))
                     .AddTags("Allowed Cors Origins", f => f
                         .Hints("Gets or sets the allowed CORS origins for JavaScript clients."))
-                    .AddBoolean("Require Consent", f => f
-                        .AsToggle()
-                        .Hints("Specifies whether a consent screen is required."))
-                    .AddBoolean("Allow Offline Access", f => f
-                        .AsToggle()
-                        .Hints("Gets or sets a value indicating whether to allow offline access."))
                     .Build();
 
             return publish(schema);
@@ -232,11 +241,42 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             await publish(schema);
         }
 
-        private static Task CreateApiResourcesSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<Guid>> CreateApiScopesSchemaAsync(Func<ICommand, Task> publish)
+        {
+            var schema =
+                SchemaBuilder.Create("API Scopes")
+                    .AddString("Name", f => f
+                        .Unique()
+                        .Required()
+                        .ShowInList()
+                        .Hints("The unique name of the API scope."))
+                    .AddString("Display Name", f => f
+                        .Localizable()
+                        .Hints("The display name of the API scope."))
+                    .AddString("Description", f => f
+                        .Localizable()
+                        .Hints("The description name of the API scope."))
+                    .AddBoolean("Disabled", f => f
+                        .AsToggle()
+                        .Hints("Enable or disable the scope."))
+                    .AddBoolean("Emphasize", f => f
+                        .AsToggle()
+                        .Hints("Emphasize the API scope for important scopes."))
+                    .AddTags("User Claims", f => f
+                        .Hints("List of accociated user claims that should be included when this resource is requested."))
+                    .Build();
+
+            await publish(schema);
+
+            return NamedId.Of(schema.SchemaId, schema.Name);
+        }
+
+        private static Task CreateApiResourcesSchemaAsync(Func<ICommand, Task> publish, NamedId<Guid> scopeId)
         {
             var schema =
                 SchemaBuilder.Create("API Resources")
                     .AddString("Name", f => f
+                        .Unique()
                         .Required()
                         .ShowInList()
                         .Hints("The unique name of the API."))
@@ -246,6 +286,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     .AddString("Description", f => f
                         .Localizable()
                         .Hints("The description name of the API."))
+                    .AddBoolean("Disabled", f => f
+                        .AsToggle()
+                        .Hints("Enable or disable the API."))
+                    .AddReferences("Scopes", f => f
+                        .WithSchemaId(scopeId.Id)
+                        .Hints("The scopes for this API."))
                     .AddTags("User Claims", f => f
                         .Hints("List of accociated user claims that should be included when this resource is requested."))
                     .Build();
@@ -258,6 +304,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             var schema =
                 SchemaBuilder.Create("Identity Resources")
                     .AddString("Name", f => f
+                        .Unique()
                         .Required()
                         .ShowInList()
                         .Hints("The unique name of the identity information."))
@@ -267,10 +314,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     .AddString("Description", f => f
                         .Localizable()
                         .Hints("The description name of the identity information."))
+                    .AddBoolean("Required", f => f
+                        .AsToggle()
+                        .Hints("Specifies whether the user can de-select the scope on the consent screen."))
+                    .AddBoolean("Disabled", f => f
+                        .AsToggle()
+                        .Hints("Enable or disable the scope."))
+                    .AddBoolean("Emphasize", f => f
+                        .AsToggle()
+                        .Hints("Emphasize the API scope for important scopes."))
                     .AddTags("User Claims", f => f
                         .Hints("List of accociated user claims that should be included when this resource is requested."))
-                    .AddBoolean("Required", f => f
-                        .Hints("Specifies whether the user can de-select the scope on the consent screen."))
                     .Build();
 
             return publish(schema);

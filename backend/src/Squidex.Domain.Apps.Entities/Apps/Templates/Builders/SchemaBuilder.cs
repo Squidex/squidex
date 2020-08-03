@@ -106,6 +106,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             return this;
         }
 
+        public SchemaBuilder AddReferences(string name, Action<ReferencesFieldBuilder> configure)
+        {
+            var field = AddField<ReferencesFieldProperties>(name);
+
+            configure(new ReferencesFieldBuilder(field, command));
+
+            return this;
+        }
+
         public SchemaBuilder AddString(string name, Action<StringFieldBuilder> configure)
         {
             var field = AddField<StringFieldProperties>(name);

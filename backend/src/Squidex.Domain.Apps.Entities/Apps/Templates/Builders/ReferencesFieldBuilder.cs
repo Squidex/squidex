@@ -5,22 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
+using System;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class TagsFieldBuilder : FieldBuilder
+    public class ReferencesFieldBuilder : FieldBuilder
     {
-        public TagsFieldBuilder(UpsertSchemaField field, UpsertCommand schema)
+        public ReferencesFieldBuilder(UpsertSchemaField field, UpsertCommand schema)
             : base(field, schema)
         {
         }
 
-        public TagsFieldBuilder WithAllowedValues(params string[] values)
+        public ReferencesFieldBuilder WithSchemaId(Guid id)
         {
-            Properties<TagsFieldProperties>().AllowedValues = new ReadOnlyCollection<string>(values);
+            Properties<ReferencesFieldProperties>().SchemaId = id;
 
             return this;
         }
