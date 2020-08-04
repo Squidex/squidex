@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -35,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 if (isRequired && !context.IsOptional)
                 {
-                    addError(context.Path, "Field is required.");
+                    addError(context.Path, T.Get("contents.validation.required"));
                 }
 
                 return Task.CompletedTask;
@@ -45,23 +46,23 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 if (minItems == maxItems && minItems != items.Count)
                 {
-                    addError(context.Path, $"Must have exactly {maxItems} item(s).");
+                    addError(context.Path, T.Get("contents.validation.itemCount", new { count = minItems }));
                 }
                 else if (items.Count < minItems || items.Count > maxItems)
                 {
-                    addError(context.Path, $"Must have between {minItems} and {maxItems} item(s).");
+                    addError(context.Path, T.Get("contents.validation.itemCountBetween", new { min = minItems, max = maxItems }));
                 }
             }
             else
             {
                 if (minItems.HasValue && items.Count < minItems.Value)
                 {
-                    addError(context.Path, $"Must have at least {minItems} item(s).");
+                    addError(context.Path, T.Get("contents.validation.minItems", new { min = minItems }));
                 }
 
                 if (maxItems.HasValue && items.Count > maxItems.Value)
                 {
-                    addError(context.Path, $"Must not have more than {maxItems} item(s).");
+                    addError(context.Path, T.Get("contents.validation.maxItems", new { max = maxItems }));
                 }
             }
 

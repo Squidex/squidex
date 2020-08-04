@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 if (asset == null || asset.Version <= EtagVersion.Empty || (version > EtagVersion.Any && asset.Version != version))
                 {
-                    throw new DomainObjectNotFoundException(id.ToString(), typeof(IAssetEntity));
+                    throw new DomainObjectNotFoundException(id.ToString());
                 }
 
                 return asset;

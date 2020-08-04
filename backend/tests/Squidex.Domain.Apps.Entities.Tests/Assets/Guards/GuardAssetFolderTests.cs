@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Validation;
@@ -16,7 +17,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Guards
 {
-    public class GuardAssetFolderTests
+    public class GuardAssetFolderTests : IClassFixture<TranslationsFixture>
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
 

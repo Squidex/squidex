@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
@@ -21,55 +22,55 @@ namespace Squidex.Domain.Apps.Entities.Apps
             : base(typeNameRegistry)
         {
             AddEventMessage<AppContributorAssigned>(
-                "assigned {user:[Contributor]} as {[Role]}");
+                T.Get("history.apps.contributoreAssigned"));
 
             AddEventMessage<AppContributorRemoved>(
-                "removed {user:[Contributor]} from app");
+                T.Get("history.apps.contributoreRemoved"));
 
             AddEventMessage<AppClientAttached>(
-                "added client {[Id]} to app");
+                T.Get("history.apps.clientAdded"));
 
             AddEventMessage<AppClientRevoked>(
-                "revoked client {[Id]}");
+                T.Get("history.apps.clientRevoked"));
 
             AddEventMessage<AppClientUpdated>(
-                "updated client {[Id]}");
+                T.Get("history.apps.clientUpdated"));
 
             AddEventMessage<AppPlanChanged>(
-                "changed plan to {[Plan]}");
+                T.Get("history.apps.planChanged"));
 
             AddEventMessage<AppPlanReset>(
-                "resetted plan");
+                T.Get("history.apps.planReset"));
 
             AddEventMessage<AppLanguageAdded>(
-                "added language {[Language]}");
+                T.Get("history.apps.languagedAdded"));
 
             AddEventMessage<AppLanguageRemoved>(
-                "removed language {[Language]}");
+                T.Get("history.apps.languagedRemoved"));
 
             AddEventMessage<AppLanguageUpdated>(
-                "updated language {[Language]}");
+                T.Get("history.apps.languagedUpdated"));
 
             AddEventMessage<AppMasterLanguageSet>(
-                "changed master language to {[Language]}");
+                T.Get("history.apps.languagedSetToMaster"));
 
             AddEventMessage<AppPatternAdded>(
-                "added pattern {[Name]}");
+                T.Get("history.apps.patternAdded"));
 
             AddEventMessage<AppPatternDeleted>(
-                "deleted pattern {[PatternId]}");
+                T.Get("history.apps.patternDeleted"));
 
             AddEventMessage<AppPatternUpdated>(
-                "updated pattern {[Name]}");
+                T.Get("history.apps.patternUpdated"));
 
             AddEventMessage<AppRoleAdded>(
-                "added role {[Name]}");
+                T.Get("history.apps.roleAdded"));
 
             AddEventMessage<AppRoleDeleted>(
-                "deleted role {[Name]}");
+                T.Get("history.apps.roleDeleted"));
 
             AddEventMessage<AppRoleUpdated>(
-                "updated role {[Name]}");
+                T.Get("history.apps.roleUpdated"));
         }
 
         private HistoryEvent? CreateEvent(IEvent @event)

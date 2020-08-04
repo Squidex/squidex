@@ -8,12 +8,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 {
-    public class PatternValidatorTests
+    public class PatternValidatorTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 
@@ -55,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync("foo", errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Does not match to the pattern." });
+                new[] { "Must follow the pattern." });
         }
 
         [Fact]

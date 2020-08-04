@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
@@ -34,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
             {
-                yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
@@ -44,35 +45,35 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
             {
-                yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
 
             if (properties.MaxHeight.HasValue && properties.MinHeight.HasValue && properties.MinHeight.Value > properties.MaxHeight.Value)
             {
-                yield return new ValidationError(Not.GreaterEquals("Max height", "min height"),
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxHeight), nameof(properties.MinHeight)),
                     nameof(properties.MaxHeight),
                     nameof(properties.MinHeight));
             }
 
             if (properties.MaxWidth.HasValue && properties.MinWidth.HasValue && properties.MinWidth.Value > properties.MaxWidth.Value)
             {
-                yield return new ValidationError(Not.GreaterEquals("Max width", "min width"),
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxWidth), nameof(properties.MinWidth)),
                     nameof(properties.MaxWidth),
                     nameof(properties.MinWidth));
             }
 
             if (properties.MaxSize.HasValue && properties.MinSize.HasValue && properties.MinSize.Value >= properties.MaxSize.Value)
             {
-                yield return new ValidationError(Not.GreaterThan("Max size", "min size"),
+                yield return new ValidationError(Not.GreaterThan(nameof(properties.MaxSize), nameof(properties.MinSize)),
                     nameof(properties.MaxSize),
                     nameof(properties.MinSize));
             }
 
             if (properties.AspectWidth.HasValue != properties.AspectHeight.HasValue)
             {
-                yield return new ValidationError(Not.Defined2("Aspect width", "aspect height"),
+                yield return new ValidationError(Not.BothDefined(nameof(properties.AspectWidth), nameof(properties.AspectHeight)),
                     nameof(properties.AspectWidth),
                     nameof(properties.AspectHeight));
             }
@@ -82,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError(Not.Valid("Editor"),
+                yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
         }
@@ -91,25 +92,25 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError(Not.Valid("Editor"),
+                yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
 
             if (properties.DefaultValue.HasValue && properties.MinValue.HasValue && properties.DefaultValue.Value < properties.MinValue.Value)
             {
-                yield return new ValidationError(Not.GreaterEquals("Default value", "min value"),
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.DefaultValue), nameof(properties.MinValue)),
                     nameof(properties.DefaultValue));
             }
 
             if (properties.DefaultValue.HasValue && properties.MaxValue.HasValue && properties.DefaultValue.Value > properties.MaxValue.Value)
             {
-                yield return new ValidationError(Not.LessEquals("Default value", "max value"),
+                yield return new ValidationError(Not.LessEqualsThan(nameof(properties.DefaultValue), nameof(properties.MaxValue)),
                     nameof(properties.DefaultValue));
             }
 
             if (properties.MaxValue.HasValue && properties.MinValue.HasValue && properties.MinValue.Value >= properties.MaxValue.Value)
             {
-                yield return new ValidationError(Not.GreaterThan("Max value", "min value"),
+                yield return new ValidationError(Not.GreaterThan(nameof(properties.MaxValue), nameof(properties.MinValue)),
                     nameof(properties.MinValue),
                     nameof(properties.MaxValue));
             }
@@ -118,13 +119,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (!properties.CalculatedDefaultValue.Value.IsEnumValue())
                 {
-                    yield return new ValidationError(Not.Valid("Calculated default value"),
+                    yield return new ValidationError(Not.Valid(nameof(properties.CalculatedDefaultValue)),
                         nameof(properties.CalculatedDefaultValue));
                 }
 
                 if (properties.DefaultValue.HasValue)
                 {
-                    yield return new ValidationError("Calculated default value and default value cannot be used together.",
+                    yield return new ValidationError(T.Get("schemas.dateTimeCalculatedDefaultAndDefaultError"),
                         nameof(properties.CalculatedDefaultValue),
                         nameof(properties.DefaultValue));
                 }
@@ -135,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError(Not.Valid("Editor"),
+                yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
         }
@@ -149,38 +150,38 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError(Not.Valid("Editor"),
+                yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
 
             if ((properties.Editor == NumberFieldEditor.Radio || properties.Editor == NumberFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
             {
-                yield return new ValidationError("Radio buttons or dropdown list need allowed values.",
+                yield return new ValidationError(T.Get("schemas.stringEditorsNeedAllowedValuesError"),
                     nameof(properties.AllowedValues));
             }
 
             if (properties.DefaultValue.HasValue && properties.MinValue.HasValue && properties.DefaultValue.Value < properties.MinValue.Value)
             {
-                yield return new ValidationError(Not.GreaterEquals("Default value", "min value"),
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.DefaultValue), nameof(properties.MinValue)),
                     nameof(properties.DefaultValue));
             }
 
             if (properties.DefaultValue.HasValue && properties.MaxValue.HasValue && properties.DefaultValue.Value > properties.MaxValue.Value)
             {
-                yield return new ValidationError(Not.LessEquals("Default value", "max value"),
+                yield return new ValidationError(Not.LessEqualsThan(nameof(properties.DefaultValue), nameof(properties.MaxValue)),
                     nameof(properties.DefaultValue));
             }
 
             if (properties.MaxValue.HasValue && properties.MinValue.HasValue && properties.MinValue.Value >= properties.MaxValue.Value)
             {
-                yield return new ValidationError(Not.GreaterThan("Max value", "min value"),
+                yield return new ValidationError(Not.GreaterThan(nameof(properties.MaxValue), nameof(properties.MinValue)),
                     nameof(properties.MinValue),
                     nameof(properties.MaxValue));
             }
 
             if (properties.AllowedValues != null && properties.AllowedValues.Count > 0 && (properties.MinValue.HasValue || properties.MaxValue.HasValue))
             {
-                yield return new ValidationError("Either allowed values or min and max value can be defined.",
+                yield return new ValidationError(T.Get("schemas.string.eitherMinMaxOrAllowedValuesError"),
                     nameof(properties.AllowedValues),
                     nameof(properties.MinValue),
                     nameof(properties.MaxValue));
@@ -188,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (properties.InlineEditable && properties.Editor == NumberFieldEditor.Radio)
             {
-                yield return new ValidationError("Inline editing is not allowed for Radio editor.",
+                yield return new ValidationError(T.Get("schemas.number.inlineEditorError"),
                     nameof(properties.InlineEditable),
                     nameof(properties.Editor));
             }
@@ -198,20 +199,20 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError(Not.Valid("Editor"),
+                yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
 
             if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
             {
-                yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
 
             if (properties.ResolveReference && properties.MaxItems != 1)
             {
-                yield return new ValidationError("Can only resolve references when MaxItems is 1.",
+                yield return new ValidationError(T.Get("schemas.references.resolveError"),
                     nameof(properties.ResolveReference),
                     nameof(properties.MaxItems));
             }
@@ -221,32 +222,32 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError(Not.Valid("Editor"),
+                yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
 
             if ((properties.Editor == StringFieldEditor.Radio || properties.Editor == StringFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
             {
-                yield return new ValidationError("Radio buttons or dropdown list need allowed values.",
+                yield return new ValidationError(T.Get("schemas.stringEditorsNeedAllowedValuesError"),
                     nameof(properties.AllowedValues));
             }
 
             if (properties.Pattern != null && !properties.Pattern.IsValidRegex())
             {
-                yield return new ValidationError(Not.Valid("Pattern"),
+                yield return new ValidationError(Not.Valid(nameof(properties.Pattern)),
                     nameof(properties.Pattern));
             }
 
             if (properties.MaxLength.HasValue && properties.MinLength.HasValue && properties.MinLength.Value > properties.MaxLength.Value)
             {
-                yield return new ValidationError(Not.GreaterEquals("Max length", "min length"),
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxLength), nameof(properties.MinLength)),
                     nameof(properties.MinLength),
                     nameof(properties.MaxLength));
             }
 
             if (properties.AllowedValues != null && properties.AllowedValues.Count > 0 && (properties.MinLength.HasValue || properties.MaxLength.HasValue))
             {
-                yield return new ValidationError("Either allowed values or min and max length can be defined.",
+                yield return new ValidationError(T.Get("schemas.number.eitherMinMaxOrAllowedValuesError"),
                     nameof(properties.AllowedValues),
                     nameof(properties.MinLength),
                     nameof(properties.MaxLength));
@@ -254,7 +255,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (properties.InlineEditable && properties.Editor != StringFieldEditor.Dropdown && properties.Editor != StringFieldEditor.Input && properties.Editor != StringFieldEditor.Slug)
             {
-                yield return new ValidationError("Inline editing is only allowed for dropdowns, slugs and input fields.",
+                yield return new ValidationError(T.Get("schemas.string.inlineEditorError"),
                     nameof(properties.InlineEditable),
                     nameof(properties.Editor));
             }
@@ -264,19 +265,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError(Not.Valid("Editor"),
+                yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
 
             if ((properties.Editor == TagsFieldEditor.Checkboxes || properties.Editor == TagsFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
             {
-                yield return new ValidationError("Checkboxes or dropdown list need allowed values.",
+                yield return new ValidationError(T.Get("schemas.tags.editorNeedsAllowedValues"),
                     nameof(properties.AllowedValues));
             }
 
             if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
             {
-                yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
@@ -286,7 +287,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError(Not.Valid("Editor"),
+                yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
         }

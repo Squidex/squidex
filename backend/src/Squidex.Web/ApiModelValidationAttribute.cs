@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Web
@@ -34,7 +35,7 @@ namespace Squidex.Web
                     {
                         if (string.IsNullOrWhiteSpace(key))
                         {
-                            errors.Add(new ValidationError("Request body has an invalid format."));
+                            errors.Add(new ValidationError(T.Get("common.httpInvalidRequestFormat")));
                         }
                         else
                         {
@@ -55,7 +56,7 @@ namespace Squidex.Web
 
                 if (errors.Count > 0)
                 {
-                    throw new ValidationException("The model is not valid.", errors);
+                    throw new ValidationException(errors);
                 }
             }
         }

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectGrain<T, TState> : GrainOfGuid where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
+    public abstract class DomainObjectGrain<T, TState> : GrainOfGuid, IDomainObjectGrain where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
     {
         private readonly T domainObject;
 
@@ -40,8 +40,10 @@ namespace Squidex.Infrastructure.Commands
             return base.OnActivateAsync(key);
         }
 
-        public async Task<J<object?>> ExecuteAsync(J<IAggregateCommand> command)
+        public async Task<J<object?>> ExecuteAsync(J<IAggregateCommand> command, GrainContext context)
         {
+            context?.Use();
+
             var result = await domainObject.ExecuteAsync(command.Value);
 
             return result;

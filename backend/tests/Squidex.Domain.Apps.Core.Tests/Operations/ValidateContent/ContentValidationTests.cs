@@ -11,6 +11,7 @@ using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
@@ -18,7 +19,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
-    public class ContentValidationTests
+    public class ContentValidationTests : IClassFixture<TranslationsFixture>
     {
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
         private readonly List<ValidationError> errors = new List<ValidationError>();
@@ -58,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Must be less or equal to '100'.", "my-field")
+                    new ValidationError("Must be less or equal to 100.", "my-field")
                 });
         }
 
@@ -239,7 +240,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Must be less or equal to '100'.", "my-field")
+                    new ValidationError("Must be less or equal to 100.", "my-field")
                 });
         }
 

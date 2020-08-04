@@ -9,9 +9,13 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="NewFolder\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Equals.Fody" Version="4.0.1" PrivateAssets="all" />
     <PackageReference Include="FluentFTP" Version="32.4.3" />
-    <PackageReference Include="FluentValidation" Version="9.0.1" />
     <PackageReference Include="Fody" Version="6.2.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
@@ -18,15 +19,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot attach client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e(Not.Defined("Client id"), nameof(command.Id));
+                    e(Not.Defined("ClientId"), nameof(command.Id));
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
-                    e("A client with the same id already exists.");
+                    e(T.Get("apps.clients.idAlreadyExists"));
                 }
             });
         }
@@ -37,11 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot revoke client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e(Not.Defined("Client id"), nameof(command.Id));
+                    e(Not.Defined("ClientId"), nameof(command.Id));
                 }
             });
         }
@@ -52,16 +53,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot update client.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e(Not.Defined("Client id"), nameof(command.Id));
+                    e(Not.Defined("Clientd"), nameof(command.Id));
                 }
 
                 if (command.Role != null && !roles.Contains(command.Role))
                 {
-                    e(Not.Valid("role"), nameof(command.Role));
+                    e(Not.Valid("Role"), nameof(command.Role));
                 }
             });
         }
@@ -75,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!clients.TryGetValue(id, out var client))
             {
-                throw new DomainObjectNotFoundException(id, "Clients", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(id);
             }
 
             return client;

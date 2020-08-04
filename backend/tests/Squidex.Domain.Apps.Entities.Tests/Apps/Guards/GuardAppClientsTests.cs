@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -16,7 +17,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
-    public class GuardAppClientsTests
+    public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         private readonly AppClients clients_0 = AppClients.Empty;
         private readonly Roles roles = Roles.Empty;
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new AttachClient();
 
             ValidationAssert.Throws(() => GuardAppClients.CanAttach(clients_0, command),
-                new ValidationError("Client id is required.", "Id"));
+                new ValidationError("Client ID is required.", "Id"));
         }
 
         [Fact]
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new RevokeClient();
 
             ValidationAssert.Throws(() => GuardAppClients.CanRevoke(clients_0, command),
-                new ValidationError("Client id is required.", "Id"));
+                new ValidationError("Client ID is required.", "Id"));
         }
 
         [Fact]
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdateClient { Name = "iOS" };
 
             ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_0, command, Roles.Empty),
-                new ValidationError("Client id is required.", "Id"));
+                new ValidationError("Client ID is required.", "Id"));
         }
 
         [Fact]

@@ -8,7 +8,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using Newtonsoft.Json;
@@ -18,11 +18,9 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public static class BsonJsonConvention
     {
-        private static volatile int isRegistered;
-
         public static void Register(JsonSerializer serializer)
         {
-            if (Interlocked.Increment(ref isRegistered) == 1)
+            try
             {
                 var pack = new ConventionPack();
 
@@ -52,6 +50,10 @@ namespace Squidex.Infrastructure.MongoDb
                 });
 
                 ConventionRegistry.Register("json", pack, t => true);
+            }
+            catch (BsonSerializationException)
+            {
+                return;
             }
         }
     }

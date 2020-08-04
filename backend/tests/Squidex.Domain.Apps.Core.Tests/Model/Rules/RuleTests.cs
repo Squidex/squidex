@@ -11,6 +11,7 @@ using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using Xunit;

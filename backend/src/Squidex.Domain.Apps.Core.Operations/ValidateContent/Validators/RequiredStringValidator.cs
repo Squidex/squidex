@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (value.IsNullOrUndefined() || IsEmptyString(value))
             {
-                addError(context.Path, "Field is required.");
+                addError(context.Path, T.Get("contents.validation.required"));
             }
 
             return Task.CompletedTask;

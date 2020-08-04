@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
@@ -18,17 +19,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add language.", e =>
+            Validate.It(e =>
             {
                 var language = command.Language;
 
                 if (language == null)
                 {
-                    e(Not.Defined("Language code"), nameof(command.Language));
+                    e(Not.Defined(nameof(command.Language)), nameof(command.Language));
                 }
                 else if (languages.Contains(language))
                 {
-                    e("Language has already been added.");
+                    e(T.Get("apps.languages.languageAlreadyAdded"));
                 }
             });
         }
@@ -37,13 +38,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot remove language.", e =>
+            Validate.It(e =>
             {
                 var language = command.Language;
 
                 if (language == null)
                 {
-                    e(Not.Defined("Language code"), nameof(command.Language));
+                    e(Not.Defined(nameof(command.Language)), nameof(command.Language));
                 }
                 else
                 {
@@ -51,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                     if (languages.IsMaster(language))
                     {
-                        e("Master language cannot be removed.");
+                        e(T.Get("apps.languages.masterLanguageNotRemovable"));
                     }
                 }
             });
@@ -61,13 +62,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot update language.", e =>
+            Validate.It(e =>
             {
                 var language = command.Language;
 
                 if (language == null)
                 {
-                    e(Not.Defined("Language code"), nameof(command.Language));
+                    e(Not.Defined(nameof(command.Language)), nameof(command.Language));
                 }
                 else
                 {
@@ -77,12 +78,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     {
                         if (command.IsOptional)
                         {
-                            e("Master language cannot be made optional.", nameof(command.IsMaster));
+                            e(T.Get("apps.languages.masterLanguageNotOptional"), nameof(command.IsMaster));
                         }
 
                         if (command.Fallback?.Count > 0)
                         {
-                            e("Master language cannot have fallback languages.", nameof(command.Fallback));
+                            e(T.Get("apps.languages.masterLanguageNoFallbacks"), nameof(command.Fallback));
                         }
                     }
 
@@ -95,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     {
                         if (!languages.Contains(fallback))
                         {
-                            e($"App does not have fallback language '{fallback}'.", nameof(command.Fallback));
+                            e(T.Get("apps.languages.fallbackNotFound", new { fallback }), nameof(command.Fallback));
                         }
                     }
                 }
@@ -106,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             if (!languages.Contains(language))
             {
-                throw new DomainObjectNotFoundException(language, "Languages", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(language);
             }
         }
     }

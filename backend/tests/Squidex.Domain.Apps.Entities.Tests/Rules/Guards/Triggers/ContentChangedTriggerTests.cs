@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -20,7 +21,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
 {
-    public class ContentChangedTriggerTests
+    public class ContentChangedTriggerTests : IClassFixture<TranslationsFixture>
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Schema id is required.", "Schemas")
+                    new ValidationError("Schema ID is required.", "Schemas")
                 });
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<Guid>._, false, false))

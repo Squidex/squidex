@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Translations;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Comments.Notifications
@@ -95,7 +96,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
         {
             if (!string.Equals(userId, User.OpenIdSubject()))
             {
-                throw new DomainForbiddenException("You can only access your notifications.");
+                throw new DomainForbiddenException(T.Get("comments.noPermissions"));
             }
         }
     }

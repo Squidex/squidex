@@ -153,12 +153,12 @@ namespace Squidex.Infrastructure.Commands
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {
-                throw new DomainObjectVersionException(id.ToString(), GetType(), Version, command.ExpectedVersion);
+                throw new DomainObjectVersionException(id.ToString(), Version, command.ExpectedVersion);
             }
 
             if (isUpdate && Version < 0)
             {
-                throw new DomainObjectNotFoundException(id.ToString(), GetType());
+                throw new DomainObjectNotFoundException(id.ToString());
             }
 
             var previousSnapshot = Snapshot;

@@ -11,12 +11,13 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
 {
-    public class UsageTriggerValidationTests
+    public class UsageTriggerValidationTests : IClassFixture<TranslationsFixture>
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly Guid appId = Guid.NewGuid();

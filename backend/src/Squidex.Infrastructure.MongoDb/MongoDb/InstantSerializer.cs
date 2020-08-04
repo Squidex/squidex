@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using NodaTime;
@@ -14,13 +14,15 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class InstantSerializer : SerializerBase<Instant>, IBsonPolymorphicSerializer
     {
-        private static volatile int isRegistered;
-
         public static void Register()
         {
-            if (Interlocked.Increment(ref isRegistered) == 1)
+            try
             {
                 BsonSerializer.RegisterSerializer(new InstantSerializer());
+            }
+            catch (BsonSerializationException)
+            {
+                return;
             }
         }
 

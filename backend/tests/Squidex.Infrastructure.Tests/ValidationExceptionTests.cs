@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using FluentAssertions;
 using Squidex.Infrastructure.TestHelpers;
 using Squidex.Infrastructure.Validation;
@@ -15,67 +16,50 @@ namespace Squidex.Infrastructure
     public class ValidationExceptionTests
     {
         [Fact]
-        public void Should_format_message_from_summary()
+        public void Should_format_message_from_error()
         {
-            var ex = new ValidationException("Summary.");
+            var ex = new ValidationException("Error.");
 
-            Assert.Equal("Summary.", ex.Message);
+            Assert.Equal("Error.", ex.Message);
         }
 
         [Fact]
-        public void Should_append_dot_to_summary()
+        public void Should_append_dot_to_error()
         {
-            var ex = new ValidationException("Summary");
+            var ex = new ValidationException("Error");
 
-            Assert.Equal("Summary.", ex.Message);
+            Assert.Equal("Error.", ex.Message);
         }
 
         [Fact]
         public void Should_format_message_from_errors()
         {
-            var ex = new ValidationException("Summary", new ValidationError("Error1."), new ValidationError("Error2."));
+            var errors = new List<ValidationError>
+            {
+                new ValidationError("Error1"),
+                new ValidationError("Error2"),
+            };
 
-            Assert.Equal("Summary: Error1. Error2.", ex.Message);
-        }
+            var ex = new ValidationException(errors);
 
-        [Fact]
-        public void Should_not_add_colon_twice()
-        {
-            var ex = new ValidationException("Summary:", new ValidationError("Error1."), new ValidationError("Error2."));
-
-            Assert.Equal("Summary: Error1. Error2.", ex.Message);
-        }
-
-        [Fact]
-        public void Should_append_dots_to_errors()
-        {
-            var ex = new ValidationException("Summary", new ValidationError("Error1"), new ValidationError("Error2"));
-
-            Assert.Equal("Summary: Error1. Error2.", ex.Message);
-        }
-
-        [Fact]
-        public void Should_serialize_and_deserialize1()
-        {
-            var source = new ValidationException("Summary", new ValidationError("Error1"), null!);
-            var result = source.SerializeAndDeserializeBinary();
-
-            result.Errors.Should().BeEquivalentTo(source.Errors);
-
-            Assert.Equal(source.Message, result.Message);
-            Assert.Equal(source.Summary, result.Summary);
+            Assert.Equal("Error1. Error2.", ex.Message);
         }
 
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var source = new ValidationException("Summary", new ValidationError("Error1"), new ValidationError("Error2"));
+            var errors = new List<ValidationError>
+            {
+                new ValidationError("Error1"),
+                new ValidationError("Error2"),
+            };
+
+            var source = new ValidationException(errors);
             var result = source.SerializeAndDeserializeBinary();
 
             result.Errors.Should().BeEquivalentTo(source.Errors);
 
             Assert.Equal(source.Message, result.Message);
-            Assert.Equal(source.Summary, result.Summary);
         }
     }
 }

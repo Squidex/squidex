@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -20,7 +21,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {
-    public class GuardSchemaFieldTests
+    public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         private readonly Schema schema_0;
         private readonly StringFieldProperties validProperties = new StringFieldProperties();

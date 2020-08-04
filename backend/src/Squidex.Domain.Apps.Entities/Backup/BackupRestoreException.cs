@@ -13,12 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     [Serializable]
     public class BackupRestoreException : Exception
     {
-        public BackupRestoreException(string message)
-            : base(message)
-        {
-        }
-
-        public BackupRestoreException(string message, Exception inner)
+        public BackupRestoreException(string message, Exception? inner = null)
             : base(message, inner)
         {
         }

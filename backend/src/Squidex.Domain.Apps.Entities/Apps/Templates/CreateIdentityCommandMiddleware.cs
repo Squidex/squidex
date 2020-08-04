@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static Task CreateAuthenticationSchemeSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<Guid>> CreateAuthenticationSchemeSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Authentication Schemes")
@@ -71,7 +71,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .Hints("Additional scopes you want from the provider."))
                     .Build();
 
-            return publish(schema);
+            await publish(schema);
+
+            return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
         private static Task CreateClientsSchemaAsync(Func<ICommand, Task> publish)

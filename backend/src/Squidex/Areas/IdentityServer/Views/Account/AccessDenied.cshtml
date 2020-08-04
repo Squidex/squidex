@@ -1,16 +1,17 @@
 ﻿@{
     ViewBag.Theme = "white";
-    ViewBag.Title = "Account locked";
+
+    ViewBag.Title = T.Get("users.accessDenied.title");
 }
 
 <img class="splash-image" src="@Url.RootContentUrl("~/squid.svg?title=STOP%20HERE&text=You%20shall%20not%20pass!")" />
 
-<h1 class="splash-h1">Access denied</h1>
+<h1 class="splash-h1">@T.Get("users.accessDenied.title")</h1>
 
 <p class="splash-text">
-    This operation is not allowed, your account might be locked.
+    @T.Get("users.accessDenied.text")
 </p>
 
 <p class="splash-text">
-    <a href="~/account/logout-redirect">Logout</a>
+    <a href="~/account/logout-redirect">@T.Get("common.logout")</a>
 </p>

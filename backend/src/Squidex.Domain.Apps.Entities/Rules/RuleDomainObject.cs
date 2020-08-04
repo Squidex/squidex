@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -18,6 +18,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
@@ -143,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             if (Snapshot.IsDeleted)
             {
-                throw new DomainException("Rule has already been deleted.");
+                throw new DomainException(T.Get("rules.alreadyDeleted"));
             }
         }
     }

@@ -18,8 +18,8 @@ namespace Squidex.Domain.Apps.Core.Templates
     {
         public IReadOnlyList<string> Errors { get; }
 
-        public TemplateParseException(string template, IEnumerable<string> errors)
-            : base(BuildErrorMessage(errors, template))
+        public TemplateParseException(string template, IEnumerable<string> errors, Exception? inner = null)
+            : base(BuildErrorMessage(errors, template), inner)
         {
             Errors = errors.ToList();
         }

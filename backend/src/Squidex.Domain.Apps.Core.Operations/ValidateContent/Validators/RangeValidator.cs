@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,15 +7,16 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public sealed class RangeValidator<T> : IValidator where T : struct, IComparable<T>
+    public sealed class RangeValidator<TValue> : IValidator where TValue : struct, IComparable<TValue>
     {
-        private readonly T? min;
-        private readonly T? max;
+        private readonly TValue? min;
+        private readonly TValue? max;
 
-        public RangeValidator(T? min, T? max)
+        public RangeValidator(TValue? min, TValue? max)
         {
             if (min.HasValue && max.HasValue && min.Value.CompareTo(max.Value) > 0)
             {
@@ -28,29 +29,29 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
-            if (value != null && value is T typedValue)
+            if (value != null && value is TValue typedValue)
             {
                 if (min.HasValue && max.HasValue)
                 {
                     if (Equals(min, max) && Equals(min.Value, max.Value))
                     {
-                        addError(context.Path, $"Must be exactly '{max}'.");
+                        addError(context.Path, T.Get("contents.validation.exactValue", new { value = max.Value }));
                     }
                     else if (typedValue.CompareTo(min.Value) < 0 || typedValue.CompareTo(max.Value) > 0)
                     {
-                        addError(context.Path, $"Must be between '{min}' and '{max}'.");
+                        addError(context.Path, T.Get("contents.validation.between", new { min, max }));
                     }
                 }
                 else
                 {
                     if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
                     {
-                        addError(context.Path, $"Must be greater or equal to '{min}'.");
+                        addError(context.Path, T.Get("contents.validation.min", new { min }));
                     }
 
                     if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
                     {
-                        addError(context.Path, $"Must be less or equal to '{max}'.");
+                        addError(context.Path, T.Get("contents.validation.max", new { max }));
                     }
                 }
             }

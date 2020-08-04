@@ -7,10 +7,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -18,7 +20,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class DefaultWorkflowsValidatorTests
+    public class DefaultWorkflowsValidatorTests : IClassFixture<TranslationsFixture>
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -47,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
-            Assert.Equal(errors, new[] { "Multiple workflows cover all schemas." });
+            Assert.Equal(new[] { "Multiple workflows cover all schemas." }, errors.ToArray());
         }
 
         [Fact]
@@ -64,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
-            Assert.Equal(errors, new[] { "The schema `my-schema` is covered by multiple workflows." });
+            Assert.Equal(new[] { "The schema 'my-schema' is covered by multiple workflows." }, errors.ToArray());
         }
 
         [Fact]

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -25,6 +25,7 @@ using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -74,7 +75,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/forbidden/")]
         public IActionResult Forbidden()
         {
-            throw new DomainForbiddenException("User is not allowed to login.");
+            throw new DomainForbiddenException(T.Get("users.userLocked"));
         }
 
         [HttpGet]
@@ -111,12 +112,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         {
             if (!model.ConsentToCookies)
             {
-                ModelState.AddModelError(nameof(model.ConsentToCookies), "You have to give consent.");
+                ModelState.AddModelError(nameof(model.ConsentToCookies), T.Get("users.consent.needed"));
             }
 
             if (!model.ConsentToPersonalInformation)
             {
-                ModelState.AddModelError(nameof(model.ConsentToPersonalInformation), "You have to give consent.");
+                ModelState.AddModelError(nameof(model.ConsentToPersonalInformation), T.Get("users.consent.needed"));
             }
 
             if (!ModelState.IsValid)
@@ -130,7 +131,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             if (user == null)
             {
-                throw new DomainException("Cannot find user.");
+                throw new DomainException(T.Get("users.userNotFound"));
             }
 
             var update = new UserValues

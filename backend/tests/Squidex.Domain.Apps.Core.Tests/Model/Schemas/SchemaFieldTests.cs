@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore

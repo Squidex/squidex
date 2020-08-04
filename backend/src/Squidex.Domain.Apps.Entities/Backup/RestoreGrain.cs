@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -23,6 +23,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -112,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (CurrentJob?.Status == JobStatus.Started)
             {
-                throw new DomainException("A restore operation is already running.");
+                throw new DomainException(T.Get("backups.restoreRunning"));
             }
 
             state.Value.Job = new RestoreJob

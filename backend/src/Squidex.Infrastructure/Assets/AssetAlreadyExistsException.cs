@@ -13,12 +13,7 @@ namespace Squidex.Infrastructure.Assets
     [Serializable]
     public class AssetAlreadyExistsException : Exception
     {
-        public AssetAlreadyExistsException(string fileName)
-            : base(FormatMessage(fileName))
-        {
-        }
-
-        public AssetAlreadyExistsException(string fileName, Exception inner)
+        public AssetAlreadyExistsException(string fileName, Exception? inner = null)
             : base(FormatMessage(fileName), inner)
         {
         }

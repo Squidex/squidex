@@ -27,6 +27,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Queries.OData;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
@@ -119,11 +120,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
             catch (NotSupportedException)
             {
-                throw new ValidationException("OData operation is not supported.");
+                throw new ValidationException(T.Get("common.odataNotSupported"));
             }
             catch (ODataException ex)
             {
-                throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
+                throw new ValidationException(T.Get("common.odataFailure", new { message = ex.Message }), ex);
             }
         }
 
