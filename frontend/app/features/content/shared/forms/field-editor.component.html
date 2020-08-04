@@ -20,6 +20,7 @@
 			<ng-container [ngSwitch]="field.properties.fieldType">
                 <ng-container *ngSwitchCase="'Array'">
                     <sqx-array-editor
+                        [canUnset]="canUnset"
                         [formModel]="formModel"
                         [formContext]="formContext"
                         [language]="language"
@@ -170,7 +171,7 @@
 		</ng-template>
     </div>
 
-    <div class="unset" title="Unset value">
+    <div *ngIf="canUnset" class="unset" title="Unset value">
         <button type="button" class="btn btn-sm btn-secondary" [disabled]="isEmpty | async" (click)="unset()">
             <i class="icon-close"></i>
         </button>

@@ -27,6 +27,9 @@ export class ArrayEditorComponent {
     public formModel: FieldArrayForm;
 
     @Input()
+    public canUnset: boolean;
+
+    @Input()
     public language: AppLanguageDto;
 
     @Input()

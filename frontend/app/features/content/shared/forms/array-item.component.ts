@@ -38,6 +38,9 @@ export class ArrayItemComponent implements OnChanges {
     public formModel: FieldArrayItemForm;
 
     @Input()
+    public canUnset: boolean;
+
+    @Input()
     public isFirst = false;
 
     @Input()

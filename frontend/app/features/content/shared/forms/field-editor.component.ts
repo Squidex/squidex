@@ -33,6 +33,9 @@ export class FieldEditorComponent implements OnChanges {
     public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
+    public canUnset: boolean;
+
+    @Input()
     public displaySuffix: string;
 
     @ViewChild('editor', { static: false })
