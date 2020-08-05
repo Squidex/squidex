@@ -5,15 +5,15 @@
     <sqx-panel desiredWidth="26rem" isBlank="true" [isLazyLoaded]="false">
         <ng-container title>
             <ng-container *ngIf="usersState.selectedUser | async; else noUserTitle">
-                <sqx-title message="{{ 'users.edit' | sqxTranslate }}"></sqx-title>
+                <sqx-title message="i18n:users.editPageTitle"></sqx-title>
 
                 {{ 'users.editTitle' | sqxTranslate }}
             </ng-container>
 
             <ng-template #noUserTitle>
-                <sqx-title message="{{ 'users.new' | sqxTranslate }}"></sqx-title>
+                <sqx-title message="i18n:users.createPageTitle"></sqx-title>
 
-                {{ 'users.newTitle' | sqxTranslate }}
+                {{ 'users.createTitle' | sqxTranslate }}
             </ng-template>
         </ng-container>
 

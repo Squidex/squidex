@@ -26,10 +26,10 @@
         <div class="table-items-row-details-tabs clearfix">
             <ul class="nav nav-tabs2">
                 <li class="nav-item">
-                    <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">{{ 'workflow.tabEdit' | sqxTranslate }}</a>
+                    <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">{{ 'workflows.tabEdit' | sqxTranslate }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">{{ 'workflow.tabVisualize' | sqxTranslate }}</a>
+                    <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">{{ 'workflows.tabVisualize' | sqxTranslate }}</a>
                 </li>
             </ul>
 
@@ -50,7 +50,7 @@
                         <input class="form-control" id="{{workflow.id}}_name" [ngModelOptions]="onBlur" [ngModel]="workflow.name" (ngModelChange)="rename($event)">
             
                         <sqx-form-hint>
-                            {{ 'workflow.workflowNameHint' | sqxTranslate }}
+                            {{ 'workflows.workflowNameHint' | sqxTranslate }}
                         </sqx-form-hint>
                     </div>
                 </div>
@@ -59,11 +59,11 @@
                     <label class="col-form-label" for="{{workflow.id}}_schemas">{{ 'dashboard.schemas' | sqxTranslate }}</label>
             
                     <div class="col">
-                        <sqx-tag-editor placeholder="{{ 'workflow.schemaTagsAdd' | sqxTranslate }}" [converter]="schemasSource.converter | async" [ngModel]="workflow.schemaIds" (ngModelChange)="changeSchemaIds($event)" [suggestions]="(schemasSource.converter | async)?.suggestions">
+                        <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" [converter]="schemasSource.converter | async" [ngModel]="workflow.schemaIds" (ngModelChange)="changeSchemaIds($event)" [suggestions]="(schemasSource.converter | async)?.suggestions">
                         </sqx-tag-editor>
             
                         <sqx-form-hint>
-                            {{ 'workflow.schemasHint' | sqxTranslate }}
+                            {{ 'workflows.schemasHint' | sqxTranslate }}
                         </sqx-form-hint>
                     </div>
                 </div>

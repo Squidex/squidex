@@ -7,7 +7,7 @@
             <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">{{ 'schemas.field.tabValidation' | sqxTranslate }}</a>
         </li>
         <li class="nav-item" [class.hidden]="!field.properties.isContentField || field.properties.fieldType === 'Array'">
-            <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">{{ 'workflow.tabEdit' | sqxTranslate }}</a>
+            <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">{{ 'workflows.tabEdit' | sqxTranslate }}</a>
         </li>
     </ul>
 

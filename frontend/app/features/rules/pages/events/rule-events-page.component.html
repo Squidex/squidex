@@ -1,4 +1,4 @@
-<sqx-title message="{{ 'common.events' | sqxTranslate }}"></sqx-title>
+<sqx-title message="i18n:rules.ruleEvents.listPageTitle"></sqx-title>
 
 <sqx-panel desiredWidth="63rem" grid="true">
     <ng-container title>
@@ -58,7 +58,7 @@
                         <tr *ngIf="selectedEventId === event.id">
                             <td colspan="5">
                                 <div class="event-header">
-                                    <h3>{{ 'rules.ruleEventLastInvoced' | sqxTranslate }}</h3>
+                                    <h3>{{ 'rules.ruleEvents.lastInvokedLabel' | sqxTranslate }}</h3>
                                 </div>
                                 
                                 <div class="row no-gutters event-stats align-items-center">
@@ -66,10 +66,10 @@
                                         <span class="badge badge-pill badge-{{event.result | sqxRuleEventBadgeClass}}">{{event.result}}</span>
                                     </div>
                                     <div class="col-2">
-                                        {{ 'rules.ruleEventsNumAttempts' | sqxTranslate }}
+                                        {{ 'rules.ruleEvents.numAttemptsLabel' | sqxTranslate }}
                                     </div>
                                     <div class="col-4">
-                                        {{ 'rules.ruleEventsNextAttempt' | sqxTranslate }}: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
+                                        {{ 'rules.ruleEvents.nextAttemptLabel' | sqxTranslate }}: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
                                     </div>
                                     <div class="col-3 text-right">
                                         <button type="button" class="btn btn-text-danger btn-sm mr-1" (click)="cancel(event)" [class.hidden]="!event.nextAttempt">

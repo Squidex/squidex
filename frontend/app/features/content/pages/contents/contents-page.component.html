@@ -25,7 +25,7 @@
             </div>
             <div class="col-auto pl-1">
                 <button type="button" class="btn btn-success" #newButton routerLink="new" title="i18n:contents.createContentTooltip" [disabled]="(contentsState.canCreateAny | async) === false">
-                    <i class="icon-plus"></i> {{ 'users.newUser' | sqxTranslate }}
+                    <i class="icon-plus"></i> {{ 'users.create' | sqxTranslate }}
                 </button>
                 
                 <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()"></sqx-shortcut>

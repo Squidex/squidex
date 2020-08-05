@@ -12,8 +12,8 @@
             </button>
         </div>
         <div class="form-group" *ngIf="showTime && shouldShowDateButtons">
-            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="i18n:common.dateTimePickerNow">
-                {{ 'common.dateTimePickerNow2' | sqxTranslate }}
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="i18n:common.dateTimeEditor.nowTooltip">
+                {{ 'common.dateTimeEditor.now' | sqxTranslate }}
             </button>
         </div>
         <div class="form-group" *ngIf="!showTime && shouldShowDateButtons">

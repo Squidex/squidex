@@ -39,19 +39,19 @@
                 <div class="form-group">
                     <sqx-control-errors for="name" submitOnly="true"></sqx-control-errors>
 
-                    <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput placeholder="{{ 'schemas.fieldNamePlaceholder' | sqxTranslate }}" sqxFocusOnInit>
+                    <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput placeholder="{{ 'schemas.field.namePlaceholder' | sqxTranslate }}" sqxFocusOnInit>
                 </div>
 
                 <div class="form-group" *ngIf="!parent && (addFieldForm.isContentField | async)">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="isLocalizable" formControlName="isLocalizable">
                         <label class="form-check-label" for="isLocalizable">
-                            {{ 'schemas.fieldLocalizable' | sqxTranslate }}
+                            {{ 'schemas.field.localizable' | sqxTranslate }}
                         </label>
                     </div>
 
                     <sqx-form-hint>
-                        {{ 'schemas.fieldLocalizableHint' | sqxTranslate }}
+                        {{ 'schemas.field.localizableHint' | sqxTranslate }}
                     </sqx-form-hint>
                 </div>
 

@@ -1,4 +1,4 @@
-<sqx-title message="{{ 'common.rules' | sqxTranslate }}"></sqx-title>
+<sqx-title message="i18n:rules.listPageTitle"></sqx-title>
 
 <sqx-panel desiredWidth="54rem" showSidebar="true" grid="true">
     <ng-container title>
@@ -16,7 +16,7 @@
             <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
     
             <button type="button" class="btn btn-success" #buttonNew (click)="createNew()" title="i18n:rules.createTooltip">
-                <i class="icon-plus"></i> {{ 'users.newUser' | sqxTranslate }}
+                <i class="icon-plus"></i> {{ 'rules.create' | sqxTranslate }}
             </button>
         </ng-container>
     </ng-container>

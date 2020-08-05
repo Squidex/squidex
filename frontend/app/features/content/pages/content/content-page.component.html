@@ -8,12 +8,12 @@
             </a>
 
             <ng-container *ngIf="content else noContentTitle">
-                <sqx-title message="{{ 'contents.editTitle' | sqxTranslate }}"></sqx-title>
+                <sqx-title message="i18n:contents.editPageTitle"></sqx-title>
 
                 {{ 'contents.editTitle' | sqxTranslate }}
             </ng-container>
             <ng-template #noContentTitle>
-                <sqx-title message="{{ 'contents.createTitle' | sqxTranslate }}"></sqx-title>
+                <sqx-title message="i18n:contents.createPageTitle"></sqx-title>
 
                 {{ 'contents.createTitle' | sqxTranslate }}
             </ng-template>

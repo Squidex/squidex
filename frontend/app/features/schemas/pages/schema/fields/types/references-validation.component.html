@@ -3,7 +3,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldSchemaId">{{ 'dashboard.schemas' | sqxTranslate }}</label>
 
         <div class="col-6">
-            <sqx-tag-editor placeholder="{{ 'workflow.schemaTagsAdd' | sqxTranslate }}" formControlName="schemaIds" [converter]="schemasSource.converter | async" [suggestions]="(schemasSource.converter | async)?.suggestions">
+            <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" formControlName="schemaIds" [converter]="schemasSource.converter | async" [suggestions]="(schemasSource.converter | async)?.suggestions">
             </sqx-tag-editor>
         </div>
     </div>

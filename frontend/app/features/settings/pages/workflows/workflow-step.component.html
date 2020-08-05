@@ -16,7 +16,7 @@
         <div class="col">
         </div>
         <div class="col-auto" *ngIf="step.isLocked">
-            <small class="text-decent">({{ 'workflow.publishedNotRemovable' | sqxTranslate }})</small>
+            <small class="text-decent">({{ 'workflows.publishedNotRemovable' | sqxTranslate }})</small>
         </div>
         <div class="col-auto">
             <button type="button" class="btn btn-text-danger" (click)="remove.emit()" *ngIf="!step.isLocked && workflow.steps.length > 2" [disabled]="disabled">
@@ -54,19 +54,19 @@
                     <input class="form-check-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}" [disabled]="disabled" [ngModel]="step.noUpdate" (ngModelChange)="changeNoUpdate($event)">
 
                     <label class="form-check-label" for="preventUpdates_{{step.name}}">
-                        {{ 'workflow.preventUpdates' | sqxTranslate }}
+                        {{ 'workflows.preventUpdates' | sqxTranslate }}
                     </label>
                 </div>
             </div>
             <ng-container *ngIf="step.noUpdate">
                 <div class="col-auto col-label">
-                    <span class="text-decent">{{ 'workflow.syntax.when' | sqxTranslate }}</span>
+                    <span class="text-decent">{{ 'workflows.syntax.when' | sqxTranslate }}</span>
                 </div>
                 <div class="col col-step-expression">
-                    <input class="form-control" [class.dashed]="!step.noUpdateExpression" spellcheck="false" [disabled]="disabled" [ngModelOptions]="onBlur" [ngModel]="step.noUpdateExpression" (ngModelChange)="changeNoUpdateExpression($event)" placeholder="{{ 'workflow.syntax.expression' | sqxTranslate }}">
+                    <input class="form-control" [class.dashed]="!step.noUpdateExpression" spellcheck="false" [disabled]="disabled" [ngModelOptions]="onBlur" [ngModel]="step.noUpdateExpression" (ngModelChange)="changeNoUpdateExpression($event)" placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}">
                 </div>
                 <div class="col-auto col-label">
-                    <span class="text-decent">{{ 'workflow.syntax.for' | sqxTranslate }}</span>
+                    <span class="text-decent">{{ 'workflows.syntax.for' | sqxTranslate }}</span>
                 </div>
                 <div class="col col-roles">
                     <sqx-tag-editor [allowDuplicates]="false" [dashed]="true" [disabled]="disabled" (ngModelChange)="changeNoUpdateRoles($event)" [ngModel]="step.noUpdateRoles" [ngModelOptions]="onBlur" [singleLine]="true" [suggestions]="roles" placeholder="{{ 'common.role' | sqxTranslate }}">

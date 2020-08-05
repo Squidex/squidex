@@ -1,8 +1,8 @@
-<sqx-title message="{{ 'backups.restore' | sqxTranslate }}"></sqx-title>
+<sqx-title message="i18n:backups.restorePageTitle"></sqx-title>
 
 <sqx-panel theme="light" desiredWidth="70rem">
     <ng-container title>
-        {{ 'backups.restore' | sqxTranslate }}
+        {{ 'backups.restoreTitle' | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
@@ -38,10 +38,10 @@
             <div class="card-footer text-muted">
                 <div class="row">
                     <div class="col">
-                        {{ 'backups.restoreStarted' | sqxTranslate }}: {{job.started | sqxISODate}}
+                        {{ 'backups.restoreStartedLabel' | sqxTranslate }}: {{job.started | sqxISODate}}
                     </div>
                     <div class="col text-right" *ngIf="job.stopped">
-                        {{ 'backups.restoreStopped' | sqxTranslate }}: {{job.stopped | sqxISODate}}
+                        {{ 'backups.restoreStoppedLabel' | sqxTranslate }}: {{job.stopped | sqxISODate}}
                     </div>
                 </div>
             </div>
