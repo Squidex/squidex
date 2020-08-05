@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormArray, FormGroupDirective } from '@angular/forms';
-import { fadeAnimation, StatefulComponent, TranslationsService, Types } from '@app/framework/internal';
+import { fadeAnimation, LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
 import { merge } from 'rxjs';
 
 interface State {
@@ -41,7 +41,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
 
     constructor(changeDetector: ChangeDetectorRef,
         @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
-        private readonly translator: TranslationsService
+        private readonly localizer: LocalizerService
     ) {
         super(changeDetector, {
             errorMessages: []
@@ -61,7 +61,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             if (Types.isString(this.for)) {
                 this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
             } else {
-                this.displayFieldName = this.translator.get('common.field');
+                this.displayFieldName = this.localizer.get('common.field');
             }
         }
 
@@ -137,7 +137,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
 
                     const error = this.control.errors[key];
 
-                    const message = this.translator.get(`validation.${type}`, {
+                    const message = this.localizer.get(`validation.${type}`, {
                         ...error, field: this.displayFieldName
                     });
 

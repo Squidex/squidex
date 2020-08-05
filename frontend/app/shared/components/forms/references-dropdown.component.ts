@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppsState, ContentDto, ContentsService, getContentValue, LanguageDto, StatefulControlComponent, TranslationsService, Types, UIOptions, value$ } from '@app/shared/internal';
+import { AppsState, ContentDto, ContentsService, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, Types, UIOptions, value$ } from '@app/shared/internal';
 
 export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesDropdownComponent), multi: true
@@ -64,7 +64,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
-        private readonly translator: TranslationsService
+        private readonly localizer: LocalizerService
     ) {
         super(changeDetector, {
             contents: [],
@@ -161,13 +161,13 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             const name =
                 content.referenceFields
                     .map(f => getContentValue(content, this.languageField, f, false))
-                    .map(v => v.formatted || this.translator.get('common.noValue'))
+                    .map(v => v.formatted || this.localizer.get('common.noValue'))
                     .filter(v => !!v)
                     .join(', ');
 
             return { name, id: content.id };
         });
 
-        return [{ name:  this.translator.get('contents.noReference') }, ...names];
+        return [{ name:  this.localizer.get('contents.noReference') }, ...names];
     }
 }

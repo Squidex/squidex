@@ -9,7 +9,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, ResourceLoaderService, StatefulControlComponent, TranslationsService, Types, UploadCanceled } from '@app/shared/internal';
+import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, LocalizerService, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 
 declare var tinymce: any;
 
@@ -50,7 +50,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
         private readonly resourceLoader: ResourceLoaderService,
-        private readonly translator: TranslationsService
+        private readonly localizer: LocalizerService
     ) {
         super(changeDetector, undefined);
     }
@@ -118,7 +118,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                     onAction: self.showSelector,
                     icon: 'gallery',
                     text: '',
-                    tooltip: this.translator.get('assets.insertAsset')
+                    tooltip: this.localizer.get('assets.insertAsset')
                 });
 
                 editor.on('init', () => {
