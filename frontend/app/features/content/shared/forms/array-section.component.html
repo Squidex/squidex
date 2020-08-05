@@ -9,9 +9,11 @@
     
     <div class="form-group" *ngFor="let child of formSection.fields; trackBy: trackByField">
         <sqx-field-editor *ngIf="!(child.hiddenChanges | async)"
+            [canUnset]="canUnset"
             [form]="form"
             [formContext]="formContext"
             [formModel]="child"
+            [canUnset]="canUnset"
             [language]="language"
             [languages]="languages">
         </sqx-field-editor>
