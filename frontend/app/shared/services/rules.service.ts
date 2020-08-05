@@ -385,7 +385,7 @@ export class RulesService {
 
                 return ruleEvents;
             }),
-            pretifyError('i18n:rules.loadEventsFailed'));
+            pretifyError('i18n:rules.ruleEvents.loadFailed'));
     }
 
     public enqueueEvent(appName: string, resource: Resource): Observable<any> {
@@ -397,7 +397,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'EventEnqueued', appName);
             }),
-            pretifyError('i18n:rules.enqueueEventFailed'));
+            pretifyError('i18n:rules.ruleEvents.enqueueFailed'));
     }
 
     public cancelEvent(appName: string, resource: Resource): Observable<any> {
@@ -409,7 +409,7 @@ export class RulesService {
             tap(() => {
                 this.analytics.trackEvent('Rule', 'EventDequeued', appName);
             }),
-            pretifyError('i18n:rules.cancelEventFailed'));
+            pretifyError('i18n:rules.ruleEvents.cancelFailed'));
     }
 }
 

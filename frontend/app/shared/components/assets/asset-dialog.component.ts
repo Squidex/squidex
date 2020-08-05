@@ -12,15 +12,15 @@ import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
 const TABS_IMAGE: ReadonlyArray<string> = [
-    'i18n:assets.metadata',
-    'i18n:assets.image',
-    'i18n:assets.focusPoint',
-    'i18n:assets.history'
+    'i18n:assets.tabMetadata',
+    'i18n:assets.tabImage',
+    'i18n:assets.tabFocusPoint',
+    'i18n:assets.tabHistory'
 ];
 
 const TABS_DEFAULT: ReadonlyArray<string> = [
-    'i18n:assets.metadata',
-    'i18n:assets.history'
+    'i18n:assets.tabMetadata',
+    'i18n:assets.tabHistory'
 ];
 
 @Component({

@@ -37,7 +37,7 @@ export class RestorePageComponent {
 
             this.backupsService.postRestore(value)
                 .subscribe(() => {
-                    this.dialogs.notifyInfo('i18n:backup.restoreStarted');
+                    this.dialogs.notifyInfo('i18n:backups.restoreStarted');
                 }, error => {
                     this.dialogs.notifyError(error);
                 });

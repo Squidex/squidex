@@ -115,7 +115,7 @@ const DEFAULT_CONFIG: GridsterItem[] = [
     { cols: 2, rows: 1, x: 0, y: 1, type: 'api-calls', name: 'i18n:dashboard.apiCallsChart' },
     { cols: 2, rows: 1, x: 2, y: 1, type: 'api-performance', name: 'i18n:dashboard.apiPerformanceChart' },
 
-    { cols: 1, rows: 1, x: 0, y: 2, type: 'api-calls-summary', name: 'i18n:dashboard.apiCallsSummary' },
+    { cols: 1, rows: 1, x: 0, y: 2, type: 'api-calls-summary', name: 'i18n:dashboard.apiCallsSummaryCard' },
     { cols: 2, rows: 1, x: 1, y: 2, type: 'asset-uploads-count', name: 'i18n:dashboard.assetUpdloadsCountChart' },
     { cols: 1, rows: 1, x: 2, y: 2, type: 'asset-uploads-size-summary', name: 'i18n:dashboard.assetUploadsSizeChart' },
 

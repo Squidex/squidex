@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col col-name">
                 <sqx-editable-title [disabled]="!rule.canUpdate"
-                    [fallback]="'rules.unnamed' |sqxTranslate" 
+                    [fallback]="'rules.unnamed' | sqxTranslate" 
                     [name]="rule.name"
                     (nameChange)="rename($event)"
                     [maxLength]="60"

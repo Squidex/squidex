@@ -22,10 +22,10 @@
         <div class="col">
             <div>
                 <span title="i18n:backups.backupCountEventsTooltip">
-                    {{ 'common.events' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledEvents | sqxKNumber}}</strong>
+                    {{ 'backups.backupCountEvents' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledEvents | sqxKNumber}}</strong>
                 </span>,
                 <span title="i18n:backups.backupCountAssetsTooltip">
-                    {{ 'common.assets' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledAssets | sqxKNumber}}</strong>
+                    {{ 'backups.backupCountAssets' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledAssets | sqxKNumber}}</strong>
                 </span>
             </div>
             <div *ngIf="backup.stopped && !backup.isFailed">
