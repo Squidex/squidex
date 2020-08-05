@@ -1,25 +1,39 @@
-<div>
+<div (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="500" [sqxResizeMaxWidth]="0">
     <div class="form-inline">
         <div class="form-group mr-1">
+            <div *ngIf="!isCompact && showTime && shouldShowDateTimeModeButton">
+                <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(false)"
+                    *ngIf="isLocalMode">
+                    Local
+                </button>
+                <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(true)"
+                    *ngIf="!isLocalMode">
+                    UTC
+                </button>
+            </div>
             <div class="input-group">
-                <input type="text" class="form-control form-date" [formControl]="dateControl" placeholder="Date" [class.form-date-only]="!showTime"
-                    (blur)="callTouched()" maxlength="10" #dateInput />
+                <input type="text" class="form-control form-date" [formControl]="dateControl" placeholder="Date"
+                    [class.form-date-only]="!showTime" [class.form-date-time-only]="showTime && shouldShowDateTimeModeButton" (blur)="callTouched()"
+                    maxlength="10" #dateInput />
 
-                <input type="text" class="form-control form-time" [formControl]="timeControl" placeholder="Time" 
+                <input type="text" class="form-control form-time" [formControl]="timeControl" placeholder="Time"
                     (blur)="callTouched()" *ngIf="showTime" />
             </div>
 
-            <button type="button" class="btn btn-text-secondary btn-sm btn-clear" [class.hidden]="!hasValue" [disabled]="snapshot.isDisabled" (click)="reset()" *ngIf="!hideClear">
+            <button type="button" class="btn btn-text-secondary btn-sm btn-clear" [class.hidden]="!hasValue"
+                [disabled]="snapshot.isDisabled" (click)="reset()" *ngIf="!hideClear">
                 <i class="icon-close"></i>
             </button>
         </div>
         <div class="form-group" *ngIf="showTime && shouldShowDateButtons">
-            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="Use Now (UTC)">
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()"
+                title="Use Now">
                 Now
             </button>
         </div>
         <div class="form-group" *ngIf="!showTime && shouldShowDateButtons">
-            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="Use Today (UTC)">
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()"
+                title="Use Today">
                 Today
             </button>
         </div>
