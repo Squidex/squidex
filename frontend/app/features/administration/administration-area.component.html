@@ -1,10 +1,10 @@
-<sqx-title message="Administration"></sqx-title>
+<sqx-title message="{{ 'common.administration' | sqxTranslate }}"></sqx-title>
 
 <div class="sidebar">
     <ul class="nav nav-panel flex-column">
         <li class="nav-item" *ngIf="uiState.canReadEvents | async">
             <a class="nav-link" routerLink="event-consumers" routerLinkActive="active">
-                <i class="nav-icon icon-time"></i> <div class="nav-text">Consumers</div>
+                <i class="nav-icon icon-time"></i> <div class="nav-text">{{ 'common.consumers' | sqxTranslate }}</div>
             </a>
         </li>
         <li class="nav-item" *ngIf="uiState.canReadUsers | async">

@@ -1,6 +1,13 @@
 {
+  "/_theme.html": [
+    "*"
+  ],
   "/app.module.ts": [
     "Application element not found"
+  ],
+  "/features/apps/pages/apps-page.component.html": [
+    "&middot;",
+    "|"
   ],
   "/features/content/pages/content/content-page.component.ts": [
     "close the current content view"
@@ -11,6 +18,9 @@
   ],
   "/framework/angular/forms/validators.ts": [
     "matchValidator(): other control is not found in parent group"
+  ],
+  "/framework/angular/pager.component.html": [
+    "*"
   ],
   "/framework/angular/pipes/colors.pipes.ts": [
     "*"
@@ -27,6 +37,12 @@
   ],
   "/framework/angular/resized.directive.ts": [
     "*"
+  ],
+  "/index.html": [
+    "*"
+  ],
+  "/shared/components/app-form.component.html": [
+    "appName"
   ],
   "/shared/components/forms/geolocation-editor.component.ts": [
     "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
@@ -84,5 +100,8 @@
     "is less than or equals to",
     "is not equals to",
     "starts with"
+  ],
+  "/theme/icomoon/demo.html": [
+    "*"
   ]
 }
