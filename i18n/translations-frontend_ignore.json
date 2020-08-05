@@ -9,6 +9,9 @@
     "&middot;",
     "|"
   ],
+  "/features/content/pages/content/content-event.component.html": [
+    "&middot;"
+  ],
   "/features/content/pages/content/content-page.component.ts": [
     "close the current content view"
   ],
