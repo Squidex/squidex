@@ -88,7 +88,11 @@
         <ng-container *ngIf="field['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
-            <div cdkDropList [cdkDropListDisabled]="!isEditable" [cdkDropListData]="nested" (cdkDropListDropped)="sortFields($event)">
+            <div
+                cdkDropList
+                [cdkDropListDisabled]="!isEditable"
+                [cdkDropListData]="nested"
+                (cdkDropListDropped)="sortFields($event)">
                 <div *ngFor="let nested of nested; trackBy: trackByFieldFn" class="nested-field table-drag" cdkDrag cdkDragLockAxis="y">
 
                     <span class="nested-field-line-h"></span>

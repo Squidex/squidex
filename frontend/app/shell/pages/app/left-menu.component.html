@@ -1,7 +1,7 @@
 <ul class="nav flex-column" *ngIf="appsState.selectedApp | async; let app">
     <li class="nav-item" *ngIf="app.canReadSchemas">
         <a class="nav-link" routerLink="schemas" routerLinkActive="active">
-            <i class="nav-icon icon-schemas"></i> <div class="nav-text">{{ 'dashboard.schemas' | sqxTranslate }}</div>
+            <i class="nav-icon icon-schemas"></i> <div class="nav-text">{{ 'common.schemas' | sqxTranslate }}</div>
         </a>
     </li>
     <li class="nav-item" *ngIf="app.canAccessContent">

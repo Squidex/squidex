@@ -4,7 +4,7 @@
             <div class="col-selector">
                 <select class="form-control form-control-dark" [ngModel]="schema?.id" (ngModelChange)="selectSchema($event)">
                     <option *ngFor="let schema of schemas" [ngValue]="schema.id">
-                        {{ 'contents.referencesSelectSchema' | sqxTranslate }}
+                        {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
                     </option>
                 </select>
             </div>
@@ -15,8 +15,7 @@
         <div class="row no-gutters">
             <div class="col-auto">          
                 <div *ngIf="schema && languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages">
-                    </sqx-language-selector>
+                    <sqx-language-selector class="languages-buttons"(selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
                 </div>
             </div>
 
@@ -37,7 +36,13 @@
     <ng-container content>
         <ng-container *ngIf="schema && contentForm">
             <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-                <sqx-content-section *ngFor="let section of contentForm.sections" [(language)]="language" [form]="contentForm" [formContext]="contentFormContext" [formSection]="section" [languages]="languages" [schema]="schema">
+                <sqx-content-section *ngFor="let section of contentForm.sections"
+                    [(language)]="language"
+                    [form]="contentForm"
+                    [formContext]="contentFormContext"
+                    [formSection]="section"
+                    [languages]="languages"
+                    [schema]="schema">
                 </sqx-content-section>
             </form>
         </ng-container>

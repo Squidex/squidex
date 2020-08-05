@@ -3,7 +3,7 @@
 <sqx-panel theme="dark" [desiredWidth]="width" [showClose]="!isCollapsed" showSecondHeader="true">
     <ng-container title>
         <ng-container *ngIf="!isCollapsed">
-            {{ 'dashboard.schemas' | sqxTranslate }}
+            {{ 'common.schemas' | sqxTranslate }}
         </ng-container>
     </ng-container>
 
@@ -28,13 +28,16 @@
     <ng-container content>
         <div [class.hidden]="isCollapsed">
             <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
-                <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory" [schemaCategory]="category" [schemasFilter]="schemasFilter.valueChanges | async" [forContent]="true">
+                <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
+                    [schemaCategory]="category"
+                    [schemasFilter]="schemasFilter.valueChanges | async"
+                    [forContent]="true">
                 </sqx-schema-category>
             </ng-container>
         </div>
 
         <div class="headline" [class.hidden]="!isCollapsed">
-            {{ 'dashboard.schemas' | sqxTranslate }}
+            {{ 'common.schemas' | sqxTranslate }}
         </div>
     </ng-container>
 </sqx-panel>

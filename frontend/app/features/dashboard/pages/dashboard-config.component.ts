@@ -107,9 +107,9 @@ export class DashboardConfigComponent implements OnChanges {
 }
 
 const DEFAULT_CONFIG: GridsterItem[] = [
-    { cols: 1, rows: 1, x: 0, y: 0, type: 'schemas', name: 'i18n:dashboard.schemas' },
+    { cols: 1, rows: 1, x: 0, y: 0, type: 'schemas', name: 'i18n:common.schemas' },
     { cols: 1, rows: 1, x: 1, y: 0, type: 'api', name: 'i18n:dashboard.apiDocumentation' },
-    { cols: 1, rows: 1, x: 2, y: 0, type: 'support', name: 'i18n:dashboard.schemas' },
+    { cols: 1, rows: 1, x: 2, y: 0, type: 'support', name: 'i18n:common.schemas' },
     { cols: 1, rows: 1, x: 3, y: 0, type: 'github', name: 'i18n:dashboard.github' },
 
     { cols: 2, rows: 1, x: 0, y: 1, type: 'api-calls', name: 'i18n:dashboard.apiCallsChart' },

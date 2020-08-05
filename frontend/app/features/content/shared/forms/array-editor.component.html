@@ -1,6 +1,21 @@
-<div class="array-container" *ngIf="formModel.items.length > 0" cdkDropList [cdkDropListDisabled]="false" [cdkDropListData]="formModel.items" (cdkDropListDropped)="sort($event)">
+<div class="array-container" *ngIf="formModel.items.length > 0"
+    cdkDropList
+    [cdkDropListDisabled]="false"
+    [cdkDropListData]="formModel.items"
+    (cdkDropListDropped)="sort($event)">
     <div *ngFor="let itemForm of formModel.items; index as i; last as isLast; first as isFirst" class="table-drag item" cdkDrag cdkDragLockAxis="y">
-        <sqx-array-item [canUnset]="canUnset" [form]="form" [formContext]="formContext" [formModel]="itemForm" [index]="i" [isDisabled]="formModel.form.disabled" [isFirst]="isFirst" [isLast]="isLast" [language]="language" [languages]="languages" (clone)="itemAdd(itemForm)" (move)="move(itemForm, $event)" (remove)="itemRemove(i)">
+        <sqx-array-item
+            [canUnset]="canUnset"
+            [form]="form"
+            [formContext]="formContext"
+            [formModel]="itemForm"
+            [index]="i"
+            [isDisabled]="formModel.form.disabled"
+            [isFirst]="isFirst"
+            [isLast]="isLast"
+            [language]="language"
+            [languages]="languages"
+            (clone)="itemAdd(itemForm)" (move)="move(itemForm, $event)" (remove)="itemRemove(i)">
             <i cdkDragHandle class="icon-drag2"></i>
         </sqx-array-item>
     </div>

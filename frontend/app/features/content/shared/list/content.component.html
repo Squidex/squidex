@@ -26,7 +26,10 @@
                     <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
                         {{ 'common.statusChangeTo' | sqxTranslate }} 
 
-                        <sqx-content-status layout="text" small="true" [status]="info.status" [statusColor]="info.color">
+                        <sqx-content-status small="true"
+                            layout="text"
+                            [status]="info.status"
+                            [statusColor]="info.color">
                         </sqx-content-status>
                     </a>
                     <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="canClone">
@@ -47,7 +50,12 @@
     </td>
 
     <td *ngFor="let field of listFields" [sqxContentListCell]="field" [sqxStopClick]="shouldStop(field)">
-        <sqx-content-list-field [field]="field" [patchForm]="patchForm?.form" [patchAllowed]="patchAllowed" [content]="content" [language]="language">
+        <sqx-content-list-field
+            [field]="field"
+            [patchForm]="patchForm?.form"
+            [patchAllowed]="patchAllowed"
+            [content]="content"
+            [language]="language">
         </sqx-content-list-field>
     </td>
 </tr>

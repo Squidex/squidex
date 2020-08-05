@@ -44,7 +44,13 @@
     
     <div class="card-body" [class.hidden]="isCollapsed">
         <div class="form-group" *ngFor="let section of formModel.sections">
-            <sqx-array-section [canUnset]="canUnset" [form]="form" [formContext]="formContext" [formSection]="section" [language]="language" [languages]="languages">
+            <sqx-array-section
+                [canUnset]="canUnset"
+                [form]="form"
+                [formContext]="formContext"
+                [formSection]="section"
+                [language]="language"
+                [languages]="languages">
             </sqx-array-section>
         </div>
     </div>

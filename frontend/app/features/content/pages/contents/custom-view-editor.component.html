@@ -7,8 +7,10 @@
     
     <hr>
 
-    <div cdkDropList [cdkDropListData]="fieldNames" (cdkDropListDropped)="drop($event)">
-    
+    <div
+        cdkDropList
+        [cdkDropListData]="fieldNames"
+        (cdkDropListDropped)="drop($event)">
         <div *ngFor="let field of fieldNames" cdkDrag>
             <i class="icon-drag2 drag-handle"></i> 
             

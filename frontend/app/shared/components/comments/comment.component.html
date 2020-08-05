@@ -14,7 +14,7 @@
     
                 <div class="comment-created text-muted">
                     <ng-container *ngIf="canFollow && comment.url">
-                        <a [routerLink]="comment.url">{{ 'commonts.follow' | sqxTranslate }}</a>&nbsp;
+                        <a [routerLink]="comment.url">{{ 'comments.follow' | sqxTranslate }}</a>&nbsp;
                     </ng-container>
     
                     {{comment.time | sqxFromNow}} 

@@ -25,7 +25,7 @@
                 <ng-container *ngIf="rolesState.roles | async; let roles">
                     <ng-container *ngIf="contributorsState.maxContributors | async; let maxContributors">
                         <div class="panel-alert panel-alert-success" *ngIf="maxContributors > 0">
-                            {{ 'contributors.planHint' | sqxTranslate }}
+                            {{ 'contributors.planHint' | sqxTranslate: { maxContributors: maxContributors } }}
                         </div>
                     </ng-container>
                     <ng-container *ngIf="contributorsState.canCreate | async">
@@ -67,7 +67,7 @@
 
     <ng-container sidebar>
         <div class="panel-nav">
-            <a class="panel-link" routerLink="history" routerLinkActive="active" title="i18n:assets.history" titlePosition="left">
+            <a class="panel-link" routerLink="history" routerLinkActive="active" title="i18n:common.history" titlePosition="left">
                 <i class="icon-time"></i>
             </a>
 

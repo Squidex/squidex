@@ -1,8 +1,8 @@
-<sqx-title message="i18n:dashboard.schemas"></sqx-title>
+<sqx-title message="i18n:common.schemas"></sqx-title>
 
 <sqx-panel theme="dark" desiredWidth="30rem" showSecondHeader="true">
     <ng-container title>
-        {{ 'dashboard.schemas' | sqxTranslate }}
+        {{ 'common.schemas' | sqxTranslate }}
     </ng-container>
     
     <ng-container secondHeader>
@@ -25,7 +25,10 @@
 
     <ng-container content>
         <div cdkDropListGroup>
-            <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory" [schemaCategory]="category" [schemasFilter]="schemasFilter.valueChanges | async" (remove)="removeCategory(category.name)">
+            <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
+                [schemaCategory]="category"
+                [schemasFilter]="schemasFilter.valueChanges | async"
+                (remove)="removeCategory(category.name)">
             </sqx-schema-category>
         </div>
 

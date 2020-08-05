@@ -1,10 +1,14 @@
 <div class="card card">
-    <div class="card-header">{{ 'dashboard.apiCalls' | sqxTranslate }}</div>
+    <div class="card-header">{{ 'dashboard.apiCallsSummaryCard' | sqxTranslate }}</div>
     <div class="card-body">
         <div class="aggregation" *ngIf="callsTotal >= 0">
             <div class="aggregation-label">{{ 'dashboard.currentMonthLabel' | sqxTranslate }}</div>
+
             <div class="aggregation-value">{{callsTotal | sqxKNumber}}</div>
-            <div class="aggregation-label" *ngIf="callsAllowed > 0">{{ 'dashboard.callsLimit' | sqxTranslate }}</div>
+
+            <div class="aggregation-label" *ngIf="callsAllowed > 0">
+                {{ 'dashboard.apiCallsLimitLabel' | sqxTranslate }}: {{callsAllowed | sqxKNumber}}
+            </div>
         </div>
     </div>
 </div>

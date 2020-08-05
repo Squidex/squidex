@@ -35,7 +35,8 @@
 
             <div content>
                 <table class="table table-items table-fixed" [sqxSyncWidth]="header">        
-                    <tbody *ngFor="let eventConsumer of eventConsumersState.eventConsumers | async; trackBy: trackByEventConsumer" [sqxEventConsumer]="eventConsumer" (error)="showError(eventConsumer)">
+                    <tbody *ngFor="let eventConsumer of eventConsumersState.eventConsumers | async; trackBy: trackByEventConsumer"
+                        [sqxEventConsumer]="eventConsumer" (error)="showError(eventConsumer)">
                     </tbody>
                 </table>
             </div>

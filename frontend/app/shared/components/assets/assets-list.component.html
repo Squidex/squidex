@@ -23,17 +23,29 @@
                 </ng-container>
         
                 <div class="row no-gutters">
-                    <div class="folder-container" *ngIf="state.parentFolder | async; let parent" cdkDropList [cdkDropListData]="parent?.id" (cdkDropListDropped)="move($event)">
+                    <div class="folder-container" *ngIf="state.parentFolder | async; let parent"
+                        cdkDropList
+                        [cdkDropListData]="parent?.id"
+                        (cdkDropListDropped)="move($event)">
                         <div class="folder-container-over"></div>
             
                         <sqx-asset-folder [assetFolder]="parent" (navigate)="state.navigate($event.id)">
                         </sqx-asset-folder>
                     </div>
                     
-                    <div class="folder-container" *ngFor="let assetFolder of state.assetFolders | async; trackBy: trackByAssetItem" cdkDropList cdkDropListSortingDisabled [cdkDropListData]="assetFolder.id" (cdkDropListDropped)="move($event)" [cdkDropListEnterPredicate]="canEnter">
+                    <div class="folder-container" *ngFor="let assetFolder of state.assetFolders | async; trackBy: trackByAssetItem"
+                        cdkDropList cdkDropListSortingDisabled
+                        [cdkDropListData]="assetFolder.id" 
+                        (cdkDropListDropped)="move($event)"
+                        [cdkDropListEnterPredicate]="canEnter">
                         <div class="folder-container-over"></div>
         
-                        <sqx-asset-folder [assetFolder]="assetFolder" cdkDrag [cdkDragData]="assetFolder" [cdkDragDisabled]="isDisabled || !assetFolder.canMove" (navigate)="state.navigate($event.id)" (delete)="deleteAssetFolder($event)">
+                        <sqx-asset-folder
+                            [assetFolder]="assetFolder"
+                            cdkDrag
+                            [cdkDragData]="assetFolder"
+                            [cdkDragDisabled]="isDisabled || !assetFolder.canMove"
+                            (navigate)="state.navigate($event.id)" (delete)="deleteAssetFolder($event)">
                         </sqx-asset-folder>
                     </div>
                 </div>
@@ -44,11 +56,29 @@
                     <h5>{{ 'common.files' | sqxTranslate }}</h5>
                 </ng-container>
                 
-                <div class="row no-gutters" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags" (paste)="addFiles($event)" cdkDropList cdkDropListSortingDisabled>
-                    <sqx-asset *ngFor="let file of newFiles" [assetFile]="file" [assetsState]="state" [isListView]="isListView" (loadError)="remove(file)" (load)="add(file, $event)">
+                <div class="row no-gutters" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags" (paste)="addFiles($event)"
+                    cdkDropList
+                    cdkDropListSortingDisabled>
+                    <sqx-asset *ngFor="let file of newFiles" 
+                        [assetFile]="file"
+                        [assetsState]="state"
+                        [isListView]="isListView"
+                        (loadError)="remove(file)"
+                        (load)="add(file, $event)">
                     </sqx-asset>
         
-                    <sqx-asset *ngFor="let asset of assets; trackBy: trackByAssetItem" cdkDrag [cdkDragData]="asset" [cdkDragDisabled]="isDisabled || !asset.canMove" [asset]="asset" [assetsState]="state" [isListView]="isListView" [isDisabled]="isDisabled" [isSelectable]="!!selectedIds" [isSelected]="isSelected(asset)" [allTags]="tags" (select)="select.emit(asset)" (delete)="deleteAsset(asset)">
+                    <sqx-asset *ngFor="let asset of assets; trackBy: trackByAssetItem"
+                        cdkDrag
+                        [cdkDragData]="asset"
+                        [cdkDragDisabled]="isDisabled || !asset.canMove"
+                        [asset]="asset"
+                        [assetsState]="state"
+                        [isListView]="isListView"
+                        [isDisabled]="isDisabled"
+                        [isSelectable]="!!selectedIds"
+                        [isSelected]="isSelected(asset)"
+                        [allTags]="tags" 
+                        (select)="select.emit(asset)" (delete)="deleteAsset(asset)">
                     </sqx-asset>
                 </div>
             </ng-container>

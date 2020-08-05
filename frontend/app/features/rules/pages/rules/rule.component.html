@@ -2,7 +2,12 @@
     <div class="card-header">
         <div class="row">
             <div class="col col-name">
-                <sqx-editable-title fallback="Unnamed Rule" [name]="rule.name" (nameChange)="rename($event)" [maxLength]="60" [isRequired]="false" [disabled]="!rule.canUpdate">
+                <sqx-editable-title [disabled]="!rule.canUpdate"
+                    [fallback]="'rules.unnamed' |sqxTranslate" 
+                    [name]="rule.name"
+                    (nameChange)="rename($event)"
+                    [maxLength]="60"
+                    [isRequired]="false">
                 </sqx-editable-title>
             </div>
             <div class="col-auto" *ngIf="rule.canDelete || rule.canRun">

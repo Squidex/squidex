@@ -10,8 +10,8 @@
                     <textarea class="form-control content" placeholder="user1@squidex.io;user2@squidex.io" formControlName="import"></textarea>
                    
                     <sqx-form-hint>
-                        <ng-container *ngIf="importForm.numberOfEmails | async; let emails">
-                            {{ 'contributors.import.emailsDetected' | sqxTranslate }}
+                        <ng-container *ngIf="importForm.numberOfEmails | async; let count">
+                            {{ 'contributors.import.emailsDetected' | sqxTranslate: { count: count } }}
                         </ng-container>
         
                         &nbsp;

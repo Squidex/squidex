@@ -17,11 +17,19 @@
             <div class="col pl-1" style="width: 300px">
                 <div class="row no-gutters search">
                     <div class="col-6">
-                        <sqx-tag-editor class="tags" singleLine="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}" [suggestions]="assetsState.tagsNames | async" [ngModel]="assetsState.selectedTagNames | async" (ngModelChange)="selectTags($event)" [undefinedWhenEmpty]="false">
+                        <sqx-tag-editor class="tags" singleLine="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
+                            [suggestions]="assetsState.tagsNames | async"
+                            [ngModel]="assetsState.selectedTagNames | async"
+                            (ngModelChange)="selectTags($event)"
+                            [undefinedWhenEmpty]="false">
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">
-                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize" [query]="assetsState.assetsQuery | async" [queries]="queries" (queryChange)="search($event)" enableShortcut="true">
+                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize"
+                            [query]="assetsState.assetsQuery | async"
+                            [queries]="queries"
+                            (queryChange)="search($event)"
+                            enableShortcut="true">
                         </sqx-search-form>
                     </div>
                 </div>
@@ -49,8 +57,7 @@
     <ng-container content>
         <sqx-list-view [isLoading]="assetsState.isLoading | async">
             <ng-container header>
-                <sqx-asset-path [path]="assetsState.path | async" (navigate)="assetsState.navigate($event)">
-                </sqx-asset-path>
+                <sqx-asset-path [path]="assetsState.path | async" (navigate)="assetsState.navigate($event)"></sqx-asset-path>
             </ng-container>
 
             <div content>
@@ -73,8 +80,7 @@
 </sqx-panel>
 
 <ng-container *sqxModal="addAssetFolderDialog">
-    <sqx-asset-folder-dialog (complete)="addAssetFolderDialog.hide()">
-    </sqx-asset-folder-dialog>
+    <sqx-asset-folder-dialog (complete)="addAssetFolderDialog.hide()"></sqx-asset-folder-dialog>
 </ng-container>
 
 <router-outlet></router-outlet>

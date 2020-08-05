@@ -6,21 +6,21 @@
 
         <ng-container *ngIf="app.canReadSchemas; else noPermission">
             <h4 class="card-title">
-                <a [routerLink]="['schemas', { showDialog: true }]">{{ 'schemas.new' | sqxTranslate }}</a>
+                <a [routerLink]="['schemas', { showDialog: true }]">{{ 'dashboard.schemaNewCard' | sqxTranslate }}</a>
             </h4>
 
             <div class="card-text">
-                {{ 'dashboard.newSchemaCardDescription' | sqxTranslate }}
+                {{ 'dashboard.schemaNewCardDescription' | sqxTranslate }}
             </div>
         </ng-container>
 
         <ng-template #noPermission>
             <h4 class="card-title">
-                <a [routerLink]="['schemas']">{{ 'dashboard.schemas' | sqxTranslate }}</a>
+                <a [routerLink]="['schemas']">{{ 'dashboard.schemasCard' | sqxTranslate }}</a>
             </h4>
 
             <div class="card-text">
-                {{ 'dashboard.newSchemaCardDescriptionReader' | sqxTranslate }}
+                {{ 'dashboard.schemasCardDescription' | sqxTranslate }}
             </div>
         </ng-template>
     </div>

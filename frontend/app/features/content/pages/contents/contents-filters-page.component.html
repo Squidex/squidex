@@ -4,7 +4,11 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-query-list [queryUsed]="contentsState.contentsQuery | async" [queries]="schemaQueries.defaultQueries" (search)="search($event)">
+        <sqx-query-list
+            [types]="'common.contents' | sqxTranslate"
+            [queryUsed]="contentsState.contentsQuery | async"
+            [queries]="schemaQueries.defaultQueries"
+            (search)="search($event)">
         </sqx-query-list>
 
         <hr>
@@ -12,13 +16,21 @@
         <div class="sidebar-section">
             <h3>{{ 'contents.statusQueries' | sqxTranslate }}</h3>
 
-            <sqx-query-list [queryUsed]="contentsState.contentsQuery | async" [queries]="contentsState.statusQueries | async" (search)="search($event)">
+            <sqx-query-list
+                [types]="'common.contents' | sqxTranslate"
+                [queryUsed]="contentsState.contentsQuery | async"
+                [queries]="contentsState.statusQueries | async"
+                (search)="search($event)">
             </sqx-query-list>
         </div>
 
         <hr>
 
-        <sqx-shared-queries types="contents" [queryUsed]="contentsState.contentsQuery | async" [queries]="schemaQueries" (search)="search($event)">
+        <sqx-shared-queries
+            [types]="'common.contents' | sqxTranslate"
+            [queryUsed]="contentsState.contentsQuery | async"
+            [queries]="schemaQueries"
+            (search)="search($event)">
         </sqx-shared-queries>
     </ng-container>
 </sqx-panel>

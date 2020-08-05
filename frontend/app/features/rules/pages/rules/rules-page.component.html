@@ -29,7 +29,7 @@
                         <a class="force" (click)="cancelRun()">{{ 'common.cancel' | sqxTranslate }}</a>
                     </div>
 
-                    {{ 'rules.runningRule' | sqxTranslate }}
+                    {{ 'rules.runningRule' | sqxTranslate: { name: runningRule.name || 'Unnamed Rule' } }}
                 </div>
             </ng-container>
 
@@ -44,12 +44,24 @@
                     </div>
         
                     <table class="table table-items table-fixed">
-                        <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule" [rule]="rule" [ruleActions]="ruleActions" [ruleTriggers]="ruleTriggers" (delete)="delete(rule)" (editAction)="editAction(rule)" (editTrigger)="editTrigger(rule)" (toggle)="toggle(rule)">
+                        <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule"
+                            [rule]="rule"
+                            [ruleActions]="ruleActions"
+                            [ruleTriggers]="ruleTriggers"
+                            (delete)="delete(rule)"
+                            (editAction)="editAction(rule)"
+                            (editTrigger)="editTrigger(rule)"
+                            (toggle)="toggle(rule)">
                         </sqx-rule>
                     </table>
         
                     <ng-container *sqxModal="addRuleDialog">
-                        <sqx-rule-wizard [schemas]="schemasState.schemas | async" [rule]="wizardRule" [ruleActions]="ruleActions" [ruleTriggers]="ruleTriggers" [mode]="wizardMode" (complete)="addRuleDialog.hide()">
+                        <sqx-rule-wizard [schemas]="schemasState.schemas | async"
+                            [rule]="wizardRule"
+                            [ruleActions]="ruleActions"
+                            [ruleTriggers]="ruleTriggers"
+                            [mode]="wizardMode"
+                            (complete)="addRuleDialog.hide()">
                         </sqx-rule-wizard>
                     </ng-container>
                 </ng-container>
@@ -60,7 +72,7 @@
     <ng-container sidebar>
         <div class="panel-nav">
             <ng-container *ngIf="rulesState.canReadEvents | async">
-                <a class="panel-link panel-link-gray" routerLink="events" routerLinkActive="active" title="i18n:assets.history" titlePosition="left">
+                <a class="panel-link panel-link-gray" routerLink="events" routerLinkActive="active" title="i18n:common.history" titlePosition="left">
                     <i class="icon-time"></i>
                 </a>
             </ng-container>

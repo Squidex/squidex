@@ -3,8 +3,12 @@
     <div class="card-body">
         <div class="aggregation" *ngIf="storageCurrent >= 0">
             <div class="aggregation-label">{{ 'dashboard.assetSizeLabel' | sqxTranslate }}</div>
+
             <div class="aggregation-value">{{storageCurrent | sqxFileSize}}</div>
-            <div class="aggregation-label" *ngIf="storageAllowed > 0">{{ 'dashboard.assetSizeLimit' | sqxTranslate }}</div>
+
+            <div class="aggregation-label" *ngIf="storageAllowed > 0">
+                {{ 'dashboard.assetSizeLimitLabel' | sqxTranslate }}:  {{storageAllowed | sqxFileSize}}
+            </div>
         </div>
     </div>
 </div>

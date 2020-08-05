@@ -8,13 +8,13 @@
     <div class="card-body">
         <div class="plan-fact text-center">
             <div>
-                <strong>{{planInfo.plan.maxApiCalls | sqxKNumber}}</strong> {{ 'dashboard.apiCalls' | sqxTranslate }}
+                <strong>{{planInfo.plan.maxApiCalls | sqxKNumber}}</strong> {{ 'plans.includedCalls' | sqxTranslate }}
             </div>
             <div>
-                {{planInfo.plan.maxAssetSize | sqxFileSize}} Storage
+                {{planInfo.plan.maxAssetSize | sqxFileSize}} {{ 'plans.includedStorage' | sqxTranslate }}
             </div>
             <div>
-                {{planInfo.plan.maxContributors}} Contributors
+                {{planInfo.plan.maxContributors}} {{ 'plans.includedContributors' | sqxTranslate }}
             </div>
         </div>
     

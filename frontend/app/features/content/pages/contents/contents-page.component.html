@@ -17,7 +17,12 @@
                 </button>
             </div>
             <div class="col pl-1">
-                <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}" (queryChange)="search($event)" [query]="contentsState.contentsQuery | async" [queries]="queries" [queryModel]="queryModel" [language]="languageMaster" enableShortcut="true">
+                <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
+                    (queryChange)="search($event)"
+                    [query]="contentsState.contentsQuery | async"
+                    [queries]="queries"
+                    [queryModel]="queryModel"
+                    [language]="languageMaster" enableShortcut="true">
                 </sqx-search-form>
             </div>
             <div class="col-auto pl-1" *ngIf="languages.length > 1">
@@ -25,7 +30,7 @@
             </div>
             <div class="col-auto pl-1">
                 <button type="button" class="btn btn-success" #newButton routerLink="new" title="i18n:contents.createContentTooltip" [disabled]="(contentsState.canCreateAny | async) === false">
-                    <i class="icon-plus"></i> {{ 'users.create' | sqxTranslate }}
+                    <i class="icon-plus"></i> {{ 'contents.create' | sqxTranslate }}
                 </button>
                 
                 <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()"></sqx-shortcut>
@@ -38,10 +43,12 @@
             <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
                 <ng-container topHeader>
                     <div class="selection" *ngIf="selectionCount > 0">
-                        {{selectionCount}} items selected&nbsp;&nbsp;
+                        {{ 'contents.selectionCount' | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
             
                         <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of nextStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
-                            <sqx-content-status layout="text" [status]="status" [statusColor]="nextStatuses[status]">
+                            <sqx-content-status layout="text"
+                                [status]="status"
+                                [statusColor]="nextStatuses[status]">
                             </sqx-content-status>
                         </button>
                         
@@ -60,7 +67,9 @@
 
                         <ng-container *sqxModal="tableViewModal">
                             <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" @fade position="bottom-right">
-                                <sqx-custom-view-editor [allFields]="tableView.allFields" (fieldNamesChange)="tableView.updateFields($event)" [fieldNames]="tableView.listFieldNames | async">
+                                <sqx-custom-view-editor [allFields]="tableView.allFields" 
+                                    (fieldNamesChange)="tableView.updateFields($event)"
+                                    [fieldNames]="tableView.listFieldNames | async">
                                 </sqx-custom-view-editor>
                             </div>
                         </ng-container>
@@ -78,7 +87,11 @@
                                     {{ 'common.actions' | sqxTranslate }}
                                 </th>
                                 <th *ngFor="let field of listFields" [sqxContentListCell]="field">
-                                    <sqx-content-list-header [field]="field" (queryChange)="search($event)" [query]="contentsState.contentsQuery | async" [language]="language">
+                                    <sqx-content-list-header
+                                        [field]="field"
+                                        (queryChange)="search($event)"
+                                        [query]="contentsState.contentsQuery | async"
+                                        [language]="language">
                                     </sqx-content-list-header>
                                 </th>
                             </tr>
@@ -89,7 +102,17 @@
                 <ng-container syncedContent>
                     <div class="table-container">
                         <table class="table table-items table-fixed" [style.minWidth]="listFields | sqxContentListWidth" [sqxSyncWidth]="header">
-                            <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent" [sqxContent]="content" (delete)="delete(content)" [selected]="isItemSelected(content)" (selectedChange)="selectItem(content, $event)" (statusChange)="changeStatus(content, $event)" (clone)="clone(content)" [canClone]="contentsState.snapshot.canCreate" [language]="language" [link]="[content.id, 'history']" [listFields]="listFields">
+                            <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent" 
+                                [sqxContent]="content"
+                                (delete)="delete(content)"
+                                [selected]="isItemSelected(content)"
+                                (selectedChange)="selectItem(content, $event)"
+                                (statusChange)="changeStatus(content, $event)"
+                                (clone)="clone(content)"
+                                [canClone]="contentsState.snapshot.canCreate"
+                                [language]="language"
+                                [link]="[content.id, 'history']"
+                                [listFields]="listFields">
                             </tbody>
                         </table>
                     </div>

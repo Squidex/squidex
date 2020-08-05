@@ -10,7 +10,10 @@
     </button>
 
     <ng-container *ngIf="field.properties.isComplexUI || !showAllControls">
-        <sqx-language-selector size="sm" #buttonLanguages [selectedLanguage]="language" (selectedLanguageChange)="languageChange.emit($event)" [languages]="languages">
+        <sqx-language-selector size="sm" #buttonLanguages
+            [selectedLanguage]="language"
+            (selectedLanguageChange)="languageChange.emit($event)"
+            [languages]="languages">
         </sqx-language-selector>
 
         <sqx-onboarding-tooltip helpId="languages" [for]="buttonLanguages" position="top-right" after="120000">
