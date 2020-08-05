@@ -5,9 +5,9 @@
         </a>
     </li>
     <li class="nav-item nav-icon dropdown" #button>
-        <span class="nav-link dropdown-toggle"(click)="modalMenu.toggle()">
+        <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
             <span class="user">
-                <img class="user-picture" [src]="snapshot.profileId | sqxUserIdPicture" />
+                <img class="user-picture" [src]="snapshot.profileId | sqxUserIdPicture">
                 
                 <span class="profile-name">{{snapshot.profileDisplayName}}</span>
             </span>
@@ -18,7 +18,7 @@
 <ng-container *sqxModal="modalMenu;closeAlways:true;onRoot:false">
     <div class="dropdown-menu" [sqxAnchoredTo]="button" [offset]="10" @fade>
         <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
-            <div>Signed in with</div>
+            <div>{{ 'profile.userEmail' | sqxTranslate }}</div>
     
             <strong>{{snapshot.profileEmail}}</strong>
         </a>
@@ -26,17 +26,17 @@
         <div class="dropdown-divider"></div>
 
         <a class="dropdown-item" routerLink="/app/administration" *ngIf="uiState.canUserAdminResource | async">
-            Administration
+            {{ 'common.administration' | sqxTranslate }}
         </a>
 
         <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
-            Profile
+            {{ 'profile.title' | sqxTranslate }}
         </a>
 
         <div class="dropdown-divider"></div>
 
         <a class="dropdown-item" (click)="logout()" sqxExternalLink>
-            Logout
+            {{ 'common.logout' | sqxTranslate }}
         </a>
     </div>
 </ng-container>

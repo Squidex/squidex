@@ -1,8 +1,8 @@
-<sqx-title message="Restore Backup"></sqx-title>
+<sqx-title message="{{ 'backups.restore' | sqxTranslate }}"></sqx-title>
 
 <sqx-panel theme="light" desiredWidth="70rem">
     <ng-container title>
-        Restore Backup
+        {{ 'backups.restore' | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
@@ -22,7 +22,7 @@
                     </div>
                         
                     <div class="col">
-                        <h3>Last Restore Operation</h3>
+                        <h3>{{ 'backups.restoreLastStatus' | sqxTranslate }}</h3>
                     </div>
 
                     <div class="col text-right restore-url">
@@ -38,10 +38,10 @@
             <div class="card-footer text-muted">
                 <div class="row">
                     <div class="col">
-                        Started: {{job.started | sqxISODate}}
+                        {{ 'backups.restoreStarted' | sqxTranslate }}: {{job.started | sqxISODate}}
                     </div>
                     <div class="col text-right" *ngIf="job.stopped">
-                        Stopped: {{job.stopped | sqxISODate}}
+                        {{ 'backups.restoreStopped' | sqxTranslate }}: {{job.stopped | sqxISODate}}
                     </div>
                 </div>
             </div>
@@ -51,13 +51,13 @@
             <form [formGroup]="restoreForm.form" (ngSubmit)="restore()">
                 <div class="row no-gutters">
                     <div class="col">
-                        <input class="form-control" formControlName="url" placeholder="Url to backup" />
+                        <input class="form-control" formControlName="url" placeholder="{{ 'backups.restoreLastUrl' | sqxTranslate }}">
                     </div>
                     <div class="col pl-1">
-                        <input class="form-control" formControlName="name" placeholder="Optional app name" />
+                        <input class="form-control" formControlName="name" placeholder="{{ 'backups.restoreNewAppName' | sqxTranslate }}">
                     </div>
                     <div class="col-auto pl-1">
-                        <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">Restore Backup</button>
+                        <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">{{ 'backups.restore' | sqxTranslate }}</button>
                     </div>
                 </div>
             </form>

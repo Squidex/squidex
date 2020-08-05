@@ -5,11 +5,11 @@
                 <div class="form-group mr-2">
                     <sqx-control-errors for="name"></sqx-control-errors>
                     
-                    <input type="text" class="form-control form-underlined" formControlName="name" [maxLength]="maxLength" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" spellcheck="false" />
+                    <input type="text" class="form-control form-underlined" formControlName="name" [maxLength]="maxLength" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" spellcheck="false">
                 </div>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary mr-1" [disabled]="!renameForm.valid || !renameForm.dirty">Save</button>
+                <button type="submit" class="btn btn-primary mr-1" [disabled]="!renameForm.valid || !renameForm.dirty">{{ 'common.save' | sqxTranslate }}</button>
         
                 <button type="button" class="btn btn-text-secondary btn-cancel mr-4" (click)="toggleRename()">
                     <i class="icon-close"></i>

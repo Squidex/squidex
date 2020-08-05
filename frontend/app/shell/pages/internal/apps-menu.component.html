@@ -6,7 +6,7 @@
             </ng-container>
 
             <ng-template #noApp>
-                Apps Overview
+                {{ 'apps.appsButtonFallbackTitle' | sqxTranslate }}
             </ng-template>
         </span>
 
@@ -14,7 +14,7 @@
             <ng-container *sqxModal="appsMenu;closeAlways:true;onRoot:false">
                 <div class="dropdown-menu" [sqxAnchoredTo]="button" position="bottom-left" @fade>
                     <a class="dropdown-item all-apps" routerLink="/app">
-                        <span class="all-apps-text">All Apps</span> 
+                        <span class="all-apps-text">{{ 'apps.allApps' | sqxTranslate }}</span> 
                         <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
                     </a>
         
@@ -31,7 +31,7 @@
         
                         <div class="dropdown-button">
                             <button type="button" class="btn btn-block btn-success" (click)="addAppDialog.show()">
-                                <i class="icon-plus"></i> Create New App
+                                <i class="icon-plus"></i> {{ 'apps.create' | sqxTranslate }}
                             </button>
                         </div>
                     </ng-container>
@@ -44,10 +44,10 @@
         <li class="nav-item" *ngIf="app.planUpgrade && app.planName">
             <div class="btn-group app-upgrade">
                 <button type="button" class="btn btn-primary btn-plan">
-                    You are on the <strong>{{app.planName}}</strong> plan.
+                    <span [innerHTML]="'apps.upgradeHintCurrent' | sqxTranslate: { plan: app.planName } | sqxMarkdown"></span>
                 </button>
                 <button type="button" class="btn btn-warning" [routerLink]="['/app', app.name, 'settings', 'plans']">
-                    Upgrade!
+                    {{ 'apps.upgradeHintUpgrade' | sqxTranslate }}
                 </button>
             </div>
         </li>
@@ -56,7 +56,6 @@
 
 
 <ng-container *sqxModal="addAppDialog">
-    <sqx-app-form 
-        (complete)="addAppDialog.hide()">
+    <sqx-app-form (complete)="addAppDialog.hide()">
     </sqx-app-form>
 </ng-container>

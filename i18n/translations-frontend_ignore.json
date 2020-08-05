@@ -19,6 +19,9 @@
   "/framework/angular/forms/validators.ts": [
     "matchValidator(): other control is not found in parent group"
   ],
+  "/framework/angular/modals/dialog-renderer.component.html": [
+    "&times;"
+  ],
   "/framework/angular/pager.component.html": [
     "*"
   ],
@@ -59,6 +62,9 @@
   "/shared/components/forms/rich-editor.component.ts": [
     "code image media link lists advlist paste",
     "undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets"
+  ],
+  "/shared/components/search/search-form.component.html": [
+    "."
   ],
   "/shared/components/search/search-form.component.ts": [
     "form-inline search-form"

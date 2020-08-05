@@ -1,7 +1,7 @@
 <div class="events">
     <div class="event row no-gutters" *ngFor="let assetEvent of assetEvents | async; trackBy: trackByEvent">
         <div class="col-auto">
-            <img class="user-picture" title="{{assetEvent.event.actor | sqxUserNameRef}}" [src]="assetEvent.event.actor | sqxUserPictureRef" />
+            <img class="user-picture" title="{{assetEvent.event.actor | sqxUserNameRef}}" [src]="assetEvent.event.actor | sqxUserPictureRef">
         </div>
         <div class="col pl-2">
             <div class="event-message">
@@ -12,7 +12,7 @@
             <div class="event-created">{{assetEvent.event.created | sqxFromNow}}</div>
     
             <ng-container *ngIf="assetEvent.canDownload">
-                <a class="event-load force" [href]="asset | sqxAssetUrl:assetEvent.fileVersion" sqxExternalLink="noicon">Download this Version</a> 
+                <a class="event-load force" [href]="asset | sqxAssetUrl:assetEvent.fileVersion" sqxExternalLink="noicon">{{ 'assets.downloadVersion' | sqxTranslate }}</a> 
             </ng-container>
         </div>
     </div>

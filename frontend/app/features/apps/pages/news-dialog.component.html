@@ -1,11 +1,11 @@
 <sqx-modal-dialog size="lg" (close)="close.emit()">
     <ng-container title>
-        New Features
+        {{ 'news.title' | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
         <div class="help">
-            <h1>What's new?</h1>
+            <h1>{{ 'news.headline' | sqxTranslate }}</h1>
 
             <div *ngFor="let feature of features; trackBy: trackByFeature">
                 <h4>{{feature.name}}</h4>

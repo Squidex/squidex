@@ -88,7 +88,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public styleGray = false;
 
     @Input()
-    public placeholder = 'i18n:common.addTag';
+    public placeholder = 'i18n:common.tagAdd';
 
     @Input()
     public inputName = 'tag-editor';

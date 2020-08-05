@@ -1,6 +1,6 @@
 <div class="comment row no-gutters">
     <div class="col-auto pr-2">
-        <img class="user-picture" title="{{comment.user | sqxUserNameRef}}" [src]="comment.user | sqxUserPictureRef" />
+        <img class="user-picture" title="{{comment.user | sqxUserNameRef}}" [src]="comment.user | sqxUserPictureRef">
     </div>
 
     <ng-container *ngIf="!isEditing; else editing">
@@ -14,7 +14,7 @@
     
                 <div class="comment-created text-muted">
                     <ng-container *ngIf="canFollow && comment.url">
-                        <a [routerLink]="comment.url">Follow</a>&nbsp;
+                        <a [routerLink]="comment.url">{{ 'commonts.follow' | sqxTranslate }}</a>&nbsp;
                     </ng-container>
     
                     {{comment.time | sqxFromNow}} 
@@ -26,18 +26,14 @@
     <ng-template #editing>
         <div class="col">
             <form (ngSubmit)="update()">
-                <textarea class="form-control mb-1" name="{{comment.id}}" sqxFocusOnInit
-                    [(ngModel)]="editingText"
-                    [mention]="mentionUsers" 
-                    [mentionConfig]="mentionConfig" 
-                    (keydown)="updateWhenEnter($event)"></textarea>
+                <textarea class="form-control mb-1" name="{{comment.id}}" sqxFocusOnInit [(ngModel)]="editingText" [mention]="mentionUsers" [mentionConfig]="mentionConfig" (keydown)="updateWhenEnter($event)"></textarea>
     
                 <div>
                     <button type="button" class="btn btn-sm btn-secondary mr-1" (click)="cancelEdit()">
-                        Cancel
+                        {{ 'common.cancel' | sqxTranslate }}
                     </button>
                     <button type="submit" class="btn btn-sm btn-primary">
-                        <i class="icon-enter"></i> Save
+                        <i class="icon-enter"></i> {{ 'common.save' | sqxTranslate }}
                     </button>
                 </div>
             </form>
@@ -49,11 +45,7 @@
             <i class="icon-pencil"></i>
         </button>
     
-        <button *ngIf="isDeletable || canDelete" type="button" class="btn btn-sm btn-text-danger"
-            (sqxConfirmClick)="delete()"
-            confirmTitle="Delete comment"
-            confirmText="Do you really want to delete the comment?"
-            [confirmRequired]="confirmDelete">
+        <button *ngIf="isDeletable || canDelete" type="button" class="btn btn-sm btn-text-danger" (sqxConfirmClick)="delete()" confirmTitle="Delete comment" confirmText="Do you really want to delete the comment?" [confirmRequired]="confirmDelete">
             <i class="icon-bin2"></i>
         </button>
     </div>

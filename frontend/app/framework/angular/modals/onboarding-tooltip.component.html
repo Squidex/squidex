@@ -7,11 +7,11 @@
 
         <div class="onboarding-buttons clearfix">
             <button (click)="hideAll()" class="btn btn-text-primary btn-sm float-left">
-                Stop Tour
+                {{ 'tour.tooltipStop' | sqxTranslate }}
             </button>
 
             <button (click)="hideThis()" class="btn btn-text-success btn-sm float-right">
-                Got It
+                {{ 'tour.tooltipConfirm' | sqxTranslate }}
             </button>
         </div>
     </div>

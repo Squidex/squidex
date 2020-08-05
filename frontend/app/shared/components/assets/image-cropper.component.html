@@ -1,25 +1,25 @@
 <div class="menu">
-    <button type="button" class="btn" (click)="rotate(-90)" title="Rotate Left">
+    <button type="button" class="btn" (click)="rotate(-90)" title="{{ 'assets.rotateLeft' | sqxTranslate }}">
         <i class="icon-rotate_left"></i>
     </button>
 
-    <button type="button" class="btn" (click)="rotate(90)" title="Rotate Right">
+    <button type="button" class="btn" (click)="rotate(90)" title="{{ 'assets.rotateRight' | sqxTranslate }}">
         <i class="icon-rotate_right"></i>
     </button>
 
     <span class="separator"></span>
 
-    <button type="button" class="btn" (click)="flip(false)" title="Flip Vertically">
+    <button type="button" class="btn" (click)="flip(false)" title="{{ 'assets.flipVertically' | sqxTranslate }}">
         <i class="icon-flip"></i>
     </button>
 
-    <button type="button" class="btn rotate 90" (click)="flip(true)" title="Flip Horizontally">
+    <button type="button" class="btn rotate 90" (click)="flip(true)" title="{{ 'assets.flipHorizontally' | sqxTranslate }}">
         <i class="icon-flip"></i>
     </button>
 
     <span class="separator"></span>
 
-    <button type="button" class="btn" (click)="reset()" title="Reset">
+    <button type="button" class="btn" (click)="reset()" title="{{ 'common.reset' | sqxTranslate }}">
         <i class="icon-close"></i>
     </button>
 </div>

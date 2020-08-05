@@ -12,7 +12,7 @@
                     <div class="dropdown-menu container" (sqxDropFile)="addFiles($event)" @fade>
                         <div class="uploads">
                             <small class="uploads-empty text-muted" *ngIf="uploads.length === 0">
-                                No upload in progress, drop files here.
+                                {{ 'assets.uploaderUploadHere' | sqxTranslate }}
                             </small>
                 
                             <div class="upload row no-gutters" *ngFor="let upload of uploads; trackBy: trackByUpload">

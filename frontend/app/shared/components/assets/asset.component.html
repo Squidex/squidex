@@ -1,11 +1,5 @@
 <ng-container *ngIf="!isListView; else listTemplate">
-    <div class="card" 
-        (click)="select.emit()" 
-        [class.selectable]="isSelectable"
-        [class.border-primary]="isSelected"
-        (sqxDropFile)="updateFile($event)"
-        [sqxDropDisabled]="!asset || !asset.canUpload"
-        [sqxDropNoPaste]="true">
+    <div class="card" (click)="select.emit()" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (sqxDropFile)="updateFile($event)" [sqxDropDisabled]="!asset || !asset.canUpload" [sqxDropNoPaste]="true">
         <div class="card-body">
             <div class="file-preview" *ngIf="asset && progress === 0">
                 <span class="file-type" *ngIf="asset.fileType">
@@ -36,10 +30,7 @@
                         </a>
 
                         <ng-container *ngIf="!isDisabled">
-                            <a class="file-delete ml-2" *ngIf="!removeMode && asset.canDelete"
-                                (sqxConfirmClick)="delete.emit()"
-                                confirmTitle="Delete asset" 
-                                confirmText="Do you really want to delete the asset?">
+                            <a class="file-delete ml-2" *ngIf="!removeMode && asset.canDelete" (sqxConfirmClick)="delete.emit()" confirmTitle="Delete asset" confirmText="Do you really want to delete the asset?">
                                 <i class="icon-delete"></i>
                             </a>
 
@@ -65,7 +56,7 @@
         
                 <div class="drop-overlay align-items-center justify-content-center">
                     <div class="drop-overlay-background"></div>
-                    <div class="drop-overlay-text">Drop to update</div>
+                    <div class="drop-overlay-text">{{ 'assets.dropToUpdate' | sqxTranslate }}</div>
                 </div>
             </div>
 
@@ -92,13 +83,8 @@
 </ng-container>
 
 <ng-template #listTemplate>
-    <div class="table-items-row" 
-        (click)="select.emit()"
-        [class.selectable]="isSelectable"
-        (sqxDropFile)="updateFile($event)"
-        [sqxDropDisabled]="!asset || !asset.canUpload"
-        [sqxDropNoPaste]="true">
-        <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected" ></div>
+    <div class="table-items-row" (click)="select.emit()" [class.selectable]="isSelectable" (sqxDropFile)="updateFile($event)" [sqxDropDisabled]="!asset || !asset.canUpload" [sqxDropNoPaste]="true">
+        <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected"></div>
 
         <ng-container *ngIf="asset && progress === 0">
             <ng-container *ngIf="asset.canPreview; else noPreview">
@@ -125,7 +111,7 @@
                             <div class="truncate">{{asset.metadataText}}</div>
                         </td>
                         <td class="col-user">
-                            <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [src]="asset.lastModifiedBy | sqxUserPictureRef" />
+                            <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [src]="asset.lastModifiedBy | sqxUserPictureRef">
                         </td>
                         <td class="col-actions text-right">
                             <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxStopClick sqxExternalLink="noicon">
@@ -135,10 +121,7 @@
                     </ng-container>
 
                     <td class="col-actions text-right" *ngIf="!isDisabled">
-                        <button type="button" class="btn btn-text-danger" *ngIf="!removeMode && asset.canDelete"
-                            (sqxConfirmClick)="delete.emit()"
-                            confirmTitle="Delete asset" 
-                            confirmText="Do you really want to delete the asset?">
+                        <button type="button" class="btn btn-text-danger" *ngIf="!removeMode && asset.canDelete" (sqxConfirmClick)="delete.emit()" confirmTitle="Delete asset" confirmText="Do you really want to delete the asset?">
                             <i class="icon-bin2"></i>
                         </button>
 
@@ -151,7 +134,7 @@
 
         <div class="drop-overlay align-items-center justify-content-center">
             <div class="drop-overlay-background"></div>
-            <div class="drop-overlay-text">Drop to update</div>
+            <div class="drop-overlay-text">{{ 'assets.dropToUpdate' | sqxTranslate }}</div>
         </div>
         </ng-container>
 
@@ -163,9 +146,7 @@
 
 <ng-container *ngIf="asset">
     <ng-container *sqxModal="editDialog">
-        <sqx-asset-dialog [allTags]="allTags" [asset]="asset"
-            (changed)="setAsset($event)"
-            (complete)="editDialog.hide()">
+        <sqx-asset-dialog [allTags]="allTags" [asset]="asset" (changed)="setAsset($event)" (complete)="editDialog.hide()">
         </sqx-asset-dialog>
     </ng-container>
 </ng-container>
