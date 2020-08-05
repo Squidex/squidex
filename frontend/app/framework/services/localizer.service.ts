@@ -7,29 +7,22 @@
 
 import { Injectable } from '@angular/core';
 
-export const LocalizerServiceServiceFactory = () => {
-    return new LocalizerService();
+export const LocalizerServiceServiceFactory = (translations: Object, logMissingKeys: boolean) => {
+    return new LocalizerService(translations, logMissingKeys);
 };
 
 export enum PipeOptions {
     TRANSLATE = 'translate',
-    LOWER =  'lower',
+    LOWER = 'lower',
     UPPER = 'upper'
 }
 
-// TODO refactor this file, substract helper functions
 @Injectable()
 export class LocalizerService {
-    public translations: Object;
-
-    constructor() {
-        if (process.env.NODE_ENV !== 'production') {
-            console.log('dev mode, reading from json');
-            // TODO make it possible to change the language.
-            this.translations = require('./../../i18n/texts.en.json');
-        } else {
-            console.log('prod mode, reading from window option');
-        }
+    constructor(
+        private readonly translations: Object,
+        private readonly logMissingKeys: boolean
+    ) {
     }
 
     public get(key: string, args?: ReadonlyArray<object>): any {
@@ -40,13 +33,17 @@ export class LocalizerService {
         }
 
         if (!this.translations[key]) {
+            if (this.logMissingKeys) {
+                console.warn('Missing i18n key: {key}');
+            }
+
             return key;
         }
 
         text = this.translations[key];
 
         if (args && Object.keys(args).length > 0) {
-           text = this.replaceVariables(text, args);
+            text = this.replaceVariables(text, args);
         }
 
         return text;
@@ -61,27 +58,30 @@ export class LocalizerService {
             }
 
             const indexOfEnd = text.indexOf('}');
+
             const replace = text.substring(indexOfStart, indexOfEnd + 1);
 
             text = text.replace(replace, (matched: string) => {
-                    let replaceValue: string;
-                    if (matched.includes('|')) {
-                        const splittedValue = matched.split('|');
-                        replaceValue = this.handlePipeOption(args[splittedValue[0].substr(1)], splittedValue[1].slice(0, -1));
-                    } else {
-                        const key = matched.substring(1, matched.length - 1);
-                        replaceValue = args[key];
-                    }
+                let replaceValue: string;
 
-                    return replaceValue;
-                });
+                if (matched.includes('|')) {
+                    const splittedValue = matched.split('|');
+
+                    replaceValue = this.handlePipeOption(args[splittedValue[0].substr(1)], splittedValue[1].slice(0, -1));
+                } else {
+                    const key = matched.substring(1, matched.length - 1);
+
+                    replaceValue = args[key];
+                }
+
+                return replaceValue;
+            });
         }
 
         return text;
     }
 
     private handlePipeOption(value: string, pipeOption: string) {
-
         if (!pipeOption) {
             return value;
         }
@@ -99,7 +99,6 @@ export class LocalizerService {
                 return value.charAt(0).toUpperCase() + value.slice(1);
             }
             default: {
-                console.log('default');
                 return value;
             }
         }

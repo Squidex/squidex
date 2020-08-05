@@ -1,31 +1,31 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label">Editor</label>
+        <label class="col-3 col-form-label">{{ 'schemas.fields.editor' | sqxTranslate }}</label>
 
         <div class="col-9">
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'List'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="List" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="List">
 
                 <i class="icon-control-Checkboxes"></i>
 
                 <span class="radio-label">List</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Dropdown'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Dropdown" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Dropdown">
 
                 <i class="icon-control-Dropdown"></i>
 
                 <span class="radio-label">Dropdown</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Tags'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Tags" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Tags">
 
                 <i class="icon-control-Tags"></i>
 
-                <span class="radio-label">Tags</span>
+                <span class="radio-label">{{ 'common.tags' | sqxTranslate }}</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Checkboxes'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Checkboxes" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Checkboxes">
 
                 <i class="icon-control-Checkboxes"></i>
 
@@ -37,14 +37,14 @@
     <div class="form-group row" *ngIf="field.properties.isContentField">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldResolveReferences" formControlName="resolveReference" />
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldResolveReferences" formControlName="resolveReference">
                 <label class="form-check-label" for="{{field.fieldId}}_fieldResolveReferences">
                     Resolve reference
                 </label>
             </div>
 
             <sqx-form-hint>
-                Show the name of the referenced item in content list when MaxItems is set to 1.
+                {{ 'fieldTypes.references.resolveHint' | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>

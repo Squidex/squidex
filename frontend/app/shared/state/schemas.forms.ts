@@ -28,7 +28,7 @@ export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.nameValidationMessage')
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:schemas.schemaNameValidationMessage')
                 ]
             ],
             isSingleton: false,
@@ -247,7 +247,7 @@ export class AddFieldForm extends Form<FormGroup, AddFieldDto> {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'i18n:schemas.fieldNameValidationMessage')
+                    ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'i18n:schemas.field.nameValidationMessage')
                 ]
             ],
             isLocalizable: false

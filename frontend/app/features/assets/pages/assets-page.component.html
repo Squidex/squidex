@@ -10,7 +10,7 @@
             <div class="col-auto offset-xl-2">
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="{{ 'assets.refresh' | sqxTranslate }}">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:assets.refreshTooltip">
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
@@ -39,7 +39,7 @@
             <div class="col-auto pl-1">
                 <sqx-shortcut keys="ctrl+shift+g" (trigger)="reload()"></sqx-shortcut>
 
-                <button type="button" class="btn btn-success" (click)="addAssetFolderDialog.show()" title="{{ 'assets.createFolderTooltip' | sqxTranslate }}">
+                <button type="button" class="btn btn-success" (click)="addAssetFolderDialog.show()" title="i18n:assets.createFolderTooltip">
                     <i class="icon-create_new_folder"></i>
                 </button>
             </div>
@@ -65,7 +65,7 @@
 
     <ng-container sidebar>   
         <div class="panel-nav">
-            <a class="panel-link" routerLink="filters" routerLinkActive="active" title="{{ 'common.filters' | sqxTranslate }}" titlePosition="left">
+            <a class="panel-link" routerLink="filters" routerLinkActive="active" title="i18n:common.filters" titlePosition="left">
                 <i class="icon-filter"></i>
             </a>    
         </div> 

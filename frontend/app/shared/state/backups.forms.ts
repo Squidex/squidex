@@ -17,7 +17,7 @@ export class RestoreForm extends Form<FormGroup, StartRestoreDto> {
             name: ['',
                 [
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:backups.nameValidationMessage')
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage')
                 ]
             ],
             url: ['',

@@ -11,27 +11,27 @@
                 </div>
             </div>
             <div class="col-auto pr-4">
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveTop()" title="{{ 'contents.arrayMoveTop' | sqxTranslate }}">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveTop()" title="i18n:contents.arrayMoveTop">
                     <i class="icon-caret-top"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveUp()" title="{{ 'contents.arrayMoveUp' | sqxTranslate }}">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveUp()" title="i18n:contents.arrayMoveUp">
                     <i class="icon-caret-up"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveDown()" title="{{ 'contents.arrayMoveDown' | sqxTranslate }}">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveDown()" title="i18n:contents.arrayMoveDown">
                     <i class="icon-caret-down"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()" title="{{ 'contents.arrayMoveBottom' | sqxTranslate }}">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()" title="i18n:contents.arrayMoveBottom">
                     <i class="icon-caret-bottom"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isCollapsed" (click)="expand()" title="{{ 'contents.arrayExpandItem' | sqxTranslate }}">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isCollapsed" (click)="expand()" title="i18n:contents.arrayExpandItem">
                     <i class="icon-plus-square"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="isCollapsed" (click)="collapse()" title="{{ 'contents.arrayCollapseItem' | sqxTranslate }}">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="isCollapsed" (click)="collapse()" title="i18n:contents.arrayCollapseItem">
                     <i class="icon-minus-square"></i>
                 </button>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled" (click)="clone.emit()" title="{{ 'contents.arrayCloneItem' | sqxTranslate }}">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled" (click)="clone.emit()" title="i18n:contents.arrayCloneItem">
                     <i class="icon-clone"></i>
                 </button>
         

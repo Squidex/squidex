@@ -11,7 +11,7 @@
 <ng-container *ngIf="appsState.apps | async; let apps">
     <div class="apps-section">
         <div class="empty" *ngIf="apps.length === 0">
-            <h3 class="empty-headline">{{ 'apps.noAppsYet' | sqxTranslate }}</h3>
+            <h3 class="empty-headline">{{ 'apps.empty' | sqxTranslate }}</h3>
         </div>
 
         <div class="card card-href card-app" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">
@@ -51,10 +51,10 @@
                 <img src="./images/add-app.svg">
             </div>
 
-            <h3 class="card-title">{{ 'apps.newApp' | sqxTranslate }}</h3>
+            <h3 class="card-title">{{ 'apps.createBlankApp' | sqxTranslate }}</h3>
 
             <div class="card-text">
-                {{ 'apps.newBlankAppDescription' | sqxTranslate }}
+                {{ 'apps.createBlankAppDescription' | sqxTranslate }}
             </div>
         </div>
     </div>
@@ -65,10 +65,10 @@
                 <img src="./images/add-blog.svg">
             </div>
 
-            <h3 class="card-title">{{ 'apps.newBlogApp' | sqxTranslate }}</h3>
+            <h3 class="card-title">{{ 'apps.createBlogApp' | sqxTranslate }}</h3>
 
             <div class="card-text">
-                <div>{{ 'apps.newBlogAppDescription' | sqxTranslate }}</div>
+                <div>{{ 'apps.createBlogAppDescription' | sqxTranslate }}</div>
                 <div>
                     {{ 'common.sampleCode' | sqxTranslate }} <a href="https://github.com/Squidex/squidex-samples" sqxStopClick sqxExternalLink>{{ 'dashboard.github' | sqxTranslate }}</a>
                 </div>
@@ -82,10 +82,10 @@
                 <img src="./images/add-identity.svg">
             </div>
 
-            <h3 class="card-title">{{ 'apps.newIdentityApp' | sqxTranslate }}</h3>
+            <h3 class="card-title">{{ 'apps.createIdentityApp' | sqxTranslate }}</h3>
 
             <div class="card-text">
-                <div>{{ 'apps.newIdentityAppDescription' | sqxTranslate }}</div>
+                <div>{{ 'apps.createIdentityAppDescription' | sqxTranslate }}</div>
                 <div>
                     <a href="https://github.com/Squidex/squidex-identity" sqxStopClick sqxExternalLink>{{ 'common.project' | sqxTranslate }}</a>
                 </div>
@@ -99,10 +99,10 @@
                 <img src="./images/add-identity.svg">
             </div>
 
-            <h3 class="card-title">{{ 'apps.newIdentityAppV2' | sqxTranslate }}</h3>
+            <h3 class="card-title">{{ 'apps.createIdentityAppV2' | sqxTranslate }}</h3>
 
             <div class="card-text">
-                <div>{{ 'apps.newIdentityAppV2Description' | sqxTranslate }}</div>
+                <div>{{ 'apps.createIdentityAppV2Description' | sqxTranslate }}</div>
                 <div>
                     <a href="https://github.com/Squidex/squidex-identity" sqxStopClick sqxExternalLink>{{ 'common.project' | sqxTranslate }}</a>
                 </div>
@@ -116,10 +116,10 @@
                 <img src="./images/add-profile.svg">
             </div>
 
-            <h3 class="card-title">{{ 'apps.newProfileApp' | sqxTranslate }}</h3>
+            <h3 class="card-title">{{ 'apps.createProfileApp' | sqxTranslate }}</h3>
 
             <div class="card-text">
-                <div>{{ 'apps.newProfileAppDescription' | sqxTranslate }}</div>
+                <div>{{ 'apps.createProfileAppDescription' | sqxTranslate }}</div>
                 <div>
                     {{ 'common.sampleCode' | sqxTranslate }} <a href="https://github.com/Squidex/squidex-samples" sqxStopClick sqxExternalLink>{{ 'dashboard.github' | sqxTranslate }}</a>
                 </div>

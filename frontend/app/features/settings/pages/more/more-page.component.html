@@ -56,7 +56,7 @@
                                     <sqx-avatar [image]="app?.image" [identifier]="app?.name" [size]="150"></sqx-avatar>
 
                                     <ng-container *ngIf="isImageEditable && app?.image">
-                                        <button class="btn btn-danger btn-sm app-image-remove" title="{{ 'apps.removeImage' | sqxTranslate }}" (click)="removeImage()">
+                                        <button class="btn btn-danger btn-sm app-image-remove" title="i18n:apps.removeImage" (click)="removeImage()">
                                             <i class="icon-bin2"></i>
                                         </button>
                                     </ng-container>

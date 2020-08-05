@@ -15,14 +15,6 @@
   "/features/content/pages/content/content-page.component.html": [
     "."
   ],
-  "/features/content/pages/content/content-page.component.ts": [
-    "close the current content view"
-  ],
-  "/features/content/shared/due-time-selector.component.html": [
-    "Change content item(s) to {{dueTimeAction}}",
-    "Set to {{dueTimeAction}} at a later point date and time.",
-    "Set to {{dueTimeAction}} immediately."
-  ],
   "/features/content/shared/forms/array-item.component.html": [
     "#{{index + 1}}"
   ],
@@ -35,10 +27,6 @@
   ],
   "/features/rules/pages/rules/actions/generic-action.component.html": [
     "*"
-  ],
-  "/features/rules/pages/rules/rules-page.component.html": [
-    "for the full documentation.",
-    "https://docs.squidex.io"
   ],
   "/features/rules/pages/rules/triggers/asset-changed-trigger.component.html": [
     "*"
@@ -68,11 +56,60 @@
     "Checkbox",
     "Toggle"
   ],
+  "/features/schemas/pages/schema/fields/types/date-time-ui.component.html": [
+    "DateTime"
+  ],
+  "/features/schemas/pages/schema/fields/types/geolocation-ui.component.html": [
+    "Map"
+  ],
+  "/features/schemas/pages/schema/fields/types/number-ui.component.html": [
+    "Dropdown",
+    "Input",
+    "Radio",
+    "Stars"
+  ],
+  "/features/schemas/pages/schema/fields/types/number-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/references-ui.component.html": [
+    "Checkboxes",
+    "Dropdown",
+    "List",
+    "Resolve reference"
+  ],
+  "/features/schemas/pages/schema/fields/types/references-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/string-ui.component.html": [
+    "Color",
+    "Dropdown",
+    "HTML",
+    "Input",
+    "Markdown",
+    "Radio",
+    "RichText",
+    "StockPhoto",
+    "TextArea"
+  ],
+  "/features/schemas/pages/schema/fields/types/string-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/tags-ui.component.html": [
+    "Checkboxes",
+    "Dropdown"
+  ],
+  "/features/schemas/pages/schema/fields/types/tags-validation.component.html": [
+    "-"
+  ],
   "/features/settings/pages/backups/backup.component.html": [
     ","
   ],
   "/features/settings/pages/clients/client-connect-form.component.html": [
-    "*"
+    "1",
+    "2",
+    "3",
+    "4",
+    "nuget"
   ],
   "/features/settings/pages/clients/client-connect-form.component.ts": [
     "Content-Type: application/x-www-form-urlencoded",
@@ -88,10 +125,10 @@
     "&times;"
   ],
   "/framework/angular/pager.component.html": [
-    "*"
-  ],
-  "/framework/angular/pipes/colors.pipes.ts": [
-    "*"
+    "10",
+    "20",
+    "30",
+    "50"
   ],
   "/framework/angular/pipes/date-time.pipes.ts": [
     "dd. LLL yyyy",
@@ -102,9 +139,6 @@
   ],
   "/framework/angular/pipes/numbers.pipes.ts": [
     " kMGTPEZY"
-  ],
-  "/framework/angular/resized.directive.ts": [
-    "*"
   ],
   "/index.html": [
     "*"
@@ -135,9 +169,6 @@
   "/shared/components/search/queries/sorting.component.html": [
     "ascending",
     "descending"
-  ],
-  "/shared/components/search/search-form.component.html": [
-    "."
   ],
   "/shared/components/search/search-form.component.ts": [
     "form-inline search-form"

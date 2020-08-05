@@ -14,7 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
-import { ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
+import { ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
 
 export function configApiUrl() {
@@ -53,6 +53,14 @@ export function configCurrency() {
     return new CurrencyConfig('EUR', '€', true);
 }
 
+export function configTranslations() {
+    if (process.env.NODE_ENV === 'production') {
+        return new LocalizerService(window['18n'], false);
+    } else {
+        return new LocalizerService(require('./../../i18n/translations-frontend.en.json'), true);
+    }
+}
+
 @NgModule({
     imports: [
         BrowserAnimationsModule,
@@ -75,6 +83,7 @@ export function configCurrency() {
         { provide: CurrencyConfig, useFactory: configCurrency },
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
         { provide: TitlesConfig, useFactory: configTitles },
+        { provide: LocalizerService, useFactory: configTranslations },
         { provide: UIOptions, useFactory: configUIOptions }
     ],
     entryComponents: [AppComponent]

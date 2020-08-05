@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary mr-1" (click)="reload()" title="{{ 'users.refreshTooltip' | sqxTranslate }}">
+        <button type="button" class="btn btn-text-secondary mr-1" (click)="reload()" title="i18n:users.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
 
@@ -20,7 +20,7 @@
         <ng-container *ngIf="usersState.canCreate | async">
             <sqx-shortcut keys="ctrl+shift+n" (trigger)="buttonNew.click()"></sqx-shortcut>
 
-            <button type="button" class="btn btn-success" #buttonNew routerLink="new" title="{{ 'users.newUserTooltip' | sqxTranslate }}">
+            <button type="button" class="btn btn-success" #buttonNew routerLink="new" title="i18n:users.newUserTooltip">
                 <i class="icon-plus"></i> {{ 'users.newUser' | sqxTranslate }}
             </button>
         </ng-container>

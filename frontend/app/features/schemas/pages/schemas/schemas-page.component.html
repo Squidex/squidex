@@ -11,7 +11,7 @@
         <ng-container *ngIf="schemasState.canCreate | async">
             <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
 
-            <button type="button" class="btn btn-success subheader-button" (click)="createSchema()" title="{{ 'schemas.createSchemaTooltip' | sqxTranslate }}" titlePosition="top-left">
+            <button type="button" class="btn btn-success subheader-button" (click)="createSchema()" title="i18n:schemas.createSchemaTooltip" titlePosition="top-left">
                 <i class="icon-plus"></i>          
             </button>
         </ng-container>

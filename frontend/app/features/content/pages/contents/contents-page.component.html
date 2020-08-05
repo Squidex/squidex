@@ -12,7 +12,7 @@
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="{{ 'contents.refreshTooltip' | sqxTranslate }}">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:contents.refreshTooltip">
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
@@ -24,7 +24,7 @@
                 <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
             </div>
             <div class="col-auto pl-1">
-                <button type="button" class="btn btn-success" #newButton routerLink="new" title="{{ 'contents.createContentTooltip' | sqxTranslate }}" [disabled]="(contentsState.canCreateAny | async) === false">
+                <button type="button" class="btn btn-success" #newButton routerLink="new" title="i18n:contents.createContentTooltip" [disabled]="(contentsState.canCreateAny | async) === false">
                     <i class="icon-plus"></i> {{ 'users.newUser' | sqxTranslate }}
                 </button>
                 
@@ -101,7 +101,7 @@
 
     <ng-container sidebar>
         <div class="panel-nav">
-            <a class="panel-link" routerLink="filters" routerLinkActive="active" title="{{ 'common.filters' | sqxTranslate }}" titlePosition="left">
+            <a class="panel-link" routerLink="filters" routerLinkActive="active" title="i18n:common.filters" titlePosition="left">
                 <i class="icon-filter"></i>
             </a>
         </div>

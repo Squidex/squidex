@@ -1,95 +1,95 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">Editor Url</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">{{ 'schemas.field.editorUrl' | sqxTranslate }}</label>
 
         <div class="col-6">
-            <input type="text" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl" />
+            <input type="text" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl">
 
             <sqx-form-hint>
-                Url to your plugin if you use a custom editor.
+                {{ 'schemas.field.editorUrlHint' | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPlaceholder">Placeholder</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPlaceholder">{{ 'schemas.fields.placeholder' | sqxTranslate }}</label>
 
         <div class="col-6">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder" />
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder">
 
             <sqx-form-hint>
-                Define the placeholder for the input control.
+                {{ 'schemas.fields.placeholderHint' | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
     <div class="form-group row">
-        <label class="col-3 col-form-label">Editor</label>
+        <label class="col-3 col-form-label">{{ 'schemas.fields.editor' | sqxTranslate }}</label>
 
         <div class="col-9">
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Input'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Input" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Input">
 
                 <i class="icon-control-Input"></i>
 
                 <span class="radio-label">Input</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Slug'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Slug" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Slug">
 
                 <i class="icon-control-Slug"></i>
 
-                <span class="radio-label">Slug</span>
+                <span class="radio-label">{{ 'common.slug' | sqxTranslate }}</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'TextArea'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="TextArea" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="TextArea">
 
                 <i class="icon-control-TextArea"></i>
 
                 <span class="radio-label">TextArea</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'RichText'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="RichText" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="RichText">
 
                 <i class="icon-control-RichText"></i>
 
                 <span class="radio-label">RichText</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Markdown'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Markdown" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Markdown">
 
                 <i class="icon-control-Markdown"></i>
 
                 <span class="radio-label">Markdown</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Dropdown'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Dropdown" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Dropdown">
 
                 <i class="icon-control-Dropdown"></i>
 
                 <span class="radio-label" clas>Dropdown</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Radio'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Radio" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Radio">
 
                 <i class="icon-control-Radio"></i>
 
                 <span class="radio-label">Radio</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Color'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Color" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Color">
 
                 <i class="icon-control-Color"></i>
 
                 <span class="radio-label">Color</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Html'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Html" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Html">
 
                 <i class="icon-control-Html"></i>
 
                 <span class="radio-label">HTML</span>
             </label>
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'StockPhoto'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="StockPhoto" />
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="StockPhoto">
 
                 <i class="icon-media"></i>
 
@@ -98,7 +98,7 @@
         </div>
     </div>
     <div class="form-group row" [class.hidden]="hideAllowedValues | async">
-        <label class="col-3 col-form-label">Allowed Values</label>
+        <label class="col-3 col-form-label">{{ 'schemas.field.allowedValues' | sqxTranslate }}</label>
 
         <div class="col-6">
             <sqx-tag-editor formControlName="allowedValues"></sqx-tag-editor>
@@ -107,9 +107,9 @@
     <div class="form-group row" [class.hidden]="hideInlineEditable | async">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldInlineEditable" formControlName="inlineEditable" />
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldInlineEditable" formControlName="inlineEditable">
                 <label class="form-check-label" for="{{field.fieldId}}_fieldInlineEditable">
-                    Inline Editable
+                    {{ 'schemas.fields.inlineEditable' | sqxTranslate }}
                 </label>
             </div>
         </div>

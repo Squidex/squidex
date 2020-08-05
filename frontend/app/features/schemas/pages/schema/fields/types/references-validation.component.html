@@ -1,10 +1,9 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldSchemaId">Schemas</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldSchemaId">{{ 'dashboard.schemas' | sqxTranslate }}</label>
 
         <div class="col-6">
-            <sqx-tag-editor placeholder=", to add schema" formControlName="schemaIds"
-                [converter]="schemasSource.converter | async" [suggestions]="(schemasSource.converter | async)?.suggestions">
+            <sqx-tag-editor placeholder="{{ 'workflow.schemaTagsAdd' | sqxTranslate }}" formControlName="schemaIds" [converter]="schemasSource.converter | async" [suggestions]="(schemasSource.converter | async)?.suggestions">
             </sqx-tag-editor>
         </div>
     </div>
@@ -13,9 +12,9 @@
     <div class="form-group row">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldRequired" formControlName="isRequired" />
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldRequired" formControlName="isRequired">
                 <label class="form-check-label" for="{{field.fieldId}}_fieldRequired">
-                    Required
+                    {{ 'schemas.field.required' | sqxTranslate }}
                 </label>
             </div>
         </div>
@@ -24,24 +23,24 @@
     <div class="form-group row">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldAllowDuplicates" formControlName="allowDuplicates" />
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldAllowDuplicates" formControlName="allowDuplicates">
                 <label class="form-check-label" for="{{field.fieldId}}_fieldAllowDuplicates">
-                    Allow duplicate values
+                    {{ 'fieldTypes.assets.allowDuplicates' | sqxTranslate }}
                 </label>
             </div>
         </div>
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label">Items</label>
+        <label class="col-3 col-form-label">{{ 'schemas.field.items' | sqxTranslate }}</label>
 
         <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minItems" placeholder="Min Items" />
+            <input type="number" class="form-control" formControlName="minItems" placeholder="{{ 'schemas.field.itemsMin' | sqxTranslate }}">
             
             <label class="col-form-label minmax-label">-</label>
         </div>
         <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxItems" placeholder="Max Items" />
+            <input type="number" class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.field.itemsMax' | sqxTranslate }}">
         </div>
     </div>
 </div>

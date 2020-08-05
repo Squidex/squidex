@@ -31,10 +31,10 @@
             </div>
         </form>
         <div class="col-auto">
-            <button type="button" class="btn btn-text-secondary" [class.hidden]="!snapshot.isMapHidden" (click)="hideMap(false)" title="{{ 'common.mapShow' | sqxTranslate }}">
+            <button type="button" class="btn btn-text-secondary" [class.hidden]="!snapshot.isMapHidden" (click)="hideMap(false)" title="i18n:common.mapShow">
                 <i class="icon-plus-square"></i>
             </button>
-            <button type="button" class="btn btn-text-secondary" [class.hidden]="snapshot.isMapHidden" (click)="hideMap(true)" title="{{ 'common.mapHide' | sqxTranslate }}">
+            <button type="button" class="btn btn-text-secondary" [class.hidden]="snapshot.isMapHidden" (click)="hideMap(true)" title="i18n:common.mapHide">
                 <i class="icon-minus-square"></i>
             </button>
         </div>
