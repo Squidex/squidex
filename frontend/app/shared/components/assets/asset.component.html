@@ -30,7 +30,10 @@
                         </a>
 
                         <ng-container *ngIf="!isDisabled">
-                            <a class="file-delete ml-2" *ngIf="!removeMode && asset.canDelete" (sqxConfirmClick)="delete.emit()" confirmTitle="Delete asset" confirmText="Do you really want to delete the asset?">
+                            <a class="file-delete ml-2" *ngIf="!removeMode && asset.canDelete"
+                                (sqxConfirmClick)="delete.emit()"
+                                confirmTitle="i18n:assets.deleteConfirmTitle"
+                                confirmText="i18n:assets.deleteConfirmText">
                                 <i class="icon-delete"></i>
                             </a>
 
@@ -121,7 +124,10 @@
                     </ng-container>
 
                     <td class="col-actions text-right" *ngIf="!isDisabled">
-                        <button type="button" class="btn btn-text-danger" *ngIf="!removeMode && asset.canDelete" (sqxConfirmClick)="delete.emit()" confirmTitle="Delete asset" confirmText="Do you really want to delete the asset?">
+                        <button type="button" class="btn btn-text-danger" *ngIf="!removeMode && asset.canDelete"
+                            (sqxConfirmClick)="delete.emit()"
+                            confirmTitle="i18n:assets.deleteConfirmTitle"
+                            confirmText="i18n:assets.deleteConfirmText">
                             <i class="icon-bin2"></i>
                         </button>
 

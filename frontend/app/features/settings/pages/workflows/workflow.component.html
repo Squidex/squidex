@@ -14,7 +14,10 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-danger" [disabled]="!workflow.canDelete" (sqxConfirmClick)="remove()" confirmTitle="Remove workflow" confirmText="Do you really want to remove the workflow?">
+                    <button type="button" class="btn btn-text-danger" [disabled]="!workflow.canDelete"
+                        (sqxConfirmClick)="remove()"
+                        confirmTitle="i18n:workflows.deleteConfirmTitle"
+                        confirmText="i18n:workflows.deleteConfirmText">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>

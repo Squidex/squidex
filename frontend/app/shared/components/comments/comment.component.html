@@ -45,7 +45,11 @@
             <i class="icon-pencil"></i>
         </button>
     
-        <button *ngIf="isDeletable || canDelete" type="button" class="btn btn-sm btn-text-danger" (sqxConfirmClick)="delete()" confirmTitle="Delete comment" confirmText="Do you really want to delete the comment?" [confirmRequired]="confirmDelete">
+        <button *ngIf="isDeletable || canDelete" type="button" class="btn btn-sm btn-text-danger"
+            (sqxConfirmClick)="delete()"
+            confirmTitle="i18n:comments.deleteConfirmTitle"
+            confirmText="i18n:comments.deleteConfirmText"
+            [confirmRequired]="confirmDelete">
             <i class="icon-bin2"></i>
         </button>
     </div>

@@ -51,7 +51,10 @@
                                 <ng-container *ngIf="field.canLock">
                                     <div class="dropdown-divider"></div>
                             
-                                    <a class="dropdown-item" (sqxConfirmClick)="lockField()" confirmTitle="Lock field" confirmText="WARNING: Locking a field cannot be undone! Locked field definitions cannot be unlocked, deleted, or changed anymore. Do you really want to lock this field?">
+                                    <a class="dropdown-item"
+                                        (sqxConfirmClick)="lockField()"
+                                        confirmTitle="i18n:schemas.field.lockConfirmText"
+                                        confirmText="i18n:schemas.field.lockConfirmText">
                                         {{ 'schemas.field.lock' | sqxTranslate }}
                                     </a>
                                 </ng-container>
@@ -59,7 +62,10 @@
                                 <ng-container>
                                     <div class="dropdown-divider"></div>
     
-                                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!field.canDelete" (sqxConfirmClick)="deleteField()" confirmTitle="Delete field" confirmText="Do you really want to delete the field?">
+                                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!field.canDelete"
+                                        (sqxConfirmClick)="deleteField()"
+                                        confirmTitle="i18n:schemas.field.deleteConfirmTitle"
+                                        confirmText="i18n:schemas.field.deleteConfirmText">
                                         {{ 'common.delete' | sqxTranslate }}
                                     </a>
                                 </ng-container>

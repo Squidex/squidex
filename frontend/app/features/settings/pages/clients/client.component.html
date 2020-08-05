@@ -9,7 +9,10 @@
                 <button type="button" class="btn btn-primary" (click)="connectDialog.show()">{{ 'clients.connect' | sqxTranslate }}</button>
             </div>
             <div class="col-auto cell-actions no-padding">
-                <button type="button" class="btn btn-text-danger" [disabled]="!client.canRevoke" (sqxConfirmClick)="revoke()" confirmTitle="Revoke client" confirmText="Do you really want to revoke the client?">
+                <button type="button" class="btn btn-text-danger" [disabled]="!client.canRevoke"
+                    (sqxConfirmClick)="revoke()"
+                    confirmTitle="i18n:clients.revokeConfirmTitle"
+                    confirmText="i18n:clients.revokeConfirmText">
                     <i class="icon-bin2"></i>
                 </button>
             </div>

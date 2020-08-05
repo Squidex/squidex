@@ -26,7 +26,10 @@
                     </div>
 
                     <div class="col-auto">
-                        <button type="button" class="btn btn-text-danger" [disabled]="!isEditable" (sqxConfirmClick)="editForm.remove(i)" confirmTitle="Remove url" confirmText="Do you really want to remove this url?">
+                        <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
+                            (sqxConfirmClick)="editForm.remove(i)"
+                            confirmTitle="i18n:assets.deleteMetadataConfirmTitle"
+                            confirmText="i18n:schemas.deleteUrlConfirmText">
                             <i class="icon-bin2"></i>
                         </button>
                     </div>

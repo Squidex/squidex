@@ -16,7 +16,10 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-danger" [disabled]="!role.canDelete" (sqxConfirmClick)="delete()" confirmTitle="Delete role" confirmText="Do you really want to delete the role?">
+                    <button type="button" class="btn btn-text-danger" [disabled]="!role.canDelete"
+                        (sqxConfirmClick)="delete()"
+                        confirmTitle="i18n:patterns.deleteConfirmTitle"
+                        confirmText="i18n:patterns.deleteConfirmText">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>

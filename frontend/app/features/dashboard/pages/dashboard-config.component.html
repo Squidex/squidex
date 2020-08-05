@@ -23,7 +23,10 @@
     
             <div class="dropdown-divider"></div>
     
-            <a class="dropdown-item dropdown-item-delete" (beforeClick)="dropdownModal.hide()" (sqxConfirmClick)="resetConfig()" confirmTitle="i18n:dashboard.resetConfigConfirmTitle" confirmText="i18n:dashboard.resetConfigConfirmText">
+            <a class="dropdown-item dropdown-item-delete" (beforeClick)="dropdownModal.hide()"
+                (sqxConfirmClick)="resetConfig()"
+                confirmTitle="i18n:dashboard.resetConfigConfirmTitle"
+                confirmText="i18n:dashboard.resetConfigConfirmText">
                 {{ 'common.reset' | sqxTranslate }}
             </a>
         </div>

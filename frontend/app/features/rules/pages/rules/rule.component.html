@@ -12,11 +12,17 @@
         
                 <ng-container *sqxModal="dropdown;closeAlways:true">
                     <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-right" @fade>
-                        <a class="dropdown-item" *ngIf="rule.canRun" (sqxConfirmClick)="run()" confirmTitle="Run rule" confirmText="Do you really want to run the rule for all events?">
+                        <a class="dropdown-item" *ngIf="rule.canRun"
+                            (sqxConfirmClick)="run()"
+                            confirmTitle="i18n:rules.runRuleConfirmTitle"
+                            confirmText="i18n:rules.runRuleConfirmText">
                             {{ 'rules.run' | sqxTranslate }}
                         </a>
             
-                        <a class="dropdown-item dropdown-item-delete" *ngIf="rule.canDelete" (sqxConfirmClick)="delete()" confirmTitle="Delete rule" confirmText="Do you really want to delete the rule?">
+                        <a class="dropdown-item dropdown-item-delete" *ngIf="rule.canDelete"
+                            (sqxConfirmClick)="delete()"
+                            confirmTitle="i18n:rules.deleteConfirmTitle"
+                            confirmText="i18n:rules.deleteConfirmText">
                             {{ 'common.delete' | sqxTranslate }}
                         </a>
                     </div>
@@ -44,7 +50,10 @@
             </div>
             <div class="col col-last text-right">
                 <ng-container *ngIf="isManual; else notManual">
-                    <button class="btn btn-secondary" [disabled]="!rule.canTrigger" (sqxConfirmClick)="trigger()" confirmTitle="Trigger rule" confirmText="Do you really want to trigger the rule?">
+                    <button class="btn btn-secondary" [disabled]="!rule.canTrigger"
+                        (sqxConfirmClick)="trigger()"
+                        confirmTitle="i18n:rules.triggerConfirmTitle"
+                        confirmText="i18n:rules.triggerConfirmText">
                         <i class="icon-play-line"></i>
                     </button>
                 </ng-container>

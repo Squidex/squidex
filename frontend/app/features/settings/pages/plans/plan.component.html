@@ -22,7 +22,11 @@
             {{ 'plans.selected' | sqxTranslate }}
         </button>
         
-        <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" (sqxConfirmClick)="changeMonthly()" [confirmTitle]="'Change subscription'" [confirmText]="planInfo.plan.confirmText" [confirmRequired]="planInfo.plan.confirmText">
+        <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async"
+            (sqxConfirmClick)="changeMonthly()"
+            confirmTitle="i18n:plans.changeConfirmTitle"
+            [confirmText]="planInfo.plan.confirmText"
+            [confirmRequired]="planInfo.plan.confirmText">
             {{ 'plans.change' | sqxTranslate }}
         </button>
     </div>
@@ -37,7 +41,11 @@
             {{ 'plans.selected' | sqxTranslate }}
         </button>
         
-        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" (sqxConfirmClick)="changeYearly()" [confirmTitle]="'Change subscription'" [confirmText]="planInfo.plan.yearlyConfirmText" [confirmRequired]="planInfo.plan.yearlyConfirmText">
+        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async"
+            (sqxConfirmClick)="changeYearly()"
+            confirmTitle="i18n:plans.changeConfirmTitle"
+            [confirmText]="planInfo.plan.yearlyConfirmText"
+            [confirmRequired]="planInfo.plan.yearlyConfirmText">
             {{ 'plans.change' | sqxTranslate }}
         </button>
     </div>

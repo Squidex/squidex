@@ -37,7 +37,10 @@
                     <ng-container>
                         <div class="dropdown-divider"></div>
         
-                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!schema.canDelete" (sqxConfirmClick)="deleteSchema()" confirmTitle="Delete schema" confirmText="Do you really want to delete the schema?">
+                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!schema.canDelete"
+                            (sqxConfirmClick)="deleteSchema()"
+                            confirmTitle="i18n:schemas.deleteConfirmTitle"
+                            confirmText="i18n:schemas.deleteConfirmText">
                             {{ 'common.delete' | sqxTranslate }}
                         </a>
                     </ng-container>

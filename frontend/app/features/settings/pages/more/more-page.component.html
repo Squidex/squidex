@@ -95,7 +95,10 @@
                         </sqx-form-hint>
                     </div>
                     <div class="col-auto">
-                        <button type="button" class="btn btn-danger" [disabled]="!isDeletable" (sqxConfirmClick)="archiveApp()" confirmTitle="Archive App" confirmText="Do you really want to archive this app?">
+                        <button type="button" class="btn btn-danger" [disabled]="!isDeletable"
+                            (sqxConfirmClick)="archiveApp()"
+                            confirmTitle="i18n:apps.archieve"
+                            confirmText="i18n:apps.archieveConfirmTitle">
                             {{ 'apps.archieve' | sqxTranslate }}
                         </button>
                     </div>

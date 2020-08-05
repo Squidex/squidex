@@ -13,7 +13,10 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-danger" [disabled]="!language.canDelete" (sqxConfirmClick)="remove()" confirmTitle="Remove language" confirmText="Do you really want to remove the language?">
+                    <button type="button" class="btn btn-text-danger" [disabled]="!language.canDelete"
+                        (sqxConfirmClick)="remove()"
+                        confirmTitle="i18n:languages.removeConfirmTitle"
+                        confirmText="i18n:languages.removeConfirmText">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>

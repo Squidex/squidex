@@ -37,7 +37,10 @@
             </div>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-text-danger mt-1" [disabled]="!backup.canDelete" (sqxConfirmClick)="delete()" confirmTitle="Delete backup" confirmText="Do you really want to delete the backup?">
+            <button type="button" class="btn btn-text-danger mt-1" [disabled]="!backup.canDelete"
+                (sqxConfirmClick)="delete()"
+                confirmTitle="i18n:backups.deleteConfirmTitle"
+                confirmText="i18n:backups.deleteConfirmText">
                 <i class="icon-bin2"></i>
             </button>
         </div>

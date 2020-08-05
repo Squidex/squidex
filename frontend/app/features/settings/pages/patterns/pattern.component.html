@@ -24,7 +24,10 @@
                 <i class="icon-checkmark"></i>
             </button>
 
-            <button type="button" class="btn btn-text-danger" [disabled]="!isDeletable" (sqxConfirmClick)="delete()" confirmTitle="Remove pattern" confirmText="Do you really want to remove this pattern?">
+            <button type="button" class="btn btn-text-danger" [disabled]="!isDeletable"
+                (sqxConfirmClick)="delete()"
+                confirmTitle="i18n:patterns.deleteConfirmTitle"
+                confirmText="i18n:patterns.deleteConfirmText">
                 <i class="icon-bin2"></i>
             </button>
         </div>

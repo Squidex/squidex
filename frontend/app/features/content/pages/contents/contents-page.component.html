@@ -45,7 +45,10 @@
                             </sqx-content-status>
                         </button>
                         
-                        <button type="button" class="btn btn-danger" *ngIf="selectionCanDelete" (sqxConfirmClick)="deleteSelected()" confirmTitle="Delete content" confirmText="Do you really want to delete the selected content items?">
+                        <button type="button" class="btn btn-danger" *ngIf="selectionCanDelete"
+                            (sqxConfirmClick)="deleteSelected()"
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmText="i18n:contents.deleteManyConfirmText">
                             {{ 'common.delete' | sqxTranslate }}
                         </button>
                     </div>

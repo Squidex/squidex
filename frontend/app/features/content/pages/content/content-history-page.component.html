@@ -29,13 +29,19 @@
                             <div class="dropdown-divider"></div>
                         </ng-container>
 
-                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDraftDelete" (sqxConfirmClick)="deleteDraft()" confirmTitle="Delete content" confirmText="Do you really want to delete this version?">
+                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDraftDelete"
+                            (sqxConfirmClick)="deleteDraft()" 
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmText="i18n:contents.deleteVersionConfirmText">
                             {{ 'contents.versionDelete' | sqxTranslate }}
                         </a>
 
                         <div class="dropdown-divider"></div>
 
-                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete" (sqxConfirmClick)="delete()" confirmTitle="Delete content" confirmText="Do you really want to delete the content?">
+                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
+                            (sqxConfirmClick)="delete()"
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmText="i18n:contents.deleteConfirmText">
                             {{ 'common.delete' | sqxTranslate }}
                         </a>
                     </div>
@@ -65,7 +71,10 @@
                             <div class="dropdown-divider"></div>
                         </ng-container>
 
-                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete" (sqxConfirmClick)="delete()" confirmTitle="Delete content" confirmText="Do you really want to delete the content?">
+                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
+                            (sqxConfirmClick)="delete()"
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmText="i18n:contents.deleteConfirmText">
                             {{ 'common.delete' | sqxTranslate }}
                         </a>
                     </div>
