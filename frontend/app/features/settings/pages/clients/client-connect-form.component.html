@@ -1,37 +1,37 @@
-<sqx-modal-dialog (close)="complete.emit()" size="lg" >
+<sqx-modal-dialog (close)="complete.emit()" size="lg">
     <ng-container title>
-        Connect
+        {{ 'clients.connect' | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb steps">
                 <li class="breadcrumb-item done">
-                    <i class="icon-checkmark"></i> Setup client
+                    <i class="icon-checkmark"></i> {{ 'clients.step0Title' | sqxTranslate }}
                 </li>
                 <ng-container *ngIf="isStart; else noStart">
                     <li class="breadcrumb-item active">
                         <span>
-                            <i class="icon-checkmark"></i> Choose connection method
+                            <i class="icon-checkmark"></i> {{ 'clients.step1Title' | sqxTranslate }}
                         </span>
                     </li>
                 </ng-container>
                 <ng-template #noStart>
                     <li class="breadcrumb-item done">
                         <a class="force" (click)="go('Start')">
-                            <i class="icon-checkmark"></i> Choose connection method
+                            <i class="icon-checkmark"></i> {{ 'clients.step1Title' | sqxTranslate }}
                         </a>
                     </li>
                 </ng-template>
                 <li class="breadcrumb-item" [class.active]="!isStart">
-                    <i class="icon-checkmark"></i> Connect
+                    <i class="icon-checkmark"></i> {{ 'clients.connect' | sqxTranslate }}
                 </li>
             </ol>
         </nav>
 
         <ng-container [ngSwitch]="step">
             <ng-container *ngSwitchCase="'Start'">
-                <h3>Choose a connection method</h3>
+                <h3>{{ 'clients.wizard.step2Title' | sqxTranslate }}</h3>
 
                 <sqx-form-hint>
                     Start with the Postman tutorial in the <a href="https://docs.squidex.io/02-documentation/developer-guides/api-overview/postman" sqxExternalLink>Documentation</a>

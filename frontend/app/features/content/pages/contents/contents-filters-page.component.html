@@ -1,33 +1,24 @@
 <sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false">
     <ng-container title>
-        Filters
+        {{ 'common.filters' | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
-        <sqx-query-list
-            [queryUsed]="contentsState.contentsQuery | async"
-            [queries]="schemaQueries.defaultQueries"
-            (search)="search($event)">
+        <sqx-query-list [queryUsed]="contentsState.contentsQuery | async" [queries]="schemaQueries.defaultQueries" (search)="search($event)">
         </sqx-query-list>
 
-        <hr />
+        <hr>
 
         <div class="sidebar-section">
-            <h3>Status Queries</h3>
+            <h3>{{ 'contents.statusQueries' | sqxTranslate }}</h3>
 
-            <sqx-query-list
-                [queryUsed]="contentsState.contentsQuery | async"
-                [queries]="contentsState.statusQueries | async"
-                (search)="search($event)">
+            <sqx-query-list [queryUsed]="contentsState.contentsQuery | async" [queries]="contentsState.statusQueries | async" (search)="search($event)">
             </sqx-query-list>
         </div>
 
-        <hr />
+        <hr>
 
-        <sqx-shared-queries types="contents"
-            [queryUsed]="contentsState.contentsQuery | async"
-            [queries]="schemaQueries"
-            (search)="search($event)">
+        <sqx-shared-queries types="contents" [queryUsed]="contentsState.contentsQuery | async" [queries]="schemaQueries" (search)="search($event)">
         </sqx-shared-queries>
     </ng-container>
 </sqx-panel>

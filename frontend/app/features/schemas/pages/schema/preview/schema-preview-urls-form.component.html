@@ -1,36 +1,32 @@
 <form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
     <div class="card mb-2">
-        <div class="card-header">Preview URLs</div>
+        <div class="card-header">{{ 'schemas.previewUrls.title' | sqxTranslate }}</div>
 
         <div class="card-body">
             <sqx-form-alert>
-                Checkout the integrated help page to learn more about preview URL's.
+                {{ 'schemas.previewUrls.help' | sqxTranslate }}
             </sqx-form-alert>
 
             <div class="content">
                 <div class="mt-4" *ngIf="!isEditable && editForm.form.controls.length === 0">
-                    No preview urls configured.
+                    {{ 'schemas.previewUrls.empty' | sqxTranslate }}
                 </div>
 
                 <div class="form-group row no-gutters" *ngFor="let form of editForm.form.controls; let i = index" [formGroup]="form">
                     <div class="col col-name pr-1">
                         <sqx-control-errors for="name"></sqx-control-errors>
 
-                        <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="Web or Mobile" />
+                        <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="{{ 'schemas.previewUrls.namePlaceholder' | sqxTranslate }}">
                     </div>
 
                     <div class="col pr-1">
                         <sqx-control-errors for="url"></sqx-control-errors>
 
-                        <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="URL with variables" />
+                        <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="{{ 'schemas.previewUrls.urlPlaceholder' | sqxTranslate }}">
                     </div>
 
                     <div class="col-auto">
-                        <button type="button" class="btn btn-text-danger"
-                            [disabled]="!isEditable"
-                            (sqxConfirmClick)="editForm.remove(i)"
-                            confirmTitle="Remove url" 
-                            confirmText="Do you really want to remove this url?">
+                        <button type="button" class="btn btn-text-danger" [disabled]="!isEditable" (sqxConfirmClick)="editForm.remove(i)" confirmTitle="Remove url" confirmText="Do you really want to remove this url?">
                             <i class="icon-bin2"></i>
                         </button>
                     </div>
@@ -38,11 +34,11 @@
 
                 <div class="form-group row no-gutters" *ngIf="isEditable">
                     <div class="col col-name pr-1">
-                        <div class="form-control preview">Web or Mobile</div>
+                        <div class="form-control preview">{{ 'schemas.previewUrls.namePlaceholder' | sqxTranslate }}</div>
                     </div>
 
                     <div class="col pr-1">
-                        <div class="form-control preview">URL with variables</div>
+                        <div class="form-control preview">{{ 'schemas.previewUrls.urlPlaceholder' | sqxTranslate }}</div>
                     </div>
 
                     <div class="col-auto col-options">
@@ -54,7 +50,7 @@
             </div>
         </div>
         <div class="card-footer" *ngIf="isEditable">
-            <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">Save</button>
+            <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">{{ 'common.save' | sqxTranslate }}</button>
         </div>
     </div>
 </form>

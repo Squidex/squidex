@@ -1,15 +1,15 @@
-<sqx-title message="Subscription"></sqx-title>
+<sqx-title message="{{ 'common.subscription' | sqxTranslate }}"></sqx-title>
 
 <sqx-panel desiredWidth="65rem" [showSidebar]="true" [scrollX]="true" grid="true">
     <ng-container title>
-        Subscription
+        {{ 'common.subscription' | sqxTranslate }}
     </ng-container>
 
     <ng-container menu>
         <sqx-notifo topic="apps/{{plansState.appId}}/settings/plan"></sqx-notifo>
 
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh Plans (CTRL + SHIFT + R)">
-            <i class="icon-reset"></i> Refresh
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="{{ 'plans.refreshTooltip' | sqxTranslate }}">
+            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
@@ -20,7 +20,7 @@
             <ng-container topHeader>
                 <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
                     <div class="panel-alert panel-alert-danger" *ngIf="(plansState.isOwner | async) === false">
-                        You have not created the subscription. Therefore you cannot change the plan.
+                        {{ 'plans.notPlanOwner' | sqxTranslate }}
                     </div>
                 </ng-container>
             </ng-container>
@@ -28,17 +28,16 @@
             <div content>
                 <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
                     <div class="text-muted text-center empty" *ngIf="plans.length === 0">
-                        No plan configured, this app has unlimited usage.
+                        {{ 'plans.noPlanConfigured' | sqxTranslate }}
                     </div>
 
                     <div class="clearfix">
-                        <sqx-plan *ngFor="let planInfo of plans; trackBy: trackByPlan"
-                            [planInfo]="planInfo">
+                        <sqx-plan *ngFor="let planInfo of plans; trackBy: trackByPlan" [planInfo]="planInfo">
                         </sqx-plan>
                     </div>
 
                     <div *ngIf="plansState.hasPortal | async" class="billing-portal-link">
-                        Go to <a [href]="portalUrl" sqxExternalLink>Billing Portal</a> for payment history and subscription overview.
+                        {{ 'plan.billingPortalHint' | sqxTranslate }} <a [href]="portalUrl" sqxExternalLink>{{ 'plan.billingPortal' | sqxTranslate }}</a>
                     </div>
                 </ng-container>
             </div>
@@ -47,7 +46,7 @@
 
     <ng-container sidebar>
         <div class="panel-nav">        
-            <a class="panel-link" routerLink="history" routerLinkActive="active" title="History" titlePosition="left">
+            <a class="panel-link" routerLink="history" routerLinkActive="active" title="{{ 'assets.history' | sqxTranslate }}" titlePosition="left">
                 <i class="icon-time"></i>
             </a>
         </div>

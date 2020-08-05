@@ -11,27 +11,27 @@
                 </div>
             </div>
             <div class="col-auto pr-4">
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveTop()" title="Move this item to top">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveTop()" title="{{ 'contents.arrayMoveTop' | sqxTranslate }}">
                     <i class="icon-caret-top"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveUp()" title="Move this item up">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveUp()" title="{{ 'contents.arrayMoveUp' | sqxTranslate }}">
                     <i class="icon-caret-up"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveDown()" title="Move this item down">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveDown()" title="{{ 'contents.arrayMoveDown' | sqxTranslate }}">
                     <i class="icon-caret-down"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()" title="Move this item to bottom">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()" title="{{ 'contents.arrayMoveBottom' | sqxTranslate }}">
                     <i class="icon-caret-bottom"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isCollapsed" (click)="expand()" title="Expand this item">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isCollapsed" (click)="expand()" title="{{ 'contents.arrayExpandItem' | sqxTranslate }}">
                     <i class="icon-plus-square"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="isCollapsed" (click)="collapse()" title="Collapse this item">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="isCollapsed" (click)="collapse()" title="{{ 'contents.arrayCollapseItem' | sqxTranslate }}">
                     <i class="icon-minus-square"></i>
                 </button>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled" (click)="clone.emit()" title="Clone this item">
+                <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled" (click)="clone.emit()" title="{{ 'contents.arrayCloneItem' | sqxTranslate }}">
                     <i class="icon-clone"></i>
                 </button>
         
@@ -44,13 +44,7 @@
     
     <div class="card-body" [class.hidden]="isCollapsed">
         <div class="form-group" *ngFor="let section of formModel.sections">
-            <sqx-array-section
-                [canUnset]="canUnset"
-                [form]="form"
-                [formContext]="formContext"
-                [formSection]="section"
-                [language]="language"
-                [languages]="languages">
+            <sqx-array-section [canUnset]="canUnset" [form]="form" [formContext]="formContext" [formSection]="section" [language]="language" [languages]="languages">
             </sqx-array-section>
         </div>
     </div>

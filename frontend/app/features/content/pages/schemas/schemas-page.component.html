@@ -1,9 +1,9 @@
-<sqx-title message="Contents"></sqx-title>
+<sqx-title message="{{ 'common.contents' | sqxTranslate }}"></sqx-title>
 
 <sqx-panel theme="dark" [desiredWidth]="width" [showClose]="!isCollapsed" showSecondHeader="true">
     <ng-container title>
         <ng-container *ngIf="!isCollapsed">
-            Schemas
+            {{ 'dashboard.schemas' | sqxTranslate }}
         </ng-container>
     </ng-container>
 
@@ -18,7 +18,7 @@
             <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
             <div class="search-form">
-                <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas" />
+                <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="{{ 'schemas.searchPlaceholder' | sqxTranslate }}">
 
                 <i class="icon-search"></i>
             </div>
@@ -28,16 +28,13 @@
     <ng-container content>
         <div [class.hidden]="isCollapsed">
             <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
-                <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-                    [schemaCategory]="category"
-                    [schemasFilter]="schemasFilter.valueChanges | async"
-                    [forContent]="true">
+                <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory" [schemaCategory]="category" [schemasFilter]="schemasFilter.valueChanges | async" [forContent]="true">
                 </sqx-schema-category>
             </ng-container>
         </div>
 
         <div class="headline" [class.hidden]="!isCollapsed">
-            Schemas
+            {{ 'dashboard.schemas' | sqxTranslate }}
         </div>
     </ng-container>
 </sqx-panel>

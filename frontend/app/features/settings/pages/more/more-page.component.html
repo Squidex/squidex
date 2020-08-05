@@ -1,56 +1,52 @@
 <sqx-panel desiredWidth="46rem" [showClose]="false">
     <ng-container title>
-        Settings
+        {{ 'common.settings' | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
         <form [formGroup]="updateForm.form" (ngSubmit)="save()">
             <div class="card mb-2">
-                <h3 class="card-header">General</h3>
+                <h3 class="card-header">{{ 'apps.generalSettings' | sqxTranslate }}</h3>
 
                 <div class="card-body">
                     <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
 
                     <div class="form-group">
-                        <label for="email">Name</label>
+                        <label for="email">{{ 'common.name' | sqxTranslate }}</label>
         
-                        <input type="text" class="form-control" readonly [value]="app?.name" />
+                        <input type="text" class="form-control" readonly [value]="app?.name">
                     </div>
 
                     <div class="form-group">
-                        <label for="label">Label</label>
+                        <label for="label">{{ 'common.label' | sqxTranslate }}</label>
         
                         <sqx-control-errors for="label"></sqx-control-errors>
         
-                        <input type="text" class="form-control" id="label" maxlength="100" formControlName="label" />
+                        <input type="text" class="form-control" id="label" maxlength="100" formControlName="label">
                     </div>
 
                     <div class="form-group">
-                        <label for="description">Description</label>
+                        <label for="description">{{ 'common.description' | sqxTranslate }}</label>
         
                         <sqx-control-errors for="description"></sqx-control-errors>
         
-                        <input type="text" class="form-control" id="description" maxlength="100" formControlName="description" />
+                        <input type="text" class="form-control" id="description" maxlength="100" formControlName="description">
                     </div>
                 </div>
 
                 <div class="card-footer">
-                    <button type="submit" class="float-right btn btn-primary">Save</button>
+                    <button type="submit" class="float-right btn btn-primary">{{ 'common.save' | sqxTranslate }}</button>
                 </div>
             </div>
         </form>
 
         <div class="card mb-2">
-            <h3 class="card-header">Image</h3>
+            <h3 class="card-header">{{ 'assets.image' | sqxTranslate }}</h3>
 
             <div class="card-body">
                 <div class="row">
                     <div class="col-auto">
-                        <div class="app-image"
-                            (sqxDropFile)="uploadImage($event)"
-                            [sqxDropDisabled]="uploading || !isImageEditable"
-                            [sqxDropOnlyImages]="true"
-                            [sqxDropNoPaste]="true">
+                        <div class="app-image" (sqxDropFile)="uploadImage($event)" [sqxDropDisabled]="uploading || !isImageEditable" [sqxDropOnlyImages]="true" [sqxDropNoPaste]="true">
                             <div class="app-progress" *ngIf="uploading; else notUploading">
                                 <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
                             </div>
@@ -60,7 +56,7 @@
                                     <sqx-avatar [image]="app?.image" [identifier]="app?.name" [size]="150"></sqx-avatar>
 
                                     <ng-container *ngIf="isImageEditable && app?.image">
-                                        <button class="btn btn-danger btn-sm app-image-remove" title="Remove image" (click)="removeImage()">
+                                        <button class="btn btn-danger btn-sm app-image-remove" title="{{ 'apps.removeImage' | sqxTranslate }}" (click)="removeImage()">
                                             <i class="icon-bin2"></i>
                                         </button>
                                     </ng-container>
@@ -68,18 +64,18 @@
         
                                 <div class="drop-overlay align-items-center justify-content-center">
                                     <div class="drop-overlay-background"></div>
-                                    <div class="drop-overlay-text">Drop to update</div>
+                                    <div class="drop-overlay-text">{{ 'assets.dropToUpdate' | sqxTranslate }}</div>
                                 </div>
                             </ng-template>
                         </div>
                     </div>
                     <div class="auto align-self-center pl-4">
-                        <sqx-form-hint>Drop an file to replace the app image. Use a square size.</sqx-form-hint>
+                        <sqx-form-hint>{{ 'apps.uploadImage' | sqxTranslate }}</sqx-form-hint>
 
                         <span class="btn btn-success upload-button" [class.disabled]="!isImageEditable" (click)="fileInput.click()">
-                            <span>Upload File</span>
+                            <span>{{ 'apps.uploadImageButton' | sqxTranslate }}</span>
                 
-                            <input type="file" (change)="uploadImage($event.target.files)" #fileInput single accept="image/x-png,image/gif,image/jpeg" />
+                            <input type="file" (change)="uploadImage($event.target.files)" #fileInput single accept="image/x-png,image/gif,image/jpeg">
                         </span>
                     </div>
                 </div>
@@ -87,23 +83,20 @@
         </div>
 
         <div class="card">
-            <h3 class="card-header">Danger Zone</h3>
+            <h3 class="card-header">{{ 'apps.dangerZone' | sqxTranslate }}</h3>
 
             <div class="card-body">
                 <div class="row">
                     <div class="col">
-                        <h5>Archive App</h5>
+                        <h5>{{ 'apps.archieve' | sqxTranslate }}</h5>
 
                         <sqx-form-hint>
-                            Once you archive an app, there is no going back. Please be certain.
+                            {{ 'apps.archieveWarning' | sqxTranslate }}
                         </sqx-form-hint>
                     </div>
                     <div class="col-auto">
-                        <button type="button" class="btn btn-danger" [disabled]="!isDeletable"
-                            (sqxConfirmClick)="archiveApp()"
-                            confirmTitle="Archive App" 
-                            confirmText="Do you really want to archive this app?">
-                            Archive App
+                        <button type="button" class="btn btn-danger" [disabled]="!isDeletable" (sqxConfirmClick)="archiveApp()" confirmTitle="Archive App" confirmText="Do you really want to archive this app?">
+                            {{ 'apps.archieve' | sqxTranslate }}
                         </button>
                     </div>
                 </div>

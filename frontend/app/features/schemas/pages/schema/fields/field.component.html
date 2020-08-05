@@ -10,14 +10,14 @@
                     <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
 
                     <span [class.field-hidden]="field.isHidden" title="{{field.isHidden ? 'Hidden Field' : 'Visible Field'}}">{{field.displayName}}</span>
-                    <span class="field-partitioning ml-2" *ngIf="field['isLocalizable']">localizable</span>
+                    <span class="field-partitioning ml-2" *ngIf="field['isLocalizable']">{{ 'schemas.fieldLocalizableMarker' | sqxTranslate }}</span>
                 </span>
             </div>
             <div class="col col-tags">
                 <div class="float-right">
-                    <span class="ml-1 badge badge-pill badge-danger" *ngIf="field.isLocked">Locked</span>
-                    <span class="ml-1 badge badge-pill badge-success" *ngIf="!field.isDisabled">Enabled</span>
-                    <span class="ml-1 badge badge-pill badge-danger" *ngIf="field.isDisabled">Disabled</span>
+                    <span class="ml-1 badge badge-pill badge-danger" *ngIf="field.isLocked">{{ 'schemas.fieldLockedMarker' | sqxTranslate }}</span>
+                    <span class="ml-1 badge badge-pill badge-success" *ngIf="!field.isDisabled">{{ 'schemas.fieldEnabledmarker' | sqxTranslate }}</span>
+                    <span class="ml-1 badge badge-pill badge-danger" *ngIf="field.isDisabled">{{ 'schemas.fieldDisabledmarker' | sqxTranslate }}</span>
                 </div>
             </div>
             <div class="col col-options">
@@ -35,39 +35,32 @@
                             <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
                                 <ng-container *ngIf="field.properties.isContentField">
                                     <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
-                                        Enable in UI
+                                        {{ 'schemas.fieldEnable' | sqxTranslate }}
                                     </a>
                                     <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
-                                        Disable in UI
+                                        {{ 'schemas.fieldDisable' | sqxTranslate }}
                                     </a>
                                     <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
-                                        Hide in API
+                                        {{ 'schemas.field.hide' | sqxTranslate }}
                                     </a>
                                     <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
-                                        Show in API
+                                        {{ 'schemas.field.show' | sqxTranslate }}
                                     </a>
                                 </ng-container>                
                                 
                                 <ng-container *ngIf="field.canLock">
                                     <div class="dropdown-divider"></div>
                             
-                                    <a class="dropdown-item" 
-                                        (sqxConfirmClick)="lockField()"
-                                        confirmTitle="Lock field" 
-                                        confirmText="WARNING: Locking a field cannot be undone! Locked field definitions cannot be unlocked, deleted, or changed anymore. Do you really want to lock this field?">
-                                        Lock and prevent changes
+                                    <a class="dropdown-item" (sqxConfirmClick)="lockField()" confirmTitle="Lock field" confirmText="WARNING: Locking a field cannot be undone! Locked field definitions cannot be unlocked, deleted, or changed anymore. Do you really want to lock this field?">
+                                        {{ 'schemas.field.lock' | sqxTranslate }}
                                     </a>
                                 </ng-container>
     
                                 <ng-container>
                                     <div class="dropdown-divider"></div>
     
-                                    <a class="dropdown-item dropdown-item-delete"
-                                        [class.disabled]="!field.canDelete"
-                                        (sqxConfirmClick)="deleteField()"
-                                        confirmTitle="Delete field" 
-                                        confirmText="Do you really want to delete the field?">
-                                        Delete
+                                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!field.canDelete" (sqxConfirmClick)="deleteField()" confirmTitle="Delete field" confirmText="Do you really want to delete the field?">
+                                        {{ 'common.delete' | sqxTranslate }}
                                     </a>
                                 </ng-container>
                             </div>
@@ -80,12 +73,7 @@
 
     <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
-            <sqx-field-form showButtons="true"
-                (cancel)="toggleEditing()"
-                [patterns]="patterns" 
-                [fieldForm]="editForm.form"
-                [field]="field"
-                [isEditable]="isEditable">
+            <sqx-field-form showButtons="true" (cancel)="toggleEditing()" [patterns]="patterns" [fieldForm]="editForm.form" [field]="field" [isEditable]="isEditable">
             </sqx-field-form>
         </form> 
     </div>
@@ -94,15 +82,8 @@
         <ng-container *ngIf="field['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
-            <div
-                cdkDropList
-                [cdkDropListDisabled]="!isEditable"
-                [cdkDropListData]="nested"
-                (cdkDropListDropped)="sortFields($event)">
-                <div *ngFor="let nested of nested; trackBy: trackByFieldFn"
-                    class="nested-field table-drag"
-                    cdkDrag
-                    cdkDragLockAxis="y">
+            <div cdkDropList [cdkDropListDisabled]="!isEditable" [cdkDropListData]="nested" (cdkDropListDropped)="sortFields($event)">
+                <div *ngFor="let nested of nested; trackBy: trackByFieldFn" class="nested-field table-drag" cdkDrag cdkDragLockAxis="y">
 
                     <span class="nested-field-line-h"></span>
     
@@ -116,13 +97,12 @@
                 <span class="nested-field-line-h"></span>
 
                 <button type="button" class="btn btn-success btn-sm" (click)="addFieldDialog.show()">
-                    <i class="icon icon-plus"></i> Add Nested Field
+                    <i class="icon icon-plus"></i> {{ 'schemas.addNestedField' | sqxTranslate }}
                 </button>
             </div>
                 
             <ng-container *sqxModal="addFieldDialog">
-                <sqx-field-wizard [schema]="schema" [parent]="field"
-                    (complete)="addFieldDialog.hide()">
+                <sqx-field-wizard [schema]="schema" [parent]="field" (complete)="addFieldDialog.hide()">
                 </sqx-field-wizard>
             </ng-container>
         </ng-container>

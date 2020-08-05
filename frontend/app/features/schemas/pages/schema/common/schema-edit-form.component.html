@@ -1,27 +1,27 @@
 
 <form [formGroup]="fieldForm.form" (ngSubmit)="saveSchema()">
     <div class="card">
-        <div class="card-header">Common</div>
+        <div class="card-header">{{ 'common.common' | sqxTranslate }}</div>
 
         <div class="card-body">
             <div class="form-group">
-                <label for="schemaName">Name</label>
+                <label for="schemaName">{{ 'common.name' | sqxTranslate }}</label>
         
-                <input type="text" class="form-control" id="schemaName" readonly [ngModel]="schema.name" [ngModelOptions]="standalone" />
+                <input type="text" class="form-control" id="schemaName" readonly [ngModel]="schema.name" [ngModelOptions]="standalone">
             </div>
         
             <div class="form-group">
-                <label for="schemaLabel">Label</label>
+                <label for="schemaLabel">{{ 'common.label' | sqxTranslate }}</label>
                 
                 <sqx-control-errors for="label"></sqx-control-errors>
         
-                <input type="text" class="form-control" id="schemaLabel" formControlName="label" />
+                <input type="text" class="form-control" id="schemaLabel" formControlName="label">
 
-                <sqx-form-hint>Display name for documentation and user interfaces.</sqx-form-hint>
+                <sqx-form-hint>{{ 'schemas.fieldLabelHint' | sqxTranslate }}</sqx-form-hint>
             </div>
         
             <div class="form-group">
-                <label for="schemaHints">Hints</label>
+                <label for="schemaHints">{{ 'common.hints' | sqxTranslate }}</label>
                 
                 <sqx-control-errors for="hints"></sqx-control-errors>
         
@@ -29,17 +29,17 @@
             </div>
         
             <div class="form-group">
-                <label for="schemaTags">Tags</label>
+                <label for="schemaTags">{{ 'common.tags' | sqxTranslate }}</label>
                 
                 <sqx-control-errors for="tags"></sqx-control-errors>
         
                 <sqx-tag-editor id="schemaTags" formControlName="tags"></sqx-tag-editor>
         
-                <sqx-form-hint>Tags to annotate your schema for automation processes.</sqx-form-hint>
+                <sqx-form-hint>{{ 'schemas.schemaTagsHint' | sqxTranslate }}</sqx-form-hint>
             </div>
         </div>
         <div class="card-footer">
-            <button type="submit" class="float-right btn btn-primary" *ngIf="isEditable">Save</button>
+            <button type="submit" class="float-right btn btn-primary" *ngIf="isEditable">{{ 'common.save' | sqxTranslate }}</button>
         </div>
     </div>
 </form>

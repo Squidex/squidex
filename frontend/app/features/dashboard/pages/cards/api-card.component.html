@@ -1,15 +1,15 @@
 <div class="card card-href">
     <div class="card-body">
         <div class="card-image">
-            <img src="./images/dashboard-api.svg" />
+            <img src="./images/dashboard-api.svg">
         </div>
 
         <h4 class="card-title">
-            <a href="/api/content/{{app.name}}/docs" sqxExternalLink>Content API</a>
+            <a href="/api/content/{{app.name}}/docs" sqxExternalLink>{{ 'common.contentApi' | sqxTranslate }}</a>
         </h4>
 
         <div class="card-text">
-            OpenAPI 3.0 compatible documentation for your app content.
+            {{ 'dashboard.contentApiDescription' | sqxTranslate }}
         </div>
     </div>
 </div>

@@ -1,21 +1,14 @@
 <div class="table-items-row table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
-    No field created yet.
+    {{ 'schemas.fields.empty' | sqxTranslate }}
     
     <button type="button" class="btn btn-success btn-sm ml-2" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
-        <i class="icon icon-plus"></i> Add Field
+        <i class="icon icon-plus"></i> {{ 'schemas.addField' | sqxTranslate }}
     </button>
 </div>
 
 <ng-container *ngIf="patternsState.patterns | async; let patterns">
-    <div
-        cdkDropList
-        [cdkDropListDisabled]="!schema.canOrderFields"
-        [cdkDropListData]="schema.fields"
-        (cdkDropListDropped)="sortFields($event)">
-        <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn"
-            class="table-drag"
-            cdkDrag
-            cdkDragLockAxis="y">
+    <div cdkDropList [cdkDropListDisabled]="!schema.canOrderFields" [cdkDropListData]="schema.fields" (cdkDropListDropped)="sortFields($event)">
+        <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn" class="table-drag" cdkDrag cdkDragLockAxis="y">
             <sqx-field [field]="field" [schema]="schema" [patterns]="patterns">
                 <i cdkDragHandle class="icon-drag2 drag-handle"></i>
             </sqx-field>
@@ -23,12 +16,11 @@
     </div>
 
     <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
-        <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">Add Field</div>
+        <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">{{ 'schemas.addField' | sqxTranslate }}</div>
     </button>
 </ng-container>
 
 <ng-container *sqxModal="addFieldDialog">
-    <sqx-field-wizard [schema]="schema"
-        (complete)="addFieldDialog.hide()">
+    <sqx-field-wizard [schema]="schema" (complete)="addFieldDialog.hide()">
     </sqx-field-wizard>
 </ng-container>

@@ -12,12 +12,70 @@
   "/features/content/pages/content/content-event.component.html": [
     "&middot;"
   ],
+  "/features/content/pages/content/content-page.component.html": [
+    "."
+  ],
   "/features/content/pages/content/content-page.component.ts": [
     "close the current content view"
+  ],
+  "/features/content/shared/due-time-selector.component.html": [
+    "Change content item(s) to {{dueTimeAction}}",
+    "Set to {{dueTimeAction}} at a later point date and time.",
+    "Set to {{dueTimeAction}} immediately."
+  ],
+  "/features/content/shared/forms/array-item.component.html": [
+    "#{{index + 1}}"
+  ],
+  "/features/content/shared/forms/field-editor.component.html": [
+    "*",
+    "{{field.displayName}} {{displaySuffix}}"
+  ],
+  "/features/content/shared/references/references-editor.component.html": [
+    "&middot;"
+  ],
+  "/features/rules/pages/rules/actions/generic-action.component.html": [
+    "*"
+  ],
+  "/features/rules/pages/rules/rules-page.component.html": [
+    "for the full documentation.",
+    "https://docs.squidex.io"
+  ],
+  "/features/rules/pages/rules/triggers/asset-changed-trigger.component.html": [
+    "*"
+  ],
+  "/features/rules/pages/rules/triggers/comment-trigger.component.html": [
+    "*"
+  ],
+  "/features/rules/pages/rules/triggers/content-changed-trigger.component.html": [
+    "*"
+  ],
+  "/features/rules/pages/rules/triggers/schema-changed-trigger.component.html": [
+    "*"
+  ],
+  "/features/rules/pages/rules/triggers/usage-trigger.component.html": [
+    "*"
+  ],
+  "/features/schemas/pages/schema/fields/types/array-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/assets-validation.component.html": [
+    "-",
+    "3",
+    "4",
+    "px"
+  ],
+  "/features/settings/pages/backups/backup.component.html": [
+    ","
+  ],
+  "/features/settings/pages/clients/client-connect-form.component.html": [
+    "*"
   ],
   "/features/settings/pages/clients/client-connect-form.component.ts": [
     "Content-Type: application/x-www-form-urlencoded",
     "grant_type=client_credentials&\r\n        client_id=${app}:${client.id}&\r\n        client_secret=${client.secret}&\r\n        scope=squidex-api"
+  ],
+  "/features/settings/pages/contributors/import-contributors-dialog.component.html": [
+    "user1@squidex.io;user2@squidex.io"
   ],
   "/framework/angular/forms/validators.ts": [
     "matchValidator(): other control is not found in parent group"
@@ -65,6 +123,14 @@
   "/shared/components/forms/rich-editor.component.ts": [
     "code image media link lists advlist paste",
     "undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets"
+  ],
+  "/shared/components/search/queries/filter-logical.component.html": [
+    "AND",
+    "OR"
+  ],
+  "/shared/components/search/queries/sorting.component.html": [
+    "ascending",
+    "descending"
   ],
   "/shared/components/search/search-form.component.html": [
     "."

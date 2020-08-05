@@ -1,4 +1,9 @@
 {
+  "/features/content/shared/due-time-selector.component.html": [
+    "Change content item(s) to {{dueTimeAction}}",
+    "Set to {{dueTimeAction}} at a later point date and time.",
+    "Set to {{dueTimeAction}} immediately."
+  ],
   "/framework/angular/pager.component.html": [
     "{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}"
   ],

@@ -1,7 +1,7 @@
 <form [formGroup]="importForm.form" (ngSubmit)="detect()">  
     <sqx-modal-dialog (close)="close.emit()">
         <ng-container title>
-            Import contributors
+            {{ 'contributors.importTitle' | sqxTranslate }}
         </ng-container>
 
         <ng-container content>
@@ -11,7 +11,7 @@
                    
                     <sqx-form-hint>
                         <ng-container *ngIf="importForm.numberOfEmails | async; let emails">
-                            Emails detected: {{emails}}
+                            {{ 'contributors.import.emailsDetected' | sqxTranslate }}
                         </ng-container>
         
                         &nbsp;
@@ -39,9 +39,7 @@
                         </div>
 
                         <div class="col-auto aligned">
-                            <sqx-status-icon size="sm"
-                                [status]="status.result"
-                                [statusText]="status.resultText | sqxTranslate">
+                            <sqx-status-icon size="sm" [status]="status.result" [statusText]="status.resultText | sqxTranslate">
                             </sqx-status-icon>
                         </div>
                     </div>
@@ -50,15 +48,15 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-secondary" (click)="close.emit()">Cancel</button>
+            <button type="button" class="btn btn-secondary" (click)="close.emit()">{{ 'common.cancel' | sqxTranslate }}</button>
 
             <ng-container [ngSwitch]="importStage">
                 <ng-container *ngSwitchCase="'Start'">
-                    <button type="submit" class="btn btn-success" [disabled]="importForm.hasNoUser | async">Add Contributors</button>
+                    <button type="submit" class="btn btn-success" [disabled]="importForm.hasNoUser | async">{{ 'contributors.import.run' | sqxTranslate }}</button>
                 </ng-container>
 
                 <ng-container *ngSwitchCase="'Change'">
-                    <button type="button" class="btn btn-success" [disabled]="importStatus.length === 0" (click)="import()">Import</button>
+                    <button type="button" class="btn btn-success" [disabled]="importStatus.length === 0" (click)="import()">{{ 'contributors.import.run2' | sqxTranslate }}</button>
                 </ng-container>
             </ng-container>
         </ng-container>

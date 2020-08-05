@@ -1,32 +1,22 @@
 <div class="step">
     <div class="row no-gutters step-header">
         <div class="col-auto">
-            <button class="btn btn-initial mr-1" (click)="makeInitial.emit()"
-                [class.enabled]="step.name !== workflow.initial && !step.isLocked"
-                [class.active]="step.name === workflow.initial"
-                [disabled]="step.name === workflow.initial || step.isLocked || disabled">
+            <button class="btn btn-initial mr-1" (click)="makeInitial.emit()" [class.enabled]="step.name !== workflow.initial && !step.isLocked" [class.active]="step.name === workflow.initial" [disabled]="step.name === workflow.initial || step.isLocked || disabled">
                 <i class="icon-arrow-right text-decent" *ngIf="!step.isLocked"></i>
             </button>
         </div>
         <div class="col-auto color pr-2">
-            <sqx-color-picker mode="Circle"
-                [ngModelOptions]="onBlur"
-                [ngModel]="step.color"
-                (ngModelChange)="changeColor($event)"
-                [disabled]="disabled">
+            <sqx-color-picker mode="Circle" [ngModelOptions]="onBlur" [ngModel]="step.color" (ngModelChange)="changeColor($event)" [disabled]="disabled">
             </sqx-color-picker>
         </div>
         <div class="col">
-            <sqx-editable-title 
-                [name]="step.name"
-                (nameChange)="changeName($event)"
-                [disabled]="step.isLocked || disabled">
+            <sqx-editable-title [name]="step.name" (nameChange)="changeName($event)" [disabled]="step.isLocked || disabled">
             </sqx-editable-title>
         </div>
         <div class="col">
         </div>
         <div class="col-auto" *ngIf="step.isLocked">
-            <small class="text-decent">(Cannot be removed)</small>
+            <small class="text-decent">({{ 'workflow.publishedNotRemovable' | sqxTranslate }})</small>
         </div>
         <div class="col-auto">
             <button type="button" class="btn btn-text-danger" (click)="remove.emit()" *ngIf="!step.isLocked && workflow.steps.length > 2" [disabled]="disabled">
@@ -36,12 +26,7 @@
     </div>
 
     <div class="step-inner">
-        <sqx-workflow-transition *ngFor="let transition of transitions; trackBy: trackByTransition"
-            [transition]="transition"
-            [disabled]="disabled"
-            [roles]="roles"
-            (remove)="transitionRemove.emit(transition)"
-            (update)="changeTransition(transition, $event)">
+        <sqx-workflow-transition *ngFor="let transition of transitions; trackBy: trackByTransition" [transition]="transition" [disabled]="disabled" [roles]="roles" (remove)="transitionRemove.emit(transition)" (update)="changeTransition(transition, $event)">
         </sqx-workflow-transition>
 
         <div class="row transition no-gutters" *ngIf="openSteps.length > 0 && !disabled">
@@ -66,41 +51,25 @@
             <div class="col col-arrow"></div>
             <div class="col col-step">
                 <div class="form-check float-right">
-                    <input class="form-check-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}"
-                        [disabled]="disabled"
-                        [ngModel]="step.noUpdate"
-                        (ngModelChange)="changeNoUpdate($event)" />
+                    <input class="form-check-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}" [disabled]="disabled" [ngModel]="step.noUpdate" (ngModelChange)="changeNoUpdate($event)">
 
                     <label class="form-check-label" for="preventUpdates_{{step.name}}">
-                        Prevent updates
+                        {{ 'workflow.preventUpdates' | sqxTranslate }}
                     </label>
                 </div>
             </div>
             <ng-container *ngIf="step.noUpdate">
                 <div class="col-auto col-label">
-                    <span class="text-decent">when</span>
+                    <span class="text-decent">{{ 'workflow.syntax.when' | sqxTranslate }}</span>
                 </div>
                 <div class="col col-step-expression">
-                    <input class="form-control" [class.dashed]="!step.noUpdateExpression" spellcheck="false"
-                        [disabled]="disabled"
-                        [ngModelOptions]="onBlur"
-                        [ngModel]="step.noUpdateExpression"
-                        (ngModelChange)="changeNoUpdateExpression($event)"
-                        placeholder="Expression" />
+                    <input class="form-control" [class.dashed]="!step.noUpdateExpression" spellcheck="false" [disabled]="disabled" [ngModelOptions]="onBlur" [ngModel]="step.noUpdateExpression" (ngModelChange)="changeNoUpdateExpression($event)" placeholder="{{ 'workflow.syntax.expression' | sqxTranslate }}">
                 </div>
                 <div class="col-auto col-label">
-                    <span class="text-decent">for</span>
+                    <span class="text-decent">{{ 'workflow.syntax.for' | sqxTranslate }}</span>
                 </div>
                 <div class="col col-roles">
-                    <sqx-tag-editor [allowDuplicates]="false"
-                        [dashed]="true"
-                        [disabled]="disabled"
-                        (ngModelChange)="changeNoUpdateRoles($event)"
-                        [ngModel]="step.noUpdateRoles"
-                        [ngModelOptions]="onBlur"
-                        [singleLine]="true"
-                        [suggestions]="roles"
-                        placeholder="Role">
+                    <sqx-tag-editor [allowDuplicates]="false" [dashed]="true" [disabled]="disabled" (ngModelChange)="changeNoUpdateRoles($event)" [ngModel]="step.noUpdateRoles" [ngModelOptions]="onBlur" [singleLine]="true" [suggestions]="roles" placeholder="{{ 'common.role' | sqxTranslate }}">
                     </sqx-tag-editor>
                 </div>
                 <div class="col col-button"></div>

@@ -1,33 +1,17 @@
-<div class="references-container" [class.disabled]="snapshot.isDisabled"
-    (sqxResizeCondition)="setCompact($event)"
-    [sqxResizeMinWidth]="600"
-    [sqxResizeMaxWidth]="0">
+<div class="references-container" [class.disabled]="snapshot.isDisabled" (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="600" [sqxResizeMaxWidth]="0">
     <ng-container>
         <div class="drop-area-container">
             <div class="drop-area">
-                <a (click)="contentCreatorDialog.show()">Add New</a>
+                <a (click)="contentCreatorDialog.show()">{{ 'contents.referencesCreateNew' | sqxTranslate }}</a>
 
                 &middot;
 
-                <a (click)="contentSelectorDialog.show()">Select Existing</a>
+                <a (click)="contentSelectorDialog.show()">{{ 'contents.referencesSelectExisting' | sqxTranslate }}</a>
             </div>
         </div>
         
-        <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.contentItems && snapshot.contentItems.length > 0"
-            cdkDropList
-            [cdkDropListData]="snapshot.contentItems"
-            [cdkDropListDisabled]="snapshot.isDisabled"
-            (cdkDropListDropped)="sort($event)">
-            <tbody *ngFor="let content of snapshot.contentItems; trackBy: trackByContent"
-                [sqxReferenceItem]="content"
-                class="table-drag"
-                cdkDrag
-                cdkDragLockAxis="y"
-                [columns]="snapshot.columns"
-                [isCompact]="snapshot.isCompact"
-                [isDisabled]="snapshot.isDisabled"
-                [language]="language"
-                (delete)="remove(content)">
+        <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.contentItems && snapshot.contentItems.length > 0" cdkDropList [cdkDropListData]="snapshot.contentItems" [cdkDropListDisabled]="snapshot.isDisabled" (cdkDropListDropped)="sort($event)">
+            <tbody *ngFor="let content of snapshot.contentItems; trackBy: trackByContent" [sqxReferenceItem]="content" class="table-drag" cdkDrag cdkDragLockAxis="y" [columns]="snapshot.columns" [isCompact]="snapshot.isCompact" [isDisabled]="snapshot.isDisabled" [language]="language" (delete)="remove(content)">
                 <i cdkDragHandle class="icon-drag2 drag-handle"></i>
             </tbody>
         </table>
@@ -35,21 +19,11 @@
 </div>
 
 <ng-container *sqxModal="contentCreatorDialog">
-    <sqx-content-creator 
-        (select)="select($event)"
-        [language]="language"
-        [languages]="languages"
-        [schemaIds]="schemaIds">
+    <sqx-content-creator (select)="select($event)" [language]="language" [languages]="languages" [schemaIds]="schemaIds">
     </sqx-content-creator>
 </ng-container>
 
 <ng-container *sqxModal="contentSelectorDialog">
-    <sqx-content-selector 
-        (select)="select($event)"
-        [allowDuplicates]="allowDuplicates"
-        [alreadySelected]="snapshot.contentItems"
-        [language]="language"
-        [languages]="languages"
-        [schemaIds]="schemaIds">
+    <sqx-content-selector (select)="select($event)" [allowDuplicates]="allowDuplicates" [alreadySelected]="snapshot.contentItems" [language]="language" [languages]="languages" [schemaIds]="schemaIds">
     </sqx-content-selector>
 </ng-container>
