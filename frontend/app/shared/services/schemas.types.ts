@@ -21,37 +21,37 @@ export type FieldType =
 export const fieldTypes: ReadonlyArray<{ type: FieldType, description: string }> = [
     {
         type: 'String',
-        description: 'i18n:fieldTypes.stringDescription'
+        description: 'i18n:fieldTypes.string.description'
     }, {
         type: 'Assets',
-        description: 'i18n:fieldTypes.assetsDescription'
+        description: 'i18n:fieldTypes.assets.description'
     }, {
         type: 'Boolean',
-        description: 'i18n:fieldTypes.booleanDescription'
+        description: 'i18n:fieldTypes.boolean.description'
     }, {
         type: 'DateTime',
-        description: 'i18n:fieldTypes.dateTimeDescription'
+        description: 'i18n:fieldTypes.dateTime.description'
     }, {
         type: 'Geolocation',
-        description: 'i18n:fieldTypes.geolocationDescription'
+        description: 'i18n:fieldTypes.geolocation.description'
     }, {
         type: 'Json',
-        description: 'i18n:fieldTypes.jsonDescription'
+        description: 'i18n:fieldTypes.json.description'
     }, {
         type: 'Number',
-        description: 'i18n:fieldTypes.numberDescription'
+        description: 'i18n:fieldTypes.number.description'
     }, {
         type: 'References',
-        description: 'i18n:fieldTypes.referencesDescription'
+        description: 'i18n:fieldTypes.references.description'
     }, {
         type: 'Tags',
-        description: 'i18n:fieldTypes.tagsDescription'
+        description: 'i18n:fieldTypes.tags.description'
     }, {
         type: 'Array',
-        description: 'i18n:fieldTypes.arrayDescription'
+        description: 'i18n:fieldTypes.array.description'
     }, {
         type: 'UI',
-        description: 'i18n:fieldTypes.uiDescription'
+        description: 'i18n:fieldTypes.ui.description'
     }
 ];
 

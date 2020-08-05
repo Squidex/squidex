@@ -64,6 +64,10 @@
     "4",
     "px"
   ],
+  "/features/schemas/pages/schema/fields/types/boolean-ui.component.html": [
+    "Checkbox",
+    "Toggle"
+  ],
   "/features/settings/pages/backups/backup.component.html": [
     ","
   ],
