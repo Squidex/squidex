@@ -1,4 +1,4 @@
-<div *ngIf="formModel">
+<div class="field" *ngIf="formModel">
     <label>
         {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
     </label> 
@@ -20,6 +20,7 @@
 			<ng-container [ngSwitch]="field.properties.fieldType">
                 <ng-container *ngSwitchCase="'Array'">
                     <sqx-array-editor
+                        [canUnset]="canUnset"
                         [formModel]="formModel"
                         [formContext]="formContext"
                         [language]="language"
@@ -168,6 +169,12 @@
                 </ng-container>
 			</ng-container>
 		</ng-template>
+    </div>
+
+    <div *ngIf="canUnset" class="unset" title="Unset value">
+        <button type="button" class="btn btn-sm btn-secondary" [disabled]="isEmpty | async" (click)="unset()">
+            <i class="icon-close"></i>
+        </button>
     </div>
 
     <sqx-form-hint *ngIf="field.properties.hints?.length > 0">

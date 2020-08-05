@@ -7,8 +7,8 @@
 
 // tslint:disable: readonly-array
 
-import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, StringFormControl, Types, valueAll$ } from '@app/framework';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Form, Types, valueAll$ } from '@app/framework';
 import { BehaviorSubject } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
@@ -48,7 +48,7 @@ export class PatchContentForm extends Form<FormGroup, any> {
         for (const field of this.editableFields) {
             const validators = FieldsValidators.create(field, this.language.isOptional);
 
-            this.form.setControl(field.name, new StringFormControl(undefined, { updateOn: FieldUpdateOn.get(field), validators }));
+            this.form.setControl(field.name, new FormControl(undefined, { updateOn: FieldUpdateOn.get(field), validators }));
         }
     }
 
@@ -328,7 +328,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     }
 }
 
-export class FieldValueForm extends AbstractContentForm<RootFieldDto, StringFormControl> {
+export class FieldValueForm extends AbstractContentForm<RootFieldDto, FormControl> {
     constructor(field: RootFieldDto, isOptional: boolean
     ) {
         super(field, FieldValueForm.buildControl(field, isOptional), isOptional);
@@ -339,7 +339,7 @@ export class FieldValueForm extends AbstractContentForm<RootFieldDto, StringForm
 
         const validators = FieldsValidators.create(field, isOptional);
 
-        return new StringFormControl(value, { updateOn: FieldUpdateOn.get(field), validators });
+        return new FormControl(value, { updateOn: FieldUpdateOn.get(field), validators });
     }
 }
 
@@ -467,7 +467,7 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
     }
 }
 
-export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto, StringFormControl> {
+export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto, FormControl> {
     private isRequired = false;
 
     constructor(field: NestedFieldDto, parent: RootFieldDto, rules: CompiledRule[], isOptional: boolean, source?: FieldArrayItemForm
@@ -517,7 +517,7 @@ export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto,
 
         const validators = FieldsValidators.create(field, isOptional);
 
-        return new StringFormControl(value, { updateOn: FieldUpdateOn.get(field), validators });
+        return new FormControl(value, { updateOn: FieldUpdateOn.get(field), validators });
     }
 }
 

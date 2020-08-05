@@ -47,6 +47,13 @@ export class TooltipDirective {
         }
     }
 
+    @HostListener('click')
+    public onClick() {
+        if (this.titleText) {
+            this.dialogs.tooltip(new Tooltip(this.element.nativeElement, null, this.titlePosition));
+        }
+    }
+
     private unsetAttribute() {
         try {
             this.renderer.setProperty(this.element.nativeElement, 'title', '');

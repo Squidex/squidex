@@ -31,6 +31,9 @@ export class ArraySectionComponent {
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
 
+    @Input()
+    public canUnset: boolean;
+
     @ViewChildren(FieldEditorComponent)
     public editors: QueryList<FieldEditorComponent>;
 
