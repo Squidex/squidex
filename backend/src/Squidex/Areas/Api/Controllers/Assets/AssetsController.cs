@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
@@ -316,9 +317,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             if (file == null || Request.Form.Files.Count != 1)
             {
-                var error = new ValidationError($"Can only upload one file, found {Request.Form.Files.Count} files.");
+                var error = T.Get("validation.onlyOneFile");
 
-                throw new ValidationException("Cannot create asset.", error);
+                throw new ValidationException(error);
             }
 
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
@@ -327,9 +328,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (plan.MaxAssetSize > 0 && plan.MaxAssetSize < currentSize + file.Length)
             {
-                var error = new ValidationError("You have reached your max asset size.");
+                var error = new ValidationError(T.Get("assets.maxSizeReached"));
 
-                throw new ValidationException("Cannot create asset.", error);
+                throw new ValidationException(error);
             }
 
             return file.ToAssetFile();

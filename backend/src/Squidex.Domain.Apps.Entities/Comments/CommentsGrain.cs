@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {
-                throw new DomainObjectVersionException(Key, GetType(), Version, command.ExpectedVersion);
+                throw new DomainObjectVersionException(Key, Version, command.ExpectedVersion);
             }
 
             var prevVersion = version;

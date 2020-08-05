@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (!schema.ContainsKey(name))
                     {
-                        addError(context.Path.Enqueue(name), $"Not a known {fieldType}.");
+                        addError(context.Path.Enqueue(name), T.Get("contents.validation.unknownField", new { fieldType }));
                     }
                 }
 

@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Commands
             }
 
             if (string.Equals(context.InterfaceMethod.Name, nameof(IDomainObjectGrain.ExecuteAsync), StringComparison.CurrentCultureIgnoreCase) &&
-                context.Arguments?.Length == 1 &&
+                context.Arguments?.Length > 0 &&
                 context.Arguments[0] != null)
             {
                 var argumentFullName = context.Arguments[0].ToString();

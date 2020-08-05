@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!schema.FieldsById.TryGetValue(parentId, out var rootField) || !(rootField is IArrayField arrayField))
             {
-                throw new DomainObjectNotFoundException(parentId.ToString(), "Fields", typeof(Schema));
+                throw new DomainObjectNotFoundException(parentId.ToString());
             }
 
             if (!allowLocked)
@@ -35,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                 if (!arrayField.FieldsById.TryGetValue(fieldId, out var nestedField))
                 {
-                    throw new DomainObjectNotFoundException(fieldId.ToString(), $"Fields[{parentId}].Fields", typeof(Schema));
+                    throw new DomainObjectNotFoundException(fieldId.ToString());
                 }
 
                 return nestedField;
@@ -43,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (!schema.FieldsById.TryGetValue(fieldId, out var field))
             {
-                throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Schema));
+                throw new DomainObjectNotFoundException(fieldId.ToString());
             }
 
             if (!allowLocked)
@@ -58,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (field.IsLocked)
             {
-                throw new DomainException("Schema field is locked.");
+                throw new DomainException(T.Get("schemas.fieldIsLocked"));
             }
         }
     }

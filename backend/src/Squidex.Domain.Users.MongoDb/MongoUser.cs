@@ -50,7 +50,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         internal void AddClaims(IEnumerable<Claim> claims)
         {
-            claims.Foreach(AddClaim);
+            claims.Foreach((x, _) => AddClaim(x));
         }
 
         internal void RemoveClaim(Claim claim)
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         internal void RemoveClaims(IEnumerable<Claim> claims)
         {
-            claims.Foreach(RemoveClaim);
+            claims.Foreach((x, _) => RemoveClaim(x));
         }
 
         internal string? GetToken(string loginProvider, string name)

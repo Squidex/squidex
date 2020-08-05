@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -21,7 +22,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards
 {
-    public class GuardRuleTests
+    public class GuardRuleTests : IClassFixture<TranslationsFixture>
     {
         private readonly Uri validUrl = new Uri("https://squidex.io");
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -90,12 +91,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         }
 
         [Fact]
-        public async Task CanUpdate_should_throw_exception_if_action_and_trigger_are_null()
+        public async Task CanUpdate_should_not_throw_exception_if_all_properties_are_null()
         {
             var command = new UpdateRule();
 
-            await ValidationAssert.ThrowsAsync(() => GuardRule.CanUpdate(command, appId.Id, appProvider),
-                new ValidationError("Either trigger, action or name is required.", "Trigger", "Action"));
+            await GuardRule.CanUpdate(command, appId.Id, appProvider);
         }
 
         [Fact]

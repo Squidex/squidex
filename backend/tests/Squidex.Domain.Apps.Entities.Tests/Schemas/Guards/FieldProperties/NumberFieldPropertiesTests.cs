@@ -9,13 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 {
-    public class NumberFieldPropertiesTests
+    public class NumberFieldPropertiesTests : IClassFixture<TranslationsFixture>
     {
         [Fact]
         public void Should_not_add_error_if_sut_is_valid()

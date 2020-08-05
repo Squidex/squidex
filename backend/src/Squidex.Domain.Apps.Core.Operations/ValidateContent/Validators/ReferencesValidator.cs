@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -46,11 +47,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (schemaId == Guid.Empty)
                     {
-                        addError(context.Path, $"Contains invalid reference '{id}'.");
+                        addError(context.Path, T.Get("common.referenceNotFound", new { id }));
                     }
                     else if (schemaIds?.Any() == true && !schemaIds.Contains(schemaId))
                     {
-                        addError(context.Path, $"Contains reference '{id}' to invalid schema.");
+                        addError(context.Path, T.Get("common.referenceToInvalidSchema", new { id }));
                     }
                 }
             }

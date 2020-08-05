@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Core.Templates.Extensions;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Identity;

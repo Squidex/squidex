@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
@@ -128,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private static JsonObject CreateFallback(Context context, List<IEnrichedContentEntity> referencedContents)
         {
-            var text = $"{referencedContents.Count} Reference(s)";
+            var text = T.Get("contents.listReferences", new { count = referencedContents.Count });
 
             var value = JsonValue.Object();
 

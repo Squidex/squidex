@@ -5,16 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public sealed class UserProperty
     {
-        [Required(ErrorMessage = "Name is required.")]
+        [LocalizedRequired]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Value is required.")]
+        [LocalizedRequired]
         public string Value { get; set; }
 
         public (string Name, string Value) ToTuple()

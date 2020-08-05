@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -14,6 +14,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Web
@@ -82,7 +83,7 @@ namespace Squidex.Web
             switch (exception)
             {
                 case ValidationException ex:
-                    return (CreateError(400, ex.Summary, ToDetails(ex)), true);
+                    return (CreateError(400, T.Get("common.httpValidationError"), ToDetails(ex)), true);
 
                 case DomainObjectNotFoundException _:
                     return (CreateError(404), true);
@@ -116,11 +117,43 @@ namespace Squidex.Web
 
         private static string[] ToDetails(ValidationException ex)
         {
+            static string FixPropertyName(string property)
+            {
+                property = property.Trim();
+
+                if (property.Length == 0)
+                {
+                    return property;
+                }
+
+                var prevChar = 0;
+
+                var builder = new StringBuilder(property.Length);
+
+                builder.Append(char.ToLower(property[0]));
+
+                foreach (var character in property.Skip(1))
+                {
+                    if (prevChar == '.')
+                    {
+                        builder.Append(char.ToLower(character));
+                    }
+                    else
+                    {
+                        builder.Append(character);
+                    }
+
+                    prevChar = character;
+                }
+
+                return builder.ToString();
+            }
+
             return ex.Errors.Select(e =>
             {
                 if (e.PropertyNames?.Any() == true)
                 {
-                    return $"{string.Join(", ", e.PropertyNames)}: {e.Message}";
+                    return $"{string.Join(", ", e.PropertyNames.Select(FixPropertyName))}: {e.Message}";
                 }
                 else
                 {

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure.Commands
 {
@@ -25,7 +26,7 @@ namespace Squidex.Infrastructure.Commands
         {
             if (options.IsReadonly)
             {
-                throw new DomainException("Application is in readonly mode at the moment.");
+                throw new DomainException(T.Get("common.readonlyMode"));
             }
 
             return next(context);

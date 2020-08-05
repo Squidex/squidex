@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -64,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 if (image == null)
                 {
-                    throw new ValidationException("File is not an image.");
+                    throw new ValidationException(T.Get("apps.notImage"));
                 }
             }
 

@@ -10,12 +10,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 {
-    public class StringLengthValidatorTests
+    public class StringLengthValidatorTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 

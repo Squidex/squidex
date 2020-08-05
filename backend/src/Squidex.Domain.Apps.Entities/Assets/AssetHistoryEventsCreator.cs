@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -19,13 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             : base(typeNameRegistry)
         {
             AddEventMessage<AssetCreated>(
-                "uploaded asset.");
+                T.Get("history.assets.uploaded"));
 
             AddEventMessage<AssetUpdated>(
-                "replaced asset.");
+                T.Get("history.assets.replaced"));
 
             AddEventMessage<AssetAnnotated>(
-                "updated asset.");
+                T.Get("history.assets.updated"));
         }
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)

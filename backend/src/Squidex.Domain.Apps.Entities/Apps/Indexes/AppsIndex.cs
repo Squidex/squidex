@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -17,6 +17,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 
@@ -237,7 +238,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                                 await RemoveContributorAsync(removeContributor);
                                 break;
 
-                            case ArchiveApp archiveApp:
+                            case ArchiveApp _:
                                 await ArchiveAppAsync(app);
                                 break;
                         }
@@ -256,9 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 if (token == null)
                 {
-                    var error = new ValidationError("An app with this already exists.");
-
-                    throw new ValidationException("Cannot create app.", error);
+                    throw new ValidationException(T.Get("apps.nameAlreadyExists"));
                 }
 
                 return token;

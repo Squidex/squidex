@@ -9,13 +9,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
-    public class StringFieldTests
+    public class StringFieldTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 
@@ -100,7 +101,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Does not match to the pattern." });
+                new[] { "Must follow the pattern." });
         }
 
         [Fact]

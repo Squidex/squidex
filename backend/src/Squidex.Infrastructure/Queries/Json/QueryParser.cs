@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -12,6 +12,7 @@ using NJsonSchema;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.Queries.Json
@@ -46,10 +47,17 @@ namespace Squidex.Infrastructure.Queries.Json
 
             if (errors.Count > 0)
             {
-                throw new ValidationException("Failed to parse json query", errors.Select(x => new ValidationError(x)).ToArray());
+                throw new ValidationException(errors.Select(BuildError).ToList());
             }
 
             return result;
+        }
+
+        private static ValidationError BuildError(string message)
+        {
+            var error = T.Get("exception.invalidJsonQuery", new { message });
+
+            return new ValidationError(error);
         }
 
         private static void ConvertFilters(JsonSchema schema, ClrQuery result, List<string> errors, Query<IJsonValue> query)
@@ -84,7 +92,9 @@ namespace Squidex.Infrastructure.Queries.Json
             }
             catch (JsonException ex)
             {
-                throw new ValidationException("Failed to parse json query.", new ValidationError(ex.Message));
+                var error = T.Get("exception.invalidJsonQueryJson", new { message = ex.Message });
+
+                throw new ValidationException(error);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -20,28 +21,28 @@ namespace Squidex.Domain.Apps.Entities.Contents
             : base(typeNameRegistry)
         {
             AddEventMessage<ContentCreated>(
-                "created {[Schema]} content.");
+                T.Get("history.contents.created"));
 
             AddEventMessage<ContentUpdated>(
-                "updated {[Schema]} content.");
+                T.Get("history.contents.updated"));
 
             AddEventMessage<ContentDeleted>(
-                "deleted {[Schema]} content.");
+                T.Get("history.contents.deleted"));
 
             AddEventMessage<ContentDraftCreated>(
-                "created new draft.");
+                T.Get("history.contents.draftCreated"));
 
             AddEventMessage<ContentDraftDeleted>(
-                "deleted draft.");
+                T.Get("history.contents.draftDeleted"));
 
             AddEventMessage<ContentSchedulingCancelled>(
-                "failed to schedule status change for {[Schema]} content.");
+                T.Get("history.contents.scheduleFailed"));
 
             AddEventMessage<ContentStatusChanged>(
-                "changed status of {[Schema]} content to {[Status]}.");
+                T.Get("history.statusChanged"));
 
             AddEventMessage<ContentStatusScheduled>(
-                "scheduled to change status of {[Schemra]} content to {[Status]}.");
+                T.Get("history.contents.scheduleCompleted"));
         }
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)

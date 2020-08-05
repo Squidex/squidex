@@ -33,6 +33,20 @@ namespace Squidex.Config.Web
             return app;
         }
 
+        public static IApplicationBuilder UseSquidexLocalization(this IApplicationBuilder app)
+        {
+            var supportedCultures = new[] { "en-US" };
+
+            var localizationOptions = new RequestLocalizationOptions()
+                .SetDefaultCulture(supportedCultures[0])
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+
+            app.UseRequestLocalization(localizationOptions);
+
+            return app;
+        }
+
         public static IApplicationBuilder UseSquidexTracking(this IApplicationBuilder app)
         {
             app.UseMiddleware<RequestExceptionMiddleware>();

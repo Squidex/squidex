@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.Commands
 {
@@ -42,7 +43,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId);
 
-            var result = await grain.ExecuteAsync(typedCommand);
+            var result = await grain.ExecuteAsync(typedCommand, GrainContext.Create());
 
             return result.Value;
         }

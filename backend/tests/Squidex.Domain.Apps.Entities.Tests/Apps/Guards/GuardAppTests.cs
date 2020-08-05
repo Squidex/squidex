@@ -7,6 +7,7 @@
 
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -17,7 +18,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
-    public class GuardAppTests
+    public class GuardAppTests : IClassFixture<TranslationsFixture>
     {
         private readonly IUserResolver users = A.Fake<IUserResolver>();
         private readonly IAppPlansProvider appPlans = A.Fake<IAppPlansProvider>();
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             AppPlan? plan = null;
 
             ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
-                new ValidationError("Plan id is required.", "PlanId"));
+                new ValidationError("Plan ID is required.", "PlanId"));
         }
 
         [Fact]

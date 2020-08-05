@@ -19,28 +19,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot create rule.", async e =>
+            return Validate.It(async e =>
             {
                 if (command.Trigger == null)
                 {
-                   e(Not.Defined("Trigger"), nameof(command.Trigger));
+                    e(Not.Defined(nameof(command.Trigger)), nameof(command.Trigger));
                 }
                 else
                 {
                     var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Id, command.Trigger, appProvider);
 
-                    errors.Foreach(x => x.AddTo(e));
+                    errors.Foreach((x, _) => x.AddTo(e));
                 }
 
                 if (command.Action == null)
                 {
-                   e(Not.Defined("Action"), nameof(command.Action));
+                    e(Not.Defined(nameof(command.Action)), nameof(command.Action));
                 }
                 else
                 {
                     var errors = command.Action.Validate();
 
-                    errors.Foreach(x => x.AddTo(e));
+                    errors.Foreach((x, _) => x.AddTo(e));
                 }
             });
         }
@@ -49,25 +49,20 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot update rule.", async e =>
+            return Validate.It(async e =>
             {
-                if (command.Trigger == null && command.Action == null && command.Name == null)
-                {
-                   e(Not.Defined("Either trigger, action or name"), nameof(command.Trigger), nameof(command.Action));
-                }
-
                 if (command.Trigger != null)
                 {
                     var errors = await RuleTriggerValidator.ValidateAsync(appId, command.Trigger, appProvider);
 
-                    errors.Foreach(x => x.AddTo(e));
+                    errors.Foreach((x, _) => x.AddTo(e));
                 }
 
                 if (command.Action != null)
                 {
                     var errors = command.Action.Validate();
 
-                    errors.Foreach(x => x.AddTo(e));
+                    errors.Foreach((x, _) => x.AddTo(e));
                 }
             });
         }

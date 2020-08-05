@@ -24,7 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         {
             new object[] { new CreateBlogCommandMiddleware(), "blog" },
             new object[] { new CreateIdentityCommandMiddleware(), "identity" },
-            new object[] { new CreateIdentityV2CommandMiddleware(), "identityV2" },
             new object[] { new CreateProfileCommandMiddleware(), "profile" }
         };
 

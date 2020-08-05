@@ -13,12 +13,7 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainForbiddenException : DomainException
     {
-        public DomainForbiddenException(string message)
-            : base(message)
-        {
-        }
-
-        public DomainForbiddenException(string message, Exception inner)
+        public DomainForbiddenException(string message, Exception? inner = null)
             : base(message, inner)
         {
         }

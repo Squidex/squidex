@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -10,9 +10,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Infrastructure.Validation;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -104,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             if (this.IsUser(id))
             {
-                throw new ValidationException("Locking user failed.", new ValidationError("You cannot lock yourself."));
+                throw new DomainForbiddenException(T.Get("users.lockYourselfError"));
             }
 
             var user = await userManager.LockAsync(id);
@@ -122,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             if (this.IsUser(id))
             {
-                throw new ValidationException("Unlocking user failed.", new ValidationError("You cannot unlock yourself."));
+                throw new DomainForbiddenException(T.Get("users.unlockYourselfError"));
             }
 
             var user = await userManager.UnlockAsync(id);
