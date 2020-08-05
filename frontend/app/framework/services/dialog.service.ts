@@ -9,9 +9,10 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, throwError } from 'rxjs';
 import { ErrorDto } from './../utils/error';
 import { Types } from './../utils/types';
+import { LocalizerService } from './localizer.service';
 
-export const DialogServiceFactory = () => {
-    return new DialogService();
+export const DialogServiceFactory = (localizer: LocalizerService) => {
+    return new DialogService(localizer);
 };
 
 export class DialogRequest {
@@ -61,6 +62,9 @@ export class Notification {
 
 @Injectable()
 export class DialogService {
+
+    constructor(private readonly localizer: LocalizerService) {}
+
     private readonly requestStream$ = new Subject<DialogRequest>();
     private readonly notificationsStream$ = new Subject<Notification>();
     private readonly tooltipStream$ = new Subject<Tooltip>();
@@ -88,6 +92,7 @@ export class DialogService {
     }
 
     public notifyInfo(text: string) {
+        text = this.localizer.get(text);
         this.notificationsStream$.next(Notification.info(text));
     }
 
@@ -100,7 +105,7 @@ export class DialogService {
     }
 
     public confirm(title: string, text: string): Observable<boolean> {
-        const request = new DialogRequest(title, text);
+        const request = new DialogRequest(this.localizer.get(title), this.localizer.get(text));
 
         this.requestStream$.next(request);
 
