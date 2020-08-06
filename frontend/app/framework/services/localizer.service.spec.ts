@@ -16,7 +16,7 @@ describe('LocalizerService', () => {
     };
 
     it('should instantiate from factory', () => {
-        const titleService = LocalizerServiceFactory(translations, false);
+        const titleService = LocalizerServiceFactory(translations);
 
         expect(titleService).toBeDefined();
     });
@@ -33,6 +33,22 @@ describe('LocalizerService', () => {
         const result = localizer.get('key');
 
         expect(result).toEqual('key');
+    });
+
+    it('should return simple key', () => {
+        const localizer = new LocalizerService(translations);
+
+        const result = localizer.get('simple');
+
+        expect(result).toEqual('Simple Result');
+    });
+
+    it('should return simple key with prefix', () => {
+        const localizer = new LocalizerService(translations);
+
+        const result = localizer.get('i18n:simple');
+
+        expect(result).toEqual('Simple Result');
     });
 
     it('should return text with variable', () => {

@@ -38,14 +38,14 @@ export class LocalizerService {
         }
 
         if (key.startsWith('i18n:')) {
-            return this.get(key.substring(5), args);
+            key = key.substring(5);
         }
 
         let text = this.translations[key];
 
         if (!text) {
-            if (this.shouldLog) {
-                console.warn('Missing i18n key: {key}');
+            if (this.shouldLog && !key.indexOf(' ')) {
+                console.warn(`Missing i18n key: ${key}`);
             }
 
             return key;
