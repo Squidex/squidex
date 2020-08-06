@@ -5,36 +5,58 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { IMock, It, Mock } from 'typemoq';
+import { LocalizerService } from './../services/localizer.service';
 import { ErrorDto } from './error';
 
 describe('ErrorDto', () => {
-    it('should create simple message when no details are specified.', () => {
-        const error = new ErrorDto(500, 'Error Message.');
+    let localizer: IMock<LocalizerService>;
 
-        expect(error.displayMessage).toBe('Error Message.');
+    beforeEach(() => {
+        document.title = '';
+
+        localizer = Mock.ofType<LocalizerService>();
+        localizer.setup(x => x.get(It.isAnyString()))
+            .returns((key: string) => key.substr(5));
+    });
+
+    it('should create simple message when no details are specified.', () => {
+        const error = new ErrorDto(500, 'i18n:error.');
+
+        const result = error.translate(localizer.object);
+
+        expect(result).toBe('error.');
     });
 
     it('should append dot to message', () => {
-        const error = new ErrorDto(500, 'Error Message');
+        const error = new ErrorDto(500, 'i18n:error');
 
-        expect(error.displayMessage).toBe('Error Message.');
+        const result = error.translate(localizer.object);
+
+        expect(result).toBe('error.');
     });
 
-    it('should create simple message when detail has one item', () => {
-        const error = new ErrorDto(500, 'Error Message.', ['Detail Message.']);
+    it('should append dot to detail', () => {
+        const error = new ErrorDto(500, 'i18n:error.', ['i18n:detail']);
 
-        expect(error.displayMessage).toBe('Error Message.\n\n * Detail Message.\n');
+        const result = error.translate(localizer.object);
+
+        expect(result).toBe('error.\n\n * detail.\n');
     });
 
-    it('should create simple message with appended dots when detail has one item', () => {
-        const error = new ErrorDto(500, 'Error Message', ['Detail Message']);
+    it('should ccreate html list when detail has one item', () => {
+        const error = new ErrorDto(500, 'i18n:error.', ['i18n:detail.']);
 
-        expect(error.displayMessage).toBe('Error Message.\n\n * Detail Message.\n');
+        const result = error.translate(localizer.object);
+
+        expect(result).toBe('error.\n\n * detail.\n');
     });
 
     it('should create html list when error has more items.', () => {
-        const error = new ErrorDto(500, 'Error Message', ['Detail1.', 'Detail2.']);
+        const error = new ErrorDto(500, 'i18n:error.', ['i18n:detail1.', 'i18n:detail2.']);
 
-        expect(error.displayMessage).toBe('Error Message.\n\n * Detail1.\n * Detail2.\n');
+        const result = error.translate(localizer.object);
+
+        expect(result).toBe('error.\n\n * detail1.\n * detail2.\n');
     });
 });

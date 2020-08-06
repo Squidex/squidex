@@ -9,10 +9,9 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, throwError } from 'rxjs';
 import { ErrorDto } from './../utils/error';
 import { Types } from './../utils/types';
-import { LocalizerService } from './localizer.service';
 
-export const DialogServiceFactory = (localizer: LocalizerService) => {
-    return new DialogService(localizer);
+export const DialogServiceFactory = () => {
+    return new DialogService();
 };
 
 export class DialogRequest {
@@ -45,26 +44,23 @@ export class Tooltip {
 
 export class Notification {
     constructor(
-        public readonly message: string,
+        public readonly message: string | ErrorDto,
         public readonly messageType: string,
         public readonly displayTime: number = 10000
     ) {
     }
 
-    public static error(message: string): Notification {
+    public static error(message: string | ErrorDto): Notification {
         return new Notification(message, 'danger');
     }
 
-    public static info(message: string): Notification {
+    public static info(message: string | ErrorDto): Notification {
         return new Notification(message, 'info');
     }
 }
 
 @Injectable()
 export class DialogService {
-
-    constructor(private readonly localizer: LocalizerService) {}
-
     private readonly requestStream$ = new Subject<DialogRequest>();
     private readonly notificationsStream$ = new Subject<Notification>();
     private readonly tooltipStream$ = new Subject<Tooltip>();
@@ -83,7 +79,7 @@ export class DialogService {
 
     public notifyError(error: string | ErrorDto) {
         if (Types.is(error, ErrorDto)) {
-            this.notify(Notification.error(error.displayMessage));
+            this.notify(Notification.error(error));
         } else {
             this.notify(Notification.error(error));
         }
@@ -92,7 +88,6 @@ export class DialogService {
     }
 
     public notifyInfo(text: string) {
-        text = this.localizer.get(text);
         this.notificationsStream$.next(Notification.info(text));
     }
 
@@ -105,7 +100,7 @@ export class DialogService {
     }
 
     public confirm(title: string, text: string): Observable<boolean> {
-        const request = new DialogRequest(this.localizer.get(title), this.localizer.get(text));
+        const request = new DialogRequest(title, text);
 
         this.requestStream$.next(request);
 

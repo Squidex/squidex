@@ -7,8 +7,8 @@
 
 import { Injectable } from '@angular/core';
 
-export const LocalizerServiceServiceFactory = (translations: Object, logMissingKeys: boolean) => {
-    return new LocalizerService(translations, logMissingKeys);
+export const LocalizerServiceFactory = (translations: Object) => {
+    return new LocalizerService(translations);
 };
 
 export enum PipeOptions {
@@ -19,10 +19,17 @@ export enum PipeOptions {
 
 @Injectable()
 export class LocalizerService {
+    private shouldLog = false;
+
     constructor(
-        private readonly translations: Object,
-        private readonly logMissingKeys: boolean
+        private readonly translations: Object
     ) {
+    }
+
+    public logMissingKeys() {
+        this.shouldLog = true;
+
+        return this;
     }
 
     public get(key: string | undefined, args?: any): string {
@@ -37,7 +44,7 @@ export class LocalizerService {
         let text = this.translations[key];
 
         if (!text) {
-            if (this.logMissingKeys) {
+            if (this.shouldLog) {
                 console.warn('Missing i18n key: {key}');
             }
 

@@ -168,7 +168,7 @@ describe('ContributorsState', () => {
                 })
             ).subscribe();
 
-            expect(error!.message).toBe('The user does not exist.');
+            expect(error!.message).toBe('i18n:contributors.userNotFound');
         });
 
         it('should return original error when not a 404', () => {

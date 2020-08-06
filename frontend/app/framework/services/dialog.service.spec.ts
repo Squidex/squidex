@@ -5,25 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { IMock, Mock } from 'typemoq';
 import { DialogRequest, DialogService, DialogServiceFactory, Notification, Tooltip } from './dialog.service';
-import { LocalizerService } from './localizer.service';
 
 describe('DialogService', () => {
-    let localizerService: IMock<LocalizerService>;
-
-    beforeEach(() => {
-        localizerService = Mock.ofType<LocalizerService>();
-    });
 
     it('should instantiate from factory', () => {
-        const dialogService = DialogServiceFactory(localizerService.object);
+        const dialogService = DialogServiceFactory();
 
         expect(dialogService).toBeDefined();
     });
 
     it('should instantiate', () => {
-        const dialogService = new DialogService(localizerService.object);
+        const dialogService = new DialogService();
 
         expect(dialogService).toBeDefined();
     });
@@ -70,7 +63,7 @@ describe('DialogService', () => {
     });
 
     it('should publish tooltip', () => {
-        const dialogService = new DialogService(localizerService.object);
+        const dialogService = new DialogService();
 
         const tooltip = new Tooltip('target', 'text', 'left');
 
@@ -86,7 +79,7 @@ describe('DialogService', () => {
     });
 
     it('should publish notification', () => {
-        const dialogService = new DialogService(localizerService.object);
+        const dialogService = new DialogService();
 
         const notification = Notification.error('Message');
 
@@ -102,7 +95,7 @@ describe('DialogService', () => {
     });
 
     it('should publish dialog request', () => {
-        const dialogService = new DialogService(localizerService.object);
+        const dialogService = new DialogService();
 
         let pushedDialog: DialogRequest;
 

@@ -55,9 +55,9 @@ export function configCurrency() {
 
 export function configTranslations() {
     if (process.env.NODE_ENV === 'production') {
-        return new LocalizerService(window['18n'], false);
+        return new LocalizerService(window['texts']);
     } else {
-        return new LocalizerService(require('./../../i18n/translations-frontend.en.json'), true);
+        return new LocalizerService(require('./../../i18n/translations-frontend.en.json')).logMissingKeys();
     }
 }
 

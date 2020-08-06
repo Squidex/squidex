@@ -1,16 +1,30 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
 import { Pipe, PipeTransform } from '@angular/core';
-import { LocalizerService } from '@app/framework/services/localizer.service';
+import { LocalizerService, Types } from '@app/framework/internal';
 
 @Pipe({
     name: 'sqxTranslate',
     pure: true
-  })
-  export class SqxTranslatePipe implements PipeTransform {
-
-    constructor(private readonly localizer: LocalizerService) {
+})
+export class TranslatePipe implements PipeTransform {
+    constructor(
+        private readonly localizer: LocalizerService
+    ) {
     }
 
-    public transform(value: string, args?: ReadonlyArray<object>): string {
-        return this.localizer.get(value, args);
+    public transform(value: any, args?: any): string {
+        if (Types.isString(value)) {
+            return this.localizer.get(value, args);
+        } else if (value && Types.isFunction(value['translate'])) {
+            return value['translate'](this.localizer);
+        } else {
+            return '';
+        }
     }
-  }
+}

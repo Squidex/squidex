@@ -167,7 +167,7 @@ describe('AppsService', () => {
         req.flush({}, { status: 413, statusText: 'Payload too large' });
 
         expect(app!).toBeUndefined();
-        expect(error!).toEqual(new ErrorDto(413, 'App image is too big.'));
+        expect(error!).toEqual(new ErrorDto(413, 'i18n:apps.uploadImageTooBig'));
     }));
 
     it('should make delete request to remove app image',

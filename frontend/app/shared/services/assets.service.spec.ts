@@ -262,7 +262,7 @@ describe('AssetsService', () => {
         req.flush({}, { status: 413, statusText: 'Payload too large' });
 
         expect(asset!).toBeUndefined();
-        expect(error!).toEqual(new ErrorDto(413, 'Asset is too big.'));
+        expect(error!).toEqual(new ErrorDto(413, 'i18n:assets.fileTooBig'));
     }));
 
     it('should make put request to replace asset content',
@@ -316,7 +316,7 @@ describe('AssetsService', () => {
         req.flush({}, { status: 413, statusText: 'Payload too large' });
 
         expect(asset!).toBeUndefined();
-        expect(error!).toEqual(new ErrorDto(413, 'Asset is too big.'));
+        expect(error!).toEqual(new ErrorDto(413, 'i18n:assets.fileTooBig'));
     }));
 
     it('should make put request to annotate asset',

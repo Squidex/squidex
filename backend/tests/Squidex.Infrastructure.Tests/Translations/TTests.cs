@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Translations
         }
 
         [Fact]
-        public void Should_return_text_with_lower_var()
+        public void Should_return_text_with_lower_variable()
         {
             var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "withLowerVar", "fallback", new { var = "Lower" });
 
@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Translations
         }
 
         [Fact]
-        public void Should_return_text_with_upper_var()
+        public void Should_return_text_with_upper_variable()
         {
             var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "withUpperVar", "fallback", new { var = "upper" });
 
