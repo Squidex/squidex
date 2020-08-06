@@ -29,7 +29,14 @@ export class TitleService {
 
     constructor(
         private readonly titles: TitlesConfig,
-        private readonly localizer: LocalizerService) {
+        private readonly localizer: LocalizerService
+    ) {
+        this.titles = new TitlesConfig(
+            this.localizer.get(titles.prefix),
+            this.localizer.get(titles.suffix),
+            this.titles.separator
+        );
+
         this.updateTitle();
     }
 
@@ -54,13 +61,12 @@ export class TitleService {
     }
 
     private updateTitle() {
-        const { prefix, separator } = this.titles;
-        const suffix = (this.titles.suffix) ? this.localizer.get(this.titles.suffix) : undefined;
+        const { prefix, separator, suffix } = this.titles;
 
         let title = '';
 
         if (this.stack.length > 0) {
-            title = this.stack.join(separator || ' | ');
+            title = this.stack.map(x => this.localizer.get(x)).join(separator || ' | ');
         }
 
         if (title) {

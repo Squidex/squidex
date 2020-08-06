@@ -10,7 +10,7 @@
     </div>
 
     <div class="inner-main">
-        <sqx-field-list [class.hidden]="selectedTab !== 'List Fields'"
+        <sqx-field-list [class.hidden]="selectedTab !== 'i18n:schemas.listFields'"
             [emptyText]="'schemas.listFieldsEmpty' | sqxTranslate"
             [schema]="schema"
             [fieldNames]="state.fieldsInLists"
@@ -18,7 +18,7 @@
             [withMetaFields]="true">
         </sqx-field-list>
 
-        <sqx-field-list [class.hidden]="selectedTab !== 'Reference Fields'"
+        <sqx-field-list [class.hidden]="selectedTab !== 'i18n:schemas.referenceFields'"
             [emptyText]="'schemas.referenceFieldsEmpty' | sqxTranslate"
             [schema]="schema"
             [fieldNames]="state.fieldsInReferences"

@@ -25,22 +25,24 @@ export class LocalizerService {
     ) {
     }
 
-    public get(key: string, args?: ReadonlyArray<object>): any {
-        let text: string;
+    public get(key: string | undefined, args?: any): string {
+        if (!key) {
+            return key || '';
+        }
 
         if (key.startsWith('i18n:')) {
             return this.get(key.substring(5), args);
         }
 
-        if (!this.translations[key]) {
+        let text = this.translations[key];
+
+        if (!text) {
             if (this.logMissingKeys) {
                 console.warn('Missing i18n key: {key}');
             }
 
             return key;
         }
-
-        text = this.translations[key];
 
         if (args && Object.keys(args).length > 0) {
             text = this.replaceVariables(text, args);

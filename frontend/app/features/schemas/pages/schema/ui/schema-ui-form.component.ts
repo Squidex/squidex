@@ -12,7 +12,7 @@ type State = { fieldsInLists: ReadonlyArray<string>, fieldsInReferences: Readonl
 
 const TABS: ReadonlyArray<string> = [
     'i18n:schemas.listFields',
-    'i18n:references.listFields'
+    'i18n:schemas.referenceFields'
 ];
 
 @Component({

@@ -101,9 +101,11 @@
 
                     <p [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown"></p>
 
-                    <sqx-form-hint>
-                        {{ 'clients.connectWizard.cliStep1Hint' | sqxTranslate }}
-                    </sqx-form-hint>
+                    <p>
+                        <sqx-form-hint>
+                            {{ 'clients.connectWizard.cliStep1Hint' | sqxTranslate }}
+                        </sqx-form-hint>
+                    </p>
                 </div>
                 
                 <div class="section">
@@ -150,9 +152,11 @@
                 </div>
 
                 <div class="section">
-                    <sqx-form-hint>
-                        {{ 'clients.connectWizard.sdkHelp' | sqxTranslate }} <a href="https://support.squidex.io" sqxExternalLink>{{ 'clients.connectWizard.sdkHelpLink' | sqxTranslate }}</a>
-                    </sqx-form-hint>
+                    <p>
+                        <sqx-form-hint>
+                            {{ 'clients.connectWizard.sdkHelp' | sqxTranslate }} <a href="https://support.squidex.io" sqxExternalLink>{{ 'clients.connectWizard.sdkHelpLink' | sqxTranslate }}</a>
+                        </sqx-form-hint>
+                    </p>
                 </div>
             </ng-container>
         </ng-container>

@@ -14,6 +14,7 @@ describe('TitleService', () => {
 
     beforeEach(() => {
         document.title = '';
+
         localizerService = Mock.ofType<LocalizerService>();
     });
 

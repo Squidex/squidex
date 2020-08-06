@@ -3,11 +3,11 @@
 <ng-container *sqxModal="dialogView">
     <sqx-modal-dialog showClose="false" (close)="cancel()">
         <ng-container title>
-            {{snapshot.dialogRequest?.title}}
+            {{snapshot.dialogRequest?.title | sqxTranslate}}
         </ng-container>
     
         <ng-container content>
-            <span [innerHTML]="snapshot.dialogRequest?.text | sqxMarkdown"></span>
+            <span [innerHTML]="snapshot.dialogRequest?.text | sqxTranslate | sqxMarkdown"></span>
         </ng-container>
     
         <ng-container footer>
@@ -30,6 +30,6 @@
 
 <ng-container *ngIf="snapshot.tooltip; let tooltip">
     <div class="tooltip2 tooltip2-{{tooltip.position}}" [sqxAnchoredTo]="tooltip.target" [position]="tooltip.position" [offset]="6">
-        {{tooltip.text}}
+        {{tooltip.text | sqxTranslate}}
     </div>
 </ng-container>

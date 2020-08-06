@@ -78,7 +78,7 @@ export class AppLanguagesService {
             tap(() => {
                 this.analytics.trackEvent('Language', 'Added', appName);
             }),
-            pretifyError('i18n:loadings.addFailed'));
+            pretifyError('i18n:languages.addFailed'));
     }
 
     public putLanguage(appName: string, resource: Resource, dto: UpdateAppLanguageDto, version: Version): Observable<AppLanguagesDto> {
@@ -108,7 +108,7 @@ export class AppLanguagesService {
             tap(() => {
                 this.analytics.trackEvent('Language', 'Deleted', appName);
             }),
-            pretifyError('i18n:loadings.addFailed'));
+            pretifyError('i18n:languages.deleteFailed'));
     }
 }
 
