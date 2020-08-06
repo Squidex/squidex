@@ -33,7 +33,7 @@
         </div>
         <div class="form-group" *ngIf="!showTime && shouldShowDateButtons">
             <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()"
-                title="Use Today">
+                title="Use Today (UTC)">
                 Today
             </button>
         </div>

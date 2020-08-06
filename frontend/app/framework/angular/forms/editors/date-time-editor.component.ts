@@ -174,7 +174,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         if (this.showTime && this.timeControl.value) {
             const combined = `${this.dateControl.value}T${this.timeControl.value}`;
 
-            const parsed = DateTime.tryParseISO(combined, !this.isLocalMode);
+            const parsed = DateTime.tryParseISO(combined);
 
             if (parsed) {
                 result = parsed.toISOString();
@@ -210,7 +210,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         if (this.dateTime && this.picker) {
 
             let dateString: string;
-            if (this.isLocalMode) {
+            if (this.showTime && this.isLocalMode) {
                 dateString = this.dateTime.toStringFormat('yyyy-MM-dd');
             } else {
                 dateString = this.dateTime.toStringFormatUTC('yyyy-MM-dd');
