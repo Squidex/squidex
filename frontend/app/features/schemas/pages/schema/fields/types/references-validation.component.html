@@ -25,22 +25,22 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldAllowDuplicates" formControlName="allowDuplicates">
                 <label class="form-check-label" for="{{field.fieldId}}_fieldAllowDuplicates">
-                    {{ 'fieldTypes.assets.allowDuplicates' | sqxTranslate }}
+                    {{ 'schemas.fieldTypes.assets.allowDuplicates' | sqxTranslate }}
                 </label>
             </div>
         </div>
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label">{{ 'fieldTypes.references.count' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.references.count' | sqxTranslate }}</label>
 
         <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minItems" placeholder="{{ 'fieldTypes.references.countMin' | sqxTranslate }}">
+            <input type="number" class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.references.countMin' | sqxTranslate }}">
             
             <label class="col-form-label minmax-label">-</label>
         </div>
         <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxItems" placeholder="{{ 'fieldTypes.references.countMax' | sqxTranslate }}">
+            <input type="number" class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.fieldTypes.references.countMax' | sqxTranslate }}">
         </div>
     </div>
 </div>

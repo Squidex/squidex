@@ -21,37 +21,37 @@ export type FieldType =
 export const fieldTypes: ReadonlyArray<{ type: FieldType, description: string }> = [
     {
         type: 'String',
-        description: 'i18n:fieldTypes.string.description'
+        description: 'i18n:schemas.fieldTypes.string.description'
     }, {
         type: 'Assets',
-        description: 'i18n:fieldTypes.assets.description'
+        description: 'i18n:schemas.fieldTypes.assets.description'
     }, {
         type: 'Boolean',
-        description: 'i18n:fieldTypes.boolean.description'
+        description: 'i18n:schemas.fieldTypes.boolean.description'
     }, {
         type: 'DateTime',
-        description: 'i18n:fieldTypes.dateTime.description'
+        description: 'i18n:schemas.fieldTypes.dateTime.description'
     }, {
         type: 'Geolocation',
-        description: 'i18n:fieldTypes.geolocation.description'
+        description: 'i18n:schemas.fieldTypes.geolocation.description'
     }, {
         type: 'Json',
-        description: 'i18n:fieldTypes.json.description'
+        description: 'i18n:schemas.fieldTypes.json.description'
     }, {
         type: 'Number',
-        description: 'i18n:fieldTypes.number.description'
+        description: 'i18n:schemas.fieldTypes.number.description'
     }, {
         type: 'References',
-        description: 'i18n:fieldTypes.references.description'
+        description: 'i18n:schemas.fieldTypes.references.description'
     }, {
         type: 'Tags',
-        description: 'i18n:fieldTypes.tags.description'
+        description: 'i18n:schemas.fieldTypes.tags.description'
     }, {
         type: 'Array',
-        description: 'i18n:fieldTypes.array.description'
+        description: 'i18n:schemas.fieldTypes.array.description'
     }, {
         type: 'UI',
-        description: 'i18n:fieldTypes.ui.description'
+        description: 'i18n:schemas.fieldTypes.ui.description'
     }
 ];
 

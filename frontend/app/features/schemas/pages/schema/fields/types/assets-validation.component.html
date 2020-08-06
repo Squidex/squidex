@@ -11,28 +11,28 @@
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label">{{ 'fieldTypes.assets.count' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.assets.count' | sqxTranslate }}</label>
 
         <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minItems" placeholder="{{ 'fieldTypes.assets.countMin' | sqxTranslate }}">
+            <input type="number" class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.assets.countMin' | sqxTranslate }}">
             
             <label class="col-form-label minmax-label">-</label>
         </div>
         <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxItems" placeholder="{{ 'fieldTypes.assets.countMax' | sqxTranslate }}">
+            <input type="number" class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.fieldTypes.assets.countMax' | sqxTranslate }}">
         </div>
     </div>
     
     <div class="form-group row">
-        <label class="col-3 col-form-label">{{ 'fieldTypes.assets.size' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.assets.size' | sqxTranslate }}</label>
 
         <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minSize" placeholder="{{ 'fieldTypes.assets.sizeMin' | sqxTranslate }}">
+            <input type="number" class="form-control" formControlName="minSize" placeholder="{{ 'schemas.fieldTypes.assets.sizeMin' | sqxTranslate }}">
             
             <label class="col-form-label minmax-label">-</label>
         </div>
         <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxSize" placeholder="{{ 'fieldTypes.assets.sizeMax' | sqxTranslate }}">
+            <input type="number" class="form-control" formControlName="maxSize" placeholder="{{ 'schemas.fieldTypes.assets.sizeMax' | sqxTranslate }}">
         </div>
         <div class="col-3">            
             <label class="col-form-label">{{ 'common.bytes' | sqxTranslate }}</label>
@@ -44,7 +44,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldMustBeImage" formControlName="mustBeImage">
                 <label class="form-check-label" for="{{field.fieldId}}_fieldMustBeImage">
-                    {{ 'fieldTypes.assets.mustBeImage' | sqxTranslate }}
+                    {{ 'schemas.fieldTypes.assets.mustBeImage' | sqxTranslate }}
                 </label>
             </div>
         </div>
@@ -103,7 +103,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldAllowDuplicates" formControlName="allowDuplicates">
                 <label class="form-check-label" for="{{field.fieldId}}_fieldAllowDuplicates">
-                    {{ 'fieldTypes.assets.allowDuplicates' | sqxTranslate }}
+                    {{ 'schemas.fieldTypes.assets.allowDuplicates' | sqxTranslate }}
                 </label>
             </div>
         </div>
@@ -111,7 +111,7 @@
     
     <div class="form-group2 row">
         <label class="col-3 col-form-label">
-            {{ 'fieldTypes.assets.fileExtensions' | sqxTranslate }}
+            {{ 'schemas.fieldTypes.assets.fileExtensions' | sqxTranslate }}
         </label>
 
         <div class="col-6">

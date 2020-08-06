@@ -22,15 +22,15 @@
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label">{{ 'fieldTypes.string.length' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.string.length' | sqxTranslate }}</label>
 
         <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minLength" placeholder="{{ 'fieldTypes.string.lengthMin' | sqxTranslate }}">
+            <input type="number" class="form-control" formControlName="minLength" placeholder="{{ 'schemas.fieldTypes.string.lengthMin' | sqxTranslate }}">
             
             <label class="col-form-label minmax-label">-</label>
         </div>
         <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxLength" placeholder="{{ 'fieldTypes.string.lengthMax' | sqxTranslate }}">
+            <input type="number" class="form-control" formControlName="maxLength" placeholder="{{ 'schemas.fieldTypes.string.lengthMax' | sqxTranslate }}">
         </div>
     </div>
 
@@ -38,12 +38,12 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPattern">{{ 'common.pattern' | sqxTranslate }}</label>
 
         <div class="col-6">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPattern" formControlName="pattern" placeholder="{{ 'fieldTypes.string.pattern' | sqxTranslate }}" #inputPattern autocomplete="off" autocorrect="off" autocapitalize="off" (focus)="patternsModal.show()">
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPattern" formControlName="pattern" placeholder="{{ 'schemas.fieldTypes.string.pattern' | sqxTranslate }}" #inputPattern autocomplete="off" autocorrect="off" autocapitalize="off" (focus)="patternsModal.show()">
 
             <ng-container *ngIf="patterns.length > 0 && (showPatternSuggestions | async)">
                 <ng-container *sqxModal="patternsModal">
                     <div class="control-dropdown" [sqxAnchoredTo]="inputPattern" position="bottom-left" @fade>
-                        <h4>{{ 'fieldTypes.string.suggestions' | sqxTranslate }}</h4>
+                        <h4>{{ 'schemas.fieldTypes.string.suggestions' | sqxTranslate }}</h4>
         
                         <div *ngFor="let pattern of patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
                             <div class="truncate">{{pattern.name}}</div>
@@ -58,7 +58,7 @@
         </small>
     </div>
     <div class="form-group row" *ngIf="showPatternMessage | async">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPatternMessage">{{ 'fieldTypes.string.patternMessage' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPatternMessage">{{ 'schemas.fieldTypes.string.patternMessage' | sqxTranslate }}</label>
 
         <div class="col-6">
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldPatternMessage" formControlName="patternMessage">
