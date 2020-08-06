@@ -65,7 +65,7 @@
             </ng-container>
 
             <ng-container *ngSwitchCase="'HTTP'">
-                <div class="section">
+                <div class="section step">
                     <h5><span class="badge badge-pill badge-dark">1</span> {{ 'clients.connectWizard.manuallyStep1' | sqxTranslate }}</h5>
 
                     <p>                 
@@ -73,7 +73,7 @@
                     </p>
                 </div>
                 
-                <div class="section">
+                <div class="section step">
                     <h5><span class="badge badge-pill badge-dark">2</span> {{ 'clients.connectWizard.manuallyStep2' | sqxTranslate }}</h5>
 
                     <p>              
@@ -81,7 +81,7 @@
                     </p>
                 </div>
                 
-                <div class="section">
+                <div class="section step">
                     <h5><span class="badge badge-pill badge-dark">3</span> {{ 'clients.connectWizard.manuallyStep3' | sqxTranslate }}</h5>
 
                     <p>              
@@ -89,30 +89,26 @@
                     </p>
                 </div>
 
-                <div class="section">
-                    <sqx-form-hint>
-                        {{ 'clients.connectWizard.manuallyTokenHint' | sqxTranslate }}
-                    </sqx-form-hint>
-                </div>
+                <sqx-form-hint>
+                    {{ 'clients.connectWizard.manuallyTokenHint' | sqxTranslate }}
+                </sqx-form-hint>
             </ng-container>
             <ng-container *ngSwitchCase="'CLI'">
-                <div class="section">
+                <div class="section step">
                     <h5><span class="badge badge-pill badge-dark">1</span> {{ 'clients.connectWizard.cliStep1' | sqxTranslate }}</h5>
 
-                    <p [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown"></p>
+                    <div [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown"></div>
 
-                    <p>
-                        <sqx-form-hint>
-                            {{ 'clients.connectWizard.cliStep1Hint' | sqxTranslate }}
-                        </sqx-form-hint>
-                    </p>
+                    <sqx-form-hint>
+                        {{ 'clients.connectWizard.cliStep1Hint' | sqxTranslate }}
+                    </sqx-form-hint>
                 </div>
                 
-                <div class="section">
+                <div class="section step">
                     <h5><span class="badge badge-pill badge-dark">2</span> <span [innerHTML]="'clients.connectWizard.cliStep2' | sqxTranslate | sqxMarkdownInline"></span></h5>
                 </div>
 
-                <div class="section">
+                <div class="section step">
                     <h5><span class="badge badge-pill badge-dark">3</span> {{ 'clients.connectWizard.cliStep3' | sqxTranslate }}</h5>
 
                     <p>                 
@@ -124,7 +120,7 @@
                     </p>
                 </div>
 
-                <div class="section">
+                <div class="section step">
                     <h5><span class="badge badge-pill badge-dark">4</span> {{ 'clients.connectWizard.cliStep4' | sqxTranslate }}</h5>
             
                     <p>    
@@ -133,17 +129,17 @@
                 </div>
             </ng-container>
             <ng-container *ngSwitchCase="'SDK'">
-                <div class="section">
+                <div class="section step">
                     <h5><span class="badge badge-pill badge-dark">1</span> {{ 'clients.connectWizard.sdkStep1' | sqxTranslate }}</h5>
 
-                    <p [innerHTML]="'clients.connectWizard.sdkStep1Download' | sqxTranslate | sqxMarkdown"></p>
+                    <div [innerHTML]="'clients.connectWizard.sdkStep1Download' | sqxTranslate | sqxMarkdown"></div>
 
                     <p>              
                         <sqx-code>dotnet add package Squidex.ClientLibrary</sqx-code>
                     </p>
                 </div>
 
-                <div class="section">
+                <div class="section step">
                     <h5><span class="badge badge-pill badge-dark">2</span> {{ 'clients.connectWizard.sdkStep2' | sqxTranslate }}</h5>
 
                     <p>              
@@ -151,12 +147,10 @@
                     </p>
                 </div>
 
-                <div class="section">
-                    <p>
-                        <sqx-form-hint>
-                            {{ 'clients.connectWizard.sdkHelp' | sqxTranslate }} <a href="https://support.squidex.io" sqxExternalLink>{{ 'clients.connectWizard.sdkHelpLink' | sqxTranslate }}</a>
-                        </sqx-form-hint>
-                    </p>
+                <div class="section step">
+                    <sqx-form-hint>
+                        {{ 'clients.connectWizard.sdkHelp' | sqxTranslate }} <a href="https://support.squidex.io" sqxExternalLink>{{ 'clients.connectWizard.sdkHelpLink' | sqxTranslate }}</a>
+                    </sqx-form-hint>
                 </div>
             </ng-container>
         </ng-container>

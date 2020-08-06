@@ -9,9 +9,13 @@
 
 .section {
     margin-top: 2rem;
+}
 
-    p {
-        padding-left: 1.75rem;
+.step {
+    padding-left: 1.75rem;
+
+    h5 {
+        margin-left: -1.75rem;
     }
 }
 
@@ -22,6 +26,7 @@
     cursor: pointer;
     margin-top: .5rem;
     padding: 1rem;
+    padding-right: 0;
     position: relative;
 
     &:hover {
