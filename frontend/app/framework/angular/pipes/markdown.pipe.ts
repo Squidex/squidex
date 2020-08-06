@@ -25,6 +25,20 @@ renderer.link = (href, _, text) => {
 export class MarkdownPipe implements PipeTransform {
     public transform(text: string | null | undefined): string {
         if (text) {
+            return marked(text, { renderer });
+        } else {
+            return '';
+        }
+    }
+}
+
+@Pipe({
+    name: 'sqxMarkdownInline',
+    pure: true
+})
+export class MarkdownInlinePipe implements PipeTransform {
+    public transform(text: string | null | undefined): string {
+        if (text) {
             return marked.inlineLexer(text, [], { renderer });
         } else {
             return '';

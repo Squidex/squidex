@@ -44,8 +44,9 @@
         <li class="nav-item" *ngIf="app.planUpgrade && app.planName">
             <div class="btn-group app-upgrade">
                 <button type="button" class="btn btn-primary btn-plan">
-                    <span [innerHTML]="'apps.upgradeHintCurrent' | sqxTranslate: { plan: app.planName } | sqxMarkdown"></span>
+                    <span [innerHTML]="'apps.upgradeHintCurrent' | sqxTranslate: { plan: app.planName } | sqxMarkdownInline"></span>
                 </button>
+
                 <button type="button" class="btn btn-warning" [routerLink]="['/app', app.name, 'settings', 'plans']">
                     {{ 'apps.upgradeHintUpgrade' | sqxTranslate }}
                 </button>
