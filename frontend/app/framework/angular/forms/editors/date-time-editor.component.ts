@@ -174,7 +174,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         if (this.showTime && this.timeControl.value) {
             const combined = `${this.dateControl.value}T${this.timeControl.value}`;
 
-            const parsed = DateTime.tryParseISO(combined);
+            const parsed = DateTime.tryParseISO(combined, !this.isLocalMode);
 
             if (parsed) {
                 result = parsed.toISOString();
@@ -182,7 +182,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         }
 
         if (!result) {
-            const parsed = DateTime.tryParseISO(this.dateControl.value, !this.isLocalMode);
+            const parsed = DateTime.tryParseISO(this.dateControl.value);
 
             if (parsed) {
                 result = parsed.toISOString();
