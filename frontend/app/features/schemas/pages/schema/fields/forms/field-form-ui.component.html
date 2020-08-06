@@ -1,3 +1,17 @@
+<div [formGroup]="fieldForm">
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">{{ 'schemas.field.editorUrl' | sqxTranslate }}</label>
+
+        <div class="col-6">
+            <input type="text" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl">
+
+            <sqx-form-hint>
+                {{ 'schemas.field.editorUrlHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
+</div>
+
 <ng-container [ngSwitch]="field.rawProperties.fieldType">
     <ng-container *ngSwitchCase="'Assets'">
         <sqx-assets-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-assets-ui>
