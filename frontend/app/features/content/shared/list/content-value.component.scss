@@ -1,22 +1,20 @@
-:host ::ng-deep {
-    .html-value {
-        img {
-            margin-top: -15px;
-            max-height: 50px;
-            min-height: 50px;
-            position: absolute;
-        }
-
-        img + span {
-            padding-left: 60px;
-        }
-
-        span {
-            @include truncate;
-        }
-    }
+:host {
+    position: relative;
 }
 
-.html-value {
-    position: relative;
+:host ::ng-deep {
+    img {
+        max-height: 50px;
+        min-height: 50px;
+        position: absolute;
+        top: -15px;
+    }
+
+    img + span {
+        padding-left: 60px;
+    }
+
+    span {
+        @include truncate;
+    }
 }
