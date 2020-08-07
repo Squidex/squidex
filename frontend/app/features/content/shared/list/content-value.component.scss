@@ -1,6 +1,4 @@
-:host {
-    direction: ltr;
-    display: block;
+.html-value {
     position: relative;
 }
 
@@ -19,9 +17,5 @@
 
     span {
         @include truncate;
-
-        &::after {
-            content: '';
-        }
     }
 }
