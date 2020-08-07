@@ -76,7 +76,7 @@
                             <a class="force" (click)="loadLatest()">{{ 'contents.viewLatest' | sqxTranslate }}</a>
                         </div>
 
-                        <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdown"></div>
+                        <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline"></div>
                     </div>
                 </ng-container>
 
