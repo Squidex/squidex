@@ -422,7 +422,7 @@ describe('StringField', () => {
     it('should format to preview image', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
-        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', true)).toEqual(new HtmlValue('<img src="https://images.unsplash.com/123?x&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=50&fit=max" /> &nbsp;'));
+        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', true)).toEqual(new HtmlValue('<img src="https://images.unsplash.com/123?x&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=50&fit=max" />'));
     });
 
     it('should not format to preview image when html not allowed', () => {
@@ -463,7 +463,7 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, assetWithImageAndFileName);
 
-        expect(result).toEqual({ value: ['url/to/13', 'file13'], formatted: new HtmlValue('<img src="url/to/13?width=50&height=50" /> <span>file13 &nbsp;</span>') });
+        expect(result).toEqual({ value: ['url/to/13', 'file13'], formatted: new HtmlValue('<img src="url/to/13?width=50&height=50" /> <span>file13</span>') });
     });
 
     it('should resolve image url only from referenced asset', () => {
@@ -479,7 +479,7 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, assetWithImage);
 
-        expect(result).toEqual({ value: ['url/to/13', 'file13'], formatted: new HtmlValue('<img src="url/to/13?width=50&height=50" /> &nbsp;') });
+        expect(result).toEqual({ value: ['url/to/13', 'file13'], formatted: new HtmlValue('<img src="url/to/13?width=50&height=50" />') });
     });
 
     it('should resolve filename only from referenced asset', () => {

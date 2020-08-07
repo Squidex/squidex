@@ -1,13 +1,9 @@
-:host {
-    position: relative;
-}
-
 :host ::ng-deep {
     img {
         max-height: 50px;
         min-height: 50px;
         position: absolute;
-        top: -15px;
+        top: 5px;
     }
 
     img + span {
