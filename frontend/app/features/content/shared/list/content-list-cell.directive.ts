@@ -86,7 +86,5 @@ export class ContentListCellDirective implements OnChanges {
             this.renderer.setStyle(this.element.nativeElement, 'max-width', width);
             this.renderer.setStyle(this.element.nativeElement, 'width', width);
         }
-
-        this.renderer.setStyle(this.element.nativeElement, 'position', 'relative');
     }
 }
