@@ -11,6 +11,6 @@ namespace Squidex.Infrastructure.Translations
 {
     public interface ILocalizer
     {
-        (string Result, bool NotFound) Get(CultureInfo culture, string key, string fallback, object? args = null);
+        (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null);
     }
 }
