@@ -4,7 +4,7 @@
     <ng-container header>
         <ul class="nav nav-tabs2">
             <li class="nav-item" *ngFor="let tab of selectableTabs">
-                <a class="nav-link" [class.active]="tab === selectedTab" (click)="selectTab(tab)">{{tab}}</a>
+                <a class="nav-link" [class.active]="tab === selectedTab" (click)="selectTab(tab)">{{tab | sqxTranslate}}</a>
             </li>
         </ul>
     </ng-container>
@@ -59,19 +59,19 @@
 
     <ng-container content>
         <ng-container [ngSwitch]="selectedTab">
-            <ng-container *ngSwitchCase="'Fields'">
+            <ng-container *ngSwitchCase="'i18n:schemas.tabFields'">
                 <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
             </ng-container>
-            <ng-container *ngSwitchCase="'UI'">
+            <ng-container *ngSwitchCase="'i18n:schemas.tabUI'">
                 <sqx-schema-ui-form [schema]="schema"></sqx-schema-ui-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'Scripts'">
+            <ng-container *ngSwitchCase="'i18n:schemas.tabScripts'">
                 <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'Json'">
+            <ng-container *ngSwitchCase="'i18n:schemas.tabJson'">
                 <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'More'">
+            <ng-container *ngSwitchCase="'i18n:schemas.tabMore'">
                 <div class="cards">
                     <sqx-schema-preview-urls-form [schema]="schema"> </sqx-schema-preview-urls-form>
                     <sqx-schema-field-rules-form [schema]="schema"> </sqx-schema-field-rules-form>

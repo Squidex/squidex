@@ -91,7 +91,11 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
                         Validators.required
                     ]
                 ],
-                condition: ''
+                condition: ['',
+                    [
+                        Validators.required
+                    ]
+                ]
             }));
     }
 

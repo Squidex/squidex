@@ -11,12 +11,6 @@ export const LocalizerServiceFactory = (translations: Object) => {
     return new LocalizerService(translations);
 };
 
-export enum PipeOptions {
-    TRANSLATE = 'translate',
-    LOWER = 'lower',
-    UPPER = 'upper'
-}
-
 @Injectable()
 export class LocalizerService {
     private shouldLog = false;
@@ -32,9 +26,13 @@ export class LocalizerService {
         return this;
     }
 
-    public get(key: string | undefined, args?: any): string {
+    public getOrKey(key: string | undefined, args?: any): string  {
+        return this.get(key, args) || key || '';
+    }
+
+    public get(key: string | undefined, args?: any): string | null  {
         if (!key) {
-            return key || '';
+            return null;
         }
 
         if (key.startsWith('i18n:')) {
@@ -48,7 +46,7 @@ export class LocalizerService {
                 console.warn(`Missing i18n key: ${key}`);
             }
 
-            return key;
+            return null;
         }
 
         if (args && Object.keys(args).length > 0) {
@@ -91,26 +89,13 @@ export class LocalizerService {
     }
 
     private handlePipeOption(value: string, pipeOption: string) {
-        if (!pipeOption) {
-            return value;
-        }
-
         switch (pipeOption) {
-            case PipeOptions.TRANSLATE: {
-                return this.get(value);
-            }
-
-            case PipeOptions.LOWER: {
+            case 'lower':
                 return value.charAt(0).toLowerCase() + value.slice(1);
-            }
-
-            case PipeOptions.UPPER: {
+            case 'upper':
                 return value.charAt(0).toUpperCase() + value.slice(1);
-            }
-            default: {
+            default:
                 return value;
-            }
         }
     }
-
 }

@@ -20,7 +20,7 @@ export class TranslatePipe implements PipeTransform {
 
     public transform(value: any, args?: any): string {
         if (Types.isString(value)) {
-            return this.localizer.get(value, args);
+            return this.localizer.getOrKey(value, args);
         } else if (value && Types.isFunction(value['translate'])) {
             return value['translate'](this.localizer);
         } else {

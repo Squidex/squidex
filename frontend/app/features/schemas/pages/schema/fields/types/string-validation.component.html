@@ -54,7 +54,7 @@
     </div>
 
     <div class="form-group row" *ngIf="showDefaultValue | async">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValue">{{ 'schemas.fields.defaultValue' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValue">{{ 'schemas.field.defaultValue' | sqxTranslate }}</label>
 
         <div class="col-6">
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldDefaultValue" formControlName="defaultValue">

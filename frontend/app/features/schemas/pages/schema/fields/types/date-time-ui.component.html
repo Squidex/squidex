@@ -6,12 +6,12 @@
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder">
 
             <sqx-form-hint>
-                {{ 'schemas.fields.placeholderHint' | sqxTranslate }}
+                {{ 'schemas.field.placeholderHint' | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
     <div class="form-group row">
-        <label class="col-3 col-form-label">{{ 'schemas.fields.editor' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label">{{ 'schemas.field.editor' | sqxTranslate }}</label>
 
         <div class="col-9">
             <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Date'">

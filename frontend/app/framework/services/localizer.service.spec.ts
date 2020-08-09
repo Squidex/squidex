@@ -30,9 +30,17 @@ describe('LocalizerService', () => {
     it('should return key if not found', () => {
         const localizer = new LocalizerService(translations);
 
-        const result = localizer.get('key');
+        const result = localizer.getOrKey('key');
 
         expect(result).toEqual('key');
+    });
+
+    it('should return null if not found', () => {
+        const localizer = new LocalizerService(translations);
+
+        const result = localizer.get('key');
+
+        expect(result).toBeNull();
     });
 
     it('should return simple key', () => {

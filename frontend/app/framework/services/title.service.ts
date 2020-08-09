@@ -32,8 +32,8 @@ export class TitleService {
         private readonly localizer: LocalizerService
     ) {
         this.titles = new TitlesConfig(
-            this.localizer.get(titles.prefix),
-            this.localizer.get(titles.suffix),
+            this.localizer.getOrKey(titles.prefix),
+            this.localizer.getOrKey(titles.suffix),
             this.titles.separator
         );
 
@@ -66,7 +66,7 @@ export class TitleService {
         let title = '';
 
         if (this.stack.length > 0) {
-            title = this.stack.map(x => this.localizer.get(x)).join(separator || ' | ');
+            title = this.stack.map(x => this.localizer.getOrKey(x)).join(separator || ' | ');
         }
 
         if (title) {

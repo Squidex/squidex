@@ -1,5 +1,5 @@
 <div class="table-items-row table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
-    {{ 'schemas.fields.empty' | sqxTranslate }}
+    {{ 'schemas.field.empty' | sqxTranslate }}
     
     <button type="button" class="btn btn-success btn-sm ml-2" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
         <i class="icon icon-plus"></i> {{ 'schemas.addField' | sqxTranslate }}

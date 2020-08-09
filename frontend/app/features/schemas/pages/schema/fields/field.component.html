@@ -9,15 +9,30 @@
                 <span class="field-name">
                     <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
 
-                    <span [class.field-hidden]="field.isHidden">{{field.displayName}}</span>
+                    <ng-container *ngIf="field.isHidden else visible">
+                        <span class="field-hidden" title="i18n:schemas.field.hiddenMarker">{{field.displayName}}</span>
+                    </ng-container>
+                
+                    <ng-template #visible>
+                        <span title="schema.field.visibleMarker" title="i18n:schema.field.visibleMarker">{{field.displayName}}</span>
+                    </ng-template>
+
                     <span class="field-partitioning ml-2" *ngIf="field['isLocalizable']">{{ 'schemas.field.localizableMarker' | sqxTranslate }}</span>
                 </span>
             </div>
             <div class="col col-tags">
                 <div class="float-right">
-                    <span class="ml-1 badge badge-pill badge-danger" *ngIf="field.isLocked">{{ 'schemas.field.lockedMarker' | sqxTranslate }}</span>
-                    <span class="ml-1 badge badge-pill badge-success" *ngIf="!field.isDisabled">{{ 'schemas.field.enabledMarker' | sqxTranslate }}</span>
-                    <span class="ml-1 badge badge-pill badge-danger" *ngIf="field.isDisabled">{{ 'schemas.field.disabledMarker' | sqxTranslate }}</span>
+                    <span class="ml-1 badge badge-pill badge-danger"  *ngIf="field.isLocked">
+                        {{ 'schemas.field.lockedMarker' | sqxTranslate }}
+                    </span>
+
+                    <span class="ml-1 badge badge-pill badge-success" *ngIf="!field.isDisabled">
+                        {{ 'schemas.field.enabledMarker' | sqxTranslate }}
+                    </span>
+
+                    <span class="ml-1 badge badge-pill badge-danger"  *ngIf="field.isDisabled">
+                        {{ 'schemas.field.disabledMarker' | sqxTranslate }}
+                    </span>
                 </div>
             </div>
             <div class="col col-options">

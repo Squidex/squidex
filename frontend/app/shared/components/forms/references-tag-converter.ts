@@ -37,7 +37,7 @@ export class ReferencesTagsConverter implements TagConverter {
             const name =
                 content.referenceFields
                     .map(f => getContentValue(content, language, f, false))
-                    .map(v => v.formatted || this.localizer.get('common.noValue'))
+                    .map(v => v.formatted || this.localizer.getOrKey('common.noValue'))
                     .filter(v => !!v)
                     .join(', ');
 

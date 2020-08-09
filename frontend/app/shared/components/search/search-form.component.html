@@ -69,7 +69,7 @@
             </ng-container>
         
             <ng-container content>    
-                <div class="form-group">            
+                <div class="form-group mt-2">            
                     <sqx-control-errors for="name"></sqx-control-errors>
             
                     <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxFocusOnInit>
@@ -86,7 +86,7 @@
             <ng-container footer>
                 <button type="button" class="btn btn-secondary" (click)="saveQueryDialog.hide()">{{ 'common.cancel' | sqxTranslate }}</button>
                
-                <button type="submit" class="btn-success">{{ 'common.create' | sqxTranslate }}</button>
+                <button type="submit" class="btn btn-success">{{ 'common.create' | sqxTranslate }}</button>
             </ng-container>
         </sqx-modal-dialog>
     </form>

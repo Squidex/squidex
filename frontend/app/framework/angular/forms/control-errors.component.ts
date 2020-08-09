@@ -59,9 +59,15 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             this.displayFieldName = this.fieldName;
         } else if (this.for) {
             if (Types.isString(this.for)) {
-                this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
+                let translation = this.localizer.get(`common.${this.for}`)!;
+
+                if (!translation) {
+                    translation = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
+                }
+
+                this.displayFieldName = translation;
             } else {
-                this.displayFieldName = this.localizer.get('common.field');
+                this.displayFieldName = this.localizer.get(`common.field`)!;
             }
         }
 
@@ -137,9 +143,18 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
 
                     const error = this.control.errors[key];
 
-                    const message = this.localizer.get(`validation.${type}`, {
-                        ...error, field: this.displayFieldName
-                    });
+                    let message: string | null = null;
+
+                    if (Types.isString(error['message'])) {
+                        message = this.localizer.get(error['message']);
+                    }
+
+                    if (!message) {
+                        const args = { ...error, field: this.displayFieldName };
+
+                        message = this.localizer.getOrKey(`validation.${type}`, args);
+
+                    }
 
                     if (message) {
                         errors.push(message);

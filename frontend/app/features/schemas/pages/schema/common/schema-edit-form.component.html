@@ -17,7 +17,7 @@
         
                 <input type="text" class="form-control" id="label" formControlName="label">
 
-                <sqx-form-hint>{{ 'schemas.field.labelHint' | sqxTranslate }}</sqx-form-hint>
+                <sqx-form-hint>{{ 'schemas.schemaLabelHint' | sqxTranslate }}</sqx-form-hint>
             </div>
         
             <div class="form-group">
@@ -26,6 +26,8 @@
                 <sqx-control-errors for="hints"></sqx-control-errors>
         
                 <textarea type="text" class="form-control" id="hints" formControlName="hints" rows="4"></textarea>
+
+                <sqx-form-hint>{{ 'schemas.schemaHintsHint' | sqxTranslate }}</sqx-form-hint>
             </div>
         
             <div class="form-group">

@@ -19,7 +19,7 @@ describe('TranslatePipe', () => {
     it('should invoke localizer service with string', () => {
         const pipe = new TranslatePipe(localizer.object);
 
-        localizer.setup(x => x.get('key', It.isAny()))
+        localizer.setup(x => x.getOrKey('key', It.isAny()))
             .returns(() => 'translated');
 
         const translation = pipe.transform('key');

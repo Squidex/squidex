@@ -17,13 +17,13 @@ export class ErrorDto {
     }
 
     public translate(localizer: LocalizerService) {
-        let result = appendLast(localizer.get(this.message), '.');
+        let result = appendLast(localizer.getOrKey(this.message), '.');
 
         if (this.details && this.details.length > 0) {
             result += '\n\n';
 
             for (const detail of this.details) {
-                const translated = localizer.get(detail);
+                const translated = localizer.getOrKey(detail);
 
                 result += ` * ${appendLast(translated, '.')}\n`;
             }

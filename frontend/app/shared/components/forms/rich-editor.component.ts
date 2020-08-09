@@ -118,7 +118,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                     onAction: self.showSelector,
                     icon: 'gallery',
                     text: '',
-                    tooltip: this.localizer.get('assets.insertAssets')
+                    tooltip: this.localizer.getOrKey('assets.insertAssets')
                 });
 
                 editor.on('init', () => {

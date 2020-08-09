@@ -22,7 +22,7 @@
     <div class="alert alert-dismissible alert-{{notification.messageType}} overlayed" *ngFor="let notification of snapshot.notifications" (click)="close(notification)" @fade>
         <button type="button" class="close" data-dismiss="alert" (close)="close(notification)">&times;</button>
 
-        <span [innerHTML]="notification.message | sqxMarkdown"></span>
+        <span [innerHTML]="notification.message | sqxTranslate | sqxMarkdown"></span>
 
         <div class="overlay"></div>
     </div>

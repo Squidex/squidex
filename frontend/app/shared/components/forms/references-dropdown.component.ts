@@ -161,13 +161,13 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             const name =
                 content.referenceFields
                     .map(f => getContentValue(content, this.languageField, f, false))
-                    .map(v => v.formatted || this.localizer.get('common.noValue'))
+                    .map(v => v.formatted || this.localizer.getOrKey('common.noValue'))
                     .filter(v => !!v)
                     .join(', ');
 
             return { name, id: content.id };
         });
 
-        return [{ name:  this.localizer.get('contents.noReference') }, ...names];
+        return [{ name: this.localizer.getOrKey('contents.noReference') }, ...names];
     }
 }

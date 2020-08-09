@@ -13,9 +13,9 @@
                         <sqx-control-errors for="action"></sqx-control-errors>
 
                         <select class="form-control" formControlName="action">
-                            <option>{{ 'schemas.rules.disable' | sqxTranslate }}</option>
-                            <option>{{ 'common.hide' | sqxTranslate }}</option>
-                            <option>{{ 'schemas.rules.require' | sqxTranslate }}</option>
+                            <option>Disable</option>
+                            <option>Hide</option>
+                            <option>Require</option>
                         </select>
                     </div>
 
@@ -49,7 +49,7 @@
 
                 <div class="form-group row no-gutters" *ngIf="isEditable">
                     <div class="col col-action pr-1">
-                        <div class="form-control preview">{{ 'schemas.rules.disable' | sqxTranslate }}</div>
+                        <div class="form-control preview">{{ 'schemas.rules.action' | sqxTranslate }}</div>
                     </div>
 
                     <div class="col-3 pr-1">
