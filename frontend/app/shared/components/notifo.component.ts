@@ -53,7 +53,7 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
         if (userToken) {
             let notifo = window['notifo'];
 
-            if (!notifo) {
+            if (!notifo && this.notifoApiUrl) {
                 notifo = [];
 
                 const options: any = { apiUrl: this.notifoApiUrl, userToken };
