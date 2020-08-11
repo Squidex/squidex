@@ -1,23 +1,23 @@
 <div class="login-area">
     <div class="card">
         <div class="card-body text-center">
-            <img alt="Logo" class="login-icon login-element" src="./images/logo.png" />
+            <img alt="Logo" class="login-icon login-element" src="./images/logo.png">
 
             <div>
                 <button type="button" class="btn btn-success btn-lg login-button login-element" (click)="login()">
-                    Login to Squidex
+                    {{ 'start.login' | sqxTranslate }}
                 </button>
             </div>
 
             <div class="login-info login-element" *ngIf="!isIE()">
-                The login button will open a new popup. Once you are logged in successful we will redirect you to the Squidex management portal.
+                {{ 'start.loginHint' | sqxTranslate }}
             </div>
         </div>
-
+        
         <div class="login-arms"></div>
     </div>
 
     <div class="proudly-made">
-        Proudly made by<br /> Qaisar Ahmad &amp; Sebastian Stehle, 2016-2020
+        {{ 'start.madeBy' | sqxTranslate }}<br> {{ 'start.madeByCopyright' | sqxTranslate }}
     </div>
 </div>

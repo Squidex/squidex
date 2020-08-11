@@ -38,14 +38,14 @@ namespace Squidex.Web.Services
 
                 TranslateProperty(name, arguments, currentCulture);
 
-                var (result, notFound) = translationService.Get(currentCulture, $"aspnet_{name}", name);
+                var (result, found) = translationService.Get(currentCulture, $"aspnet_{name}", name);
 
-                if (arguments != null && !notFound)
+                if (arguments != null && found)
                 {
                     result = string.Format(currentCulture, result, arguments);
                 }
 
-                return new LocalizedString(name, result, notFound);
+                return new LocalizedString(name, result, !found);
             }
         }
 
@@ -55,9 +55,9 @@ namespace Squidex.Web.Services
             {
                 var key = $"common.{arguments[0].ToString()?.ToCamelCase()}";
 
-                var (result, notFound) = translationService.Get(currentCulture, key, name);
+                var (result, found) = translationService.Get(currentCulture, key, name);
 
-                if (!notFound)
+                if (found)
                 {
                     arguments[0] = result;
                 }

@@ -1,13 +1,13 @@
-<sqx-title message="Languages"></sqx-title>
+<sqx-title message="i18n:common.languages"></sqx-title>
 
 <sqx-panel desiredWidth="50rem" showSidebar="true" grid="true">
     <ng-container title>
-        Languages
+        {{ 'common.languages' | sqxTranslate }}
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh languages (CTRL + SHIFT + R)">
-            <i class="icon-reset"></i> Refresh
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:languages.refreshTooltip">
+            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
@@ -17,14 +17,10 @@
         <sqx-list-view [isLoading]="languagesState.isLoading | async">
             <div content>
                 <ng-container *ngIf="(languagesState.isLoaded | async) && (languagesState.languages | async); let languages">
-                    <sqx-language *ngFor="let languageInfo of languages; trackBy: trackByLanguage"
-                        [language]="languageInfo.language" 
-                        [fallbackLanguages]="languageInfo.fallbackLanguages"
-                        [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew">
+                    <sqx-language *ngFor="let languageInfo of languages; trackBy: trackByLanguage" [language]="languageInfo.language" [fallbackLanguages]="languageInfo.fallbackLanguages" [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew">
                     </sqx-language>
         
-                    <sqx-language-add-form *ngIf="languagesState.canCreate | async"
-                        [newLanguages]="languagesState.newLanguages | async">
+                    <sqx-language-add-form *ngIf="languagesState.canCreate | async" [newLanguages]="languagesState.newLanguages | async">
                     </sqx-language-add-form>
                 </ng-container>
             </div>
@@ -33,11 +29,11 @@
 
     <ng-container sidebar>
         <div class="panel-nav">
-            <a class="panel-link" routerLink="history" routerLinkActive="active" title="History" titlePosition="left">
+            <a class="panel-link" routerLink="history" routerLinkActive="active" title="i18n:common.history" titlePosition="left">
                 <i class="icon-time"></i>
             </a>
 
-            <a class="panel-link" routerLink="help" routerLinkActive="active" title="Help" titlePosition="left">
+            <a class="panel-link" routerLink="help" routerLinkActive="active" title="i18n:common.help" titlePosition="left">
                 <i class="icon-help2"></i>
             </a>
         </div>

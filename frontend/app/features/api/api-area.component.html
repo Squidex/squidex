@@ -1,26 +1,26 @@
-<sqx-title message="API"></sqx-title>
+<sqx-title message="i18n:api.pageTitle"></sqx-title>
 
 <sqx-panel theme="dark" desiredWidth="12rem">
     <ng-container title>
-        API
+        {{ 'api.title' | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
         <ul class="nav nav-panel nav-dark flex-column">
             <li class="nav-item">
                 <a class="nav-link" routerLink="graphql" routerLinkActive="active">
-                    GraphQL
+                    {{ 'api.graphql' | sqxTranslate }}
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/api/content/{{appsState.appName}}/docs" sqxExternalLink>
-                    Content API
+                    {{ 'api.contentApi' | sqxTranslate }}
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/api/docs" sqxExternalLink>
-                    General API
+                    {{ 'api.generalApi' | sqxTranslate }}
                 </a>
             </li>
         </ul>

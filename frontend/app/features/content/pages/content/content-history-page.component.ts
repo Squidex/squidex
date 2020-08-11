@@ -70,7 +70,7 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
     }
 
     public changeStatus(status: string) {
-        this.contentPage.checkPendingChanges('change the status').pipe(
+        this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
                 filter(x => !!x),
                 switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
                 switchMap(d => this.contentsState.changeStatus(this.content, status, d)),

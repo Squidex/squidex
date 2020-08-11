@@ -80,7 +80,7 @@ export class PlansService {
 
                 return plans;
             }),
-            pretifyError('Failed to load plans. Please reload.'));
+            pretifyError('i18n:plans.loadFailed'));
     }
 
     public putPlan(appName: string, dto: ChangePlanDto, version: Version): Observable<Versioned<PlanChangedDto>> {
@@ -93,6 +93,6 @@ export class PlansService {
             tap(() => {
                 this.analytics.trackEvent('Plan', 'Changed', appName);
             }),
-            pretifyError('Failed to change plan. Please reload.'));
+            pretifyError('i18n:plans.changeFailed'));
     }
 }

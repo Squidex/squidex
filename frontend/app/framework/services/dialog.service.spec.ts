@@ -8,6 +8,7 @@
 import { DialogRequest, DialogService, DialogServiceFactory, Notification, Tooltip } from './dialog.service';
 
 describe('DialogService', () => {
+
     it('should instantiate from factory', () => {
         const dialogService = DialogServiceFactory();
 

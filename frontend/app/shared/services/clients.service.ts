@@ -73,7 +73,7 @@ export class ClientsService {
             mapVersioned(({ body }) => {
                 return parseClients(body);
             }),
-            pretifyError('Failed to load clients. Please reload.'));
+            pretifyError('i18n:clients.loadFailed'));
     }
 
     public postClient(appName: string, dto: CreateClientDto, version: Version): Observable<ClientsDto> {
@@ -86,7 +86,7 @@ export class ClientsService {
             tap(() => {
                 this.analytics.trackEvent('Client', 'Created', appName);
             }),
-            pretifyError('Failed to add client. Please reload.'));
+            pretifyError('i18n:clients.addFailed'));
     }
 
     public putClient(appName: string, resource: Resource, dto: UpdateClientDto, version: Version): Observable<ClientsDto> {
@@ -101,7 +101,7 @@ export class ClientsService {
             tap(() => {
                 this.analytics.trackEvent('Client', 'Updated', appName);
             }),
-            pretifyError('Failed to revoke client. Please reload.'));
+            pretifyError('i18n:clients.revokeFailed'));
     }
 
     public deleteClient(appName: string, resource: Resource, version: Version): Observable<ClientsDto> {
@@ -116,7 +116,7 @@ export class ClientsService {
             tap(() => {
                 this.analytics.trackEvent('Client', 'Deleted', appName);
             }),
-            pretifyError('Failed to revoke client. Please reload.'));
+            pretifyError('i18n:clients.revokeFailed'));
     }
 
     public createToken(appName: string, client: ClientDto): Observable<AccessTokenDto> {
@@ -134,7 +134,7 @@ export class ClientsService {
             map((response: any) => {
                 return new AccessTokenDto(response.access_token, response.token_type);
             }),
-            pretifyError('Failed to create token. Please retry.'));
+            pretifyError('i18n:clients.tokenFailed'));
     }
 }
 

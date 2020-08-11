@@ -90,9 +90,8 @@ export class SearchFormComponent implements OnChanges {
             }
 
             this.saveQueryForm.submitCompleted();
+            this.saveQueryDialog.hide();
         }
-
-        this.saveQueryDialog.hide();
     }
 
     public changeQueryFullText(fullText: string) {

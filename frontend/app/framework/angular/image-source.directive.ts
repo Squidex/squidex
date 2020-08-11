@@ -6,8 +6,7 @@
  */
 
 import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { MathHelper, ResourceOwner } from '@app/framework/internal';
-import { StringHelper } from '../utils/string-helper';
+import { MathHelper, ResourceOwner, StringHelper } from '@app/framework/internal';
 
 const LAYOUT_CACHE: { [key: string]: { width: number, height: number } } = {};
 

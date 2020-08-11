@@ -3,50 +3,50 @@
         <h4 class="card-title">{{planInfo.plan.name}}</h4>
         <h5 class="plan-price">{{planInfo.plan.costs}}</h5>
 
-        <small class="text-muted">Per Month</small>
+        <small class="text-muted">{{ 'plans.perMonth' | sqxTranslate }}</small>
     </div>
     <div class="card-body">
         <div class="plan-fact text-center">
             <div>
-                <strong>{{planInfo.plan.maxApiCalls | sqxKNumber}}</strong> API Calls
+                <strong>{{planInfo.plan.maxApiCalls | sqxKNumber}}</strong> {{ 'plans.includedCalls' | sqxTranslate }}
             </div>
             <div>
-                {{planInfo.plan.maxAssetSize | sqxFileSize}} Storage
+                {{planInfo.plan.maxAssetSize | sqxFileSize}} {{ 'plans.includedStorage' | sqxTranslate }}
             </div>
             <div>
-                {{planInfo.plan.maxContributors}} Contributors
+                {{planInfo.plan.maxContributors}} {{ 'plans.includedContributors' | sqxTranslate }}
             </div>
         </div>
     
         <button *ngIf="planInfo.isSelected" class="btn btn-block btn-text-success plan-selected">
-            &#10003; Selected
+            {{ 'plans.selected' | sqxTranslate }}
         </button>
         
         <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async"
             (sqxConfirmClick)="changeMonthly()"
-            [confirmTitle]="'Change subscription'"
+            confirmTitle="i18n:plans.changeConfirmTitle"
             [confirmText]="planInfo.plan.confirmText"
             [confirmRequired]="planInfo.plan.confirmText">
-            Change
+            {{ 'plans.change' | sqxTranslate }}
         </button>
     </div>
     <div class="card-footer" *ngIf="planInfo.plan.yearlyId">
         <div class="text-center">
             <h5 class="plan-price">{{planInfo.plan.yearlyCosts}}</h5>
 
-            <small class="text-muted">Per Year</small>
+            <small class="text-muted">{{ 'plans.perYear' | sqxTranslate }}</small>
         </div>
 
         <button *ngIf="planInfo.isYearlySelected" class="btn btn-block btn-text-success plan-selected">
-            &#10003; Selected
+            {{ 'plans.selected' | sqxTranslate }}
         </button>
         
-        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" 
+        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async"
             (sqxConfirmClick)="changeYearly()"
-            [confirmTitle]="'Change subscription'"
+            confirmTitle="i18n:plans.changeConfirmTitle"
             [confirmText]="planInfo.plan.yearlyConfirmText"
             [confirmRequired]="planInfo.plan.yearlyConfirmText">
-            Change
+            {{ 'plans.change' | sqxTranslate }}
         </button>
     </div>
 </div>

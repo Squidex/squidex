@@ -1,5 +1,5 @@
 <div class="card card-lg">
-    <div class="card-header">History</div>
+    <div class="card-header">{{ 'dashboard.historyCard' | sqxTranslate }}</div>
     <div class="card-body card-history card-body-scroll">
         <sqx-history-list [events]="history | async"></sqx-history-list>            
     </div>

@@ -170,7 +170,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.contentsService.getContents(this.appName, this.schemaName, query).pipe(
             tap(({ total, items: contents, canCreate, canCreateAndPublish, statuses }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Contents reloaded.');
+                    this.dialogs.notifyInfo('i18n:contents.reloaded');
                 }
 
                 return this.next(s => {
@@ -209,7 +209,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public create(request: any, publish: boolean): Observable<ContentDto> {
         return this.contentsService.postContent(this.appName, this.schemaName, request, publish).pipe(
             tap(payload => {
-                this.dialogs.notifyInfo('Content created successfully.');
+                this.dialogs.notifyInfo('i18n:contents.created');
 
                 return this.next(s => {
                     const contents = [payload, ...s.contents];
@@ -260,7 +260,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public changeStatus(content: ContentDto, status: string, dueTime: string | null): Observable<ContentDto> {
         return this.contentsService.putStatus(this.appName, content, status, dueTime, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -268,7 +268,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public update(content: ContentDto, request: any): Observable<ContentDto> {
         return this.contentsService.putContent(this.appName, content, request, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -276,7 +276,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public createDraft(content: ContentDto): Observable<ContentDto> {
         return this.contentsService.createVersion(this.appName, content, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -284,7 +284,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public deleteDraft(content: ContentDto): Observable<ContentDto> {
         return this.contentsService.deleteVersion(this.appName, content, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -292,7 +292,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public patch(content: ContentDto, request: any): Observable<ContentDto> {
         return this.contentsService.patchContent(this.appName, content, request, content.version).pipe(
             tap(updated => {
-                this.replaceContent(updated, content.version, 'Content updated successfully.');
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
             }),
             shareSubscribed(this.dialogs));
     }

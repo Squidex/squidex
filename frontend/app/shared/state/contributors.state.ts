@@ -113,7 +113,7 @@ export class ContributorsState extends State<Snapshot> {
         return this.contributorsService.getContributors(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Contributors reloaded.');
+                    this.dialogs.notifyInfo('i18n:contributors.reloaded');
                 }
 
                 this.replaceContributors(version, payload);
@@ -144,7 +144,7 @@ export class ContributorsState extends State<Snapshot> {
         return this.contributorsService.postContributor(this.appName, request, this.version).pipe(
             catchError(error => {
                 if (Types.is(error, ErrorDto) && error.statusCode === 404) {
-                    return throwError(new ErrorDto(404, 'The user does not exist.'));
+                    return throwError(new ErrorDto(404, 'i18n:contributors.userNotFound'));
                 } else {
                     return throwError(error);
                 }

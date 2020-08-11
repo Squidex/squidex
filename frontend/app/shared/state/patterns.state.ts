@@ -67,7 +67,7 @@ export class PatternsState extends State<Snapshot> {
         return this.patternsService.getPatterns(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Patterns reloaded.');
+                    this.dialogs.notifyInfo('i18n:patterns.reloaded');
                 }
 
                 this.replacePatterns(payload, version);

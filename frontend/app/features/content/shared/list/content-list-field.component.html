@@ -6,7 +6,7 @@
         <small class="truncate">{{content.created | sqxFromNow}}</small>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.createdByAvatar">
-        <img class="user-picture" title="{{content.createdBy | sqxUserNameRef}}" [src]="content.createdBy | sqxUserPictureRef" />
+        <img class="user-picture" title="{{content.createdBy | sqxUserNameRef}}" [src]="content.createdBy | sqxUserPictureRef">
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.createdByName">
         <small class="truncate">{{content.createdBy | sqxUserNameRef}}</small>
@@ -15,7 +15,7 @@
         <small class="truncate">{{content.lastModified | sqxFromNow}}</small>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.lastModifiedByAvatar">
-        <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [src]="content.lastModifiedBy | sqxUserPictureRef" />
+        <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [src]="content.lastModifiedBy | sqxUserPictureRef">
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.lastModifiedByName">
         <small class="truncate">{{content.lastModifiedBy | sqxUserNameRef}}</small>
@@ -34,7 +34,7 @@
                     <i class="icon-caret-right"></i>
                 </div>
                 <div class="col">
-                    <sqx-content-status truncate="true"
+                    <sqx-content-status truncate="true" 
                         layout="text"
                         [status]="content.newStatus"
                         [statusColor]="content.newStatusColor"
@@ -45,7 +45,7 @@
         </ng-container>
 
         <ng-template #singleStatus>
-            <sqx-content-status truncate="true"
+            <sqx-content-status truncate="true" 
                 layout="text"
                 [status]="content.status"
                 [statusColor]="content.statusColor"
@@ -61,7 +61,7 @@
                 [statusColor]="content.scheduleJob?.color">
             </sqx-content-status>
         
-            at {{content.scheduleJob?.dueTime | sqxShortDate}}
+            {{ 'contents.scheduledAtLabel' | sqxTranslate }}&nbsp;{{content.scheduleJob?.dueTime | sqxShortDate}}
         </span>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.statusColor">

@@ -48,16 +48,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.indexer = indexer;
         }
 
-        protected override Task PrepareAsync(CancellationToken ct = default)
+        protected override async Task PrepareAsync(CancellationToken ct = default)
         {
-            var index =
+            var indexBySchemaWithRefs =
                 new CreateIndexModel<MongoContentEntity>(Index
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted)
                     .Ascending(x => x.ReferencedIds)
                     .Descending(x => x.LastModified));
 
-            return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
+            await Collection.Indexes.CreateOneAsync(indexBySchemaWithRefs, cancellationToken: ct);
+
+            var indexBySchema =
+                new CreateIndexModel<MongoContentEntity>(Index
+                    .Ascending(x => x.IndexedSchemaId)
+                    .Ascending(x => x.IsDeleted)
+                    .Descending(x => x.LastModified));
+
+            await Collection.Indexes.CreateOneAsync(indexBySchema, cancellationToken: ct);
         }
 
         public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, SearchScope scope)

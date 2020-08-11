@@ -98,7 +98,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     if (clone) {
                         this.loadContent(clone, true);
                     } else if (isNewContent && autosaved && this.contentForm.hasChanges(autosaved)) {
-                        this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
+                        this.dialogs.confirm('i18n:contents.unsavedChangesTitle', 'i18n:contents.unsavedChangesText')
                             .subscribe(shouldLoad => {
                                 if (shouldLoad) {
                                     this.loadContent(autosaved, false);
@@ -120,7 +120,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public canDeactivate(): Observable<boolean> {
-        return this.checkPendingChanges('close the current content view').pipe(
+        return this.checkPendingChangesBeforeClose().pipe(
             tap(confirmed => {
                 if (confirmed) {
                     this.autoSaveService.remove(this.autoSaveKey);
@@ -167,7 +167,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     });
             }
         } else {
-            this.contentForm.submitFailed('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
+            this.contentForm.submitFailed('i18n:contents.contentNotValid');
         }
     }
 
@@ -194,13 +194,23 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public checkPendingChanges(action: string) {
+    public checkPendingChangesBeforeClose() {
         if (this.content && !this.content.canUpdate) {
             return of(true);
         }
 
         return this.contentForm.hasChanged() ?
-            this.dialogs.confirm('Unsaved changes', `You have unsaved changes.\n\nWhen you ${action} you will loose them.\n\n**Do you want to continue anyway?**`) :
+            this.dialogs.confirm('i18n:contents.pendingChangesTitle', 'i18n:contents.pendingChangesTextToClose') :
+            of(true);
+    }
+
+    public checkPendingChangesBeforeChangingStatus() {
+        if (this.content && !this.content.canUpdate) {
+            return of(true);
+        }
+
+        return this.contentForm.hasChanged() ?
+            this.dialogs.confirm('i18n:contents.pendingChangesTitle', 'i18n:contents.pendingChangesTextToChange') :
             of(true);
     }
 

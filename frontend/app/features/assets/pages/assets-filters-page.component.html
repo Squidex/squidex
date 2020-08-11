@@ -1,21 +1,21 @@
 <sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false">
     <ng-container title>
-        Filters
+        {{ 'common.filters' | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
-        <h3>Tags</h3>
+        <h3>{{ 'common.tags' | sqxTranslate }}</h3>
 
-        <sqx-asset-tags
-            (reset)="resetTags()"
+        <sqx-asset-tags (reset)="resetTags()"
             [tags]="assetsState.tags | async"
             [tagsSelected]="assetsState.tagsSelected | async"
             (toggle)="toggleTag($event)">
         </sqx-asset-tags>
 
-        <hr />
+        <hr>
 
-        <sqx-shared-queries types="contents"
+        <sqx-shared-queries
+            [types]="'common.assets' | sqxTranslate"
             [queryUsed]="assetsState.assetsQuery | async"
             [queries]="assetsQueries"
             (search)="search($event)">

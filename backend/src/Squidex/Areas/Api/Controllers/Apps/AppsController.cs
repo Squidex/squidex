@@ -284,7 +284,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/")]
-        [ApiPermissionOrAnonymous(Permissions.AppDelete)]
+        [ApiPermission(Permissions.AppDelete)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteApp(string app)
         {

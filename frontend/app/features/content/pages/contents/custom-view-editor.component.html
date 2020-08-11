@@ -1,17 +1,16 @@
 <div class="container">
     <div class="header">
         <button type="button" class="btn btn-secondary btn-sm" (click)="resetDefault()">
-            Reset Default View
+            {{ 'contents.viewReset' | sqxTranslate }}
         </button>
     </div>
     
-    <hr />
+    <hr>
 
-    <div 
+    <div
         cdkDropList
         [cdkDropListData]="fieldNames"
         (cdkDropListDropped)="drop($event)">
-    
         <div *ngFor="let field of fieldNames" cdkDrag>
             <i class="icon-drag2 drag-handle"></i> 
             
@@ -24,7 +23,7 @@
         </div>
     </div>
     
-    <hr />
+    <hr>
     
     <div>
         <div *ngFor="let field of fieldsNotAdded">    

@@ -64,7 +64,7 @@ export class UsagesService {
             map(body => {
                 return body.downloadUrl;
             }),
-            pretifyError('Failed to load monthly api calls. Please reload.'));
+            pretifyError('i18n:usages.loadMonthlyCallsFailed'));
     }
 
     public getTodayStorage(app: string): Observable<CurrentStorageDto> {
@@ -74,7 +74,7 @@ export class UsagesService {
             map(body => {
                 return new CurrentStorageDto(body.size, body.maxAllowed);
             }),
-            pretifyError('Failed to load todays storage size. Please reload.'));
+            pretifyError('i18n:usages.loadTodayStorageFailed'));
     }
 
     public getCallsUsages(app: string, fromDate: string, toDate: string): Observable<CallsUsageDto> {
@@ -103,7 +103,7 @@ export class UsagesService {
 
                 return usages;
             }),
-            pretifyError('Failed to load calls usage. Please reload.'));
+            pretifyError('i18n:usages.loadCallsFailed'));
     }
 
     public getStorageUsages(app: string, fromDate: string, toDate: string): Observable<ReadonlyArray<StorageUsagePerDateDto>> {
@@ -119,6 +119,6 @@ export class UsagesService {
 
                 return usages;
             }),
-            pretifyError('Failed to load storage usage. Please reload.'));
+            pretifyError('i18n:usages.loadStorageFailed'));
     }
 }

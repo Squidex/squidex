@@ -37,11 +37,11 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             var assembly = typeof(UsersController).Assembly;
 
-            using (var avatarStream = assembly.GetManifestResourceStream("Squidex.Areas.Api.Controllers.Users.Assets.Avatar.png"))
+            using (var resourceStream = assembly.GetManifestResourceStream("Squidex.Areas.Api.Controllers.Users.Assets.Avatar.png"))
             {
-                AvatarBytes = new byte[avatarStream!.Length];
+                AvatarBytes = new byte[resourceStream!.Length];
 
-                avatarStream.Read(AvatarBytes, 0, AvatarBytes.Length);
+                resourceStream.Read(AvatarBytes, 0, AvatarBytes.Length);
             }
         }
 

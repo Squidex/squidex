@@ -86,6 +86,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
+    <EmbeddedResource Include="Areas\Frontend\Resources\texts.en" />
     <EmbeddedResource Include="Docs\schemabody.md" />
     <EmbeddedResource Include="Docs\schemaquery.md" />
     <EmbeddedResource Include="Docs\security.md" />
@@ -94,7 +95,6 @@
     <EmbeddedResource Include="Pipeline\Squid\icon-sad-sm.svg" />
     <EmbeddedResource Include="Pipeline\Squid\icon-sad.svg" />
     <EmbeddedResource Remove="Assets\**" />
-    <EmbeddedResource Remove="_test-output\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -102,11 +102,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="Assets\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Areas\Api\Controllers\Users\Assets\Avatar.png" />
+    <None Remove="Areas\Frontend\Resources\texts.en" />
     <None Remove="Docs\schemabody.md" />
     <None Remove="Docs\schemaquery.md" />
     <None Remove="Docs\security.md" />
@@ -120,9 +117,11 @@
     <None Remove="Assets\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="Assets\**" />
+  </ItemGroup>
+
   <PropertyGroup>
     <NoWarn>$(NoWarn);CS1591;1591;1573;1572;NU1605;IDE0060</NoWarn>
   </PropertyGroup>
-
-  <ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="http://json.schemastore.org/BizTalkServerApplicationSchema" /></VisualStudio></ProjectExtensions>
 </Project>

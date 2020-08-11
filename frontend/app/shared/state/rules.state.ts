@@ -85,7 +85,7 @@ export class RulesState extends State<Snapshot> {
         return this.rulesService.getRules(this.appName).pipe(
             tap(({ items: rules, runningRuleId, canCancelRun, canCreate, canReadEvents }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Rules reloaded.');
+                    this.dialogs.notifyInfo('i18n:rules.reloaded');
                 }
 
                 this.next({
@@ -171,7 +171,7 @@ export class RulesState extends State<Snapshot> {
     public run(rule: RuleDto): Observable<any> {
         return this.rulesService.runRule(this.appName, rule).pipe(
             tap(() => {
-                this.dialogs.notifyInfo('Rule will start to run in a few seconds.');
+                this.dialogs.notifyInfo('i18n:rules.restarted');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -179,7 +179,7 @@ export class RulesState extends State<Snapshot> {
     public trigger(rule: RuleDto): Observable<any> {
         return this.rulesService.triggerRule(this.appName, rule).pipe(
             tap(() => {
-                this.dialogs.notifyInfo('Rule has been added to the queue.');
+                this.dialogs.notifyInfo('i18n:rules.enqueued');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -187,7 +187,7 @@ export class RulesState extends State<Snapshot> {
     public runCancel(): Observable<any> {
         return this.rulesService.runCancel(this.appName).pipe(
             tap(() => {
-                this.dialogs.notifyInfo('Rule will stop soon.');
+                this.dialogs.notifyInfo('i18n:rules.stop');
             }),
             shareSubscribed(this.dialogs));
     }

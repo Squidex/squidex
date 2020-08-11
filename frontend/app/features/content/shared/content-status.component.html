@@ -9,7 +9,7 @@
 
     <div class="content-status-scheduled mt-2" *ngIf="scheduled">
         <div>
-            <span class="label">to&nbsp;</span>
+            <span class="label">{{ 'contents.scheduledTo' | sqxTranslate }}&nbsp;</span>
 
             <span class="content-status default mr-1" [style.color]="scheduled?.color" title="{{tooltipText}}">
                 <i class="icon-circle icon-sm"></i>
@@ -19,7 +19,7 @@
         </div>
 
         <div class="truncate">
-            <span class="label">at&nbsp;</span>
+            <span class="label">{{ 'contents.scheduledAt' | sqxTranslate }}&nbsp;</span>
     
             <span>{{scheduled?.dueTime | sqxFullDateTime}}</span>
         </div>

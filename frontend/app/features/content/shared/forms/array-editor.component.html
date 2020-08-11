@@ -1,12 +1,9 @@
-<div class="array-container" *ngIf="formModel.items.length > 0" 
+<div class="array-container" *ngIf="formModel.items.length > 0"
     cdkDropList
     [cdkDropListDisabled]="false"
     [cdkDropListData]="formModel.items"
     (cdkDropListDropped)="sort($event)">
-    <div *ngFor="let itemForm of formModel.items; index as i; last as isLast; first as isFirst"
-        class="table-drag item"
-        cdkDrag
-        cdkDragLockAxis="y">
+    <div *ngFor="let itemForm of formModel.items; index as i; last as isLast; first as isFirst" class="table-drag item" cdkDrag cdkDragLockAxis="y">
         <sqx-array-item
             [canUnset]="canUnset"
             [form]="form"
@@ -27,20 +24,20 @@
 <div class="row">
     <div class="col">
         <button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || formModel.form.disabled" (click)="itemAdd(undefined)">
-            Add Item
+            {{ 'contents.arrayAddItem' | sqxTranslate }}
         </button>
     </div>
 
     <div class="col-auto" *ngIf="formModel.items.length > 0">
-        <button type="button" class="btn btn-text-secondary" (click)="expandAll()" title="Expand all items">
+        <button type="button" class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll">
             <i class="icon-plus-square"></i>
         </button>
-        <button type="button" class="btn btn-text-secondary" (click)="collapseAll()" title="Collapse all items">
+        <button type="button" class="btn btn-text-secondary" (click)="collapseAll()" title="i18n:contents.arrayCollapseAll">
             <i class="icon-minus-square"></i>
         </button>
     </div>
 </div>
 
 <small class="text-muted ml-2" *ngIf="field.nested.length === 0">
-    Add a nested field first to add items.
+    {{ 'contents.arrayNoFields' | sqxTranslate }}
 </small>

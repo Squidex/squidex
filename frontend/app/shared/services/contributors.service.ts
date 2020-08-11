@@ -62,7 +62,7 @@ export class ContributorsService {
             mapVersioned(({ body }) => {
                 return parseContributors(body);
             }),
-            pretifyError('Failed to load contributors. Please reload.'));
+            pretifyError('i18n:contributors.loadFailed'));
     }
 
     public postContributor(appName: string, dto: AssignContributorDto, version: Version): Observable<ContributorsDto> {
@@ -75,7 +75,7 @@ export class ContributorsService {
             tap(() => {
                 this.analytics.trackEvent('Contributor', 'Configured', appName);
             }),
-            pretifyError('Failed to add contributors. Please reload.'));
+            pretifyError('i18n:contributors.addFailed'));
     }
 
     public deleteContributor(appName: string, resource: Resource, version: Version): Observable<ContributorsDto> {
@@ -92,7 +92,7 @@ export class ContributorsService {
             tap(() => {
                 this.analytics.trackEvent('Contributor', 'Deleted', appName);
             }),
-            pretifyError('Failed to delete contributors. Please reload.'));
+            pretifyError('i18n:contributors.deleteFailed'));
     }
 }
 

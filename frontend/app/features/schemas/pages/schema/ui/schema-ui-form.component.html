@@ -2,23 +2,24 @@
     <div class="inner-header">
         <ul class="nav nav-tabs2">
             <li class="nav-item" *ngFor="let tab of selectableTabs">
-                <a class="nav-link" [class.active]="selectedTab === tab" (click)="selectTab(tab)">{{tab}}</a>
+                <a class="nav-link" [class.active]="selectedTab === tab" (click)="selectTab(tab)">{{tab | sqxTranslate}}</a>
             </li>
         </ul>
 
-        <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">Save</button>
+        <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">{{ 'common.save' | sqxTranslate }}</button>
     </div>
 
     <div class="inner-main">
-        <sqx-field-list [class.hidden]="selectedTab !== 'List Fields'"
-            emptyText="Drop field here or reorder them to show the fields in the content list. When no list field is defined, the first field is used."
+        <sqx-field-list [class.hidden]="selectedTab !== 'i18n:schemas.listFields'"
+            [emptyText]="'schemas.listFieldsEmpty' | sqxTranslate"
             [schema]="schema"
             [fieldNames]="state.fieldsInLists"
             (fieldNamesChange)="setFieldsInLists($event)"
             [withMetaFields]="true">
         </sqx-field-list>
-        <sqx-field-list [class.hidden]="selectedTab !== 'Reference Fields'"
-            emptyText="Drop field here or reorder them to show the fields when referenced by another content. When no reference field is defined, the list fields are used instead."
+
+        <sqx-field-list [class.hidden]="selectedTab !== 'i18n:schemas.referenceFields'"
+            [emptyText]="'schemas.referenceFieldsEmpty' | sqxTranslate"
             [schema]="schema"
             [fieldNames]="state.fieldsInReferences"
             (fieldNamesChange)="setFieldsInReferences($event)">

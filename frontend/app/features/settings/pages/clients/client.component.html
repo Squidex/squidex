@@ -2,21 +2,17 @@
     <div class="card-header">
         <div class="row no-gutters">
             <div class="col col-name">
-                <sqx-editable-title 
-                    [name]="client.name"
-                    (nameChange)="rename($event)"
-                    [disabled]="!client.canUpdate">
+                <sqx-editable-title [name]="client.name" (nameChange)="rename($event)" [disabled]="!client.canUpdate">
                 </sqx-editable-title>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-primary" (click)="connectDialog.show()">Connect</button>
+                <button type="button" class="btn btn-primary" (click)="connectDialog.show()">{{ 'clients.connect' | sqxTranslate }}</button>
             </div>
             <div class="col-auto cell-actions no-padding">
-                <button type="button" class="btn btn-text-danger"
-                    [disabled]="!client.canRevoke"
+                <button type="button" class="btn btn-text-danger" [disabled]="!client.canRevoke"
                     (sqxConfirmClick)="revoke()"
-                    confirmTitle="Revoke client" 
-                    confirmText="Do you really want to revoke the client?">
+                    confirmTitle="i18n:clients.deleteConfirmTitle"
+                    confirmText="i18n:clients.deleteConfirmText">
                     <i class="icon-bin2"></i>
                 </button>
             </div>
@@ -26,10 +22,10 @@
         <div class="container">
             <div class="form-group row">
                 <label class="col-3 col-form-label">
-                    Client Id
+                    {{ 'common.clientId' | sqxTranslate }}
                 </label>
                 <div class="col cell-input">
-                    <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName />
+                    <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName>
                 </div>
                 <div class="col-auto cell-actions no-padding">
                     <button type="button" class="btn btn-text" [sqxCopy]="inputName">
@@ -39,10 +35,10 @@
             </div>
             <div class="form-group row">
                 <label class="col-3 col-form-label">
-                    Client Secret
+                    {{ 'common.clientSecret' | sqxTranslate }}
                 </label>
                 <div class="col cell-input">
-                    <input readonly class="form-control" [value]="client.secret" #inputSecret />
+                    <input readonly class="form-control" [value]="client.secret" #inputSecret>
                 </div>
                 <div class="col-auto cell-actions no-padding">
                     <button type="button" class="btn btn-text" [sqxCopy]="inputSecret">
@@ -52,13 +48,10 @@
             </div>
             <div class="form-group row">
                 <label class="col-3 col-form-label">
-                    Role
+                    {{ 'common.role' | sqxTranslate }}
                 </label>
                 <div class="col cell-input">
-                    <select class="form-control"
-                        [disabled]="!client.canUpdate"
-                        [ngModel]="client.role"
-                        (ngModelChange)="update($event)">
+                    <select class="form-control" [disabled]="!client.canUpdate" [ngModel]="client.role" (ngModelChange)="update($event)">
                         <option *ngFor="let role of clientRoles; trackBy: trackByRole" [ngValue]="role.name">{{role.name}}</option>
                     </select>
                 </div>
@@ -67,18 +60,15 @@
             <div class="form-group row">
                 <div class="col cell-input offset-3">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="{{client.id}}_allowAnonymous" 
-                            [disabled]="!client.canUpdate"
-                            [ngModel]="client.allowAnonymous"
-                            (ngModelChange)="updateAccess($event)" />
+                        <input class="form-check-input" type="checkbox" id="{{client.id}}_allowAnonymous" [disabled]="!client.canUpdate" [ngModel]="client.allowAnonymous" (ngModelChange)="updateAccess($event)">
             
                         <label class="form-check-label" for="{{client.id}}_allowAnonymous">
-                            Allow anonymous access.
+                            {{ 'clients.allowAnonymous' | sqxTranslate }}
                         </label>
                     </div>
         
                     <sqx-form-hint>
-                        Allow access to the API without an access token to all resources that are configured via the role of this client. Do not give more than one client anonymous access.
+                        {{ 'clients.allowAnonymousHint' | sqxTranslate }}
                     </sqx-form-hint>
                 </div>
                 <div class="col-auto cell-actions"></div>
@@ -88,7 +78,6 @@
 </div>
 
 <ng-container *sqxModal="connectDialog">
-    <sqx-client-connect-form [client]="client"
-        (complete)="connectDialog.hide()">
+    <sqx-client-connect-form [client]="client" (complete)="connectDialog.hide()">
     </sqx-client-connect-form>   
 </ng-container>

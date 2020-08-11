@@ -11,8 +11,17 @@ import { AnnotateAssetDto, AnnotateAssetForm, AssetDto, AssetsState, AssetUpload
 import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
-const TABS_IMAGE: ReadonlyArray<string> = ['Metadata', 'Image', 'Focus Point', 'History'];
-const TABS_DEFAULT: ReadonlyArray<string> = ['Metadata', 'History'];
+const TABS_IMAGE: ReadonlyArray<string> = [
+    'i18n:assets.tabMetadata',
+    'i18n:assets.tabImage',
+    'i18n:assets.tabFocusPoint',
+    'i18n:assets.tabHistory'
+];
+
+const TABS_DEFAULT: ReadonlyArray<string> = [
+    'i18n:assets.tabMetadata',
+    'i18n:assets.tabHistory'
+];
 
 @Component({
     selector: 'sqx-asset-dialog',
@@ -106,7 +115,7 @@ export class AssetDialogComponent implements OnChanges {
                         } else {
                             this.changed.emit(dto);
 
-                            this.dialogs.notifyInfo('Asset has been updated.');
+                            this.dialogs.notifyInfo('i18n:assets.updated');
                         }
                     }, error => {
                         if (!Types.is(error, UploadCanceled)) {
@@ -116,7 +125,7 @@ export class AssetDialogComponent implements OnChanges {
                         this.setProgress(0);
                     });
             } else {
-                this.dialogs.notifyInfo('Nothing has changed.');
+                this.dialogs.notifyInfo('i18n:common.nothingChanged');
             }
         });
     }
@@ -143,12 +152,12 @@ export class AssetDialogComponent implements OnChanges {
                 .subscribe(() => {
                     this.annotateForm.submitCompleted({ noReset: true });
 
-                    this.dialogs.notifyInfo('Asset has been updated.');
+                    this.dialogs.notifyInfo('i18n:assets.updated');
                 }, error => {
                     this.annotateForm.submitFailed(error);
                 });
         } else {
-            this.dialogs.notifyInfo('Nothing has changed.');
+            this.dialogs.notifyInfo('i18n:common.nothingChanged');
         }
     }
 

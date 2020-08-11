@@ -213,6 +213,8 @@ describe('RulesState', () => {
                 .returns(() => of()).verifiable();
 
             rulesState.runCancel().subscribe();
+
+            expect().nothing();
         });
     });
 });

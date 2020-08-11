@@ -1,90 +1,70 @@
-<sqx-title message="Dashboard"></sqx-title>
+<sqx-title message="i18n:dashboard.pageTitle"></sqx-title>
 
 <ng-container *ngIf="appsState.selectedApp | async; let app">
-    <div class="dashboard" @fade>
-        <div class="dashboard-summary" *ngIf="!isScrolled" @fade>
-            <h1 class="dashboard-title">Hi {{authState.user?.displayName}}</h1>
+    <div class="dashboard" @fade="">
+        <div class="dashboard-summary" *ngIf="!isScrolled" @fade="">
+            <h1 class="dashboard-title">{{ 'dashboard.welcomeTitle' | sqxTranslate: { user: authState.user?.displayName } }}</h1>
 
-            <div class="subtext">
-                Welcome to <strong>{{app.displayName}}</strong> dashboard.
-            </div>
+            <div class="subtext" [innerHTML]="'dashboard.welcomeText' | sqxTranslate: { app: app.displayName } | sqxMarkdown"></div>
         </div>
 
-        <gridster [options]="gridOptions" #grid>
+        <gridster [options]="gridOptions" #grid="">
             <gridster-item [item]="item" *ngFor="let item of gridConfig">
                 <ng-container [ngSwitch]="item.type">
                     <ng-container *ngSwitchCase="'schemas'">
-                        <sqx-schema-card
-                            [app]="app">
+                        <sqx-schema-card [app]="app">
                         </sqx-schema-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'api'">
-                        <sqx-api-card
-                            [app]="app">
+                        <sqx-api-card [app]="app">
                         </sqx-api-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'support'">
-                        <sqx-support-card
-                            [app]="app">
+                        <sqx-support-card [app]="app">
                         </sqx-support-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'github'">
-                        <sqx-github-card
-                            [app]="app">
+                        <sqx-github-card [app]="app">
                         </sqx-github-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'api-calls'">
-                        <sqx-api-calls-card
-                            [app]="app" [usage]="callsUsage">
+                        <sqx-api-calls-card [app]="app" [usage]="callsUsage">
                         </sqx-api-calls-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'api-performance'">
-                        <sqx-api-performance-card
-                            [isStacked]="isStacked"
-                            (isStackedChange)="changeIsStacked($event)"
-                            [app]="app" [usage]="callsUsage">
+                        <sqx-api-performance-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [app]="app" [usage]="callsUsage">
                         </sqx-api-performance-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'api-calls-summary'">
-                        <sqx-api-calls-summary-card
-                            [app]="app" [usage]="callsUsage">
+                        <sqx-api-calls-summary-card [app]="app" [usage]="callsUsage">
                         </sqx-api-calls-summary-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'asset-uploads-count'">
-                        <sqx-asset-uploads-count-card
-                            [app]="app" [usage]="storageUsage">
+                        <sqx-asset-uploads-count-card [app]="app" [usage]="storageUsage">
                         </sqx-asset-uploads-count-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'asset-uploads-size-summary'">
-                        <sqx-asset-uploads-size-summary-card
-                            [app]="app" [usage]="storageCurrent">
+                        <sqx-asset-uploads-size-summary-card [app]="app" [usage]="storageCurrent">
                         </sqx-asset-uploads-size-summary-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'asset-uploads-size'">
-                        <sqx-asset-uploads-size-card
-                            [app]="app" [usage]="storageUsage">
+                        <sqx-asset-uploads-size-card [app]="app" [usage]="storageUsage">
                         </sqx-asset-uploads-size-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'api-traffic'">                
-                        <sqx-api-traffic-card
-                            [isStacked]="isStacked"
-                            (isStackedChange)="changeIsStacked($event)"
-                            [app]="app" [usage]="callsUsage">
+                        <sqx-api-traffic-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [app]="app" [usage]="callsUsage">
                         </sqx-api-traffic-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'history'">
-                        <sqx-history-card
-                            [app]="app">
+                        <sqx-history-card [app]="app">
                         </sqx-history-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'content-summary'">
-                        <sqx-content-summary-card
-                            [app]="app" [options]="item">
+                        <sqx-content-summary-card [app]="app" [options]="item">
                         </sqx-content-summary-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'iframe'">
-                        <sqx-iframe-card
-                            [app]="app" [options]="item">
+                        <sqx-iframe-card [app]="app" [options]="item">
                         </sqx-iframe-card>
                     </ng-container>
                 </ng-container>
@@ -92,10 +72,7 @@
         </gridster>
 
         <div class="dashboard-settings">
-            <sqx-dashboard-config [app]="app"
-                [needsAttention]="isScrolled"
-                [config]="gridConfig" 
-                (configChange)="changeConfig($event)">
+            <sqx-dashboard-config [app]="app" [needsAttention]="isScrolled" [config]="gridConfig" (configChange)="changeConfig($event)">
             </sqx-dashboard-config>
         </div>
     </div>

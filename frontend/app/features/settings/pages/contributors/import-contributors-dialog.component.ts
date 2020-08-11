@@ -96,6 +96,6 @@ function getError(error: ErrorDto): string {
 
 function getSuccess(created: boolean | undefined): string {
     return created ?
-        'User has been invited and assigned.' :
-        'User has been assigned';
+        'i18n:contributors.contributorAssignedInvited' :
+        'i18n:contributors.contributorAssignedExisting';
 }

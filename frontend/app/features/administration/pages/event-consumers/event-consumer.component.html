@@ -10,13 +10,13 @@
         <span>{{eventConsumer.position}}</span>
     </td>
     <td class="cell-actions-lg">
-        <button type="button" class="btn btn-text" (click)="reset()" *ngIf="eventConsumer.canReset" title="Reset Event Consumer">
+        <button type="button" class="btn btn-text" (click)="reset()" *ngIf="eventConsumer.canReset" title="i18n:eventConsumers.resetTooltip">
             <i class="icon icon-reset"></i>
         </button>
-        <button type="button" class="btn btn-text" (click)="start()" *ngIf="eventConsumer.canStart" title="Start Event Consumer">
+        <button type="button" class="btn btn-text" (click)="start()" *ngIf="eventConsumer.canStart" title="i18n:eventConsumers.startTooltip">
             <i class="icon icon-play"></i>
         </button>
-        <button type="button" class="btn btn-text" (click)="stop()" *ngIf="eventConsumer.canStop" title="Stop Event Consumer">
+        <button type="button" class="btn btn-text" (click)="stop()" *ngIf="eventConsumer.canStop" title="i18n:eventConsumers.stopTooltip">
             <i class="icon icon-pause"></i>
         </button>
     </td>
