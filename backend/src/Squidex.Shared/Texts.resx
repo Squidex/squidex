@@ -130,6 +130,15 @@
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>Cannot remove a role when a contributor is assigned.</value>
   </data>
+  <data name="aspnet_annotations_AbsoluteUrl" xml:space="preserve">
+    <value>The field {0} must be an absolute URL.</value>
+  </data>
+  <data name="aspnet_annotations_Compare" xml:space="preserve">
+    <value>The field {0} must be the same as {other|lower}.</value>
+  </data>
+  <data name="aspnet_annotations_Required" xml:space="preserve">
+    <value>The field {0} is required.</value>
+  </data>
   <data name="assets.assetAlreadyDeleted" xml:space="preserve">
     <value>Asset has already been deleted</value>
   </data>
@@ -1003,11 +1012,14 @@
   <data name="validation.valid" xml:space="preserve">
     <value>{property|upper} is not a valid value.</value>
   </data>
-  <data name="workflows.initialNotPublished" xml:space="preserve">
-    <value>Initial step cannot be published step.</value>
-  </data>
   <data name="workflows.overlap" xml:space="preserve">
     <value>Multiple workflows cover all schemas.</value>
+  </data>
+  <data name="workflows.publishedIsInitial" xml:space="preserve">
+    <value>Initial step cannot be published step.</value>
+  </data>
+  <data name="workflows.publishedNotDefined" xml:space="preserve">
+    <value>Workflow must have a published step.</value>
   </data>
   <data name="workflows.publishedStepNotFound" xml:space="preserve">
     <value>Transition has an invalid target.</value>

@@ -2,6 +2,9 @@
   "annotations_AbsoluteUrl": "The field {name|lower} must be an absolute URL.",
   "annotations_Compare": "The field {name|lower} must be the same as {other|lower}.",
   "annotations_Required": "The field {name|lower} is required.",
+  "aspnet_annotations_AbsoluteUrl": "The field {0} must be an absolute URL.",
+  "aspnet_annotations_Compare": "The field {0} must be the same as {other|lower}.",
+  "aspnet_annotations_Required": "The field {0} is required.",
   "apps.alreadyArchieved": "App has already been archived.",
   "apps.clients.idAlreadyExists": "A client with the same id already exists.",
   "apps.contributors.cannotChangeYourself": "You cannot change your own role.",
@@ -315,7 +318,8 @@
   "validation.slug": "{property|upper} is not a valid slug.",
   "validation.valid": "{property|upper} is not a valid value.",
   "validation.notAnImage": "Picture is not a valid image.",
-  "workflows.initialNotPublished": "Initial step cannot be published step.",
+  "workflows.publishedIsInitial": "Initial step cannot be published step.",
+  "workflows.publishedNotDefined": "Workflow must have a published step.",
   "workflows.overlap": "Multiple workflows cover all schemas.",
   "workflows.schemaOverlap": "The schema '{schema}' is covered by multiple workflows."
 }
