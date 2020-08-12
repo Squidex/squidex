@@ -29,8 +29,9 @@ namespace Squidex.Translator.State
 
         private readonly TranslatedTexts translations;
         private readonly TranslationTodos translationsTodo;
-        private readonly TranslationsToIgnore ignoreList;
+        private readonly TranslationsToIgnore translationToIgnore;
         private readonly DirectoryInfo directory;
+        private readonly string fileName;
         private readonly bool onlySingleWords;
         private string previousPrefix;
 
@@ -44,21 +45,22 @@ namespace Squidex.Translator.State
             SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         }
 
-        public TranslationService(DirectoryInfo directory, bool onlySingleWords)
+        public TranslationService(DirectoryInfo directory, string fileName, bool onlySingleWords)
         {
             this.directory = directory;
 
-            translations = Load<TranslatedTexts>("texts_en.json");
-            translationsTodo = Load<TranslationTodos>("__todos.json");
+            this.fileName = fileName;
 
-            ignoreList = Load<TranslationsToIgnore>("__ignore.json");
+            translations = Load<TranslatedTexts>("_en.json");
+            translationsTodo = Load<TranslationTodos>("__todos.json");
+            translationToIgnore = Load<TranslationsToIgnore>("__ignore.json");
 
             this.onlySingleWords = onlySingleWords;
         }
 
         private T Load<T>(string name) where T : new()
         {
-            var fullName = Path.Combine(directory.FullName, name);
+            var fullName = Path.Combine(directory.FullName, $"{fileName}{name}");
 
             if (File.Exists(fullName))
             {
@@ -118,10 +120,10 @@ namespace Squidex.Translator.State
 
         public void Save()
         {
-            Save("texts-en.json", translations);
+            Save("_en.json", translations);
 
             Save("__todos.json", translationsTodo);
-            Save("__ignore.json", ignoreList);
+            Save("__ignore.json", translationToIgnore);
         }
 
         public void Translate(string fileName, string text, string originText, Action<string> handler, bool silent = false)
@@ -245,9 +247,9 @@ namespace Squidex.Translator.State
             }
         }
 
-        private bool IsIgnored(string fileName, string text)
+        private bool IsIgnored(string name, string text)
         {
-            return ignoreList.TryGetValue(fileName, out var ignores) && (ignores.Contains(text) || ignores.Contains("*"));
+            return translationToIgnore.TryGetValue(name, out var ignores) && (ignores.Contains(text) || ignores.Contains("*"));
         }
 
         private void AddText(string key, string text)
@@ -255,25 +257,25 @@ namespace Squidex.Translator.State
             translations[key] = text;
         }
 
-        private void AddIgnore(string fileName, string text)
+        private void AddIgnore(string name, string text)
         {
-            if (!ignoreList.TryGetValue(fileName, out var ignores))
+            if (!translationToIgnore.TryGetValue(name, out var ignores))
             {
                 ignores = new SortedSet<string>();
 
-                ignoreList[fileName] = ignores;
+                translationToIgnore[name] = ignores;
             }
 
             ignores.Add(text);
         }
 
-        private void AddTodo(string fileName, string text)
+        private void AddTodo(string name, string text)
         {
-            if (!translationsTodo.TryGetValue(fileName, out var todos))
+            if (!translationsTodo.TryGetValue(name, out var todos))
             {
                 todos = new SortedSet<string>();
 
-                translationsTodo[fileName] = todos;
+                translationsTodo[name] = todos;
             }
 
             todos.Add(text);

@@ -1,472 +1,217 @@
 {
-  "/Migrations/OldTriggers/AssetChangedTrigger.cs": [
+  "/_theme.html": [
     "*"
   ],
-  "/Migrations/OldTriggers/ContentChangedTriggerSchema.cs": [
+  "/app.module.ts": [
+    "Application element not found"
+  ],
+  "/features/apps/pages/apps-page.component.html": [
+    "&middot;",
+    "|"
+  ],
+  "/features/content/pages/content/content-event.component.html": [
+    "&middot;"
+  ],
+  "/features/content/pages/content/content-page.component.html": [
+    "."
+  ],
+  "/features/content/shared/forms/array-item.component.html": [
+    "#{{index + 1}}"
+  ],
+  "/features/content/shared/forms/field-editor.component.html": [
+    "*",
+    "{{field.displayName}} {{displaySuffix}}"
+  ],
+  "/features/content/shared/references/references-editor.component.html": [
+    "&middot;"
+  ],
+  "/features/rules/pages/rules/actions/generic-action.component.html": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Core.Model/Apps/AppClients.cs": [
+  "/features/rules/pages/rules/triggers/asset-changed-trigger.component.html": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Core.Model/Contents/Json/ContentFieldDataConverter.cs": [
+  "/features/rules/pages/rules/triggers/comment-trigger.component.html": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Core.Model/Freezable.cs": [
+  "/features/rules/pages/rules/triggers/content-changed-trigger.component.html": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Core.Model/InvariantPartitioning.cs": [
+  "/features/rules/pages/rules/triggers/schema-changed-trigger.component.html": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Core.Model/Rules/Rule.cs": [
+  "/features/rules/pages/rules/triggers/usage-trigger.component.html": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Core.Model/Schemas/FieldCollection.cs": [
+  "/features/schemas/pages/schema/fields/types/array-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/assets-validation.component.html": [
+    "-",
+    "3",
+    "4",
+    "px"
+  ],
+  "/features/schemas/pages/schema/fields/types/boolean-ui.component.html": [
+    "Checkbox",
+    "Toggle"
+  ],
+  "/features/schemas/pages/schema/fields/types/date-time-ui.component.html": [
+    "DateTime"
+  ],
+  "/features/schemas/pages/schema/fields/types/geolocation-ui.component.html": [
+    "Map"
+  ],
+  "/features/schemas/pages/schema/fields/types/number-ui.component.html": [
+    "Dropdown",
+    "Input",
+    "Radio",
+    "Stars"
+  ],
+  "/features/schemas/pages/schema/fields/types/number-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/references-ui.component.html": [
+    "Checkboxes",
+    "Dropdown",
+    "List",
+    "Resolve reference"
+  ],
+  "/features/schemas/pages/schema/fields/types/references-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/string-ui.component.html": [
+    "Color",
+    "Dropdown",
+    "HTML",
+    "Input",
+    "Markdown",
+    "Radio",
+    "RichText",
+    "StockPhoto",
+    "TextArea"
+  ],
+  "/features/schemas/pages/schema/fields/types/string-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/tags-ui.component.html": [
+    "Checkboxes",
+    "Dropdown"
+  ],
+  "/features/schemas/pages/schema/fields/types/tags-validation.component.html": [
+    "-"
+  ],
+  "/features/settings/pages/backups/backup.component.html": [
+    ","
+  ],
+  "/features/settings/pages/clients/client-connect-form.component.html": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "nuget"
+  ],
+  "/features/settings/pages/clients/client-connect-form.component.ts": [
+    "Content-Type: application/x-www-form-urlencoded",
+    "grant_type=client_credentials&\r\n        client_id=${app}:${client.id}&\r\n        client_secret=${client.secret}&\r\n        scope=squidex-api"
+  ],
+  "/features/settings/pages/contributors/import-contributors-dialog.component.html": [
+    "user1@squidex.io;user2@squidex.io"
+  ],
+  "/framework/angular/forms/validators.ts": [
+    "matchValidator(): other control is not found in parent group"
+  ],
+  "/framework/angular/modals/dialog-renderer.component.html": [
+    "&times;"
+  ],
+  "/framework/angular/pager.component.html": [
+    "10",
+    "20",
+    "30",
+    "50"
+  ],
+  "/framework/angular/pipes/date-time.pipes.ts": [
+    "dd. LLL yyyy",
+    "dd. MMM"
+  ],
+  "/framework/angular/pipes/money.pipe.ts": [
+    "<span class=\"decimal\">"
+  ],
+  "/framework/angular/pipes/numbers.pipes.ts": [
+    " kMGTPEZY"
+  ],
+  "/index.html": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Core.Model/Schemas/NestedField{T}.cs": [
+  "/shared/components/app-form.component.html": [
+    "appName"
+  ],
+  "/shared/components/forms/geolocation-editor.component.ts": [
+    "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
+  ],
+  "/shared/components/forms/markdown-editor.component.ts": [
+    "*",
+    "fa fa-bold",
+    "fa fa-header",
+    "fa fa-italic",
+    "fa fa-list-ul",
+    "fa fa-quote-left",
+    "Generic List"
+  ],
+  "/shared/components/forms/rich-editor.component.ts": [
+    "code image media link lists advlist paste",
+    "undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets"
+  ],
+  "/shared/components/search/queries/filter-logical.component.html": [
+    "AND",
+    "OR"
+  ],
+  "/shared/components/search/queries/sorting.component.html": [
+    "ascending",
+    "descending"
+  ],
+  "/shared/components/search/search-form.component.ts": [
+    "form-inline search-form"
+  ],
+  "/shared/services/auth.service.ts": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Core.Model/Schemas/RootField{T}.cs": [
-    "*"
+  "/shared/services/rules.service.ts": [
+    "Asset changed",
+    "Content changed",
+    "For asset changes like uploaded, updated (reuploaded), renamed, deleted...",
+    "For content changes like created, updated, published, unpublished...",
+    "Manually triggered",
+    "Schema changed",
+    "To invoke processes manually, for example to update your static site...",
+    "Usage exceeded",
+    "User mentioned",
+    "When a schema definition has been created, updated, published or deleted...",
+    "When a user is mentioned in any comment...",
+    "When monthly API calls exceed a specified limit for one time a month..."
   ],
-  "/Squidex.Domain.Apps.Core.Operations/ConvertContent/StringFormatter.cs": [
-    "{array.Count} {pluralName}",
-    "{lat}, {lon}",
+  "/shared/services/schemas.types.ts": [
+    "Invalid properties type"
+  ],
+  "/shared/state/contents.forms.visitors.ts": [
     "<Json />",
-    "0 {pluralName}",
-    "1 {singularName}"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/DefaultValues/DefaultValueFactory.cs": [
-    ", CultureInfo.InvariantCulture)}T00:00:00Z"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/GenerateJsonSchema/ContentSchemaBuilder.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/GenerateJsonSchema/JsonSchemaExtensions.cs": [
-    "{field.Name} ({field.RawProperties.Hints})"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/HandleRules/Result.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/HandleRules/RuleService.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/Scripting/ContentWrapper/ContentDataProperty.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/Scripting/ContentWrapper/JsonMapper.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/Scripting/Extensions/HttpJintExtension.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/Scripting/ScriptOptions.cs": [
-    "CanReject={CanReject}, CanDisallow={CanDisallow}, AsContext={AsContext}"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/Templates/TemplateParseException.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/ValidateContent/Validators/CollectionValidator.cs": [
-    "Min length must be greater than max length."
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/ValidateContent/Validators/RangeValidator.cs": [
-    "Min value must be greater than max value."
-  ],
-  "/Squidex.Domain.Apps.Core.Operations/ValidateContent/Validators/StringLengthValidator.cs": [
-    "Min length must be greater than max length."
-  ],
-  "/Squidex.Domain.Apps.Entities/Apps/AppUISettingsGrain.cs": [
-    "Path does not lead to an object."
-  ],
-  "/Squidex.Domain.Apps.Entities/Apps/BackupApps.cs": [
-    "The app id or name is not available."
-  ],
-  "/Squidex.Domain.Apps.Entities/Apps/Diagnostics/OrleansAppsHealthCheck.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Apps/Invitation/InvitationEventConsumer.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Apps/Templates/CreateBlogCommandMiddleware.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Apps/Templates/CreateIdentityCommandMiddleware.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Apps/Templates/CreateProfileCommandMiddleware.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Apps/Templates/DefaultScripts.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Backup/BackupReader.cs": [
-    "Cannot find attachment."
-  ],
-  "/Squidex.Domain.Apps.Entities/Backup/RestoreGrain.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Backup/TempFolderBackupArchiveLocation.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/ContentOperationContext.cs": [
-    "Cannot resolve app with id {appId}.",
-    "Cannot resolve schema with id id {schemaId}."
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/AllTypes.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/AppQueriesGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/AssetGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/AssetsResultGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentDataFlatGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentDataGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentInterfaceGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentsResultGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/NestedGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/Utils/GuidGraphType2.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/Utils/JsonGraphType.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/Text/Elastic/ElasticSearchTextIndex.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/Text/Lucene/IndexManager.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Contents/Text/Lucene/IndexManager_Impl.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Notifications/NotificationEmailSender.cs": [
-    "*"
-  ],
-  "/Squidex.Domain.Apps.Entities/Rules/Runner/RuleRunnerGrain.cs": [
-    "Cannot find rule."
-  ],
-  "/Squidex.Domain.Apps.Entities/Rules/UsageTracking/UsageTriggerHandler.cs": [
-    "Usage exceeded"
-  ],
-  "/Squidex.Domain.Users.MongoDb/MongoKeyStore.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.Amazon/Assets/AmazonS3AssetStore.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.Amazon/Assets/SeekFakerStream.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.Azure/Assets/AzureBlobAssetStore.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.Azure/Diagnostics/CosmosDbHealthCheck.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.Azure/EventSourcing/CosmosDbEventStore_Writer.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.Azure/EventSourcing/CosmosDbSubscription.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.Azure/EventSourcing/FilterBuilder.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.GetEventStore/Diagnostics/GetEventStoreHealthCheck.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.GetEventStore/EventSourcing/GetEventStore.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.GetEventStore/EventSourcing/GetEventStoreSubscription.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.GetEventStore/EventSourcing/ProjectionClient.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.GoogleCloud/Assets/GoogleCloudAssetStore.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.MongoDb/Assets/MongoGridFsAssetStore.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.MongoDb/Diagnostics/MongoDBHealthCheck.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.MongoDb/EventSourcing/MongoEventStore_Writer.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.MongoDb/MongoDb/MongoRepositoryBase.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.RabbitMq/CQRS/Events/RabbitMqEventConsumer.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure.Redis/RedisPubSub.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Assets/AssetAlreadyExistsException.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Assets/AssetNotFoundException.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Assets/FolderAssetStore.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Assets/HasherStream.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Configuration/ConfigurationExtensions.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Diagnostics/GCHealthCheck.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Diagnostics/OrleansHealthCheck.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Email/SmtpEmailSender.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/EventSourcing/DefaultEventDataFormatter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/EventSourcing/EventConsumersHealthCheck.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/EventSourcing/WrongEventVersionException.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/FileExtensions.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Guard.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Http/DumpFormatter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Json/Newtonsoft/InstantConverter.cs": [
-    "Not a valid date time, expected String or Date, but got {reader.TokenType}."
-  ],
-  "/Squidex.Infrastructure/Json/Newtonsoft/JsonValueConverter.cs": [
-    "Unexpected end when reading Object."
-  ],
-  "/Squidex.Infrastructure/Json/Newtonsoft/NamedGuidIdConverter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Json/Newtonsoft/NamedLongIdConverter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Json/Newtonsoft/NamedStringIdConverter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Json/Newtonsoft/RefTokenConverter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Json/Objects/JsonArray.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Json/Objects/JsonObject.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Json/Objects/JsonValue.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Language.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Languages.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Log/Internal/ConsoleLogProcessor.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Log/Internal/FileLogProcessor.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Log/SemanticLog.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Migrations/MigrationFailedException.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Migrations/Migrator.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/NamedId{T}.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Orleans/OrleansWrapperException.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Plugins/PluginManager.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/ClrValue.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/CompareFilter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/Json/FilterConverter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/Json/JsonFilterVisitor.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/Json/PropertyPathValidator.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/Json/ValueConverter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/LogicalFilter.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/OData/ConstantWithTypeVisitor.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/PropertyPath.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/Query.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Queries/SortNode.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/Reflection/TypeNameRegistry.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/RefToken.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/States/DefaultStreamNameResolver.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/States/InconsistentStateException.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/States/Persistence{TSnapshot,TKey}.cs": [
-    "*"
-  ],
-  "/Squidex.Infrastructure/StringExtensions.cs": [
-    "*"
-  ],
-  "/Squidex.Web/ApiController.cs": [
-    "*"
-  ],
-  "/Squidex.Web/ApiExceptionConverter.cs": [
-    ", e.PropertyNames.Select(FixPropertyName))}: {e.Message}"
-  ],
-  "/Squidex.Web/ApiExceptionFilterAttribute.cs": [
-    "An unexpected exception has occurred."
-  ],
-  "/Squidex.Web/CommandMiddlewares/EnrichWithActorCommandMiddleware.cs": [
-    "*"
-  ],
-  "/Squidex.Web/CommandMiddlewares/EnrichWithAppIdCommandMiddleware.cs": [
-    "*"
-  ],
-  "/Squidex.Web/CommandMiddlewares/EnrichWithSchemaIdCommandMiddleware.cs": [
-    "*"
-  ],
-  "/Squidex.Web/EntityCreatedDto.cs": [
-    "*"
-  ],
-  "/Squidex.Web/ErrorDto.cs": [
-    "*"
-  ],
-  "/Squidex.Web/Json/TypedJsonInheritanceConverter.cs": [
-    "*"
-  ],
-  "/Squidex.Web/Pipeline/FileCallbackResultExecutor.cs": [
-    "*"
-  ],
-  "/Squidex.Web/Pipeline/RequestExceptionMiddleware.cs": [
-    "An unexpected exception has occurred."
-  ],
-  "/Squidex.Web/Pipeline/SameSiteCookiesServiceCollectionExtensions.cs": [
-    "*"
-  ],
-  "/Squidex.Web/Resource.cs": [
-    "*"
-  ],
-  "/Squidex.Web/ResourceLink.cs": [
-    "*"
-  ],
-  "/Squidex.Web/UrlsOptions.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/Api/Config/OpenApi/ErrorDtoProcessor.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/Api/Config/OpenApi/ODataExtensions.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/Api/Config/OpenApi/OpenApiServices.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/Api/Config/OpenApi/SecurityProcessor.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/Api/Config/OpenApi/XmlResponseTypesProcessor.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/Api/Controllers/Contents/Generator/SchemaOpenApiGenerator.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/Api/Controllers/News/Service/FeaturesService.cs": [
-    "data/version/iv ge {FeatureVersion}"
-  ],
-  "/Squidex/Areas/Api/Controllers/Schemas/Models/Fields/AssetsFieldPropertiesDto.cs": [
-    "Use ResolveFirst now"
-  ],
-  "/Squidex/Areas/Frontend/Middlewares/IndexExtensions.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/IdentityServer/Config/LazyClientStore.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/IdentityServer/Controllers/Extensions.cs": [
-    "*"
-  ],
-  "/Squidex/Areas/IdentityServer/Controllers/Profile/RemoveLoginModel.cs": [
-    "Provider key."
-  ],
-  "/Squidex/Config/Domain/EventPublishersServices.cs": [
-    "*"
-  ],
-  "/Squidex/Config/Orleans/Helper.cs": [
-    "*"
-  ],
-  "/Squidex/Config/Startup/LogConfigurationHost.cs": [
-    "*"
-  ],
-  "/Squidex/Pipeline/OpenApi/NSwagHelper.cs": [
-    "*"
-  ],
-  "/Squidex/Pipeline/Squid/SquidMiddleware.cs": [
+    "yyyy-MM-dd HH:mm:ss"
+  ],
+  "/shared/state/patterns.forms.ts": [
+    "[A-z0-9]+[A-z0-9\\- ]*[A-z0-9]"
+  ],
+  "/shared/state/query.ts": [
+    "ends with",
+    "is empty",
+    "is equals to",
+    "is greater than",
+    "is greater than or equals to",
+    "is less than",
+    "is less than or equals to",
+    "is not equals to",
+    "starts with"
+  ],
+  "/theme/icomoon/demo.html": [
     "*"
   ]
 }

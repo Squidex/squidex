@@ -32,7 +32,7 @@ namespace Squidex.Translator
             [Command(Name = "check-backend", Description = "Check backend files.")]
             public void CheckBackend(TranslateArguments arguments)
             {
-                var (folder, service) = Setup(arguments, "backend/i18n");
+                var (folder, service) = Setup(arguments, "backend");
 
                 new CheckBackend(folder, service).Run();
             }
@@ -40,7 +40,7 @@ namespace Squidex.Translator
             [Command(Name = "check-frontend", Description = "Check frontend files.")]
             public void CheckFrontend(TranslateArguments arguments)
             {
-                var (folder, service) = Setup(arguments, "frontend/i18n");
+                var (folder, service) = Setup(arguments, "frontend");
 
                 new CheckFrontend(folder, service).Run();
             }
@@ -48,7 +48,7 @@ namespace Squidex.Translator
             [Command(Name = "backend", Description = "Translate backend files.")]
             public void Backend(TranslateArguments arguments)
             {
-                var (folder, service) = Setup(arguments, "backend/i18n");
+                var (folder, service) = Setup(arguments, "backend");
 
                 new TranslateBackend(folder, service).Run();
             }
@@ -56,7 +56,7 @@ namespace Squidex.Translator
             [Command(Name = "templates", Description = "Translate angular templates.")]
             public void Templates(TranslateArguments arguments)
             {
-                var (folder, service) = Setup(arguments, "frontend/i18n");
+                var (folder, service) = Setup(arguments, "frontend");
 
                 new TranslateTemplates(folder, service).Run(arguments.Report);
             }
@@ -64,7 +64,7 @@ namespace Squidex.Translator
             [Command(Name = "typescript", Description = "Translate typescript files.")]
             public void Typescript(TranslateArguments arguments)
             {
-                var (folder, service) = Setup(arguments, "frontend/i18n");
+                var (folder, service) = Setup(arguments, "frontend");
 
                 new TranslateTypescript(folder, service).Run();
             }
@@ -72,7 +72,7 @@ namespace Squidex.Translator
             [Command(Name = "gen-backend", Description = "Generate the backend translations.")]
             public void GenerateBackend(TranslateArguments arguments)
             {
-                var (folder, service) = Setup(arguments, "backend/i18n");
+                var (folder, service) = Setup(arguments, "backend");
 
                 new GenerateBackendResources(folder, service).Run();
             }
@@ -80,7 +80,7 @@ namespace Squidex.Translator
             [Command(Name = "migrate-backend", Description = "Migrate the backend files.")]
             public void MigrateBackend(TranslateArguments arguments)
             {
-                var (_, service) = Setup(arguments, "backend/i18n");
+                var (_, service) = Setup(arguments, "backend");
 
                 service.Migrate();
             }
@@ -88,20 +88,20 @@ namespace Squidex.Translator
             [Command(Name = "migrate-frontend", Description = "Migrate the frontend files.")]
             public void MigrateFrontend(TranslateArguments arguments)
             {
-                var (_, service) = Setup(arguments, "frontend/i17n");
+                var (_, service) = Setup(arguments, "frontend");
 
                 service.Migrate();
             }
 
-            private static (DirectoryInfo, TranslationService) Setup(TranslateArguments arguments, string folder)
+            private static (DirectoryInfo, TranslationService) Setup(TranslateArguments arguments, string fileName)
             {
                 if (!Directory.Exists(arguments.Folder))
                 {
                     throw new ArgumentException("Folder does not exist.");
                 }
 
-                var translationsDirectory = new DirectoryInfo(Path.Combine(arguments.Folder, folder));
-                var translationsService = new TranslationService(translationsDirectory, arguments.SingleWords);
+                var translationsDirectory = new DirectoryInfo(Path.Combine(arguments.Folder, "backend", "i18n"));
+                var translationsService = new TranslationService(translationsDirectory, fileName, arguments.SingleWords);
 
                 return (new DirectoryInfo(arguments.Folder), translationsService);
             }

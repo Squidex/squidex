@@ -124,7 +124,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\i18n\texts_en.json" Link="Areas\Frontend\Resources\texts_en.json" />
+    <EmbeddedResource Include="..\..\i18n\frontend_en.json" Link="Areas\Frontend\Resources\frontend_en.json" />
   </ItemGroup>
 
   <PropertyGroup>

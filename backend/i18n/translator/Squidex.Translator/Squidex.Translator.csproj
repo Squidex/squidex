@@ -18,10 +18,10 @@
   </ItemGroup>
   
   <PropertyGroup>
-    <CodeAnalysisRuleSet>..\..\..\backend\Squidex.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\..\Squidex.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   
   <ItemGroup>
-    <AdditionalFiles Include="..\..\..\backend\stylecop.json" Link="stylecop.json" />
+    <AdditionalFiles Include="..\..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
 </Project>

@@ -182,7 +182,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 }
                 catch
                 {
-                    return IdentityResult.Failed(new IdentityError { Description = T.Get("valiodation.notAnImage") });
+                    return IdentityResult.Failed(new IdentityError { Description = T.Get("validation.notAnImage") });
                 }
 
                 await userPictureStore.UploadAsync(user.Id, thumbnailStream);

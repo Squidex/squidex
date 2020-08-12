@@ -59,7 +59,7 @@ namespace Squidex.Translator.Processes
 
                     var parts = key.Split(".");
 
-                    if (parts[0] != "common")
+                    if (parts[0] != "common" && parts[0] != "validation")
                     {
                         prefixes.Add(parts[0]);
                     }
