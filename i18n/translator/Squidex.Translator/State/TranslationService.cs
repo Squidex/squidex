@@ -30,7 +30,7 @@ namespace Squidex.Translator.State
         private readonly TranslatedTexts translations;
         private readonly TranslationTodos translationsTodo;
         private readonly TranslationsToIgnore ignoreList;
-        private readonly FileInfo file;
+        private readonly DirectoryInfo directory;
         private readonly bool onlySingleWords;
         private string previousPrefix;
 
@@ -44,21 +44,21 @@ namespace Squidex.Translator.State
             SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         }
 
-        public TranslationService(FileInfo file, bool onlySingleWords)
+        public TranslationService(DirectoryInfo directory, bool onlySingleWords)
         {
-            this.file = file;
+            this.directory = directory;
 
-            translations = Load<TranslatedTexts>("__en.json");
-            translationsTodo = Load<TranslationTodos>("_todos.json");
+            translations = Load<TranslatedTexts>("texts_en.json");
+            translationsTodo = Load<TranslationTodos>("__todos.json");
 
-            ignoreList = Load<TranslationsToIgnore>("_ignore.json");
+            ignoreList = Load<TranslationsToIgnore>("__ignore.json");
 
             this.onlySingleWords = onlySingleWords;
         }
 
         private T Load<T>(string name) where T : new()
         {
-            var fullName = file.FullName + name;
+            var fullName = Path.Combine(directory.FullName, name);
 
             if (File.Exists(fullName))
             {
@@ -74,7 +74,7 @@ namespace Squidex.Translator.State
 
         private void Save<T>(string name, T value) where T : new()
         {
-            var path = file.FullName + name;
+            var path = directory.FullName + name;
 
             WriteTo(value, path);
         }
@@ -83,9 +83,9 @@ namespace Squidex.Translator.State
         {
             var json = JsonSerializer.Serialize(value, SerializerOptions);
 
-            if (!file.Directory.Exists)
+            if (!directory.Exists)
             {
-                Directory.CreateDirectory(file.Directory.FullName);
+                Directory.CreateDirectory(directory.FullName);
             }
 
             File.WriteAllText(path, json);
@@ -118,10 +118,10 @@ namespace Squidex.Translator.State
 
         public void Save()
         {
-            Save("__en.json", translations);
+            Save("texts-en.json", translations);
 
-            Save("_todos.json", translationsTodo);
-            Save("_ignore.json", ignoreList);
+            Save("__todos.json", translationsTodo);
+            Save("__ignore.json", ignoreList);
         }
 
         public void Translate(string fileName, string text, string originText, Action<string> handler, bool silent = false)

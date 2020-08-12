@@ -1,0 +1,20 @@
+{
+  "/Squidex.Domain.Apps.Core.Model/Freezable.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Model/InvariantPartitioning.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Users.MongoDb/MongoKeyStore.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Users/PwnedPasswordValidator.cs": [
+    "This password has previously appeared in a data breach and should never be used. If you've ever used it anywhere before, change it!"
+  ],
+  "/Squidex.Infrastructure/FileExtensions.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Guard.cs": [
+    "*"
+  ]
+}
