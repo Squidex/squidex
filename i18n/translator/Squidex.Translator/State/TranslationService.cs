@@ -48,7 +48,7 @@ namespace Squidex.Translator.State
         {
             this.file = file;
 
-            translations = Load<TranslatedTexts>(".en.json");
+            translations = Load<TranslatedTexts>("__en.json");
             translationsTodo = Load<TranslationTodos>("_todos.json");
 
             ignoreList = Load<TranslationsToIgnore>("_ignore.json");
@@ -118,7 +118,8 @@ namespace Squidex.Translator.State
 
         public void Save()
         {
-            Save(".en.json", translations);
+            Save("__en.json", translations);
+
             Save("_todos.json", translationsTodo);
             Save("_ignore.json", ignoreList);
         }

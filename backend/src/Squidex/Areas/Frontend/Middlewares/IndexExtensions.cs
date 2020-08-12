@@ -82,7 +82,7 @@ namespace Squidex.Areas.Frontend.Middlewares
             {
                 var assembly = typeof(IndexExtensions).Assembly;
 
-                var resourceName = $"Squidex.Areas.Frontend.Resources.texts.{culture}";
+                var resourceName = $"Squidex.Areas.Frontend.Resources.translations-frontend__{culture}.json";
                 var resourceStream = assembly.GetManifestResourceStream(resourceName);
 
                 if (resourceStream != null)

@@ -86,7 +86,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
-    <EmbeddedResource Include="Areas\Frontend\Resources\texts.en" />
     <EmbeddedResource Include="Docs\schemabody.md" />
     <EmbeddedResource Include="Docs\schemaquery.md" />
     <EmbeddedResource Include="Docs\security.md" />
@@ -103,7 +102,6 @@
 
   <ItemGroup>
     <None Remove="Areas\Api\Controllers\Users\Assets\Avatar.png" />
-    <None Remove="Areas\Frontend\Resources\texts.en" />
     <None Remove="Docs\schemabody.md" />
     <None Remove="Docs\schemaquery.md" />
     <None Remove="Docs\security.md" />
@@ -119,6 +117,14 @@
 
   <ItemGroup>
     <Content Remove="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Frontend\Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\i18n\translations-frontend__en.json" Link="Areas\Frontend\Resources\translations-frontend__en.json" />
   </ItemGroup>
 
   <PropertyGroup>

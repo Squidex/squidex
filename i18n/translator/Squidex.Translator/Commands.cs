@@ -77,14 +77,6 @@ namespace Squidex.Translator
                 new GenerateBackendResources(folder, service).Run();
             }
 
-            [Command(Name = "gen-frontend", Description = "Generate the frontend translations.")]
-            public void GenerateFrontend(TranslateArguments arguments)
-            {
-                var (folder, service) = Setup(arguments, "translations-frontend");
-
-                new GenerateFrontendResources(folder, service).Run();
-            }
-
             [Command(Name = "migrate-backend", Description = "Migrate the backend files.")]
             public void MigrateBackend(TranslateArguments arguments)
             {
