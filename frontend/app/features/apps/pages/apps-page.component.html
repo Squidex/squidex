@@ -1,135 +1,137 @@
 <sqx-title message="i18n:apps.listPageTitle"></sqx-title>
 
-<div class="apps-section">
-    <h1 class="apps-title">{{ 'apps.welcomeTitle' | sqxTranslate: { user: authState.user?.displayName } }}</h1>
-
-    <div class="subtext">
-        {{ 'apps.welcomeSubtitle' | sqxTranslate }}
-    </div>
-</div>
-
-<ng-container *ngIf="appsState.apps | async; let apps">
+<div class="panel-container page">  
     <div class="apps-section">
-        <div class="empty" *ngIf="apps.length === 0">
-            <h3 class="empty-headline">{{ 'apps.empty' | sqxTranslate }}</h3>
-        </div>
+        <h1 class="apps-title">{{ 'apps.welcomeTitle' | sqxTranslate: { user: authState.user?.displayName } }}</h1>
 
-        <div class="card card-href card-app" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">
+        <div class="subtext">
+            {{ 'apps.welcomeSubtitle' | sqxTranslate }}
+        </div>
+    </div>
+
+    <ng-container *ngIf="appsState.apps | async; let apps">
+        <div class="apps-section">
+            <div class="empty" *ngIf="apps.length === 0">
+                <h3 class="empty-headline">{{ 'apps.empty' | sqxTranslate }}</h3>
+            </div>
+
+            <div class="card card-href card-app" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">
+                <div class="card-body">
+                    <div class="row no-gutters">
+                        <div class="col-auto card-left">
+                            <sqx-avatar [image]="app.image" [identifier]="app.name"></sqx-avatar>
+                        </div>
+                        <div class="col card-right">
+                            <h3 class="card-title">{{app.displayName}}</h3>
+
+                            <div class="card-text card-links">
+                                <a [routerLink]="['/app', app.name]" sqxStopClick>{{ 'common.edit' | sqxTranslate }}</a>
+
+                                <span class="deeplinks">
+                                    &nbsp;|
+                                    <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ 'common.content' | sqxTranslate }}</a> &middot;
+                                    <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ 'common.assets' | sqxTranslate }}</a> &middot;
+                                    <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ 'common.settings' | sqxTranslate }}</a>
+                                </span>
+                            </div>
+
+                            <div class="card-text" *ngIf="app.description">
+                                {{app.description}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <div class="apps-section" *ngIf="(uiState.settings | async).canCreateApps">
+        <div class="card card-template card-href" (click)="createNewApp('')">
             <div class="card-body">
-                <div class="row no-gutters">
-                    <div class="col-auto card-left">
-                        <sqx-avatar [image]="app.image" [identifier]="app.name"></sqx-avatar>
+                <div class="card-image">
+                    <img src="./images/add-app.svg">
+                </div>
+
+                <h3 class="card-title">{{ 'apps.createBlankApp' | sqxTranslate }}</h3>
+
+                <div class="card-text">
+                    {{ 'apps.createBlankAppDescription' | sqxTranslate }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-template card-href" (click)="createNewApp('Blog')">
+            <div class="card-body">
+                <div class="card-image">
+                    <img src="./images/add-blog.svg">
+                </div>
+
+                <h3 class="card-title">{{ 'apps.createBlogApp' | sqxTranslate }}</h3>
+
+                <div class="card-text">
+                    <div>{{ 'apps.createBlogAppDescription' | sqxTranslate }}</div>
+                    <div>
+                        {{ 'common.sampleCodeLabel' | sqxTranslate }} <a href="https://github.com/Squidex/squidex-samples" sqxStopClick sqxExternalLink>{{ 'common.github' | sqxTranslate }}</a>
                     </div>
-                    <div class="col card-right">
-                        <h3 class="card-title">{{app.displayName}}</h3>
+                </div>
+            </div>
+        </div>
 
-                        <div class="card-text card-links">
-                            <a [routerLink]="['/app', app.name]" sqxStopClick>{{ 'common.edit' | sqxTranslate }}</a>
+        <div class="card card-template card-href" (click)="createNewApp('Identity')">
+            <div class="card-body">
+                <div class="card-image">
+                    <img src="./images/add-identity.svg">
+                </div>
 
-                            <span class="deeplinks">
-                                &nbsp;|
-                                <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ 'common.content' | sqxTranslate }}</a> &middot;
-                                <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ 'common.assets' | sqxTranslate }}</a> &middot;
-                                <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ 'common.settings' | sqxTranslate }}</a>
-                            </span>
-                        </div>
+                <h3 class="card-title">{{ 'apps.createIdentityApp' | sqxTranslate }}</h3>
 
-                        <div class="card-text" *ngIf="app.description">
-                            {{app.description}}
-                        </div>
+                <div class="card-text">
+                    <div>{{ 'apps.createIdentityAppDescription' | sqxTranslate }}</div>
+                    <div>
+                        <a href="https://github.com/Squidex/squidex-identity" sqxStopClick sqxExternalLink>{{ 'common.project' | sqxTranslate }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-template card-href" (click)="createNewApp('IdentityV2')">
+            <div class="card-body">
+                <div class="card-image">
+                    <img src="./images/add-identity.svg">
+                </div>
+
+                <h3 class="card-title">{{ 'apps.createIdentityAppV2' | sqxTranslate }}</h3>
+
+                <div class="card-text">
+                    <div>{{ 'apps.createIdentityAppV2Description' | sqxTranslate }}</div>
+                    <div>
+                        <a href="https://github.com/Squidex/squidex-identity" sqxStopClick sqxExternalLink>{{ 'common.project' | sqxTranslate }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-template card-href" (click)="createNewApp('Profile')">
+            <div class="card-body">
+                <div class="card-image">
+                    <img src="./images/add-profile.svg">
+                </div>
+
+                <h3 class="card-title">{{ 'apps.createProfileApp' | sqxTranslate }}</h3>
+
+                <div class="card-text">
+                    <div>{{ 'apps.createProfileAppDescription' | sqxTranslate }}</div>
+                    <div>
+                        {{ 'common.sampleCodeLabel' | sqxTranslate }} <a href="https://github.com/Squidex/squidex-samples" sqxStopClick sqxExternalLink>{{ 'common.github' | sqxTranslate }}</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</ng-container>
 
-<div class="apps-section" *ngIf="(uiState.settings | async).canCreateApps">
-    <div class="card card-template card-href" (click)="createNewApp('')">
-        <div class="card-body">
-            <div class="card-image">
-                <img src="./images/add-app.svg">
-            </div>
-
-            <h3 class="card-title">{{ 'apps.createBlankApp' | sqxTranslate }}</h3>
-
-            <div class="card-text">
-                {{ 'apps.createBlankAppDescription' | sqxTranslate }}
-            </div>
-        </div>
+    <div *ngIf="info" class="apps-section">
+        <small class="info">{{info}}</small>
     </div>
-
-    <div class="card card-template card-href" (click)="createNewApp('Blog')">
-        <div class="card-body">
-            <div class="card-image">
-                <img src="./images/add-blog.svg">
-            </div>
-
-            <h3 class="card-title">{{ 'apps.createBlogApp' | sqxTranslate }}</h3>
-
-            <div class="card-text">
-                <div>{{ 'apps.createBlogAppDescription' | sqxTranslate }}</div>
-                <div>
-                    {{ 'common.sampleCodeLabel' | sqxTranslate }} <a href="https://github.com/Squidex/squidex-samples" sqxStopClick sqxExternalLink>{{ 'common.github' | sqxTranslate }}</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card card-template card-href" (click)="createNewApp('Identity')">
-        <div class="card-body">
-            <div class="card-image">
-                <img src="./images/add-identity.svg">
-            </div>
-
-            <h3 class="card-title">{{ 'apps.createIdentityApp' | sqxTranslate }}</h3>
-
-            <div class="card-text">
-                <div>{{ 'apps.createIdentityAppDescription' | sqxTranslate }}</div>
-                <div>
-                    <a href="https://github.com/Squidex/squidex-identity" sqxStopClick sqxExternalLink>{{ 'common.project' | sqxTranslate }}</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card card-template card-href" (click)="createNewApp('IdentityV2')">
-        <div class="card-body">
-            <div class="card-image">
-                <img src="./images/add-identity.svg">
-            </div>
-
-            <h3 class="card-title">{{ 'apps.createIdentityAppV2' | sqxTranslate }}</h3>
-
-            <div class="card-text">
-                <div>{{ 'apps.createIdentityAppV2Description' | sqxTranslate }}</div>
-                <div>
-                    <a href="https://github.com/Squidex/squidex-identity" sqxStopClick sqxExternalLink>{{ 'common.project' | sqxTranslate }}</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card card-template card-href" (click)="createNewApp('Profile')">
-        <div class="card-body">
-            <div class="card-image">
-                <img src="./images/add-profile.svg">
-            </div>
-
-            <h3 class="card-title">{{ 'apps.createProfileApp' | sqxTranslate }}</h3>
-
-            <div class="card-text">
-                <div>{{ 'apps.createProfileAppDescription' | sqxTranslate }}</div>
-                <div>
-                    {{ 'common.sampleCodeLabel' | sqxTranslate }} <a href="https://github.com/Squidex/squidex-samples" sqxStopClick sqxExternalLink>{{ 'common.github' | sqxTranslate }}</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div *ngIf="info" class="apps-section">
-    <small class="info">{{info}}</small>
 </div>
 
 <ng-container *sqxModal="addAppDialog">
