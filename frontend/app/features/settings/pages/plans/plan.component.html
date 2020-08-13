@@ -38,7 +38,7 @@
         </div>
 
         <button *ngIf="planInfo.isYearlySelected" class="btn btn-block btn-text-success plan-selected">
-            {{ 'plans.selected' | sqxTranslate }}
+            &#10003; {{ 'plans.selected' | sqxTranslate }}
         </button>
         
         <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async"
