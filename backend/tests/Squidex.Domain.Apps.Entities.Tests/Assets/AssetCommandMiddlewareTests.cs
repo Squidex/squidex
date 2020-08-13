@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Xunit;
 
@@ -279,7 +278,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = Id, File = file }), GrainContext.Create());
+            var command = CreateCommand(new CreateAsset { AssetId = Id, File = file });
+
+            return asset.ExecuteAsync(CommandRequest.Create(command));
         }
 
         private void AssertAssetHasBeenUploaded(long version)

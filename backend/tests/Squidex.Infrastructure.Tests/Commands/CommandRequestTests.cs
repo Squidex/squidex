@@ -9,27 +9,36 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.TestingHost;
-using Squidex.Infrastructure.TestHelpers;
+using Squidex.Infrastructure.Commands;
 using Xunit;
 
 #pragma warning disable SA1133 // Do not combine attributes
 
-namespace Squidex.Infrastructure.Orleans
+namespace Squidex.Infrastructure.Commands
 {
-    public class GrainContextTests
+    public class CommandRequestTests
     {
         public interface IContextGrain : IGrainWithStringKey
         {
-            Task<GrainContext> TestAsync(GrainContext async);
+            Task<string> GetCultureUIAsync(CommandRequest request);
+
+            Task<string> GetCultureAsync(CommandRequest request);
         }
 
         public class ContextGrain : Grain, IContextGrain
         {
-            public async Task<GrainContext> TestAsync(GrainContext context)
+            public Task<string> GetCultureAsync(CommandRequest request)
             {
-                await Task.Delay(100);
+                request.ApplyContext();
 
-                return context;
+                return Task.FromResult(CultureInfo.CurrentCulture.Name);
+            }
+
+            public Task<string> GetCultureUIAsync(CommandRequest request)
+            {
+                request.ApplyContext();
+
+                return Task.FromResult(CultureInfo.CurrentUICulture.Name);
             }
         }
 
@@ -42,26 +51,10 @@ namespace Squidex.Infrastructure.Orleans
             CultureInfo.CurrentCulture = culture;
             CultureInfo.CurrentUICulture = cultureUI;
 
-            var sut = GrainContext.Create();
+            var sut = CommandRequest.Create(null!);
 
-            Assert.Same(culture, sut.Culture);
-            Assert.Same(cultureUI, sut.CultureUI);
-        }
-
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            var culture = CultureInfo.GetCultureInfo("de");
-            var cultureUI = CultureInfo.GetCultureInfo("it");
-
-            CultureInfo.CurrentCulture = culture;
-            CultureInfo.CurrentUICulture = cultureUI;
-
-            var source = GrainContext.Create();
-            var result = source.SerializeAndDeserializeBinary();
-
-            Assert.Equal(culture, result.Culture);
-            Assert.Equal(cultureUI, result.CultureUI);
+            Assert.Same(culture.Name, sut.Culture);
+            Assert.Same(cultureUI.Name, sut.CultureUI);
         }
 
         [Fact, Trait("Category", "Dependencies")]
@@ -81,11 +74,13 @@ namespace Squidex.Infrastructure.Orleans
 
             var grain = cluster.Client.GetGrain<IContextGrain>("Default");
 
-            var source = GrainContext.Create();
-            var result = await grain.TestAsync(source);
+            var request = CommandRequest.Create(null!);
 
-            Assert.Equal(culture, result.Culture);
-            Assert.Equal(cultureUI, result.CultureUI);
+            var cultureFromGrain = await grain.GetCultureAsync(request);
+            var cultureUIFromGrain = await grain.GetCultureAsync(request);
+
+            Assert.Same(culture.Name, cultureFromGrain);
+            Assert.Same(cultureUI.Name, cultureUIFromGrain);
         }
     }
 }

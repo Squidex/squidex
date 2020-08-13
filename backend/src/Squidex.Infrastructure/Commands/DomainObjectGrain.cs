@@ -40,11 +40,11 @@ namespace Squidex.Infrastructure.Commands
             return base.OnActivateAsync(key);
         }
 
-        public async Task<J<object?>> ExecuteAsync(J<IAggregateCommand> command, GrainContext context)
+        public async Task<J<object?>> ExecuteAsync(J<CommandRequest> request)
         {
-            context?.Use();
+            request.Value.ApplyContext();
 
-            var result = await domainObject.ExecuteAsync(command.Value);
+            var result = await domainObject.ExecuteAsync(request.Value.Command);
 
             return result;
         }
