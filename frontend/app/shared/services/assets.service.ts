@@ -14,6 +14,8 @@ import { encodeQuery, Query } from './../state/query';
 import { AuthService } from './auth.service';
 
 const SVG_PREVIEW_LIMIT = 10 * 1024;
+const MIME_TIFF = 'image/tiff';
+const MIME_SVG = 'image/svg+xml';
 
 export class AssetsDto extends ResultSet<AssetDto> {
     public get canCreate() {
@@ -61,7 +63,7 @@ export class AssetDto {
         public readonly tags: ReadonlyArray<string>,
         public readonly version: Version
     ) {
-        this.canPreview = this.type === 'Image' || (this.mimeType === 'image/svg+xml' && this.fileSize < SVG_PREVIEW_LIMIT);
+        this.canPreview = (this.type === 'Image' && this.mimeType !== MIME_TIFF) || (this.mimeType === MIME_SVG && this.fileSize < SVG_PREVIEW_LIMIT);
 
         this._links = links;
 
