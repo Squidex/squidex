@@ -21,7 +21,6 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Web;
-using ThirdParty.BouncyCastle.Asn1;
 
 #pragma warning disable 1573
 

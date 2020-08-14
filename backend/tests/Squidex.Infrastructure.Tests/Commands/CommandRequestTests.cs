@@ -9,7 +9,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.TestingHost;
-using Squidex.Infrastructure.Commands;
 using Xunit;
 
 #pragma warning disable SA1133 // Do not combine attributes
