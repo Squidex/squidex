@@ -106,11 +106,29 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                     .Set(x => x.JobResult, RuleJobResult.Cancelled));
         }
 
-        public async Task UpdateAsync(RuleJob job, RuleJobUpdate update)
+        public Task UpdateAsync(RuleJob job, RuleJobUpdate update)
         {
             Guard.NotNull(job, nameof(job));
             Guard.NotNull(update, nameof(update));
 
+            return Task.WhenAll(
+                UpdateStatisticsAsync(job, update),
+                UpdateEventAsync(job, update));
+        }
+
+        private Task UpdateEventAsync(RuleJob job, RuleJobUpdate update)
+        {
+            return Collection.UpdateOneAsync(x => x.Id == job.Id,
+                Update
+                    .Set(x => x.Result, update.ExecutionResult)
+                    .Set(x => x.LastDump, update.ExecutionDump)
+                    .Set(x => x.JobResult, update.JobResult)
+                    .Set(x => x.NextAttempt, update.JobNext)
+                    .Inc(x => x.NumCalls, 1));
+        }
+
+        private async Task UpdateStatisticsAsync(RuleJob job, RuleJobUpdate update)
+        {
             if (update.ExecutionResult == RuleResult.Success)
             {
                 await statisticsCollection.IncrementSuccess(job.AppId, job.RuleId, update.Finished);
@@ -119,14 +137,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             {
                 await statisticsCollection.IncrementFailed(job.AppId, job.RuleId, update.Finished);
             }
-
-            await Collection.UpdateOneAsync(x => x.Id == job.Id,
-                Update
-                    .Set(x => x.Result, update.ExecutionResult)
-                    .Set(x => x.LastDump, update.ExecutionDump)
-                    .Set(x => x.JobResult, update.JobResult)
-                    .Set(x => x.NextAttempt, update.JobNext)
-                    .Inc(x => x.NumCalls, 1));
         }
 
         public Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(Guid appId)
