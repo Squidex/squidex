@@ -21,6 +21,7 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Web;
+using ThirdParty.BouncyCastle.Asn1;
 
 #pragma warning disable 1573
 
@@ -201,8 +202,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                         using (Profiler.Trace("ResizeImage"))
                         {
-                            await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
-                            destinationStream.Position = 0;
+                            try
+                            {
+                                await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
+                                destinationStream.Position = 0;
+                            }
+                            catch
+                            {
+                                sourceStream.Position = 0;
+                                await sourceStream.CopyToAsync(destinationStream);
+                            }
                         }
 
                         using (Profiler.Trace("ResizeUpload"))
