@@ -213,9 +213,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
                             }
                         }
 
-                        using (Profiler.Trace("ResizeUpload"))
+                        try
                         {
-                            await assetStore.UploadAsync(fileName, destinationStream, overwrite);
+                            using (Profiler.Trace("ResizeUpload"))
+                            {
+                                await assetStore.UploadAsync(fileName, destinationStream, overwrite);
+                                destinationStream.Position = 0;
+                            }
+                        }
+                        catch (AssetAlreadyExistsException)
+                        {
                             destinationStream.Position = 0;
                         }
 

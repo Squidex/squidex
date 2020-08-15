@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Queries.Json
                 {
                     schema = p;
 
-                    if (schema.Type == JsonObjectType.None)
+                    if (schema.Type == JsonObjectType.None && schema.Reference == null)
                     {
                         break;
                     }
