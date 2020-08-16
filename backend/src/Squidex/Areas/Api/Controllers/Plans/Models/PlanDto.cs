@@ -52,6 +52,11 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         public string? YearlyId { get; set; }
 
         /// <summary>
+        /// The maximum number of API traffic.
+        /// </summary>
+        public long MaxApiBytes { get; set; }
+
+        /// <summary>
         /// The maximum number of API calls.
         /// </summary>
         public long MaxApiCalls { get; set; }
