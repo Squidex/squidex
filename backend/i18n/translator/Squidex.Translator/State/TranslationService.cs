@@ -129,7 +129,8 @@ namespace Squidex.Translator.State
 
         public void SaveKeys()
         {
-            TranslationKeys translationKeys = new TranslationKeys();
+            var translationKeys = new TranslationKeys();
+
             foreach (var text in Texts)
             {
                 translationKeys.Add(text.Key, string.Empty);

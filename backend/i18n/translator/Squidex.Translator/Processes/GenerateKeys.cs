@@ -23,7 +23,7 @@ namespace Squidex.Translator.Processes
             {
                 this.folder = Frontend.GetFolder(folder);
             }
-              else if (type == "backend")
+            else if (type == "backend")
             {
                 this.folder = new DirectoryInfo(Path.Combine(folder.FullName, "backend", "src", "Squidex.Shared"));
             }
