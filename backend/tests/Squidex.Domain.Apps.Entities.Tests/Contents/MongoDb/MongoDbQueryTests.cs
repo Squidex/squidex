@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_throw_exception_for_invalid_field()
         {
-            Assert.Throws<NotSupportedException>(() => _F(ClrFilter.Eq("data/invalid/iv", "Me")));
+            Assert.Throws<KeyNotFoundException>(() => _F(ClrFilter.Eq("data/invalid/iv", "Me")));
         }
 
         [Fact]
