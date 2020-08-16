@@ -124,7 +124,6 @@ namespace Squidex.Translator.State
 
             Save("__todos.json", translationsTodo);
             Save("__ignore.json", translationToIgnore);
-            SaveKeys();
         }
 
         public void SaveKeys()
