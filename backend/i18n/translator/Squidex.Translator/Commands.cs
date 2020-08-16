@@ -77,6 +77,18 @@ namespace Squidex.Translator
                 new GenerateBackendResources(folder, service).Run();
             }
 
+            [Command(Name = "gen-keys", Description = "Generate the keys for translations.")]
+            public void GenerateBackendKeys(TranslateArguments arguments)
+            {
+                var (folderBackend, serviceBackend) = Setup(arguments, "backend");
+
+                new GenerateKeys(folderBackend, serviceBackend, "backend").Run();
+
+                var (folderFrontend, serviceFrontend) = Setup(arguments, "frontend");
+
+                new GenerateKeys(folderFrontend, serviceFrontend, "frontend").Run();
+            }
+
             [Command(Name = "migrate-backend", Description = "Migrate the backend files.")]
             public void MigrateBackend(TranslateArguments arguments)
             {

@@ -124,8 +124,20 @@ namespace Squidex.Translator.State
 
             Save("__todos.json", translationsTodo);
             Save("__ignore.json", translationToIgnore);
+            SaveKeys();
         }
-        
+
+        public void SaveKeys()
+        {
+            TranslationKeys translationKeys = new TranslationKeys();
+            foreach (var text in Texts)
+            {
+                translationKeys.Add(text.Key, string.Empty);
+            }
+
+            Save("__keys.json", translationKeys);
+        }
+
         public void Translate(string fileName, string text, string originText, Action<string> handler, bool silent = false)
         {
             if (onlySingleWords && text.Contains(' '))
