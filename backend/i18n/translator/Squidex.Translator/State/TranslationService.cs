@@ -76,7 +76,7 @@ namespace Squidex.Translator.State
 
         private void Save<T>(string name, T value) where T : new()
         {
-            var path = directory.FullName + name;
+            var path = Path.Combine(directory.FullName, this.fileName + name);
 
             WriteTo(value, path);
         }
@@ -124,6 +124,18 @@ namespace Squidex.Translator.State
 
             Save("__todos.json", translationsTodo);
             Save("__ignore.json", translationToIgnore);
+        }
+
+        public void SaveKeys()
+        {
+            var translationKeys = new TranslationKeys();
+
+            foreach (var text in Texts)
+            {
+                translationKeys.Add(text.Key, string.Empty);
+            }
+
+            Save("__keys.json", translationKeys);
         }
 
         public void Translate(string fileName, string text, string originText, Action<string> handler, bool silent = false)
