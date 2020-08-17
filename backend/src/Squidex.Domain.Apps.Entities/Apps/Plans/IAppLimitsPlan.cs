@@ -27,6 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         long MaxApiCalls { get; }
 
+        long MaxApiBytes { get; }
+
         long MaxAssetSize { get; }
 
         int MaxContributors { get; }

@@ -13,7 +13,9 @@ import { map } from 'rxjs/operators';
 
 export class CallsUsageDto {
     constructor(
+        public readonly allowedBytes: number,
         public readonly allowedCalls: number,
+        public readonly blockingCalls: number,
         public readonly totalBytes: number,
         public readonly totalCalls: number,
         public readonly averageElapsedMs: number,
@@ -95,7 +97,9 @@ export class UsagesService {
 
                 const usages =
                     new CallsUsageDto(
+                        body.allowedBytes,
                         body.allowedCalls,
+                        body.blockingCalls,
                         body.totalBytes,
                         body.totalCalls,
                         body.averageElapsedMs,

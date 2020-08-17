@@ -11,6 +11,9 @@
                 <strong>{{planInfo.plan.maxApiCalls | sqxKNumber}}</strong> {{ 'plans.includedCalls' | sqxTranslate }}
             </div>
             <div>
+                <strong>{{planInfo.plan.maxApiBytes | sqxFileSize}}</strong> {{ 'plans.includedTraffic' | sqxTranslate }}
+            </div>
+            <div>
                 {{planInfo.plan.maxAssetSize | sqxFileSize}} {{ 'plans.includedStorage' | sqxTranslate }}
             </div>
             <div>

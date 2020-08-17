@@ -27,6 +27,7 @@ export class PlanDto {
         public readonly yearlyId: string,
         public readonly yearlyCosts: string,
         public readonly yearlyConfirmText: string | undefined,
+        public readonly maxApiBytes: number,
         public readonly maxApiCalls: number,
         public readonly maxAssetSize: number,
         public readonly maxContributors: number
@@ -72,6 +73,7 @@ export class PlansService {
                             item.yearlyId,
                             item.yearlyCosts,
                             item.yearlyConfirmText,
+                            item.maxApiBytes,
                             item.maxApiCalls,
                             item.maxAssetSize,
                             item.maxContributors)),

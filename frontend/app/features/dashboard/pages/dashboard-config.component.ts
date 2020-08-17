@@ -107,10 +107,10 @@ export class DashboardConfigComponent implements OnChanges {
 }
 
 const DEFAULT_CONFIG: GridsterItem[] = [
-    { cols: 1, rows: 1, x: 0, y: 0, type: 'schemas', name: 'i18n:common.schemas' },
-    { cols: 1, rows: 1, x: 1, y: 0, type: 'api', name: 'i18n:dashboard.apiDocumentation' },
-    { cols: 1, rows: 1, x: 2, y: 0, type: 'support', name: 'i18n:common.schemas' },
-    { cols: 1, rows: 1, x: 3, y: 0, type: 'github', name: 'i18n:dashboard.github' },
+    { cols: 1, rows: 1, x: 0, y: 0, type: 'schemas', name: 'i18n:dashboard.schemasCard' },
+    { cols: 1, rows: 1, x: 1, y: 0, type: 'api', name: 'i18n:dashboard.apiDocumentationCard' },
+    { cols: 1, rows: 1, x: 2, y: 0, type: 'support', name: 'i18n:dashboard.supportCard' },
+    { cols: 1, rows: 1, x: 3, y: 0, type: 'github', name: 'i18n:dashboard.githubCard' },
 
     { cols: 2, rows: 1, x: 0, y: 1, type: 'api-calls', name: 'i18n:dashboard.apiCallsChart' },
     { cols: 2, rows: 1, x: 2, y: 1, type: 'api-performance', name: 'i18n:dashboard.apiPerformanceChart' },
@@ -122,5 +122,6 @@ const DEFAULT_CONFIG: GridsterItem[] = [
     { cols: 2, rows: 1, x: 0, y: 3, type: 'asset-uploads-size', name: 'i18n:dashboard.assetTotalSize' },
     { cols: 2, rows: 1, x: 2, y: 3, type: 'api-traffic', name: 'i18n:dashboard.trafficChart' },
 
-    { cols: 2, rows: 1, x: 0, y: 4, type: 'history', name: 'i18n:dashboard.history' }
+    { cols: 1, rows: 1, x: 0, y: 4, type: 'api-traffic-summary', name: 'i18n:dashboard.trafficSummaryCard' },
+    { cols: 2, rows: 1, x: 1, y: 4, type: 'history', name: 'i18n:dashboard.historyCard' }
 ];
