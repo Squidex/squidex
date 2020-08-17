@@ -196,7 +196,7 @@
   "history.contents.deleted": "deleted {[Schema]} content.",
   "history.contents.draftCreated": "created new draft.",
   "history.contents.draftDeleted": "deleted draft.",
-  "history.contents.scheduleCompleted": "scheduled to change status of {[Schemra]} content to {[Status]}.",
+  "history.contents.scheduleCompleted": "scheduled to change status of {[Schema]} content to {[Status]}.",
   "history.contents.scheduleFailed": "failed to schedule status change for {[Schema]} content.",
   "history.contents.updated": "updated {[Schema]} content.",
   "history.schemas.created": "created schema {[Name]}.",
