@@ -184,6 +184,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         }
 
         [Fact]
+        public void Should_make_query_with_null_regex()
+        {
+            var i = _F(ClrFilter.Contains("createdBy", null!));
+            var o = _C("{ 'cb' : /null/i }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_make_query_with_empty_test()
         {
             var i = _F(ClrFilter.Empty("data/firstName/iv"));

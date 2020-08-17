@@ -55,6 +55,7 @@ describe('PlansService', () => {
                     yearlyId: 'free_yearly',
                     yearlyCosts: '120 €',
                     yearlyConfirmText: 'Change for 120 € per year?',
+                    maxApiBytes: 128,
                     maxApiCalls: 1000,
                     maxAssetSize: 1500,
                     maxContributors: 2500
@@ -67,6 +68,7 @@ describe('PlansService', () => {
                     yearlyId: 'professional_yearly',
                     yearlyCosts: '160 €',
                     yearlyConfirmText: 'Change for 160 € per year?',
+                    maxApiBytes: 512,
                     maxApiCalls: 4000,
                     maxAssetSize: 5500,
                     maxContributors: 6500
@@ -89,13 +91,13 @@ describe('PlansService', () => {
                         'Change for 14 € per month?',
                         'free_yearly', '120 €',
                         'Change for 120 € per year?',
-                        1000, 1500, 2500),
+                        128, 1000, 1500, 2500),
                     new PlanDto(
                         'professional', 'Professional', '18 €',
                         'Change for 18 € per month?',
                         'professional_yearly', '160 €',
                         'Change for 160 € per year?',
-                        4000, 5500, 6500)
+                        512, 4000, 5500, 6500)
                 ],
                 hasPortal: true
             },

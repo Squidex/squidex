@@ -28,6 +28,10 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     @ViewChild('element', { static: false })
     public element: ElementRef<Element>;
 
+    public get isConfigured() {
+        return !!this.notifoApiKey && !!this.notifoApiUrl;
+    }
+
     public get showOnboarding() {
         return !!this.notifoApiUrl && !!this.topic;
     }
@@ -38,7 +42,7 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
         this.notifoApiKey = authService.user?.notifoToken;
         this.notifoApiUrl = uiOptions.get('more.notifoApi');
 
-        if (this.notifoApiKey && this.notifoApiUrl) {
+        if (this.isConfigured) {
             if (this.notifoApiUrl.indexOf('localhost:5002') >= 0) {
                 resourceLoader.loadScript(`https://localhost:3002/notifo-sdk.js`);
             } else {
@@ -48,15 +52,13 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     public ngAfterViewInit() {
-        const userToken = this.notifoApiKey;
-
-        if (userToken) {
+        if (this.isConfigured) {
             let notifo = window['notifo'];
 
-            if (!notifo && this.notifoApiUrl) {
+            if (!notifo) {
                 notifo = [];
 
-                const options: any = { apiUrl: this.notifoApiUrl, userToken };
+                const options: any = { apiUrl: this.notifoApiUrl, userToken: this.notifoApiKey };
 
                 if (this.notifoApiUrl.indexOf('localhost:5002') >= 0) {
                     options.styleUrl = 'https://localhost:3002/notifo-sdk.css';
