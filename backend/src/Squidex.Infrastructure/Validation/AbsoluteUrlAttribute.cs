@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Validation
         {
             var property = T.Get($"common.{name.ToCamelCase()}", name);
 
-            return T.Get("aspnet_annotations_AbsoluteUrl", new { property });
+            return T.Get("annotations_AbsoluteUrl", new { property });
         }
 
         public override bool IsValid(object value)

@@ -20,13 +20,60 @@ namespace Squidex.Translator.Processes
             return file.FullName.Substring(folder.FullName.Length).Replace("\\", "/");
         }
 
+        public static void CheckOtherLocales(TranslationService service)
+        {
+            var mainTranslations = service.MainTranslations;
+
+            foreach (var (locale, texts) in service.Translations.Where(x => x.Key != service.MainLocale))
+            {
+                Console.WriteLine();
+                Console.WriteLine("Checking {0}", locale);
+
+                var notTranslated = mainTranslations.Keys.Except(texts.Keys).ToList();
+                var notUsed = texts.Keys.Except(mainTranslations.Keys).ToList();
+
+                if (notTranslated.Count > 0 || notUsed.Count > 0)
+                {
+                    if (notTranslated.Count > 0)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("Translations missing:");
+
+                        foreach (var key in notTranslated.OrderBy(x => x))
+                        {
+                            Console.Write(" * ");
+                            Console.WriteLine(key);
+                        }
+                    }
+
+                    if (notUsed.Count > 0)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("Translations not used:");
+
+                        foreach (var key in notUsed.OrderBy(x => x))
+                        {
+                            Console.Write(" * ");
+                            Console.WriteLine(key);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("> No errors found");
+                }
+            }
+        }
+
         public static void CheckUnused(TranslationService service, HashSet<string> translations)
         {
             var notUsed = new SortedSet<string>();
 
             foreach (var key in service.MainTranslations.Keys)
             {
-                if (!translations.Contains(key) && !key.StartsWith("validation.", StringComparison.OrdinalIgnoreCase))
+                if (!translations.Contains(key) &&
+                    !key.StartsWith("validation.", StringComparison.OrdinalIgnoreCase) &&
+                    !key.StartsWith("aspnet_", StringComparison.OrdinalIgnoreCase))
                 {
                     notUsed.Add(key);
                 }
@@ -67,7 +114,7 @@ namespace Squidex.Translator.Processes
 
                 if (HasInvalidPrefixes(prefixes) || translations.Count > 0)
                 {
-                    Console.WriteLine("Errors in {0}.", relativeName);
+                    Console.WriteLine("Errors in file {0}.", relativeName);
 
                     if (HasInvalidPrefixes(prefixes))
                     {

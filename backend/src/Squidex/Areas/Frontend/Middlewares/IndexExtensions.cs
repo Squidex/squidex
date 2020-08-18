@@ -65,6 +65,8 @@ namespace Squidex.Areas.Frontend.Middlewares
                     uiOptions.More["notifoApi"] = notifo.Value.ApiUrl;
                 }
 
+                uiOptions.More["culture"] = CultureInfo.CurrentUICulture.Name;
+
                 var jsonSerializer = httpContext.RequestServices.GetRequiredService<IJsonSerializer>();
                 var jsonOptions = jsonSerializer.Serialize(uiOptions, true);
 

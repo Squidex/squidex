@@ -57,7 +57,9 @@ export function configTranslations() {
     if (process.env.NODE_ENV === 'production') {
         return new LocalizerService(window['texts']);
     } else {
-        return new LocalizerService(require('./../../backend/i18n/frontend_en.json')).logMissingKeys();
+        const culture = window['options'].more.culture;
+
+        return new LocalizerService(require(`./../../backend/i18n/frontend_${culture}.json`)).logMissingKeys();
     }
 }
 

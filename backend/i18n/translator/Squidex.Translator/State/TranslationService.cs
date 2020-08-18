@@ -164,9 +164,9 @@ namespace Squidex.Translator.State
 
         public void Save()
         {
-            foreach (var locale in supportedLocales)
+            foreach (var (locale, texts) in translations)
             {
-                Save($"_{locale}.json", translations);
+                Save($"_{locale}.json", texts);
             }
 
             Save("__todos.json", translationsTodo);
