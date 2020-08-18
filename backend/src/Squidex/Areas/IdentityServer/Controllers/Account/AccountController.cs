@@ -208,7 +208,11 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, true, true);
 
-            if (!result.Succeeded)
+            if (!result.Succeeded && result.IsLockedOut)
+            {
+                return View(nameof(LockedOut));
+            }
+            else if (!result.Succeeded)
             {
                 return await LoginViewAsync(returnUrl, true, true);
             }

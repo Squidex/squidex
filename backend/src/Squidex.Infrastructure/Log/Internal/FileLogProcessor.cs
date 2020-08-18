@@ -32,8 +32,7 @@ namespace Squidex.Infrastructure.Log.Internal
 
             outputThread = new Thread(ProcessLogQueue)
             {
-                IsBackground = true,
-                Name = "Logging"
+                IsBackground = true, Name = "Logging"
             };
         }
 
