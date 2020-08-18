@@ -24,7 +24,7 @@ namespace Squidex.Translator.Processes
         {
             var notUsed = new SortedSet<string>();
 
-            foreach (var key in service.Texts.Keys)
+            foreach (var key in service.MainTranslations.Keys)
             {
                 if (!translations.Contains(key) && !key.StartsWith("validation.", StringComparison.OrdinalIgnoreCase))
                 {
@@ -52,7 +52,7 @@ namespace Squidex.Translator.Processes
 
                 foreach (var key in translations.ToList())
                 {
-                    if (service.Texts.ContainsKey(key))
+                    if (service.MainTranslations.ContainsKey(key))
                     {
                         translations.Remove(key);
                     }

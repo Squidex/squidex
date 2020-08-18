@@ -10,36 +10,33 @@ using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes
 {
-    public sealed class GenerateKeys
+    public sealed class GenerateFrontendResources
     {
         private readonly TranslationService service;
-        private readonly string fileName;
         private readonly DirectoryInfo folder;
 
-        public GenerateKeys(DirectoryInfo folder, TranslationService service, string fileName)
+        public GenerateFrontendResources(DirectoryInfo folder, TranslationService service)
         {
-            this.folder = folder;
+            this.folder = new DirectoryInfo(Path.Combine(folder.FullName, "backend", "i18n"));
+
             this.service = service;
-            this.fileName = fileName;
         }
 
         public void Run()
         {
-            var keys = new TranslatedTexts();
-
-            foreach (var text in service.MainTranslations)
+            foreach (var locale in service.SupportedLocales)
             {
-                keys.Add(text.Key, string.Empty);
+                var fullName = Path.Combine(folder.FullName, $"frontend_{locale}.json");
+
+                if (!folder.Exists)
+                {
+                    Directory.CreateDirectory(folder.FullName);
+                }
+
+                var texts = service.GetTextsWithFallback(locale);
+
+                service.WriteTo(texts, fullName);
             }
-
-            var fullName = Path.Combine(folder.FullName, fileName);
-
-            if (!folder.Exists)
-            {
-                Directory.CreateDirectory(folder.FullName);
-            }
-
-            service.WriteTo(keys, fullName);
 
             service.Save();
         }
