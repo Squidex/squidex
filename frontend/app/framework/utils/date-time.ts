@@ -6,9 +6,11 @@
  */
 
 import { addDays, addHours, addMilliseconds, addMinutes, addMonths, addSeconds, addYears, format, formatDistanceToNow, parse, parseISO, startOfDay, startOfMonth, startOfTomorrow, startOfWeek, startOfYesterday } from 'date-fns';
+import { enUS, nl } from 'date-fns/locale';
 import { DateHelper } from './date-helper';
 
 const DATE_FORMAT = 'yyyy-MM-dd';
+const LOCALES = { enUS, nl };
 
 export class DateTime {
     public get raw(): Date {
@@ -186,7 +188,7 @@ export class DateTime {
     }
 
     public toFromNow(): string {
-        return formatDistanceToNow(this.value);
+        return formatDistanceToNow(this.value, { locale: this.getLocale() });
     }
 
     public toISOString(withoutMilliseconds = true): string {
@@ -197,6 +199,19 @@ export class DateTime {
         }
 
         return result;
+    }
+
+    private getLocale(): Locale {
+        let locale = DateHelper.getLocale();
+        if (locale === 'en') {
+            locale = 'enUS';
+        }
+
+        if ( LOCALES.hasOwnProperty(locale) ) {
+            return LOCALES[locale];
+        }
+
+        return LOCALES['enUS'];
     }
 
 }
