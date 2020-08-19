@@ -443,7 +443,7 @@
   "dashboard.supportCard": "Feedback en ondersteuning",
   "dashboard.supportCardDescription": "Geef feedback en vraag om functies om ons te helpen Squidex te verbeteren.",
   "dashboard.trafficChart": "API-verkeersdiagram",
-  "dashboard.trafficHeader": "Verkeerd (MB)",
+  "dashboard.trafficHeader": "Verkeer (MB)",
   "dashboard.trafficLimitLabel": "Maandelijks limiet",
   "dashboard.trafficSummaryCard": "API Verkeer Samenvatting",
   "dashboard.welcomeText": "Welkom bij **{app}** dashboard.",
