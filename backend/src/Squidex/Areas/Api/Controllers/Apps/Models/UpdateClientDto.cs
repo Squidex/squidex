@@ -29,6 +29,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public bool? AllowAnonymous { get; set; }
 
+        /// <summary>
+        /// The number of allowed api calls per month for this client.
+        /// </summary>
+        public long? ApiCallsLimit { get; set; }
+
         public UpdateClient ToCommand(string clientId)
         {
             return SimpleMapper.Map(this, new UpdateClient { Id = clientId });

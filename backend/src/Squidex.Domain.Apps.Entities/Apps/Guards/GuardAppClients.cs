@@ -62,7 +62,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (command.Role != null && !roles.Contains(command.Role))
                 {
-                    e(Not.Valid("Role"), nameof(command.Role));
+                    e(Not.Valid(nameof(command.Role)), nameof(command.Role));
+                }
+
+                if (command.ApiCallsLimit != null && command.ApiCallsLimit < 0)
+                {
+                    e(Not.GreaterEqualsThan(nameof(command.ApiCallsLimit), "0"), nameof(command.ApiCallsLimit));
                 }
             });
         }

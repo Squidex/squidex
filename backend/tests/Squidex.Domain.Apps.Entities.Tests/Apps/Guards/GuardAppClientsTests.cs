@@ -108,6 +108,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
+        public void UpdateClient_should_throw_exception_if_api_calls_limit_is_less_than_zero()
+        {
+            var command = new UpdateClient { Id = "ios", ApiCallsLimit = -10 };
+
+            var clients_1 = clients_0.Add("ios", "secret");
+
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
+                new ValidationError("ApiCallsLimit must be greater or equal to 0.", "ApiCallsLimit"));
+        }
+
+        [Fact]
         public void UpdateClient_should_not_throw_exception_if_client_has_same_name()
         {
             var command = new UpdateClient { Id = "ios", Name = "ios" };

@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure
         [InlineData(" ")]
         public void Should_provide_fallback_if_invalid(string value)
         {
-            Assert.Equal("fallback", value.WithFallback("fallback"));
+            Assert.Equal("fallback", value.Or("fallback"));
         }
 
         [Theory]
@@ -130,7 +130,7 @@ namespace Squidex.Infrastructure
         {
             const string value = "value";
 
-            Assert.Equal(value, value.WithFallback("fallback"));
+            Assert.Equal(value, value.Or("fallback"));
         }
 
         [Theory]
