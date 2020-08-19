@@ -21,55 +21,55 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             : base(typeNameRegistry)
         {
             AddEventMessage<SchemaFieldsReordered>(
-                T.Get("history.schemas.fieldsReordered"));
+                "history.schemas.fieldsReordered");
 
             AddEventMessage<SchemaCreated>(
-                T.Get("history.schemas.created"));
+                "history.schemas.created");
 
             AddEventMessage<SchemaUpdated>(
-                T.Get("history.schemas.updated"));
+                "history.schemas.updated");
 
             AddEventMessage<SchemaDeleted>(
-                T.Get("history.schemas.deleted"));
+                "history.schemas.deleted");
 
             AddEventMessage<SchemaPublished>(
-                T.Get("history.schemas.published"));
+                "history.schemas.published");
 
             AddEventMessage<SchemaUnpublished>(
-                T.Get("history.schemas.unpublished"));
+                "history.schemas.unpublished");
 
             AddEventMessage<SchemaFieldsReordered>(
-                T.Get("history.schemas.fieldsReordered"));
+                "history.schemas.fieldsReordered");
 
             AddEventMessage<SchemaScriptsConfigured>(
-                T.Get("history.schemas.scriptsConfigured"));
+                "history.schemas.scriptsConfigured");
 
             AddEventMessage<FieldAdded>(
-                T.Get("history.schemas.fieldAdded"));
+                "history.schemas.fieldAdded");
 
             AddEventMessage<FieldDeleted>(
-                T.Get("history.schemas.fieldDeleted"));
+                "history.schemas.fieldDeleted");
 
             AddEventMessage<FieldLocked>(
-                T.Get("history.schemas.fieldLocked"));
+                "history.schemas.fieldLocked");
 
             AddEventMessage<FieldHidden>(
-                T.Get("history.schemas.fieldHidden"));
+                "history.schemas.fieldHidden");
 
             AddEventMessage<FieldShown>(
-                T.Get("history.schemas.fieldShown"));
+                "history.schemas.fieldShown");
 
             AddEventMessage<FieldDisabled>(
-                T.Get("history.schemas.fieldDisabled"));
+                "history.schemas.fieldDisabled");
 
             AddEventMessage<FieldEnabled>(
-                T.Get("history.schemas.fieldDisabled"));
+                "history.schemas.fieldDisabled");
 
             AddEventMessage<FieldUpdated>(
-                T.Get("history.schemas.fieldUpdated"));
+                "history.schemas.fieldUpdated");
 
             AddEventMessage<FieldDeleted>(
-                T.Get("history.schemas.fieldDeleted"));
+                "history.schemas.fieldDeleted");
         }
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)

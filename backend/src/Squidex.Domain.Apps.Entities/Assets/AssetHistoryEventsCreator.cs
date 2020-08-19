@@ -20,13 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             : base(typeNameRegistry)
         {
             AddEventMessage<AssetCreated>(
-                T.Get("history.assets.uploaded"));
+                "history.assets.uploaded");
 
             AddEventMessage<AssetUpdated>(
-                T.Get("history.assets.replaced"));
+                "history.assets.replaced");
 
             AddEventMessage<AssetAnnotated>(
-                T.Get("history.assets.updated"));
+                "history.assets.updated");
         }
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)
