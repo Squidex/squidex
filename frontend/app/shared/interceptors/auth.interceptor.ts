@@ -42,7 +42,6 @@ export class AuthInterceptor implements HttpInterceptor {
         req = req.clone({
             headers: req.headers
                 .set('Authorization', token)
-                .set('Accept-Language', '*')
                 .set('Pragma', 'no-cache')
         });
 
