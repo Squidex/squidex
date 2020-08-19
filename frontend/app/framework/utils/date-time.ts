@@ -172,19 +172,19 @@ export class DateTime {
     }
 
     public toISODateUTC(): string {
-        return format(DateHelper.getUTCDate(this.value), DATE_FORMAT);
+        return format(DateHelper.getUTCDate(this.value), DATE_FORMAT, { locale: this.getLocale() });
     }
 
     public toISODate(): string {
-        return format(this.value, DATE_FORMAT);
+        return format(this.value, DATE_FORMAT, { locale: this.getLocale() });
     }
 
     public toStringFormat(pattern: string): string {
-        return format(this.value, pattern);
+        return format(this.value, pattern, { locale: this.getLocale() });
     }
 
     public toStringFormatUTC(pattern: string): string {
-        return format(DateHelper.getUTCDate(this.value), pattern);
+        return format(DateHelper.getUTCDate(this.value), pattern, { locale: this.getLocale() });
     }
 
     public toFromNow(): string {
@@ -202,16 +202,7 @@ export class DateTime {
     }
 
     private getLocale(): Locale {
-        let locale = DateHelper.getLocale();
-        if (locale === 'en') {
-            locale = 'enUS';
-        }
-
-        if ( LOCALES.hasOwnProperty(locale) ) {
-            return LOCALES[locale];
-        }
-
-        return LOCALES['enUS'];
+        return LOCALES[DateHelper.getLocale()] || enUS;
     }
 
 }

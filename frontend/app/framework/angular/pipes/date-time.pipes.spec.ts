@@ -89,14 +89,9 @@ describe('DayOfWeekPipe', () => {
     });
 });
 
-describe('FromNowPipe', () => {
-    it('should format to from now string', () => {
-        const pipe = new FromNowPipe();
-
-        const actual = pipe.transform(DateTime.now().addMinutes(-4));
-        const expected = '4 minutes';
-
-        expect(actual).toBe(expected);
+describe('FromNowPipeTranslate', () => {
+    afterEach(() => {
+        DateHelper.setlocale(null);
     });
 
     it('should format to from now string in Dutch', () => {
@@ -105,6 +100,17 @@ describe('FromNowPipe', () => {
 
         const actual = pipe.transform(DateTime.now().addMinutes(-4));
         const expected = '4 minuten';
+
+        expect(actual).toBe(expected);
+    });
+});
+
+describe('FromNowPipe', () => {
+    it('should format to from now string', () => {
+        const pipe = new FromNowPipe();
+
+        const actual = pipe.transform(DateTime.now().addMinutes(-4));
+        const expected = '4 minutes';
 
         expect(actual).toBe(expected);
     });
