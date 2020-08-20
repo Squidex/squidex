@@ -208,7 +208,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
     public updateState(user: any, data: any, itemData?: any) {
         const state = {
             isDisabled: this.field.isDisabled,
-            isHidden: this.field.isHidden,
+            isHidden: false,
             isRequired: this.field.properties.isRequired && !this.isOptional
         };
 

@@ -6,6 +6,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { QueryParamsHandling } from '@angular/router';
 import { slideRightAnimation } from '@app/framework/internal';
 import { PanelContainerDirective } from './panel-container.directive';
 
@@ -25,6 +26,9 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
 
     @Output()
     public close = new EventEmitter();
+
+    @Input()
+    public closeQueryParamsHandling: QueryParamsHandling = 'preserve';
 
     @Input()
     public theme = 'light';
