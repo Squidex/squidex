@@ -108,9 +108,9 @@ describe('FromNowPipe', () => {
             const expected = '4 minuten';
 
             expect(actual).toBe(expected);
-          } finally {
+        } finally {
             DateHelper.setlocale(null);
-          }
+        }
     });
 
     [null, undefined].map(x => {
