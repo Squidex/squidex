@@ -6,6 +6,7 @@
  */
 
 import { DateTime } from './date-time';
+import { DateHelper } from '..';
 
 describe('DateTime', () => {
     const today = DateTime.today();
@@ -214,4 +215,25 @@ describe('DateTime', () => {
         expect(now.ge(now)).toBeTruthy();
         expect(today.ge(now)).toBeFalsy();
     });
+
+    describe('for Dutch locale', () => {
+        beforeEach(() => {
+          DateHelper.setlocale('nl');
+        });
+        beforeEach(() => {
+          DateHelper.setlocale(null);
+        });
+
+        it('should format to from now string in Dutch', () => {
+            DateHelper.setlocale('nl');
+            const value = DateTime.now().addMinutes(-4);
+            const expected = '4 minuten';
+
+            try {
+                expect(value.toFromNow()).toBe(expected);
+            } finally {
+                DateHelper.setlocale(null);
+            }
+        });
+     });
 });

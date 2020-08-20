@@ -6,7 +6,6 @@
  */
 
 import { DateTime, Duration } from '@app/framework/internal';
-import { DateHelper } from '@app/shared';
 import { DatePipe, DayOfWeekPipe, DayPipe, DurationPipe, FromNowPipe, FullDateTimePipe, ISODatePipe, MonthPipe, ShortDatePipe, ShortTimePipe } from './date-time.pipes';
 
 const dateTime = DateTime.parseISO('2013-10-03T12:13:14.125', false);
@@ -97,20 +96,6 @@ describe('FromNowPipe', () => {
         const expected = '4 minutes';
 
         expect(actual).toBe(expected);
-    });
-
-    it('should format to from now string in Dutch', () => {
-        DateHelper.setlocale('nl');
-        const pipe = new FromNowPipe();
-
-        const actual = pipe.transform(DateTime.now().addMinutes(-4));
-        const expected = '4 minuten';
-
-        try {
-            expect(actual).toBe(expected);
-        } finally {
-            DateHelper.setlocale(null);
-        }
     });
 
     [null, undefined].map(x => {
