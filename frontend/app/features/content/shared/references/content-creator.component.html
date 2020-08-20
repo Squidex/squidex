@@ -2,11 +2,9 @@
     <ng-container title>
         <div class="row">
             <div class="col-selector">
-                <select class="form-control form-control-dark"
-                    [ngModel]="schema?.id"
-                    (ngModelChange)="selectSchema($event)">
+                <select class="form-control form-control-dark" [ngModel]="schema?.id" (ngModelChange)="selectSchema($event)">
                     <option *ngFor="let schema of schemas" [ngValue]="schema.id">
-                        Select {{schema.displayName}}
+                        {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
                     </option>
                 </select>
             </div>
@@ -17,19 +15,17 @@
         <div class="row no-gutters">
             <div class="col-auto">          
                 <div *ngIf="schema && languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" 
-                        (selectedLanguageChange)="selectLanguage($event)" [languages]="languages">
-                    </sqx-language-selector>
+                    <sqx-language-selector class="languages-buttons"(selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
                 </div>
             </div>
 
             <div class="col text-right">
                 <button type="button" class="btn btn-outline-success" (click)="save()">
-                    Create
+                    {{ 'common.create' | sqxTranslate }}
                 </button>
 
                 <button type="button" class="btn btn-success ml-1" (click)="saveAndPublish()" *ngIf="schema?.canContentsCreateAndPublish">
-                    Create and Publish
+                    {{ 'contents.referencesCreatePublish' | sqxTranslate }}
                 </button>
 
                 <sqx-form-error bubble="true" closeable="true" [error]="contentForm?.error | async"></sqx-form-error>

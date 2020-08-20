@@ -12,6 +12,7 @@ using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Guards;
 using Squidex.Domain.Apps.Entities.Contents.State;
@@ -23,7 +24,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Guard
 {
-    public class GuardContentTests
+    public class GuardContentTests : IClassFixture<TranslationsFixture>
     {
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");

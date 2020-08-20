@@ -201,13 +201,28 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                         using (Profiler.Trace("ResizeImage"))
                         {
-                            await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
-                            destinationStream.Position = 0;
+                            try
+                            {
+                                await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
+                                destinationStream.Position = 0;
+                            }
+                            catch
+                            {
+                                sourceStream.Position = 0;
+                                await sourceStream.CopyToAsync(destinationStream);
+                            }
                         }
 
-                        using (Profiler.Trace("ResizeUpload"))
+                        try
                         {
-                            await assetStore.UploadAsync(fileName, destinationStream, overwrite);
+                            using (Profiler.Trace("ResizeUpload"))
+                            {
+                                await assetStore.UploadAsync(fileName, destinationStream, overwrite);
+                                destinationStream.Position = 0;
+                            }
+                        }
+                        catch (AssetAlreadyExistsException)
+                        {
                             destinationStream.Position = 0;
                         }
 

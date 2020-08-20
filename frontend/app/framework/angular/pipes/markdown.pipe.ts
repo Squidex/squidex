@@ -31,3 +31,17 @@ export class MarkdownPipe implements PipeTransform {
         }
     }
 }
+
+@Pipe({
+    name: 'sqxMarkdownInline',
+    pure: true
+})
+export class MarkdownInlinePipe implements PipeTransform {
+    public transform(text: string | null | undefined): string {
+        if (text) {
+            return marked.inlineLexer(text, [], { renderer });
+        } else {
+            return '';
+        }
+    }
+}

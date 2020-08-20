@@ -88,7 +88,7 @@ export class DashboardConfigComponent implements OnChanges {
     public saveConfig() {
         this.uiState.set('dashboard.grid', this.config, true);
 
-        this.dialogs.notifyInfo('Configuration saved.');
+        this.dialogs.notifyInfo('i18n:dashboard.configSaved');
     }
 
     public addOrRemove(item: GridsterItem) {
@@ -107,20 +107,21 @@ export class DashboardConfigComponent implements OnChanges {
 }
 
 const DEFAULT_CONFIG: GridsterItem[] = [
-    { cols: 1, rows: 1, x: 0, y: 0, type: 'schemas', name: 'Schema' },
-    { cols: 1, rows: 1, x: 1, y: 0, type: 'api', name: 'API Documentation' },
-    { cols: 1, rows: 1, x: 2, y: 0, type: 'support', name: 'Support' },
-    { cols: 1, rows: 1, x: 3, y: 0, type: 'github', name: 'Github' },
+    { cols: 1, rows: 1, x: 0, y: 0, type: 'schemas', name: 'i18n:dashboard.schemasCard' },
+    { cols: 1, rows: 1, x: 1, y: 0, type: 'api', name: 'i18n:dashboard.apiDocumentationCard' },
+    { cols: 1, rows: 1, x: 2, y: 0, type: 'support', name: 'i18n:dashboard.supportCard' },
+    { cols: 1, rows: 1, x: 3, y: 0, type: 'github', name: 'i18n:dashboard.githubCard' },
 
-    { cols: 2, rows: 1, x: 0, y: 1, type: 'api-calls', name: 'API Calls Chart' },
-    { cols: 2, rows: 1, x: 2, y: 1, type: 'api-performance', name: 'API Performance Chart' },
+    { cols: 2, rows: 1, x: 0, y: 1, type: 'api-calls', name: 'i18n:dashboard.apiCallsChart' },
+    { cols: 2, rows: 1, x: 2, y: 1, type: 'api-performance', name: 'i18n:dashboard.apiPerformanceChart' },
 
-    { cols: 1, rows: 1, x: 0, y: 2, type: 'api-calls-summary', name: 'API Calls Summary' },
-    { cols: 2, rows: 1, x: 1, y: 2, type: 'asset-uploads-count', name: 'Asset Uploads Count Chart' },
-    { cols: 1, rows: 1, x: 2, y: 2, type: 'asset-uploads-size-summary', name: 'Asset Uploads Size Chart' },
+    { cols: 1, rows: 1, x: 0, y: 2, type: 'api-calls-summary', name: 'i18n:dashboard.apiCallsSummaryCard' },
+    { cols: 2, rows: 1, x: 1, y: 2, type: 'asset-uploads-count', name: 'i18n:dashboard.assetUpdloadsCountChart' },
+    { cols: 1, rows: 1, x: 2, y: 2, type: 'asset-uploads-size-summary', name: 'i18n:dashboard.assetUploadsSizeChart' },
 
-    { cols: 2, rows: 1, x: 0, y: 3, type: 'asset-uploads-size', name: 'Asset Total Storage Size' },
-    { cols: 2, rows: 1, x: 2, y: 3, type: 'api-traffic', name: 'API Traffic Chart' },
+    { cols: 2, rows: 1, x: 0, y: 3, type: 'asset-uploads-size', name: 'i18n:dashboard.assetTotalSize' },
+    { cols: 2, rows: 1, x: 2, y: 3, type: 'api-traffic', name: 'i18n:dashboard.trafficChart' },
 
-    { cols: 2, rows: 1, x: 0, y: 4, type: 'history', name: 'History' }
+    { cols: 1, rows: 1, x: 0, y: 4, type: 'api-traffic-summary', name: 'i18n:dashboard.trafficSummaryCard' },
+    { cols: 2, rows: 1, x: 1, y: 4, type: 'history', name: 'i18n:dashboard.historyCard' }
 ];

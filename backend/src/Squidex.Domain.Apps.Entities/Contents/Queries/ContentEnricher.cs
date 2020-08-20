@@ -59,9 +59,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 var results = new List<ContentEntity>();
 
-                foreach (var step in steps)
+                if (context.App != null)
                 {
-                    await step.EnrichAsync(context);
+                    foreach (var step in steps)
+                    {
+                        await step.EnrichAsync(context);
+                    }
                 }
 
                 if (contents.Any())
@@ -78,18 +81,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         results.Add(result);
                     }
 
-                    var schemaCache = new Dictionary<Guid, Task<ISchemaEntity>>();
-
-                    Task<ISchemaEntity> GetSchema(Guid id)
+                    if (context.App != null)
                     {
-                        return schemaCache.GetOrAdd(id, x => ContentQuery.GetSchemaOrThrowAsync(context, x.ToString()));
-                    }
+                        var schemaCache = new Dictionary<Guid, Task<ISchemaEntity>>();
 
-                    foreach (var step in steps)
-                    {
-                        using (Profiler.TraceMethod(step.ToString()!))
+                        Task<ISchemaEntity> GetSchema(Guid id)
                         {
-                            await step.EnrichAsync(context, results, GetSchema);
+                            return schemaCache.GetOrAdd(id, x => ContentQuery.GetSchemaOrThrowAsync(context, x.ToString()));
+                        }
+
+                        foreach (var step in steps)
+                        {
+                            using (Profiler.TraceMethod(step.ToString()!))
+                            {
+                                await step.EnrichAsync(context, results, GetSchema);
+                            }
                         }
                     }
                 }

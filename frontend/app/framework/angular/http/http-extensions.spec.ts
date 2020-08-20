@@ -27,14 +27,14 @@ describe('ErrorParsing', () => {
         const response: any = { status: 412 };
         const result = parseError(response, 'Fallback');
 
-        expect(result).toEqual(new ErrorDto(412, 'Failed to make the update. Another user has made a change. Please reload.', [], response));
+        expect(result).toEqual(new ErrorDto(412, 'i18n:common.httpConflict', [], response));
     });
 
     it('should return default 429 error', () => {
         const response: any = { status: 429 };
         const result = parseError(response, 'Fallback');
 
-        expect(result).toEqual(new ErrorDto(429, 'You have exceeded the maximum limit of API calls.', [], response));
+        expect(result).toEqual(new ErrorDto(429, 'i18n:common.httpLimit', [], response));
     });
 
     it('should return error from error object', () => {

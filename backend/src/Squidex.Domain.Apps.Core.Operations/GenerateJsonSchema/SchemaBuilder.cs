@@ -51,14 +51,14 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return Enrich(new JsonSchemaProperty { Type = JsonObjectType.Number }, description, isRequired);
         }
 
-        public static JsonSchemaProperty ObjectProperty(JsonSchema item, string? description = null, bool isRequired = false)
-        {
-            return Enrich(new JsonSchemaProperty { Type = JsonObjectType.Object, Reference = item }, description, isRequired);
-        }
-
         public static JsonSchemaProperty StringProperty(string? description = null, bool isRequired = false)
         {
             return Enrich(new JsonSchemaProperty { Type = JsonObjectType.String }, description, isRequired);
+        }
+
+        public static JsonSchemaProperty ObjectProperty(JsonSchema reference, string? description = null, bool isRequired = false)
+        {
+            return Enrich(new JsonSchemaProperty { Reference = reference }, description, isRequired);
         }
 
         public static JsonSchemaProperty JsonProperty(string? description = null, bool isRequired = false)

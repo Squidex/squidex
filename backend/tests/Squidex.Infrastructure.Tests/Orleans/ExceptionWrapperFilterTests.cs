@@ -6,11 +6,20 @@
 // ==========================================================================
 
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using FakeItEasy;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Clusters;
+using MongoDB.Driver.Core.Connections;
+using MongoDB.Driver.Core.Servers;
 using Orleans;
+using Orleans.Hosting;
+using Orleans.TestingHost;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
+
+#pragma warning disable SA1133 // Do not combine attributes
 
 namespace Squidex.Infrastructure.Orleans
 {
@@ -19,11 +28,41 @@ namespace Squidex.Infrastructure.Orleans
         private readonly IIncomingGrainCallContext context = A.Fake<IIncomingGrainCallContext>();
         private readonly ExceptionWrapperFilter sut;
 
+        public interface IExceptionGrain : IGrainWithStringKey
+        {
+            Task ThrowCustomAsync();
+
+            Task ThrowMongoAsync();
+        }
+
+        public sealed class ExceptionGrain : Grain, IExceptionGrain
+        {
+            public Task ThrowCustomAsync()
+            {
+                throw new InvalidException("My Message");
+            }
+
+            public Task ThrowMongoAsync()
+            {
+                var connection = new ConnectionId(new ServerId(new ClusterId(), new IPEndPoint(IPAddress.Loopback, 21017)), 1);
+
+                throw new MongoWriteException(connection, null, null, null);
+            }
+        }
+
         private sealed class InvalidException : Exception
         {
             public InvalidException(string message)
                 : base(message)
             {
+            }
+        }
+
+        public sealed class Configurator : ISiloConfigurator
+        {
+            public void Configure(ISiloBuilder siloBuilder)
+            {
+                siloBuilder.AddIncomingGrainCallFilter<ExceptionWrapperFilter>();
             }
         }
 
@@ -68,8 +107,41 @@ namespace Squidex.Infrastructure.Orleans
             var result = source.SerializeAndDeserializeBinary();
 
             Assert.Equal(result.ExceptionType, source.ExceptionType);
-
             Assert.Equal(result.Message, source.Message);
+        }
+
+        [Fact, Trait("Category", "Dependencies")]
+        public async Task Simple_grain_tests()
+        {
+            var cluster =
+                new TestClusterBuilder(1)
+                    .AddSiloBuilderConfigurator<Configurator>()
+                    .Build();
+
+            await cluster.DeployAsync();
+
+            var grain = cluster.GrainFactory.GetGrain<IExceptionGrain>(SingleGrain.Id);
+
+            var ex = await Assert.ThrowsAsync<OrleansWrapperException>(() => grain.ThrowCustomAsync());
+
+            Assert.Equal(typeof(InvalidException), ex.ExceptionType);
+        }
+
+        [Fact, Trait("Category", "Dependencies")]
+        public async Task Simple_grain_tests_with_mongo_exception()
+        {
+            var cluster =
+                new TestClusterBuilder(1)
+                    .AddSiloBuilderConfigurator<Configurator>()
+                    .Build();
+
+            await cluster.DeployAsync();
+
+            var grain = cluster.GrainFactory.GetGrain<IExceptionGrain>(SingleGrain.Id);
+
+            var ex = await Assert.ThrowsAsync<OrleansWrapperException>(() => grain.ThrowMongoAsync());
+
+            Assert.Equal(typeof(MongoWriteException), ex.ExceptionType);
         }
     }
 }

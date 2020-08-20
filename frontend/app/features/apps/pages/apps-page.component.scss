@@ -9,6 +9,12 @@
     }
 }
 
+.page {
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
 .card {
     & {
         @include hover-visible('.deeplinks', inline-block);

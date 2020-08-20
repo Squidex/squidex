@@ -43,23 +43,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 if (result.Count > 1)
                 {
-                    var edmName = result[1].UnescapeEdmField();
+                    var rootEdmName = result[1].UnescapeEdmField();
+                    var rootField = schema.FieldsByName[rootEdmName];
 
-                    if (!schema.FieldsByName.TryGetValue(edmName, out var field))
-                    {
-                        throw new NotSupportedException();
-                    }
+                    result[1] = rootField.Id.ToString();
 
-                    result[1] = field.Id.ToString();
-
-                    if (field is IArrayField arrayField && result.Count > 3)
+                    if (rootField is IArrayField arrayField && result.Count > 3)
                     {
                         var nestedEdmName = result[3].UnescapeEdmField();
-
-                        if (!arrayField.FieldsByName.TryGetValue(nestedEdmName, out var nestedField))
-                        {
-                            throw new NotSupportedException();
-                        }
+                        var nestedField = arrayField.FieldsByName[nestedEdmName];
 
                         result[3] = nestedField.Id.ToString();
                     }

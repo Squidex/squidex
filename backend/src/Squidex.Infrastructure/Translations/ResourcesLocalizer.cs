@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.Translations
 #endif
         }
 
-        public (string Result, bool NotFound) Get(CultureInfo culture, string key, string fallback, object? args = null)
+        public (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null)
         {
             Guard.NotNull(culture, nameof(culture));
             Guard.NotNullOrEmpty(key, nameof(key));
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Translations
 
             if (translation == null)
             {
-                return (fallback, true);
+                return (fallback, false);
             }
 
             if (args != null)
@@ -153,10 +153,10 @@ namespace Squidex.Infrastructure.Translations
 
                 sb.Append(span);
 
-                return (sb.ToString(), false);
+                return (sb.ToString(), true);
             }
 
-            return (translation, false);
+            return (translation, true);
         }
 
         private string? GetCore(CultureInfo culture, string key)

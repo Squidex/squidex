@@ -7,9 +7,8 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormArray, FormGroupDirective } from '@angular/forms';
-import { fadeAnimation, StatefulComponent, Types } from '@app/framework/internal';
+import { fadeAnimation, LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
 import { merge } from 'rxjs';
-import { formatError } from './error-formatting';
 
 interface State {
     // The error messages to show.
@@ -36,15 +35,13 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     @Input()
     public fieldName: string;
 
-    @Input()
-    public errors: string;
-
     public get isTouched() {
         return this.control.touched || Types.is(this.control, FormArray);
     }
 
     constructor(changeDetector: ChangeDetectorRef,
-        @Optional() @Host() private readonly formGroupDirective: FormGroupDirective
+        @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
+        private readonly localizer: LocalizerService
     ) {
         super(changeDetector, {
             errorMessages: []
@@ -62,9 +59,15 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             this.displayFieldName = this.fieldName;
         } else if (this.for) {
             if (Types.isString(this.for)) {
-                this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
+                let translation = this.localizer.get(`common.${this.for}`)!;
+
+                if (!translation) {
+                    translation = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
+                }
+
+                this.displayFieldName = translation;
             } else {
-                this.displayFieldName = 'field';
+                this.displayFieldName = this.localizer.get(`common.field`)!;
             }
         }
 
@@ -118,7 +121,40 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         if (this.control && this.control.invalid && this.isTouched && this.control.errors) {
             for (const key in <any>this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
-                    const message = formatError(this.displayFieldName, key, this.control.errors[key], this.control.value, this.errors);
+                    let type = key.toLowerCase();
+
+                    if (Types.isString(this.control.value)) {
+                        if (type === 'minlength') {
+                            type = 'minlengthstring';
+                        }
+
+                        if (type === 'maxlength') {
+                            type = 'maxlengthstring';
+                        }
+
+                        if (type === 'exactlylength') {
+                            type = 'exactlylengthstring';
+                        }
+
+                        if (type === 'betweenlength') {
+                            type = 'betweenlengthstring';
+                        }
+                    }
+
+                    const error = this.control.errors[key];
+
+                    let message: string | null = null;
+
+                    if (Types.isString(error['message'])) {
+                        message = this.localizer.get(error['message']);
+                    }
+
+                    if (!message) {
+                        const args = { ...error, field: this.displayFieldName };
+
+                        message = this.localizer.getOrKey(`validation.${type}`, args);
+
+                    }
 
                     if (message) {
                         errors.push(message);

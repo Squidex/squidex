@@ -52,14 +52,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (workflow.Initial == Status.Published)
                 {
-                    e(T.Get("workflows.initialNotPublished"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
+                    e(T.Get("workflows.publishedIsInitial"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
                 }
 
                 var stepsPrefix = $"{nameof(command.Workflow)}.{nameof(workflow.Steps)}";
 
                 if (!workflow.Steps.ContainsKey(Status.Published))
                 {
-                    e(T.Get("apps.workflows.initialNotPublished"), stepsPrefix);
+                    e(T.Get("workflows.publishedNotDefined"), stepsPrefix);
                 }
 
                 foreach (var step in workflow.Steps)
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                             if (!workflow.Steps.ContainsKey(status))
                             {
-                                e(T.Get("apps.workflows.publishedStepNotFound"), transitionPrefix);
+                                e(T.Get("workflows.publishedStepNotFound"), transitionPrefix);
                             }
 
                             if (transition == null)

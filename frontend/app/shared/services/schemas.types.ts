@@ -21,37 +21,37 @@ export type FieldType =
 export const fieldTypes: ReadonlyArray<{ type: FieldType, description: string }> = [
     {
         type: 'String',
-        description: 'Titles, names, paragraphs.'
+        description: 'i18n:schemas.fieldTypes.string.description'
     }, {
         type: 'Assets',
-        description: 'Images, videos, documents.'
+        description: 'i18n:schemas.fieldTypes.assets.description'
     }, {
         type: 'Boolean',
-        description: 'Yes or no, true or false.'
+        description: 'i18n:schemas.fieldTypes.boolean.description'
     }, {
         type: 'DateTime',
-        description: 'Events date, opening hours.'
+        description: 'i18n:schemas.fieldTypes.dateTime.description'
     }, {
         type: 'Geolocation',
-        description: 'Coordinates: latitude and longitude.'
+        description: 'i18n:schemas.fieldTypes.geolocation.description'
     }, {
         type: 'Json',
-        description: 'Data in JSON format, for developers.'
+        description: 'i18n:schemas.fieldTypes.json.description'
     }, {
         type: 'Number',
-        description: 'ID, order number, rating, quantity.'
+        description: 'i18n:schemas.fieldTypes.number.description'
     }, {
         type: 'References',
-        description: 'Links to other content items.'
+        description: 'i18n:schemas.fieldTypes.references.description'
     }, {
         type: 'Tags',
-        description: 'Special format for tags.'
+        description: 'i18n:schemas.fieldTypes.tags.description'
     }, {
         type: 'Array',
-        description: 'List of embedded objects.'
+        description: 'i18n:schemas.fieldTypes.array.description'
     }, {
         type: 'UI',
-        description: 'Separator for editing UI.'
+        description: 'i18n:schemas.fieldTypes.ui.description'
     }
 ];
 

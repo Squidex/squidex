@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
                     foreach (var (key, propertyDescriptor) in obj.GetOwnProperties())
                     {
-                        contentField.Put(key, propertyDescriptor.Value, true);
+                        contentField.Set(key, propertyDescriptor.Value);
                     }
 
                     this.value = contentField;

@@ -66,7 +66,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                     }
                 }
             } else {
-                value = formatted = '- No Value -';
+                value = formatted = '-';
             }
 
             return { value, formatted };

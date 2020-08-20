@@ -1,12 +1,10 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg"  fullHeight="true" grid="true" flexBody="true">
+<sqx-modal-dialog (close)="emitComplete()" size="lg" fullHeight="true" grid="true" flexBody="true">
     <ng-container title>
         <div class="row">
             <div class="col-selector">
-                <select class="form-control form-control-dark"
-                    [ngModel]="schema?.id"
-                    (ngModelChange)="selectSchema($event)">
+                <select class="form-control form-control-dark" [ngModel]="schema?.id" (ngModelChange)="selectSchema($event)">
                     <option *ngFor="let schema of schemas" [ngValue]="schema.id">
-                        Select {{schema.displayName}}
+                        {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
                     </option>
                 </select>
             </div>
@@ -22,7 +20,7 @@
                     </button>
                 </div>
                 <div class="col pl-1">
-                    <sqx-search-form formClass="form" placeholder="Fulltext search"
+                    <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}" 
                         [query]="contentsState.contentsQuery | async"
                         [queryModel]="queryModel"
                         (queryChange)="search($event)">
@@ -46,7 +44,7 @@
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
+                                    <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)">
                                 </th>
                                 <th sqxContentListCell="meta.lastModifiedBy.avatar">
                                     <sqx-content-list-header field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
@@ -87,7 +85,12 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn btn-secondary" (click)="emitComplete()">Cancel</button>
-        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0">Link selected contents ({{selectionCount}})</button>
+        <button type="button" class="btn btn-secondary" (click)="emitComplete()">
+            {{ 'common.cancel' | sqxTranslate }}
+        </button>
+
+        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0">
+            {{ 'contents.referencesLink' | sqxTranslate: { count: selectionCount} }})
+        </button>
     </ng-container>
 </sqx-modal-dialog>

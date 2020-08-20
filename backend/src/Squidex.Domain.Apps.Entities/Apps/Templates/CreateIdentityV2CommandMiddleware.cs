@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Fluid;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
 using Squidex.Infrastructure;

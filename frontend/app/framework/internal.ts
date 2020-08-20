@@ -22,6 +22,7 @@ export * from './services/resource-loader.service';
 export * from './services/shortcut.service';
 export * from './services/temp.service';
 export * from './services/title.service';
+export * from './services/localizer.service';
 export * from './utils/array-helper';
 export * from './utils/date-helper';
 export * from './utils/date-time';

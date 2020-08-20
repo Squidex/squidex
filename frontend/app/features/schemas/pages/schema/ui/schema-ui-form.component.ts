@@ -10,6 +10,11 @@ import { SchemaDetailsDto, SchemasState } from '@app/shared';
 
 type State = { fieldsInLists: ReadonlyArray<string>, fieldsInReferences: ReadonlyArray<string> };
 
+const TABS: ReadonlyArray<string> = [
+    'i18n:schemas.listFields',
+    'i18n:schemas.referenceFields'
+];
+
 @Component({
     selector: 'sqx-schema-ui-form',
     styleUrls: ['./schema-ui-form.component.scss'],
@@ -19,7 +24,7 @@ export class SchemaUIFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDetailsDto;
 
-    public selectableTabs: ReadonlyArray<string> = ['List Fields', 'Reference Fields'];
+    public selectableTabs = TABS;
     public selectedTab = this.selectableTabs[0];
 
     public isEditable = false;

@@ -130,17 +130,11 @@
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>Cannot remove a role when a contributor is assigned.</value>
   </data>
-  <data name="apps.workflows.initialNotPublished" xml:space="preserve">
-    <value>Workflow must have a published step.</value>
-  </data>
-  <data name="apps.workflows.publishedStepNotFound" xml:space="preserve">
-    <value>Transition has an invalid target.</value>
-  </data>
   <data name="aspnet_annotations_AbsoluteUrl" xml:space="preserve">
     <value>The field {0} must be an absolute URL.</value>
   </data>
   <data name="aspnet_annotations_Compare" xml:space="preserve">
-    <value>The field {0} must be the same as {1}.</value>
+    <value>The field {0} must be the same as {other|lower}.</value>
   </data>
   <data name="aspnet_annotations_Required" xml:space="preserve">
     <value>The field {0} is required.</value>
@@ -219,6 +213,9 @@
   </data>
   <data name="common.fieldIds" xml:space="preserve">
     <value>Field IDs</value>
+  </data>
+  <data name="common.fieldName" xml:space="preserve">
+    <value>Field name</value>
   </data>
   <data name="common.file" xml:space="preserve">
     <value>File</value>
@@ -730,9 +727,6 @@
   <data name="schemas.fieldIsLocked" xml:space="preserve">
     <value>Schema field is locked.</value>
   </data>
-  <data name="schemas.fieldName" xml:space="preserve">
-    <value>Field name</value>
-  </data>
   <data name="schemas.fieldNameAlreadyExists" xml:space="preserve">
     <value>A field with the same name already exists.</value>
   </data>
@@ -997,6 +991,9 @@
   <data name="validation.lessThan" xml:space="preserve">
     <value>{property|upper} must be less than {other|lower}.</value>
   </data>
+  <data name="validation.notAnImage" xml:space="preserve">
+    <value>Picture is not a valid image.</value>
+  </data>
   <data name="validation.onlyOneFile" xml:space="preserve">
     <value>Can only upload one file.</value>
   </data>
@@ -1015,14 +1012,17 @@
   <data name="validation.valid" xml:space="preserve">
     <value>{property|upper} is not a valid value.</value>
   </data>
-  <data name="valiodation.notAnImage" xml:space="preserve">
-    <value>Picture is not a valid image.</value>
-  </data>
-  <data name="workflows.initialNotPublished" xml:space="preserve">
-    <value>Initial step cannot be published step.</value>
-  </data>
   <data name="workflows.overlap" xml:space="preserve">
     <value>Multiple workflows cover all schemas.</value>
+  </data>
+  <data name="workflows.publishedIsInitial" xml:space="preserve">
+    <value>Initial step cannot be published step.</value>
+  </data>
+  <data name="workflows.publishedNotDefined" xml:space="preserve">
+    <value>Workflow must have a published step.</value>
+  </data>
+  <data name="workflows.publishedStepNotFound" xml:space="preserve">
+    <value>Transition has an invalid target.</value>
   </data>
   <data name="workflows.schemaOverlap" xml:space="preserve">
     <value>The schema '{schema}' is covered by multiple workflows.</value>

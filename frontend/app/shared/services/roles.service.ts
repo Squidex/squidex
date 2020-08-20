@@ -63,7 +63,7 @@ export class RolesService {
             mapVersioned(({ body }) => {
                 return parseRoles(body);
             }),
-            pretifyError('Failed to load roles. Please reload.'));
+            pretifyError('i18n:roles.loadFailed'));
     }
 
     public postRole(appName: string, dto: CreateRoleDto, version: Version): Observable<RolesDto> {
@@ -76,7 +76,7 @@ export class RolesService {
             tap(() => {
                 this.analytics.trackEvent('Role', 'Created', appName);
             }),
-            pretifyError('Failed to add role. Please reload.'));
+            pretifyError('i18n:roles.addFailed'));
     }
 
     public putRole(appName: string, resource: Resource, dto: UpdateRoleDto, version: Version): Observable<RolesDto> {
@@ -91,7 +91,7 @@ export class RolesService {
             tap(() => {
                 this.analytics.trackEvent('Role', 'Updated', appName);
             }),
-            pretifyError('Failed to revoke role. Please reload.'));
+            pretifyError('i18n:roles.updateFailed'));
     }
 
     public deleteRole(appName: string, resource: Resource, version: Version): Observable<RolesDto> {
@@ -106,14 +106,14 @@ export class RolesService {
             tap(() => {
                 this.analytics.trackEvent('Role', 'Deleted', appName);
             }),
-            pretifyError('Failed to revoke role. Please reload.'));
+            pretifyError('i18n:roles.revokeFailed'));
     }
 
     public getPermissions(appName: string): Observable<ReadonlyArray<string>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles/permissions`);
 
         return this.http.get<string[]>(url).pipe(
-            pretifyError('Failed to load permissions. Please reload.'));
+            pretifyError('i18n:roles.loadPermissionsFailed'));
     }
 }
 

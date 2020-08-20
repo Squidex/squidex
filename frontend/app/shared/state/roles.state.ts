@@ -67,7 +67,7 @@ export class RolesState extends State<Snapshot> {
         return this.rolesService.getRoles(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Roles reloaded.');
+                    this.dialogs.notifyInfo('i18n:roles.reloaded');
                 }
 
                 this.replaceRoles(payload, version);

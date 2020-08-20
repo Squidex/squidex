@@ -67,7 +67,7 @@ export class ClientsState extends State<Snapshot> {
         return this.clientsService.getClients(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Clients reloaded.');
+                    this.dialogs.notifyInfo('i18n:clients.reloaded');
                 }
 
                 this.replaceClients(payload, version);

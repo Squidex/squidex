@@ -52,7 +52,7 @@ export class ModalDialogComponent implements AfterViewInit {
 
     public ngAfterViewInit() {
         this.hideWhenEmpty(this.tabsElement);
-        this.hideParentWhenEmpty(this.footerElement);
+        this.hideWhenEmpty(this.footerElement);
     }
 
     private hideWhenEmpty(element: ElementRef) {
@@ -61,16 +61,6 @@ export class ModalDialogComponent implements AfterViewInit {
 
             if (isEmpty) {
                 this.renderer.setStyle(element.nativeElement, 'display', 'none');
-            }
-        }
-    }
-
-    private hideParentWhenEmpty(element: ElementRef) {
-        if (element && element.nativeElement) {
-            const isEmpty = element.nativeElement.children.length === 0;
-
-            if (isEmpty) {
-                this.renderer.setStyle(element.nativeElement.parentNode, 'display', 'none');
             }
         }
     }

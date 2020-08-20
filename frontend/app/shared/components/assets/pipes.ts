@@ -57,16 +57,6 @@ export class AssetPreviewUrlPipe implements PipeTransform {
 })
 export class FileIconPipe implements PipeTransform {
     public transform(asset: { mimeType: string, fileType: string }): string {
-        const knownTypes = [
-            'doc',
-            'docx',
-            'pdf',
-            'ppt',
-            'pptx',
-            'video',
-            'xls',
-            'xlsx'
-        ];
 
         let mimeIcon: string;
 
@@ -75,9 +65,20 @@ export class FileIconPipe implements PipeTransform {
         if (mimeParts.length === 2 && mimeParts[0].toLowerCase() === 'video') {
             mimeIcon = 'video';
         } else {
-            mimeIcon = knownTypes.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
+            mimeIcon = KNOWN_TYPES.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
         }
 
         return `./images/asset_${mimeIcon}.svg`;
     }
 }
+
+const KNOWN_TYPES: ReadonlyArray<string> = [
+    'doc',
+    'docx',
+    'pdf',
+    'ppt',
+    'pptx',
+    'video',
+    'xls',
+    'xlsx'
+];

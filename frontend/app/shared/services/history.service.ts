@@ -95,6 +95,6 @@ export class HistoryService {
 
                 return history;
             }),
-            pretifyError('Failed to load history. Please reload.'));
+            pretifyError('i18n:history.loadFailed'));
     }
 }

@@ -106,7 +106,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
-            var response = CallsUsageDtoDto.FromStats(plan.MaxApiCalls, summary, details);
+            var response = CallsUsageDtoDto.FromStats(plan, summary, details);
 
             return Ok(response);
         }

@@ -12,12 +12,10 @@
                 </button>
             </div>
             <div class="input-group">
-                <input type="text" class="form-control form-date" [formControl]="dateControl" placeholder="Date"
-                    [class.form-date-only]="!showTime" [class.form-date-time-only]="showTime && shouldShowDateTimeModeButton" (blur)="callTouched()"
-                    maxlength="10" #dateInput />
+                <input type="text" class="form-control form-date" [formControl]="dateControl" placeholder="{{ 'common.date' | sqxTranslate }}" [class.form-date-only]="!showTime" [class.form-date-time-only]="showTime && shouldShowDateTimeModeButton" 
+                    (blur)="callTouched()" maxlength="10" #dateInput>
 
-                <input type="text" class="form-control form-time" [formControl]="timeControl" placeholder="Time"
-                    (blur)="callTouched()" *ngIf="showTime" />
+                <input type="text" class="form-control form-time" [formControl]="timeControl" placeholder="{{ 'common.time' | sqxTranslate }}" (blur)="callTouched()" *ngIf="showTime">
             </div>
 
             <button type="button" class="btn btn-text-secondary btn-sm btn-clear" [class.hidden]="!hasValue"
@@ -26,15 +24,13 @@
             </button>
         </div>
         <div class="form-group" *ngIf="showTime && shouldShowDateButtons">
-            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()"
-                title="Use Now">
-                Now
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="i18n:common.dateTimeEditor.nowTooltip">
+                {{ 'common.dateTimeEditor.now' | sqxTranslate }}
             </button>
         </div>
         <div class="form-group" *ngIf="!showTime && shouldShowDateButtons">
-            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()"
-                title="Use Today (UTC)">
-                Today
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="i18n:common.dateTimeEditor.todayTooltip">
+                {{ 'common.dateTimeEditor.today' | sqxTranslate }}
             </button>
         </div>
     </div>

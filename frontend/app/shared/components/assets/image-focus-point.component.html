@@ -1,28 +1,28 @@
 <div class="row">
     <div class="col-5">
-        <Label>Select position of focus point</Label>
+        <Label>{{ 'assets.editor.focusPointLabel' | sqxTranslate }}</Label>
 
         <div class="image">
             <div class="image-container absolute align-items-center justify-content-center">
                 <div>
-                    <img #image [src]="imageSource" />
+                    <img #image [src]="imageSource">
                 </div>
             </div>
         </div>
     </div>
     <div class="col-7">
-        <Label>Preview for different sizes</Label>
+        <Label>{{ 'assets.editor.focusPointPreview' | sqxTranslate }}</Label>
 
         <div class="preview preview-wide">
-            <img #previewWide [src]="imageSource" />
+            <img #previewWide [src]="imageSource">
         </div>
 
         <div class="preview-line2">
             <div class="preview preview-small absolute">
-                <img #previewSmall [src]="imageSource" />
+                <img #previewSmall [src]="imageSource">
             </div>
             <div class="preview preview-normal absolute">
-                <img #previewNormal [src]="imageSource" />
+                <img #previewNormal [src]="imageSource">
             </div>
         </div>
     </div>

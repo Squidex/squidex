@@ -3,7 +3,7 @@
         <div class="table-items-row" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
             <div class="languages-container">
                 <div class="languages-buttons">
-                    <button *ngIf="canTranslate" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="Autotranslate from master language">
+                    <button *ngIf="canTranslate" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="i18n:contents.autotranslate">
                         <i class="icon-translate"></i>
                     </button>
     
@@ -53,7 +53,7 @@
         <div class="table-items-row" *ngIf="!(formModelCompare!.hiddenChanges | async)">
             <div class="languages-container">
                 <div class="languages-buttons-compare">
-                    <sqx-field-languages 
+                    <sqx-field-languages
                         [field]="formModelCompare!.field"
                         (languageChange)="languageChange.emit($event)"
                         [language]="language"

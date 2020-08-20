@@ -70,7 +70,7 @@ export class AssetUploaderState extends State<Snapshot> {
 
         return this.upload(stream, MathHelper.guid(), file.name, asset  => {
             if (asset.isDuplicate) {
-                this.dialogs.notifyError('Asset has already been uploaded.');
+                this.dialogs.notifyError('i18n:assets.duplicateFile');
             } else if (target) {
                 target.addAsset(asset);
             }

@@ -1,17 +1,17 @@
 
 <div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_previewMode">PreviewMode</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_previewMode">{{ 'schemas.fieldTypes.assets.previewMode' | sqxTranslate }}</label>
 
         <div class="col-6">
             <select type="text" class="form-control" id="{{field.fieldId}}_previewMode" formControlName="previewMode">
-                <option value="ImageAndFileName">Thumbnail and file name</option>
-                <option value="Image">Only thumbnail or file name if not an image</option>
-                <option value="FileName">Only file name</option>
+                <option value="ImageAndFileName">{{ 'schemas.fieldTypes.assets.previewModeTumbnailName' | sqxTranslate }}</option>
+                <option value="Image">{{ 'schemas.fieldTypes.assets.previewModeTumbnailOrName' | sqxTranslate }}</option>
+                <option value="FileName">{{ 'schemas.fieldTypes.assets.previewModeName' | sqxTranslate }}</option>
             </select>
 
             <sqx-form-hint>
-                The preview mode for assets in content lists.
+                {{ 'schemas.fieldTypes.assets.previewModeHint' | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
@@ -19,14 +19,14 @@
     <div class="form-group row">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldResolveFirst" formControlName="resolveFirst" />
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldResolveFirst" formControlName="resolveFirst">
                 <label class="form-check-label" for="{{field.fieldId}}_fieldResolveFirst">
-                    Resolve first asset
+                    {{ 'schemas.fieldTypes.assets.resolve' | sqxTranslate }}
                 </label>
             </div>
 
             <sqx-form-hint>
-                Show the first referenced asset in the content list.
+                {{ 'schemas.fieldTypes.assets.resolveHint' | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>

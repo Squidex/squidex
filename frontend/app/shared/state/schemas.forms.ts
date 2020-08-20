@@ -28,7 +28,7 @@ export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes between.')
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:schemas.schemaNameValidationMessage')
                 ]
             ],
             isSingleton: false,
@@ -91,7 +91,11 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
                         Validators.required
                     ]
                 ],
-                condition: ''
+                condition: ['',
+                    [
+                        Validators.required
+                    ]
+                ]
             }));
     }
 
@@ -247,7 +251,7 @@ export class AddFieldForm extends Form<FormGroup, AddFieldDto> {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'Name must be a valid javascript name in camel case.')
+                    ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'i18n:schemas.field.nameValidationMessage')
                 ]
             ],
             isLocalizable: false

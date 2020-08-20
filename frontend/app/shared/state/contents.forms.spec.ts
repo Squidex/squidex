@@ -523,7 +523,7 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldAssets);
 
-        expect(result).toEqual({ value: '- No Value -', formatted: '- No Value -' });
+        expect(result).toEqual({ value: '-', formatted: '-' });
     });
 
     it('should resolve string field from references value', () => {
@@ -585,7 +585,7 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldLocalized);
 
-        expect(result).toEqual({ value: '- No Value -', formatted: '- No Value -' });
+        expect(result).toEqual({ value: '-', formatted: '-' });
     });
 
     it('should resolve invariant field', () => {

@@ -22,42 +22,41 @@ namespace Squidex.Infrastructure.Translations
         [Fact]
         public void Should_return_key_if_not_found()
         {
-            var (result, notFound) = sut.Get(CultureInfo.CurrentUICulture, "key", "fallback");
+            var result = sut.Get(CultureInfo.CurrentUICulture, "key", "fallback");
 
-            Assert.Equal("fallback", result);
-            Assert.True(notFound);
+            Assert.Equal(("fallback", false), result);
         }
 
         [Fact]
         public void Should_return_simple_key()
         {
-            var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "simple", "fallback");
+            var result = sut.Get(CultureInfo.CurrentUICulture, "simple", "fallback");
 
-            Assert.Equal("Simple Result", result);
+            Assert.Equal(("Simple Result", true), result);
         }
 
         [Fact]
         public void Should_return_text_with_variable()
         {
-            var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "withVar", "fallback", new { var = 5 });
+            var result = sut.Get(CultureInfo.CurrentUICulture, "withVar", "fallback", new { var = 5 });
 
-            Assert.Equal("Var: 5.", result);
+            Assert.Equal(("Var: 5.", true), result);
         }
 
         [Fact]
-        public void Should_return_text_with_lower_var()
+        public void Should_return_text_with_lower_variable()
         {
-            var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "withLowerVar", "fallback", new { var = "Lower" });
+            var result = sut.Get(CultureInfo.CurrentUICulture, "withLowerVar", "fallback", new { var = "Lower" });
 
-            Assert.Equal("Var: lower.", result);
+            Assert.Equal(("Var: lower.", true), result);
         }
 
         [Fact]
-        public void Should_return_text_with_upper_var()
+        public void Should_return_text_with_upper_variable()
         {
-            var (result, _) = sut.Get(CultureInfo.CurrentUICulture, "withUpperVar", "fallback", new { var = "upper" });
+            var result = sut.Get(CultureInfo.CurrentUICulture, "withUpperVar", "fallback", new { var = "upper" });
 
-            Assert.Equal("Var: Upper.", result);
+            Assert.Equal(("Var: Upper.", true), result);
         }
     }
 }

@@ -8,14 +8,14 @@
             </a>
 
             <ng-container *ngIf="content else noContentTitle">
-                <sqx-title message="Edit Content"></sqx-title>
+                <sqx-title message="i18n:contents.editPageTitle"></sqx-title>
 
-                Edit Content
+                {{ 'contents.editTitle' | sqxTranslate }}
             </ng-container>
             <ng-template #noContentTitle>
-                <sqx-title message="New Content"></sqx-title>
+                <sqx-title message="i18n:contents.createPageTitle"></sqx-title>
 
-                New Content
+                {{ 'contents.createTitle' | sqxTranslate }}
             </ng-template>
         </ng-container>
  
@@ -35,9 +35,9 @@
                             <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
                                 <a class="dropdown-item dropdown-item-delete"
                                     (sqxConfirmClick)="delete()"
-                                    confirmTitle="Delete content"
-                                    confirmText="Do you really want to delete the content?">
-                                    Delete
+                                    confirmTitle="i18n:contents.deleteConfirmTitle"
+                                    confirmText="i18n:contents.deleteConfirmText">
+                                    {{ 'common.delete' | sqxTranslate }}
                                 </a>
                             </div>
                         </ng-container>
@@ -45,8 +45,8 @@
                 </ng-container>
 
                 <ng-container *ngIf="content?.canUpdate">
-                    <button type="submit" class="btn btn-primary ml-1" title="CTRL + S">
-                        Save
+                    <button type="submit" class="btn btn-primary ml-1" title="i18n:common.saveShortcut">
+                        {{ 'common.save' | sqxTranslate }}
                     </button>
 
                     <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
@@ -55,11 +55,11 @@
 
             <ng-template #noContent>
                 <button type="button" class="btn btn-secondary" (click)="save()" *ngIf="contentsState.canCreate | async">
-                    Save
+                    {{ 'common.save' | sqxTranslate }}
                 </button>
 
-                <button type="submit" class="btn btn-primary ml-1" title="CTRL + S" *ngIf="contentsState.canCreateAndPublish | async">
-                    Save and Publish
+                <button type="submit" class="btn btn-primary ml-1" title="i18n:common.saveShortcut" *ngIf="contentsState.canCreateAndPublish | async">
+                    {{ 'contents.saveAndPublish' | sqxTranslate }}
                 </button>
 
                 <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
@@ -73,10 +73,10 @@
                 <ng-container topHeader>
                     <div class="panel-alert panel-alert-danger" *ngIf="contentVersion">
                         <div class="float-right">
-                            <a class="force" (click)="loadLatest()">View latest</a>
+                            <a class="force" (click)="loadLatest()">{{ 'contents.viewLatest' | sqxTranslate }}</a>
                         </div>
-        
-                        Viewing <strong>version {{contentVersion}}</strong>.
+
+                        <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline"></div>
                     </div>
                 </ng-container>
 
@@ -97,16 +97,16 @@
 
         <ng-container sidebar>
             <div class="panel-nav">
-                <a class="panel-link" routerLink="history" routerLinkActive="active" title="Workflow" titlePosition="left" #linkHistory>
+                <a class="panel-link" routerLink="history" routerLinkActive="active" title="i18n:common.workflow" titlePosition="left" #linkHistory>
                     <i class="icon-time"></i>
                 </a>
 
-                <a class="panel-link" routerLink="comments" routerLinkActive="active" title="Comments" titlePosition="left">
+                <a class="panel-link" routerLink="comments" routerLinkActive="active" title="i18n:common.comments" titlePosition="left">
                     <i class="icon-comments"></i>
                 </a>
 
                 <sqx-onboarding-tooltip helpId="history" [for]="linkHistory" position="left-top" after="120000">
-                    The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
+                    {{ 'common.sidebarTour' | sqxTranslate }}
                 </sqx-onboarding-tooltip>
             </div>
         </ng-container>

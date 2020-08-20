@@ -66,7 +66,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
                         return empty();
                     } else {
-                        return throwError(new ErrorDto(403, 'You do not have the permissions to do this.'));
+                        return throwError(new ErrorDto(403, 'i18n:common.errorNoPermission'));
                     }
                 }
 

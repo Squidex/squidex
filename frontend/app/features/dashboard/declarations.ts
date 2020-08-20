@@ -10,6 +10,7 @@ export * from './pages/cards/api-calls-summary-card.component';
 export * from './pages/cards/api-card.component';
 export * from './pages/cards/api-performance-card.component';
 export * from './pages/cards/api-traffic-card.component';
+export * from './pages/cards/api-traffic-summary-card.component';
 export * from './pages/cards/asset-uploads-count-card.component';
 export * from './pages/cards/asset-uploads-size-card.component';
 export * from './pages/cards/asset-uploads-size-summary-card.component';

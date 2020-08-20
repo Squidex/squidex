@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Comments;
@@ -17,7 +18,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Comments.Guards
 {
-    public class GuardCommentsTests
+    public class GuardCommentsTests : IClassFixture<TranslationsFixture>
     {
         private readonly string commentsId = Guid.NewGuid().ToString();
         private readonly RefToken user1 = new RefToken(RefTokenType.Subject, "1");

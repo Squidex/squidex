@@ -188,7 +188,7 @@ export class AssetsState extends State<Snapshot> {
         return forkJoin(([assets$, assetFolders$, tags$])).pipe(
             tap(([assets, assetFolders, tagsAvailable]) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Assets reloaded.');
+                    this.dialogs.notifyInfo('i18n:assets.reloaded');
                 }
 
                 const path = assetFolders.path ?

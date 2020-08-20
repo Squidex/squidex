@@ -1,13 +1,13 @@
 <sqx-modal-dialog size="lg" fullHeight="true" (close)="emitComplete()" [showFooter]="step === 2 || step === 4">
     <ng-container title>
         <ng-container *ngIf="mode === 'EditTrigger'">
-            Edit Trigger
+            {{ 'rules.triggerEdit' | sqxTranslate }}
         </ng-container>
         <ng-container *ngIf="mode === 'EditAction'">
-            Edit Action
+            {{ 'rules.actionEdit' | sqxTranslate }}
         </ng-container>
         <ng-container *ngIf="mode === 'Wizard'">
-            Create new Rule
+            {{ 'rules.create' | sqxTranslate }}
         </ng-container>
     </ng-container>
 
@@ -16,21 +16,21 @@
             <ol class="breadcrumb steps">
                 <li class="breadcrumb-item" [class.active]="step === 1" [class.done]="step > 1">
                     <a class="force" (click)="go(1)" [class.disabled]="step <= 1">
-                        <i class="icon-checkmark"></i> Select Trigger
+                        <i class="icon-checkmark"></i> {{ 'rules.wizard.selectTrigger' | sqxTranslate }}
                     </a>
                 </li>
                 <li class="breadcrumb-item" [class.active]="step === 2" [class.done]="step > 2">
                     <a class="force" (click)="go(2)" [class.disabled]="step <= 2">
-                        <i class="icon-checkmark"></i> Edit Trigger
+                        <i class="icon-checkmark"></i> {{ 'rules.triggerEdit' | sqxTranslate }}
                     </a>
                 </li>
                 <li class="breadcrumb-item" [class.active]="step === 3" [class.done]="step > 3">
                     <a class="force" (click)="go(3)" [class.disabled]="step <= 3">
-                        <i class="icon-checkmark"></i> Select Action
+                        <i class="icon-checkmark"></i> {{ 'rules.wizard.selectAction' | sqxTranslate }}
                     </a>
                 </li>
                 <li class="breadcrumb-item" [class.active]="step === 4">
-                    <i class="icon-checkmark"></i> Edit Action
+                    <i class="icon-checkmark"></i> {{ 'rules.actionEdit' | sqxTranslate }}
                 </li>
             </ol>
         </nav>
@@ -38,7 +38,7 @@
         <ng-container [ngSwitch]="step">
             <ng-container *ngSwitchCase="1">
                 <sqx-form-alert>
-                    The selection of the trigger type cannot be changed later.
+                    {{ 'rules.wizard.triggerHint' | sqxTranslate }}
                 </sqx-form-alert>
     
                 <div class="row no-gutters">
@@ -57,34 +57,23 @@
     
                     <ng-container [ngSwitch]="trigger.triggerType">
                         <ng-container *ngSwitchCase="'AssetChanged'">
-                            <sqx-asset-changed-trigger
-                                [trigger]="trigger"
-                                [triggerForm]="triggerForm.form">
+                            <sqx-asset-changed-trigger [trigger]="trigger" [triggerForm]="triggerForm.form">
                             </sqx-asset-changed-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Comment'">
-                            <sqx-comment-trigger
-                                [trigger]="trigger"
-                                [triggerForm]="triggerForm.form">
+                            <sqx-comment-trigger [trigger]="trigger" [triggerForm]="triggerForm.form">
                             </sqx-comment-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'ContentChanged'">
-                            <sqx-content-changed-trigger
-                                [schemas]="schemas"
-                                [trigger]="trigger"
-                                [triggerForm]="triggerForm.form">
+                            <sqx-content-changed-trigger [schemas]="schemas" [trigger]="trigger" [triggerForm]="triggerForm.form">
                             </sqx-content-changed-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'SchemaChanged'">
-                            <sqx-schema-changed-trigger
-                                [trigger]="trigger"
-                                [triggerForm]="triggerForm.form">
+                            <sqx-schema-changed-trigger [trigger]="trigger" [triggerForm]="triggerForm.form">
                             </sqx-schema-changed-trigger>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Usage'">
-                            <sqx-usage-trigger
-                                [trigger]="trigger"
-                                [triggerForm]="triggerForm.form">
+                            <sqx-usage-trigger [trigger]="trigger" [triggerForm]="triggerForm.form">
                             </sqx-usage-trigger>
                         </ng-container>
                     </ng-container>
@@ -92,7 +81,7 @@
             </ng-container>
             <ng-container *ngSwitchCase="3">
                 <sqx-form-alert marginTop="0">
-                    The selection of the action type cannot be changed later.
+                    {{ 'rules.wizard.actionHint' | sqxTranslate }}
                 </sqx-form-alert>
     
                 <div class="row no-gutters">
@@ -109,11 +98,7 @@
                         {{actionElement.display}}
                     </h3>
     
-                    <sqx-generic-action
-                        [definition]="actionElement"
-                        [action]="action"
-                        [actionForm]="actionForm.form">
-                    </sqx-generic-action>
+                    <sqx-generic-action [definition]="actionElement" [action]="action" [actionForm]="actionForm.form"></sqx-generic-action>
                 </form>
             </ng-container>
         </ng-container>
@@ -121,14 +106,14 @@
 
     <ng-container footer>
         <ng-container *ngIf="step === 2 || step === 4">
-            <button type="button" class="btn btn-secondary" (click)="emitComplete()">Cancel</button>
+            <button type="button" class="btn btn-secondary" (click)="emitComplete()">{{ 'common.cancel' | sqxTranslate }}</button>
         </ng-container>
 
         <ng-container *ngIf="isEditable">
-            <button *ngIf="step === 2 &&  isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">Next</button>
-            <button *ngIf="step === 2 && !isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">Save</button>
+            <button *ngIf="step === 2 &&  isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">{{ 'common.continue' | sqxTranslate }}</button>
+            <button *ngIf="step === 2 && !isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">{{ 'common.save' | sqxTranslate }}</button>
 
-            <button *ngIf="step === 4" type="submit" class="btn btn-primary" (click)="saveAction()">Save</button>
+            <button *ngIf="step === 4" type="submit" class="btn btn-primary" (click)="saveAction()">{{ 'common.save' | sqxTranslate }}</button>
         </ng-container>
     </ng-container>
 </sqx-modal-dialog>

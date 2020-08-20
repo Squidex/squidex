@@ -1,11 +1,11 @@
 <form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
     <div class="card mb-2">
-        <div class="card-header">Field rules</div>
+        <div class="card-header">{{ 'schemas.rules.title' | sqxTranslate }}</div>
 
         <div class="card-body">
             <div class="content">
                 <div class="mt-4" *ngIf="!isEditable && editForm.form.controls.length === 0">
-                    No field rules configured.
+                    {{ 'schemas.rules.empty' | sqxTranslate }}
                 </div>
 
                 <div class="form-group row no-gutters" *ngFor="let form of editForm.form.controls; let i = index" [formGroup]="form">
@@ -28,21 +28,20 @@
                     </div>
 
                     <div class="col-auto pr-1">
-                        <div class="label text-muted">when</div>
+                        <div class="label text-muted">{{ 'schemas.rules.when' | sqxTranslate }}</div>
                     </div>
 
                     <div class="col pr-1">
                         <sqx-control-errors for="condition"></sqx-control-errors>
 
-                        <input type="text" class="form-control" formControlName="condition" placeholder="Condition in Javascript" />
+                        <input type="text" class="form-control" formControlName="condition" placeholder="{{ 'schemas.rules.condition' | sqxTranslate }}">
                     </div>
 
                     <div class="col-auto">
-                        <button type="button" class="btn btn-text-danger"
-                            [disabled]="!isEditable"
+                        <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
                             (sqxConfirmClick)="editForm.remove(i)"
-                            confirmTitle="Remove url" 
-                            confirmText="Do you really want to remove this rule?">
+                            confirmTitle="i18n:schemas.deleteRuleConfirmTitle"
+                            confirmText="i18n:schemas.deleteRuleConfirmText">
                             <i class="icon-bin2"></i>
                         </button>
                     </div>
@@ -50,19 +49,19 @@
 
                 <div class="form-group row no-gutters" *ngIf="isEditable">
                     <div class="col col-action pr-1">
-                        <div class="form-control preview">Disable</div>
+                        <div class="form-control preview">{{ 'schemas.rules.action' | sqxTranslate }}</div>
                     </div>
 
                     <div class="col-3 pr-1">
-                        <div class="form-control preview">Field</div>
+                        <div class="form-control preview">{{ 'common.field' | sqxTranslate }}</div>
                     </div>
 
                     <div class="col-auto pr-1">
-                        <div class="label text-muted">when</div>
+                        <div class="label text-muted">{{ 'schemas.rules.when' | sqxTranslate }}</div>
                     </div>
 
                     <div class="col pr-1">
-                        <div class="form-control preview">Condition in Javascript</div>
+                        <div class="form-control preview">{{ 'schemas.rules.condition' | sqxTranslate }}</div>
                     </div>
 
                     <div class="col-auto">
@@ -74,7 +73,7 @@
             </div>
         </div>
         <div class="card-footer" *ngIf="isEditable">
-            <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">Save</button>
+            <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">{{ 'common.save' | sqxTranslate }}</button>
         </div>
     </div>
 </form>

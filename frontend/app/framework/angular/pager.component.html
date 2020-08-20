@@ -8,7 +8,7 @@
         </select>
 
         <span class="page-info">
-            <span *ngIf="pager.numberOfItems > 0" class="pagination-text">{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}</span>
+            <span *ngIf="pager.numberOfItems > 0" class="pagination-text">{{ 'common.pagerInfo' | sqxTranslate: pager }}</span>
     
             <button type="button" class="btn btn-text-secondary pagination-button" [disabled]="!pager.canGoPrev" (click)="goPrev()">
                 <i class="icon-angle-left"></i>

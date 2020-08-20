@@ -1,8 +1,8 @@
-<sqx-title message="Assets"></sqx-title>
+<sqx-title message="i18n:assets.listPageTitle"></sqx-title>
 
 <sqx-panel desiredWidth="*" minWidth="50rem" showSidebar="true" grid="true">
     <ng-container title>
-        Assets
+        {{ 'common.assets' | sqxTranslate }}
     </ng-container>
     
     <ng-container menu>
@@ -10,14 +10,14 @@
             <div class="col-auto offset-xl-2">
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:assets.refreshTooltip">
+                    <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
             <div class="col pl-1" style="width: 300px">
                 <div class="row no-gutters search">
                     <div class="col-6">
-                        <sqx-tag-editor class="tags" singleLine="true" placeholder="Search by tags"
+                        <sqx-tag-editor class="tags" singleLine="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
                             [suggestions]="assetsState.tagsNames | async"
                             [ngModel]="assetsState.selectedTagNames | async"
                             (ngModelChange)="selectTags($event)"
@@ -25,7 +25,7 @@
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">
-                        <sqx-search-form formClass="form" placeholder="Search by name" fieldExample="fileSize"
+                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize"
                             [query]="assetsState.assetsQuery | async"
                             [queries]="queries"
                             (queryChange)="search($event)"
@@ -47,7 +47,7 @@
             <div class="col-auto pl-1">
                 <sqx-shortcut keys="ctrl+shift+g" (trigger)="reload()"></sqx-shortcut>
 
-                <button type="button" class="btn btn-success" (click)="addAssetFolderDialog.show()" title="Create new folder (CTRL + SHIFT + G)">
+                <button type="button" class="btn btn-success" (click)="addAssetFolderDialog.show()" title="i18n:assets.createFolderTooltip">
                     <i class="icon-create_new_folder"></i>
                 </button>
             </div>
@@ -57,9 +57,7 @@
     <ng-container content>
         <sqx-list-view [isLoading]="assetsState.isLoading | async">
             <ng-container header>
-                <sqx-asset-path [path]="assetsState.path | async"
-                    (navigate)="assetsState.navigate($event)">
-                </sqx-asset-path>
+                <sqx-asset-path [path]="assetsState.path | async" (navigate)="assetsState.navigate($event)"></sqx-asset-path>
             </ng-container>
 
             <div content>
@@ -74,7 +72,7 @@
 
     <ng-container sidebar>   
         <div class="panel-nav">
-            <a class="panel-link" routerLink="filters" routerLinkActive="active" title="Filters" titlePosition="left">
+            <a class="panel-link" routerLink="filters" routerLinkActive="active" title="i18n:common.filters" titlePosition="left">
                 <i class="icon-filter"></i>
             </a>    
         </div> 
@@ -82,9 +80,7 @@
 </sqx-panel>
 
 <ng-container *sqxModal="addAssetFolderDialog">
-    <sqx-asset-folder-dialog
-        (complete)="addAssetFolderDialog.hide()">
-    </sqx-asset-folder-dialog>
+    <sqx-asset-folder-dialog (complete)="addAssetFolderDialog.hide()"></sqx-asset-folder-dialog>
 </ng-container>
 
 <router-outlet></router-outlet>

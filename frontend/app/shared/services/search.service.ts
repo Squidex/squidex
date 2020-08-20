@@ -49,6 +49,6 @@ export class SearchService {
 
                 return results;
             }),
-            pretifyError('Failed to make search. Please reload.'));
+            pretifyError('i18n:search.searchFailed'));
     }
 }

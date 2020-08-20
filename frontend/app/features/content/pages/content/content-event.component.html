@@ -1,6 +1,6 @@
 <div class="event row no-gutters">
     <div class="col-auto">
-        <img class="user-picture" title="{{event.actor | sqxUserNameRef}}" [src]="event.actor | sqxUserPictureRef" />
+        <img class="user-picture" title="{{event.actor | sqxUserNameRef}}" [src]="event.actor | sqxUserPictureRef">
     </div>
     <div class="col pl-2 event-right">
         <div class="event-message">
@@ -11,11 +11,11 @@
         <div class="event-created">{{event.created | sqxFromNow}}</div>
 
         <ng-container *ngIf="canLoadOrCompare">
-            <a class="event-load force" (click)="dataLoad.emit()">Load</a> 
+            <a class="event-load force" (click)="dataLoad.emit()">{{ 'contents.loadContent' | sqxTranslate }}</a> 
             
             &middot; 
 
-            <a class="event-load force" (click)="dataCompare.emit()">Compare</a> 
+            <a class="event-load force" (click)="dataCompare.emit()">{{ 'contents.versionCompare' | sqxTranslate }}</a> 
         </ng-container>
     </div>
 </div>

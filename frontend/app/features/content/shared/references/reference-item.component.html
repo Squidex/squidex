@@ -3,7 +3,7 @@
         <ng-content></ng-content>
     </td>
 
-    <td sqxContentListCell="meta.lastModifiedBy.avatar">
+    <td class="content-field" sqxContentListCell="meta.lastModifiedBy.avatar">
         <sqx-content-list-field field="meta.lastModifiedBy.avatar" [content]="content" [language]="language"></sqx-content-list-field>
     </td>
 
@@ -22,7 +22,7 @@
             </button>
 
             <div class="reference-menu">
-                <a class="btn btn-text-secondary" [routerLink]="['../..', content.schemaName, content.id]">
+                <a class="btn btn-text-secondary" target="_blank" [routerLink]="['../..', content.schemaName, content.id]">
                     <i class="icon-pencil"></i>
                 </a>
 

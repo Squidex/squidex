@@ -27,6 +27,7 @@ export class PlanDto {
         public readonly yearlyId: string,
         public readonly yearlyCosts: string,
         public readonly yearlyConfirmText: string | undefined,
+        public readonly maxApiBytes: number,
         public readonly maxApiCalls: number,
         public readonly maxAssetSize: number,
         public readonly maxContributors: number
@@ -72,6 +73,7 @@ export class PlansService {
                             item.yearlyId,
                             item.yearlyCosts,
                             item.yearlyConfirmText,
+                            item.maxApiBytes,
                             item.maxApiCalls,
                             item.maxAssetSize,
                             item.maxContributors)),
@@ -80,7 +82,7 @@ export class PlansService {
 
                 return plans;
             }),
-            pretifyError('Failed to load plans. Please reload.'));
+            pretifyError('i18n:plans.loadFailed'));
     }
 
     public putPlan(appName: string, dto: ChangePlanDto, version: Version): Observable<Versioned<PlanChangedDto>> {
@@ -93,6 +95,6 @@ export class PlansService {
             tap(() => {
                 this.analytics.trackEvent('Plan', 'Changed', appName);
             }),
-            pretifyError('Failed to change plan. Please reload.'));
+            pretifyError('i18n:plans.changeFailed'));
     }
 }

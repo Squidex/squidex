@@ -14,7 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
-import { ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
+import { ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
 
 export function configApiUrl() {
@@ -42,7 +42,7 @@ export function configUIOptions() {
 }
 
 export function configTitles() {
-    return new TitlesConfig(undefined, 'Squidex Headless CMS');
+    return new TitlesConfig(undefined, 'i18n:common.product');
 }
 
 export function configDecimalSeparator() {
@@ -51,6 +51,14 @@ export function configDecimalSeparator() {
 
 export function configCurrency() {
     return new CurrencyConfig('EUR', '€', true);
+}
+
+export function configTranslations() {
+    if (process.env.NODE_ENV === 'production') {
+        return new LocalizerService(window['texts']);
+    } else {
+        return new LocalizerService(require('./../../backend/i18n/frontend_en.json')).logMissingKeys();
+    }
 }
 
 @NgModule({
@@ -75,6 +83,7 @@ export function configCurrency() {
         { provide: CurrencyConfig, useFactory: configCurrency },
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
         { provide: TitlesConfig, useFactory: configTitles },
+        { provide: LocalizerService, useFactory: configTranslations },
         { provide: UIOptions, useFactory: configUIOptions }
     ],
     entryComponents: [AppComponent]

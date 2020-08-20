@@ -256,27 +256,27 @@ const DEFAULT_FIELDS: QueryModelFields = {
     created: {
         ...TypeDateTime,
         displayName: MetaFields.created,
-        description: 'The date time when the content item was created.'
+        description: 'i18n:contents.createFieldDescription'
     },
     createdBy: {
         ...TypeString,
         displayName: 'meta.createdBy',
-        description: 'The user who created the content item.'
+        description: 'i18n:contents.createdByFieldDescription'
     },
     lastModified: {
         ...TypeDateTime,
         displayName: MetaFields.lastModified,
-        description: 'The date time when the content item was modified the last time.'
+        description: 'i18n:contents.lastModifiedFieldDescription'
     },
     lastModifiedBy: {
         ...TypeString,
         displayName: 'meta.lastModifiedBy',
-        description: 'The user who modified the content item the last time.'
+        description: 'i18n:contents.lastModifiedByFieldDescription'
     },
     version: {
         ...TypeNumber,
         displayName: MetaFields.version,
-        description: 'The version of the content item'
+        description: 'i18n:contents.versionFieldDescription'
     }
 };
 
@@ -291,7 +291,7 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
         model.fields['status'] = {
              ...TypeStatus,
              displayName: MetaFields.status,
-             description: 'The status of the content item.',
+             description: 'i18n:contents.statusFieldDescription',
              extra: statuses
         };
     }

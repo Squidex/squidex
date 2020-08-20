@@ -4,7 +4,7 @@
             <a class="form-alert-close" (click)="close()">
                 <i class="icon-close"></i>
             </a>
-            <div [innerHTML]="error?.displayMessage | sqxMarkdown"></div>
+            <div [innerHTML]="error | sqxTranslate | sqxMarkdown"></div>
         </div>
     </div>
 </ng-container>

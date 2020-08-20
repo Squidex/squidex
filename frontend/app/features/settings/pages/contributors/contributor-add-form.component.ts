@@ -75,9 +75,9 @@ export class ContributorAddFormComponent implements OnChanges {
                     this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
 
                     if (isCreated) {
-                        this.dialogs.notifyInfo('A new user with the entered email address has been created and assigned as contributor.');
+                        this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
                     } else {
-                        this.dialogs.notifyInfo('User has been added as contributor.');
+                        this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
                     }
                 }, error => {
                     this.assignContributorForm.submitFailed(error);

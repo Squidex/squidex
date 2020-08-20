@@ -27,7 +27,7 @@ export class WorkflowComponent implements OnChanges {
     @Input()
     public schemasSource: SchemaTagSource;
 
-    public error: string | null;
+    public error: ErrorDto | null;
 
     public isEditing = false;
     public isEditable = false;
@@ -60,7 +60,7 @@ export class WorkflowComponent implements OnChanges {
             .subscribe(() => {
                 this.error = null;
             }, (error: ErrorDto) => {
-                this.error = error.displayMessage;
+                this.error = error;
             });
     }
 

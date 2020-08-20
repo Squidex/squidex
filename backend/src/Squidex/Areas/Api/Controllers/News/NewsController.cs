@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers.News
         [Route("news/features/")]
         [ProducesResponseType(typeof(FeaturesDto), 200)]
         [ApiPermission]
-        public async Task<IActionResult> GetLanguages([FromQuery] int version = 0)
+        public async Task<IActionResult> GetNews([FromQuery] int version = 0)
         {
             var features = await featuresService.GetFeaturesAsync(version);
 
