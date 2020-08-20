@@ -573,6 +573,7 @@
   "schemas.addFieldAndClose": "Create and close",
   "schemas.addFieldAndCreate": "Create and add field",
   "schemas.addFieldAndEdit": "Create and edit field",
+  "schemas.addFieldButton": "Add Field",
   "schemas.addFieldFailed": "Failed to add field. Please reload.",
   "schemas.addNestedField": "Add Nested Field",
   "schemas.changeCategoryFailed": "Failed to change category. Please reload.",
