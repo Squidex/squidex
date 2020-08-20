@@ -6,11 +6,9 @@
  */
 
 import { addDays, addHours, addMilliseconds, addMinutes, addMonths, addSeconds, addYears, format, formatDistanceToNow, parse, parseISO, startOfDay, startOfMonth, startOfTomorrow, startOfWeek, startOfYesterday } from 'date-fns';
-import { enUS, nl } from 'date-fns/locale';
 import { DateHelper } from './date-helper';
 
 const DATE_FORMAT = 'yyyy-MM-dd';
-const LOCALES = { enUS, nl };
 
 export class DateTime {
     public get raw(): Date {
@@ -172,23 +170,23 @@ export class DateTime {
     }
 
     public toISODateUTC(): string {
-        return format(DateHelper.getUTCDate(this.value), DATE_FORMAT, { locale: this.getLocale() });
+        return format(DateHelper.getUTCDate(this.value), DATE_FORMAT, { locale: DateHelper.getFnsLocale() });
     }
 
     public toISODate(): string {
-        return format(this.value, DATE_FORMAT, { locale: this.getLocale() });
+        return format(this.value, DATE_FORMAT, { locale: DateHelper.getFnsLocale() });
     }
 
     public toStringFormat(pattern: string): string {
-        return format(this.value, pattern, { locale: this.getLocale() });
+        return format(this.value, pattern, { locale: DateHelper.getFnsLocale() });
     }
 
     public toStringFormatUTC(pattern: string): string {
-        return format(DateHelper.getUTCDate(this.value), pattern, { locale: this.getLocale() });
+        return format(DateHelper.getUTCDate(this.value), pattern, { locale: DateHelper.getFnsLocale() });
     }
 
     public toFromNow(): string {
-        return formatDistanceToNow(this.value, { locale: this.getLocale() });
+        return formatDistanceToNow(this.value, { locale: DateHelper.getFnsLocale() });
     }
 
     public toISOString(withoutMilliseconds = true): string {
@@ -199,10 +197,6 @@ export class DateTime {
         }
 
         return result;
-    }
-
-    private getLocale(): Locale {
-        return LOCALES[DateHelper.getLocale()] || enUS;
     }
 
 }
