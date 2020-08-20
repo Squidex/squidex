@@ -100,13 +100,13 @@ describe('FromNowPipe', () => {
     });
 
     it('should format to from now string in Dutch', () => {
+        DateHelper.setlocale('nl');
+        const pipe = new FromNowPipe();
+
+        const actual = pipe.transform(DateTime.now().addMinutes(-4));
+        const expected = '4 minuten';
+
         try {
-            DateHelper.setlocale('nl');
-            const pipe = new FromNowPipe();
-
-            const actual = pipe.transform(DateTime.now().addMinutes(-4));
-            const expected = '4 minuten';
-
             expect(actual).toBe(expected);
         } finally {
             DateHelper.setlocale(null);
