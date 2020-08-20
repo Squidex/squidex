@@ -78,7 +78,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [ApiCosts(0)]
         public async Task<IActionResult> PutPlan(string app, [FromBody] ChangePlanDto request)
         {
-            var context = await CommandBus.PublishAsync(request.ToCommand());
+            var context = await CommandBus.PublishAsync(request.ToCommand(HttpContext));
 
             string? redirectUri = null;
 

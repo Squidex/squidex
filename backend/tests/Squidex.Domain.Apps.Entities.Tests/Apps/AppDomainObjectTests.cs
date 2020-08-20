@@ -187,7 +187,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer))
                 .Returns(new PlanChangedResult());
 
             await ExecuteCreateAsync();
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>._, A<NamedId<Guid>>._, A<string?>._))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>._, A<NamedId<Guid>>._, A<string?>._, A<string?>._))
                 .MustNotHaveHappened();
         }
 
@@ -231,7 +231,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planIdFree, FromCallback = true };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer))
                 .Returns(new PlanChangedResult());
 
             await ExecuteCreateAsync();
@@ -248,19 +248,19 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     CreateEvent(new AppPlanReset())
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>._, A<NamedId<Guid>>._, planIdFree))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(A<string>._, A<NamedId<Guid>>._, planIdFree, A<string?>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task ChangePlan_should_reset_plan_for_reset_plan()
+        public async Task ChangePlan_should_reset_plan_for_free_plan()
         {
             var command = new ChangePlan { PlanId = planIdFree };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer))
                 .Returns(new PlanChangedResult());
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdFree))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdFree, command.Referer))
                 .Returns(new PlanChangedResult());
 
             await ExecuteCreateAsync();
@@ -283,7 +283,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, command.Referer))
                 .Returns(new RedirectToCheckoutResult(new Uri("http://squidex.io")));
 
             await ExecuteCreateAsync();
@@ -306,7 +306,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(new EntitySavedResult(4));
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, A<string?>._))
                 .MustNotHaveHappened();
         }
 
@@ -678,7 +678,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     CreateEvent(new AppArchived())
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppNamedId, null))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppNamedId, null, A<string?>._))
                 .MustHaveHappened();
         }
 
