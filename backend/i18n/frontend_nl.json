@@ -210,7 +210,7 @@
   "common.created": "Gemaakt",
   "common.date": "Datum",
   "common.dateTimeEditor.now": "Nu",
-  "common.dateTimeEditor.nowTooltip": "Nu gebruiken (UTC)",
+  "common.dateTimeEditor.nowTooltip": "Nu gebruiken",
   "common.dateTimeEditor.today": "Vandaag",
   "common.dateTimeEditor.todayTooltip": "Gebruik vandaag (UTC)",
   "common.delete": "Verwijderen",
