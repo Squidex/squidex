@@ -14,8 +14,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
-import { ApiUrlConfig, CurrencyConfig, DecimalSeparatorConfig, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
+import { ApiUrlConfig, CurrencyConfig, DateHelper, DecimalSeparatorConfig, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
+
+DateHelper.setlocale(window['options'].more.culture);
 
 export function configApiUrl() {
     const baseElements = document.getElementsByTagName('base');
@@ -57,7 +59,7 @@ export function configTranslations() {
     if (process.env.NODE_ENV === 'production') {
         return new LocalizerService(window['texts']);
     } else {
-        const culture = window['options'].more.culture;
+        const culture = DateHelper.getLocale();
 
         return new LocalizerService(require(`./../../backend/i18n/frontend_${culture}.json`)).logMissingKeys();
     }

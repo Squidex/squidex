@@ -178,15 +178,15 @@ export class DateTime {
     }
 
     public toStringFormat(pattern: string): string {
-        return format(this.value, pattern);
+        return format(this.value, pattern, { locale: DateHelper.getFnsLocale() });
     }
 
     public toStringFormatUTC(pattern: string): string {
-        return format(DateHelper.getUTCDate(this.value), pattern);
+        return format(DateHelper.getUTCDate(this.value), pattern, { locale: DateHelper.getFnsLocale() });
     }
 
     public toFromNow(): string {
-        return formatDistanceToNow(this.value);
+        return formatDistanceToNow(this.value, { locale: DateHelper.getFnsLocale() });
     }
 
     public toISOString(withoutMilliseconds = true): string {
