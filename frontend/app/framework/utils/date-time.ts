@@ -170,11 +170,11 @@ export class DateTime {
     }
 
     public toISODateUTC(): string {
-        return format(DateHelper.getUTCDate(this.value), DATE_FORMAT, { locale: DateHelper.getFnsLocale() });
+        return format(DateHelper.getUTCDate(this.value), DATE_FORMAT);
     }
 
     public toISODate(): string {
-        return format(this.value, DATE_FORMAT, { locale: DateHelper.getFnsLocale() });
+        return format(this.value, DATE_FORMAT);
     }
 
     public toStringFormat(pattern: string): string {
