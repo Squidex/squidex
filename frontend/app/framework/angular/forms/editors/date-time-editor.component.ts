@@ -122,8 +122,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     }
 
     public ngAfterViewInit() {
-        this.picker = new Pikaday({
-            field: this.dateInput.nativeElement, format: 'YYYY-MM-DD',
+        this.picker = new Pikaday({field: this.dateInput.nativeElement, format: 'YYYY-MM-DD',
             onSelect: () => {
                 if (this.suppressEvents) {
                     return;
@@ -196,20 +195,18 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         this.suppressEvents = true;
 
         if (this.dateTime && this.mode === 'DateTime') {
-
             if (this.isLocalMode) {
                 this.timeControl.setValue(this.dateTime.toStringFormat('HH:mm:ss'), NO_EMIT);
             } else {
                 this.timeControl.setValue(this.dateTime.toStringFormatUTC('HH:mm:ss'), NO_EMIT);
             }
-
         } else {
             this.timeControl.setValue(null, NO_EMIT);
         }
 
         if (this.dateTime && this.picker) {
-
             let dateString: string;
+
             if (this.showTime && this.isLocalMode) {
                 dateString = this.dateTime.toStringFormat('yyyy-MM-dd');
             } else {
@@ -243,17 +240,19 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         }
 
         if (parsed) {
-            let dateString: string;
-
             if (this.isLocalMode) {
-                dateString = parsed.toStringFormat('yyyy-MM-dd');
+                const dateString = parsed.toStringFormat('yyyy-MM-dd');
+
                 this.dateControl.setValue(dateString, NO_EMIT);
                 this.timeControl.setValue(parsed.toStringFormat('HH:mm:ss'), NO_EMIT);
+
                 this.picker.setDate(dateString);
             } else {
-                dateString = parsed.toStringFormatUTC('yyyy-MM-dd');
+                const dateString = parsed.toStringFormatUTC('yyyy-MM-dd');
+
                 this.dateControl.setValue(dateString, NO_EMIT);
                 this.timeControl.setValue(parsed.toStringFormatUTC('HH:mm:ss'), NO_EMIT);
+
                 this.picker.setDate(dateString);
             }
 
