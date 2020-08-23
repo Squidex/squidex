@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public string Secret { get; }
 
-        public bool AllowAnonymous { get; set; }
+        public bool AllowAnonymous { get; }
 
         public long ApiCallsLimit { get; }
 
@@ -28,13 +28,13 @@ namespace Squidex.Domain.Apps.Core.Apps
             Guard.NotNullOrEmpty(role, nameof(role));
             Guard.GreaterEquals(apiCallsLimit, 0, nameof(apiCallsLimit));
 
-            Role = role;
-
             Secret = secret;
 
             AllowAnonymous = allowAnonymous;
 
             ApiCallsLimit = apiCallsLimit;
+
+            Role = role;
         }
 
         [Pure]

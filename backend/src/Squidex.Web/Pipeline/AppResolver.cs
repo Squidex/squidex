@@ -51,16 +51,16 @@ namespace Squidex.Web.Pipeline
                     return;
                 }
 
-                var (role, permissions) = FindByOpenIdSubject(app, user);
+                var (role, permissions, apiCallsLimit) = FindByOpenIdSubject(app, user);
 
                 if (permissions == null)
                 {
-                    (role, permissions) = FindByOpenIdClient(app, user);
+                    (role, permissions, apiCallsLimit) = FindByOpenIdClient(app, user);
                 }
 
                 if (permissions == null)
                 {
-                    (role, permissions) = FindAnonymousClient(app);
+                    (role, permissions, apiCallsLimit) = FindAnonymousClient(app);
                 }
 
                 if (permissions != null)
@@ -132,45 +132,45 @@ namespace Squidex.Web.Pipeline
             return context.ActionDescriptor.EndpointMetadata.Any(x => x is AllowAnonymousAttribute);
         }
 
-        private static (string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
+        private static (string?, PermissionSet?, long) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
         {
             var (appName, clientId) = user.GetClient();
 
             if (app.Name != appName)
             {
-                return (null, null);
+                return (null, null, 0);
             }
 
             if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, out var role))
             {
-                return (client.Role, role.Permissions);
+                return (client.Role, role.Permissions, client.ApiCallsLimit);
             }
 
-            return (null, null);
+            return (null, null, 0);
         }
 
-        private static (string?, PermissionSet?) FindAnonymousClient(IAppEntity app)
+        private static (string?, PermissionSet?, long) FindAnonymousClient(IAppEntity app)
         {
             var client = app.Clients.Values.FirstOrDefault(x => x.AllowAnonymous);
 
             if (client != null && app.Roles.TryGet(app.Name, client.Role, out var role))
             {
-                return (client.Role, role.Permissions);
+                return (client.Role, role.Permissions, client.ApiCallsLimit);
             }
 
-            return (null, null);
+            return (null, null, 0);
         }
 
-        private static (string?, PermissionSet?) FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
+        private static (string?, PermissionSet?, long) FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
         {
             var subjectId = user.OpenIdSubject();
 
             if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGet(app.Name, roleName, out var role))
             {
-                return (roleName, role.Permissions);
+                return (roleName, role.Permissions, 0);
             }
 
-            return (null, null);
+            return (null, null, 0);
         }
     }
 }

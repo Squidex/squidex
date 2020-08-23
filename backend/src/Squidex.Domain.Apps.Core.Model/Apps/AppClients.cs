@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 throw new ArgumentException("Id already exists.", nameof(id));
             }
 
-            return With<AppClients>(id, new AppClient(id, secret, Role.Editor, false, 0));
+            return Add(id, new AppClient(id, secret, Role.Editor, false, 0));
         }
 
         [Pure]
