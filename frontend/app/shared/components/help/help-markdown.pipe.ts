@@ -11,7 +11,7 @@ import marked from 'marked';
 const renderer = new marked.Renderer();
 
 renderer.link = (href, _, text) => {
-    if (!href.startsWith('http')) {
+    if (href && !href.startsWith('http')) {
         href = `https://docs.squidex.io/${href}`;
     }
 

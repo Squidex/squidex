@@ -6,12 +6,14 @@
  */
 
 // tslint:disable: no-pipe-impure
+// tslint:disable: directive-class-suffix
 
-import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
+import { ChangeDetectorRef, Directive, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { ApiUrlConfig, UserDto, UsersProviderService } from '@app/shared/internal';
 import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+@Directive()
 class UserAsyncPipe implements OnDestroy {
     private lastUserId: string;
     private lastValue: string | undefined = undefined;

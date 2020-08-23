@@ -11,7 +11,7 @@ import marked from 'marked';
 const renderer = new marked.Renderer();
 
 renderer.link = (href, _, text) => {
-    if (href.startsWith('mailto')) {
+    if (href && href.startsWith('mailto')) {
         return text;
     } else {
         return `<a href="${href}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
