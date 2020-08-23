@@ -246,4 +246,35 @@ describe('DateTime', () => {
             expect(value.toStringFormatUTC('PPPp')).toBe(expected);
         });
     });
+
+    describe('for Italian locale', () => {
+        beforeEach(() => {
+            DateHelper.setlocale('it');
+        });
+
+        afterEach(() => {
+            DateHelper.setlocale(null);
+        });
+
+        it('should format to from now string', () => {
+            const value = DateTime.now().addMinutes(-4);
+            const expected = '4 minuti';
+
+            expect(value.toFromNow()).toBe(expected);
+        });
+
+        it('should format to string', () => {
+            const value = DateTime.parseISO('2020-07-23');
+            const expected = 'giovedì 23 luglio 2020';
+
+            expect(value.toStringFormat('PPPP')).toBe(expected);
+        });
+
+        it('should format to UTC string', () => {
+            const value = DateTime.parseISO('2020-05-23T12:00');
+            const expected = '23 maggio 2020 12:00';
+
+            expect(value.toStringFormatUTC('PPPp')).toBe(expected);
+        });
+    });
 });
