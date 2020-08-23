@@ -18,6 +18,14 @@ renderer.link = (href, _, text) => {
     }
 };
 
+const inlinerRenderer = new marked.Renderer();
+
+inlinerRenderer.paragraph = (text) => {
+    return text;
+};
+
+inlinerRenderer.link = renderer.link;
+
 @Pipe({
     name: 'sqxMarkdown',
     pure: true
@@ -39,7 +47,7 @@ export class MarkdownPipe implements PipeTransform {
 export class MarkdownInlinePipe implements PipeTransform {
     public transform(text: string | null | undefined): string {
         if (text) {
-            return marked.inlineLexer(text, [], { renderer });
+            return marked(text, { renderer: inlinerRenderer });
         } else {
             return '';
         }
