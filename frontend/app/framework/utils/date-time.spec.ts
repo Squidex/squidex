@@ -13,6 +13,10 @@ describe('DateTime', () => {
     const today2 = DateTime.today();
     const now = DateTime.now();
 
+    beforeEach(() => {
+        DateHelper.setlocale(null);
+    });
+
     it('should parse from iso string', () => {
         const actual = DateTime.parseISO('2013-10-16T12:13:14.125', false);
 
