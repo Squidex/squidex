@@ -77,16 +77,24 @@ namespace Squidex.Translator
                 new GenerateBackendResources(folder, service).Run();
             }
 
+            [Command(Name = "gen-frontend", Description = "Generate the frontend translations.")]
+            public void GenerateFrontend(TranslateArguments arguments)
+            {
+                var (folder, service) = Setup(arguments, "frontend");
+
+                new GenerateFrontendResources(folder, service).Run();
+            }
+
             [Command(Name = "gen-keys", Description = "Generate the keys for translations.")]
             public void GenerateBackendKeys(TranslateArguments arguments)
             {
-                var (folderBackend, serviceBackend) = Setup(arguments, "backend");
+                var (backendFolder, serviceBackend) = Setup(arguments, "backend");
 
-                new GenerateKeys(folderBackend, serviceBackend, "backend").Run();
+                new GenerateKeys(backendFolder, serviceBackend, "backend_keys.json").Run();
 
-                var (folderFrontend, serviceFrontend) = Setup(arguments, "frontend");
+                var (frontendFolder, frontendService) = Setup(arguments, "frontend");
 
-                new GenerateKeys(folderFrontend, serviceFrontend, "frontend").Run();
+                new GenerateKeys(frontendFolder, frontendService, "frontend_keys.json").Run();
             }
 
             [Command(Name = "migrate-backend", Description = "Migrate the backend files.")]
@@ -112,8 +120,10 @@ namespace Squidex.Translator
                     throw new ArgumentException("Folder does not exist.");
                 }
 
+                var locales = new string[] { "en", "nl" };
+
                 var translationsDirectory = new DirectoryInfo(Path.Combine(arguments.Folder, "backend", "i18n"));
-                var translationsService = new TranslationService(translationsDirectory, fileName, arguments.SingleWords);
+                var translationsService = new TranslationService(translationsDirectory, fileName, locales, arguments.SingleWords);
 
                 return (new DirectoryInfo(arguments.Folder), translationsService);
             }

@@ -5,8 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { enUS, it, nl } from 'date-fns/locale';
+
 export module DateHelper {
     let locale: string | null;
+
+    export const FNSLOCALES = { enUS, it, nl };
 
     export function setlocale(code: string | null) {
         locale = code;
@@ -20,7 +24,11 @@ export module DateHelper {
         return new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
     }
 
-    export function getLocalDate (date: Date) {
+    export function getLocalDate(date: Date) {
         return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+    }
+
+    export function getFnsLocale(): Locale {
+        return DateHelper.FNSLOCALES[DateHelper.getLocale()] || enUS;
     }
 }

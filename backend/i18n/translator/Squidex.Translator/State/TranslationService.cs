@@ -27,15 +27,36 @@ namespace Squidex.Translator.State
             WriteIndented = true
         };
 
-        private readonly TranslatedTexts translations;
+        private readonly Dictionary<string, TranslatedTexts> translations = new Dictionary<string, TranslatedTexts>();
         private readonly TranslationTodos translationsTodo;
         private readonly TranslationsToIgnore translationToIgnore;
-        private readonly DirectoryInfo directory;
-        private readonly string fileName;
+        private readonly DirectoryInfo sourceDirectory;
+        private readonly string sourceFileName;
+        private readonly string[] supportedLocales;
         private readonly bool onlySingleWords;
         private string previousPrefix;
 
-        public IReadOnlyDictionary<string, string> Texts
+        public TranslatedTexts MainTranslations
+        {
+            get { return translations[MainLocale]; }
+        }
+
+        public string MainLocale
+        {
+            get { return supportedLocales[0]; }
+        }
+
+        public IEnumerable<string> SupportedLocales
+        {
+            get { return supportedLocales; }
+        }
+
+        public IEnumerable<string> NonMainSupportedLocales
+        {
+            get { return supportedLocales.Skip(1); }
+        }
+
+        public IReadOnlyDictionary<string, TranslatedTexts> Translations
         {
             get { return translations; }
         }
@@ -45,22 +66,45 @@ namespace Squidex.Translator.State
             SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         }
 
-        public TranslationService(DirectoryInfo directory, string fileName, bool onlySingleWords)
+        public TranslationService(DirectoryInfo sourceDirectory, string sourceFileName, string[] supportedLocales, bool onlySingleWords)
         {
-            this.directory = directory;
+            this.onlySingleWords = onlySingleWords;
 
-            this.fileName = fileName;
+            this.sourceDirectory = sourceDirectory;
+            this.sourceFileName = sourceFileName;
 
-            translations = Load<TranslatedTexts>("_en.json");
+            this.supportedLocales = supportedLocales;
+
+            foreach (var locale in supportedLocales)
+            {
+                translations[locale] = Load<TranslatedTexts>($"_{locale}.json");
+            }
+
             translationsTodo = Load<TranslationTodos>("__todos.json");
             translationToIgnore = Load<TranslationsToIgnore>("__ignore.json");
+        }
 
-            this.onlySingleWords = onlySingleWords;
+        public TranslatedTexts GetTextsWithFallback(string locale)
+        {
+            var result = new TranslatedTexts(MainTranslations);
+
+            if (translations.TryGetValue(locale, out var translated))
+            {
+                foreach (var key in result.Keys.ToList())
+                {
+                    if (translated.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value))
+                    {
+                        result[key] = value;
+                    }
+                }
+            }
+
+            return result;
         }
 
         private T Load<T>(string name) where T : new()
         {
-            var fullName = Path.Combine(directory.FullName, $"{fileName}{name}");
+            var fullName = GetFullName(name);
 
             if (File.Exists(fullName))
             {
@@ -76,26 +120,26 @@ namespace Squidex.Translator.State
 
         private void Save<T>(string name, T value) where T : new()
         {
-            var path = Path.Combine(directory.FullName, this.fileName + name);
+            var fullName = GetFullName(name);
 
-            WriteTo(value, path);
+            WriteTo(value, fullName);
         }
 
-        private void WriteTo<T>(T value, string path) where T : new()
+        private string GetFullName(string name)
+        {
+            return Path.Combine(sourceDirectory.FullName, "source", $"{sourceFileName}{name}");
+        }
+
+        public void WriteTo<T>(T value, string path) where T : new()
         {
             var json = JsonSerializer.Serialize(value, SerializerOptions);
 
-            if (!directory.Exists)
+            if (!sourceDirectory.Exists)
             {
-                Directory.CreateDirectory(directory.FullName);
+                Directory.CreateDirectory(sourceDirectory.FullName);
             }
 
             File.WriteAllText(path, json);
-        }
-
-        public void WriteTexts(string path)
-        {
-            WriteTo(translations, path);
         }
 
         public void Migrate()
@@ -106,7 +150,7 @@ namespace Squidex.Translator.State
             {
                 if (value.Texts.TryGetValue("en", out var text))
                 {
-                    translations[key] = text;
+                    MainTranslations[key] = text;
                 }
             }
 
@@ -120,22 +164,13 @@ namespace Squidex.Translator.State
 
         public void Save()
         {
-            Save("_en.json", translations);
+            foreach (var (locale, texts) in translations)
+            {
+                Save($"_{locale}.json", texts);
+            }
 
             Save("__todos.json", translationsTodo);
             Save("__ignore.json", translationToIgnore);
-        }
-
-        public void SaveKeys()
-        {
-            var translationKeys = new TranslationKeys();
-
-            foreach (var text in Texts)
-            {
-                translationKeys.Add(text.Key, string.Empty);
-            }
-
-            Save("__keys.json", translationKeys);
         }
 
         public void Translate(string fileName, string text, string originText, Action<string> handler, bool silent = false)
@@ -147,7 +182,7 @@ namespace Squidex.Translator.State
 
             if (!IsIgnored(fileName, text))
             {
-                var (key, keyState) = translations.FirstOrDefault(x => x.Value == text);
+                var (key, keyState) = MainTranslations.FirstOrDefault(x => x.Value == text);
 
                 if (string.IsNullOrWhiteSpace(key))
                 {
@@ -266,7 +301,7 @@ namespace Squidex.Translator.State
 
         private void AddText(string key, string text)
         {
-            translations[key] = text;
+            MainTranslations[key] = text;
         }
 
         private void AddIgnore(string name, string text)
