@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// GraphQL endpoint.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="query">The graphql query.</param>
+        /// <param name="queries">The graphql query.</param>
         /// <returns>
         /// 200 => Contents retrieved or mutated.
         /// 404 => Schema or app not found.
@@ -52,6 +52,35 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
+        [Route("content/{app}/graphql/")]
+        [ApiPermission]
+        [ApiCosts(2)]
+        public async Task<IActionResult> GetGraphQL(string app, [FromQuery] GraphQLQuery? queries = null)
+        {
+            var (hasError, response) = await graphQl.QueryAsync(Context, queries ?? new GraphQLQuery());
+
+            if (hasError)
+            {
+                return BadRequest(response);
+            }
+            else
+            {
+                return Ok(response);
+            }
+        }
+
+        /// <summary>
+        /// GraphQL endpoint.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="query">The graphql query.</param>
+        /// <returns>
+        /// 200 => Contents retrieved or mutated.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
         [HttpPost]
         [Route("content/{app}/graphql/")]
         [ApiPermission]
@@ -82,7 +111,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
-        [HttpGet]
         [HttpPost]
         [Route("content/{app}/graphql/batch")]
         [ApiPermission]
