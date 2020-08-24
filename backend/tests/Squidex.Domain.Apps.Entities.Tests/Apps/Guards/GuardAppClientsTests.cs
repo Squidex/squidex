@@ -119,6 +119,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
+        public void UpdateClient_should_throw_exception_if_api_traffic_limit_is_less_than_zero()
+        {
+            var command = new UpdateClient { Id = "ios", ApiTrafficLimit = -10 };
+
+            var clients_1 = clients_0.Add("ios", "secret");
+
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
+                new ValidationError("ApiTrafficLimit must be greater or equal to 0.", "ApiTrafficLimit"));
+        }
+
+        [Fact]
         public void UpdateClient_should_not_throw_exception_if_client_has_same_name()
         {
             var command = new UpdateClient { Id = "ios", Name = "ios" };

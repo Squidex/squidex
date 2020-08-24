@@ -33,12 +33,16 @@ export class ClientComponent {
         this.clientsState.revoke(this.client);
     }
 
-    public update(role: string) {
+    public updateRole(role: string) {
         this.clientsState.update(this.client, { role });
     }
 
-    public updateAccess(allowAnonymous: boolean) {
+    public updateAllowAnonymous(allowAnonymous: boolean) {
         this.clientsState.update(this.client, { allowAnonymous });
+    }
+
+    public updateApiCallsLimit() {
+        this.clientsState.update(this.client, { apiCallsLimit: this.client.apiCallsLimit });
     }
 
     public rename(name: string) {

@@ -30,6 +30,8 @@ export class ClientDto {
         public readonly name: string,
         public readonly secret: string,
         public readonly role: string,
+        public readonly apiCallsLimit: number,
+        public readonly apiTrafficLimit: number,
         public readonly allowAnonymous: boolean
     ) {
         this._links = links;
@@ -54,6 +56,8 @@ export interface CreateClientDto {
 export interface UpdateClientDto {
     readonly name?: string;
     readonly role?: string;
+    readonly apiCallsLimit?: number;
+    readonly apiTrafficLimit?: number;
     readonly allowAnonymous?: boolean;
 }
 
@@ -147,6 +151,8 @@ function parseClients(response: any): ClientsPayload {
             item.name || item.id,
             item.secret,
             item.role,
+            item.apiCallsLimit,
+            item.apiTrafficLimit,
             item.allowAnonymous));
 
     const _links = response._links;

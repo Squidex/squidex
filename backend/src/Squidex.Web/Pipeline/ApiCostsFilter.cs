@@ -53,7 +53,7 @@ namespace Squidex.Web.Pipeline
                 {
                     using (Profiler.Trace("CheckUsage"))
                     {
-                        var clientId = context.HttpContext.User.OpenIdClientId();
+                        var (_, clientId) = context.HttpContext.User.GetClient();
 
                         var isBlocked = await usageGate.IsBlockedAsync(app, clientId, DateTime.Today);
 

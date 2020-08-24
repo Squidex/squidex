@@ -60,6 +60,8 @@ namespace Squidex.Web.Pipeline
                             bytes += context.Request.ContentLength.Value;
                         }
 
+                        var (_, clientId) = context.User.GetClient();
+
                         var request = default(RequestLog);
 
                         request.Bytes = bytes;
@@ -68,7 +70,7 @@ namespace Squidex.Web.Pipeline
                         request.RequestMethod = context.Request.Method;
                         request.RequestPath = context.Request.Path;
                         request.Timestamp = clock.GetCurrentInstant();
-                        request.UserClientId = context.User.OpenIdClientId();
+                        request.UserClientId = clientId;
                         request.UserId = context.User.OpenIdSubject();
 
                         await logStore.LogAsync(appId.Id, request);

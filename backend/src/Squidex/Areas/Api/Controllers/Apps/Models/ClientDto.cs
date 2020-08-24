@@ -37,6 +37,21 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string? Role { get; set; }
 
+        /// <summary>
+        /// The number of allowed api calls per month for this client.
+        /// </summary>
+        public long ApiCallsLimit { get; set; }
+
+        /// <summary>
+        /// The number of allowed api traffic bytes per month for this client.
+        /// </summary>
+        public long ApiTrafficLimit { get; set; }
+
+        /// <summary>
+        /// True to allow anonymous access without an access token for this client.
+        /// </summary>
+        public bool AllowAnonymous { get; set; }
+
         public static ClientDto FromClient(string id, AppClient client)
         {
             var result = SimpleMapper.Map(client, new ClientDto { Id = id });

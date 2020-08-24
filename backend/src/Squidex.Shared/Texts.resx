@@ -650,7 +650,7 @@
     <value>deleted draft.</value>
   </data>
   <data name="history.contents.scheduleCompleted" xml:space="preserve">
-    <value>scheduled to change status of {[Schemra]} content to {[Status]}.</value>
+    <value>scheduled to change status of {[Schema]} content to {[Status]}.</value>
   </data>
   <data name="history.contents.scheduleFailed" xml:space="preserve">
     <value>failed to schedule status change for {[Schema]} content.</value>

@@ -69,6 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                     e(Not.GreaterEqualsThan(nameof(command.ApiCallsLimit), "0"), nameof(command.ApiCallsLimit));
                 }
+
+                if (command.ApiTrafficLimit != null && command.ApiTrafficLimit < 0)
+                {
+                    e(Not.GreaterEqualsThan(nameof(command.ApiTrafficLimit), "0"), nameof(command.ApiTrafficLimit));
+                }
             });
         }
 

@@ -34,6 +34,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public long? ApiCallsLimit { get; set; }
 
+        /// <summary>
+        /// The number of allowed api traffic bytes per month for this client.
+        /// </summary>
+        public long? ApiTrafficLimit { get; set; }
+
         public UpdateClient ToCommand(string clientId)
         {
             return SimpleMapper.Map(this, new UpdateClient { Id = clientId });

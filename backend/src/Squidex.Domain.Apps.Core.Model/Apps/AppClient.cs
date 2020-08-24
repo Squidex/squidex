@@ -28,6 +28,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(secret, nameof(secret));
             Guard.NotNullOrEmpty(role, nameof(role));
+            Guard.GreaterEquals(apiCallsLimit, 0, nameof(apiCallsLimit));
+            Guard.GreaterEquals(apiTrafficLimit, 0, nameof(apiTrafficLimit));
 
             Secret = secret;
 
@@ -43,10 +45,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClient Update(string? name, string? role, long? apiCallsLimit, long? apiTrafficLimit, bool? allowAnonymous)
         {
-            return new AppClient(name.Or(Name), Secret, role.Or(Role),
-                apiCallsLimit ?? ApiCallsLimit,
-                apiTrafficLimit ?? ApiTrafficLimit,
-                allowAnonymous ?? AllowAnonymous);
+            return new AppClient(name.Or(Name), Secret, role.Or(Role), apiCallsLimit ?? ApiCallsLimit, apiTrafficLimit ?? ApiTrafficLimit, allowAnonymous ?? AllowAnonymous);
         }
     }
 }
