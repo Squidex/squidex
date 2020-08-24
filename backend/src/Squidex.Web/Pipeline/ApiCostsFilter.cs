@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web.Pipeline
 {
@@ -52,7 +53,9 @@ namespace Squidex.Web.Pipeline
                 {
                     using (Profiler.Trace("CheckUsage"))
                     {
-                        var isBlocked = await usageGate.IsBlockedAsync(app, DateTime.Today);
+                        var clientId = context.HttpContext.User.OpenIdClientId();
+
+                        var isBlocked = await usageGate.IsBlockedAsync(app, clientId, DateTime.Today);
 
                         if (isBlocked)
                         {

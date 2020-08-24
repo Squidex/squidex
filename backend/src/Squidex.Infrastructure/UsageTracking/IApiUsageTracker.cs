@@ -15,9 +15,9 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsedMs, long bytes);
 
-        Task<long> GetMonthCallsAsync(string key, DateTime date);
+        Task<long> GetMonthCallsAsync(string key, DateTime date, string? category);
 
-        Task<long> GetMonthBytesAsync(string key, DateTime date);
+        Task<long> GetMonthBytesAsync(string key, DateTime date, string? category);
 
         Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate);
     }

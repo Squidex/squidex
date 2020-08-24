@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new DeleteRole { Name = roleName };
 
-            ValidationAssert.Throws(() => GuardAppRoles.CanDelete(roles_1, command, contributors, clients.Add("1", new AppClient("client", "1", roleName, false))),
+            ValidationAssert.Throws(() => GuardAppRoles.CanDelete(roles_1, command, contributors, clients.Add("1", new AppClient("client", "1", roleName))),
                 new ValidationError("Cannot remove a role when a client is assigned."));
         }
 

@@ -17,30 +17,36 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public string Secret { get; }
 
-        public bool AllowAnonymous { get; }
-
         public long ApiCallsLimit { get; }
 
-        public AppClient(string name, string secret, string role, bool allowAnonymous = false, long apiCallsLimit = 0)
+        public long ApiTrafficLimit { get; }
+
+        public bool AllowAnonymous { get; }
+
+        public AppClient(string name, string secret, string role, long apiCallsLimit = 0, long apiTrafficLimit = 0, bool allowAnonymous = false)
             : base(name)
         {
             Guard.NotNullOrEmpty(secret, nameof(secret));
             Guard.NotNullOrEmpty(role, nameof(role));
-            Guard.GreaterEquals(apiCallsLimit, 0, nameof(apiCallsLimit));
 
             Secret = secret;
 
-            AllowAnonymous = allowAnonymous;
+            Role = role;
 
             ApiCallsLimit = apiCallsLimit;
 
-            Role = role;
+            ApiTrafficLimit = apiTrafficLimit;
+
+            AllowAnonymous = allowAnonymous;
         }
 
         [Pure]
-        public AppClient Update(string? name, string? role, bool? allowAnonymous, long? apiCallsLimit)
+        public AppClient Update(string? name, string? role, long? apiCallsLimit, long? apiTrafficLimit, bool? allowAnonymous)
         {
-            return new AppClient(name.Or(Name), Secret, role.Or(Role), allowAnonymous ?? AllowAnonymous, apiCallsLimit ?? ApiCallsLimit);
+            return new AppClient(name.Or(Name), Secret, role.Or(Role),
+                apiCallsLimit ?? ApiCallsLimit,
+                apiTrafficLimit ?? ApiTrafficLimit,
+                allowAnonymous ?? AllowAnonymous);
         }
     }
 }

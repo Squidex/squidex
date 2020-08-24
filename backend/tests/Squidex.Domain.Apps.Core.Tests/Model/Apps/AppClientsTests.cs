@@ -71,15 +71,23 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", allowAnonymous: true);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, true));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, 0, 0, true));
         }
 
         [Fact]
-        public void Should_update_client_with_allow_api_limit()
+        public void Should_update_client_with_allow_api_calls_limit()
         {
             var client_1 = clients_0.Update("1", apiCallsLimit: 1000);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, false, 1000));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, 1000, 0, false));
+        }
+
+        [Fact]
+        public void Should_update_client_with_allow_api_traffic_limit()
+        {
+            var client_1 = clients_0.Update("1", apiTrafficLimit: 1000);
+
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, 0, 1000, false));
         }
 
         [Fact]

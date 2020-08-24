@@ -38,19 +38,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             usageLimitNotifier = grainFactory.GetGrain<IUsageNotifierGrain>(SingleGrain.Id);
         }
 
-        public virtual async Task<bool> IsBlockedAsync(IAppEntity app, DateTime today)
+        public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime today)
         {
             Guard.NotNull(app, nameof(app));
 
-            var isLocked = false;
+            var appId = app.Id;
+
+            var isBlocked = false;
+
+            if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && client.ApiCallsLimit > 0)
+            {
+                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, clientId);
+
+                isBlocked = usage >= client.ApiCallsLimit;
+            }
 
             var (plan, _) = appPlansProvider.GetPlanForApp(app);
 
             if (plan.MaxApiCalls > 0 || plan.BlockingApiCalls > 0)
             {
-                var appId = app.Id;
-
-                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today);
+                var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, null);
 
                 if (IsAboutToBeLocked(today, plan.MaxApiCalls, usage) && !HasNotifiedBefore(app.Id))
                 {
@@ -70,10 +77,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                     TrackNotified(appId);
                 }
 
-                isLocked = plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls;
+                isBlocked = isBlocked || plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls;
             }
 
-            return isLocked;
+            return isBlocked;
         }
 
         private bool HasNotifiedBefore(Guid appId)

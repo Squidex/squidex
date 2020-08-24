@@ -227,7 +227,7 @@ namespace Squidex.Web.Pipeline
             return userIdentity;
         }
 
-        private static IAppEntity CreateApp(string name, string? appUser = null, string? appClient = null, bool? allowAnonymous = null)
+        private static IAppEntity CreateApp(string name, string? appUser = null, string? appClient = null, long? apiCallsLimit = null, bool? allowAnonymous = null)
         {
             var appEntity = A.Fake<IAppEntity>();
 
@@ -245,7 +245,7 @@ namespace Squidex.Web.Pipeline
             if (appClient != null)
             {
                 A.CallTo(() => appEntity.Clients)
-                    .Returns(AppClients.Empty.Add(appClient, "secret").Update(appClient, allowAnonymous: allowAnonymous));
+                    .Returns(AppClients.Empty.Add(appClient, "secret").Update(appClient, apiCallsLimit: apiCallsLimit, allowAnonymous: allowAnonymous));
             }
             else
             {

@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                     return UpdateClients(e, (ev, c) => c.Add(ev.Id, ev.Secret));
 
                 case AppClientUpdated e:
-                    return UpdateClients(e, (ev, c) => c.Update(ev.Id, ev.Name, ev.Role, ev.AllowAnonymous));
+                    return UpdateClients(e, (ev, c) => c.Update(ev.Id, ev.Name, ev.Role, ev.ApiCallsLimit, ev.ApiTrafficLimit, ev.AllowAnonymous));
 
                 case AppClientRevoked e:
                     return UpdateClients(e, (ev, c) => c.Revoke(ev.Id));
