@@ -97,7 +97,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
 
     public writeValue(obj: any) {
         try {
-            this.dateTime = DateTime.parseISO(obj);
+            this.dateTime = DateTime.parseISO(obj, false);
         } catch (ex) {
             this.dateTime = null;
         }
@@ -138,9 +138,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     }
 
     public writeNow() {
-        let datetime = DateTime.parseISO(DateTime.now().toISOString(), !this.isLocalMode);
-        this.writeValue(datetime.toISOString());
-
+        this.writeValue(DateTime.now().toISODateTime());
         this.updateControls();
         this.callChangeFormatted();
         this.callTouched();

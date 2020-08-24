@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { addDays, addHours, addMilliseconds, addMinutes, addMonths, addSeconds, addYears, format, formatDistanceToNow, parse, parseISO, startOfDay, startOfMonth, startOfTomorrow, startOfWeek, startOfYesterday } from 'date-fns';
+import { addDays, addHours, addMilliseconds, addMinutes, addMonths, addSeconds, addYears, format, formatDistanceToNow, formatISO, parse, parseISO, startOfDay, startOfMonth, startOfTomorrow, startOfWeek, startOfYesterday } from 'date-fns';
 import { DateHelper } from './date-helper';
 
 const DATE_FORMAT = 'yyyy-MM-dd';
@@ -175,6 +175,10 @@ export class DateTime {
 
     public toISODate(): string {
         return format(this.value, DATE_FORMAT);
+    }
+
+    public toISODateTime(): string {
+        return formatISO(this.value);
     }
 
     public toStringFormat(pattern: string): string {
