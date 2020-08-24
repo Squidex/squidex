@@ -33,14 +33,25 @@
         width: 8.5rem;
     }
 
+    .form-date-time-only {
+        padding-left: 3.3rem;
+        width: 11rem;
+    }
+
+
     .form-time {
         width: 7rem;
     }
 }
 
-.btn-clear {
-    & {
+.btn {
+    &-clear {
         @include absolute(auto, 4px, 3px, auto);
+    }
+
+    &-time-mode {
+        @include absolute(1px, auto, -1px, auto);
+        z-index: 1000;
     }
 
     &:focus {

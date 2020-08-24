@@ -210,7 +210,7 @@
   "common.created": "Created",
   "common.date": "Date",
   "common.dateTimeEditor.now": "Now",
-  "common.dateTimeEditor.nowTooltip": "Use Now (UTC)",
+  "common.dateTimeEditor.nowTooltip": "Use Now",
   "common.dateTimeEditor.today": "Today",
   "common.dateTimeEditor.todayTooltip": "Use Today (UTC)",
   "common.delete": "Delete",
