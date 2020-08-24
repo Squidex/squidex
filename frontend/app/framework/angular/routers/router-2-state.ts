@@ -150,18 +150,18 @@ export class Router2State implements OnDestroy, StateSynchronizer {
     }
 
     public ngOnDestroy() {
-        this.mapper?.ngOnDestroy();
+        this.mapper?.destroy();
     }
 
     public mapTo<T extends object>(state: State<T>) {
-        this.mapper?.ngOnDestroy();
+        this.mapper?.destroy();
         this.mapper = this.mapper || new Router2StateMap<T>(state, this.route, this.router, this.localStore);
 
         return this.mapper;
     }
 }
 
-export class Router2StateMap<T extends object> implements OnDestroy, StateSynchronizerMap<T> {
+export class Router2StateMap<T extends object> implements StateSynchronizerMap<T> {
     private readonly syncs: { [field: string]: { synchronizer: RouteSynchronizer, value: any } } = {};
     private readonly keysToKeep: string[] = [];
     private syncDone: (() => void)[] = [];
@@ -187,7 +187,7 @@ export class Router2StateMap<T extends object> implements OnDestroy, StateSynchr
                 .subscribe(s => this.syncToRoute(s));
     }
 
-    public ngOnDestroy() {
+    public destroy() {
         this.syncDone = [];
 
         this.subscriptionQueryParams?.unsubscribe();

@@ -179,7 +179,6 @@ namespace TestSuite.ApiTests
             AssertItems(items, 3, new[] { 4, 5, 6 });
         }
 
-
         [Fact]
         public async Task Should_query_items_with_graphql()
         {
@@ -199,6 +198,31 @@ namespace TestSuite.ApiTests
             };
 
             var result = await _.Contents.GraphQlAsync<QueryResult>(query);
+
+            var items = result.Items;
+
+            Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
+        }
+
+        [Fact]
+        public async Task Should_query_items_with_graphql_get()
+        {
+            var query = new
+            {
+                query = @"
+                {
+                    queryMyReadsContents(filter: ""data/number/iv gt 3 and data/number/iv lt 7"", orderby: ""data/number/iv asc"") {
+                        id,
+                        data {
+                            number {
+                                iv
+                            }
+                        }
+                    }
+                }"
+            };
+
+            var result = await _.Contents.GraphQlGetAsync<QueryResult>(query);
 
             var items = result.Items;
 

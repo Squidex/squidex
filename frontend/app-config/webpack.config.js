@@ -157,7 +157,7 @@ module.exports = function (env) {
                 }, {
                     loader: 'sass-loader', 
                     options: {
-                        prependData: `
+                        additionalData: `
                             @import '_vars';
                             @import '_mixins';
                         `,
@@ -178,7 +178,9 @@ module.exports = function (env) {
              * 
              * See: https://github.com/webpack-contrib/mini-css-extract-plugin
              */
-            new plugins.MiniCssExtractPlugin('[name].css'),
+            new plugins.MiniCssExtractPlugin({
+                filename: '[name].css'
+            }),
 
             new webpack.LoaderOptionsPlugin({
                 options: {

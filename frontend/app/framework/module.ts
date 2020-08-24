@@ -178,7 +178,7 @@ import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterc
     ]
 })
 export class SqxFrameworkModule {
-    public static forRoot(): ModuleWithProviders {
+    public static forRoot(): ModuleWithProviders<SqxFrameworkModule> {
         return {
             ngModule: SqxFrameworkModule,
             providers: [

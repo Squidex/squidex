@@ -10,30 +10,6 @@
 import { Directive, EventEmitter, HostListener, Input, OnDestroy, Output } from '@angular/core';
 import { DialogService } from '@app/framework/internal';
 
-class DelayEventEmitter<T> extends EventEmitter<T> {
-    private delayedNexts: any[] | null = [];
-
-    public delayEmit() {
-        if (this.delayedNexts) {
-            for (const callback of this.delayedNexts) {
-                callback();
-            }
-        }
-    }
-
-    public clear() {
-        this.delayedNexts = null;
-    }
-
-    public subscribe(generatorOrNext?: any, error?: any, complete?: any): any {
-        if (this.delayedNexts) {
-            this.delayedNexts.push(generatorOrNext);
-        }
-
-        return super.subscribe(generatorOrNext, error, complete);
-    }
-}
-
 @Directive({
     selector: '[sqxConfirmClick]'
 })
@@ -54,7 +30,7 @@ export class ConfirmClickDirective implements OnDestroy {
     public beforeClick = new EventEmitter();
 
     @Output('sqxConfirmClick')
-    public clickConfirmed = new DelayEventEmitter();
+    public clickConfirmed = new EventEmitter();
 
     constructor(
         private readonly dialogs: DialogService
@@ -65,7 +41,7 @@ export class ConfirmClickDirective implements OnDestroy {
         this.isDestroyed = true;
 
         if (!this.isOpen) {
-            this.clickConfirmed.clear();
+            this.clickConfirmed.complete();
         }
     }
 
@@ -87,13 +63,13 @@ export class ConfirmClickDirective implements OnDestroy {
                         this.isOpen = false;
 
                         if (confirmed) {
-                            this.clickConfirmed.delayEmit();
+                            this.clickConfirmed.emit();
                         }
 
                         subscription.unsubscribe();
 
                         if (this.isDestroyed) {
-                            this.clickConfirmed.clear();
+                            this.clickConfirmed.complete();
                         }
                     });
         } else {
