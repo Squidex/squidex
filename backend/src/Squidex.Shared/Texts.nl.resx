@@ -59,337 +59,337 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="annotations_AbsoluteUrl" xml:space="preserve">
-    <value>The field {name|lower} must be an absolute URL.</value>
+    <value>Het veld {name|lower} moet een absolute URL zijn.</value>
   </data>
   <data name="annotations_Compare" xml:space="preserve">
-    <value>The field {name|lower} must be the same as {other|lower}.</value>
+    <value>Het veld {name|lower} moet hetzelfde zijn als {other|lower}.</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
-    <value>The field {name|lower} is required.</value>
+    <value>Het veld {name|lower} is verplicht.</value>
   </data>
   <data name="apps.alreadyArchieved" xml:space="preserve">
-    <value>App has already been archived.</value>
+    <value>App is al gearchiveerd.</value>
   </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
-    <value>A client with the same id already exists.</value>
+    <value>Er bestaat al een client met dezelfde id.</value>
   </data>
   <data name="apps.contributors.cannotChangeYourself" xml:space="preserve">
-    <value>You cannot change your own role.</value>
+    <value>Je kunt jouw eigen rol niet wijzigen.</value>
   </data>
   <data name="apps.contributors.maxReached" xml:space="preserve">
-    <value>You have reached the maximum number of contributors for your plan.</value>
+    <value>Je heeft het maximale aantal bijdragers voor jouw plan bereikt.</value>
   </data>
   <data name="apps.contributors.onlyOneOwner" xml:space="preserve">
-    <value>Cannot remove the only owner.</value>
+    <value>Kan de enige eigenaar niet verwijderen.</value>
   </data>
   <data name="apps.languages.fallbackNotFound" xml:space="preserve">
-    <value>App does not have fallback language '{fallback}'.</value>
+    <value>App heeft geen terugvaltaal '{fallback}'.</value>
   </data>
   <data name="apps.languages.languageAlreadyAdded" xml:space="preserve">
-    <value>Language has already been added.</value>
+    <value>Taal is al toegevoegd.</value>
   </data>
   <data name="apps.languages.masterLanguageNoFallbacks" xml:space="preserve">
-    <value>Master language cannot have fallback languages.</value>
+    <value>Hoofdtaal kan geen terugval talen hebben.</value>
   </data>
   <data name="apps.languages.masterLanguageNotOptional" xml:space="preserve">
-    <value>Master language cannot be made optional.</value>
+    <value>Hoofdtaal kan niet optioneel worden gemaakt.</value>
   </data>
   <data name="apps.languages.masterLanguageNotRemovable" xml:space="preserve">
-    <value>Master language cannot be removed.</value>
+    <value>Hoofdtaal kan niet worden verwijderd.</value>
   </data>
   <data name="apps.nameAlreadyExists" xml:space="preserve">
-    <value>An app with the same name already exists.</value>
+    <value>Er bestaat al een app met dezelfde naam.</value>
   </data>
   <data name="apps.notImage" xml:space="preserve">
-    <value>File is not an image</value>
+    <value>Bestand is geen afbeelding</value>
   </data>
   <data name="apps.patterns.nameAlreadyExists" xml:space="preserve">
-    <value>A pattern with the same name already exists.</value>
+    <value>Er bestaat al een patroon met dezelfde naam.</value>
   </data>
   <data name="apps.patterns.patternAlreadyExists" xml:space="preserve">
-    <value>This pattern already exists but with another name.</value>
+    <value>Dit patroon bestaat al maar met een andere naam.</value>
   </data>
   <data name="apps.plans.notFound" xml:space="preserve">
-    <value>A plan with this id does not exist.</value>
+    <value>Een plan met deze id bestaat niet.</value>
   </data>
   <data name="apps.plans.notPlanOwner" xml:space="preserve">
-    <value>Plan can only changed from the user who configured the plan initially.</value>
+    <value>Plan kan alleen worden gewijzigd van de gebruiker die het plan aanvankelijk heeft geconfigureerd.</value>
   </data>
   <data name="apps.roles.defaultRoleNotRemovable" xml:space="preserve">
-    <value>Cannot delete a default role.</value>
+    <value>Kan een standaardrol niet verwijderen.</value>
   </data>
   <data name="apps.roles.defaultRoleNotUpdateable" xml:space="preserve">
-    <value>Cannot update a default role.</value>
+    <value>Kan een standaardrol niet bijwerken.</value>
   </data>
   <data name="apps.roles.nameAlreadyExists" xml:space="preserve">
-    <value>A role with the same name already exists.</value>
+    <value>Er bestaat al een rol met dezelfde naam.</value>
   </data>
   <data name="apps.roles.usedRoleByClientsNotRemovable" xml:space="preserve">
-    <value>Cannot remove a role when a client is assigned.</value>
+    <value>Kan een rol niet verwijderen wanneer een client is toegewezen.</value>
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
-    <value>Cannot remove a role when a contributor is assigned.</value>
+    <value>Kan een rol niet verwijderen wanneer een bijdrager is toegewezen.</value>
   </data>
   <data name="aspnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>The field {0} must be an absolute URL.</value>
+    <value>Het veld {0} moet een absolute URL zijn.</value>
   </data>
   <data name="aspnet_annotations_Compare" xml:space="preserve">
-    <value>The field {0} must be the same as {other|lower}.</value>
+    <value>Het veld {0} moet hetzelfde zijn als {other|lower}.</value>
   </data>
   <data name="aspnet_annotations_Required" xml:space="preserve">
-    <value>The field {0} is required.</value>
+    <value>Het veld {0} is verplicht.</value>
   </data>
   <data name="assets.assetAlreadyDeleted" xml:space="preserve">
-    <value>Asset has already been deleted</value>
+    <value>Asset is al verwijderd</value>
   </data>
   <data name="assets.assetFolderAlreadyDeleted" xml:space="preserve">
-    <value>Asset folder has already been deleted</value>
+    <value>Assetmap is al verwijderd</value>
   </data>
   <data name="assets.folderNotFound" xml:space="preserve">
-    <value>Asset folder does not exist.</value>
+    <value>Assetmap bestaat niet.</value>
   </data>
   <data name="assets.folderRecursion" xml:space="preserve">
-    <value>Cannot add folder to its own child.</value>
+    <value>Kan map niet toevoegen aan zijn eigen kind.</value>
   </data>
   <data name="assets.maxSizeReached" xml:space="preserve">
-    <value>You have reached your max asset size.</value>
+    <value>Je hebt jouw maximale assetgrootte bereikt.</value>
   </data>
   <data name="backups.alreadyRunning" xml:space="preserve">
-    <value>Another backup process is already running.</value>
+    <value>Er wordt al een ander back-upproces uitgevoerd.</value>
   </data>
   <data name="backups.maxReached" xml:space="preserve">
-    <value>You cannot have more than {max} backups.</value>
+    <value>Je kunt niet meer dan {max} backups hebben.</value>
   </data>
   <data name="backups.restoreRunning" xml:space="preserve">
-    <value>A restore operation is already running.</value>
+    <value>Er wordt al een herstelbewerking uitgevoerd.</value>
   </data>
   <data name="comments.noPermissions" xml:space="preserve">
-    <value>You can only access your notifications.</value>
+    <value>Je hebt alleen toegang tot jouw notificaties.</value>
   </data>
   <data name="comments.notUserComment" xml:space="preserve">
-    <value>Comment is created by another user.</value>
+    <value>Reactie is gemaakt door een andere gebruiker.</value>
   </data>
   <data name="common.action" xml:space="preserve">
-    <value>Action</value>
+    <value>Actie</value>
   </data>
   <data name="common.aspectHeight" xml:space="preserve">
-    <value>Aspect height</value>
+    <value>Hoogte aspect</value>
   </data>
   <data name="common.aspectWidth" xml:space="preserve">
-    <value>Aspect width</value>
+    <value>Aspect breedte</value>
   </data>
   <data name="common.calculatedDefaultValue" xml:space="preserve">
-    <value>Calculated default value</value>
+    <value>Berekende standaardwaarde</value>
   </data>
   <data name="common.clientd" xml:space="preserve">
-    <value>Client ID</value>
+    <value>Client-ID</value>
   </data>
   <data name="common.clientId" xml:space="preserve">
-    <value>Client ID</value>
+    <value>Client-ID</value>
   </data>
   <data name="common.clientSecret" xml:space="preserve">
-    <value>Client Secret</value>
+    <value>Clientgeheim</value>
   </data>
   <data name="common.contributorId" xml:space="preserve">
-    <value>Contributor ID or email</value>
+    <value>Bijdrager-ID of e-mailadres</value>
   </data>
   <data name="common.data" xml:space="preserve">
-    <value>Data</value>
+    <value>Gegevens</value>
   </data>
   <data name="common.defaultValue" xml:space="preserve">
-    <value>Default value</value>
+    <value>Standaardwaarde</value>
   </data>
   <data name="common.displayName" xml:space="preserve">
-    <value>Display name</value>
+    <value>Weergavenaam</value>
   </data>
   <data name="common.editor" xml:space="preserve">
     <value>Editor</value>
   </data>
   <data name="common.email" xml:space="preserve">
-    <value>Email</value>
+    <value>E-mail</value>
   </data>
   <data name="common.field" xml:space="preserve">
-    <value>Field</value>
+    <value>Veld</value>
   </data>
   <data name="common.fieldIds" xml:space="preserve">
-    <value>Field IDs</value>
+    <value>Veld-ID's</value>
   </data>
   <data name="common.fieldName" xml:space="preserve">
-    <value>Field name</value>
+    <value>Veldnaam</value>
   </data>
   <data name="common.file" xml:space="preserve">
-    <value>File</value>
+    <value>Bestand</value>
   </data>
   <data name="common.folderName" xml:space="preserve">
-    <value>Folder name</value>
+    <value>Mapnaam</value>
   </data>
   <data name="common.fullTextNotSupported" xml:space="preserve">
-    <value>Query search clause not supported.</value>
+    <value>Query-zoekclausule niet ondersteund.</value>
   </data>
   <data name="common.httpContentTypeNotDefined" xml:space="preserve">
-    <value>File content-type is not defined.</value>
+    <value>Bestandstype inhoud is niet gedefinieerd.</value>
   </data>
   <data name="common.httpFileNameNotDefined" xml:space="preserve">
-    <value>File name is not defined.</value>
+    <value>Bestandsnaam is niet gedefinieerd.</value>
   </data>
   <data name="common.httpInvalidRequest" xml:space="preserve">
-    <value>The model is not valid.</value>
+    <value>Het model is niet geldig.</value>
   </data>
   <data name="common.httpInvalidRequestFormat" xml:space="preserve">
-    <value>Request body has an invalid format.</value>
+    <value>Verzoektekst heeft een ongeldige indeling.</value>
   </data>
   <data name="common.httpOnlyAsUser" xml:space="preserve">
-    <value>Not allowed for clients.</value>
+    <value>Niet toegestaan ​​voor klanten.</value>
   </data>
   <data name="common.httpValidationError" xml:space="preserve">
-    <value>Validation error</value>
+    <value>Validatiefout</value>
   </data>
   <data name="common.initialStep" xml:space="preserve">
-    <value>Initial step</value>
+    <value>Eerste stap</value>
   </data>
   <data name="common.jsError" xml:space="preserve">
-    <value>Failed to execute script with Javascript error: {message}</value>
+    <value>Kan script niet uitvoeren met Javascript-fout: {message}</value>
   </data>
   <data name="common.jsNotAlloweed" xml:space="preserve">
-    <value>Script has forbidden the operation.</value>
+    <value>Script heeft de bewerking verboden.</value>
   </data>
   <data name="common.jsParseError" xml:space="preserve">
-    <value>Failed to execute script with Javascript syntax error: {message}</value>
+    <value>Kan script niet uitvoeren met Javascript-syntaxisfout: {message}</value>
   </data>
   <data name="common.jsRejected" xml:space="preserve">
-    <value>Script rejected the operation.</value>
+    <value>Script heeft de bewerking afgewezen.</value>
   </data>
   <data name="common.language" xml:space="preserve">
-    <value>Language code</value>
+    <value>Taalcode</value>
   </data>
   <data name="common.login" xml:space="preserve">
-    <value>Login</value>
+    <value>Inloggen</value>
   </data>
   <data name="common.logout" xml:space="preserve">
-    <value>Logout</value>
+    <value>Uitloggen</value>
   </data>
   <data name="common.maxHeight" xml:space="preserve">
-    <value>Max height</value>
+    <value>Max. hoogte</value>
   </data>
   <data name="common.maxItems" xml:space="preserve">
-    <value>Max items</value>
+    <value>Max. aantal items</value>
   </data>
   <data name="common.maxLength" xml:space="preserve">
-    <value>Max length</value>
+    <value>Max. lengte</value>
   </data>
   <data name="common.maxSize" xml:space="preserve">
-    <value>Max size</value>
+    <value>Max. grootte</value>
   </data>
   <data name="common.maxValue" xml:space="preserve">
-    <value>Max value</value>
+    <value>Max. waarde</value>
   </data>
   <data name="common.maxWidth" xml:space="preserve">
-    <value>Max width</value>
+    <value>Max. breedte</value>
   </data>
   <data name="common.minHeight" xml:space="preserve">
-    <value>Min height</value>
+    <value>Min. hoogte</value>
   </data>
   <data name="common.minItems" xml:space="preserve">
     <value>Min items</value>
   </data>
   <data name="common.minLength" xml:space="preserve">
-    <value>Min length</value>
+    <value>Min. lengte</value>
   </data>
   <data name="common.minSize" xml:space="preserve">
-    <value>Min size</value>
+    <value>Min. grootte</value>
   </data>
   <data name="common.minValue" xml:space="preserve">
-    <value>Min value</value>
+    <value>Min. waarde</value>
   </data>
   <data name="common.minWidth" xml:space="preserve">
-    <value>Min width</value>
+    <value>Min. breedte</value>
   </data>
   <data name="common.name" xml:space="preserve">
-    <value>Name</value>
+    <value>Naam</value>
   </data>
   <data name="common.notFoundValue" xml:space="preserve">
-    <value>- not found -</value>
+    <value>- niet gevonden -</value>
   </data>
   <data name="common.numDays" xml:space="preserve">
-    <value>Num days</value>
+    <value>Aantal dagen</value>
   </data>
   <data name="common.odataFailure" xml:space="preserve">
-    <value>Failed to parse query: {message}</value>
+    <value>Ontleden zoekopdracht: {message}</value>
   </data>
   <data name="common.odataFilterNotValid" xml:space="preserve">
-    <value>OData $filter clause not valid: {ex.Message}</value>
+    <value>OData $ filterclausule niet geldig: {ex.Message}</value>
   </data>
   <data name="common.odataNotSupported" xml:space="preserve">
-    <value>OData operation is not supported.</value>
+    <value>OData-bewerking wordt niet ondersteund.</value>
   </data>
   <data name="common.odataSearchNotValid" xml:space="preserve">
-    <value>OData $search clause not valid: {ex.Message}</value>
+    <value>OData $ zoekclausule niet geldig: {ex.Message}</value>
   </data>
   <data name="common.oldPassword" xml:space="preserve">
-    <value>Old password</value>
+    <value>Oud wachtwoord</value>
   </data>
   <data name="common.other" xml:space="preserve">
-    <value>Other</value>
+    <value>Anders</value>
   </data>
   <data name="common.partitioning" xml:space="preserve">
-    <value>Partitioning</value>
+    <value>Partitioneren</value>
   </data>
   <data name="common.password" xml:space="preserve">
-    <value>Password</value>
+    <value>Wachtwoord</value>
   </data>
   <data name="common.passwordConfirm" xml:space="preserve">
-    <value>Confirm</value>
+    <value>Bevestigen</value>
   </data>
   <data name="common.pattern" xml:space="preserve">
-    <value>Pattern</value>
+    <value>Patroon</value>
   </data>
   <data name="common.permissions" xml:space="preserve">
-    <value>Permissions</value>
+    <value>Rechten</value>
   </data>
   <data name="common.planId" xml:space="preserve">
-    <value>Plan ID</value>
+    <value>Plan-ID</value>
   </data>
   <data name="common.previewUrls" xml:space="preserve">
-    <value>Preview URLs</value>
+    <value>Voorbeeld-URL's</value>
   </data>
   <data name="common.product" xml:space="preserve">
     <value>Squidex Headless CMS</value>
   </data>
   <data name="common.properties" xml:space="preserve">
-    <value>Properties</value>
+    <value>Eigenschappen</value>
   </data>
   <data name="common.property" xml:space="preserve">
-    <value>Property</value>
+    <value>Eigenschap</value>
   </data>
   <data name="common.readonlyMode" xml:space="preserve">
-    <value>Application is in readonly mode at the moment.</value>
+    <value>Applicatie is momenteel in de alleen-lezen modus.</value>
   </data>
   <data name="common.referenceNotFound" xml:space="preserve">
-    <value>Contains invalid reference '{id}'.</value>
+    <value>Bevat ongeldige referentie '{id}'.</value>
   </data>
   <data name="common.referenceToInvalidSchema" xml:space="preserve">
-    <value>Contains reference '{id}' to invalid schema.</value>
+    <value>Bevat verwijzing '{id}' naar ongeldig schema.</value>
   </data>
   <data name="common.remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Verwijderen</value>
   </data>
   <data name="common.resultTooLarge" xml:space="preserve">
-    <value>Result set is too large to be retrieved. Use $take parameter to reduce the number of items.</value>
+    <value>Resultaatset is te groot om opgehaald te worden. Gebruik $ take parameter om het aantal items te verminderen.</value>
   </data>
   <data name="common.role" xml:space="preserve">
-    <value>Role</value>
+    <value>Rol</value>
   </data>
   <data name="common.save" xml:space="preserve">
-    <value>Save</value>
+    <value>Opslaan</value>
   </data>
   <data name="common.schemaId" xml:space="preserve">
-    <value>Schema ID</value>
+    <value>Schema-ID</value>
   </data>
   <data name="common.signup" xml:space="preserve">
-    <value>Signup</value>
+    <value>Aanmelden</value>
   </data>
   <data name="common.text" xml:space="preserve">
-    <value>Text</value>
+    <value>Tekst</value>
   </data>
   <data name="common.trigger" xml:space="preserve">
     <value>Trigger</value>
@@ -398,633 +398,633 @@
     <value>Workflow</value>
   </data>
   <data name="common.workflowStep" xml:space="preserve">
-    <value>Step</value>
+    <value>Stap</value>
   </data>
   <data name="common.workflowTransition" xml:space="preserve">
-    <value>Transition</value>
+    <value>Overgang</value>
   </data>
   <data name="contents.alreadyDeleted" xml:space="preserve">
-    <value>Content has already been deleted.</value>
+    <value>Content is al verwijderd.</value>
   </data>
   <data name="contents.bulkInsertQueryNotUnique" xml:space="preserve">
-    <value>More than one content matches to the query.</value>
+    <value>Meer dan één inhoud komt overeen met de zoekopdracht.</value>
   </data>
   <data name="contents.draftNotCreateForUnpublished" xml:space="preserve">
-    <value>You can only create a new version when the content is published.</value>
+    <value>Je kunt alleen een nieuwe versie maken wanneer de inhoud is gepubliceerd.</value>
   </data>
   <data name="contents.draftToDeleteNotFound" xml:space="preserve">
-    <value>There is nothing to delete.</value>
+    <value>Er is niets te verwijderen.</value>
   </data>
   <data name="contents.invalidArrayOfIds" xml:space="preserve">
-    <value>Invalid json type, expected array of guid strings.</value>
+    <value>Ongeldig json-type, verwachte array van guid-strings.</value>
   </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
-    <value>Invalid json type, expected array of objects.</value>
+    <value>Ongeldig json-type, verwachte reeks objecten.</value>
   </data>
   <data name="contents.invalidArrayOfStrings" xml:space="preserve">
-    <value>Invalid json type, expected array of strings.</value>
+    <value>Ongeldig json-type, verwachte reeks strings.</value>
   </data>
   <data name="contents.invalidBoolean" xml:space="preserve">
-    <value>Invalid json type, expected boolean.</value>
+    <value>Ongeldig json-type, verwachte boolean.</value>
   </data>
   <data name="contents.invalidGeolocation" xml:space="preserve">
-    <value>Invalid json type, expected latitude/longitude object.</value>
+    <value>Ongeldig json-type, verwacht object voor lengte- / breedtegraad.</value>
   </data>
   <data name="contents.invalidGeolocationLatitude" xml:space="preserve">
-    <value>Latitude must be between -90 and 90.</value>
+    <value>Breedtegraad moet tussen -90 en 90 zijn.</value>
   </data>
   <data name="contents.invalidGeolocationLongitude" xml:space="preserve">
-    <value>Longitude must be between -180 and 180.</value>
+    <value>Lengtegraad moet tussen -180 en 180 liggen.</value>
   </data>
   <data name="contents.invalidGeolocationMoreProperties" xml:space="preserve">
-    <value>Geolocation can only have latitude and longitude property.</value>
+    <value>Geolocatie kan alleen de eigenschap lengte- en breedtegraad hebben.</value>
   </data>
   <data name="contents.invalidNumber" xml:space="preserve">
-    <value>Invalid json type, expected number.</value>
+    <value>Ongeldig json-type, verwacht aantal.</value>
   </data>
   <data name="contents.invalidString" xml:space="preserve">
-    <value>Invalid json type, expected string.</value>
+    <value>Ongeldig json-type, verwachte string.</value>
   </data>
   <data name="contents.listReferences" xml:space="preserve">
-    <value>{count} Reference(s)</value>
+    <value>{count} referentie (s)</value>
   </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
-    <value>Singleton content cannot be updated.</value>
+    <value>Singleton-inhoud kan niet worden bijgewerkt.</value>
   </data>
   <data name="contents.singletonNotCreatable" xml:space="preserve">
-    <value>Singleton content cannot be created.</value>
+    <value>Singleton-inhoud kan niet worden gemaakt.</value>
   </data>
   <data name="contents.singletonNotDeletable" xml:space="preserve">
-    <value>Singleton content cannot be deleted.</value>
+    <value>Singleton-inhoud kan niet worden verwijderd.</value>
   </data>
   <data name="contents.statusSchedulingNotInFuture" xml:space="preserve">
-    <value>Due time must be in the future.</value>
+    <value>De tijd moet in de toekomst liggen.</value>
   </data>
   <data name="contents.statusTransitionNotAllowed" xml:space="preserve">
-    <value>Cannot change status from {oldStatus} to {newStatus}.</value>
+    <value>Kan status niet wijzigen van {oldStatus} in {newStatus}.</value>
   </data>
   <data name="contents.validation.aspectRatio" xml:space="preserve">
-    <value>Must have aspect ratio {width}:{height}.</value>
+    <value>Moet aspectverhouding {breedte}: {hoogte} hebben.</value>
   </data>
   <data name="contents.validation.assetNotFound" xml:space="preserve">
-    <value>Id {id} not found.</value>
+    <value>Id {id} niet gevonden.</value>
   </data>
   <data name="contents.validation.between" xml:space="preserve">
-    <value>Must be between {min} and {max}.</value>
+    <value>Moet tussen {min} en {max} liggen.</value>
   </data>
   <data name="contents.validation.characterCount" xml:space="preserve">
-    <value>Must have exactly {count} character(s).</value>
+    <value>Moet exact {count} teken (s) bevatten.</value>
   </data>
   <data name="contents.validation.charactersBetween" xml:space="preserve">
-    <value>Must have between {min} and {max} character(s).</value>
+    <value>Moet tussen {min} en {max} teken (s) bevatten.</value>
   </data>
   <data name="contents.validation.duplicates" xml:space="preserve">
-    <value>Must not contain duplicate values.</value>
+    <value>Mag geen dubbele waarden bevatten.</value>
   </data>
   <data name="contents.validation.exactValue" xml:space="preserve">
-    <value>Must be exactly {value}.</value>
+    <value>Moet exact {waarde} zijn.</value>
   </data>
   <data name="contents.validation.extension" xml:space="preserve">
-    <value>Must be an allowed extension.</value>
+    <value>Moet een toegestane extensie zijn.</value>
   </data>
   <data name="contents.validation.image" xml:space="preserve">
-    <value>Not an image.</value>
+    <value>Geen afbeelding.</value>
   </data>
   <data name="contents.validation.invalid" xml:space="preserve">
-    <value>Not a valid value.</value>
+    <value>Geen geldige waarde.</value>
   </data>
   <data name="contents.validation.itemCount" xml:space="preserve">
-    <value>Must have exactly {count} item(s).</value>
+    <value>Moet exact {count} item (s) bevatten.</value>
   </data>
   <data name="contents.validation.itemCountBetween" xml:space="preserve">
-    <value>Must have between {min} and {max} item(s).</value>
+    <value>Moet tussen {min} en {max} item (s) bevatten.</value>
   </data>
   <data name="contents.validation.max" xml:space="preserve">
-    <value>Must be less or equal to {max}.</value>
+    <value>Moet kleiner zijn dan of gelijk zijn aan {max}.</value>
   </data>
   <data name="contents.validation.maximumHeight" xml:space="preserve">
-    <value>Height {height}px must be less than {max}px.</value>
+    <value>Hoogte {hoogte} px moet kleiner zijn dan {max} px.</value>
   </data>
   <data name="contents.validation.maximumSize" xml:space="preserve">
-    <value>Size of {size} must be less than {max}.</value>
+    <value>Grootte van {size} moet kleiner zijn dan {max}.</value>
   </data>
   <data name="contents.validation.maximumWidth" xml:space="preserve">
-    <value>Width {width}px must be less than {max}px.</value>
+    <value>Breedte {breedte} px moet kleiner zijn dan {max} px.</value>
   </data>
   <data name="contents.validation.maxItems" xml:space="preserve">
-    <value>Must not have more than {max} item(s).</value>
+    <value>Mag niet meer dan {max} item (s) bevatten.</value>
   </data>
   <data name="contents.validation.maxLength" xml:space="preserve">
-    <value>Must not have more than {max} character(s).</value>
+    <value>Mag niet meer dan {max} teken (s) bevatten.</value>
   </data>
   <data name="contents.validation.min" xml:space="preserve">
-    <value>Must be greater or equal to {min}.</value>
+    <value>Moet groter zijn dan of gelijk zijn aan {min}.</value>
   </data>
   <data name="contents.validation.minimumHeight" xml:space="preserve">
-    <value>Height {height}px must be greater than {min}px.</value>
+    <value>Hoogte {hoogte} px moet groter zijn dan {min} px.</value>
   </data>
   <data name="contents.validation.minimumSize" xml:space="preserve">
-    <value>Size of {size} must be greater than {min}.</value>
+    <value>Grootte van {size} moet groter zijn dan {min}.</value>
   </data>
   <data name="contents.validation.minimumWidth" xml:space="preserve">
-    <value>Width {width}px must be greater than {min}px.</value>
+    <value>Breedte {breedte} px moet groter zijn dan {min} px.</value>
   </data>
   <data name="contents.validation.minItems" xml:space="preserve">
-    <value>Must have at least {min} item(s).</value>
+    <value>Moet minstens {min} item (s) bevatten.</value>
   </data>
   <data name="contents.validation.minLength" xml:space="preserve">
-    <value>Must have at least {min} character(s).</value>
+    <value>Moet minstens {min} teken (s) bevatten.</value>
   </data>
   <data name="contents.validation.mustBeEmpty" xml:space="preserve">
-    <value>Value must not be defined.</value>
+    <value>Waarde mag niet worden gedefinieerd.</value>
   </data>
   <data name="contents.validation.notAllowed" xml:space="preserve">
-    <value>Not an allowed value.</value>
+    <value>Geen toegestane waarde.</value>
   </data>
   <data name="contents.validation.pattern" xml:space="preserve">
-    <value>Must follow the pattern.</value>
+    <value>Moet het patroon volgen.</value>
   </data>
   <data name="contents.validation.regexTooSlow" xml:space="preserve">
-    <value>Regex is too slow.</value>
+    <value>Regex is te traag.</value>
   </data>
   <data name="contents.validation.required" xml:space="preserve">
-    <value>Field is required.</value>
+    <value>Veld is verplicht.</value>
   </data>
   <data name="contents.validation.unique" xml:space="preserve">
-    <value>Another content with the same value exists.</value>
+    <value>Er bestaat een andere inhoud met dezelfde waarde.</value>
   </data>
   <data name="contents.validation.unknownField" xml:space="preserve">
-    <value>Not a known {fieldType}.</value>
+    <value>Onbekend {fieldType}.</value>
   </data>
   <data name="contents.workflowErorPublishing" xml:space="preserve">
-    <value>Content workflow prevents publishing.</value>
+    <value>Contentworkflow verhindert publiceren.</value>
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">
-    <value>The workflow does not allow updates at status {status}</value>
+    <value>De werkstroom staat geen updates toe met status {status}</value>
   </data>
   <data name="exception.invalidJsonQuery" xml:space="preserve">
-    <value>Json query not valid: {message}</value>
+    <value>Json-query niet geldig: {message}</value>
   </data>
   <data name="exception.invalidJsonQueryJson" xml:space="preserve">
-    <value>Json query not valid json: {message}</value>
+    <value>Json-query is niet geldig json: {message}</value>
   </data>
   <data name="exceptions.domainObjectDeleted" xml:space="preserve">
-    <value>Entity ({id}) has been deleted.</value>
+    <value>Entiteit ({id}) is verwijderd.</value>
   </data>
   <data name="exceptions.domainObjectNotFound" xml:space="preserve">
-    <value>Entity ({id}) does not exist.</value>
+    <value>Entiteit ({id}) bestaat niet.</value>
   </data>
   <data name="exceptions.domainObjectVersion" xml:space="preserve">
-    <value>Entity ({id}) requested version {expectedVersion}, but found {currentVersion}.</value>
+    <value>Entiteit ({id}) heeft versie {verwachteVersion} aangevraagd, maar heeft {currentVersion} gevonden.</value>
   </data>
   <data name="history.apps.clientAdded" xml:space="preserve">
-    <value>added client {[Id]} to app</value>
+    <value>client {[Id]} toegevoegd aan app</value>
   </data>
   <data name="history.apps.clientRevoked" xml:space="preserve">
-    <value>revoked client {[Id]}</value>
+    <value>ingetrokken klant {[Id]}</value>
   </data>
   <data name="history.apps.clientUpdated" xml:space="preserve">
-    <value>updated client {[Id]}</value>
+    <value>bijgewerkte client {[Id]}</value>
   </data>
   <data name="history.apps.contributoreAssigned" xml:space="preserve">
-    <value>assigned {user:[Contributor]} as {[Role]}</value>
+    <value>heeft {user:[Contributor]} toegewezen als {[Role]}</value>
   </data>
   <data name="history.apps.contributoreRemoved" xml:space="preserve">
-    <value>removed {user:[Contributor]} from app</value>
+    <value>heeft {user:[Contributor]} verwijderd uit app</value>
   </data>
   <data name="history.apps.languagedAdded" xml:space="preserve">
-    <value>added language {[Language]}</value>
+    <value>taal toegevoegd {[Language]}</value>
   </data>
   <data name="history.apps.languagedRemoved" xml:space="preserve">
-    <value>removed language {[Language]}</value>
+    <value>verwijderde taal {[Language]}</value>
   </data>
   <data name="history.apps.languagedSetToMaster" xml:space="preserve">
-    <value>changed master language to {[Language]}</value>
+    <value>hoofdtaal gewijzigd in {[Language]}</value>
   </data>
   <data name="history.apps.languagedUpdated" xml:space="preserve">
-    <value>updated language {[Language]}</value>
+    <value>bijgewerkte taal {[Language]}</value>
   </data>
   <data name="history.apps.patternAdded" xml:space="preserve">
-    <value>added pattern {[Name]}</value>
+    <value>toegevoegd patroon {[Name]}</value>
   </data>
   <data name="history.apps.patternDeleted" xml:space="preserve">
-    <value>deleted pattern {[PatternId]}</value>
+    <value>verwijderd patroon {[PatternId]}</value>
   </data>
   <data name="history.apps.patternUpdated" xml:space="preserve">
-    <value>updated pattern {[Name]}</value>
+    <value>bijgewerkt patroon {[Name]}</value>
   </data>
   <data name="history.apps.planChanged" xml:space="preserve">
-    <value>changed plan to {[Plan]}</value>
+    <value>plan gewijzigd in {[Plan]}</value>
   </data>
   <data name="history.apps.planReset" xml:space="preserve">
-    <value>resetted plan</value>
+    <value>gereset plan</value>
   </data>
   <data name="history.apps.roleAdded" xml:space="preserve">
-    <value>added role {[Name]}</value>
+    <value>toegevoegde rol {[Name]}</value>
   </data>
   <data name="history.apps.roleDeleted" xml:space="preserve">
-    <value>deleted role {[Name]}</value>
+    <value>verwijderde rol {[Name]}</value>
   </data>
   <data name="history.apps.roleUpdated" xml:space="preserve">
-    <value>updated role {[Name]}</value>
+    <value>bijgewerkte rol {[Name]}</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
-    <value>replaced asset.</value>
+    <value>item vervangen.</value>
   </data>
   <data name="history.assets.updated" xml:space="preserve">
-    <value>updated asset.</value>
+    <value>bijgewerkt item.</value>
   </data>
   <data name="history.assets.uploaded" xml:space="preserve">
-    <value>uploaded asset.</value>
+    <value>geüpload item.</value>
   </data>
   <data name="history.contents.created" xml:space="preserve">
-    <value>created {[Schema]} content.</value>
+    <value>heeft {[Schema]} inhoud gemaakt.</value>
   </data>
   <data name="history.contents.deleted" xml:space="preserve">
-    <value>deleted {[Schema]} content.</value>
+    <value>heeft {[Schema]} inhoud verwijderd.</value>
   </data>
   <data name="history.contents.draftCreated" xml:space="preserve">
-    <value>created new draft.</value>
+    <value>nieuw concept gemaakt.</value>
   </data>
   <data name="history.contents.draftDeleted" xml:space="preserve">
-    <value>deleted draft.</value>
+    <value>concept verwijderd.</value>
   </data>
   <data name="history.contents.scheduleCompleted" xml:space="preserve">
-    <value>scheduled to change status of {[Schema]} content to {[Status]}.</value>
+    <value>gepland om de status van {[Schema]} inhoud te wijzigen in {[Status]}.</value>
   </data>
   <data name="history.contents.scheduleFailed" xml:space="preserve">
-    <value>failed to schedule status change for {[Schema]} content.</value>
+    <value>kon statuswijziging voor {[Schema]} - inhoud niet plannen.</value>
   </data>
   <data name="history.contents.updated" xml:space="preserve">
-    <value>updated {[Schema]} content.</value>
+    <value>heeft {[Schema]} inhoud bijgewerkt.</value>
   </data>
   <data name="history.schemas.created" xml:space="preserve">
-    <value>created schema {[Name]}.</value>
+    <value>heeft schema {[Name]} gemaakt.</value>
   </data>
   <data name="history.schemas.deleted" xml:space="preserve">
-    <value>deleted schema {[Name]}.</value>
+    <value>verwijderde schema {[Name]}.</value>
   </data>
   <data name="history.schemas.fieldAdded" xml:space="preserve">
-    <value>added field {[Field]} to schema {[Name]}.</value>
+    <value>veld {[Field]} toegevoegd aan schema {[Name]}.</value>
   </data>
   <data name="history.schemas.fieldDeleted" xml:space="preserve">
-    <value>deleted field {[Field]} from schema {[Name]}.</value>
+    <value>heeft veld {[Field]} verwijderd uit schema {[Name]}.</value>
   </data>
   <data name="history.schemas.fieldDisabled" xml:space="preserve">
-    <value>disabled field {[Field]} of schema {[Name]}.</value>
+    <value>uitgeschakeld veld {[Field]} van schema {[Name]}.</value>
   </data>
   <data name="history.schemas.fieldHidden" xml:space="preserve">
-    <value>has hidden field {[Field]} of schema {[Name]}.</value>
+    <value>heeft veld {[Field]} van schema {[Name]} verborgen.</value>
   </data>
   <data name="history.schemas.fieldLocked" xml:space="preserve">
-    <value>has locked field {[Field]} of schema {[Name]}.</value>
+    <value>heeft veld {[Field]} van schema {[Name]} vergrendeld.</value>
   </data>
   <data name="history.schemas.fieldShown" xml:space="preserve">
-    <value>has shown field {[Field]} of schema {[Name]}.</value>
+    <value>heeft veld {[Field]} van schema {[Name]} getoond.</value>
   </data>
   <data name="history.schemas.fieldsReordered" xml:space="preserve">
-    <value>reordered fields of schema {[Name]}.</value>
+    <value>opnieuw geordende velden van schema {[Name]}.</value>
   </data>
   <data name="history.schemas.fieldUpdated" xml:space="preserve">
-    <value>has updated field {[Field]} of schema {[Name]}.</value>
+    <value>heeft veld {[Field]} van schema {[Name]} bijgewerkt.</value>
   </data>
   <data name="history.schemas.published" xml:space="preserve">
-    <value>published schema {[Name]}.</value>
+    <value>gepubliceerd schema {[Name]}.</value>
   </data>
   <data name="history.schemas.scriptsConfigured" xml:space="preserve">
-    <value>configured script of schema {[Name]}.</value>
+    <value>geconfigureerd script van schema {[Name]}.</value>
   </data>
   <data name="history.schemas.unpublished" xml:space="preserve">
-    <value>unpublished schema {[Name]}.</value>
+    <value>niet-gepubliceerd schema {[Name]}.</value>
   </data>
   <data name="history.schemas.updated" xml:space="preserve">
-    <value>updated schema {[Name]}.</value>
+    <value>bijgewerkt schema {[Name]}.</value>
   </data>
   <data name="history.statusChanged" xml:space="preserve">
-    <value>changed status of {[Schema]} content to {[Status]}.</value>
+    <value>veranderde status van {[Schema]} inhoud in {[Status]}.</value>
   </data>
   <data name="login.githubPrivateEmail" xml:space="preserve">
-    <value>Your email address is set to private in Github. Please set it to public to use Github login.</value>
+    <value>Jouw e-mailadres is ingesteld op privé in Github. Stel het in op openbaar om Github-login te gebruiken.</value>
   </data>
   <data name="rules.alreadyDeleted" xml:space="preserve">
-    <value>Rule has already been deleted.</value>
+    <value>Regel is al verwijderd.</value>
   </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
-    <value>Another rule is already running.</value>
+    <value>Er wordt al een andere regel uitgevoerd.</value>
   </data>
   <data name="schemas.alreadyDeleted" xml:space="preserve">
-    <value>Schema has already been deleted.</value>
+    <value>Schema is al verwijderd.</value>
   </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
-    <value>Calculated default value and default value cannot be used together.</value>
+    <value>Berekende standaardwaarde en standaardwaarde kunnen niet samen worden gebruikt.</value>
   </data>
   <data name="schemas.duplicateFieldName" xml:space="preserve">
-    <value>Field '{field}' has been added twice.</value>
+    <value>Veld '{field}' is twee keer toegevoegd.</value>
   </data>
   <data name="schemas.fieldCannotBeUIField" xml:space="preserve">
-    <value>Field cannot be an UI field.</value>
+    <value>Veld mag geen UI-veld zijn.</value>
   </data>
   <data name="schemas.fieldIsLocked" xml:space="preserve">
-    <value>Schema field is locked.</value>
+    <value>Schemaveld is vergrendeld.</value>
   </data>
   <data name="schemas.fieldNameAlreadyExists" xml:space="preserve">
-    <value>A field with the same name already exists.</value>
+    <value>Er bestaat al een veld met dezelfde naam.</value>
   </data>
   <data name="schemas.fieldNotInSchema" xml:space="preserve">
-    <value>Field is not part of the schema.</value>
+    <value>Veld maakt geen deel uit van het schema.</value>
   </data>
   <data name="schemas.fieldsNotCovered" xml:space="preserve">
-    <value>Field ids do not cover all fields.</value>
+    <value>Veld-id's dekken niet alle velden.</value>
   </data>
   <data name="schemas.nameAlreadyExists" xml:space="preserve">
-    <value>A schema with the same name already exists.</value>
+    <value>Er bestaat al een schema met dezelfde naam.</value>
   </data>
   <data name="schemas.noPermission" xml:space="preserve">
-    <value>You do not have permission for this schema.</value>
+    <value>Je hebt geen toestemming voor dit schema.</value>
   </data>
   <data name="schemas.notFoundId" xml:space="preserve">
-    <value>Schema {id} does not exist.</value>
+    <value>Schema {id} bestaat niet.</value>
   </data>
   <data name="schemas.number.eitherMinMaxOrAllowedValuesError" xml:space="preserve">
-    <value>Either allowed values or min and max length can be defined.</value>
+    <value>Ofwel toegestane waarden of min en max lengte kunnen worden gedefinieerd.</value>
   </data>
   <data name="schemas.number.inlineEditorError" xml:space="preserve">
-    <value>Inline editing is not allowed for Radio editor.</value>
+    <value>Inline bewerken is niet toegestaan ​​voor Radio-editor.</value>
   </data>
   <data name="schemas.onlyArraysHaveNested" xml:space="preserve">
-    <value>Only array fields can have nested fields.</value>
+    <value>Alleen matrixvelden kunnen geneste velden bevatten.</value>
   </data>
   <data name="schemas.onylArraysInRoot" xml:space="preserve">
-    <value>Nested field cannot be array fields.</value>
+    <value>Genest veld mag geen matrixvelden zijn.</value>
   </data>
   <data name="schemas.references.resolveError" xml:space="preserve">
-    <value>Can only resolve references when MaxItems is 1.</value>
+    <value>Kan alleen verwijzingen omzetten als MaxItems 1 is.</value>
   </data>
   <data name="schemas.string.eitherMinMaxOrAllowedValuesError" xml:space="preserve">
-    <value>Either allowed values or min and max value can be defined.</value>
+    <value>Ofwel toegestane waarden of min en max waarde kunnen worden gedefinieerd.</value>
   </data>
   <data name="schemas.string.inlineEditorError" xml:space="preserve">
-    <value>Inline editing is only allowed for dropdowns, slugs and input fields.</value>
+    <value>Inline bewerken is alleen toegestaan ​​voor dropdowns, slugs en invoervelden.</value>
   </data>
   <data name="schemas.stringEditorsNeedAllowedValuesError" xml:space="preserve">
-    <value>Radio buttons or dropdown list need allowed values.</value>
+    <value>Radioknoppen of vervolgkeuzelijsten hebben toegestane waarden nodig.</value>
   </data>
   <data name="schemas.tags.editorNeedsAllowedValues" xml:space="preserve">
-    <value>Checkboxes or dropdown list need allowed values.</value>
+    <value>Selectievakjes of vervolgkeuzelijsten hebben toegestane waarden nodig.</value>
   </data>
   <data name="schemas.uiFieldCannotBeDisabled" xml:space="preserve">
-    <value>UI field cannot be disabled.</value>
+    <value>UI-veld kan niet worden uitgeschakeld.</value>
   </data>
   <data name="schemas.uiFieldCannotBeEnabled" xml:space="preserve">
-    <value>UI field cannot be enabled.</value>
+    <value>UI-veld kan niet worden ingeschakeld.</value>
   </data>
   <data name="schemas.uiFieldCannotBeHidden" xml:space="preserve">
-    <value>UI field cannot be hidden.</value>
+    <value>UI-veld kan niet worden verborgen.</value>
   </data>
   <data name="schemas.uiFieldCannotBeShown" xml:space="preserve">
-    <value>UI field cannot be shown.</value>
+    <value>UI-veld kan niet worden weergegeven.</value>
   </data>
   <data name="search.contentResult" xml:space="preserve">
-    <value>{name} Content</value>
+    <value>{name} Inhoud</value>
   </data>
   <data name="search.contentsResult" xml:space="preserve">
-    <value>{name} Contents</value>
+    <value>{name} Inhoud</value>
   </data>
   <data name="search.schemaResult" xml:space="preserve">
     <value>{name} Schema</value>
   </data>
   <data name="security.passwordStolen" xml:space="preserve">
-    <value>This password has previously appeared in a data breach and should never be used. If you have ever used it anywhere before, change it!</value>
+    <value>Dit wachtwoord is eerder verschenen bij een datalek en mag nooit worden gebruikt. Als je het ooit eerder hebt gebruikt, verander het dan!</value>
   </data>
   <data name="users.accessDenied.text" xml:space="preserve">
-    <value>This operation is not allowed, your account might be locked.</value>
+    <value>Deze bewerking is niet toegestaan, je account is mogelijk vergrendeld.</value>
   </data>
   <data name="users.accessDenied.title" xml:space="preserve">
-    <value>Access denied</value>
+    <value>Toegang geweigerd</value>
   </data>
   <data name="users.consent.agree" xml:space="preserve">
-    <value>I agree!</value>
+    <value>Akkoord!</value>
   </data>
   <data name="users.consent.cookiesHeadline" xml:space="preserve">
-    <value>Cookies &amp; Analytics</value>
+    <value>Cookies en analyse</value>
   </data>
   <data name="users.consent.cookiesText" xml:space="preserve">
-    <value>&lt;p&gt; I understand and agree that Squidex uses cookies to ensure you get the best experience on our platform and to store your login status. &lt;/p&gt;&lt;p&gt; I understand and agree that Squidex has integrated Google Analytics (with the anonymizer function). Google Analytics is a web analytics service to gather and analyse data about the behavior of users. &lt;/p&gt;&lt;p&gt; I accept the &lt;a href="{privacyUrl}" target="_blank" rel="noopener"&gt;privacy policies&lt;/a&gt;.&lt;/p&gt;</value>
+    <value>&lt;p&gt; Ik begrijp en ga ermee akkoord dat Squidex cookies gebruikt om ervoor te zorgen dat je de beste ervaring op ons platform krijgt en om jouw inlogstatus op te slaan. &lt;/p&gt; &lt;p&gt; Ik begrijp en ga ermee akkoord dat Squidex heeft Google Analytics geïntegreerd (met de anonimiseringsfunctie). Google Analytics is een webanalysedienst om gegevens over het gedrag van gebruikers te verzamelen en te analyseren. &lt;/p&gt; &lt;p&gt; Ik accepteer de &lt;a href = "{privacyUrl} " target = "_blank " rel = "noopener "&gt; privacybeleid &lt;/a&gt;. &lt;/p&gt; </value>
   </data>
   <data name="users.consent.emailHeadline" xml:space="preserve">
-    <value>Automated E-Mails (Optional)</value>
+    <value>Geautomatiseerde e-mailberichten (optioneel)</value>
   </data>
   <data name="users.consent.emailText" xml:space="preserve">
-    <value>I understand and agree that Squidex sends Emails to inform me about new features, breaking changes and down times.</value>
+    <value>Ik begrijp en ga ermee akkoord dat Squidex e-mails verzendt om mij te informeren over nieuwe functies, verbroken veranderingen en downtime.</value>
   </data>
   <data name="users.consent.headline" xml:space="preserve">
-    <value>We need your consent</value>
+    <value>We hebben je toestemming nodig</value>
   </data>
   <data name="users.consent.needed" xml:space="preserve">
-    <value>You have to give consent.</value>
+    <value>Je moet toestemming geven.</value>
   </data>
   <data name="users.consent.piiHeadline" xml:space="preserve">
-    <value>Personal Information</value>
+    <value>Persoonlijke informatie</value>
   </data>
   <data name="users.consent.piiText" xml:space="preserve">
-    <value>I understand and agree that Squidex collects the following private information that are retrieved from external authentication providers such as Google, Microsoft or Github. &lt;ul class="personal-information"&gt; &lt;li&gt; Basic personal information (first name, last name and picture) are provided to all other users so that they can add you to their working space. &lt;/li&gt;&lt;li&gt; At anytime you have the option to change these information to anonymize your account. &lt;/li&gt;&lt;li&gt; Your user account has an unique identifier and for all your changes we track, that you made these changes and provide this information to other users. &lt;/li&gt;&lt;/ul&gt;</value>
+    <value>Ik begrijp en ga ermee akkoord dat Squidex de volgende privégegevens verzamelt die worden opgehaald van externe authenticatieleveranciers zoals Google, Microsoft of Github. &lt;ul class = " personal-information "&gt; &lt;li&gt; Persoonlijke basisinformatie (voornaam, achternaam en foto) wordt aan alle andere gebruikers verstrekt, zodat ze je aan hun werkruimte kunnen toevoegen. &lt;/li&gt; &lt;li&gt; Je hebt op elk moment de mogelijkheid om deze informatie te wijzigen om jouw account te anonimiseren . &lt;/li&gt; &lt;li&gt; Jouw gebruikersaccount heeft een unieke identificatie en voor al jouw wijzigingen volgen we, dat je deze wijzigingen hebt aangebracht en deze informatie aan andere gebruikers verstrekt. &lt;/li&gt; &lt;/ul&gt; </value>
   </data>
   <data name="users.consent.title" xml:space="preserve">
-    <value>Consent</value>
+    <value>Toestemming</value>
   </data>
   <data name="users.error.headline" xml:space="preserve">
-    <value>Operation failed</value>
+    <value>Bewerking mislukt</value>
   </data>
   <data name="users.error.text" xml:space="preserve">
-    <value>We are really sorry that something went wrong.</value>
+    <value>Het spijt ons echt dat er iets mis is gegaan.</value>
   </data>
   <data name="users.error.title" xml:space="preserve">
-    <value>Error</value>
+    <value>Fout</value>
   </data>
   <data name="users.errorHappened" xml:space="preserve">
-    <value>An unexpected exception occurred.</value>
+    <value>Er is een onverwachte uitzondering opgetreden.</value>
   </data>
   <data name="users.lockedOutText" xml:space="preserve">
-    <value>Your account is locked, please contact the administrator.</value>
+    <value>Jouw account is vergrendeld, neem contact op met de beheerder.</value>
   </data>
   <data name="users.lockedOutTitle" xml:space="preserve">
-    <value>Account locked</value>
+    <value>Account vergrendeld</value>
   </data>
   <data name="users.lockYourselfError" xml:space="preserve">
-    <value>You cannot lock yourself.</value>
+    <value>Je kunt jezelf niet vergrendelen.</value>
   </data>
   <data name="users.login.askAdmin" xml:space="preserve">
     <value />
   </data>
   <data name="users.login.emailPlaceholder" xml:space="preserve">
-    <value>Enter Email</value>
+    <value>E-mailadres invoeren</value>
   </data>
   <data name="users.login.error" xml:space="preserve">
-    <value>Email or password not correct</value>
+    <value>E-mailadres of wachtwoord niet correct</value>
   </data>
   <data name="users.login.loginWith" xml:space="preserve">
-    <value>{action} with &lt;strong&gt;{provider}&lt;/strong&gt;</value>
+    <value>{action} met &lt;strong&gt; {provider} &lt;/strong&gt;</value>
   </data>
   <data name="users.login.noAccountLoginAction" xml:space="preserve">
-    <value>Click here to login</value>
+    <value>Klik hier om in te loggen</value>
   </data>
   <data name="users.login.noAccountLoginQuestion" xml:space="preserve">
-    <value>Already registered?</value>
+    <value>Al geregistreerd?</value>
   </data>
   <data name="users.login.noAccountSignupAction" xml:space="preserve">
-    <value>Click here to signup</value>
+    <value>Klik hier om in te schrijven</value>
   </data>
   <data name="users.login.noAccountSignupQuestion" xml:space="preserve">
-    <value>No account yet?</value>
+    <value>Nog geen account?</value>
   </data>
   <data name="users.login.passwordPlaceholder" xml:space="preserve">
-    <value>Enter Password</value>
+    <value>Voer wachtwoord in</value>
   </data>
   <data name="users.login.separator" xml:space="preserve">
-    <value>OR</value>
+    <value>OF</value>
   </data>
   <data name="users.logout.headline" xml:space="preserve">
-    <value>Logged out!</value>
+    <value>Uitgelogd!</value>
   </data>
   <data name="users.logout.text" xml:space="preserve">
-    <value>!Please close this popup.</value>
+    <value>! Sluit deze pop-up.</value>
   </data>
   <data name="users.logout.title" xml:space="preserve">
-    <value>Logout</value>
+    <value>Uitloggen</value>
   </data>
   <data name="users.profile.addLoginDone" xml:space="preserve">
-    <value>Login added successfully.</value>
+    <value>Login succesvol toegevoegd.</value>
   </data>
   <data name="users.profile.changePassword" xml:space="preserve">
-    <value>Change Password</value>
+    <value>Wachtwoord wijzigen</value>
   </data>
   <data name="users.profile.changePasswordDone" xml:space="preserve">
-    <value>Password changed successfully.</value>
+    <value>Wachtwoord succesvol gewijzigd.</value>
   </data>
   <data name="users.profile.clientHint" xml:space="preserve">
-    <value>Use the client credentials to access the API with your profile information and permissions</value>
+    <value>Gebruik de clientreferenties om toegang te krijgen tot de API met jouw profielinformatie en machtigingen</value>
   </data>
   <data name="users.profile.clientTitle" xml:space="preserve">
     <value>Client</value>
   </data>
   <data name="users.profile.confirmPassword" xml:space="preserve">
-    <value>Confirm</value>
+    <value>Bevestigen</value>
   </data>
   <data name="users.profile.generateClient" xml:space="preserve">
-    <value>Generate</value>
+    <value>Genereer</value>
   </data>
   <data name="users.profile.generateClientDone" xml:space="preserve">
-    <value>Client secret generated successfully.</value>
+    <value>Clientgeheim succesvol gegenereerd.</value>
   </data>
   <data name="users.profile.headline" xml:space="preserve">
-    <value>Edit Profile</value>
+    <value>Profiel bewerken</value>
   </data>
   <data name="users.profile.hideProfile" xml:space="preserve">
-    <value>Do not show my profile to other users</value>
+    <value>Mijn profiel niet aan andere gebruikers tonen</value>
   </data>
   <data name="users.profile.loginsTitle" xml:space="preserve">
     <value>Logins</value>
   </data>
   <data name="users.profile.passwordTitle" xml:space="preserve">
-    <value>Password</value>
+    <value>Wachtwoord</value>
   </data>
   <data name="users.profile.pii" xml:space="preserve">
-    <value>Personal Information</value>
+    <value>Persoonlijke informatie</value>
   </data>
   <data name="users.profile.propertiesHint" xml:space="preserve">
-    <value>Use custom properties for rules and scripts.</value>
+    <value>Gebruik aangepaste eigenschappen voor regels en scripts.</value>
   </data>
   <data name="users.profile.propertiesTitle" xml:space="preserve">
-    <value>Properties</value>
+    <value>Eigenschappen</value>
   </data>
   <data name="users.profile.propertyAdd" xml:space="preserve">
-    <value>Add Property</value>
+    <value>Eigenschap toevoegen</value>
   </data>
   <data name="users.profile.removeLoginDone" xml:space="preserve">
-    <value>Login provider removed successfully.</value>
+    <value>Login provider succesvol verwijderd.</value>
   </data>
   <data name="users.profile.setPassword" xml:space="preserve">
-    <value>Set Password</value>
+    <value>Wachtwoord instellen</value>
   </data>
   <data name="users.profile.setPasswordDone" xml:space="preserve">
-    <value>Password set successfully.</value>
+    <value>Wachtwoord succesvol ingesteld.</value>
   </data>
   <data name="users.profile.title" xml:space="preserve">
-    <value>Profile</value>
+    <value>Profiel</value>
   </data>
   <data name="users.profile.updateProfileDone" xml:space="preserve">
-    <value>Account updated successfully.</value>
+    <value>Account succesvol bijgewerkt.</value>
   </data>
   <data name="users.profile.updatePropertiesDone" xml:space="preserve">
-    <value>Account updated successfully.</value>
+    <value>Account succesvol bijgewerkt.</value>
   </data>
   <data name="users.profile.uploadPicture" xml:space="preserve">
-    <value>Upload Picture</value>
+    <value>Afbeelding uploaden</value>
   </data>
   <data name="users.profile.uploadPictureDone" xml:space="preserve">
-    <value>Picture uploaded successfully.</value>
+    <value>Foto succesvol geüpload.</value>
   </data>
   <data name="users.unlockYourselfError" xml:space="preserve">
-    <value>You cannot unlock yourself.</value>
+    <value>Je kunt jezelf niet ontgrendelen.</value>
   </data>
   <data name="users.userLocked" xml:space="preserve">
-    <value>User is not allowed to login.</value>
+    <value>Gebruiker mag niet inloggen.</value>
   </data>
   <data name="users.userNotFound" xml:space="preserve">
-    <value>Cannot find user.</value>
+    <value>Kan gebruiker niet vinden.</value>
   </data>
   <data name="validation.between" xml:space="preserve">
-    <value>{property|upper} must be between {min} and {max}.</value>
+    <value>{property|upper} moet tussen {min} en {max} liggen.</value>
   </data>
   <data name="validation.greaterEqualsThan" xml:space="preserve">
-    <value>{property|upper} must be greater or equal to {other|lower}.</value>
+    <value>{property|upper} moet groter zijn dan of gelijk zijn aan {other|lower}.</value>
   </data>
   <data name="validation.greaterThan" xml:space="preserve">
-    <value>{property|upper} must be greater than {other|lower}.</value>
+    <value>{property|upper} moet groter zijn dan {other|lower}.</value>
   </data>
   <data name="validation.javascriptProperty" xml:space="preserve">
-    <value>{property|upper} is not a Javascript property name.</value>
+    <value>{property|upper} is geen Javascript-eigenschapsnaam.</value>
   </data>
   <data name="validation.lessEqualsThan" xml:space="preserve">
-    <value>{property|upper} must be less or equal to {other|lower}.</value>
+    <value>{property|upper} moet kleiner zijn dan of gelijk zijn aan {other|lower}.</value>
   </data>
   <data name="validation.lessThan" xml:space="preserve">
-    <value>{property|upper} must be less than {other|lower}.</value>
+    <value>{property|upper} moet kleiner zijn dan {other|lower}.</value>
   </data>
   <data name="validation.notAnImage" xml:space="preserve">
-    <value>Picture is not a valid image.</value>
+    <value>Afbeelding is geen geldige afbeelding.</value>
   </data>
   <data name="validation.onlyOneFile" xml:space="preserve">
-    <value>Can only upload one file.</value>
+    <value>Kan slechts één bestand uploaden.</value>
   </data>
   <data name="validation.required" xml:space="preserve">
-    <value>{property|upper} is required.</value>
+    <value>{property|upper} is vereist.</value>
   </data>
   <data name="validation.requiredBoth" xml:space="preserve">
-    <value>If {property1|lower} or {property2|lower} is used both must be defined.</value>
+    <value>Als {property1|lower} of {property2|lower} wordt gebruikt, moeten beide worden gedefinieerd.</value>
   </data>
   <data name="validation.requiredValue" xml:space="preserve">
-    <value>Value must be defined.</value>
+    <value>Waarde moet worden gedefinieerd.</value>
   </data>
   <data name="validation.slug" xml:space="preserve">
-    <value>{property|upper} is not a valid slug.</value>
+    <value>{property|upper} is geen geldige slug.</value>
   </data>
   <data name="validation.valid" xml:space="preserve">
-    <value>{property|upper} is not a valid value.</value>
+    <value>{property|upper} is geen geldige waarde.</value>
   </data>
   <data name="workflows.overlap" xml:space="preserve">
-    <value>Multiple workflows cover all schemas.</value>
+    <value>Meerdere workflows omvatten alle schema's.</value>
   </data>
   <data name="workflows.publishedIsInitial" xml:space="preserve">
-    <value>Initial step cannot be published step.</value>
+    <value>Eerste stap kan niet worden gepubliceerd stap.</value>
   </data>
   <data name="workflows.publishedNotDefined" xml:space="preserve">
-    <value>Workflow must have a published step.</value>
+    <value>Workflow moet een gepubliceerde stap hebben.</value>
   </data>
   <data name="workflows.publishedStepNotFound" xml:space="preserve">
-    <value>Transition has an invalid target.</value>
+    <value>Overgang heeft een ongeldig doel.</value>
   </data>
   <data name="workflows.schemaOverlap" xml:space="preserve">
-    <value>The schema '{schema}' is covered by multiple workflows.</value>
+    <value>Het schema '{schema}' wordt gedekt door meerdere workflows.</value>
   </data>
 </root>

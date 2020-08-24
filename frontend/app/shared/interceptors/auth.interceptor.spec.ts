@@ -56,7 +56,6 @@ describe('AuthInterceptor', () => {
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('Authorization')).toEqual('letmein');
-        expect(req.request.headers.get('Accept-Language')).toEqual('*');
         expect(req.request.headers.get('Pragma')).toEqual('no-cache');
     }));
 

@@ -22,55 +22,55 @@ namespace Squidex.Domain.Apps.Entities.Apps
             : base(typeNameRegistry)
         {
             AddEventMessage<AppContributorAssigned>(
-                T.Get("history.apps.contributoreAssigned"));
+                "history.apps.contributoreAssigned");
 
             AddEventMessage<AppContributorRemoved>(
-                T.Get("history.apps.contributoreRemoved"));
+                "history.apps.contributoreRemoved");
 
             AddEventMessage<AppClientAttached>(
-                T.Get("history.apps.clientAdded"));
+                "history.apps.clientAdded");
 
             AddEventMessage<AppClientRevoked>(
-                T.Get("history.apps.clientRevoked"));
+                "history.apps.clientRevoked");
 
             AddEventMessage<AppClientUpdated>(
-                T.Get("history.apps.clientUpdated"));
+                "history.apps.clientUpdated");
 
             AddEventMessage<AppPlanChanged>(
-                T.Get("history.apps.planChanged"));
+                "history.apps.planChanged");
 
             AddEventMessage<AppPlanReset>(
-                T.Get("history.apps.planReset"));
+                "history.apps.planReset");
 
             AddEventMessage<AppLanguageAdded>(
-                T.Get("history.apps.languagedAdded"));
+                "history.apps.languagedAdded");
 
             AddEventMessage<AppLanguageRemoved>(
-                T.Get("history.apps.languagedRemoved"));
+                "history.apps.languagedRemoved");
 
             AddEventMessage<AppLanguageUpdated>(
-                T.Get("history.apps.languagedUpdated"));
+                "history.apps.languagedUpdated");
 
             AddEventMessage<AppMasterLanguageSet>(
-                T.Get("history.apps.languagedSetToMaster"));
+                "history.apps.languagedSetToMaster");
 
             AddEventMessage<AppPatternAdded>(
-                T.Get("history.apps.patternAdded"));
+                "history.apps.patternAdded");
 
             AddEventMessage<AppPatternDeleted>(
-                T.Get("history.apps.patternDeleted"));
+                "history.apps.patternDeleted");
 
             AddEventMessage<AppPatternUpdated>(
-                T.Get("history.apps.patternUpdated"));
+                "history.apps.patternUpdated");
 
             AddEventMessage<AppRoleAdded>(
-                T.Get("history.apps.roleAdded"));
+                "history.apps.roleAdded");
 
             AddEventMessage<AppRoleDeleted>(
-                T.Get("history.apps.roleDeleted"));
+                "history.apps.roleDeleted");
 
             AddEventMessage<AppRoleUpdated>(
-                T.Get("history.apps.roleUpdated"));
+                "history.apps.roleUpdated");
         }
 
         private HistoryEvent? CreateEvent(IEvent @event)

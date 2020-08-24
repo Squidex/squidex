@@ -11,5 +11,13 @@ namespace Squidex.Translator.State
 {
     public sealed class TranslatedTexts : SortedDictionary<string, string>
     {
+        public TranslatedTexts()
+        {
+        }
+
+        public TranslatedTexts(TranslatedTexts source)
+            : base(source)
+        {
+        }
     }
 }
