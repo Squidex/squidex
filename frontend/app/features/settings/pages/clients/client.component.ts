@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto } from '@app/shared';
 
 @Component({
@@ -14,12 +14,14 @@ import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto } from '@app/s
     templateUrl: './client.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ClientComponent {
+export class ClientComponent implements OnChanges {
     @Input()
     public client: ClientDto;
 
     @Input()
     public clientRoles: ReadonlyArray<RoleDto>;
+
+    public apiCallsLimit: number;
 
     public connectDialog = new DialogModel();
 
@@ -27,6 +29,12 @@ export class ClientComponent {
         public readonly appsState: AppsState,
         private readonly clientsState: ClientsState
     ) {
+    }
+
+    public ngOnChanges(changes: SimpleChanges ) {
+        if (changes['client']) {
+            this.apiCallsLimit = this.client.apiCallsLimit;
+        }
     }
 
     public revoke() {

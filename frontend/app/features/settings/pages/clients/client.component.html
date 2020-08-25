@@ -78,7 +78,7 @@
                     {{ 'clients.apiCallsLimit' | sqxTranslate }}
                 </label>
                 <div class="col cell-input">
-                    <input type="number" class="form-control" min="0" [disabled]="!client.canUpdate" [(ngModel)]="client.apiCallsLimit" />
+                    <input type="number" class="form-control" min="0" [disabled]="!client.canUpdate" [(ngModel)]="apiCallsLimit" />
 
                     <sqx-form-hint>{{ 'clients.apiCallsLimitHint' | sqxTranslate }}</sqx-form-hint>
                 </div>
