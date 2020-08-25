@@ -46,8 +46,12 @@ namespace Squidex.Config.Authentication
             }
             else
             {
+                var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
+
                 authBuilder.AddLocalApi(options =>
                 {
+                    options.ClaimsIssuer = urlsOptions.BuildUrl("/identity-server", false);
+
                     options.ExpectedScope = apiScope;
                 });
             }

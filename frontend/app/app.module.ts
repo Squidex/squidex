@@ -17,7 +17,7 @@ import { routing } from './app.routes';
 import { ApiUrlConfig, CurrencyConfig, DateHelper, DecimalSeparatorConfig, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
 
-DateHelper.setlocale(window['options'].more.culture);
+DateHelper.setlocale(window['options']?.more?.culture);
 
 export function configApiUrl() {
     const baseElements = document.getElementsByTagName('base');

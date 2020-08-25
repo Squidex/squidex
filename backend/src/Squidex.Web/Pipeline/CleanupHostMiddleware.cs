@@ -5,40 +5,30 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Squidex.Web.Pipeline
 {
     public class CleanupHostMiddleware
     {
         private readonly RequestDelegate next;
+        private readonly HostString host;
 
-        public CleanupHostMiddleware(RequestDelegate next)
+        public CleanupHostMiddleware(RequestDelegate next, IOptions<UrlsOptions> options)
         {
             this.next = next;
+
+            host = new HostString(new Uri(options.Value.BaseUrl).Host);
         }
 
         public Task InvokeAsync(HttpContext context)
         {
-            var request = context.Request;
-
-            if (request.Host.HasValue && (HasHttpsPort(request) || HasHttpPort(request)))
-            {
-                request.Host = new HostString(request.Host.Host);
-            }
+            context.Request.Host = host;
 
             return next(context);
-        }
-
-        private static bool HasHttpPort(HttpRequest request)
-        {
-            return request.Scheme == "http" && request.Host.Port == 80;
-        }
-
-        private static bool HasHttpsPort(HttpRequest request)
-        {
-            return request.Scheme == "https" && request.Host.Port == 443;
         }
     }
 }

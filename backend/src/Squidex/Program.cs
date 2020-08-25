@@ -69,6 +69,8 @@ namespace Squidex
                             serverOptions.ListenAnyIP(
                                 5001,
                                 listenOptions => listenOptions.UseHttps("../../../dev/squidex-dev.pfx", "password"));
+
+                            serverOptions.ListenAnyIP(5000);
                         }
                     });
 
