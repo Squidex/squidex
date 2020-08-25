@@ -53,6 +53,7 @@ namespace Squidex.Translator.Processes
             }
 
             Helper.CheckUnused(service, all);
+            Helper.CheckOtherLocales(service);
 
             service.Save();
         }

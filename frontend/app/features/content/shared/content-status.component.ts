@@ -43,7 +43,7 @@ export class ContentStatusComponent {
 
     public get tooltipText() {
         if (this.scheduled) {
-            return `Will be set to '${this.scheduled.status}' at ${this.scheduled.dueTime.toStringFormatUTC('PPpp')}`;
+            return `Will be set to '${this.scheduled.status}' at ${this.scheduled.dueTime.toStringFormat('PPpp')}`;
         } else {
             return this.status;
         }

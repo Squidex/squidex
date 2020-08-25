@@ -130,9 +130,9 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
             const parsed = DateTime.parseISO(this.value);
 
             if (properties.editor === 'Date') {
-                return parsed.toStringFormatUTC('yyyy-MM-dd');
+                return parsed.toStringFormat('P');
             } else {
-                return parsed.toStringFormatUTC('yyyy-MM-dd HH:mm:ss');
+                return parsed.toStringFormat('Ppp');
             }
         } catch (ex) {
             return this.value;

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { addDays, addHours, addMilliseconds, addMinutes, addMonths, addSeconds, addYears, format, formatDistanceToNow, parse, parseISO, startOfDay, startOfMonth, startOfTomorrow, startOfWeek, startOfYesterday } from 'date-fns';
+import { addDays, addHours, addMilliseconds, addMinutes, addMonths, addSeconds, addYears, format, formatDistanceToNow, formatISO, parse, parseISO, startOfDay, startOfMonth, startOfTomorrow, startOfWeek, startOfYesterday } from 'date-fns';
 import { DateHelper } from './date-helper';
 
 const DATE_FORMAT = 'yyyy-MM-dd';
@@ -177,16 +177,20 @@ export class DateTime {
         return format(this.value, DATE_FORMAT);
     }
 
+    public toISODateTime(): string {
+        return formatISO(this.value);
+    }
+
     public toStringFormat(pattern: string): string {
-        return format(this.value, pattern);
+        return format(this.value, pattern, { locale: DateHelper.getFnsLocale() });
     }
 
     public toStringFormatUTC(pattern: string): string {
-        return format(DateHelper.getUTCDate(this.value), pattern);
+        return format(DateHelper.getUTCDate(this.value), pattern, { locale: DateHelper.getFnsLocale() });
     }
 
     public toFromNow(): string {
-        return formatDistanceToNow(this.value);
+        return formatDistanceToNow(this.value, { locale: DateHelper.getFnsLocale() });
     }
 
     public toISOString(withoutMilliseconds = true): string {
