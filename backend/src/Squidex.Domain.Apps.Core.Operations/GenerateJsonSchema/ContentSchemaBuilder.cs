@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(dataSchema, nameof(dataSchema));
 
-            var schemaName = schema.Properties.Label.WithFallback(schema.Name);
+            var schemaName = schema.Properties.Label.Or(schema.Name);
 
             var contentSchema = new JsonSchema
             {

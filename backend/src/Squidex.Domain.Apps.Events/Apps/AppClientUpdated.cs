@@ -18,6 +18,10 @@ namespace Squidex.Domain.Apps.Events.Apps
 
         public string? Role { get; set; }
 
+        public long? ApiCallsLimit { get; set; }
+
+        public long? ApiTrafficLimit { get; set; }
+
         public bool? AllowAnonymous { get; set; }
     }
 }

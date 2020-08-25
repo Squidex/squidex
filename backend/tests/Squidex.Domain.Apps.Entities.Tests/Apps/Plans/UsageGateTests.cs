@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         private readonly IUsageNotifierGrain usageNotifierGrain = A.Fake<IUsageNotifierGrain>();
         private readonly DateTime today = new DateTime(2020, 04, 10);
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly string clientId = Guid.NewGuid().ToString();
         private readonly UsageGate sut;
         private long apiCallsBlocking;
         private long apiCallsMax;
@@ -51,20 +53,38 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             A.CallTo(() => appPlan.BlockingApiCalls)
                 .ReturnsLazily(x => apiCallsBlocking);
 
-            A.CallTo(() => usageTracker.GetMonthCallsAsync(appId.Id.ToString(), today))
+            A.CallTo(() => usageTracker.GetMonthCallsAsync(appId.Id.ToString(), today, A<string>._))
                 .ReturnsLazily(x => Task.FromResult(apiCallsCurrent));
 
             sut = new UsageGate(appPlansProvider, usageTracker, grainFactory);
         }
 
         [Fact]
-        public async Task Should_return_true_if_over_blocking_limt()
+        public async Task Should_return_true_if_over_client_limit()
+        {
+            A.CallTo(() => appEntity.Clients)
+                .Returns(AppClients.Empty.Add(clientId, new AppClient(clientId, clientId, Role.Developer, 100)));
+
+            apiCallsCurrent = 1000;
+            apiCallsBlocking = 1600;
+            apiCallsMax = 1600;
+
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
+
+            Assert.True(isBlocked);
+
+            A.CallTo(() => usageNotifierGrain.NotifyAsync(A<UsageNotification>.Ignored))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_return_true_if_over_blocking_limit()
         {
             apiCallsCurrent = 1000;
             apiCallsBlocking = 600;
             apiCallsMax = 600;
 
-            var isBlocked = await sut.IsBlockedAsync(appEntity, today);
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
 
             Assert.True(isBlocked);
 
@@ -79,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 1600;
             apiCallsMax = 1600;
 
-            var isBlocked = await sut.IsBlockedAsync(appEntity, today);
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
 
             Assert.False(isBlocked);
 
@@ -94,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 5000;
             apiCallsMax = 3000;
 
-            var isBlocked = await sut.IsBlockedAsync(appEntity, today);
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
 
             Assert.False(isBlocked);
 
@@ -109,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 5000;
             apiCallsMax = 0;
 
-            var isBlocked = await sut.IsBlockedAsync(appEntity, today);
+            var isBlocked = await sut.IsBlockedAsync(appEntity, clientId, today);
 
             Assert.False(isBlocked);
 
@@ -124,8 +144,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             apiCallsBlocking = 5000;
             apiCallsMax = 3000;
 
-            await sut.IsBlockedAsync(appEntity, today);
-            await sut.IsBlockedAsync(appEntity, today);
+            await sut.IsBlockedAsync(appEntity, clientId, today);
+            await sut.IsBlockedAsync(appEntity, clientId, today);
 
             A.CallTo(() => usageNotifierGrain.NotifyAsync(A<UsageNotification>.Ignored))
                 .MustHaveHappenedOnceExactly();

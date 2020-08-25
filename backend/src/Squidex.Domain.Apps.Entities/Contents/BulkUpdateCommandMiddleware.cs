@@ -74,11 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                         {
                                             var command = SimpleMapper.Map(bulkUpdates, new CreateContent { Data = job.Data });
 
-                                            var content = serviceProvider.GetRequiredService<ContentDomainObject>();
-
-                                            content.Setup(command.ContentId);
-
-                                            await content.ExecuteAsync(command);
+                                            await InsertAsync(command);
 
                                             result.ContentId = command.ContentId;
                                         }
@@ -149,6 +145,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 await next(context);
             }
+        }
+
+        private async Task InsertAsync(CreateContent command)
+        {
+            var content = serviceProvider.GetRequiredService<ContentDomainObject>();
+
+            content.Setup(command.ContentId);
+
+            await content.ExecuteAsync(command);
         }
 
         private async Task<Guid?> FindIdAsync(Context context, string schema, BulkUpdateJob job)

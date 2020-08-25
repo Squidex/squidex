@@ -13,6 +13,7 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -22,7 +23,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public class ResolveReferencesTests
+    public class ResolveReferencesTests : IClassFixture<TranslationsFixture>
     {
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly IRequestCache requestCache = A.Fake<IRequestCache>();

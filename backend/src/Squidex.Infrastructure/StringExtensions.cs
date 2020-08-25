@@ -547,11 +547,6 @@ namespace Squidex.Infrastructure
             return !string.IsNullOrWhiteSpace(value) ? value.Trim() : fallback;
         }
 
-        public static string WithFallback(this string? value, string fallback)
-        {
-            return !string.IsNullOrWhiteSpace(value) ? value.Trim() : fallback;
-        }
-
         public static string ToPascalCase(this string value)
         {
             if (value.Length == 0)

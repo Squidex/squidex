@@ -151,10 +151,10 @@
   "/Squidex.Domain.Apps.Entities/Contents/Text/Elastic/ElasticSearchTextIndex.cs": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Entities/Contents/Text/Lucene/IndexManager_Impl.cs": [
+  "/Squidex.Domain.Apps.Entities/Contents/Text/Lucene/IndexManager.cs": [
     "*"
   ],
-  "/Squidex.Domain.Apps.Entities/Contents/Text/Lucene/IndexManager.cs": [
+  "/Squidex.Domain.Apps.Entities/Contents/Text/Lucene/IndexManager_Impl.cs": [
     "*"
   ],
   "/Squidex.Domain.Apps.Entities/Notifications/NotificationEmailSender.cs": [

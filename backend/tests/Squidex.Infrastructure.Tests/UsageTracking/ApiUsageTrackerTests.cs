@@ -18,6 +18,7 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
         private readonly string key = Guid.NewGuid().ToString();
+        private readonly string category = Guid.NewGuid().ToString();
         private readonly DateTime date = DateTime.Today;
         private readonly ApiUsageTracker sut;
 
@@ -55,10 +56,10 @@ namespace Squidex.Infrastructure.UsageTracking
                 [ApiUsageTracker.CounterTotalCalls] = 4
             };
 
-            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date))
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category))
                 .Returns(counters);
 
-            var result = await sut.GetMonthCallsAsync(key, date);
+            var result = await sut.GetMonthCallsAsync(key, date, category);
 
             Assert.Equal(4, result);
         }
@@ -71,10 +72,10 @@ namespace Squidex.Infrastructure.UsageTracking
                 [ApiUsageTracker.CounterTotalBytes] = 14
             };
 
-            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date))
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category))
                 .Returns(counters);
 
-            var result = await sut.GetMonthBytesAsync(key, date);
+            var result = await sut.GetMonthBytesAsync(key, date, category);
 
             Assert.Equal(14, result);
         }

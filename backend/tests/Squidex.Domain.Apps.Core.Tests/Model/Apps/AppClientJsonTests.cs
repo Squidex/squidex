@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             clients = clients.Update("3", name: "My Client 3");
             clients = clients.Update("2", name: "My Client 2");
 
-            clients = clients.Update("1", allowAnonymous: true);
+            clients = clients.Update("1", allowAnonymous: true, apiCallsLimit: 3);
 
             clients = clients.Revoke("4");
 

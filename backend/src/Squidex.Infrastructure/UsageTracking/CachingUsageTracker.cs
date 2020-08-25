@@ -40,31 +40,31 @@ namespace Squidex.Infrastructure.UsageTracking
             return inner.TrackAsync(date, key, category, counters);
         }
 
-        public Task<Counters> GetForMonthAsync(string key, DateTime date)
+        public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category)
         {
             Guard.NotNull(key, nameof(key));
 
-            var cacheKey = string.Join("$", "Usage", nameof(GetForMonthAsync), key, date);
+            var cacheKey = string.Join("$", "Usage", nameof(GetForMonthAsync), key, date, category);
 
             return Cache.GetOrCreateAsync(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
-                return inner.GetForMonthAsync(key, date);
+                return inner.GetForMonthAsync(key, date, category);
             });
         }
 
-        public Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate)
+        public Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category)
         {
             Guard.NotNull(key, nameof(key));
 
-            var cacheKey = string.Join("$", "Usage", nameof(GetAsync), key, fromDate, toDate);
+            var cacheKey = string.Join("$", "Usage", nameof(GetAsync), key, fromDate, toDate, category);
 
             return Cache.GetOrCreateAsync(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
-                return inner.GetAsync(key, fromDate, toDate);
+                return inner.GetAsync(key, fromDate, toDate, category);
             });
         }
     }
