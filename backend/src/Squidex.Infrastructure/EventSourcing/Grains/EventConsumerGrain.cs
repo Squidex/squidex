@@ -10,7 +10,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
-using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
@@ -78,11 +77,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         public Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent)
         {
             if (subscription.Value != currentSubscription)
-            {
-                return Task.CompletedTask;
-            }
-
-            if (State.HasSeen(storedEvent.Value))
             {
                 return Task.CompletedTask;
             }

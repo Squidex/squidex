@@ -26,6 +26,11 @@ namespace Squidex.Infrastructure.EventSourcing
             get { return Database.GetCollection<BsonDocument>(CollectionName()); }
         }
 
+        public IMongoCollection<MongoEventCommit> TypedCollection
+        {
+            get { return Collection; }
+        }
+
         public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
             : base(database)
         {

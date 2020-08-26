@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
@@ -23,7 +22,6 @@ namespace Squidex.Infrastructure.EventSourcing
 
     public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
-        private const int ReadBeforeSeconds = 1;
         private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
         private static readonly EventPredicate EmptyPredicate = x => true;
 
@@ -42,7 +40,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(subscriber, nameof(subscriber));
 
-            return new PollingSubscription(this, subscriber, streamFilter, position);
+            return new MongoEventStoreSubscription(this, subscriber, streamFilter, position);
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count)
@@ -58,27 +56,14 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var commits =
                     await Collection.Find(
-                            Filter.Eq(EventStreamField, streamName))
-                        .Sort(Sort.Descending(TimestampField)).Limit(count).ToListAsync();
+                            Filter.Eq(x => x.EventStream, streamName))
+                        .Sort(Sort.Descending(x => x.Timestamp)).Limit(count).ToListAsync();
 
                 var result = new List<StoredEvent>();
 
                 foreach (var commit in commits)
                 {
-                    var eventStreamOffset = (int)commit.EventStreamOffset;
-
-                    var commitTimestamp = commit.Timestamp;
-                    var commitOffset = 0;
-
-                    foreach (var @event in commit.Events)
-                    {
-                        eventStreamOffset++;
-
-                        var eventData = @event.ToEventData();
-                        var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
-
-                        result.Add(new StoredEvent(streamName, eventToken, eventStreamOffset, eventData));
-                    }
+                    result.AddRange(commit.Filtered(long.MinValue));
                 }
 
                 IEnumerable<StoredEvent> ordered = result.OrderBy(x => x.EventStreamNumber);
@@ -101,31 +86,15 @@ namespace Squidex.Infrastructure.EventSourcing
                 var commits =
                     await Collection.Find(
                         Filter.And(
-                            Filter.Eq(EventStreamField, streamName),
-                            Filter.Gte(EventStreamOffsetField, streamPosition - MaxCommitSize)))
-                        .Sort(Sort.Ascending(TimestampField)).ToListAsync();
+                            Filter.Eq(x => x.EventStream, streamName),
+                            Filter.Gte(x => x.EventStreamOffset, streamPosition - MaxCommitSize)))
+                        .Sort(Sort.Ascending(x => x.Timestamp)).ToListAsync();
 
                 var result = new List<StoredEvent>();
 
                 foreach (var commit in commits)
                 {
-                    var eventStreamOffset = (int)commit.EventStreamOffset;
-
-                    var commitTimestamp = commit.Timestamp;
-                    var commitOffset = 0;
-
-                    foreach (var @event in commit.Events)
-                    {
-                        eventStreamOffset++;
-
-                        if (eventStreamOffset >= streamPosition)
-                        {
-                            var eventData = @event.ToEventData();
-                            var eventPosition = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
-
-                            result.Add(new StoredEvent(streamName, eventPosition, eventStreamOffset, eventData));
-                        }
-                    }
+                    result.AddRange(commit.Filtered(streamPosition));
                 }
 
                 return result;
@@ -141,7 +110,7 @@ namespace Squidex.Infrastructure.EventSourcing
             StreamPosition lastPosition = position;
 
             var filterDefinition = CreateFilter(property, value, lastPosition);
-            var filterPredicate = CreateFilterExpression(property, value);
+            var filterPredicate = CreateFilterPredicate(property, value);
 
             return QueryAsync(callback, lastPosition, filterDefinition, filterPredicate, ct);
         }
@@ -171,7 +140,7 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 await Collection.Find(filterDefinition, options: Batching.Options).Sort(Sort.Ascending(TimestampField)).ForEachPipelineAsync(async commit =>
                 {
-                    foreach (var @event in Filtered(commit, StreamPosition.Empty, filterPredicate))
+                    foreach (var @event in commit.Filtered(StreamPosition.Empty, filterPredicate))
                     {
                         await callback(@event);
                     }
@@ -185,7 +154,7 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 await Collection.Find(filter, options: Batching.Options).Sort(Sort.Ascending(TimestampField)).ForEachPipelineAsync(async commit =>
                 {
-                    foreach (var @event in Filtered(commit, position, predicate))
+                    foreach (var @event in commit.Filtered(position, predicate))
                     {
                         await callback(@event);
                     }
@@ -193,60 +162,22 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private static IEnumerable<StoredEvent> Filtered(MongoEventCommit commit, StreamPosition lastPosition, EventPredicate predicate)
+        private static EventFilter CreateFilter(string? streamFilter, StreamPosition streamPosition, bool atLeastOnce)
         {
-            var eventStreamOffset = commit.EventStreamOffset;
+            var byPosition = Helper.FilterByPosition(streamPosition, atLeastOnce);
+            var byStream = Helper.FilterByStream(streamFilter);
 
-            var commitTimestamp = commit.Timestamp;
-            var commitOffset = 0;
-
-            foreach (var @event in commit.Events)
+            if (byStream != null)
             {
-                eventStreamOffset++;
-
-                if ((commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp) && predicate(@event))
-                {
-                    var eventData = @event.ToEventData();
-                    var eventPosition = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
-
-                    yield return new StoredEvent(commit.EventStream, eventPosition, eventStreamOffset, eventData);
-                }
-
-                commitOffset++;
+                return Filter.And(byPosition, byStream);
             }
+
+            return byPosition;
         }
 
         private static EventFilter CreateFilter(string property, object value, StreamPosition streamPosition)
         {
-            var filters = new List<EventFilter>(2)
-            {
-                PositionFilter(streamPosition, false),
-                PropertyFilter(property, value)
-            };
-
-            return Filter.And(filters);
-        }
-
-        private static EventFilter CreateFilter(string? streamFilter, StreamPosition streamPosition, bool atLeastOnce)
-        {
-            var filters = new List<EventFilter>(2)
-            {
-                PositionFilter(streamPosition, atLeastOnce)
-            };
-
-            if (!StreamFilter.IsAll(streamFilter))
-            {
-                if (streamFilter.Contains("^"))
-                {
-                    filters.Add(Filter.Regex(EventStreamField, streamFilter));
-                }
-                else
-                {
-                    filters.Add(Filter.Eq(EventStreamField, streamFilter));
-                }
-            }
-
-            return Filter.And(filters);
+            return Filter.And(Helper.FilterByPosition(streamPosition, false), PropertyFilter(property, value));
         }
 
         private static EventFilter PropertyFilter(string property, object value)
@@ -254,25 +185,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return Filter.Eq(CreateIndexPath(property), value);
         }
 
-        private static EventFilter PositionFilter(StreamPosition streamPosition, bool atLeastOnce)
-        {
-            if (atLeastOnce)
-            {
-                var before = new BsonTimestamp(Math.Max(0, streamPosition.Timestamp.Timestamp - ReadBeforeSeconds), 0);
-
-                return Filter.Gte(TimestampField, before);
-            }
-            else if (streamPosition.IsEndOfCommit)
-            {
-                return Filter.Gt(TimestampField, streamPosition.Timestamp);
-            }
-            else
-            {
-                return Filter.Gte(TimestampField, streamPosition.Timestamp);
-            }
-        }
-
-        private static EventPredicate CreateFilterExpression(string? property, object? value)
+        private static EventPredicate CreateFilterPredicate(string? property, object? value)
         {
             if (!string.IsNullOrWhiteSpace(property))
             {
@@ -282,13 +195,8 @@ namespace Squidex.Infrastructure.EventSourcing
             }
             else
             {
-                return CreateEmptyFilterExpression();
+                return EmptyPredicate;
             }
-        }
-
-        private static EventPredicate CreateEmptyFilterExpression()
-        {
-            return x => true;
         }
 
         private static string CreateIndexPath(string property)

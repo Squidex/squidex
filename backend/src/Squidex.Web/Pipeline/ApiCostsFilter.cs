@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web.Pipeline
 {

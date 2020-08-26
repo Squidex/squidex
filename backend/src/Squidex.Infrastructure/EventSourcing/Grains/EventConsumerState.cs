@@ -18,8 +18,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public string? Position { get; set; }
 
-        public SeenEvents RecentlySeenEvents { get; set; }
-
         public bool IsPaused
         {
             get { return IsStopped && string.IsNullOrWhiteSpace(Error); }
@@ -31,20 +29,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         public EventConsumerState()
-            : this(null, null)
         {
         }
 
-        public EventConsumerState(string? position, SeenEvents? seenEvents)
+        public EventConsumerState(string? position)
         {
             Position = position;
-
-            RecentlySeenEvents = seenEvents ?? new SeenEvents();
-        }
-
-        public bool HasSeen(StoredEvent @event)
-        {
-            return RecentlySeenEvents.HasSeen(@event);
         }
 
         public EventConsumerState Reset()
@@ -54,17 +44,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public EventConsumerState Handled(string position)
         {
-            return new EventConsumerState(position, RecentlySeenEvents);
+            return new EventConsumerState(position);
         }
 
         public EventConsumerState Stopped(Exception? ex = null)
         {
-            return new EventConsumerState(Position, RecentlySeenEvents) { IsStopped = true, Error = ex?.ToString() };
+            return new EventConsumerState(Position) { IsStopped = true, Error = ex?.ToString() };
         }
 
         public EventConsumerState Started()
         {
-            return new EventConsumerState(Position, RecentlySeenEvents) { IsStopped = false };
+            return new EventConsumerState(Position) { IsStopped = false };
         }
 
         public EventConsumerInfo ToInfo(string name)

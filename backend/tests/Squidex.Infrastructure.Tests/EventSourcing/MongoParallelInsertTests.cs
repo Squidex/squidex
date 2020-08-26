@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Orleans.Internal;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
@@ -300,6 +301,9 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var expectedEvents = 10 * 1000;
 
+            var consumer = new MyEventConsumer(expectedEvents);
+            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+
             Parallel.For(0, 10, x =>
             {
                 for (var i = 0; i < 1000; i++)
@@ -312,11 +316,46 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
             });
 
+            await consumerGrain.ActivateAsync(consumer.Name);
+            await consumerGrain.ActivateAsync();
+
+            await AssertConsumerAsync(expectedEvents, consumer);
+        }
+
+        [Fact]
+        public async Task Should_insert_and_retrieve_partially_afterwards()
+        {
+            var expectedEvents = 10 * 1000;
+
             var consumer = new MyEventConsumer(expectedEvents);
             var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
 
+            Parallel.For(0, 10, x =>
+            {
+                for (var i = 0; i < 500; i++)
+                {
+                    var commitId = Guid.NewGuid();
+
+                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+
+                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                }
+            });
+
             await consumerGrain.ActivateAsync(consumer.Name);
             await consumerGrain.ActivateAsync();
+
+            Parallel.For(0, 10, x =>
+            {
+                for (var i = 0; i < 500; i++)
+                {
+                    var commitId = Guid.NewGuid();
+
+                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+
+                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                }
+            });
 
             await AssertConsumerAsync(expectedEvents, consumer);
         }
@@ -396,13 +435,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static async Task AssertConsumerAsync(int expectedEvents, MyEventConsumer consumer)
         {
-            var timeout = Task.Delay(5 * 1000 * 60);
-
-            var result = Task.WhenAny(timeout, consumer.Completed);
-
-            await result;
-
-            Assert.NotSame(result, timeout);
+            await consumer.Completed.WithTimeout(TimeSpan.FromSeconds(100));
 
             await Task.Delay(2000);
 
