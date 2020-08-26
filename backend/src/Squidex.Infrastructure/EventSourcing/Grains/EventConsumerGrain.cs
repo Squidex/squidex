@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
-        private readonly LRUCache<string, string> recentlySeenEvents = new LRUCache<string, string>(1000);
+        private readonly LRUCache<Guid, Guid> recentlySeenEvents = new LRUCache<Guid, Guid>(1000);
         private TaskScheduler? scheduler;
         private IEventSubscription? currentSubscription;
         private IEventConsumer? eventConsumer;
@@ -79,6 +79,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         public Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent)
         {
             if (subscription.Value != currentSubscription)
+            {
+                return Task.CompletedTask;
+            }
+
+            var eventId = storedEvent.Value.Data.Headers.EventId();
+
+            if (recentlySeenEvents.Set(eventId, eventId))
             {
                 return Task.CompletedTask;
             }
@@ -239,12 +246,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private async Task DispatchConsumerAsync(Envelope<IEvent> @event)
         {
             var eventId = @event.Headers.EventId().ToString();
-
-            if (recentlySeenEvents.Set(eventId, eventId))
-            {
-                return;
-            }
-
             var eventType = @event.Payload.GetType().Name;
 
             var logContext = (eventId, eventType, consumer: eventConsumer!.Name);
