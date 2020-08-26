@@ -7,12 +7,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -29,8 +32,128 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public MongoEventStoreFixture _ { get; }
 
+        public class LimitedConcurrencyLevelTaskScheduler : TaskScheduler
+        {
+            [ThreadStatic]
+            private static bool currentThreadIsProcessingItems;
+
+            private readonly LinkedList<Task> tasks = new LinkedList<Task>();
+            private readonly int maxDegreeOfParallelism;
+            private int delegatesQueuedOrRunning;
+
+            public LimitedConcurrencyLevelTaskScheduler(int maxDegreeOfParallelism)
+            {
+                this.maxDegreeOfParallelism = maxDegreeOfParallelism;
+            }
+
+            protected sealed override void QueueTask(Task task)
+            {
+                lock (tasks)
+                {
+                    tasks.AddLast(task);
+
+                    if (delegatesQueuedOrRunning < maxDegreeOfParallelism)
+                    {
+                        ++delegatesQueuedOrRunning;
+
+                        NotifyThreadPoolOfPendingWork();
+                    }
+                }
+            }
+
+            private void NotifyThreadPoolOfPendingWork()
+            {
+                ThreadPool.UnsafeQueueUserWorkItem(_ =>
+                {
+                    currentThreadIsProcessingItems = true;
+                    try
+                    {
+                        while (true)
+                        {
+                            Task item;
+                            lock (tasks)
+                            {
+                                if (tasks.Count == 0)
+                                {
+                                    --delegatesQueuedOrRunning;
+                                    break;
+                                }
+
+                                item = tasks.First!.Value;
+
+                                tasks.RemoveFirst();
+                            }
+
+                            TryExecuteTask(item);
+                        }
+                    }
+                    finally
+                    {
+                        currentThreadIsProcessingItems = false;
+                    }
+                }, null);
+            }
+
+            protected sealed override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
+            {
+                if (!currentThreadIsProcessingItems)
+                {
+                    return false;
+                }
+
+                if (taskWasPreviouslyQueued)
+                {
+                    TryDequeue(task);
+                }
+
+                return TryExecuteTask(task);
+            }
+
+            protected sealed override bool TryDequeue(Task task)
+            {
+                lock (tasks)
+                {
+                    return tasks.Remove(task);
+                }
+            }
+
+            public sealed override int MaximumConcurrencyLevel
+            {
+                get { return maxDegreeOfParallelism; }
+            }
+
+            protected sealed override IEnumerable<Task> GetScheduledTasks()
+            {
+                bool lockTaken = false;
+                try
+                {
+                    Monitor.TryEnter(tasks, ref lockTaken);
+
+                    if (lockTaken)
+                    {
+                        return tasks.ToArray();
+                    }
+                    else
+                    {
+                        throw new NotSupportedException();
+                    }
+                }
+                finally
+                {
+                    if (lockTaken)
+                    {
+                        Monitor.Exit(tasks);
+                    }
+                }
+            }
+        }
+
         public sealed class MyEventConsumerGrain : EventConsumerGrain
         {
+            private readonly TaskScheduler scheduler = new LimitedConcurrencyLevelTaskScheduler(1);
+
+            public TaskScheduler Scheduler => scheduler;
+
             public MyEventConsumerGrain(
                 EventConsumerFactory eventConsumerFactory,
                 IGrainState<EventConsumerState> state,
@@ -44,6 +167,11 @@ namespace Squidex.Infrastructure.EventSourcing
             protected override IEventConsumerGrain GetSelf()
             {
                 return this;
+            }
+
+            protected override TaskScheduler GetScheduler()
+            {
+                return scheduler;
             }
 
             protected override IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string? filter, string? position)
@@ -61,6 +189,8 @@ namespace Squidex.Infrastructure.EventSourcing
             private readonly HashSet<Guid> uniqueReceivedEvents = new HashSet<Guid>();
             private readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
             private readonly int expectedCount;
+
+            public Func<int, Task> EventReceived { get; set; }
 
             public string Name => "Test";
 
@@ -85,18 +215,21 @@ namespace Squidex.Infrastructure.EventSourcing
                 return true;
             }
 
-            public Task On(Envelope<IEvent> @event)
+            public async Task On(Envelope<IEvent> @event)
             {
                 Received++;
 
-                uniqueReceivedEvents.Add(@event.Headers.CommitId());
+                uniqueReceivedEvents.Add(@event.Headers.EventId());
 
                 if (uniqueReceivedEvents.Count == expectedCount)
                 {
                     tcs.TrySetResult(true);
                 }
 
-                return Task.CompletedTask;
+                if (EventReceived != null)
+                {
+                    await EventReceived(Received);
+                }
             }
         }
 
@@ -116,6 +249,160 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var consumer = new MyEventConsumer(expectedEvents);
             var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+
+            await consumerGrain.ActivateAsync(consumer.Name);
+            await consumerGrain.ActivateAsync();
+
+            Parallel.For(0, 20, x =>
+            {
+                for (var i = 0; i < 500; i++)
+                {
+                    var commitId = Guid.NewGuid();
+
+                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+
+                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                }
+            });
+
+            var timeout = Task.Delay(5 * 1000 * 60);
+
+            var result = Task.WhenAny(timeout, consumer.Completed);
+
+            await result;
+
+            Assert.NotSame(result, timeout);
+            Assert.Equal(expectedEvents, consumer.Received);
+        }
+
+        [Fact]
+        public async Task Should_insert_and_retrieve_parallel_with_multiple_events_per_commit()
+        {
+            var expectedEvents = 10 * 1000;
+
+            var consumer = new MyEventConsumer(expectedEvents);
+            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+
+            await consumerGrain.ActivateAsync(consumer.Name);
+            await consumerGrain.ActivateAsync();
+
+            Parallel.For(0, 10, x =>
+            {
+                for (var i = 0; i < 500; i++)
+                {
+                    var commitId = Guid.NewGuid();
+
+                    var data1 = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+                    var data2 = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+
+                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data1, data2 }).Wait();
+                }
+            });
+
+            var timeout = Task.Delay(5 * 1000 * 60);
+
+            var result = Task.WhenAny(timeout, consumer.Completed);
+
+            await result;
+
+            Assert.NotSame(result, timeout);
+            Assert.Equal(expectedEvents, consumer.Received);
+        }
+
+        [Fact]
+        public async Task Should_insert_and_retrieve_afterwards()
+        {
+            var expectedEvents = 10 * 1000;
+
+            Parallel.For(0, 10, x =>
+            {
+                for (var i = 0; i < 1000; i++)
+                {
+                    var commitId = Guid.NewGuid();
+
+                    var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+
+                    _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                }
+            });
+
+            var consumer = new MyEventConsumer(expectedEvents);
+            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+
+            await consumerGrain.ActivateAsync(consumer.Name);
+            await consumerGrain.ActivateAsync();
+
+            var timeout = Task.Delay(5 * 1000 * 60);
+
+            var result = Task.WhenAny(timeout, consumer.Completed);
+
+            await result;
+
+            Assert.NotSame(result, timeout);
+            Assert.Equal(expectedEvents, consumer.Received);
+        }
+
+        [Fact]
+        public async Task Should_insert_and_retrieve_parallel_with_waits()
+        {
+            var expectedEvents = 10 * 1000;
+
+            var consumer = new MyEventConsumer(expectedEvents);
+            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+
+            await consumerGrain.ActivateAsync(consumer.Name);
+            await consumerGrain.ActivateAsync();
+
+            Parallel.For(0, 10, x =>
+            {
+                for (var j = 0; j < 10; j++)
+                {
+                    for (var i = 0; i < 100; i++)
+                    {
+                        var commitId = Guid.NewGuid();
+
+                        var data = eventDataFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId);
+
+                        _.EventStore.AppendAsync(commitId, commitId.ToString(), new[] { data }).Wait();
+                    }
+
+                    Thread.Sleep(1000);
+                }
+            });
+
+            var timeout = Task.Delay(5 * 1000 * 60);
+
+            var result = Task.WhenAny(timeout, consumer.Completed);
+
+            await result;
+
+            Assert.NotSame(result, timeout);
+            Assert.Equal(expectedEvents, consumer.Received);
+        }
+
+        [Fact]
+        public async Task Should_insert_and_retrieve_parallel_with_stops_and_starts()
+        {
+            var expectedEvents = 10 * 1000;
+
+            var consumer = new MyEventConsumer(expectedEvents);
+            var consumerGrain = new MyEventConsumerGrain(_ => consumer, grainState, _.EventStore, eventDataFormatter, log);
+
+            var scheduler = consumerGrain.Scheduler;
+
+            consumer.EventReceived = count =>
+            {
+                if (count % 100 == 0)
+                {
+                    Task.Factory.StartNew(async () =>
+                    {
+                        await consumerGrain.StopAsync();
+                        await consumerGrain.StartAsync();
+                    }, default, default, scheduler).Forget();
+                }
+
+                return Task.CompletedTask;
+            };
 
             await consumerGrain.ActivateAsync(consumer.Name);
             await consumerGrain.ActivateAsync();

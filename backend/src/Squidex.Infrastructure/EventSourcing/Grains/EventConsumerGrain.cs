@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
@@ -24,6 +25,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
+        private readonly LRUCache<string, string> recentlySeenEvents = new LRUCache<string, string>(1000);
         private TaskScheduler? scheduler;
         private IEventSubscription? currentSubscription;
         private IEventConsumer? eventConsumer;
@@ -176,6 +178,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 State = State.Reset();
             });
 
+            recentlySeenEvents.Clear();
+
             return CreateInfo();
         }
 
@@ -235,6 +239,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private async Task DispatchConsumerAsync(Envelope<IEvent> @event)
         {
             var eventId = @event.Headers.EventId().ToString();
+
+            if (recentlySeenEvents.Set(eventId, eventId))
+            {
+                return;
+            }
+
             var eventType = @event.Payload.GetType().Name;
 
             var logContext = (eventId, eventType, consumer: eventConsumer!.Name);
@@ -309,9 +319,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return new RetrySubscription(store, subscriber, filter, position);
         }
 
+        protected virtual TaskScheduler GetScheduler()
+        {
+            return scheduler!;
+        }
+
         private IEventSubscription CreateSubscription(string streamFilter, string? position)
         {
-            return CreateSubscription(eventStore, new WrapperSubscription(GetSelf(), scheduler!), streamFilter, position);
+            return CreateSubscription(eventStore, new WrapperSubscription(GetSelf(), GetScheduler()), streamFilter, position);
         }
     }
 }

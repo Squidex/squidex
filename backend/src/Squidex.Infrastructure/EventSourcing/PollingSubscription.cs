@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 try
                 {
-                    await eventStore.QueryAsync(async storedEvent =>
+                    await eventStore.QueryAtLeastOnceAsync(async storedEvent =>
                     {
                         await eventSubscriber.OnEventAsync(this, storedEvent);
 

@@ -16,9 +16,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private static readonly ObjectPool<StringBuilder> StringBuilderPool =
             new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
 
-        private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0, 0);
-
-        public static readonly StreamPosition Empty = new StreamPosition(EmptyTimestamp, -1, -1);
+        public static readonly StreamPosition Empty = new StreamPosition(new BsonTimestamp(0, 0), -1, -1);
 
         public BsonTimestamp Timestamp { get; }
 
@@ -26,10 +24,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public long CommitSize { get; }
 
-        public bool IsEndOfCommit
-        {
-            get { return CommitOffset == CommitSize - 1; }
-        }
+        public bool IsEndOfCommit { get; }
 
         public StreamPosition(BsonTimestamp timestamp, long commitOffset, long commitSize)
         {
@@ -37,6 +32,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             CommitOffset = commitOffset;
             CommitSize = commitSize;
+
+            IsEndOfCommit = CommitOffset == CommitSize - 1;
         }
 
         public static implicit operator string(StreamPosition position)

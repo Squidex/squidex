@@ -16,6 +16,11 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         Task CreateIndexAsync(string property);
 
+        Task QueryAtLeastOnceAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
+        {
+            return QueryAsync(callback, streamFilter, position, ct);
+        }
+
         Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count);
 
         Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0);

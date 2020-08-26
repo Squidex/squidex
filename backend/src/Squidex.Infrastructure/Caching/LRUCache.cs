@@ -18,6 +18,11 @@ namespace Squidex.Infrastructure.Caching
         private readonly int capacity;
         private readonly Action<TKey, TValue> itemEvicted;
 
+        public int Count
+        {
+            get { return cacheMap.Count; }
+        }
+
         public LRUCache(int capacity, Action<TKey, TValue>? itemEvicted = null)
         {
             Guard.GreaterThan(capacity, 0, nameof(capacity));
@@ -25,6 +30,12 @@ namespace Squidex.Infrastructure.Caching
             this.capacity = capacity;
 
             this.itemEvicted = itemEvicted ?? ((key, value) => { });
+        }
+
+        public void Clear()
+        {
+            cacheHistory.Clear();
+            cacheMap.Clear();
         }
 
         public bool Set(TKey key, TValue value)
