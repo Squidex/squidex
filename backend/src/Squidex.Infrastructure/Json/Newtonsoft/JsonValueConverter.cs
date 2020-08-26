@@ -81,14 +81,14 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                             switch (reader.TokenType)
                             {
                                 case JsonToken.Comment:
-                                    break;
+                                    continue;
+                                case JsonToken.EndArray:
+                                    return result;
                                 default:
                                     var value = ReadJson(reader);
 
                                     result.Add(value);
                                     break;
-                                case JsonToken.EndArray:
-                                    return result;
                             }
                         }
 

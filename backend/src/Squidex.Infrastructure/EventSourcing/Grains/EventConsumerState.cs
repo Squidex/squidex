@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using Newtonsoft.Json;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
@@ -18,6 +20,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public string? Position { get; set; }
 
+        [JsonConverter(typeof(SeenEventsJsonConverter))]
+        public LRUCache<Guid, Guid> RecentlySeenEvents { get; set; }
+
         public bool IsPaused
         {
             get { return IsStopped && string.IsNullOrWhiteSpace(Error); }
@@ -29,12 +34,22 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         public EventConsumerState()
+            : this(null, null)
         {
         }
 
-        public EventConsumerState(string? position)
+        public EventConsumerState(string? position, LRUCache<Guid, Guid>? seenEvents)
         {
             Position = position;
+
+            RecentlySeenEvents = seenEvents ?? new LRUCache<Guid, Guid>(100);
+        }
+
+        public bool HasSeen(StoredEvent @event)
+        {
+            var eventId = @event.Data.Headers.EventId();
+
+            return RecentlySeenEvents.Set(eventId, eventId);
         }
 
         public EventConsumerState Reset()
@@ -44,17 +59,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public EventConsumerState Handled(string position)
         {
-            return new EventConsumerState(position);
+            return new EventConsumerState(position, RecentlySeenEvents);
         }
 
         public EventConsumerState Stopped(Exception? ex = null)
         {
-            return new EventConsumerState(Position) { IsStopped = true, Error = ex?.ToString() };
+            return new EventConsumerState(Position, RecentlySeenEvents) { IsStopped = true, Error = ex?.ToString() };
         }
 
         public EventConsumerState Started()
         {
-            return new EventConsumerState(Position) { IsStopped = false };
+            return new EventConsumerState(Position, RecentlySeenEvents) { IsStopped = false };
         }
 
         public EventConsumerInfo ToInfo(string name)

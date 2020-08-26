@@ -25,7 +25,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
-        private readonly LRUCache<Guid, Guid> recentlySeenEvents = new LRUCache<Guid, Guid>(1000);
         private TaskScheduler? scheduler;
         private IEventSubscription? currentSubscription;
         private IEventConsumer? eventConsumer;
@@ -83,9 +82,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 return Task.CompletedTask;
             }
 
-            var eventId = storedEvent.Value.Data.Headers.EventId();
-
-            if (recentlySeenEvents.Set(eventId, eventId))
+            if (State.HasSeen(storedEvent.Value))
             {
                 return Task.CompletedTask;
             }
@@ -184,8 +181,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 State = State.Reset();
             });
-
-            recentlySeenEvents.Clear();
 
             return CreateInfo();
         }

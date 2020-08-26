@@ -23,6 +23,11 @@ namespace Squidex.Infrastructure.Caching
             get { return cacheMap.Count; }
         }
 
+        public IEnumerable<TKey> Keys
+        {
+            get { return cacheMap.Keys; }
+        }
+
         public LRUCache(int capacity, Action<TKey, TValue>? itemEvicted = null)
         {
             Guard.GreaterThan(capacity, 0, nameof(capacity));
