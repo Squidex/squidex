@@ -265,14 +265,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
             });
 
-            var timeout = Task.Delay(5 * 1000 * 60);
-
-            var result = Task.WhenAny(timeout, consumer.Completed);
-
-            await result;
-
-            Assert.NotSame(result, timeout);
-            Assert.Equal(expectedEvents, consumer.Received);
+            await AssertConsumerAsync(expectedEvents, consumer);
         }
 
         [Fact]
@@ -299,14 +292,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
             });
 
-            var timeout = Task.Delay(5 * 1000 * 60);
-
-            var result = Task.WhenAny(timeout, consumer.Completed);
-
-            await result;
-
-            Assert.NotSame(result, timeout);
-            Assert.Equal(expectedEvents, consumer.Received);
+            await AssertConsumerAsync(expectedEvents, consumer);
         }
 
         [Fact]
@@ -332,14 +318,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await consumerGrain.ActivateAsync(consumer.Name);
             await consumerGrain.ActivateAsync();
 
-            var timeout = Task.Delay(5 * 1000 * 60);
-
-            var result = Task.WhenAny(timeout, consumer.Completed);
-
-            await result;
-
-            Assert.NotSame(result, timeout);
-            Assert.Equal(expectedEvents, consumer.Received);
+            await AssertConsumerAsync(expectedEvents, consumer);
         }
 
         [Fact]
@@ -370,14 +349,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
             });
 
-            var timeout = Task.Delay(5 * 1000 * 60);
-
-            var result = Task.WhenAny(timeout, consumer.Completed);
-
-            await result;
-
-            Assert.NotSame(result, timeout);
-            Assert.Equal(expectedEvents, consumer.Received);
+            await AssertConsumerAsync(expectedEvents, consumer);
         }
 
         [Fact]
@@ -392,7 +364,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             consumer.EventReceived = count =>
             {
-                if (count % 100 == 0)
+                if (count % 1000 == 0)
                 {
                     Task.Factory.StartNew(async () =>
                     {
@@ -419,6 +391,11 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
             });
 
+            await AssertConsumerAsync(expectedEvents, consumer);
+        }
+
+        private static async Task AssertConsumerAsync(int expectedEvents, MyEventConsumer consumer)
+        {
             var timeout = Task.Delay(5 * 1000 * 60);
 
             var result = Task.WhenAny(timeout, consumer.Completed);
@@ -426,6 +403,9 @@ namespace Squidex.Infrastructure.EventSourcing
             await result;
 
             Assert.NotSame(result, timeout);
+
+            await Task.Delay(2000);
+
             Assert.Equal(expectedEvents, consumer.Received);
         }
     }

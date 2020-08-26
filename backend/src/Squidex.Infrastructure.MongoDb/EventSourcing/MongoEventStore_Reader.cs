@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
     public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
-        private const int ReadBeforeMs = 100;
+        private const int ReadBeforeSeconds = 1;
         private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
         private static readonly EventPredicate EmptyPredicate = x => true;
 
@@ -258,7 +258,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             if (atLeastOnce)
             {
-                var before = new BsonTimestamp(Math.Max(0, streamPosition.Timestamp.Timestamp - ReadBeforeMs), 0);
+                var before = new BsonTimestamp(Math.Max(0, streamPosition.Timestamp.Timestamp - ReadBeforeSeconds), 0);
 
                 return Filter.Gte(TimestampField, before);
             }

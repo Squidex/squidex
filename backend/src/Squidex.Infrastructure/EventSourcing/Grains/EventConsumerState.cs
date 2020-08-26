@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System;
-using Newtonsoft.Json;
-using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
@@ -20,8 +18,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public string? Position { get; set; }
 
-        [JsonConverter(typeof(SeenEventsJsonConverter))]
-        public LRUCache<Guid, Guid> RecentlySeenEvents { get; set; }
+        public SeenEvents RecentlySeenEvents { get; set; }
 
         public bool IsPaused
         {
@@ -38,18 +35,16 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
         }
 
-        public EventConsumerState(string? position, LRUCache<Guid, Guid>? seenEvents)
+        public EventConsumerState(string? position, SeenEvents? seenEvents)
         {
             Position = position;
 
-            RecentlySeenEvents = seenEvents ?? new LRUCache<Guid, Guid>(100);
+            RecentlySeenEvents = seenEvents ?? new SeenEvents();
         }
 
         public bool HasSeen(StoredEvent @event)
         {
-            var eventId = @event.Data.Headers.EventId();
-
-            return RecentlySeenEvents.Set(eventId, eventId);
+            return RecentlySeenEvents.HasSeen(@event);
         }
 
         public EventConsumerState Reset()
