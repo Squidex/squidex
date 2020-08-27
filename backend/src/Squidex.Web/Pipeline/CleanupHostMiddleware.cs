@@ -21,7 +21,16 @@ namespace Squidex.Web.Pipeline
         {
             this.next = next;
 
-            host = new HostString(new Uri(options.Value.BaseUrl).Host);
+            var uri = new Uri(options.Value.BaseUrl);
+
+            if (HasHttpPort(uri) || HasHttpsPort(uri))
+            {
+                host = new HostString(uri.Host);
+            }
+            else
+            {
+                host = new HostString(uri.Host, uri.Port);
+            }
         }
 
         public Task InvokeAsync(HttpContext context)
@@ -29,6 +38,16 @@ namespace Squidex.Web.Pipeline
             context.Request.Host = host;
 
             return next(context);
+        }
+
+        private static bool HasHttpPort(Uri uri)
+        {
+            return uri.Scheme == "http" && uri.Port == 80;
+        }
+
+        private static bool HasHttpsPort(Uri uri)
+        {
+            return uri.Scheme == "https" && uri.Port == 443;
         }
     }
 }

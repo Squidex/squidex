@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -31,21 +32,27 @@ namespace Squidex.Web.Pipeline
             next = Next;
         }
 
-        [Fact]
-        public async Task Should_override_host_from_urls_options()
+        [Theory]
+        [InlineData("https://cloud.squidex.io", "cloud.squidex.io")]
+        [InlineData("https://cloud.squidex.io:5000", "cloud.squidex.io:5000")]
+        [InlineData("http://cloud.squidex.io", "cloud.squidex.io")]
+        [InlineData("http://cloud.squidex.io:5000", "cloud.squidex.io:5000")]
+        public async Task Should_override_host_from_urls_options(string baseUrl, string expectedHost)
         {
-            var options = Options.Create(new UrlsOptions { BaseUrl = "https://cloud.squidex.io" });
+            var uri = new Uri(baseUrl);
+
+            var options = Options.Create(new UrlsOptions { BaseUrl = baseUrl });
 
             var sut = new CleanupHostMiddleware(next, options);
 
             var httpContext = new DefaultHttpContext();
 
-            httpContext.Request.Scheme = "https";
-            httpContext.Request.Host = new HostString("host", 443);
+            httpContext.Request.Scheme = uri.Scheme;
+            httpContext.Request.Host = new HostString(uri.Host, uri.Port);
 
             await sut.InvokeAsync(httpContext);
 
-            Assert.Equal("cloud.squidex.io", httpContext.Request.Host.Value);
+            Assert.Equal(expectedHost, httpContext.Request.Host.Value);
             Assert.True(isNextCalled);
         }
     }
