@@ -5,24 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    internal static class Helper
+    internal static class Filtering
     {
-        public static FilterDefinition<MongoEventCommit> FilterByProperty(StreamPosition streamPosition, bool atLeastOnce)
+        public static string CreateIndexPath(string property)
         {
-            if (atLeastOnce)
-            {
-                var before = new BsonTimestamp(Math.Max(0, streamPosition.Timestamp.Timestamp - 1), 0);
+            return $"Events.Metadata.{property}";
+        }
 
-                return Builders<MongoEventCommit>.Filter.Gte(x => x.Timestamp, before);
-            }
-            else if (streamPosition.IsEndOfCommit)
+        public static FilterDefinition<MongoEventCommit> ByPosition(StreamPosition streamPosition)
+        {
+            if (streamPosition.IsEndOfCommit)
             {
                 return Builders<MongoEventCommit>.Filter.Gt(x => x.Timestamp, streamPosition.Timestamp);
             }
@@ -32,25 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public static FilterDefinition<MongoEventCommit> FilterByPosition(StreamPosition streamPosition, bool atLeastOnce)
-        {
-            if (atLeastOnce)
-            {
-                var before = new BsonTimestamp(Math.Max(0, streamPosition.Timestamp.Timestamp - 1), 0);
-
-                return Builders<MongoEventCommit>.Filter.Gte(x => x.Timestamp, before);
-            }
-            else if (streamPosition.IsEndOfCommit)
-            {
-                return Builders<MongoEventCommit>.Filter.Gt(x => x.Timestamp, streamPosition.Timestamp);
-            }
-            else
-            {
-                return Builders<MongoEventCommit>.Filter.Gte(x => x.Timestamp, streamPosition.Timestamp);
-            }
-        }
-
-        public static FilterDefinition<MongoEventCommit>? FilterByStream(string? streamFilter)
+        public static FilterDefinition<MongoEventCommit>? ByStream(string? streamFilter)
         {
             if (StreamFilter.IsAll(streamFilter))
             {
@@ -67,7 +46,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public static FilterDefinition<ChangeStreamDocument<MongoEventCommit>>? FilterByStreamInChange(string? streamFilter)
+        public static FilterDefinition<ChangeStreamDocument<MongoEventCommit>>? ByChangeInStream(string? streamFilter)
         {
             if (StreamFilter.IsAll(streamFilter))
             {

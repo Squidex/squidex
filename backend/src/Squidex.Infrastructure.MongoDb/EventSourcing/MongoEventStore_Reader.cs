@@ -40,7 +40,14 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(subscriber, nameof(subscriber));
 
-            return new MongoEventStoreSubscription(this, subscriber, streamFilter, position);
+            if (IsReplicaSet)
+            {
+                return new MongoEventStoreSubscription(this, subscriber, streamFilter, position);
+            }
+            else
+            {
+                return new PollingSubscription(this, subscriber, streamFilter, position);
+            }
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count)
@@ -56,8 +63,8 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var commits =
                     await Collection.Find(
-                            Filter.Eq(x => x.EventStream, streamName))
-                        .Sort(Sort.Descending(x => x.Timestamp)).Limit(count).ToListAsync();
+                            Filter.Eq(EventStreamField, streamName))
+                        .Sort(Sort.Descending(TimestampField)).Limit(count).ToListAsync();
 
                 var result = new List<StoredEvent>();
 
@@ -86,9 +93,9 @@ namespace Squidex.Infrastructure.EventSourcing
                 var commits =
                     await Collection.Find(
                         Filter.And(
-                            Filter.Eq(x => x.EventStream, streamName),
-                            Filter.Gte(x => x.EventStreamOffset, streamPosition - MaxCommitSize)))
-                        .Sort(Sort.Ascending(x => x.Timestamp)).ToListAsync();
+                            Filter.Eq(EventStreamField, streamName),
+                            Filter.Gte(EventStreamOffsetField, streamPosition - MaxCommitSize)))
+                        .Sort(Sort.Ascending(TimestampField)).ToListAsync();
 
                 var result = new List<StoredEvent>();
 
@@ -121,31 +128,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
             StreamPosition lastPosition = position;
 
-            var filterDefinition = CreateFilter(streamFilter, lastPosition, false);
+            var filterDefinition = CreateFilter(streamFilter, lastPosition);
             var filterPredicate = EmptyPredicate;
 
             return QueryAsync(callback, lastPosition, filterDefinition, filterPredicate, ct);
-        }
-
-        public async Task QueryAtLeastOnceAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
-        {
-            Guard.NotNull(callback, nameof(callback));
-
-            StreamPosition lastPosition = position;
-
-            var filterDefinition = CreateFilter(streamFilter, lastPosition, true);
-            var filterPredicate = EmptyPredicate;
-
-            using (Profiler.TraceMethod<MongoEventStore>())
-            {
-                await Collection.Find(filterDefinition, options: Batching.Options).Sort(Sort.Ascending(TimestampField)).ForEachPipelineAsync(async commit =>
-                {
-                    foreach (var @event in commit.Filtered(StreamPosition.Empty, filterPredicate))
-                    {
-                        await callback(@event);
-                    }
-                });
-            }
         }
 
         private async Task QueryAsync(Func<StoredEvent, Task> callback, StreamPosition position, EventFilter filter, EventPredicate predicate, CancellationToken ct = default)
@@ -162,10 +148,10 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private static EventFilter CreateFilter(string? streamFilter, StreamPosition streamPosition, bool atLeastOnce)
+        private static EventFilter CreateFilter(string? streamFilter, StreamPosition streamPosition)
         {
-            var byPosition = Helper.FilterByPosition(streamPosition, atLeastOnce);
-            var byStream = Helper.FilterByStream(streamFilter);
+            var byPosition = Filtering.ByPosition(streamPosition);
+            var byStream = Filtering.ByStream(streamFilter);
 
             if (byStream != null)
             {
@@ -177,12 +163,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static EventFilter CreateFilter(string property, object value, StreamPosition streamPosition)
         {
-            return Filter.And(Helper.FilterByPosition(streamPosition, false), PropertyFilter(property, value));
-        }
-
-        private static EventFilter PropertyFilter(string property, object value)
-        {
-            return Filter.Eq(CreateIndexPath(property), value);
+            return Filter.And(Filtering.ByPosition(streamPosition), ByProperty(property, value));
         }
 
         private static EventPredicate CreateFilterPredicate(string? property, object? value)
@@ -197,6 +178,11 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 return EmptyPredicate;
             }
+        }
+
+        private static FilterDefinition<MongoEventCommit> ByProperty(string property, object value)
+        {
+            return Builders<MongoEventCommit>.Filter.Eq(CreateIndexPath(property), value);
         }
 
         private static string CreateIndexPath(string property)

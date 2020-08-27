@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var result = new EmptyPipelineDefinition<ChangeStreamDocument<MongoEventCommit>>();
 
-            var byStream = Helper.FilterByStreamInChange(streamFilter);
+            var byStream = Filtering.ByChangeInStream(streamFilter);
 
             if (byStream != null)
             {

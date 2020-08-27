@@ -25,7 +25,7 @@ using Xunit;
 namespace Squidex.Infrastructure.EventSourcing
 {
     [Trait("Category", "Dependencies")]
-    public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreFixture>
+    public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreReplicaSetFixture>
     {
         private readonly IGrainState<EventConsumerState> grainState = A.Fake<IGrainState<EventConsumerState>>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
@@ -234,7 +234,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public MongoParallelInsertTests(MongoEventStoreFixture fixture)
+        public MongoParallelInsertTests(MongoEventStoreReplicaSetFixture fixture)
         {
             _ = fixture;
 

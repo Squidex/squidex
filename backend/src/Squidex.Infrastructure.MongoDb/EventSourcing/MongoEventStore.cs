@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Clusters;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -31,12 +32,16 @@ namespace Squidex.Infrastructure.EventSourcing
             get { return Collection; }
         }
 
+        public bool IsReplicaSet { get; }
+
         public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
             : base(database)
         {
             Guard.NotNull(notifier, nameof(notifier));
 
             this.notifier = notifier;
+
+            IsReplicaSet = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
         }
 
         protected override string CollectionName()
