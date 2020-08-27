@@ -74,16 +74,12 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return property;
         }
 
-        public static void SetRequired(this JsonSchemaProperty property, bool isRequired)
+        public static JsonSchemaProperty SetRequired(this JsonSchemaProperty property, bool isRequired)
         {
-            if (isRequired)
-            {
-                property.IsRequired = true;
-            }
-            else
-            {
-                property.IsNullableRaw = true;
-            }
+            property.IsRequired = isRequired;
+            property.IsNullableRaw = !isRequired;
+
+            return property;
         }
     }
 }

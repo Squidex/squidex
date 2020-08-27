@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 jsonProperty.Description = field.Name;
             }
 
-            jsonProperty.IsRequired = field.RawProperties.IsRequired;
+            jsonProperty.SetRequired(field.RawProperties.IsRequired);
 
             return jsonProperty;
         }

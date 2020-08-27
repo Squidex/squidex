@@ -11,6 +11,7 @@ using Namotion.Reflection;
 using NJsonSchema;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
+using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
@@ -43,10 +44,8 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
                     schema.Properties["actionType"] = new JsonSchemaProperty
                     {
-                        Type = JsonObjectType.String,
-                        IsRequired = true,
-                        IsNullableRaw = null
-                    };
+                        Type = JsonObjectType.String
+                    }.SetRequired(true);
 
                     foreach (var (key, value) in ruleRegistry.Actions)
                     {
