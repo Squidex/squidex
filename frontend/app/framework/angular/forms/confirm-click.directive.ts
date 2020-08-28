@@ -7,16 +7,15 @@
 
 // tslint:disable: readonly-array
 
-import { Directive, EventEmitter, HostListener, Input, OnDestroy, Output } from '@angular/core';
+import { Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { DialogService } from '@app/framework/internal';
+import { Subscriber } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Directive({
     selector: '[sqxConfirmClick]'
 })
-export class ConfirmClickDirective implements OnDestroy {
-    private isOpen = false;
-    private isDestroyed = false;
-
+export class ConfirmClickDirective {
     @Input()
     public confirmTitle: string;
 
@@ -37,14 +36,6 @@ export class ConfirmClickDirective implements OnDestroy {
     ) {
     }
 
-    public ngOnDestroy() {
-        this.isDestroyed = true;
-
-        if (!this.isOpen) {
-            this.clickConfirmed.complete();
-        }
-    }
-
     @HostListener('click', ['$event'])
     public onClick(event: Event) {
         if (this.confirmRequired &&
@@ -53,25 +44,23 @@ export class ConfirmClickDirective implements OnDestroy {
             this.confirmText &&
             this.confirmText.length > 0) {
 
-            this.isOpen = true;
+            const observers = [...this.clickConfirmed.observers];
 
             this.beforeClick.emit();
 
-            const subscription =
-                this.dialogs.confirm(this.confirmTitle, this.confirmText)
-                    .subscribe(confirmed => {
-                        this.isOpen = false;
+            this.dialogs.confirm(this.confirmTitle, this.confirmText).pipe(take(1))
+                .subscribe(confirmed => {
+                    if (confirmed) {
+                        for (const observer of observers) {
+                            const subscriber = observer as Subscriber<any>;
 
-                        if (confirmed) {
-                            this.clickConfirmed.emit();
+                            if (subscriber['destination']) {
+                                subscriber['destination'].next!(true);
+                                subscriber['destination'].complete!();
+                            }
                         }
-
-                        subscription.unsubscribe();
-
-                        if (this.isDestroyed) {
-                            this.clickConfirmed.complete();
-                        }
-                    });
+                    }
+                });
         } else {
             this.clickConfirmed.emit();
         }
