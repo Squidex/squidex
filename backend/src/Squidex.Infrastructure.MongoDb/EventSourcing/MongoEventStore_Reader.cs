@@ -180,7 +180,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private static FilterDefinition<MongoEventCommit> ByProperty(string property, object value)
+        private static EventFilter ByProperty(string property, object value)
         {
             return Builders<MongoEventCommit>.Filter.Eq(CreateIndexPath(property), value);
         }
