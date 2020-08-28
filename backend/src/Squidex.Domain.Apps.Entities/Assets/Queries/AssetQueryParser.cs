@@ -21,6 +21,7 @@ using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {

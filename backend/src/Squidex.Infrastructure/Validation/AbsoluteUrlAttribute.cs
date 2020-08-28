@@ -8,6 +8,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Translations;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure.Validation
 {

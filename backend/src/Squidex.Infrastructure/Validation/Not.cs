@@ -7,6 +7,7 @@
 
 using System.Runtime.CompilerServices;
 using Squidex.Infrastructure.Translations;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure.Validation
 {

@@ -12,6 +12,7 @@ using System.Linq;
 using Microsoft.Extensions.Localization;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
+using Squidex.Text;
 
 namespace Squidex.Web.Services
 {

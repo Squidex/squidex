@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Xunit;
 
 namespace Squidex.Infrastructure
@@ -31,98 +30,6 @@ namespace Squidex.Infrastructure
         public void Should_provide_fallback_if_invalid(string value)
         {
             Assert.Equal("fallback", value.Or("fallback"));
-        }
-
-        [Theory]
-        [InlineData("", "")]
-        [InlineData("m", "m")]
-        [InlineData("m y", "m-y")]
-        [InlineData("M Y", "m-y")]
-        [InlineData("M_Y", "m-y")]
-        [InlineData("M_Y ", "m-y")]
-        public void Should_convert_to_kebap_case(string input, string output)
-        {
-            Assert.Equal(output, input.ToKebabCase());
-        }
-
-        [Theory]
-        [InlineData("", "")]
-        [InlineData("m", "M")]
-        [InlineData("m-y", "MY")]
-        [InlineData("my", "My")]
-        [InlineData("myProperty ", "MyProperty")]
-        [InlineData("my property", "MyProperty")]
-        [InlineData("my_property", "MyProperty")]
-        [InlineData("my-property", "MyProperty")]
-        public void Should_convert_to_pascal_case(string input, string output)
-        {
-            Assert.Equal(output, input.ToPascalCase());
-        }
-
-        [Theory]
-        [InlineData("", "")]
-        [InlineData("M", "m")]
-        [InlineData("My", "my")]
-        [InlineData("M-y", "mY")]
-        [InlineData("MyProperty ", "myProperty")]
-        [InlineData("My property", "myProperty")]
-        [InlineData("My_property", "myProperty")]
-        [InlineData("My-property", "myProperty")]
-        public void Should_convert_to_camel_case(string input, string output)
-        {
-            Assert.Equal(output, input.ToCamelCase());
-        }
-
-        [Theory]
-        [InlineData("Hello World", '-', "hello-world")]
-        [InlineData("Hello/World", '-', "hello-world")]
-        [InlineData("Hello World", '_', "hello_world")]
-        [InlineData("Hello/World", '_', "hello_world")]
-        [InlineData("Hello World ", '_', "hello_world")]
-        [InlineData("Hello World-", '_', "hello_world")]
-        [InlineData("Hello/World_", '_', "hello_world")]
-        public void Should_replace_special_characters_with_sepator_when_slugifying(string input, char separator, string output)
-        {
-            Assert.Equal(output, input.Slugify(separator: separator));
-        }
-
-        [Theory]
-        [InlineData("ö", "oe")]
-        [InlineData("ü", "ue")]
-        [InlineData("ä", "ae")]
-        public void Should_replace_multi_char_diacritics_when_slugifying(string input, string output)
-        {
-            Assert.Equal(output, input.Slugify());
-        }
-
-        [Theory]
-        [InlineData("ö", "o")]
-        [InlineData("ü", "u")]
-        [InlineData("ä", "a")]
-        public void Should_not_replace_multi_char_diacritics_when_slugifying(string input, string output)
-        {
-            Assert.Equal(output, input.Slugify(singleCharDiactric: true));
-        }
-
-        [Theory]
-        [InlineData("Físh", "fish")]
-        [InlineData("źish", "zish")]
-        [InlineData("żish", "zish")]
-        [InlineData("fórm", "form")]
-        [InlineData("fòrm", "form")]
-        [InlineData("fårt", "fart")]
-        public void Should_replace_single_char_diacritics_when_slugifying(string input, string output)
-        {
-            Assert.Equal(output, input.Slugify());
-        }
-
-        [Theory]
-        [InlineData("Hello my&World ", '_', "hello_my&world")]
-        [InlineData("Hello my&World-", '_', "hello_my&world")]
-        [InlineData("Hello my/World_", '_', "hello_my/world")]
-        public void Should_keep_characters_when_slugifying(string input, char separator, string output)
-        {
-            Assert.Equal(output, input.Slugify(new HashSet<char> { '&', '/' }, false, separator));
         }
 
         [Fact]

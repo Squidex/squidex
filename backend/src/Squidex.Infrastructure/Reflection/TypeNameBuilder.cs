@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure.Reflection
 {
