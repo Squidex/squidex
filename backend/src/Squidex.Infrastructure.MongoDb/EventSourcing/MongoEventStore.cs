@@ -32,6 +32,8 @@ namespace Squidex.Infrastructure.EventSourcing
             get { return Collection; }
         }
 
+        public bool IsReplicaSet { get; }
+
         public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
             : base(database)
         {

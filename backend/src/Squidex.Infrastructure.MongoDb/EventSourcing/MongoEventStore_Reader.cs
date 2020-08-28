@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Clusters;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
@@ -41,9 +40,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(subscriber, nameof(subscriber));
 
-            var isReplicaSet = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
-
-            if (isReplicaSet)
+            if (IsReplicaSet)
             {
                 return new MongoEventStoreSubscription(this, subscriber, streamFilter, position);
             }
