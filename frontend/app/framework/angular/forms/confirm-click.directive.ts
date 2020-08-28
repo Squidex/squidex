@@ -54,9 +54,8 @@ export class ConfirmClickDirective {
                         for (const observer of observers) {
                             const subscriber = observer as Subscriber<any>;
 
-                            if (subscriber['destination']) {
-                                subscriber['destination'].next!(true);
-                                subscriber['destination'].complete!();
+                            if (subscriber['destination'] && subscriber['destination'].next) {
+                                subscriber['destination'].next(true);
                             }
                         }
                     }
