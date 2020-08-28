@@ -32,8 +32,6 @@ namespace Squidex.Infrastructure.EventSourcing
             get { return Collection; }
         }
 
-        public bool IsReplicaSet { get; private set; }
-
         public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
             : base(database)
         {
@@ -52,9 +50,9 @@ namespace Squidex.Infrastructure.EventSourcing
             return new MongoCollectionSettings { WriteConcern = WriteConcern.WMajority };
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection, CancellationToken ct = default)
         {
-            await collection.Indexes.CreateManyAsync(new[]
+            return collection.Indexes.CreateManyAsync(new[]
             {
                 new CreateIndexModel<MongoEventCommit>(
                     Index
@@ -76,8 +74,6 @@ namespace Squidex.Infrastructure.EventSourcing
                         Unique = true
                     })
             }, ct);
-
-            IsReplicaSet = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
         }
     }
 }
