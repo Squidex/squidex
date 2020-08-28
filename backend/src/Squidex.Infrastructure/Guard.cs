@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Squidex.Infrastructure.Validation;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure
 {

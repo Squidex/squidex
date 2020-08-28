@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Text;
 
 #pragma warning disable IDE0060 // Remove unused parameter
 #pragma warning disable IDE0059 // Unnecessary assignment of a value

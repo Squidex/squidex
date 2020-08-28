@@ -8,6 +8,7 @@
 using System.Globalization;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Microsoft.Extensions.Configuration
 {

@@ -8,6 +8,7 @@
 using System;
 using Jint;
 using Jint.Native;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
@@ -17,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                return TextHelpers.WordCount(text);
+                return text.WordCount();
             }
             catch
             {
@@ -29,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                return TextHelpers.CharacterCount(text);
+                return text.CharacterCount();
             }
             catch
             {

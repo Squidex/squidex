@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {

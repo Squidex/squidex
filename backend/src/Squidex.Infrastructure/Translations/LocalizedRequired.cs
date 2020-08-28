@@ -7,6 +7,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure.Translations
 {

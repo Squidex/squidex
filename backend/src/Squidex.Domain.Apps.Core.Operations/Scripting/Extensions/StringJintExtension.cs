@@ -8,7 +8,7 @@
 using System;
 using Jint;
 using Jint.Native;
-using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {

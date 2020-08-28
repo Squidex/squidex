@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Linq;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure.Queries
 {

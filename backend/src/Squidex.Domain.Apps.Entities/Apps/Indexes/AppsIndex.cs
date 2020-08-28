@@ -20,6 +20,7 @@ using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
