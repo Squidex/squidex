@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
+using GraphQL;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
@@ -13,10 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         public string OperationName { get; set; }
 
-        public string NamedQuery { get; set; }
-
         public string Query { get; set; }
 
-        public JObject Variables { get; set; }
+        public Inputs? Inputs { get; set; }
     }
 }

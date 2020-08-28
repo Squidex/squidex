@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 context.Setup(execution);
 
                 execution.Schema = graphQLSchema;
-                execution.Inputs = query.Variables?.ToInputs();
+                execution.Inputs = query.Inputs;
                 execution.Query = query.Query;
             }).ConfigureAwait(false);
 

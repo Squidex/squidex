@@ -185,16 +185,20 @@ namespace TestSuite.ApiTests
             var query = new
             {
                 query = @"
-                {
-                    queryMyReadsContents(filter: ""data/number/iv gt 3 and data/number/iv lt 7"", orderby: ""data/number/iv asc"") {
-                        id,
-                        data {
-                            number {
-                                iv
+                    query ContentsQuery($filter: String!) {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
+                            id,
+                            data {
+                                number {
+                                    iv
+                                }
                             }
                         }
-                    }
-                }"
+                    }",
+                variables = new
+                {
+                    filter = @"data/number/iv gt 3 and data/number/iv lt 7"
+                }
             };
 
             var result = await _.Contents.GraphQlAsync<QueryResult>(query);
@@ -210,16 +214,20 @@ namespace TestSuite.ApiTests
             var query = new
             {
                 query = @"
-                {
-                    queryMyReadsContents(filter: ""data/number/iv gt 3 and data/number/iv lt 7"", orderby: ""data/number/iv asc"") {
-                        id,
-                        data {
-                            number {
-                                iv
+                    query ContentsQuery($filter: String!) {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
+                            id,
+                            data {
+                                number {
+                                    iv
+                                }
                             }
                         }
-                    }
-                }"
+                    }",
+                variables = new
+                {
+                    filter = @"data/number/iv gt 3 and data/number/iv lt 7"
+                }
             };
 
             var result = await _.Contents.GraphQlGetAsync<QueryResult>(query);
