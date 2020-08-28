@@ -355,6 +355,7 @@
   "contents.loadDataFailed": "Laden van gegevens is mislukt. Laad opnieuw.",
   "contents.loadFailed": "Laden van inhoud is mislukt. Laad opnieuw.",
   "contents.loadVersionFailed": "Versie van een nieuwe versie is mislukt. Laad opnieuw.",
+  "contents.newStatusFieldDescription": "The new status of the content item.",
   "contents.noReference": "- Geen referentie -",
   "contents.pendingChangesTextToChange": "Je hebt niet-opgeslagen wijzigingen. \n \n Wanneer je de status wijzigt, raak je ze kwijt. \n \n **Wil je toch doorgaan?**",
   "contents.pendingChangesTextToClose": "Je hebt niet-opgeslagen wijzigingen. \n \n Wanneer je de huidige inhoudsweergave sluit, raak je ze kwijt. \n  n **Wil je toch doorgaan?**",

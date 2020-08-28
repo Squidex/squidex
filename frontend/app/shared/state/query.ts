@@ -294,6 +294,13 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
              description: 'i18n:contents.statusFieldDescription',
              extra: statuses
         };
+
+        model.fields['newStatus'] = {
+             ...TypeStatus,
+             displayName: MetaFields.statusNext,
+             description: 'i18n:contents.newStatusFieldDescription',
+             extra: statuses
+        };
     }
 
     for (const field of schema.fields) {

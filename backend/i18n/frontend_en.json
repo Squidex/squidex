@@ -355,6 +355,7 @@
   "contents.loadDataFailed": "Failed to load data. Please reload.",
   "contents.loadFailed": "Failed to load contents. Please reload.",
   "contents.loadVersionFailed": "Failed to version a new version. Please reload.",
+  "contents.newStatusFieldDescription": "The new status of the content item.",
   "contents.noReference": "- No Reference -",
   "contents.pendingChangesTextToChange": "You have unsaved changes.\n\nWhen you change the status you will loose them.\n\n**Do you want to continue anyway?**",
   "contents.pendingChangesTextToClose": "You have unsaved changes.\n\nWhen you close the current content view you will loose them.\n\n**Do you want to continue anyway?**",
