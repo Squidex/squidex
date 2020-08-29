@@ -7,6 +7,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
@@ -261,12 +262,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private void Unsubscribe()
         {
-            var subscription = currentSubscription;
+            var subscription = Interlocked.Exchange(ref currentSubscription, null);
 
             if (subscription != null)
             {
-                currentSubscription = null;
-
                 subscription.StopAsync().Forget();
             }
         }
