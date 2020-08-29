@@ -50,10 +50,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
             catch (Exception ex)
             {
-                if (!stopToken.IsCancellationRequested)
-                {
-                    await eventSubscriber.OnErrorAsync(this, ex);
-                }
+                await eventSubscriber.OnErrorAsync(this, ex);
             }
         }
 

@@ -37,10 +37,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
                 catch (Exception ex)
                 {
-                    if (!timer.IsStopped)
-                    {
-                        await eventSubscriber.OnErrorAsync(this, ex);
-                    }
+                    await eventSubscriber.OnErrorAsync(this, ex);
                 }
             });
         }

@@ -261,10 +261,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private void Unsubscribe()
         {
-            if (currentSubscription != null)
+            var subscription = currentSubscription;
+
+            if (subscription != null)
             {
-                currentSubscription.StopAsync().Forget();
                 currentSubscription = null;
+
+                subscription.StopAsync().Forget();
             }
         }
 
