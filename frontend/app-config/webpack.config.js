@@ -212,7 +212,7 @@ module.exports = function (env) {
                 patterns: [
                   { from: './node_modules/simplemde/dist', to: 'dependencies/simplemde' },
 
-                  { from: './node_modules/tinymce/tinymce.min.js', to: 'dependencies/tinymce/tinymce.min.js' },
+                  { from: './node_modules/tinymce/icons/default/icons.min.js', to: 'dependencies/tinymce/icons/default/icons.min.js' },
                   { from: './node_modules/tinymce/plugins/advlist', to: 'dependencies/tinymce/plugins/advlist' },
                   { from: './node_modules/tinymce/plugins/code', to: 'dependencies/tinymce/plugins/code' },
                   { from: './node_modules/tinymce/plugins/image', to: 'dependencies/tinymce/plugins/image' },
@@ -222,6 +222,7 @@ module.exports = function (env) {
                   { from: './node_modules/tinymce/plugins/paste', to: 'dependencies/tinymce/plugins/paste' },
                   { from: './node_modules/tinymce/skins', to: 'dependencies/tinymce/skins' },
                   { from: './node_modules/tinymce/themes/silver', to: 'dependencies/tinymce/themes/silver' },
+                  { from: './node_modules/tinymce/tinymce.min.js', to: 'dependencies/tinymce/tinymce.min.js' },
 
                   { from: './node_modules/ace-builds/src-min/ace.js', to: 'dependencies/ace/ace.js' },
                   { from: './node_modules/ace-builds/src-min/mode-javascript.js', to: 'dependencies/ace/mode-javascript.js' },
