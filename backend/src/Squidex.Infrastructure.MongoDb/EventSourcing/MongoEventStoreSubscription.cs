@@ -37,95 +37,107 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 try
                 {
-                    using (var cts = new CancellationTokenSource())
-                    {
-                        using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, stopToken.Token))
-                        {
-                            await eventStore.QueryAsync(async storedEvent =>
-                            {
-                                var now = SystemClock.Instance.GetCurrentInstant();
-
-                                var timeToNow = now - storedEvent.Data.Headers.Timestamp();
-
-                                if (timeToNow <= Duration.FromMinutes(5))
-                                {
-                                    cts.Cancel();
-                                }
-                                else
-                                {
-                                    await eventSubscriber.OnEventAsync(this, storedEvent);
-
-                                    lastRawPosition = storedEvent.EventPosition;
-                                }
-                            }, streamFilter, position, combined.Token);
-                        }
-                    }
+                    lastRawPosition = await QueryOldAsync(streamFilter, position);
                 }
                 catch (OperationCanceledException)
                 {
                 }
 
-                StreamPosition lastPosition = lastRawPosition;
-
                 if (!stopToken.IsCancellationRequested)
                 {
-                    BsonDocument? resumeToken = null;
-
-                    var start =
-                        lastPosition.Timestamp.Timestamp > 0 ?
-                        lastPosition.Timestamp.Timestamp - 30 :
-                        SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(30)).ToUnixTimeSeconds();
-
-                    var changePipeline = Match(streamFilter);
-                    var changeStart = new BsonTimestamp((int)start, 0);
-
-                    while (!stopToken.IsCancellationRequested)
-                    {
-                        var changeOptions = new ChangeStreamOptions();
-
-                        if (resumeToken != null)
-                        {
-                            changeOptions.StartAfter = resumeToken;
-                        }
-                        else
-                        {
-                            changeOptions.StartAtOperationTime = changeStart;
-                        }
-
-                        using (var cursor = eventStore.TypedCollection.Watch(changePipeline, changeOptions, stopToken.Token))
-                        {
-                            var isRead = false;
-
-                            await cursor.ForEachAsync(async change =>
-                            {
-                                if (change.OperationType == ChangeStreamOperationType.Insert)
-                                {
-                                    foreach (var storedEvent in change.FullDocument.Filtered(lastPosition, x => true))
-                                    {
-                                        await eventSubscriber.OnEventAsync(this, storedEvent);
-                                    }
-                                }
-
-                                isRead = true;
-                            }, stopToken.Token);
-
-                            resumeToken = cursor.GetResumeToken();
-
-                            if (!isRead)
-                            {
-                                await Task.Delay(1000);
-                            }
-                        }
-                    }
+                    await QueryCurrentAsync(streamFilter, lastRawPosition);
                 }
             }
             catch (Exception ex)
             {
-                if (!ex.Is<OperationCanceledException>())
+                if (!stopToken.IsCancellationRequested)
                 {
                     await eventSubscriber.OnErrorAsync(this, ex);
                 }
             }
+        }
+
+        private async Task QueryCurrentAsync(string? streamFilter, StreamPosition lastPosition)
+        {
+            BsonDocument? resumeToken = null;
+
+            var start =
+                lastPosition.Timestamp.Timestamp > 0 ?
+                lastPosition.Timestamp.Timestamp - 30 :
+                SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(30)).ToUnixTimeSeconds();
+
+            var changePipeline = Match(streamFilter);
+            var changeStart = new BsonTimestamp((int)start, 0);
+
+            while (!stopToken.IsCancellationRequested)
+            {
+                var changeOptions = new ChangeStreamOptions();
+
+                if (resumeToken != null)
+                {
+                    changeOptions.StartAfter = resumeToken;
+                }
+                else
+                {
+                    changeOptions.StartAtOperationTime = changeStart;
+                }
+
+                using (var cursor = eventStore.TypedCollection.Watch(changePipeline, changeOptions, stopToken.Token))
+                {
+                    var isRead = false;
+
+                    await cursor.ForEachAsync(async change =>
+                    {
+                        if (change.OperationType == ChangeStreamOperationType.Insert)
+                        {
+                            foreach (var storedEvent in change.FullDocument.Filtered(lastPosition, x => true))
+                            {
+                                await eventSubscriber.OnEventAsync(this, storedEvent);
+                            }
+                        }
+
+                        isRead = true;
+                    }, stopToken.Token);
+
+                    resumeToken = cursor.GetResumeToken();
+
+                    if (!isRead)
+                    {
+                        await Task.Delay(1000);
+                    }
+                }
+            }
+        }
+
+        private async Task<string?> QueryOldAsync(string? streamFilter, string? position)
+        {
+            string? lastRawPosition = null;
+
+            using (var cts = new CancellationTokenSource())
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, stopToken.Token))
+                {
+                    await eventStore.QueryAsync(async storedEvent =>
+                    {
+                        var now = SystemClock.Instance.GetCurrentInstant();
+
+                        var timeToNow = now - storedEvent.Data.Headers.Timestamp();
+
+                        if (timeToNow <= Duration.FromMinutes(5))
+                        {
+                            cts.Cancel();
+                        }
+                        else
+                        {
+                            await eventSubscriber.OnEventAsync(this, storedEvent);
+
+                            lastRawPosition = storedEvent.EventPosition;
+                        }
+                    }, streamFilter, position, combined.Token);
+                }
+            }
+
+            return lastRawPosition;
         }
 
         private static PipelineDefinition<ChangeStreamDocument<MongoEventCommit>, ChangeStreamDocument<MongoEventCommit>>? Match(string? streamFilter)

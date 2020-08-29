@@ -21,6 +21,11 @@ namespace Squidex.Infrastructure.Timers
         private int oneCallState;
         private CancellationTokenSource? wakeupToken;
 
+        public bool IsStopped
+        {
+            get { return stopToken.IsCancellationRequested; }
+        }
+
         public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {
             Guard.NotNull(callback, nameof(callback));

@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
                 catch (Exception ex)
                 {
-                    if (!ex.Is<OperationCanceledException>())
+                    if (!timer.IsStopped)
                     {
                         await eventSubscriber.OnErrorAsync(this, ex);
                     }
