@@ -68,7 +68,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
                     this.schema = schema;
 
                     this.contentsState.schema = schema;
-                    this.contentForm = new EditContentForm(this.languages, this.schema);
+                    this.contentForm = new EditContentForm(this.languages, this.schema, this.contentFormContext.user);
 
                     this.changeDetector.markForCheck();
                 }
@@ -100,7 +100,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
                     this.contentForm.submitFailed(error);
                 });
         } else {
-            this.contentForm.submitFailed('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
+            this.contentForm.submitFailed('i18n:contents.contentNotValid');
         }
     }
 

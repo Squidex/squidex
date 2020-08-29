@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -16,7 +17,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Guards
 {
-    public class GuardAssetTests
+    public class GuardAssetTests : IClassFixture<TranslationsFixture>
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -92,12 +93,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         }
 
         [Fact]
-        public void CanAnnotate_should_throw_exception_if_nothing_defined()
+        public void CanAnnotate_should_not_throw_exception_if_empty()
         {
             var command = new AnnotateAsset { AppId = appId };
 
-            ValidationAssert.Throws(() => GuardAsset.CanAnnotate(command),
-                new ValidationError("At least one property must be defined.", "FileName", "IsProtected", "Metadata", "Slug", "Tags"));
+            GuardAsset.CanAnnotate(command);
         }
 
         [Fact]

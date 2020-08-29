@@ -1,22 +1,22 @@
 <div class="table-items-row" [class.table-items-footer]="!pattern">
     <form [formGroup]="editForm.form" (ngSubmit)="save()" class="row no-gutters">
         <div class="col col-name">
-            <sqx-control-errors for="name" [submitted]="editForm.submitted | async"></sqx-control-errors>
+            <sqx-control-errors for="name"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="pattern-name" maxlength="100" formControlName="name" placeholder="Name" />
+            <input type="text" class="form-control" id="pattern-name" maxlength="100" formControlName="name" placeholder="{{ 'common.name' | sqxTranslate }}">
             
         </div>
 
         <div class="col pl-1 pr-1">
-            <sqx-control-errors for="pattern" [submitted]="editForm.submitted | async"></sqx-control-errors>
+            <sqx-control-errors for="pattern"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="pattern-pattern" maxlength="1000" formControlName="pattern" placeholder="Pattern" />
+            <input type="text" class="form-control" id="pattern-pattern" maxlength="1000" formControlName="pattern" placeholder="{{ 'common.pattern' | sqxTranslate }}">
         </div>
 
         <div class="col col-message">
-            <sqx-control-errors for="message" [submitted]="editForm.submitted | async"></sqx-control-errors>
+            <sqx-control-errors for="message"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="pattern-message" maxlength="1000" formControlName="message" placeholder="Message" />
+            <input type="text" class="form-control" id="pattern-message" maxlength="1000" formControlName="message" placeholder="{{ 'common.message' | sqxTranslate }}">
         </div>
 
         <div class="col-auto pl-1 col-options" *ngIf="pattern">
@@ -24,11 +24,10 @@
                 <i class="icon-checkmark"></i>
             </button>
 
-            <button type="button" class="btn btn-text-danger"
-                [disabled]="!isDeletable"
+            <button type="button" class="btn btn-text-danger" [disabled]="!isDeletable"
                 (sqxConfirmClick)="delete()"
-                confirmTitle="Remove pattern" 
-                confirmText="Do you really want to remove this pattern?">
+                confirmTitle="i18n:patterns.deleteConfirmTitle"
+                confirmText="i18n:patterns.deleteConfirmText">
                 <i class="icon-bin2"></i>
             </button>
         </div>

@@ -42,7 +42,6 @@ export class AuthInterceptor implements HttpInterceptor {
         req = req.clone({
             headers: req.headers
                 .set('Authorization', token)
-                .set('Accept-Language', '*')
                 .set('Pragma', 'no-cache')
         });
 
@@ -66,7 +65,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
                         return empty();
                     } else {
-                        return throwError(new ErrorDto(403, 'You do not have the permissions to do this.'));
+                        return throwError(new ErrorDto(403, 'i18n:common.errorNoPermission'));
                     }
                 }
 

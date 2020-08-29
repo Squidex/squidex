@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
@@ -65,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
                 else
                 {
-                    throw new DomainObjectNotFoundException(x.ToString(), typeof(ISchemaEntity));
+                    throw new DomainObjectNotFoundException(x.ToString());
                 }
             };
 

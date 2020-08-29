@@ -47,8 +47,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         {
             var values = new { app = resources.App, id = response.Id };
 
-            response.AddSelfLink(resources.Url<AssetsController>(x => nameof(x.GetAsset), values));
-
             if (resources.CanUpdateAsset)
             {
                 response.AddPutLink("update", resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolder), values));

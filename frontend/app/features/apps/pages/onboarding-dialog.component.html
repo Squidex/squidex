@@ -1,143 +1,105 @@
 <sqx-modal-dialog [showHeader]="false">
     <ng-container content>
-        <a class="header-right modal-close" (click)="close.emit()">Skip Tour</a>
+        <a class="header-right modal-close" (click)="close.emit()">{{ 'tour.skip' | sqxTranslate }}</a>
 
         <div class="onboarding-step" *ngIf="step === 0">
-            <img @fade class="header-left" src="./images/logo-white-small.png" />
+            <img @fade class="header-left" src="./images/logo-white-small.png">
 
             <div @slide class="onboarding-enter-leave">
-                <h1>Welcome to <span class="header-focus">Squidex CMS</span></h1>
+                <h1>{{ 'tour.welcome' | sqxTranslate }} <span class="header-focus">{{ 'tour.welcomeProduct' | sqxTranslate }}</span></h1>
 
-                <p>
-                    You can start managing and distributing your content right away, but we we'd like to walk you through some basics first...
-                </p>
-                <p>
-                    How's that?
-                </p>
+                <div [innerHTML]="'tour.step0Text' | sqxTranslate | sqxMarkdown"></div>
 
-                <button (click)="next()" class="btn btn-success">Let's take a look around</button>
+                <button (click)="next()" class="btn btn-success">{{ 'tour.step0Next' | sqxTranslate }}</button>
             </div>
         </div>
         <div class="onboarding-step" *ngIf="step === 1">
-            <h1 @fade class="header-left header-focus">Apps</h1>
+            <h1 @fade class="header-left header-focus">{{ 'common.apps' | sqxTranslate }}</h1>
 
             <div @slide>
                 <div class="row">
                     <div class="col">
-                        <div class="onboarding-text">
-                            <p>
-                                An App is the repository for your project, e.g. (blog, web shop or mobile app). You can assign contributors to your app to work together.
-                            </p>
-                            <p>
-                                You can create an unlimited number of Apps in Squidex to manage multiple projects at the same time.
-                            </p>
-                        </div>
+                        <div class="onboarding-text" [innerHTML]="'tour.step1Text' | sqxTranslate | sqxMarkdown"></div>
                     </div>
                     <div class="col col-image">
-                        <img src="./images/onboarding-step1.png" />
+                        <img src="./images/onboarding-step1.png">
                     </div>
                 </div>
 
                 <div class="footer">
-                    <button (click)="next()" class="btn btn-success">Continue</button>
+                    <button (click)="next()" class="btn btn-success">{{ 'tour.step1Next' | sqxTranslate }}</button>
                 </div>
             </div>
         </div>
         <div class="onboarding-step" *ngIf="step === 2">
-            <h1 @fade class="header-left header-focus">Schemas</h1>
+            <h1 @fade class="header-left header-focus">{{ 'common.schemas' | sqxTranslate }}</h1>
 
             <div @slide>
                 <div class="row">
                     <div class="col">
-                        <div class="onboarding-text">
-                            <p>
-                                Schemas define the structure of your content, the fields and the data types of a content item.
-                            </p>
-                            <p>
-                                Before you can add content to your schema, make sure to hit the 'Publish' button at the top to make the schema available to your content editors.
-                            </p>
-                        </div>
+                        <div class="onboarding-text" [innerHTML]="'tour.step2Text' | sqxTranslate | sqxMarkdown"></div>
                     </div>
                     <div class="col col-image">
-                        <img src="./images/onboarding-step2.png" />
+                        <img src="./images/onboarding-step2.png">
                     </div>
                 </div>
 
                 <div class="footer">
-                    <button (click)="next()" class="btn btn-success">Keep going!</button>
+                    <button (click)="next()" class="btn btn-success">{{ 'tour.step2Next' | sqxTranslate }}</button>
                 </div>
             </div>
         </div>
         <div class="onboarding-step" *ngIf="step === 3">
-            <h1 @fade class="header-left header-focus">Contents</h1>
+            <h1 @fade class="header-left header-focus">{{ 'common.contents' | sqxTranslate }}</h1>
 
             <div @slide>
                 <div class="row">
                     <div class="col">
-                        <div class="onboarding-text">
-                            <p>
-                                Content is the actual data in your app which is grouped by the schema.
-                            </p>
-                            <p>
-                                Select a published schema first, then add content for this schema.
-                            </p>
-                        </div>
+                        <div class="onboarding-text" [innerHTML]="'tour.step3Text' | sqxTranslate | sqxMarkdown"></div>
                     </div>
                     <div class="col col-image">
-                        <img src="./images/onboarding-step3.png" />
+                        <img src="./images/onboarding-step3.png">
                     </div>
                 </div>
 
                 <div class="footer">
-                    <button (click)="next()" class="btn btn-success">Almost there!</button>
+                    <button (click)="next()" class="btn btn-success">{{ 'tour.step3Next' | sqxTranslate }}</button>
                 </div>
             </div>
         </div>
         <div class="onboarding-step" *ngIf="step === 4">
-            <h1 @fade class="header-left header-focus">Assets</h1>
+            <h1 @fade class="header-left header-focus">{{ 'common.assets' | sqxTranslate }}</h1>
 
             <div @slide>
                 <div class="row">
                     <div class="col">
-                        <div class="onboarding-text">
-                            <p>
-                                The assets contains all files that can also be linked to your content. For example images, videos or documents.
-                            </p>
-                            <p>
-                                You can upload the assets here and use them later or also upload them directly when you create a new content item with an asset field.
-                            </p>
-                        </div>
+                        <div class="onboarding-text" [innerHTML]="'tour.step4Text' | sqxTranslate | sqxMarkdown"></div>
                     </div>
                     <div class="col col-image">
-                        <img src="./images/onboarding-step4.png" />
+                        <img src="./images/onboarding-step4.png">
                     </div>
                 </div>
 
                 <div class="footer">
-                    <button (click)="next()" class="btn btn-success">Got It!</button>
+                    <button (click)="next()" class="btn btn-success">{{ 'tour.step4Next' | sqxTranslate }}</button>
                 </div>
             </div>
         </div>
         <div class="onboarding-step" *ngIf="step === 5">
-            <img @fade class="header-left" src="./images/logo-white-small.png" />
+            <img @fade class="header-left" src="./images/logo-white-small.png">
 
             <div @slide class="onboarding-enter-leave">
-                <h1>Awesome, now you know the basics!</h1>
-
-                <p>
-                    But that's not all of the support we can provide. <br />You can go to <a href="https://docs.squidex.io/" sqxExternalLink>https://docs.squidex.io/></a> to read more.
-                </p>
-                <p>
-                    Do you want to join our community?
-                </p>
+                <h1>{{ 'tour.step5Title' | sqxTranslate }}</h1>
+                
+                <div [innerHTML]="'tour.step5Text' | sqxTranslate | sqxMarkdown"></div>
 
                 <div>
                     <a class="btn btn-success" href="https://support.squidex.io" sqxExternalLink>
-                        Join our Forum
+                        {{ 'tour.joinForum' | sqxTranslate }}
                     </a> &nbsp;
 
                     <a class="btn btn-success" href="https://github.com/squidex/squidex" sqxExternalLink>
-                        Join us on Github
+                        {{ 'tour.joinGithub' | sqxTranslate }}
                     </a>
                 </div>
             </div>

@@ -1,26 +1,21 @@
-<div class="array-container" *ngIf="arrayControl.controls.length > 0" 
+<div class="array-container" *ngIf="formModel.items.length > 0"
     cdkDropList
     [cdkDropListDisabled]="false"
-    [cdkDropListData]="arrayControl.controls"
+    [cdkDropListData]="formModel.items"
     (cdkDropListDropped)="sort($event)">
-    <div *ngFor="let itemForm of arrayControl.controls; let i = index;"
-        class="table-drag item"
-        cdkDrag
-        cdkDragLockAxis="y">
+    <div *ngFor="let itemForm of formModel.items; index as i; last as isLast; first as isFirst" class="table-drag item" cdkDrag cdkDragLockAxis="y">
         <sqx-array-item
+            [canUnset]="canUnset"
             [form]="form"
             [formContext]="formContext"
-            [field]="field"
-            [isDisabled]="arrayControl.disabled"
-            [isFirst]="i === 0"
-            [isLast]="i === arrayControl.controls.length - 1"
+            [formModel]="itemForm"
             [index]="i"
-            [itemForm]="itemForm"
+            [isDisabled]="formModel.form.disabled"
+            [isFirst]="isFirst"
+            [isLast]="isLast"
             [language]="language"
             [languages]="languages"
-            (clone)="itemAdd(itemForm)"
-            (move)="move(itemForm, $event)"
-            (remove)="itemRemove(i)">
+            (clone)="itemAdd(itemForm)" (move)="move(itemForm, $event)" (remove)="itemRemove(i)">
             <i cdkDragHandle class="icon-drag2"></i>
         </sqx-array-item>
     </div>
@@ -28,21 +23,21 @@
 
 <div class="row">
     <div class="col">
-        <button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || arrayControl.disabled" (click)="itemAdd(undefined)">
-            Add Item
+        <button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || formModel.form.disabled" (click)="itemAdd(undefined)">
+            {{ 'contents.arrayAddItem' | sqxTranslate }}
         </button>
     </div>
 
-    <div class="col-auto" *ngIf="arrayControl.controls.length > 0">
-        <button type="button" class="btn btn-text-secondary" (click)="expandAll()" title="Expand all items">
+    <div class="col-auto" *ngIf="formModel.items.length > 0">
+        <button type="button" class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll">
             <i class="icon-plus-square"></i>
         </button>
-        <button type="button" class="btn btn-text-secondary" (click)="collapseAll()" title="Collapse all items">
+        <button type="button" class="btn btn-text-secondary" (click)="collapseAll()" title="i18n:contents.arrayCollapseAll">
             <i class="icon-minus-square"></i>
         </button>
     </div>
 </div>
 
 <small class="text-muted ml-2" *ngIf="field.nested.length === 0">
-    Add a nested field first to add items.
+    {{ 'contents.arrayNoFields' | sqxTranslate }}
 </small>

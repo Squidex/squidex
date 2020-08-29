@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetCommandMiddlewareTests()
         {
-            file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
+            file = new NoopAssetFile();
 
             var assetDomainObject = new AssetDomainObject(Store, tagService, assetQuery, A.Dummy<ISemanticLog>());
 
@@ -281,7 +281,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = assetId, File = file }));
+            var command = CreateCommand(new CreateAsset { AssetId = Id, File = file });
+
+            return asset.ExecuteAsync(CommandRequest.Create(command));
         }
 
         private void AssertAssetHasBeenUploaded(long version)

@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.States
             {
                 if (version == EtagVersion.Empty)
                 {
-                    throw new DomainObjectNotFoundException(ownerKey.ToString()!, ownerType);
+                    throw new DomainObjectNotFoundException(ownerKey.ToString()!);
                 }
                 else
                 {

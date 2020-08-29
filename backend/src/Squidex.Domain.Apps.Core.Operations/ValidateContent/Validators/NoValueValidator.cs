@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -21,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (!value.IsUndefined())
             {
-                addError(context.Path, "Value must not be defined.");
+                addError(context.Path, T.Get("contents.validation.mustBeEmpty"));
             }
 
             return Task.CompletedTask;

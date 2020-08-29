@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -21,6 +21,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -64,8 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected override bool CanAccept(ICommand command)
         {
-            return command is AppUpdateCommand update &&
-                Equals(update?.AppId?.Id, Snapshot.Id);
+            return command is AppUpdateCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
         }
 
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
@@ -295,7 +295,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
                         else
                         {
-                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId);
+                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId, c.Referer);
 
                             switch (result)
                             {
@@ -311,7 +311,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case ArchiveApp archiveApp:
                     return UpdateAsync(archiveApp, async c =>
                     {
-                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null);
+                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
 
                         ArchiveApp(c);
                     });
@@ -355,19 +355,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public void UpdateClient(UpdateClient command)
-        {
-            if (!string.IsNullOrWhiteSpace(command.Name))
-            {
-                RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
-            }
-
-            if (command.Role != null)
-            {
-                RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated { Role = command.Role }));
-            }
-        }
-
         public void ChangePlan(ChangePlan command)
         {
             if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId))
@@ -383,6 +370,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void Update(UpdateApp command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppUpdated()));
+        }
+
+        public void UpdateClient(UpdateClient command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated()));
         }
 
         public void UploadImage(UploadAppImage command)

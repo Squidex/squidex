@@ -11,8 +11,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
     {
         public string Id { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public string? Role { get; set; }
+
+        public long? ApiCallsLimit { get; set; }
+
+        public long? ApiTrafficLimit { get; set; }
+
+        public bool? AllowAnonymous { get; set; }
     }
 }

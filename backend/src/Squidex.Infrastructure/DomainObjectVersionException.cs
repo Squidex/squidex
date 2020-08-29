@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,6 +7,7 @@
 
 using System;
 using System.Runtime.Serialization;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure
 {
@@ -17,8 +18,8 @@ namespace Squidex.Infrastructure
 
         public long ExpectedVersion { get; }
 
-        public DomainObjectVersionException(string id, Type type, long currentVersion, long expectedVersion)
-            : base(FormatMessage(id, type, currentVersion, expectedVersion), id, type)
+        public DomainObjectVersionException(string id, long currentVersion, long expectedVersion, Exception? inner = null)
+            : base(FormatMessage(id, currentVersion, expectedVersion), id, inner)
         {
             CurrentVersion = currentVersion;
 
@@ -41,9 +42,9 @@ namespace Squidex.Infrastructure
             base.GetObjectData(info, context);
         }
 
-        private static string FormatMessage(string id, Type type, long currentVersion, long expectedVersion)
+        private static string FormatMessage(string id, long currentVersion, long expectedVersion)
         {
-            return $"Requested version {expectedVersion} for object '{id}' (type {type}), but found {currentVersion}.";
+            return T.Get("exceptions.domainObjectVersion", new { id, currentVersion, expectedVersion });
         }
     }
 }

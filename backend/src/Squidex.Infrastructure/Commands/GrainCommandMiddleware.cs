@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId.ToString());
 
-            var result = await grain.ExecuteAsync(typedCommand);
+            var result = await grain.ExecuteAsync(CommandRequest.Create(typedCommand));
 
             return result.Value;
         }

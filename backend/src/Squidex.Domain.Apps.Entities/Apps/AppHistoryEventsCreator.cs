@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -20,58 +20,55 @@ namespace Squidex.Domain.Apps.Entities.Apps
             : base(typeNameRegistry)
         {
             AddEventMessage<AppContributorAssigned>(
-                "assigned {user:[Contributor]} as {[Role]}");
+                "history.apps.contributoreAssigned");
 
             AddEventMessage<AppContributorRemoved>(
-                "removed {user:[Contributor]} from app");
+                "history.apps.contributoreRemoved");
 
             AddEventMessage<AppClientAttached>(
-                "added client {[Id]} to app");
+                "history.apps.clientAdded");
 
             AddEventMessage<AppClientRevoked>(
-                "revoked client {[Id]}");
+                "history.apps.clientRevoked");
 
             AddEventMessage<AppClientUpdated>(
-                "updated client {[Id]}");
-
-            AddEventMessage<AppClientRenamed>(
-                "renamed client {[Id]} to {[Name]}");
+                "history.apps.clientUpdated");
 
             AddEventMessage<AppPlanChanged>(
-                "changed plan to {[Plan]}");
+                "history.apps.planChanged");
 
             AddEventMessage<AppPlanReset>(
-                "resetted plan");
+                "history.apps.planReset");
 
             AddEventMessage<AppLanguageAdded>(
-                "added language {[Language]}");
+                "history.apps.languagedAdded");
 
             AddEventMessage<AppLanguageRemoved>(
-                "removed language {[Language]}");
+                "history.apps.languagedRemoved");
 
             AddEventMessage<AppLanguageUpdated>(
-                "updated language {[Language]}");
+                "history.apps.languagedUpdated");
 
             AddEventMessage<AppMasterLanguageSet>(
-                "changed master language to {[Language]}");
+                "history.apps.languagedSetToMaster");
 
             AddEventMessage<AppPatternAdded>(
-                "added pattern {[Name]}");
+                "history.apps.patternAdded");
 
             AddEventMessage<AppPatternDeleted>(
-                "deleted pattern {[PatternId]}");
+                "history.apps.patternDeleted");
 
             AddEventMessage<AppPatternUpdated>(
-                "updated pattern {[Name]}");
+                "history.apps.patternUpdated");
 
             AddEventMessage<AppRoleAdded>(
-                "added role {[Name]}");
+                "history.apps.roleAdded");
 
             AddEventMessage<AppRoleDeleted>(
-                "deleted role {[Name]}");
+                "history.apps.roleDeleted");
 
             AddEventMessage<AppRoleUpdated>(
-                "updated role {[Name]}");
+                "history.apps.roleUpdated");
         }
 
         private HistoryEvent? CreateEvent(IEvent @event)
@@ -84,8 +81,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     return CreateContributorsEvent(e, e.ContributorId);
                 case AppClientAttached e:
                     return CreateClientsEvent(e, e.Id);
-                case AppClientRenamed e:
-                    return CreateClientsEvent(e, e.Id, ClientName(e));
+                case AppClientUpdated e:
+                    return CreateClientsEvent(e, e.Id);
                 case AppClientRevoked e:
                     return CreateClientsEvent(e, e.Id);
                 case AppLanguageAdded e:
@@ -137,9 +134,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return ForEvent(e, "settings.patterns").Param("PatternId", id).Param("Name", name);
         }
 
-        private HistoryEvent CreateClientsEvent(IEvent e, string id, string? name = null)
+        private HistoryEvent CreateClientsEvent(IEvent e, string id)
         {
-            return ForEvent(e, "settings.clients").Param("Id", id).Param("Name", name);
+            return ForEvent(e, "settings.clients").Param("Id", id);
         }
 
         private HistoryEvent CreatePlansEvent(IEvent e, string? plan = null)
@@ -150,11 +147,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
             return Task.FromResult(CreateEvent(@event.Payload));
-        }
-
-        private static string ClientName(AppClientRenamed e)
-        {
-            return !string.IsNullOrWhiteSpace(e.Name) ? e.Name : e.Id;
         }
     }
 }

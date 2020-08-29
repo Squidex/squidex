@@ -10,17 +10,15 @@ using System.IO;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public sealed class AssetFile
+    public abstract class AssetFile : IDisposable
     {
-        private readonly Func<Stream> openAction;
-
         public string FileName { get; }
 
         public string MimeType { get; }
 
         public long FileSize { get; }
 
-        public AssetFile(string fileName, string mimeType, long fileSize, Func<Stream> openAction)
+        protected AssetFile(string fileName, string mimeType, long fileSize)
         {
             Guard.NotNullOrEmpty(fileName, nameof(fileName));
             Guard.NotNullOrEmpty(mimeType, nameof(mimeType));
@@ -30,13 +28,12 @@ namespace Squidex.Infrastructure.Assets
             FileSize = fileSize;
 
             MimeType = mimeType;
-
-            this.openAction = openAction;
         }
 
-        public Stream OpenRead()
+        public virtual void Dispose()
         {
-            return openAction();
         }
+
+        public abstract Stream OpenRead();
     }
 }

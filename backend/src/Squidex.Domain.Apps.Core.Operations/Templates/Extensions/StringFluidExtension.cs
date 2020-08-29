@@ -8,7 +8,7 @@
 using Fluid;
 using Fluid.Values;
 using Newtonsoft.Json;
-using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Templates.Extensions
 {

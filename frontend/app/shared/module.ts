@@ -119,7 +119,7 @@ import { SearchService } from './services/search.service';
     ]
 })
 export class SqxSharedModule {
-    public static forRoot(): ModuleWithProviders {
+    public static forRoot(): ModuleWithProviders<SqxSharedModule> {
         return {
             ngModule: SqxSharedModule,
             providers: [

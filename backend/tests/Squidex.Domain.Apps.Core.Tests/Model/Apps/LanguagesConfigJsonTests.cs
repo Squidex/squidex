@@ -7,6 +7,7 @@
 
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 

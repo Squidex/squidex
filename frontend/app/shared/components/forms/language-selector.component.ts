@@ -65,7 +65,7 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
         this.selectedLanguageChange.emit(language);
     }
 
-    public trackByLanguage(index: number, language: LanguageDto) {
+    public trackByLanguage(_index: number, language: LanguageDto) {
         return language.iso2Code;
     }
 }

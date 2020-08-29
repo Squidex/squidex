@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.EventSourcing
             this.connection = connection;
             this.serializer = serializer;
 
-            this.prefix = prefix.Trim(' ', '-').WithFallback("squidex");
+            this.prefix = prefix.Trim(' ', '-').Or("squidex");
 
             projectionClient = new ProjectionClient(connection, prefix, projectionHost);
         }

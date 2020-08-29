@@ -9,10 +9,9 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, valueAll$, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { debounceTime, filter, onErrorResumeNext, tap } from 'rxjs/operators';
-import { FieldSection } from '../../shared/group-fields.pipe';
 
 @Component({
     selector: 'sqx-content-page',
@@ -70,7 +69,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 .subscribe(schema => {
                     this.schema = schema;
 
-                    this.contentForm = new EditContentForm(this.languages, this.schema);
+                    this.contentForm = new EditContentForm(this.languages, this.schema, this.formContext.user);
                 }));
 
         this.own(
@@ -99,7 +98,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     if (clone) {
                         this.loadContent(clone, true);
                     } else if (isNewContent && autosaved && this.contentForm.hasChanges(autosaved)) {
-                        this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
+                        this.dialogs.confirm('i18n:contents.unsavedChangesTitle', 'i18n:contents.unsavedChangesText')
                             .subscribe(shouldLoad => {
                                 if (shouldLoad) {
                                     this.loadContent(autosaved, false);
@@ -111,7 +110,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }));
 
         this.own(
-            this.contentForm.form.valueChanges.pipe(
+            valueAll$(this.contentForm.form).pipe(
                     filter(_ => !this.isLoadingContent),
                     filter(_ => this.contentForm.form.enabled),
                     debounceTime(2000)
@@ -121,7 +120,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public canDeactivate(): Observable<boolean> {
-        return this.checkPendingChanges('close the current content view').pipe(
+        return this.checkPendingChangesBeforeClose().pipe(
             tap(confirmed => {
                 if (confirmed) {
                     this.autoSaveService.remove(this.autoSaveKey);
@@ -168,7 +167,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     });
             }
         } else {
-            this.contentForm.submitFailed('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
+            this.contentForm.submitFailed('i18n:contents.contentNotValid');
         }
     }
 
@@ -195,13 +194,23 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public checkPendingChanges(action: string) {
+    public checkPendingChangesBeforeClose() {
         if (this.content && !this.content.canUpdate) {
             return of(true);
         }
 
         return this.contentForm.hasChanged() ?
-            this.dialogs.confirm('Unsaved changes', `You have unsaved changes.\n\nWhen you ${action} you will loose them.\n\n**Do you want to continue anyway?**`) :
+            this.dialogs.confirm('i18n:contents.pendingChangesTitle', 'i18n:contents.pendingChangesTextToClose') :
+            of(true);
+    }
+
+    public checkPendingChangesBeforeChangingStatus() {
+        if (this.content && !this.content.canUpdate) {
+            return of(true);
+        }
+
+        return this.contentForm.hasChanged() ?
+            this.dialogs.confirm('i18n:contents.pendingChangesTitle', 'i18n:contents.pendingChangesTextToChange') :
             of(true);
     }
 
@@ -220,7 +229,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.contentsState.loadVersion(content, version)
                 .subscribe(dto => {
                     if (compare) {
-                        this.contentFormCompare = new EditContentForm(this.languages, this.schema);
+                        this.contentFormCompare = new EditContentForm(this.languages, this.schema, this.formContext.user);
 
                         this.contentFormCompare.load(dto.payload);
                         this.contentFormCompare.setEnabled(false);
@@ -250,7 +259,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public trackBySection(index: number, section: FieldSection<RootFieldDto>) {
+    public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {
         return section.separator?.fieldId;
     }
 }

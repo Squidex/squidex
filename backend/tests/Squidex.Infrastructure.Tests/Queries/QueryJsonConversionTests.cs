@@ -113,6 +113,14 @@ namespace Squidex.Infrastructure.Queries
             AssertErrors(json, "'notfound' is not a property of 'nested'.");
         }
 
+        [Fact]
+        public void Should_add_error_if_nested_reference_property_does_not_exist()
+        {
+            var json = new { path = "reference.notfound", op = "eq", value = 1 };
+
+            AssertErrors(json, "'notfound' is not a property of 'nested'.");
+        }
+
         public static IEnumerable<object[]> DateTimeTests()
         {
             const string value = "2012-11-10T09:08:07Z";

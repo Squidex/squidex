@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(PatternsDto), 200)]
-        [ApiPermission(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {
@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(PatternsDto), 201)]
-        [ApiPermission(Permissions.AppPatternsCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppPatternsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostPattern(string app, [FromBody] UpdatePatternDto request)
         {
@@ -94,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/patterns/{id}/")]
         [ProducesResponseType(typeof(PatternsDto), 200)]
-        [ApiPermission(Permissions.AppPatternsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutPattern(string app, string id, [FromBody] UpdatePatternDto request)
         {
@@ -120,7 +120,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/patterns/{id}/")]
         [ProducesResponseType(typeof(PatternsDto), 200)]
-        [ApiPermission(Permissions.AppPatternsDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppPatternsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeletePattern(string app, string id)
         {

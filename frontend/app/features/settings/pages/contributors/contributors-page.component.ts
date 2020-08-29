@@ -40,7 +40,7 @@ export class ContributorsPageComponent implements OnInit {
         this.contributorsState.search(query);
     }
 
-    public trackByContributor(index: number, contributor: ContributorDto) {
+    public trackByContributor(_index: number, contributor: ContributorDto) {
         return contributor.contributorId;
     }
 }

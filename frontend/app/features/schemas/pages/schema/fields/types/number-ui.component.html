@@ -1,53 +1,42 @@
-<div [formGroup]="editForm">
+<div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">Editor Url</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPlaceholder">{{ 'schemas.field.placeholder' | sqxTranslate }}</label>
 
         <div class="col-6">
-            <input type="text" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl" />
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder">
 
             <sqx-form-hint>
-                Url to your plugin if you use a custom editor.
+                {{ 'schemas.field.placeholderHint' | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPlaceholder">Placeholder</label>
-
-        <div class="col-6">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder" />
-
-            <sqx-form-hint>
-                Define the placeholder for the input control.
-            </sqx-form-hint>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-3 col-form-label">Editor</label>
+        <label class="col-3 col-form-label">{{ 'schemas.field.editor' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Input'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Input" />
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Input'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Input">
 
                 <i class="icon-control-Input"></i>
 
                 <span class="radio-label">Input</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Dropdown'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Dropdown" />
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Dropdown'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Dropdown">
 
                 <i class="icon-control-Dropdown"></i>
 
                 <span class="radio-label" clas>Dropdown</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Radio'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Radio" />
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Radio'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Radio">
 
                 <i class="icon-control-Radio"></i>
 
                 <span class="radio-label">Radio</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Stars'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Stars" />
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Stars'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Stars">
 
                 <i class="icon-control-Stars"></i>
 
@@ -56,7 +45,7 @@
         </div>
     </div>
     <div class="form-group row" [class.hidden]="hideAllowedValues | async">
-        <label class="col-3 col-form-label">Allowed Values</label>
+        <label class="col-3 col-form-label">{{ 'schemas.field.allowedValues' | sqxTranslate }}</label>
 
         <div class="col-6">
             <sqx-tag-editor formControlName="allowedValues" [converter]="converter"></sqx-tag-editor>
@@ -65,9 +54,9 @@
     <div class="form-group row" [class.hidden]="hideInlineEditable | async">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldInlineEditable" formControlName="inlineEditable" />
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldInlineEditable" formControlName="inlineEditable">
                 <label class="form-check-label" for="{{field.fieldId}}_fieldInlineEditable">
-                    Inline Editable
+                    {{ 'schemas.field.inlineEditable' | sqxTranslate }}
                 </label>
             </div>
         </div>

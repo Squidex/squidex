@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 #pragma warning disable RECS0026 // Possible unassigned object created by 'new'
@@ -44,18 +43,6 @@ namespace Squidex.Infrastructure.Validation
             catch (ArgumentException)
             {
                 return false;
-            }
-        }
-
-        public static void Validate(this IValidatable target, Func<string> message)
-        {
-            var errors = new List<ValidationError>();
-
-            target.Validate(errors);
-
-            if (errors.Any())
-            {
-                throw new ValidationException(message(), errors);
             }
         }
     }

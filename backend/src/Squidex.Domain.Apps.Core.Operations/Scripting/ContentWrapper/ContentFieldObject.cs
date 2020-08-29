@@ -6,7 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
+using Jint;
+using Jint.Native;
 using Jint.Native.Object;
+using Jint.Runtime;
 using Jint.Runtime.Descriptors;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -19,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     {
         private readonly ContentDataObject contentData;
         private readonly ContentFieldData? fieldData;
-        private HashSet<string> valuesToDelete;
+        private HashSet<string>? valuesToDelete;
         private Dictionary<string, PropertyDescriptor> valueProperties;
         private bool isChanged;
 
@@ -28,12 +32,13 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             get { return fieldData; }
         }
 
+        public override bool Extensible => true;
+
         public ContentFieldObject(ContentDataObject contentData, ContentFieldData? fieldData, bool isNew)
             : base(contentData.Engine)
         {
-            Extensible = true;
-
             this.contentData = contentData;
+
             this.fieldData = fieldData;
 
             if (isNew)
@@ -80,8 +85,10 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return isChanged;
         }
 
-        public override void RemoveOwnProperty(string propertyName)
+        public override void RemoveOwnProperty(JsValue property)
         {
+            var propertyName = property.AsString();
+
             valuesToDelete ??= new HashSet<string>();
             valuesToDelete.Add(propertyName);
 
@@ -90,9 +97,22 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             MarkChanged();
         }
 
-        public override bool DefineOwnProperty(string propertyName, PropertyDescriptor desc, bool throwOnError)
+        public override bool Set(JsValue property, JsValue value, JsValue receiver)
         {
             EnsurePropertiesInitialized();
+
+            var propertyName = property.AsString();
+
+            valueProperties.GetOrAdd(propertyName, k => new ContentFieldProperty(this)).Value = value;
+
+            return true;
+        }
+
+        public override bool DefineOwnProperty(JsValue property, PropertyDescriptor desc)
+        {
+            EnsurePropertiesInitialized();
+
+            var propertyName = property.AsString();
 
             if (!valueProperties.ContainsKey(propertyName))
             {
@@ -102,18 +122,27 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return true;
         }
 
-        public override PropertyDescriptor GetOwnProperty(string propertyName)
+        public override PropertyDescriptor GetOwnProperty(JsValue property)
         {
             EnsurePropertiesInitialized();
+
+            var propertyName = property.AsString();
 
             return valueProperties?.GetOrDefault(propertyName) ?? PropertyDescriptor.Undefined;
         }
 
-        public override IEnumerable<KeyValuePair<string, PropertyDescriptor>> GetOwnProperties()
+        public override IEnumerable<KeyValuePair<JsValue, PropertyDescriptor>> GetOwnProperties()
         {
             EnsurePropertiesInitialized();
 
-            return valueProperties;
+            return valueProperties.Select(x => new KeyValuePair<JsValue, PropertyDescriptor>(x.Key, x.Value));
+        }
+
+        public override List<JsValue> GetOwnPropertyKeys(Types types = Types.String | Types.Symbol)
+        {
+            EnsurePropertiesInitialized();
+
+            return valueProperties.Keys.Select(x => (JsValue)x).ToList();
         }
 
         private void EnsurePropertiesInitialized()

@@ -27,10 +27,12 @@ export class WorkflowComponent implements OnChanges {
     @Input()
     public schemasSource: SchemaTagSource;
 
-    public error: string | null;
+    public error: ErrorDto | null;
 
     public isEditing = false;
     public isEditable = false;
+
+    public selectedTab = 0;
 
     constructor(
         private readonly workflowsState: WorkflowsState
@@ -58,7 +60,7 @@ export class WorkflowComponent implements OnChanges {
             .subscribe(() => {
                 this.error = null;
             }, (error: ErrorDto) => {
-                this.error = error.displayMessage;
+                this.error = error;
             });
     }
 
@@ -111,7 +113,11 @@ export class WorkflowComponent implements OnChanges {
         this.workflow = this.workflow.removeStep(step.name);
     }
 
-    public trackByStep(index: number, step: WorkflowStep) {
+    public selectTab(tab: number) {
+        this.selectedTab = tab;
+    }
+
+    public trackByStep(_index: number, step: WorkflowStep) {
         return step.name;
     }
 }

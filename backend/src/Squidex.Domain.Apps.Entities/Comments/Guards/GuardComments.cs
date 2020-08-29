@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Comments.Guards
@@ -20,11 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot create comment.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                   e(Not.Defined("Text"), nameof(command.Text));
+                    e(Not.Defined("Text"), nameof(command.Text));
                 }
             });
         }
@@ -37,14 +38,14 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
             if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
             {
-                throw new DomainException("Comment is created by another user.");
+                throw new DomainException(T.Get("comments.notUserComment"));
             }
 
-            Validate.It(() => "Cannot update comment.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                   e(Not.Defined("Text"), nameof(command.Text));
+                    e(Not.Defined("Text"), nameof(command.Text));
                 }
             });
         }
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
             if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
             {
-                throw new DomainException("Comment is created by another user.");
+                throw new DomainException(T.Get("comments.notUserComment"));
             }
         }
 
@@ -79,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
             if (result == null)
             {
-                throw new DomainObjectNotFoundException(commentId.ToString(), "Comments", typeof(CommentsGrain));
+                throw new DomainObjectNotFoundException(commentId.ToString());
             }
 
             return result;

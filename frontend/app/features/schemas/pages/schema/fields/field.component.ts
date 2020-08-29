@@ -33,7 +33,7 @@ export class FieldComponent implements OnChanges {
 
     public dropdown = new ModalModel();
 
-    public trackByFieldFn: (index: number, field: NestedFieldDto) => any;
+    public trackByFieldFn: (_index: number, field: NestedFieldDto) => any;
 
     public isEditing = false;
     public isEditable = false;
@@ -112,7 +112,7 @@ export class FieldComponent implements OnChanges {
         }
     }
 
-    public trackByField(index: number, field: NestedFieldDto) {
+    public trackByField(_index: number, field: NestedFieldDto) {
         return field.fieldId + this.schema.id;
     }
 }

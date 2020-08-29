@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -18,7 +19,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {
-    public class GuardSchemaTests
+    public class GuardSchemaTests : IClassFixture<TranslationsFixture>
     {
         private readonly Schema schema_0;
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -60,8 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field name is not a Javascript property name.",
-                    "Fields[1].Name"));
+                new ValidationError("Name is not a Javascript property name.",
+                    "Fields[0].Name"));
         }
 
         [Fact]
@@ -83,8 +84,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field properties is required.",
-                    "Fields[1].Properties"));
+                new ValidationError("Properties is required.",
+                    "Fields[0].Properties"));
         }
 
         [Fact]
@@ -107,8 +108,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Max length must be greater or equal to min length.",
-                    "Fields[1].Properties.MinLength",
-                    "Fields[1].Properties.MaxLength"));
+                    "Fields[0].Properties.MinLength",
+                    "Fields[0].Properties.MaxLength"));
         }
 
         [Fact]
@@ -131,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Partitioning is not a valid value.",
-                    "Fields[1].Partitioning"));
+                    "Fields[0].Partitioning"));
         }
 
         [Fact]
@@ -190,8 +191,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field name is not a Javascript property name.",
-                    "Fields[1].Nested[1].Name"));
+                new ValidationError("Name is not a Javascript property name.",
+                    "Fields[0].Nested[0].Name"));
         }
 
         [Fact]
@@ -221,8 +222,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
-                new ValidationError("Field properties is required.",
-                    "Fields[1].Nested[1].Properties"));
+                new ValidationError("Properties is required.",
+                    "Fields[0].Nested[0].Properties"));
         }
 
         [Fact]
@@ -253,7 +254,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Nested field cannot be array fields.",
-                    "Fields[1].Nested[1].Properties"));
+                    "Fields[0].Nested[0].Properties"));
         }
 
         [Fact]
@@ -284,8 +285,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Max length must be greater or equal to min length.",
-                    "Fields[1].Nested[1].Properties.MinLength",
-                    "Fields[1].Nested[1].Properties.MaxLength"));
+                    "Fields[0].Nested[0].Properties.MinLength",
+                    "Fields[0].Nested[0].Properties.MaxLength"));
         }
 
         [Fact]
@@ -321,7 +322,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Field 'nested1' has been added twice.",
-                    "Fields[1].Nested"));
+                    "Fields[0].Nested"));
         }
 
         [Fact]
@@ -348,13 +349,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("UI field cannot be hidden.",
-                    "Fields[1].IsHidden"),
+                    "Fields[0].IsHidden"),
                 new ValidationError("UI field cannot be disabled.",
-                    "Fields[1].IsDisabled"),
+                    "Fields[0].IsDisabled"),
                 new ValidationError("Field cannot be an UI field.",
-                    "FieldsInLists[1]"),
+                    "FieldsInLists[0]"),
                 new ValidationError("Field cannot be an UI field.",
-                    "FieldsInReferences[1]"));
+                    "FieldsInReferences[0]"));
         }
 
         [Fact]
@@ -384,13 +385,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Field is required.",
-                    "FieldsInLists[1]"),
+                    "FieldsInLists[0]"),
                 new ValidationError("Field is required.",
-                    "FieldsInLists[2]"),
+                    "FieldsInLists[1]"),
                 new ValidationError("Field is not part of the schema.",
-                    "FieldsInLists[3]"),
+                    "FieldsInLists[2]"),
                 new ValidationError("Field cannot be an UI field.",
-                    "FieldsInLists[6]"),
+                    "FieldsInLists[5]"),
                 new ValidationError("Field 'field1' has been added twice.",
                     "FieldsInLists"));
         }
@@ -422,13 +423,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Field is required.",
-                    "FieldsInReferences[1]"),
+                    "FieldsInReferences[0]"),
                 new ValidationError("Field is required.",
-                    "FieldsInReferences[2]"),
+                    "FieldsInReferences[1]"),
                 new ValidationError("Field is not part of the schema.",
-                    "FieldsInReferences[3]"),
+                    "FieldsInReferences[2]"),
                 new ValidationError("Field cannot be an UI field.",
-                    "FieldsInReferences[6]"),
+                    "FieldsInReferences[5]"),
                 new ValidationError("Field 'field1' has been added twice.",
                     "FieldsInReferences"));
         }
@@ -445,7 +446,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Field is not part of the schema.",
-                    "FieldsInReferences[1]"));
+                    "FieldsInReferences[0]"));
         }
 
         [Fact]
@@ -509,13 +510,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
                 new ValidationError("Field is required.",
-                    "FieldsInLists[1]"),
+                    "FieldsInLists[0]"),
                 new ValidationError("Field is required.",
-                    "FieldsInLists[2]"),
+                    "FieldsInLists[1]"),
                 new ValidationError("Field is not part of the schema.",
-                    "FieldsInLists[3]"),
+                    "FieldsInLists[2]"),
                 new ValidationError("Field cannot be an UI field.",
-                    "FieldsInLists[6]"),
+                    "FieldsInLists[5]"),
                 new ValidationError("Field 'field1' has been added twice.",
                     "FieldsInLists"));
         }
@@ -531,13 +532,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
                 new ValidationError("Field is required.",
-                    "FieldsInReferences[1]"),
+                    "FieldsInReferences[0]"),
                 new ValidationError("Field is required.",
-                    "FieldsInReferences[2]"),
+                    "FieldsInReferences[1]"),
                 new ValidationError("Field is not part of the schema.",
-                    "FieldsInReferences[3]"),
+                    "FieldsInReferences[2]"),
                 new ValidationError("Field cannot be an UI field.",
-                    "FieldsInReferences[6]"),
+                    "FieldsInReferences[5]"),
                 new ValidationError("Field 'field1' has been added twice.",
                     "FieldsInReferences"));
         }
@@ -553,7 +554,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
                 new ValidationError("Field is not part of the schema.",
-                    "FieldsInReferences[1]"));
+                    "FieldsInReferences[0]"));
         }
 
         [Fact]
@@ -566,6 +567,51 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             GuardSchema.CanConfigureUIFields(command, schema_0);
+        }
+
+        [Fact]
+        public void CanConfigureFieldRules_should_throw_exception_if_field_rules_are_invalid()
+        {
+            var command = new ConfigureFieldRules
+            {
+                FieldRules = new List<FieldRuleCommand>
+                {
+                    new FieldRuleCommand { Field = "field", Action = (FieldRuleAction)5 },
+                    new FieldRuleCommand(),
+                }
+            };
+
+            ValidationAssert.Throws(() => GuardSchema.CanConfigureFieldRules(command),
+                new ValidationError("Action is not a valid value.",
+                    "FieldRules[0].Action"),
+                new ValidationError("Field is required.",
+                    "FieldRules[1].Field"));
+        }
+
+        [Fact]
+        public void CanConfigureFieldRules_should_not_throw_exception_if_field_rules_are_valid()
+        {
+            var command = new ConfigureFieldRules
+            {
+                FieldRules = new List<FieldRuleCommand>
+                {
+                    new FieldRuleCommand { Field = "field1", Action = FieldRuleAction.Disable, Condition = "a == b" },
+                    new FieldRuleCommand { Field = "field2" }
+                }
+            };
+
+            GuardSchema.CanConfigureFieldRules(command);
+        }
+
+        [Fact]
+        public void CanConfigureFieldRules_should_not_throw_exception_if_field_rules_are_null()
+        {
+            var command = new ConfigureFieldRules
+            {
+                FieldRules = null
+            };
+
+            GuardSchema.CanConfigureFieldRules(command);
         }
 
         [Fact]
@@ -608,7 +654,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new ReorderFields { FieldIds = null! };
 
             ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
-                new ValidationError("Field ids is required.", "FieldIds"));
+                new ValidationError("Field IDs is required.", "FieldIds"));
         }
 
         [Fact]
@@ -633,7 +679,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new ConfigurePreviewUrls { PreviewUrls = null! };
 
             ValidationAssert.Throws(() => GuardSchema.CanConfigurePreviewUrls(command),
-                new ValidationError("Preview Urls is required.", "PreviewUrls"));
+                new ValidationError("Preview URLs is required.", "PreviewUrls"));
         }
 
         [Fact]

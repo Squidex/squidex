@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -32,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (workflows.Values.Count(x => x.SchemaIds.Count == 0) > 1)
             {
-                errors.Add("Multiple workflows cover all schemas.");
+                errors.Add(T.Get("workflows.overlap"));
             }
 
             var uniqueSchemaIds = workflows.Values.SelectMany(x => x.SchemaIds).Distinct().ToList();
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                     if (schema != null)
                     {
-                        errors.Add($"The schema `{schema.SchemaDef.Name}` is covered by multiple workflows.");
+                        errors.Add(T.Get("workflows.schemaOverlap", new { schema = schema.SchemaDef.Name }));
                     }
                 }
             }

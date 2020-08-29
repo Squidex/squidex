@@ -2,11 +2,11 @@
     <sqx-modal-dialog (close)="cancel.emit()">
         <ng-container title>
             <ng-container *ngIf="import; else noImport">
-                Clone Schema
+                {{ 'schemas.clone' | sqxTranslate }}
             </ng-container>
 
             <ng-template #noImport>
-                Create Schema
+                {{ 'schemas.create' | sqxTranslate }}
             </ng-template>
         </ng-container>
 
@@ -14,14 +14,14 @@
             <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
             <div class="form-group">
-                <label for="schemaName">Name <small class="hint">(required)</small></label>
+                <label for="schemaName">{{ 'common.name' | sqxTranslate }} <small class="hint">({{ 'common.requiredHint' | sqxTranslate }})</small></label>
                 
-                <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="name"></sqx-control-errors>
         
-                <input type="text" class="form-control" id="schemaName" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit />
+                <input type="text" class="form-control" id="schemaName" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit>
 
                 <sqx-form-hint>
-                    You can only use letters, numbers and dashes and not more than 40 characters.
+                    {{ 'schemas.schemaNameHint' | sqxTranslate }}
                 </sqx-form-hint>
             </div>
 
@@ -29,7 +29,7 @@
                 <div class="row">
                     <div class="col-6 type">
                         <label>
-                            <input type="radio" class="radio-input" name="isSingleton" formControlName="isSingleton" [value]="false" />
+                            <input type="radio" class="radio-input" name="isSingleton" formControlName="isSingleton" [value]="false">
                         
                             <div class="row no-gutters">
                                 <div class="col-auto">
@@ -38,8 +38,8 @@
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="type-title">Multiple contents</div>
-                                    <div class="type-text text-muted">Best for multiple instances like blog posts, pages, authors, products...</div>
+                                    <div class="type-title">{{ 'schemas.modeMultiple' | sqxTranslate }}</div>
+                                    <div class="type-text text-muted">{{ 'schemas.modeMultipleDescription' | sqxTranslate }}</div>
                                 </div>
                             </div>
 
@@ -47,7 +47,7 @@
                     </div>
                     <div class="col-6 type">
                         <label>
-                            <input type="radio" class="radio-input" name="isSingleton" formControlName="isSingleton" [value]="true" />
+                            <input type="radio" class="radio-input" name="isSingleton" formControlName="isSingleton" [value]="true">
                         
                             <div class="row no-gutters">
                                 <div class="col-auto">
@@ -56,8 +56,8 @@
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <div class="type-title">Single content</div>
-                                    <div class="type-text text-muted">Best for single instances like the home page, privacy policies, settings...</div>
+                                    <div class="type-title">{{ 'schemas.modeSingle' | sqxTranslate }}</div>
+                                    <div class="type-text text-muted">{{ 'schemas.modeSingleDescription' | sqxTranslate }}</div>
                                 </div>
                             </div>
                         </label>
@@ -67,24 +67,24 @@
 
             <div class="form-group">
                 <button type="button" class="btn btn-sm btn-text" (click)="toggleImport()" [class.hidden]="showImport">
-                    Import schema
+                    {{ 'schemas.import' | sqxTranslate }}
                 </button>
                 <button type="button" class="btn btn-sm btn-text force" (click)="toggleImport()" [class.hidden]="!showImport">
-                    Hide
+                    {{ 'common.hide' | sqxTranslate }}
                 </button>
         
                 <sqx-json-editor height="250" *ngIf="showImport" formControlName="importing"></sqx-json-editor>
             </div>
 
             <sqx-form-alert marginBottom="0">
-                These values cannot be changed later.
+                {{ 'schemas.nameWarning' | sqxTranslate }}
             </sqx-form-alert>
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-secondary" (click)="cancel.emit()">Cancel</button>
+            <button type="button" class="btn btn-secondary" (click)="cancel.emit()">{{ 'common.cancel' | sqxTranslate }}</button>
 
-            <button type="submit" class="btn btn-success">Create</button>
+            <button type="submit" class="btn btn-success">{{ 'common.create' | sqxTranslate }}</button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

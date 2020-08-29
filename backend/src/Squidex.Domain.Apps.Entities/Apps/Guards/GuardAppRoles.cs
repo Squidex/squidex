@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -10,6 +10,7 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
@@ -20,15 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add role.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined(nameof(command.Name)), nameof(command.Name));
                 }
                 else if (roles.Contains(command.Name))
                 {
-                    e("A role with the same name already exists.");
+                    e(T.Get("apps.roles.nameAlreadyExists"));
                 }
             });
         }
@@ -39,25 +40,25 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             CheckRoleExists(roles, command.Name);
 
-            Validate.It(() => "Cannot delete role.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined(nameof(command.Name)), nameof(command.Name));
                 }
                 else if (Roles.IsDefault(command.Name))
                 {
-                    e("Cannot delete a default role.");
+                    e(T.Get("apps.roles.defaultRoleNotRemovable"));
                 }
 
                 if (clients.Values.Any(x => string.Equals(x.Role, command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    e("Cannot remove a role when a client is assigned.");
+                    e(T.Get("apps.roles.usedRoleByClientsNotRemovable"));
                 }
 
                 if (contributors.Values.Any(x => string.Equals(x, command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    e("Cannot remove a role when a contributor is assigned.");
+                    e(T.Get("apps.roles.usedRoleByContributorsNotRemovable"));
                 }
             });
         }
@@ -68,20 +69,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             CheckRoleExists(roles, command.Name);
 
-            Validate.It(() => "Cannot delete role.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                   e(Not.Defined("Name"), nameof(command.Name));
+                    e(Not.Defined(nameof(command.Name)), nameof(command.Name));
                 }
                 else if (Roles.IsDefault(command.Name))
                 {
-                    e("Cannot update a default role.");
+                    e(T.Get("apps.roles.defaultRoleNotUpdateable"));
                 }
 
                 if (command.Permissions == null)
                 {
-                   e(Not.Defined("Permissions"), nameof(command.Permissions));
+                    e(Not.Defined(nameof(command.Permissions)), nameof(command.Permissions));
                 }
             });
         }
@@ -95,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!roles.ContainsCustom(name))
             {
-                throw new DomainObjectNotFoundException(name, "Roles", typeof(IAppEntity));
+                throw new DomainObjectNotFoundException(name);
             }
         }
     }

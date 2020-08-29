@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
@@ -14,8 +15,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class ContributorDto : Resource
     {
-        private const string NotFound = "- not found -";
-
         /// <summary>
         /// The id of the user that contributes to the app.
         /// </summary>
@@ -55,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             }
             else
             {
-                ContributorName = NotFound;
+                ContributorName = T.Get("common.notFoundValue");
             }
 
             return this;

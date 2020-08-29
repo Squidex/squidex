@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
@@ -55,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return (b.Value, null);
             }
 
-            return (null, new JsonError("Invalid json type, expected boolean."));
+            return (null, new JsonError(T.Get("contents.invalidBoolean")));
         }
 
         public (object? Result, JsonError? Error) Visit(IField<NumberFieldProperties> field)
@@ -65,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return (n.Value, null);
             }
 
-            return (null, new JsonError("Invalid json type, expected number."));
+            return (null, new JsonError(T.Get("contents.invalidNumber")));
         }
 
         public (object? Result, JsonError? Error) Visit(IField<StringFieldProperties> field)
@@ -75,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return (s.Value, null);
             }
 
-            return (null, new JsonError("Invalid json type, expected string."));
+            return (null, new JsonError(T.Get("contents.invalidString")));
         }
 
         public (object? Result, JsonError? Error) Visit(IField<UIFieldProperties> field)
@@ -97,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return (parseResult.Value, null);
             }
 
-            return (null, new JsonError("Invalid json type, expected string."));
+            return (null, new JsonError(T.Get("contents.invalidString")));
         }
 
         public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field)
@@ -109,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     if (!string.Equals(propertyName, "latitude", StringComparison.OrdinalIgnoreCase) &&
                         !string.Equals(propertyName, "longitude", StringComparison.OrdinalIgnoreCase))
                     {
-                        return (null, new JsonError("Geolocation can only have latitude and longitude property."));
+                        return (null, new JsonError(T.Get("contents.invalidGeolocationMoreProperties")));
                     }
                 }
 
@@ -119,12 +120,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                     if (!lat.IsBetween(-90, 90))
                     {
-                        return (null, new JsonError("Latitude must be between -90 and 90."));
+                        return (null, new JsonError(T.Get("contents.invalidGeolocationLatitude")));
                     }
                 }
                 else
                 {
-                    return (null, new JsonError("Invalid json type, expected latitude/longitude object."));
+                    return (null, new JsonError(T.Get("contents.invalidGeolocation")));
                 }
 
                 if (geolocation.TryGetValue("longitude", out var lonValue) && lonValue is JsonNumber lonNumber)
@@ -133,18 +134,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                     if (!lon.IsBetween(-180, 180))
                     {
-                        return (null, new JsonError("Longitude must be between -180 and 180."));
+                        return (null, new JsonError(T.Get("contents.invalidGeolocationLongitude")));
                     }
                 }
                 else
                 {
-                    return (null, new JsonError("Invalid json type, expected latitude/longitude object."));
+                    return (null, new JsonError(T.Get("contents.invalidGeolocation")));
                 }
 
                 return (value, null);
             }
 
-            return (null, new JsonError("Invalid json type, expected latitude/longitude object."));
+            return (null, new JsonError(T.Get("contents.invalidGeolocation")));
         }
 
         public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field)
@@ -170,14 +171,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     }
                     else
                     {
-                        return (null, new JsonError("Invalid json type, expected array of strings."));
+                        return (null, new JsonError(T.Get("contents.invalidArrayOfStrings")));
                     }
                 }
 
                 return (result, null);
             }
 
-            return (null, new JsonError("Invalid json type, expected array of strings."));
+            return (null, new JsonError(T.Get("contents.invalidArrayOfStrings")));
         }
 
         private (object? Result, JsonError? Error) ConvertToObjectList()
@@ -194,14 +195,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     }
                     else
                     {
-                        return (null, new JsonError("Invalid json type, expected array of objects."));
+                        return (null, new JsonError(T.Get("contents.invalidArrayOfObjects")));
                     }
                 }
 
                 return (result, null);
             }
 
-            return (null, new JsonError("Invalid json type, expected array of objects."));
+            return (null, new JsonError(T.Get("contents.invalidArrayOfObjects")));
         }
     }
 }

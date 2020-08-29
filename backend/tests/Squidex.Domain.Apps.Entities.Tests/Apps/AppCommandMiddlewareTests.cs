@@ -67,19 +67,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_upload_image_to_store()
         {
-            var stream = new MemoryStream();
-
-            var file = new AssetFile("name.jpg", "image/jpg", 1024, () => stream);
+            var file = new NoopAssetFile();
 
             var command = CreateCommand(new UploadAppImage { AppId = appId, File = file });
             var context = CreateContextForCommand(command);
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .Returns(new ImageInfo(100, 100));
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._))
+                .Returns(new ImageInfo(100, 100, false));
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => appImageStore.UploadAsync(appId.Id, stream, A<CancellationToken>._))
+            A.CallTo(() => appImageStore.UploadAsync(appId.Id, A<Stream>._, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -88,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var stream = new MemoryStream();
 
-            var file = new AssetFile("name.jpg", "image/jpg", 1024, () => stream);
+            var file = new NoopAssetFile();
 
             var command = CreateCommand(new UploadAppImage { AppId = appId, File = file });
             var context = CreateContextForCommand(command);

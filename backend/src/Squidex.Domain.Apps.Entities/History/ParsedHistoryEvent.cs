@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.History
 {
@@ -58,8 +59,10 @@ namespace Squidex.Domain.Apps.Entities.History
 
             message = new Lazy<string?>(() =>
             {
-                if (texts.TryGetValue(item.EventType, out var result))
+                if (texts.TryGetValue(item.EventType, out var translationKey))
                 {
+                    var result = T.Get(translationKey);
+
                     foreach (var (key, value) in item.Parameters)
                     {
                         result = result.Replace("[" + key + "]", value);

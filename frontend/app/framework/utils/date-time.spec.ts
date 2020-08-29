@@ -5,12 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { DateHelper } from '..';
 import { DateTime } from './date-time';
 
 describe('DateTime', () => {
     const today = DateTime.today();
     const today2 = DateTime.today();
     const now = DateTime.now();
+
+    beforeEach(() => {
+        DateHelper.setlocale(null);
+    });
 
     it('should parse from iso string', () => {
         const actual = DateTime.parseISO('2013-10-16T12:13:14.125', false);
@@ -213,5 +218,67 @@ describe('DateTime', () => {
         expect(now.ge(today)).toBeTruthy();
         expect(now.ge(now)).toBeTruthy();
         expect(today.ge(now)).toBeFalsy();
+    });
+
+    describe('for Dutch locale', () => {
+        beforeEach(() => {
+            DateHelper.setlocale('nl');
+        });
+
+        afterEach(() => {
+            DateHelper.setlocale(null);
+        });
+
+        it('should format to from now string', () => {
+            const value = DateTime.now().addMinutes(-4);
+            const expected = '4 minuten';
+
+            expect(value.toFromNow()).toBe(expected);
+        });
+
+        it('should format to string', () => {
+            const value = DateTime.parseISO('2020-07-23');
+            const expected = 'donderdag 23 juli 2020';
+
+            expect(value.toStringFormat('PPPP')).toBe(expected);
+        });
+
+        it('should format to UTC string', () => {
+            const value = DateTime.parseISO('2020-05-23T12:00');
+            const expected = '23 mei 2020 om 12:00';
+
+            expect(value.toStringFormatUTC('PPPp')).toBe(expected);
+        });
+    });
+
+    describe('for Italian locale', () => {
+        beforeEach(() => {
+            DateHelper.setlocale('it');
+        });
+
+        afterEach(() => {
+            DateHelper.setlocale(null);
+        });
+
+        it('should format to from now string', () => {
+            const value = DateTime.now().addMinutes(-4);
+            const expected = '4 minuti';
+
+            expect(value.toFromNow()).toBe(expected);
+        });
+
+        it('should format to string', () => {
+            const value = DateTime.parseISO('2020-07-23');
+            const expected = 'giovedì 23 luglio 2020';
+
+            expect(value.toStringFormat('PPPP')).toBe(expected);
+        });
+
+        it('should format to UTC string', () => {
+            const value = DateTime.parseISO('2020-05-23T12:00');
+            const expected = '23 maggio 2020 12:00';
+
+            expect(value.toStringFormatUTC('PPPp')).toBe(expected);
+        });
     });
 });

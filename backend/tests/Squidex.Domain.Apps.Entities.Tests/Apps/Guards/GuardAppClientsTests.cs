@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -16,7 +17,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
-    public class GuardAppClientsTests
+    public class GuardAppClientsTests : IClassFixture<TranslationsFixture>
     {
         private readonly AppClients clients_0 = AppClients.Empty;
         private readonly Roles roles = Roles.Empty;
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new AttachClient();
 
             ValidationAssert.Throws(() => GuardAppClients.CanAttach(clients_0, command),
-                new ValidationError("Client id is required.", "Id"));
+                new ValidationError("Client ID is required.", "Id"));
         }
 
         [Fact]
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new RevokeClient();
 
             ValidationAssert.Throws(() => GuardAppClients.CanRevoke(clients_0, command),
-                new ValidationError("Client id is required.", "Id"));
+                new ValidationError("Client ID is required.", "Id"));
         }
 
         [Fact]
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdateClient { Name = "iOS" };
 
             ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_0, command, Roles.Empty),
-                new ValidationError("Client id is required.", "Id"));
+                new ValidationError("Client ID is required.", "Id"));
         }
 
         [Fact]
@@ -96,17 +97,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void UpdateClient_should_throw_exception_if_client_has_no_name_and_role()
-        {
-            var command = new UpdateClient { Id = "ios" };
-
-            var clients_1 = clients_0.Add("ios", "secret");
-
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
-                new ValidationError("Either name or role must be defined.", "Name", "Role"));
-        }
-
-        [Fact]
         public void UpdateClient_should_throw_exception_if_client_has_invalid_role()
         {
             var command = new UpdateClient { Id = "ios", Role = "Invalid" };
@@ -115,6 +105,28 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
                 new ValidationError("Role is not a valid value.", "Role"));
+        }
+
+        [Fact]
+        public void UpdateClient_should_throw_exception_if_api_calls_limit_is_less_than_zero()
+        {
+            var command = new UpdateClient { Id = "ios", ApiCallsLimit = -10 };
+
+            var clients_1 = clients_0.Add("ios", "secret");
+
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
+                new ValidationError("ApiCallsLimit must be greater or equal to 0.", "ApiCallsLimit"));
+        }
+
+        [Fact]
+        public void UpdateClient_should_throw_exception_if_api_traffic_limit_is_less_than_zero()
+        {
+            var command = new UpdateClient { Id = "ios", ApiTrafficLimit = -10 };
+
+            var clients_1 = clients_0.Add("ios", "secret");
+
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
+                new ValidationError("ApiTrafficLimit must be greater or equal to 0.", "ApiTrafficLimit"));
         }
 
         [Fact]

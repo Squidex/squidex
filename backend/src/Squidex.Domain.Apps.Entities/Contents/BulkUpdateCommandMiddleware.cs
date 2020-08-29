@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -73,11 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                         {
                                             var command = SimpleMapper.Map(bulkUpdates, new CreateContent { Data = job.Data });
 
-                                            var content = serviceProvider.GetRequiredService<ContentDomainObject>();
-
-                                            content.Setup(command.ContentId);
-
-                                            await content.ExecuteAsync(command);
+                                            await InsertAsync(command);
 
                                             result.ContentId = command.ContentId;
                                         }
@@ -89,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     {
                                         if (id == null || id == DomainId.Empty)
                                         {
-                                            throw new DomainObjectNotFoundException("NOT DEFINED", typeof(IContentEntity));
+                                            throw new DomainObjectNotFoundException("undefined");
                                         }
 
                                         var command = SimpleMapper.Map(bulkUpdates, new ChangeContentStatus { ContentId = id.Value });
@@ -107,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     {
                                         if (id == null || id == DomainId.Empty)
                                         {
-                                            throw new DomainObjectNotFoundException("NOT DEFINED", typeof(IContentEntity));
+                                            throw new DomainObjectNotFoundException("undefined");
                                         }
 
                                         var command = SimpleMapper.Map(bulkUpdates, new DeleteContent { ContentId = id.Value });
@@ -150,6 +147,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
+        private async Task InsertAsync(CreateContent command)
+        {
+            var content = serviceProvider.GetRequiredService<ContentDomainObject>();
+
+            content.Setup(command.ContentId);
+
+            await content.ExecuteAsync(command);
+        }
+
         private async Task<DomainId?> FindIdAsync(Context context, string schema, BulkUpdateJob job)
         {
             var id = job.Id;
@@ -162,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (existing.Total > 1)
                 {
-                    throw new DomainException("More than one content matches to the query.");
+                    throw new DomainException(T.Get("contents.bulkInsertQueryNotUnique"));
                 }
 
                 id = existing.FirstOrDefault()?.Id;

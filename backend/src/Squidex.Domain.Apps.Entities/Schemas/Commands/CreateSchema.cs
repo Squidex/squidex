@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using FieldRules = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.FieldRuleCommand>;
 using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaField>;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
@@ -30,6 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
         public FieldNames? FieldsInReferences { get; set; }
 
         public FieldNames? FieldsInLists { get; set; }
+
+        public FieldRules? FieldRules { get; set; }
 
         public SchemaScripts? Scripts { get; set; }
 

@@ -8,6 +8,7 @@
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 jsonProperty.Description = field.Name;
             }
 
-            jsonProperty.IsRequired = field.RawProperties.IsRequired;
+            jsonProperty.SetRequired(field.RawProperties.IsRequired);
 
             return jsonProperty;
         }

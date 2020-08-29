@@ -313,14 +313,20 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Foreach_should_call_action_foreach_item()
+        public void Foreach_should_call_action_foreach_item_with_index()
         {
             var source = new List<int> { 3, 5, 1 };
-            var target = new List<int>();
 
-            source.Foreach(target.Add);
+            var targetItems = new List<int>();
+            var targetIndexes = new List<int>();
 
-            Assert.Equal(source, target);
+            source.Foreach((x, i) =>
+            {
+                targetItems.Add(x);
+                targetIndexes.Add(i);
+            });
+
+            Assert.Equal(source, targetItems);
         }
     }
 }

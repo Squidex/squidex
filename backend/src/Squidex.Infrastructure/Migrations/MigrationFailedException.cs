@@ -15,13 +15,7 @@ namespace Squidex.Infrastructure.Migrations
     {
         public string Name { get; }
 
-        public MigrationFailedException(string name)
-            : base(FormatException(name))
-        {
-            Name = name;
-        }
-
-        public MigrationFailedException(string name, Exception inner)
+        public MigrationFailedException(string name, Exception? inner = null)
             : base(FormatException(name), inner)
         {
             Name = name;

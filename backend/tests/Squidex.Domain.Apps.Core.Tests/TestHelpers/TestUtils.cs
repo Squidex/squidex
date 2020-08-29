@@ -24,7 +24,7 @@ using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Domain.Apps.Core.TestHelpers
 {
     public static class TestUtils
     {

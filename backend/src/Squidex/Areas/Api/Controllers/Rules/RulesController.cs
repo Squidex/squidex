@@ -84,7 +84,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpGet]
         [Route("apps/{app}/rules/")]
         [ProducesResponseType(typeof(RulesDto), 200)]
-        [ApiPermission(Permissions.AppRulesRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
@@ -113,7 +113,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpPost]
         [Route("apps/{app}/rules/")]
         [ProducesResponseType(typeof(RuleDto), 201)]
-        [ApiPermission(Permissions.AppRulesCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostRule(string app, [FromBody] CreateRuleDto request)
         {
@@ -134,7 +134,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpDelete]
         [Route("apps/{app}/rules/run")]
         [ProducesResponseType(204)]
-        [ApiPermission(Permissions.AppRulesEvents)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteRuleRun(string app)
         {
@@ -157,7 +157,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpPut]
         [Route("apps/{app}/rules/{id}/")]
         [ProducesResponseType(typeof(RuleDto), 200)]
-        [ApiPermission(Permissions.AppRulesUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutRule(string app, string id, [FromBody] UpdateRuleDto request)
         {
@@ -180,7 +180,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpPut]
         [Route("apps/{app}/rules/{id}/enable/")]
         [ProducesResponseType(typeof(RuleDto), 200)]
-        [ApiPermission(Permissions.AppRulesDisable)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
         public async Task<IActionResult> EnableRule(string app, string id)
         {
@@ -203,7 +203,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpPut]
         [Route("apps/{app}/rules/{id}/disable/")]
         [ProducesResponseType(typeof(RuleDto), 200)]
-        [ApiPermission(Permissions.AppRulesDisable)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableRule(string app, string id)
         {
@@ -225,7 +225,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/rules/{id}/trigger/")]
-        [ApiPermission(Permissions.AppRulesEvents)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(1)]
         public async Task<IActionResult> TriggerRule(string app, string id)
         {
@@ -247,7 +247,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpPut]
         [Route("apps/{app}/rules/{id}/run")]
         [ProducesResponseType(204)]
-        [ApiPermission(Permissions.AppRulesEvents)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutRuleRun(string app, string id)
         {
@@ -267,7 +267,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/rules/{id}/")]
-        [ApiPermission(Permissions.AppRulesDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteRule(string app, string id)
         {
@@ -290,7 +290,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpGet]
         [Route("apps/{app}/rules/events/")]
         [ProducesResponseType(typeof(RuleEventsDto), 200)]
-        [ApiPermission(Permissions.AppRulesRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesRead)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetEvents(string app, [FromQuery] string? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
@@ -312,7 +312,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/rules/events/{id}/")]
-        [ApiPermission(Permissions.AppRulesEvents)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutEvent(string app, string id)
         {
@@ -339,7 +339,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/rules/events/{id}/")]
-        [ApiPermission(Permissions.AppRulesEvents)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteEvent(string app, string id)
         {

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -15,7 +15,9 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
@@ -178,9 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (token == null)
                 {
-                    var error = new ValidationError("A schema with this name already exists.");
-
-                    throw new ValidationException("Cannot create schema.", error);
+                    throw new ValidationException(T.Get("schemas.nameAlreadyExists"));
                 }
 
                 return token;

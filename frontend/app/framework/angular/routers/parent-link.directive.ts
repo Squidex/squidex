@@ -6,7 +6,7 @@
  */
 
 import { Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
 import { ResourceOwner } from '@app/framework/internal';
 
 @Directive({
@@ -17,6 +17,9 @@ export class ParentLinkDirective extends ResourceOwner implements OnInit {
 
     @Input()
     public isLazyLoaded = false;
+
+    @Input()
+    public queryParamsHandling: QueryParamsHandling;
 
     constructor(
         private readonly router: Router,
@@ -29,19 +32,36 @@ export class ParentLinkDirective extends ResourceOwner implements OnInit {
 
     public ngOnInit() {
         this.own(
-            this.route.url.subscribe(() => {
-                this.url = this.isLazyLoaded ?
-                    this.router.createUrlTree(['.'], { relativeTo: this.route.parent!.parent }).toString() :
-                    this.router.createUrlTree(['.'], { relativeTo: this.route.parent }).toString();
+            this.route.url
+                .subscribe(() => {
+                    this.updateUrl();
+                }));
 
-                this.renderer.setProperty(this.element.nativeElement, 'href', this.url);
-            }));
+        this.own(
+            this.router.events
+                .subscribe(event => {
+                    if (event instanceof NavigationEnd) {
+                        this.updateUrl();
+                    }
+                }));
     }
 
     @HostListener('click')
     public onClick(): boolean {
-        this.router.navigateByUrl(this.url);
+        this.router.navigateByUrl(this.url, {
+            queryParamsHandling: 'preserve'
+        });
 
         return false;
+    }
+
+    private updateUrl() {
+        const queryParamsHandling = this.queryParamsHandling;
+
+        this.url = this.isLazyLoaded ?
+            this.router.createUrlTree(['.'], { queryParamsHandling, relativeTo: this.route.parent!.parent }).toString() :
+            this.router.createUrlTree(['.'], { queryParamsHandling, relativeTo: this.route.parent }).toString();
+
+        this.renderer.setProperty(this.element.nativeElement, 'href', this.url);
     }
 }

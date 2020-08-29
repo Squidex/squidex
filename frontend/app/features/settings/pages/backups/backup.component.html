@@ -5,10 +5,10 @@
         </div>
         <div class="col-auto">
             <div>
-                Started:
+                {{ 'backups.startedLabel' | sqxTranslate }}:
             </div>
             <div>
-                Duration:
+                {{ 'backups.backupDuration' | sqxTranslate }}:
             </div>
         </div>
         <div class="col-3">
@@ -21,27 +21,26 @@
         </div>
         <div class="col">
             <div>
-                <span title="Archived events">
-                    Events: <strong class="backup-progress">{{backup.handledEvents | sqxKNumber}}</strong>
+                <span title="i18n:backups.backupCountEventsTooltip">
+                    {{ 'backups.backupCountEventsLabel' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledEvents | sqxKNumber}}</strong>
                 </span>,
-                <span title="Archived assets">
-                    Assets: <strong class="backup-progress">{{backup.handledAssets | sqxKNumber}}</strong>
+                <span title="i18n:backups.backupCountAssetsTooltip">
+                    {{ 'backups.backupCountAssetsLabel' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledAssets | sqxKNumber}}</strong>
                 </span>
             </div>
             <div *ngIf="backup.stopped && !backup.isFailed">
-                Download:
+                {{ 'backups.backupDownload' | sqxTranslate }}:
 
                 <a href="{{apiUrl.buildUrl(backup.downloadUrl)}}" sqxExternalLink="noicon">
-                    Ready <i class="icon-external-link"></i>
+                    {{ 'backups.backupDownloadLink' | sqxTranslate }} <i class="icon-external-link"></i>
                 </a>
             </div>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-text-danger mt-1"
-                [disabled]="!backup.canDelete"
+            <button type="button" class="btn btn-text-danger mt-1" [disabled]="!backup.canDelete"
                 (sqxConfirmClick)="delete()"
-                confirmTitle="Delete backup"
-                confirmText="Do you really want to delete the backup?">
+                confirmTitle="i18n:backups.deleteConfirmTitle"
+                confirmText="i18n:backups.deleteConfirmText">
                 <i class="icon-bin2"></i>
             </button>
         </div>

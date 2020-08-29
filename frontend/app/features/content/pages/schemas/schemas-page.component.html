@@ -1,9 +1,9 @@
-<sqx-title message="Contents"></sqx-title>
+<sqx-title message="i18n:contents.schemasPageTitle"></sqx-title>
 
 <sqx-panel theme="dark" [desiredWidth]="width" [showClose]="!isCollapsed" showSecondHeader="true">
     <ng-container title>
         <ng-container *ngIf="!isCollapsed">
-            Schemas
+            {{ 'common.schemas' | sqxTranslate }}
         </ng-container>
     </ng-container>
 
@@ -18,7 +18,7 @@
             <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
             <div class="search-form">
-                <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas" />
+                <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="{{ 'contents.searchSchemasPlaceholder' | sqxTranslate }}">
 
                 <i class="icon-search"></i>
             </div>
@@ -37,7 +37,7 @@
         </div>
 
         <div class="headline" [class.hidden]="!isCollapsed">
-            Schemas
+            {{ 'common.schemas' | sqxTranslate }}
         </div>
     </ng-container>
 </sqx-panel>

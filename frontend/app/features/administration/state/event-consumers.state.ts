@@ -58,7 +58,7 @@ export class EventConsumersState extends State<Snapshot> {
         return this.eventConsumersService.getEventConsumers().pipe(
             tap(({ items: eventConsumers }) => {
                 if (isReload && !silent) {
-                    this.dialogs.notifyInfo('Event Consumers reloaded.');
+                    this.dialogs.notifyInfo('i18n:eventConsumers.reloaded');
                 }
 
                 this.next({

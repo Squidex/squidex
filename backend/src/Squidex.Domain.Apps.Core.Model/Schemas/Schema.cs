@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         private string category;
         private FieldNames fieldsInLists = FieldNames.Empty;
         private FieldNames fieldsInReferences = FieldNames.Empty;
+        private FieldRules fieldRules = FieldRules.Empty;
         private FieldCollection<RootField> fields = FieldCollection<RootField>.Empty;
         private IReadOnlyDictionary<string, string> previewUrls = EmptyPreviewUrls;
         private SchemaScripts scripts = SchemaScripts.Empty;
@@ -70,6 +71,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public FieldCollection<RootField> FieldCollection
         {
             get { return fields; }
+        }
+
+        public FieldRules FieldRules
+        {
+            get { return fieldRules; }
         }
 
         public FieldNames FieldsInLists
@@ -190,6 +196,28 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public Schema SetFieldsInReferences(params string[] names)
         {
             return SetFieldsInReferences(new FieldNames(names));
+        }
+
+        [Pure]
+        public Schema SetFieldRules(FieldRules rules)
+        {
+            rules ??= FieldRules.Empty;
+
+            if (fieldRules.SetEquals(rules))
+            {
+                return this;
+            }
+
+            return Clone(clone =>
+            {
+                clone.fieldRules = rules;
+            });
+        }
+
+        [Pure]
+        public Schema SetFieldRules(params FieldRule[] rules)
+        {
+            return SetFieldRules(new FieldRules(rules));
         }
 
         [Pure]

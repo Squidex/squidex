@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_throw_exception_for_invalid_field()
         {
-            Assert.Throws<NotSupportedException>(() => _F(ClrFilter.Eq("data/invalid/iv", "Me")));
+            Assert.Throws<KeyNotFoundException>(() => _F(ClrFilter.Eq("data/invalid/iv", "Me")));
         }
 
         [Fact]
@@ -179,6 +179,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var i = _F(ClrFilter.In("version", new List<long> { 0L, 2L, 5L }));
             var o = _C("{ 'vs' : { '$in' : [NumberLong(0), NumberLong(2), NumberLong(5)] } }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_null_regex()
+        {
+            var i = _F(ClrFilter.Contains("createdBy", null!));
+            var o = _C("{ 'cb' : /null/i }");
 
             Assert.Equal(o, i);
         }

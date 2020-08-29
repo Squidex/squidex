@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\Images\logo-wide-rotated.jpg" />
     <None Remove="Assets\Images\logo.jpg" />
     <None Remove="Assets\Images\logo.png" />
   </ItemGroup>
@@ -25,6 +26,10 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="Microsoft.Orleans.TestingHost" Version="3.2.1" />
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
@@ -41,7 +46,21 @@
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\Images\logo-wide-rotated.jpg" />
     <EmbeddedResource Include="Assets\Images\logo.jpg" />
     <EmbeddedResource Include="Assets\Images\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Translations\SampleResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SampleResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Translations\SampleResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SampleResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

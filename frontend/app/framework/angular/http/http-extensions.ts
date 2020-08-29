@@ -81,7 +81,6 @@ export module HTTP {
 export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
     source.pipe(catchError((response: HttpErrorResponse) => {
         const error = parseError(response, message);
-
         return throwError(error);
     }));
 
@@ -93,11 +92,11 @@ export function parseError(response: HttpErrorResponse, fallback: string) {
     const { error, status } = response;
 
     if (status === 412) {
-        return new ErrorDto(412, 'Failed to make the update. Another user has made a change. Please reload.', [], response);
+        return new ErrorDto(412, 'i18n:common.httpConflict', [], response);
     }
 
     if (status === 429) {
-        return new ErrorDto(429, 'You have exceeded the maximum limit of API calls.', [], response);
+        return new ErrorDto(429, 'i18n:common.httpLimit', [], response);
     }
 
     let parsed: any;

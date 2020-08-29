@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -20,28 +20,28 @@ namespace Squidex.Domain.Apps.Entities.Contents
             : base(typeNameRegistry)
         {
             AddEventMessage<ContentCreated>(
-                "created {[Schema]} content.");
+                "history.contents.created");
 
             AddEventMessage<ContentUpdated>(
-                "updated {[Schema]} content.");
+                "history.contents.updated");
 
             AddEventMessage<ContentDeleted>(
-                "deleted {[Schema]} content.");
+                "history.contents.deleted");
 
             AddEventMessage<ContentDraftCreated>(
-                "created new draft.");
+                "history.contents.draftCreated");
 
             AddEventMessage<ContentDraftDeleted>(
-                "deleted draft.");
+                "history.contents.draftDeleted");
 
             AddEventMessage<ContentSchedulingCancelled>(
-                "failed to schedule status change for {[Schema]} content.");
+                "history.contents.scheduleFailed");
 
             AddEventMessage<ContentStatusChanged>(
-                "changed status of {[Schema]} content to {[Status]}.");
+                "history.statusChanged");
 
             AddEventMessage<ContentStatusScheduled>(
-                "scheduled to change status of {[Schemra]} content to {[Status]}.");
+                "history.contents.scheduleCompleted");
         }
 
         protected override Task<HistoryEvent?> CreateEventCoreAsync(Envelope<IEvent> @event)

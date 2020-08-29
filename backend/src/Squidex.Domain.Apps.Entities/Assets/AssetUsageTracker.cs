@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var key = GetKey(appId);
 
-            var counters = await usageTracker.GetAsync(key, SummaryDate, SummaryDate);
+            var counters = await usageTracker.GetAsync(key, SummaryDate, SummaryDate, null);
 
             return counters.GetInt64(CounterTotalSize);
         }

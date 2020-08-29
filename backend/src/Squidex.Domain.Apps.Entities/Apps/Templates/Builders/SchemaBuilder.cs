@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
-using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
@@ -102,6 +102,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             var field = AddField<NumberFieldProperties>(name);
 
             configure(new NumberFieldBuilder(field, command));
+
+            return this;
+        }
+
+        public SchemaBuilder AddReferences(string name, Action<ReferencesFieldBuilder> configure)
+        {
+            var field = AddField<ReferencesFieldProperties>(name);
+
+            configure(new ReferencesFieldBuilder(field, command));
 
             return this;
         }

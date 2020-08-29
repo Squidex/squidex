@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {

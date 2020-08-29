@@ -69,20 +69,16 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             geolocationSchema.Properties.Add("latitude", new JsonSchemaProperty
             {
                 Type = JsonObjectType.Number,
-                IsNullableRaw = false,
-                IsRequired = true,
                 Maximum = 90,
                 Minimum = -90
-            });
+            }.SetRequired(true));
 
             geolocationSchema.Properties.Add("longitude", new JsonSchemaProperty
             {
                 Type = JsonObjectType.Number,
-                IsNullableRaw = false,
-                IsRequired = true,
                 Maximum = 180,
                 Minimum = -180
-            });
+            }.SetRequired(true));
 
             var reference = schemaResolver("GeolocationDto", geolocationSchema);
 

@@ -97,7 +97,7 @@ export class CommentComponent implements OnChanges {
         const text = this.editingText;
 
         if (!text || text.length === 0) {
-            this.dialogs.confirm('Delete comment', 'Do you really want to delete the comment?')
+            this.dialogs.confirm('i18n:comments.deleteConfirmTitle', 'i18n:comments.deleteConfirmText')
                 .subscribe(confirmed => {
                     if (confirmed) {
                         this.delete();

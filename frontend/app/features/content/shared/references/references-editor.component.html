@@ -5,15 +5,15 @@
     <ng-container>
         <div class="drop-area-container">
             <div class="drop-area">
-                <a (click)="contentCreatorDialog.show()">Add New</a>
+                <a (click)="contentCreatorDialog.show()">{{ 'contents.referencesCreateNew' | sqxTranslate }}</a>
 
                 &middot;
 
-                <a (click)="contentSelectorDialog.show()">Select Existing</a>
+                <a (click)="contentSelectorDialog.show()">{{ 'contents.referencesSelectExisting' | sqxTranslate }}</a>
             </div>
         </div>
         
-        <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.contentItems && snapshot.contentItems.length > 0"
+        <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.contentItems && snapshot.contentItems.length > 0" 
             cdkDropList
             [cdkDropListData]="snapshot.contentItems"
             [cdkDropListDisabled]="snapshot.isDisabled"
@@ -22,7 +22,7 @@
                 [sqxReferenceItem]="content"
                 class="table-drag"
                 cdkDrag
-                cdkDragLockAxis="y"
+                cdkDragLockAxis="y" 
                 [columns]="snapshot.columns"
                 [isCompact]="snapshot.isCompact"
                 [isDisabled]="snapshot.isDisabled"
@@ -35,7 +35,7 @@
 </div>
 
 <ng-container *sqxModal="contentCreatorDialog">
-    <sqx-content-creator 
+    <sqx-content-creator
         (select)="select($event)"
         [language]="language"
         [languages]="languages"
@@ -44,7 +44,7 @@
 </ng-container>
 
 <ng-container *sqxModal="contentSelectorDialog">
-    <sqx-content-selector 
+    <sqx-content-selector
         (select)="select($event)"
         [allowDuplicates]="allowDuplicates"
         [alreadySelected]="snapshot.contentItems"

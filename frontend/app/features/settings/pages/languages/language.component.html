@@ -13,11 +13,10 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-danger"
-                        [disabled]="!language.canDelete"
+                    <button type="button" class="btn btn-text-danger" [disabled]="!language.canDelete"
                         (sqxConfirmClick)="remove()"
-                        confirmTitle="Remove language" 
-                        confirmText="Do you really want to remove the language?">
+                        confirmTitle="i18n:languages.deleteConfirmTitle"
+                        confirmText="i18n:languages.deleteConfirmText">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>
@@ -29,25 +28,18 @@
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
                 <div class="float-right">
-                    <button type="reset" class="btn btn-text-secondary2" (click)="toggleEditing()">Cancel</button>
-                    <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">Save</button>
+                    <button type="reset" class="btn btn-text-secondary2" (click)="toggleEditing()">{{ 'common.cancel' | sqxTranslate }}</button>
+                    <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">{{ 'common.save' | sqxTranslate }}</button>
                 </div>
             </div>
 
             <div class="table-items-row-details-tab">
                 <div class="form-group row" *ngIf="isEditable || fallbackLanguages.length > 0">
-                    <label class="col-3 col-form-label fallback-label">Fallback</label>
+                    <label class="col-3 col-form-label fallback-label">{{ 'common.fallback' | sqxTranslate }}</label>
 
                     <div class="col-9">
-                        <div class="fallback-languages"
-                            cdkDropList
-                            [cdkDropListData]="fallbackLanguages"
-                            [cdkDropListDisabled]="!isEditable"
-                            (cdkDropListDropped)="sort($event)" 
-                            *ngIf="fallbackLanguages.length > 0">
-                            <div class="fallback-language table-drag" *ngFor="let language of fallbackLanguages"
-                                cdkDrag
-                                cdkDragLockAxis="y">
+                        <div class="fallback-languages" cdkDropList [cdkDropListData]="fallbackLanguages" [cdkDropListDisabled]="!isEditable" (cdkDropListDropped)="sort($event)" *ngIf="fallbackLanguages.length > 0">
+                            <div class="fallback-language table-drag" *ngFor="let language of fallbackLanguages" cdkDrag cdkDragLockAxis="y">
                                 <div class="row no-gutters">
                                     <div class="col-auto" *ngIf="isEditable">
                                         <i cdkDragHandle class="icon-drag2 drag-handle mr-1"></i>
@@ -72,7 +64,7 @@
                                     </select>
                                 </div>
                                 <div class="col-auto pl-1">
-                                    <button type="submit" class="btn btn-success">Add Language</button>
+                                    <button type="submit" class="btn btn-success">{{ 'languages.add' | sqxTranslate }}</button>
                                 </div>
                             </div>
                         </form>
@@ -82,14 +74,14 @@
                 <div class="form-group row" *ngIf="!language.isMaster">
                     <div class="col offset-3 col-9">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isMaster" formControlName="isMaster" />
+                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isMaster" formControlName="isMaster">
                             <label class="form-check-label" for="{{language.iso2Code}}_isMaster">
-                                Is Master
+                                {{ 'languages.master' | sqxTranslate }}
                             </label>
                         </div>
     
                         <sqx-form-hint>
-                            Other languages fall back to the master if no fallback is defined.
+                            {{ 'languages.masterHint' | sqxTranslate }}
                         </sqx-form-hint>
                     </div>
                 </div>
@@ -97,14 +89,14 @@
                 <div class="form-group row" *ngIf="!language.isMaster">
                     <div class="col offset-3 col-9">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isOptional" formControlName="isOptional" />
+                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isOptional" formControlName="isOptional">
                             <label class="form-check-label" for="{{language.iso2Code}}_isOptional">
-                                Is Optional
+                                {{ 'languages.optional' | sqxTranslate }}
                             </label> 
                         </div>
 
                         <sqx-form-hint>
-                            Values for optional languages must not be entered, even if field is required.
+                            {{ 'languages.optionalHint' | sqxTranslate }}
                         </sqx-form-hint>
                     </div>
                 </div>

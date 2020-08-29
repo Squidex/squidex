@@ -94,15 +94,10 @@
     <EmbeddedResource Include="Pipeline\Squid\icon-sad-sm.svg" />
     <EmbeddedResource Include="Pipeline\Squid\icon-sad.svg" />
     <EmbeddedResource Remove="Assets\**" />
-    <EmbeddedResource Remove="_test-output\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Assets\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Assets\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -120,9 +115,19 @@
     <None Remove="Assets\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Frontend\Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\i18n\frontend_en.json" Link="Areas\Frontend\Resources\frontend_en.json" />
+  </ItemGroup>
+
   <PropertyGroup>
     <NoWarn>$(NoWarn);CS1591;1591;1573;1572;NU1605;IDE0060</NoWarn>
   </PropertyGroup>
-
-  <ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="http://json.schemastore.org/BizTalkServerApplicationSchema" /></VisualStudio></ProjectExtensions>
 </Project>

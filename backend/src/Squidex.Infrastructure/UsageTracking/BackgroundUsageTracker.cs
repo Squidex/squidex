@@ -141,21 +141,26 @@ namespace Squidex.Infrastructure.UsageTracking
             return result;
         }
 
-        public Task<Counters> GetForMonthAsync(string key, DateTime date)
+        public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category)
         {
             var dateFrom = new DateTime(date.Year, date.Month, 1);
             var dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
-            return GetAsync(key, dateFrom, dateTo);
+            return GetAsync(key, dateFrom, dateTo, category);
         }
 
-        public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category)
         {
             Guard.NotNullOrEmpty(key, nameof(key));
 
             ThrowIfDisposed();
 
             var queried = await usageRepository.QueryAsync(key, fromDate, toDate);
+
+            if (category != null)
+            {
+                queried = queried.Where(x => string.Equals(x.Category, category, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
 
             var result = new Counters();
 

@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {

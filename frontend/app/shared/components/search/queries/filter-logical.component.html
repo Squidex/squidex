@@ -25,8 +25,7 @@
         <div class="filter mt-3" *ngFor="let filter of filters; let i = index">
             <span class="filter-line-h"></span>
     
-            <sqx-filter-node [filter]="filter" [language]="language" [level]="nestedLevel" [model]="model"
-                (remove)="removeFilter(i)" (change)="emitChange()">
+            <sqx-filter-node [filter]="filter" [language]="language" [level]="nestedLevel" [model]="model" (remove)="removeFilter(i)" (change)="emitChange()">
             </sqx-filter-node>
         </div>
 
@@ -34,11 +33,11 @@
             <span class="filter-line-h"></span>
 
             <button class="btn btn-outline-success btn-sm mr-2" (click)="addComparison()">
-                Add Filter
+                {{ 'search.addFilter' | sqxTranslate }}
             </button>
             
             <button class="btn btn-outline-success btn-sm" (click)="addLogical()" *ngIf="level < 1">
-                Add Group
+                {{ 'search.addGroup' | sqxTranslate }}
             </button>
         </div>
     </div>

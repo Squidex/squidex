@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(dataSchema, nameof(dataSchema));
 
-            var schemaName = schema.Properties.Label.WithFallback(schema.Name);
+            var schemaName = schema.Properties.Label.Or(schema.Name);
 
             var contentSchema = new JsonSchema
             {
@@ -32,6 +32,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                     ["createdBy"] = SchemaBuilder.StringProperty($"The user that has created the {schemaName} content.", true),
                     ["lastModified"] = SchemaBuilder.DateTimeProperty($"The date and time when the {schemaName} content has been modified last.", true),
                     ["lastModifiedBy"] = SchemaBuilder.StringProperty($"The user that has updated the {schemaName} content last.", true),
+                    ["newStatus"] = SchemaBuilder.StringProperty($"The new status of the content.", true),
                     ["status"] = SchemaBuilder.StringProperty($"The status of the content.", true)
                 },
                 Type = JsonObjectType.Object

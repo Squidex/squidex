@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -398,6 +399,17 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
+        public void Should_set_field_rules()
+        {
+            var schema_1 = schema_0.SetFieldRules(FieldRule.Hide("2"));
+            var schema_2 = schema_1.SetFieldRules(FieldRule.Hide("2"));
+
+            Assert.NotEmpty(schema_1.FieldRules);
+            Assert.NotEmpty(schema_2.FieldRules);
+            Assert.Same(schema_1, schema_2);
+        }
+
+        [Fact]
         public void Should_set_scripts()
         {
             var scripts1 = new SchemaScripts
@@ -447,6 +459,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schemaSource =
                 TestUtils.MixedSchema(true)
                     .ChangeCategory("Category")
+                    .SetFieldRules(FieldRule.Hide("2"))
                     .SetFieldsInLists("field2")
                     .SetFieldsInReferences("field1")
                     .SetPreviewUrls(new Dictionary<string, string>

@@ -12,6 +12,7 @@ using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -21,7 +22,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public class SchemasSearchSourceTests
+    public class SchemasSearchSourceTests : IClassFixture<TranslationsFixture>
     {
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();

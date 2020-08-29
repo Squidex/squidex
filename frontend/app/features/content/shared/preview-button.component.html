@@ -1,5 +1,5 @@
 <ng-container *ngIf="snapshot.previewNameSelected">
-    <span>Preview: </span>
+    <span>{{ 'common.preview' | sqxTranslate }}: </span>
 
     <div class="btn-group ml-1" #buttonGroup>
         <button type="button" class="btn btn-secondary" (click)="follow(snapshot.previewNameSelected)">

@@ -69,7 +69,7 @@ export class BackupsState extends State<Snapshot> {
         return this.backupsService.getBackups(this.appName).pipe(
             tap(({ items: backups, canCreate }) => {
                 if (isReload && !silent) {
-                    this.dialogs.notifyInfo('Backups reloaded.');
+                    this.dialogs.notifyInfo('i18n:backups.reloaded');
                 }
 
                 this.next({
@@ -88,7 +88,7 @@ export class BackupsState extends State<Snapshot> {
     public start(): Observable<any> {
         return this.backupsService.postBackup(this.appsState.appName).pipe(
             tap(() => {
-                this.dialogs.notifyInfo('Backup started, it can take several minutes to complete.');
+                this.dialogs.notifyInfo('i18n:backups.started');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -96,7 +96,7 @@ export class BackupsState extends State<Snapshot> {
     public delete(backup: BackupDto): Observable<any> {
         return this.backupsService.deleteBackup(this.appsState.appName, backup).pipe(
             tap(() => {
-                this.dialogs.notifyInfo('Backup is about to be deleted.');
+                this.dialogs.notifyInfo('i18n:backups.deleted');
             }),
             shareSubscribed(this.dialogs));
     }

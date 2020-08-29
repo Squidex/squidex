@@ -43,7 +43,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => grainFactory.GetGrain<IAppsByUserIndexGrain>(userId, null))
                 .Returns(indexByUser);
 
-            var cache = new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), new SimplePubSub());
+            var cache =
+                new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), new SimplePubSub(),
+                    Options.Create(new ReplicatedCacheOptions { Enable = true }));
 
             sut = new AppsIndex(grainFactory, cache);
         }

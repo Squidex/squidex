@@ -44,17 +44,17 @@ export class Tooltip {
 
 export class Notification {
     constructor(
-        public readonly message: string,
+        public readonly message: string | ErrorDto,
         public readonly messageType: string,
         public readonly displayTime: number = 10000
     ) {
     }
 
-    public static error(message: string): Notification {
+    public static error(message: string | ErrorDto): Notification {
         return new Notification(message, 'danger');
     }
 
-    public static info(message: string): Notification {
+    public static info(message: string | ErrorDto): Notification {
         return new Notification(message, 'info');
     }
 }
@@ -79,7 +79,7 @@ export class DialogService {
 
     public notifyError(error: string | ErrorDto) {
         if (Types.is(error, ErrorDto)) {
-            this.notify(Notification.error(error.displayMessage));
+            this.notify(Notification.error(error));
         } else {
             this.notify(Notification.error(error));
         }

@@ -8,6 +8,7 @@
 using Microsoft.OData.Edm;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 

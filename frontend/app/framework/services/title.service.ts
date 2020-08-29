@@ -8,6 +8,7 @@
 // tslint:disable: readonly-array
 
 import { Injectable } from '@angular/core';
+import { LocalizerService } from './localizer.service';
 
 export class TitlesConfig {
     constructor(
@@ -18,15 +19,24 @@ export class TitlesConfig {
     }
 }
 
-export const TitleServiceFactory = (titles: TitlesConfig) => {
-    return new TitleService(titles);
+export const TitleServiceFactory = (titles: TitlesConfig, localizer: LocalizerService) => {
+    return new TitleService(titles, localizer);
 };
 
 @Injectable()
 export class TitleService {
     private readonly stack: any[] = [];
 
-    constructor(private readonly titles: TitlesConfig) {
+    constructor(
+        private readonly titles: TitlesConfig,
+        private readonly localizer: LocalizerService
+    ) {
+        this.titles = new TitlesConfig(
+            this.localizer.getOrKey(titles.prefix),
+            this.localizer.getOrKey(titles.suffix),
+            this.titles.separator
+        );
+
         this.updateTitle();
     }
 
@@ -56,7 +66,7 @@ export class TitleService {
         let title = '';
 
         if (this.stack.length > 0) {
-            title = this.stack.join(separator || ' | ');
+            title = this.stack.map(x => this.localizer.getOrKey(x)).join(separator || ' | ');
         }
 
         if (title) {

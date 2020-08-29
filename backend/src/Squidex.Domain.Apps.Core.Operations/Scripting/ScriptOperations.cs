@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,6 +7,7 @@
 
 using Jint;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Scripting
@@ -17,16 +18,16 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         private static readonly MessageDelegate Disallow = message =>
         {
-            message = !string.IsNullOrWhiteSpace(message) ? message : "Not allowed";
+            message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsNotAlloweed");
 
             throw new DomainForbiddenException(message);
         };
 
         private static readonly MessageDelegate Reject = message =>
         {
-            var errors = !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null;
+            message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsRejected");
 
-            throw new ValidationException("Script rejected the operation.", errors);
+            throw new ValidationException(message);
         };
 
         public static Engine AddDisallow(this Engine engine)

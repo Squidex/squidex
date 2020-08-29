@@ -1,13 +1,13 @@
-﻿<sqx-title message="Patterns"></sqx-title>
+<sqx-title message="i18n:common.patterns"></sqx-title>
 
 <sqx-panel desiredWidth="63rem" showSidebar="true" grid="true">
     <ng-container title>
-        Patterns
+        {{ 'common.patterns' | sqxTranslate }}
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh patterns (CTRL + SHIFT + R)">
-            <i class="icon-reset"></i> Refresh
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:patterns.refreshTooltip">
+            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
@@ -18,11 +18,10 @@
             <div content>
                 <ng-container *ngIf="(patternsState.isLoaded | async) && (patternsState.patterns | async); let patterns">
                     <div class="table-items-row table-items-row-empty" *ngIf="patterns.length === 0">
-                        No pattern created yet.
+                        {{ 'patterns.empty' | sqxTranslate }}
                     </div>
                     
-                    <sqx-pattern *ngFor="let pattern of patterns; trackBy: trackByPattern" 
-                        [pattern]="pattern">
+                    <sqx-pattern *ngFor="let pattern of patterns; trackBy: trackByPattern" [pattern]="pattern">
                     </sqx-pattern>
                     
                     <sqx-pattern *ngIf="patternsState.canCreate | async"></sqx-pattern>
@@ -33,11 +32,11 @@
 
     <ng-container sidebar>
         <div class="panel-nav">
-            <a class="panel-link" routerLink="history" routerLinkActive="active" title="History" titlePosition="left">
+            <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.history" titlePosition="left">
                 <i class="icon-time"></i>
             </a>
 
-            <a class="panel-link" routerLink="help" routerLinkActive="active" title="Help" titlePosition="left">
+            <a class="panel-link" routerLink="help" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.help" titlePosition="left">
                 <i class="icon-help2"></i>
             </a>
         </div>

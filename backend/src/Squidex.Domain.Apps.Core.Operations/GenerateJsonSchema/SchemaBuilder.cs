@@ -41,14 +41,14 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return Enrich(new JsonSchemaProperty { Type = JsonObjectType.Number }, description, isRequired);
         }
 
-        public static JsonSchemaProperty ObjectProperty(JsonSchema item, string? description = null, bool isRequired = false)
-        {
-            return Enrich(new JsonSchemaProperty { Type = JsonObjectType.Object, Reference = item }, description, isRequired);
-        }
-
         public static JsonSchemaProperty StringProperty(string? description = null, bool isRequired = false)
         {
             return Enrich(new JsonSchemaProperty { Type = JsonObjectType.String }, description, isRequired);
+        }
+
+        public static JsonSchemaProperty ObjectProperty(JsonSchema reference, string? description = null, bool isRequired = false)
+        {
+            return Enrich(new JsonSchemaProperty { Reference = reference }, description, isRequired);
         }
 
         public static JsonSchemaProperty JsonProperty(string? description = null, bool isRequired = false)
@@ -64,16 +64,12 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return property;
         }
 
-        public static void SetRequired(this JsonSchemaProperty property, bool isRequired)
+        public static JsonSchemaProperty SetRequired(this JsonSchemaProperty property, bool isRequired)
         {
-            if (isRequired)
-            {
-                property.IsRequired = true;
-            }
-            else
-            {
-                property.IsNullableRaw = true;
-            }
+            property.IsRequired = isRequired;
+            property.IsNullableRaw = !isRequired;
+
+            return property;
         }
     }
 }

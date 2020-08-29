@@ -17,7 +17,7 @@ import { Observable } from 'rxjs';
 })
 export class BooleanValidationComponent implements OnInit {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -28,13 +28,13 @@ export class BooleanValidationComponent implements OnInit {
     public showDefaultValue: Observable<boolean>;
 
     public ngOnInit() {
-        this.editForm.setControl('defaultValue',
+        this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
 
-        this.editForm.setControl('inlineEditable',
+        this.fieldForm.setControl('inlineEditable',
             new FormControl(this.properties.inlineEditable));
 
         this.showDefaultValue =
-            hasNoValue$(this.editForm.controls['isRequired']);
+            hasNoValue$(this.fieldForm.controls['isRequired']);
     }
 }

@@ -44,7 +44,7 @@ export class RolesPageComponent implements OnInit {
         this.rolesState.load(true);
     }
 
-    public trackByRole(index: number, role: RoleDto) {
+    public trackByRole(_index: number, role: RoleDto) {
         return role.name;
     }
 }

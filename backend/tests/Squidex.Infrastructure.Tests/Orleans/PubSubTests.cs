@@ -14,12 +14,15 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Orleans
 {
+    [Trait("Category", "Dependencies")]
     public class PubSubTests
     {
         [Fact]
         public async Task Simple_pubsub_tests()
         {
-            var cluster = new TestClusterBuilder(3).Build();
+            var cluster =
+                new TestClusterBuilder(3)
+                    .Build();
 
             await cluster.DeployAsync();
 

@@ -7,7 +7,9 @@
 
 import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormControl } from '@angular/forms';
-import { AppLanguageDto, EditContentForm, FieldDto, MathHelper, RootFieldDto, Types } from '@app/shared';
+import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, MathHelper, RootFieldDto, Types } from '@app/shared';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-field-editor',
@@ -22,10 +24,7 @@ export class FieldEditorComponent implements OnChanges {
     public formContext: any;
 
     @Input()
-    public field: FieldDto;
-
-    @Input()
-    public control: AbstractControl;
+    public formModel: AbstractContentForm<FieldDto, AbstractControl>;
 
     @Input()
     public language: AppLanguageDto;
@@ -34,30 +33,43 @@ export class FieldEditorComponent implements OnChanges {
     public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
+    public canUnset: boolean;
+
+    @Input()
     public displaySuffix: string;
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
 
+    public isEmpty: Observable<boolean>;
+
+    public get field() {
+        return this.formModel.field;
+    }
+
     public get arrayControl() {
-        return this.control as FormArray;
+        return this.formModel.form as FormArray;
     }
 
     public get editorControl() {
-        return this.control as FormControl;
+        return this.formModel.form as FormControl;
     }
 
     public get rootField() {
-        return this.field as RootFieldDto;
+        return this.formModel.field as RootFieldDto;
     }
 
     public uniqueId = MathHelper.guid();
 
     public ngOnChanges(changes: SimpleChanges) {
-        const previousControl = changes['control']?.previousValue;
+        if (changes['formModel']) {
+            const previousControl: AbstractContentForm<FieldDto, AbstractControl> = changes['formModel'].previousValue;
 
-        if (previousControl && Types.isFunction(previousControl['_clearChangeFns'])) {
-            previousControl['_clearChangeFns']();
+            if (previousControl && Types.isFunction(previousControl.form['_clearChangeFns'])) {
+                previousControl.form['_clearChangeFns']();
+            }
+
+            this.isEmpty = this.formModel.form.valueChanges.pipe(map(x => Types.isUndefined(x) || Types.isNull(x)));
         }
     }
 
@@ -73,5 +85,9 @@ export class FieldEditorComponent implements OnChanges {
                 this.editor['reset']();
             }
         }
+    }
+
+    public unset() {
+        this.formModel.form.setValue(undefined);
     }
 }

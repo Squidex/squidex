@@ -100,7 +100,7 @@ namespace Squidex.Infrastructure.Commands
 
             if (Snapshot.Version <= EtagVersion.Empty)
             {
-                throw new DomainObjectNotFoundException(UniqueId.ToString(), GetType());
+                throw new DomainObjectNotFoundException(UniqueId.ToString());
             }
 
             if (persistence != null)

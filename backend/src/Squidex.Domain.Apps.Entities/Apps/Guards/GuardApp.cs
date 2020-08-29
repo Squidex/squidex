@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -9,7 +9,9 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
@@ -19,11 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot create app.", e =>
+            Validate.It(e =>
             {
                 if (!command.Name.IsSlug())
                 {
-                    e(Not.ValidSlug("Name"), nameof(command.Name));
+                    e(Not.ValidSlug(nameof(command.Name)), nameof(command.Name));
                 }
             });
         }
@@ -32,11 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot upload image.", e =>
+            Validate.It(e =>
             {
                 if (command.File == null)
                 {
-                    e(Not.Defined("File"), nameof(command.File));
+                    e(Not.Defined(nameof(command.File)), nameof(command.File));
                 }
             });
         }
@@ -55,22 +57,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot change plan.", e =>
+            Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.PlanId))
                 {
-                    e(Not.Defined("Plan id"), nameof(command.PlanId));
+                    e(Not.Defined(nameof(command.PlanId)), nameof(command.PlanId));
                     return;
                 }
 
                 if (appPlans.GetPlan(command.PlanId) == null)
                 {
-                    e("A plan with this id does not exist.", nameof(command.PlanId));
+                    e(T.Get("apps.plans.notFound"), nameof(command.PlanId));
                 }
 
                 if (!string.IsNullOrWhiteSpace(command.PlanId) && plan != null && !plan.Owner.Equals(command.Actor))
                 {
-                    e("Plan can only changed from the user who configured the plan initially.");
+                    e(T.Get("apps.plans.notPlanOwner"));
                 }
             });
         }

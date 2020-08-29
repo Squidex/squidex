@@ -48,7 +48,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
         this.canUpdate = hasAnyLink(links, 'update');
         this.canDelete = hasAnyLink(links, 'delete');
 
-        this.displayName = StringHelper.firstNonEmpty(name, 'Unnamed Workflow');
+        this.displayName = StringHelper.firstNonEmpty(name, 'i18n:workflows.notNamed');
     }
 
     protected onCloned() {
@@ -224,7 +224,7 @@ export class WorkflowsService {
             mapVersioned(({ body }) => {
                 return parseWorkflows(body);
             }),
-            pretifyError('Failed to load workflows. Please reload.'));
+            pretifyError('i18n:workflows.loadFailed'));
     }
 
     public postWorkflow(appName: string, dto: CreateWorkflowDto, version: Version): Observable<WorkflowsDto> {
@@ -237,7 +237,7 @@ export class WorkflowsService {
             tap(() => {
                 this.analytics.trackEvent('Workflow', 'Created', appName);
             }),
-            pretifyError('Failed to create workflow. Please reload.'));
+            pretifyError('i18n:workflows.createFailed'));
     }
 
     public putWorkflow(appName: string, resource: Resource, dto: any, version: Version): Observable<WorkflowsDto> {
@@ -252,7 +252,7 @@ export class WorkflowsService {
             tap(() => {
                 this.analytics.trackEvent('Workflow', 'Updated', appName);
             }),
-            pretifyError('Failed to update Workflow. Please reload.'));
+            pretifyError('i18n:workflows.updateFailed'));
     }
 
     public deleteWorkflow(appName: string, resource: Resource, version: Version): Observable<WorkflowsDto> {
@@ -267,7 +267,7 @@ export class WorkflowsService {
             tap(() => {
                 this.analytics.trackEvent('Workflow', 'Deleted', appName);
             }),
-            pretifyError('Failed to delete Workflow. Please reload.'));
+            pretifyError('i18n:workflows.deleteFailed'));
     }
 }
 

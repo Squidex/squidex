@@ -18,6 +18,7 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         private readonly MemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly string key = Guid.NewGuid().ToString();
+        private readonly string category = Guid.NewGuid().ToString();
         private readonly DateTime date = DateTime.Today;
         private readonly IUsageTracker inner = A.Fake<IUsageTracker>();
         private readonly IUsageTracker sut;
@@ -55,16 +56,16 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var counters = new Counters();
 
-            A.CallTo(() => inner.GetForMonthAsync(key, date))
+            A.CallTo(() => inner.GetForMonthAsync(key, date, category))
                 .Returns(counters);
 
-            var result1 = await sut.GetForMonthAsync(key, date);
-            var result2 = await sut.GetForMonthAsync(key, date);
+            var result1 = await sut.GetForMonthAsync(key, date, category);
+            var result2 = await sut.GetForMonthAsync(key, date, category);
 
             Assert.Same(counters, result1);
             Assert.Same(counters, result2);
 
-            A.CallTo(() => inner.GetForMonthAsync(key, DateTime.Today))
+            A.CallTo(() => inner.GetForMonthAsync(key, DateTime.Today, category))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -76,16 +77,16 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(10);
 
-            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo))
+            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category))
                 .Returns(counters);
 
-            var result1 = await sut.GetAsync(key, dateFrom, dateTo);
-            var result2 = await sut.GetAsync(key, dateFrom, dateTo);
+            var result1 = await sut.GetAsync(key, dateFrom, dateTo, category);
+            var result2 = await sut.GetAsync(key, dateFrom, dateTo, category);
 
             Assert.Same(counters, result1);
             Assert.Same(counters, result2);
 
-            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo))
+            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category))
                 .MustHaveHappenedOnceExactly();
         }
 

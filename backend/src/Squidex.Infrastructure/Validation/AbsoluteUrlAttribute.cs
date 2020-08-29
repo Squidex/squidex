@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,14 +7,18 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure.Validation
 {
     public sealed class AbsoluteUrlAttribute : ValidationAttribute
     {
-        public AbsoluteUrlAttribute()
-            : base(() => "The {0} field must be an absolute URL.")
+        public override string FormatErrorMessage(string name)
         {
+            var property = T.Get($"common.{name.ToCamelCase()}", name);
+
+            return T.Get("annotations_AbsoluteUrl", new { property });
         }
 
         public override bool IsValid(object value)

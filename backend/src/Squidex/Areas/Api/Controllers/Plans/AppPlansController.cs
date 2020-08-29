@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [HttpGet]
         [Route("apps/{app}/plans/")]
         [ProducesResponseType(typeof(AppPlansDto), 200)]
-        [ApiPermission(Permissions.AppPlansRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppPlansRead)]
         [ApiCosts(0)]
         public IActionResult GetPlans(string app)
         {
@@ -74,11 +74,11 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [HttpPut]
         [Route("apps/{app}/plan/")]
         [ProducesResponseType(typeof(PlanChangedDto), 200)]
-        [ApiPermission(Permissions.AppPlansChange)]
+        [ApiPermissionOrAnonymous(Permissions.AppPlansChange)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutPlan(string app, [FromBody] ChangePlanDto request)
         {
-            var context = await CommandBus.PublishAsync(request.ToCommand());
+            var context = await CommandBus.PublishAsync(request.ToCommand(HttpContext));
 
             string? redirectUri = null;
 

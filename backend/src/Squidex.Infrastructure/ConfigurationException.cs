@@ -13,16 +13,7 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class ConfigurationException : Exception
     {
-        public ConfigurationException()
-        {
-        }
-
-        public ConfigurationException(string message)
-            : base(message)
-        {
-        }
-
-        public ConfigurationException(string message, Exception inner)
+        public ConfigurationException(string message, Exception? inner = null)
             : base(message, inner)
         {
         }

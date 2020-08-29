@@ -60,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="app">The name of the app.</param>
         /// <param name="idOrSlug">The id or slug of the asset.</param>
         /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
-        /// <param name="query">The query string parameters.</param>
+        /// <param name="queries">The query string parameters.</param>
         /// <returns>
         /// 200 => Asset found and content or (resized) image returned.
         /// 404 => Asset or app not found.
@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, string more, [FromQuery] AssetContentQueryDto query)
+        public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, string more, [FromQuery] AssetContentQueryDto queries)
         {
             IAssetEntity? asset;
 
@@ -84,14 +84,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 asset = await assetRepository.FindAssetBySlugAsync(AppId, idOrSlug);
             }
 
-            return await DeliverAssetAsync(asset, query);
+            return await DeliverAssetAsync(asset, queries);
         }
 
         /// <summary>
         /// Get the asset content.
         /// </summary>
         /// <param name="id">The id of the asset.</param>
-        /// <param name="query">The query string parameters.</param>
+        /// <param name="queries">The query string parameters.</param>
         /// <returns>
         /// 200 => Asset found and content or (resized) image returned.
         /// 404 => Asset or app not found.
@@ -103,16 +103,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(0.5)]
         [AllowAnonymous]
         [Obsolete]
-        public async Task<IActionResult> GetAssetContent(string id, [FromQuery] AssetContentQueryDto query)
+        public async Task<IActionResult> GetAssetContent(string id, [FromQuery] AssetContentQueryDto queries)
         {
             var asset = await assetRepository.FindAssetAsync(id);
 
-            return await DeliverAssetAsync(asset, query);
+            return await DeliverAssetAsync(asset, queries);
         }
 
-        private async Task<IActionResult> DeliverAssetAsync(IAssetEntity? asset, AssetContentQueryDto query)
+        private async Task<IActionResult> DeliverAssetAsync(IAssetEntity? asset, AssetContentQueryDto queries)
         {
-            query ??= new AssetContentQueryDto();
+            queries ??= new AssetContentQueryDto();
 
             if (asset == null)
             {
@@ -124,20 +124,20 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return StatusCode(403);
             }
 
-            if (query.Version > EtagVersion.Any && asset.Version != query.Version)
+            if (queries.Version > EtagVersion.Any && asset.Version != queries.Version)
             {
-                asset = await assetLoader.GetAsync(AppId, asset.Id, query.Version);
+                asset = await assetLoader.GetAsync(App.Id, asset.Id, queries.Version);
             }
 
-            var resizeOptions = query.ToResizeOptions(asset);
+            var resizeOptions = queries.ToResizeOptions(asset);
 
             FileCallback callback;
 
             Response.Headers[HeaderNames.ETag] = asset.FileVersion.ToString();
 
-            if (query.CacheDuration > 0)
+            if (queries.CacheDuration > 0)
             {
-                Response.Headers[HeaderNames.CacheControl] = $"public,max-age={query.CacheDuration}";
+                Response.Headers[HeaderNames.CacheControl] = $"public,max-age={queries.CacheDuration}";
             }
 
             var contentLength = (long?)null;
@@ -148,7 +148,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 {
                     var resizedAsset = $"{asset.AppId.Id}_{asset.Id}_{asset.FileVersion}_{resizeOptions}";
 
-                    if (query.ForceResize)
+                    if (queries.ForceResize)
                     {
                         await ResizeAsync(asset, bodyStream, resizedAsset, resizeOptions, true, ct);
                     }
@@ -182,7 +182,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 FileDownloadName = asset.FileName,
                 FileSize = contentLength,
                 LastModified = asset.LastModified.ToDateTimeOffset(),
-                SendInline = query.Download != 1
+                SendInline = queries.Download != 1
             };
         }
 
@@ -202,13 +202,28 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                         using (Profiler.Trace("ResizeImage"))
                         {
-                            await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
-                            destinationStream.Position = 0;
+                            try
+                            {
+                                await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
+                                destinationStream.Position = 0;
+                            }
+                            catch
+                            {
+                                sourceStream.Position = 0;
+                                await sourceStream.CopyToAsync(destinationStream);
+                            }
                         }
 
-                        using (Profiler.Trace("ResizeUpload"))
+                        try
                         {
-                            await assetStore.UploadAsync(fileName, destinationStream, overwrite);
+                            using (Profiler.Trace("ResizeUpload"))
+                            {
+                                await assetStore.UploadAsync(fileName, destinationStream, overwrite);
+                                destinationStream.Position = 0;
+                            }
+                        }
+                        catch (AssetAlreadyExistsException)
+                        {
                             destinationStream.Position = 0;
                         }
 

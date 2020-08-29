@@ -1,5 +1,5 @@
 <ng-container *ngIf="path.length === 0; else normalPath">
-    <span class="btn">Search Results</span>
+    <span class="btn">{{ 'common.searchResults' | sqxTranslate }}</span>
 </ng-container>
 <ng-template #normalPath>
     <ng-container *ngFor="let item of path; let i = index">

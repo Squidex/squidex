@@ -5,10 +5,10 @@
                 <span class="role-name">{{role.name}}</span>
             </div>
             <div class="col text-decent">
-                Clients: <span [class.text-force]="role.numClients > 0">{{role.numClients}}</span>
+                {{ 'common.clients' | sqxTranslate }}: <span [class.text-force]="role.numClients > 0">{{role.numClients}}</span>
             </div>
             <div class="col text-decent">
-                Users: <span [class.text-force]="role.numContributors > 0">{{role.numContributors}}</span>
+                {{ 'common.users' | sqxTranslate }}: <span [class.text-force]="role.numContributors > 0">{{role.numContributors}}</span>
             </div>
             <div class="col-auto">
                 <div class="float-right">
@@ -16,11 +16,10 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-danger"
-                        [disabled]="!role.canDelete"
+                    <button type="button" class="btn btn-text-danger" [disabled]="!role.canDelete"
                         (sqxConfirmClick)="delete()"
-                        confirmTitle="Delete role" 
-                        confirmText="Do you really want to delete the role?">
+                        confirmTitle="i18n:roles.deleteConfirmTitle"
+                        confirmText="i18n:roles.deleteConfirmText">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>
@@ -32,8 +31,8 @@
         <form (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
                 <div class="float-right">
-                    <button type="reset" class="btn btn-text-secondary2" (click)="toggleEditing()">Cancel</button>
-                    <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">Save</button>
+                    <button type="reset" class="btn btn-text-secondary2" (click)="toggleEditing()">{{ 'common.cancel' | sqxTranslate }}</button>
+                    <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">{{ 'common.save' | sqxTranslate }}</button>
                 </div>
             </div>
 
@@ -41,7 +40,7 @@
                 <ng-container *ngIf="!role.isDefaultRole; else defaultRole">
                     <div class="form-group row no-gutters" *ngFor="let control of editForm.controls; let i = index">
                         <div class="col">
-                            <sqx-control-errors [for]="control" [fieldName]="'Permission'" [submitted]="editForm.submitted | async"></sqx-control-errors>
+                            <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
     
                             <sqx-autocomplete [underlined]="true" [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
                         </div>
@@ -55,11 +54,11 @@
 
                 <ng-template #defaultRole>
                     <sqx-form-alert>
-                        {{descriptions[role.name]}}
+                        {{descriptions[role.name] | sqxTranslate}}
                     </sqx-form-alert>
                     
                     <div class="form-group" *ngFor="let control of editForm.controls">
-                       <input class="form-control form-underlined" [formControl]="control" />
+                       <input class="form-control form-underlined" [formControl]="control">
                     </div>
                 </ng-template>
 

@@ -20,7 +20,7 @@ export class NumberUIComponent extends ResourceOwner implements OnInit {
     public readonly converter = FloatConverter.INSTANCE;
 
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;
@@ -32,34 +32,34 @@ export class NumberUIComponent extends ResourceOwner implements OnInit {
     public hideInlineEditable: Observable<boolean>;
 
     public ngOnInit() {
-        this.editForm.setControl('editor',
+        this.fieldForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));
 
-        this.editForm.setControl('allowedValues',
+        this.fieldForm.setControl('allowedValues',
             new FormControl(this.properties.allowedValues, []));
 
-        this.editForm.setControl('inlineEditable',
+        this.fieldForm.setControl('inlineEditable',
             new FormControl(this.properties.inlineEditable));
 
         this.hideAllowedValues =
-            value$<string>(this.editForm.controls['editor']).pipe(map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
+            value$<string>(this.fieldForm.controls['editor']).pipe(map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
 
         this.hideInlineEditable =
-            value$<string>(this.editForm.controls['editor']).pipe(map(x => x === 'Radio'));
+            value$<string>(this.fieldForm.controls['editor']).pipe(map(x => x === 'Radio'));
 
         this.own(
             this.hideAllowedValues.subscribe(isSelection => {
                 if (isSelection) {
-                    this.editForm.controls['allowedValues'].setValue(undefined);
+                    this.fieldForm.controls['allowedValues'].setValue(undefined);
                 }
             }));
 
         this.own(
             this.hideInlineEditable.subscribe(isSelection => {
                 if (isSelection) {
-                    this.editForm.controls['inlineEditable'].setValue(false);
+                    this.fieldForm.controls['inlineEditable'].setValue(false);
                 }
             }));
     }

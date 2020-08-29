@@ -70,7 +70,7 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
     }
 
     public changeStatus(status: string) {
-        this.contentPage.checkPendingChanges('change the status').pipe(
+        this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
                 filter(x => !!x),
                 switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
                 switchMap(d => this.contentsState.changeStatus(this.content, status, d)),
@@ -98,7 +98,7 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
         this.contentPage.loadVersion(event.version, true);
     }
 
-    public trackByEvent(index: number, event: HistoryEventDto) {
+    public trackByEvent(_index: number, event: HistoryEventDto) {
         return event.eventId;
     }
 }

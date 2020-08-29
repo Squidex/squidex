@@ -175,6 +175,24 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         }
 
         [Fact]
+        public void Should_create_events_if_field_rules_changed_changed()
+        {
+            var sourceSchema =
+                new Schema("source")
+                    .SetFieldRules(FieldRule.Hide("2"));
+
+            var targetSchema =
+                new Schema("target")
+                    .SetFieldRules(FieldRule.Hide("1"));
+
+            var events = sourceSchema.Synchronize(targetSchema, idGenerator);
+
+            events.ShouldHaveSameEvents(
+                new SchemaFieldRulesConfigured { FieldRules = new FieldRules(FieldRule.Hide("1")) }
+            );
+        }
+
+        [Fact]
         public void Should_create_events_if_nested_field_deleted()
         {
             var sourceSchema =

@@ -51,41 +51,49 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_rename_client()
+        public void Should_update_client_with_role()
         {
-            var clients_1 = clients_0.Rename("1", "new-name");
-
-            clients_1["1"].Should().BeEquivalentTo(new AppClient("new-name", "my-secret", Role.Editor));
-        }
-
-        [Fact]
-        public void Should_return_same_clients_if_client_is_updated_with_the_same_values()
-        {
-            var clients_1 = clients_0.Rename("2", "2");
-
-            Assert.Same(clients_0, clients_1);
-        }
-
-        [Fact]
-        public void Should_return_same_clients_if_client_to_rename_not_found()
-        {
-            var clients_1 = clients_0.Rename("2", "new-name");
-
-            Assert.Same(clients_0, clients_1);
-        }
-
-        [Fact]
-        public void Should_update_client()
-        {
-            var client_1 = clients_0.Update("1", Role.Reader);
+            var client_1 = clients_0.Update("1", role: Role.Reader);
 
             client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Reader));
         }
 
         [Fact]
+        public void Should_update_client_with_name()
+        {
+            var client_1 = clients_0.Update("1", name: "New-Name");
+
+            client_1["1"].Should().BeEquivalentTo(new AppClient("New-Name", "my-secret", Role.Editor));
+        }
+
+        [Fact]
+        public void Should_update_client_with_allow_anonymous()
+        {
+            var client_1 = clients_0.Update("1", allowAnonymous: true);
+
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, 0, 0, true));
+        }
+
+        [Fact]
+        public void Should_update_client_with_allow_api_calls_limit()
+        {
+            var client_1 = clients_0.Update("1", apiCallsLimit: 1000);
+
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, 1000, 0, false));
+        }
+
+        [Fact]
+        public void Should_update_client_with_allow_api_traffic_limit()
+        {
+            var client_1 = clients_0.Update("1", apiTrafficLimit: 1000);
+
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, 0, 1000, false));
+        }
+
+        [Fact]
         public void Should_return_same_clients_if_client_to_update_not_found()
         {
-            var clients_1 = clients_0.Update("2", Role.Reader);
+            var clients_1 = clients_0.Update("2", role: Role.Reader);
 
             Assert.Same(clients_0, clients_1);
         }

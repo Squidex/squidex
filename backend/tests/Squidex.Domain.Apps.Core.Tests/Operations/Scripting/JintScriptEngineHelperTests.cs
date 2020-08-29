@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
@@ -22,7 +23,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting
 {
-    public class JintScriptEngineHelperTests
+    public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         private readonly IHttpClientFactory httpClientFactory = A.Fake<IHttpClientFactory>();
         private readonly JintScriptEngine sut;
@@ -195,7 +196,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
-            Assert.Empty(ex.Errors);
+            Assert.NotEmpty(ex.Errors);
         }
 
         [Fact]
@@ -229,7 +230,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
 
-            Assert.Equal("Not allowed", ex.Message);
+            Assert.Equal("Script has forbidden the operation.", ex.Message);
         }
 
         [Fact]

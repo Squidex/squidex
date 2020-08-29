@@ -6,8 +6,9 @@
  */
 
 // tslint:disable: readonly-array
+// tslint:disable: directive-class-suffix
 
-import { ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Directive, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { onErrorResumeNext, skip } from 'rxjs/operators';
@@ -16,6 +17,7 @@ import { Types } from './../utils/types';
 
 declare type UnsubscribeFunction = () => void;
 
+@Directive()
 export class ResourceOwner implements OnDestroy {
     private subscriptions: (Subscription | UnsubscribeFunction)[] = [];
 
@@ -50,6 +52,7 @@ export class ResourceOwner implements OnDestroy {
     }
 }
 
+@Directive()
 export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy {
     private readonly subscriptions = new ResourceOwner();
     private readonly subscription: Subscription;

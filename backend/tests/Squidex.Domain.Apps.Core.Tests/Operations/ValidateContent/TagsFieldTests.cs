@@ -10,13 +10,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
-    public class TagsFieldTests
+    public class TagsFieldTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 

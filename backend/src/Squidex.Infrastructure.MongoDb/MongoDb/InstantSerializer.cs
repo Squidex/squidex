@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -15,11 +14,9 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class InstantSerializer : SerializerBase<Instant>, IBsonPolymorphicSerializer
     {
-        private static int isRegistered;
-
         public static void Register()
         {
-            if (Interlocked.Increment(ref isRegistered) == 1)
+            try
             {
                 try
                 {
@@ -29,6 +26,10 @@ namespace Squidex.Infrastructure.MongoDb
                 {
                     return;
                 }
+            }
+            catch (BsonSerializationException)
+            {
+                return;
             }
         }
 

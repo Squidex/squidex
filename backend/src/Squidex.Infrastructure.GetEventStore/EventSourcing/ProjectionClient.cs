@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Projections;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure.EventSourcing
 {

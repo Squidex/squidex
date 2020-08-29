@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// GraphQL endpoint.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="query">The graphql query.</param>
+        /// <param name="queries">The graphql query.</param>
         /// <returns>
         /// 200 => Contents retrieved or mutated.
         /// 404 => Schema or app not found.
@@ -51,13 +51,46 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
+        [Route("content/{app}/graphql/")]
+        [ApiPermission]
+        [ApiCosts(2)]
+        public async Task<IActionResult> GetGraphQL(string app, [FromQuery] GraphQLGetDto? queries = null)
+        {
+            var request = queries?.ToQuery() ?? new GraphQLQuery();
+
+            var (hasError, response) = await graphQl.QueryAsync(Context, request);
+
+            if (hasError)
+            {
+                return BadRequest(response);
+            }
+            else
+            {
+                return Ok(response);
+            }
+        }
+
+        /// <summary>
+        /// GraphQL endpoint.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="query">The graphql query.</param>
+        /// <returns>
+        /// 200 => Contents retrieved or mutated.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
         [HttpPost]
         [Route("content/{app}/graphql/")]
         [ApiPermission]
         [ApiCosts(2)]
-        public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLQuery query)
+        public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLPostDto query)
         {
-            var (hasError, response) = await graphQl.QueryAsync(Context, query);
+            var request = query?.ToQuery() ?? new GraphQLQuery();
+
+            var (hasError, response) = await graphQl.QueryAsync(Context, request);
 
             if (hasError)
             {
@@ -81,14 +114,15 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
-        [HttpGet]
         [HttpPost]
         [Route("content/{app}/graphql/batch")]
         [ApiPermission]
         [ApiCosts(2)]
-        public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLQuery[] batch)
+        public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLPostDto[] batch)
         {
-            var (hasError, response) = await graphQl.QueryAsync(Context, batch);
+            var request = batch.Select(x => x.ToQuery()).ToArray();
+
+            var (hasError, response) = await graphQl.QueryAsync(Context, request);
 
             if (hasError)
             {
@@ -267,7 +301,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/{version}/")]
-        [ApiPermission(Permissions.AppContentsRead)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string name, string id, int version)
         {
@@ -296,7 +330,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/")]
         [ProducesResponseType(typeof(ContentsDto), 201)]
-        [ApiPermission(Permissions.AppContentsCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
@@ -324,7 +358,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/import")]
         [ProducesResponseType(typeof(BulkResultDto[]), 200)]
-        [ApiPermission(Permissions.AppContentsCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(5)]
         public async Task<IActionResult> PostContents(string app, string name, [FromBody] ImportContentsDto request)
         {
@@ -355,7 +389,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/bulk")]
         [ProducesResponseType(typeof(BulkResultDto[]), 200)]
-        [ApiPermission(Permissions.AppContents)]
+        [ApiPermissionOrAnonymous(Permissions.AppContents)]
         [ApiCosts(5)]
         public async Task<IActionResult> BulkContents(string app, string name, [FromBody] BulkUpdateDto request)
         {
@@ -387,7 +421,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, string id, [FromBody] NamedContentData request)
         {
@@ -416,7 +450,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPatch]
         [Route("content/{app}/{name}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, string id, [FromBody] NamedContentData request)
         {
@@ -445,7 +479,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/status/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContentStatus(string app, string name, string id, ChangeStatusDto request)
         {
@@ -472,7 +506,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsVersionCreate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsVersionCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> CreateDraft(string app, string name, string id)
         {
@@ -499,7 +533,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpDelete]
         [Route("content/{app}/{name}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteVersion(string app, string name, string id)
         {
@@ -525,7 +559,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpDelete]
         [Route("content/{app}/{name}/{id}/")]
-        [ApiPermission(Permissions.AppContentsDelete)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string app, string name, string id)
         {

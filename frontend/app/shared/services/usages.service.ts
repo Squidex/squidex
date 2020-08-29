@@ -13,7 +13,9 @@ import { map } from 'rxjs/operators';
 
 export class CallsUsageDto {
     constructor(
+        public readonly allowedBytes: number,
         public readonly allowedCalls: number,
+        public readonly blockingCalls: number,
         public readonly totalBytes: number,
         public readonly totalCalls: number,
         public readonly averageElapsedMs: number,
@@ -64,7 +66,7 @@ export class UsagesService {
             map(body => {
                 return body.downloadUrl;
             }),
-            pretifyError('Failed to load monthly api calls. Please reload.'));
+            pretifyError('i18n:usages.loadMonthlyCallsFailed'));
     }
 
     public getTodayStorage(app: string): Observable<CurrentStorageDto> {
@@ -74,7 +76,7 @@ export class UsagesService {
             map(body => {
                 return new CurrentStorageDto(body.size, body.maxAllowed);
             }),
-            pretifyError('Failed to load todays storage size. Please reload.'));
+            pretifyError('i18n:usages.loadTodayStorageFailed'));
     }
 
     public getCallsUsages(app: string, fromDate: string, toDate: string): Observable<CallsUsageDto> {
@@ -95,7 +97,9 @@ export class UsagesService {
 
                 const usages =
                     new CallsUsageDto(
+                        body.allowedBytes,
                         body.allowedCalls,
+                        body.blockingCalls,
                         body.totalBytes,
                         body.totalCalls,
                         body.averageElapsedMs,
@@ -103,7 +107,7 @@ export class UsagesService {
 
                 return usages;
             }),
-            pretifyError('Failed to load calls usage. Please reload.'));
+            pretifyError('i18n:usages.loadCallsFailed'));
     }
 
     public getStorageUsages(app: string, fromDate: string, toDate: string): Observable<ReadonlyArray<StorageUsagePerDateDto>> {
@@ -119,6 +123,6 @@ export class UsagesService {
 
                 return usages;
             }),
-            pretifyError('Failed to load storage usage. Please reload.'));
+            pretifyError('i18n:usages.loadStorageFailed'));
     }
 }

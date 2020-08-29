@@ -9,12 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 {
-    public class RangeValidatorTests
+    public class RangeValidatorTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
 
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(1500, errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must be exactly '2000'." });
+                new[] { "Must be exactly 2000." });
         }
 
         [Fact]
@@ -68,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(1500, errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must be greater or equal to '2000'." });
+                new[] { "Must be greater or equal to 2000." });
         }
 
         [Fact]
@@ -79,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(1500, errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must be less or equal to '1000'." });
+                new[] { "Must be less or equal to 1000." });
         }
     }
 }

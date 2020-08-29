@@ -40,7 +40,7 @@ export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
         this.workflowsState.load(true);
     }
 
-    public trackByWorkflow(index: number, workflow: WorkflowDto) {
+    public trackByWorkflow(_index: number, workflow: WorkflowDto) {
         return workflow.id;
     }
 }

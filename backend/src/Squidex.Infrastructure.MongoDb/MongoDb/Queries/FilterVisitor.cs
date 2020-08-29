@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 
         private static BsonRegularExpression BuildRegex(CompareFilter<ClrValue> node, Func<string, string> formatter)
         {
-            return new BsonRegularExpression(formatter(node.Value.Value!.ToString()!), "i");
+            return new BsonRegularExpression(formatter(node.Value.Value?.ToString() ?? "null"), "i");
         }
     }
 }

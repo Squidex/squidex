@@ -40,6 +40,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             return this;
         }
 
+        public StringFieldBuilder Unique()
+        {
+            Properties<StringFieldProperties>().IsUnique = true;
+
+            return this;
+        }
+
         public StringFieldBuilder Pattern(string pattern, string? message = null)
         {
             Properties<StringFieldProperties>().Pattern = pattern;

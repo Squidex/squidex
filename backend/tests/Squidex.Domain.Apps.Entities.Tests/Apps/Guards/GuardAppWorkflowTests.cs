@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -15,7 +16,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
-    public class GuardAppWorkflowTests
+    public class GuardAppWorkflowTests : IClassFixture<TranslationsFixture>
     {
         private readonly DomainId workflowId = DomainId.NewGuid();
         private readonly Workflows workflows;

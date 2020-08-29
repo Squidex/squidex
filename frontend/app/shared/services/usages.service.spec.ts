@@ -41,7 +41,9 @@ describe('UsagesService', () => {
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({
+            allowedBytes: 512,
             allowedCalls: 100,
+            blockingCalls: 200,
             totalBytes: 1024,
             totalCalls: 40,
             averageElapsedMs: 12.4,
@@ -64,7 +66,7 @@ describe('UsagesService', () => {
         });
 
         expect(usages!).toEqual(
-            new CallsUsageDto(100, 1024, 40, 12.4, {
+            new CallsUsageDto(512, 100, 200, 1024, 40, 12.4, {
                 category1: [
                     new CallsUsagePerDateDto(DateTime.parseISO('2017-10-12'), 10, 130, 12.3),
                     new CallsUsagePerDateDto(DateTime.parseISO('2017-10-13'), 13, 170, 33.3)

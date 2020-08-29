@@ -1,21 +1,10 @@
-<div [formGroup]="editForm">
+<div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">Editor Url</label>
-
-        <div class="col-6">
-            <input type="text" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl" />
-
-            <sqx-form-hint>
-                Url to your plugin if you use a custom editor.
-            </sqx-form-hint>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-3 col-form-label">Editor</label>
+        <label class="col-3 col-form-label">{{ 'schemas.field.editor' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Map'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Map" />
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Map'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Map">
 
                 <i class="icon-control-Map"></i>
 

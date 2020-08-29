@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             IReadOnlyDictionary<Status, WorkflowStep>? steps,
             IReadOnlyList<DomainId>? schemaIds = null,
             string? name = null)
-            : base(name ?? DefaultName)
+            : base(name.Or(DefaultName))
         {
             Initial = initial;
 

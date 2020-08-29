@@ -101,7 +101,7 @@ export class LanguagesState extends State<Snapshot> {
             }),
             tap(({ allLanguages, languages }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Languages reloaded.');
+                    this.dialogs.notifyInfo('i18n:languages.reloaded');
                 }
 
                 const sorted = allLanguages.sortedByString(x => x.englishName);

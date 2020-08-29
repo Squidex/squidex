@@ -40,6 +40,6 @@ export class TranslationsService {
             map(body => {
                 return new TranslationDto(body.result, body.text);
             }),
-            pretifyError('Failed to translate text. Please reload.'));
+            pretifyError('i18n:translate.translateFailed'));
     }
 }

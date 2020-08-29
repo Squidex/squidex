@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (found.Any(x => x.Id != context.ContentId))
                     {
-                        addError(context.Path, "Another content with the same value exists.");
+                        addError(context.Path, T.Get("contents.validation.unique"));
                     }
                 }
             }

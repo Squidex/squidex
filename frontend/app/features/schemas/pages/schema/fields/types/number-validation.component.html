@@ -1,44 +1,33 @@
-<div [formGroup]="editForm">
+<div [formGroup]="fieldForm">
     <div class="form-group row" *ngIf="showUnique">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldUnique" formControlName="isUnique" /> 
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldUnique" formControlName="isUnique"> 
                 <label class="form-check-label" for="{{field.fieldId}}_fieldUnique">
-                    Unique
+                    {{ 'schemas.field.unique' | sqxTranslate }}
                 </label>
             </div>
         </div>
     </div>
 
     <div class="form-group row">
-        <div class="col-9 offset-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldRequired" formControlName="isRequired" />
-                <label class="form-check-label" for="{{field.fieldId}}_fieldRequired">
-                    Required
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group row">
-        <label class="col-3 col-form-label">Range</label>
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.number.range' | sqxTranslate }}</label>
 
         <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minValue" placeholder="Min Value" />
+            <input type="number" class="form-control" formControlName="minValue" placeholder="{{ 'schemas.fieldTypes.number.rangeMin' | sqxTranslate }}">
             
             <label class="col-form-label minmax-label">-</label>
         </div>
         <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxValue" placeholder="Max Value" />
+            <input type="number" class="form-control" formControlName="maxValue" placeholder="{{ 'schemas.fieldTypes.number.rangeMax' | sqxTranslate }}">
         </div>
     </div>
 
     <div class="form-group row" *ngIf="showDefaultValue | async">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValue">Default Value</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValue">{{ 'schemas.field.defaultValue' | sqxTranslate }}</label>
 
         <div class="col-6">
-            <input type="number" class="form-control" id="{{field.fieldId}}_fieldDefaultValue" formControlName="defaultValue" />
+            <input type="number" class="form-control" id="{{field.fieldId}}_fieldDefaultValue" formControlName="defaultValue">
         </div>
     </div>
 </div>

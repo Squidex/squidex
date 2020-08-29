@@ -40,11 +40,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppPatterns Update(DomainId id, string name, string pattern, string? message = null)
+        public AppPatterns Update(DomainId id, string? name = null, string? pattern = null, string? message = null)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNullOrEmpty(pattern, nameof(pattern));
-
             if (!TryGetValue(id, out var appPattern))
             {
                 return this;

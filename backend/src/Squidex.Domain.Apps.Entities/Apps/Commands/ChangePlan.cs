@@ -12,5 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
         public bool FromCallback { get; set; }
 
         public string PlanId { get; set; }
+
+        public string Referer { get; set; }
     }
 }

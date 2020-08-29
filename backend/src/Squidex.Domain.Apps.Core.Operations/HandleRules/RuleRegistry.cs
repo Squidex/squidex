@@ -12,8 +12,8 @@ using System.Linq;
 using System.Reflection;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Text;
 
 #pragma warning disable RECS0033 // Convert 'if' to '||' expression
 

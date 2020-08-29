@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 

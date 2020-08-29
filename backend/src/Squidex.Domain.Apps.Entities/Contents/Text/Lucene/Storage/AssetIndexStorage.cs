@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene.Storage
             this.assetStore = assetStore;
         }
 
-        public async Task<LuceneDirectory> CreateDirectoryAsync(DomainId schemaId)
+        public async Task<LuceneDirectory> CreateDirectoryAsync(DomainId ownerId)
         {
-            var directoryInfo = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "LocalIndices", schemaId.ToString()));
+            var directoryInfo = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "LocalIndices", ownerId.ToString()));
 
             if (directoryInfo.Exists)
             {

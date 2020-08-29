@@ -16,7 +16,7 @@ import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
 })
 export class JsonValidationComponent {
     @Input()
-    public editForm: FormGroup;
+    public fieldForm: FormGroup;
 
     @Input()
     public field: FieldDto;

@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Concurrent;
+using System.Globalization;
+using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -18,6 +21,8 @@ namespace Squidex.Areas.Frontend.Middlewares
 {
     public static class IndexExtensions
     {
+        private static readonly ConcurrentDictionary<string, string> Texts = new ConcurrentDictionary<string, string>();
+
         public static bool IsIndex(this HttpContext context)
         {
             return context.Request.Path.Value.EndsWith("/index.html", StringComparison.OrdinalIgnoreCase);
@@ -60,10 +65,41 @@ namespace Squidex.Areas.Frontend.Middlewares
                     uiOptions.More["notifoApi"] = notifo.Value.ApiUrl;
                 }
 
-                var jsonSerializer = httpContext.RequestServices.GetRequiredService<IJsonSerializer>();
-                var jsonOptions = jsonSerializer.Serialize(uiOptions);
+                uiOptions.More["culture"] = CultureInfo.CurrentUICulture.Name;
 
-                result = result.Replace("<body>", $"<body><script>var options = {jsonOptions};</script>");
+                var jsonSerializer = httpContext.RequestServices.GetRequiredService<IJsonSerializer>();
+                var jsonOptions = jsonSerializer.Serialize(uiOptions, true);
+
+                var texts = GetText(CultureInfo.CurrentUICulture.Name);
+
+                result = result.Replace("<body>", $"<body>\n<script>\nvar options = {jsonOptions};\nvar texts = {texts};</script>");
+            }
+
+            return result;
+        }
+
+        private static string GetText(string culture)
+        {
+            if (!Texts.TryGetValue(culture, out var result))
+            {
+                var assembly = typeof(IndexExtensions).Assembly;
+
+                var resourceName = $"Squidex.Areas.Frontend.Resources.frontend_{culture}.json";
+                var resourceStream = assembly.GetManifestResourceStream(resourceName);
+
+                if (resourceStream != null)
+                {
+                    using (var reader = new StreamReader(resourceStream))
+                    {
+                        result = reader.ReadToEnd();
+
+                        Texts[culture] = result;
+                    }
+                }
+                else
+                {
+                    return GetText("en");
+                }
             }
 
             return result;

@@ -31,10 +31,16 @@ namespace Squidex.Web
         [Fact]
         public void Should_generate_400_for_ValidationException()
         {
-            var ex = new ValidationException("NotAllowed",
+            var errors = new List<ValidationError>
+            {
                 new ValidationError("Error1"),
-                new ValidationError("Error2", "P"),
-                new ValidationError("Error3", "P1", "P2"));
+                new ValidationError("Error2", "Property0"),
+                new ValidationError("Error3", "Property1", "Property2"),
+                new ValidationError("Error4", "Property3.Property4"),
+                new ValidationError("Error5", "Property5[0].Property6")
+            };
+
+            var ex = new ValidationException(errors);
 
             var context = Error(ex);
 
@@ -45,9 +51,14 @@ namespace Squidex.Web
             Assert.Equal(400, result.StatusCode);
             Assert.Equal(400, (result.Value as ErrorDto)?.StatusCode);
 
-            Assert.Equal(ex.Summary, ((ErrorDto)result.Value).Message);
-
-            Assert.Equal(new[] { "Error1", "P: Error2", "P1, P2: Error3" }, ((ErrorDto)result.Value).Details);
+            Assert.Equal(new[]
+            {
+                "Error1",
+                "property0: Error2",
+                "property1, property2: Error3",
+                "property3.property4: Error4",
+                "property5[0].property6: Error5"
+            }, ((ErrorDto)result.Value).Details);
 
             A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
@@ -56,7 +67,7 @@ namespace Squidex.Web
         [Fact]
         public void Should_generate_404_for_DomainObjectNotFoundException()
         {
-            var context = Error(new DomainObjectNotFoundException("1", typeof(object)));
+            var context = Error(new DomainObjectNotFoundException("1"));
 
             sut.OnException(context);
 
@@ -108,7 +119,7 @@ namespace Squidex.Web
         [Fact]
         public void Should_generate_412_for_DomainObjectVersionException()
         {
-            var context = Error(new DomainObjectVersionException("1", typeof(object), 1, 2));
+            var context = Error(new DomainObjectVersionException("1", 1, 2));
 
             sut.OnException(context);
 

@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Squidex.Infrastructure.Validation;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure
 {
@@ -214,15 +215,6 @@ namespace Squidex.Infrastructure
             {
                 throw new ArgumentException("Value contains an invalid character.", parameterName);
             }
-        }
-
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Valid(IValidatable? target, [CallerArgumentExpression("target")] string parameterName, Func<string> message)
-        {
-            NotNull(target, parameterName);
-
-            target?.Validate(message);
         }
     }
 }

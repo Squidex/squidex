@@ -7,40 +7,15 @@
 
 // tslint:disable: readonly-array
 
-import { Directive, EventEmitter, HostListener, Input, OnDestroy, Output } from '@angular/core';
+import { Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { DialogService } from '@app/framework/internal';
-
-class DelayEventEmitter<T> extends EventEmitter<T> {
-    private delayedNexts: any[] | null = [];
-
-    public delayEmit() {
-        if (this.delayedNexts) {
-            for (const callback of this.delayedNexts) {
-                callback();
-            }
-        }
-    }
-
-    public clear() {
-        this.delayedNexts = null;
-    }
-
-    public subscribe(generatorOrNext?: any, error?: any, complete?: any): any {
-        if (this.delayedNexts) {
-            this.delayedNexts.push(generatorOrNext);
-        }
-
-        return super.subscribe(generatorOrNext, error, complete);
-    }
-}
+import { Subscriber } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Directive({
     selector: '[sqxConfirmClick]'
 })
-export class ConfirmClickDirective implements OnDestroy {
-    private isOpen = false;
-    private isDestroyed = false;
-
+export class ConfirmClickDirective {
     @Input()
     public confirmTitle: string;
 
@@ -54,19 +29,11 @@ export class ConfirmClickDirective implements OnDestroy {
     public beforeClick = new EventEmitter();
 
     @Output('sqxConfirmClick')
-    public clickConfirmed = new DelayEventEmitter();
+    public clickConfirmed = new EventEmitter();
 
     constructor(
         private readonly dialogs: DialogService
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.isDestroyed = true;
-
-        if (!this.isOpen) {
-            this.clickConfirmed.clear();
-        }
     }
 
     @HostListener('click', ['$event'])
@@ -77,25 +44,22 @@ export class ConfirmClickDirective implements OnDestroy {
             this.confirmText &&
             this.confirmText.length > 0) {
 
-            this.isOpen = true;
+            const observers = [...this.clickConfirmed.observers];
 
             this.beforeClick.emit();
 
-            const subscription =
-                this.dialogs.confirm(this.confirmTitle, this.confirmText)
-                    .subscribe(confirmed => {
-                        this.isOpen = false;
+            this.dialogs.confirm(this.confirmTitle, this.confirmText).pipe(take(1))
+                .subscribe(confirmed => {
+                    if (confirmed) {
+                        for (const observer of observers) {
+                            const subscriber = observer as Subscriber<any>;
 
-                        if (confirmed) {
-                            this.clickConfirmed.delayEmit();
+                            if (subscriber['destination'] && subscriber['destination'].next) {
+                                subscriber['destination'].next(true);
+                            }
                         }
-
-                        subscription.unsubscribe();
-
-                        if (this.isDestroyed) {
-                            this.clickConfirmed.clear();
-                        }
-                    });
+                    }
+                });
         } else {
             this.clickConfirmed.emit();
         }

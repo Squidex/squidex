@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -30,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly DomainId parentId = DomainId.NewGuid();
         private readonly DomainId assetId = DomainId.NewGuid();
-        private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
+        private readonly AssetFile file = new NoopAssetFile();
         private readonly AssetDomainObject sut;
 
         protected override DomainId Id

@@ -40,7 +40,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private IAppEntity app;
         private ContentCommand command;
         private ValidationContext validationContext;
-        private Func<string> message;
 
         public ContentOperationContext(IAppProvider appProvider, IEnumerable<IValidatorsFactory> factories, IScriptEngine scriptEngine)
         {
@@ -54,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             get { return schema; }
         }
 
-        public async Task LoadAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, Func<string> message, bool optimized)
+        public async Task LoadAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, bool optimized)
         {
             var (app, schema) = await appProvider.GetAppWithSchemaAsync(appId.Id, schemaId.Id);
 
@@ -71,7 +70,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.app = app;
             this.schema = schema;
             this.command = command;
-            this.message = message;
 
             validationContext = new ValidationContext(appId, schemaId, schema.SchemaDef, command.ContentId).Optimized(optimized);
         }
@@ -114,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             if (validator.Errors.Count > 0)
             {
-                throw new ValidationException(message(), validator.Errors.ToList());
+                throw new ValidationException(validator.Errors.ToList());
             }
         }
 

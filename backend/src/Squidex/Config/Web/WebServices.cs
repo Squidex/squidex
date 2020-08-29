@@ -10,14 +10,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Translations;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
+using Squidex.Shared;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
+using Squidex.Web.Services;
 
 namespace Squidex.Config.Web
 {
@@ -25,6 +29,10 @@ namespace Squidex.Config.Web
     {
         public static void AddSquidexMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
+            var translator = new ResourcesLocalizer(Texts.ResourceManager);
+
+            T.Setup(translator);
+
             services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
                 .AsSelf();
 
@@ -58,6 +66,12 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<RequestLogPerformanceMiddleware>()
                 .AsSelf();
 
+            services.AddSingletonAs(c => translator)
+                .As<ILocalizer>();
+
+            services.AddSingletonAs<StringLocalizer>()
+                .As<IStringLocalizer>().As<IStringLocalizerFactory>();
+
             services.AddSingletonAs<CachingManager>()
                 .As<IRequestCache>();
 
@@ -75,6 +89,8 @@ namespace Squidex.Config.Web
                 options.SuppressModelStateInvalidFilter = true;
             });
 
+            services.AddLocalization();
+
             services.AddMvc(options =>
             {
                 options.Filters.Add<CachingFilter>();
@@ -83,6 +99,7 @@ namespace Squidex.Config.Web
                 options.Filters.Add<SchemaResolver>();
                 options.Filters.Add<MeasureResultFilter>();
             })
+            .AddDataAnnotationsLocalization()
             .AddRazorRuntimeCompilation()
             .AddSquidexPlugins(config)
             .AddSquidexSerializers();

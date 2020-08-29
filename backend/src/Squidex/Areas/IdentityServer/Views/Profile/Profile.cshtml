@@ -3,7 +3,7 @@
 @{
     ViewBag.Class = "profile-lg";
 
-    ViewBag.Title = "Profile";
+    ViewBag.Title = @T.Get("users.profile.title");
 
     void RenderValidation(string field)
     {
@@ -16,9 +16,9 @@
     }
 }
 
-<h1>Edit Profile</h1>
+<h1>@T.Get("users.profile.headline")</h1>
 
-<h2>Personal Information</h2>
+<h2>@T.Get("users.profile.pii")</h2>
 
 @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
 {
@@ -41,7 +41,7 @@
     <div class="col">
         <form id="pictureForm" class="profile-picture-form" asp-controller="Profile" asp-action="UploadPicture" method="post" enctype="multipart/form-data">
             <span class="btn btn-secondary" id="pictureButton">
-                <span>Upload Picture</span>
+                <span>@T.Get("users.profile.uploadPicture")</span>
 
                 <input class="profile-picture-input" name="file" type="file" id="pictureInput" />
             </span>
@@ -51,7 +51,7 @@
 
 <form class="profile-form profile-section" asp-controller="Profile" asp-action="UpdateProfile" method="post">
     <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">@T.Get("common.email")</label>
 
         @{ RenderValidation("Email"); }
 
@@ -59,7 +59,7 @@
     </div>
 
     <div class="form-group">
-        <label for="displayName">Display Name</label>
+        <label for="displayName">@T.Get("common.displayName")</label>
 
         @{ RenderValidation("DisplayName"); }
 
@@ -70,17 +70,17 @@
         <div class="form-check">
             <input type="checkbox" class="form-check-input" asp-for="IsHidden" />
 
-            <label class="form-check-label" asp-for="IsHidden">Do not show my profile to other users</label>
+            <label class="form-check-label" asp-for="IsHidden">@T.Get("users.profile.hideProfile")</label>
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary">@T.Get("common.save")</button>
 </form>
 
 @if (Model.ExternalProviders.Any())
 {
     <div class="profile-section">
-        <h2>Logins</h2>
+        <h2>@T.Get("users.profile.loginsTitle")</h2>
 
         <table class="table table-fixed table-lesspadding">
             <colgroup>
@@ -105,7 +105,7 @@
                                 <input type="hidden" value="@login.ProviderKey" name="ProviderKey" />
 
                                 <button type="submit" class="btn btn-text-danger btn-sm">
-                                    Remove
+                                    @T.Get("common.remove")
                                 </button>
                             </form>
                         }
@@ -130,13 +130,13 @@
 @if (Model.HasPasswordAuth)
 {
     <div class="profile-section">
-        <h2>Password</h2>
+        <h2>@T.Get("users.profile.passwordTitle")</h2>
 
         @if (Model.HasPassword)
         {
             <form class="profile-form" asp-controller="Profile" asp-action="ChangePassword" method="post">
                 <div class="form-group">
-                    <label for="oldPassword">Old Password</label>
+                    <label for="oldPassword">@T.Get("common.oldPassword")</label>
 
                     @{ RenderValidation("OldPassword"); }
 
@@ -144,7 +144,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password">@T.Get("common.password")</label>
 
                     @{ RenderValidation("Password"); }
 
@@ -152,7 +152,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="passwordConfirm">Confirm</label>
+                    <label for="passwordConfirm">@T.Get("users.profile.confirmPassword")</label>
 
                     @{ RenderValidation("PasswordConfirm"); }
 
@@ -160,7 +160,7 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Change Password</button>
+                    <button type="submit" class="btn btn-primary">@T.Get("users.profile.changePassword")</button>
                 </div>
             </form>
         }
@@ -168,7 +168,7 @@
         {
             <form class="profile-form" asp-controller="Profile" asp-action="SetPassword" method="post">
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password">@T.Get("common.password")</label>
 
                     @{ RenderValidation("Password"); }
 
@@ -176,7 +176,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="passwordConfirm">Confirm</label>
+                    <label for="passwordConfirm">@T.Get("users.profile.confirmPassword")</label>
 
                     @{ RenderValidation("PasswordConfirm"); }
 
@@ -184,7 +184,7 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Set Password</button>
+                    <button type="submit" class="btn btn-primary">@T.Get("users.profile.setPassword")</button>
                 </div>
             </form>
         }
@@ -192,9 +192,9 @@
 }
 
 <div class="profile-section">
-    <h2>Client</h2>
+    <h2>@T.Get("users.profile.clientTitle")</h2>
 
-    <small class="form-text text-muted mt-2 mb-2">Use the client credentials to access the API with your profile information and permissions.</small>
+    <small class="form-text text-muted mt-2 mb-2">@T.Get("users.profile.clientHint")</small>
 
     <div class="row no-gutters form-group">
         <div class="col-8">
@@ -205,7 +205,7 @@
     </div>
     <div class="row no-gutters form-group">
         <div class="col-8">
-            <label for="clientSecret">Client Secret</label>
+            <label for="clientSecret">@T.Get("common.clientId")</label>
 
             <input class="form-control" name="clientSecret" id="clientSecret" readonly value="@Model.ClientSecret" />
         </div>
@@ -213,16 +213,16 @@
             <label for="generate">&nbsp;</label>
 
             <form class="profile-form" asp-controller="Profile" asp-action="GenerateClientSecret" method="post">
-                <button type="submit" class="btn btn-success btn-block" id="generate">Generate</button>
+                <button type="submit" class="btn btn-success btn-block" id="generate">@T.Get("users.profile.generateClient")</button>
             </form>
         </div>
     </div>
 </div>
 
 <div class="profile-section">
-    <h2>Properties</h2>
+    <h2>@T.Get("users.profile.propertiesTitle")</h2>
 
-    <small class="form-text text-muted mt-2 mb-2">Use custom properties for rules and scripts.</small>
+    <small class="form-text text-muted mt-2 mb-2">@T.Get("users.profile.propertiesHint")</small>
 
     <form class="profile-form" asp-controller="Profile" asp-action="UpdateProperties" method="post">
         <div class="mb-2" id="properties">
@@ -252,11 +252,11 @@
 
         <div class="form-group">
             <button type="button" class="btn btn-text-success" id="propertyAdd">
-                <i class="icon-plus"></i> Add Property
+                <i class="icon-plus"></i> @T.Get("users.profile.propertyAdd")
             </button>
         </div>
 
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-primary">@T.Get("common.save")</button>
     </form>
 </div>
 

@@ -5,22 +5,22 @@
             <div class="col-auto">
                 <div class="form-inline">
                     <div class="form-check pr-4">
-                        <input class="form-check-input" type="checkbox" id="fieldsDelete" formControlName="fieldsDelete" />
+                        <input class="form-check-input" type="checkbox" id="fieldsDelete" formControlName="fieldsDelete">
                         <label class="form-check-label" for="fieldsDelete">
-                            Delete fields
+                            {{ 'schemas.export.deleteFields' | sqxTranslate }}
                         </label>
                     </div>
     
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="fieldsRecreate" formControlName="fieldsRecreate" />
+                        <input class="form-check-input" type="checkbox" id="fieldsRecreate" formControlName="fieldsRecreate">
                         <label class="form-check-label" for="fieldsRecreate">
-                            Recreate fields
+                            {{ 'schemas.export.recreateFields' | sqxTranslate }}
                         </label>
                     </div>
                 </div>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary" [disabled]="synchronizeForm.submitted | async">Synchronize</button>
+                <button type="submit" class="btn btn-primary">{{ 'schemas.export.synchronize' | sqxTranslate }}</button>
             </div>
         </div>
     </div>

@@ -13,7 +13,7 @@ namespace Squidex.Web
     {
         [Required]
         [Display(Description = "Error message.")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         [Display(Description = "The optional trace id.")]
         public string? TraceId { get; set; }
@@ -25,6 +25,6 @@ namespace Squidex.Web
         public string[]? Details { get; set; }
 
         [Display(Description = "Status code of the http response.")]
-        public int? StatusCode { get; set; } = 400;
+        public int StatusCode { get; set; } = 400;
     }
 }

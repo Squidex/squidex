@@ -8,6 +8,7 @@
 using Microsoft.OData.Edm;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 {

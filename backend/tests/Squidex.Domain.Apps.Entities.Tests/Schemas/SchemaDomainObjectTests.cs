@@ -147,9 +147,36 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
+            Assert.Equal("<query-script>", sut.Snapshot.SchemaDef.Scripts.Query);
+
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new SchemaScriptsConfigured { Scripts = command.Scripts })
+                );
+        }
+
+        [Fact]
+        public async Task ConfigureFieldRules_should_create_events_and_update_schema_field_rules()
+        {
+            var command = new ConfigureFieldRules
+            {
+                FieldRules = new List<FieldRuleCommand>
+                {
+                    new FieldRuleCommand { Field = "field1" }
+                }
+            };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishIdempotentAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.NotEmpty(sut.Snapshot.SchemaDef.FieldRules);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new SchemaFieldRulesConfigured { FieldRules = new FieldRules(FieldRule.Disable("field1")) })
                 );
         }
 

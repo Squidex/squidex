@@ -2,11 +2,11 @@
     <sqx-modal-dialog (close)="emitComplete()">
         <ng-container title>
             <ng-container *ngIf="template; else noTemplate">
-                Create {{template}} Sample
+                {{ 'apps.createWithTemplate' | sqxTranslate: { template: template } }}
             </ng-container>
 
             <ng-template #noTemplate>
-                Create App
+                {{ 'apps.create' | sqxTranslate }}
             </ng-template>
         </ng-container>
 
@@ -14,28 +14,28 @@
             <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
             <div class="form-group">
-                <label for="appName">Name <small class="hint">(required)</small></label>
+                <label for="appName">{{ 'common.name' | sqxTranslate }} <small class="hint">({{ 'common.requiredHint' | sqxTranslate }})</small></label>
                 
-                <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
+                <sqx-control-errors for="name"></sqx-control-errors>
         
-                <input type="text" class="form-control" id="name" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit />
+                <input type="text" class="form-control" id="name" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit>
                     
                 <sqx-form-hint>
-                    You can only use letters, numbers and dashes and not more than 40 characters.
+                    {{ 'apps.appNameHint' | sqxTranslate }}
                 </sqx-form-hint>
             </div>
 
             <div class="form-group">
                 <sqx-form-alert marginTop="2" marginBottom="0">
-                    The app name cannot be changed later.
+                    {{ 'apps.appNameWarning' | sqxTranslate }}
                 </sqx-form-alert>
             </div>
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-secondary" (click)="emitComplete()">Cancel</button>
+            <button type="button" class="btn btn-secondary" (click)="emitComplete()">{{ 'common.cancel' | sqxTranslate }}</button>
 
-            <button type="submit" class="btn btn-success">Create</button>
+            <button type="submit" class="btn btn-success">{{ 'common.create' | sqxTranslate }}</button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

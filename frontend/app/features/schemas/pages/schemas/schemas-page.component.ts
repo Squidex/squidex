@@ -83,7 +83,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
         this.addSchemaDialog.show();
     }
 
-    public trackByCategory(index: number, category: SchemaCategory) {
+    public trackByCategory(_index: number, category: SchemaCategory) {
         return category.name;
     }
 }

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -20,6 +20,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
@@ -45,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.indexer = indexer;
         }
 
-        protected override Task PrepareAsync(CancellationToken ct = default)
+        protected override async Task PrepareAsync(CancellationToken ct = default)
         {
-            var index =
+            var indexBySchemaWithRefs =
                 new CreateIndexModel<MongoContentEntity>(Index
                     .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.IndexedSchemaId)
@@ -55,7 +56,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     .Ascending(x => x.ReferencedIds)
                     .Descending(x => x.LastModified));
 
-            return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
+            await Collection.Indexes.CreateOneAsync(indexBySchemaWithRefs, cancellationToken: ct);
+
+            var indexBySchema =
+                new CreateIndexModel<MongoContentEntity>(Index
+                    .Ascending(x => x.IndexedSchemaId)
+                    .Ascending(x => x.IsDeleted)
+                    .Descending(x => x.LastModified));
+
+            await Collection.Indexes.CreateOneAsync(indexBySchema, cancellationToken: ct);
         }
 
         public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, SearchScope scope)
@@ -98,11 +107,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
             catch (MongoCommandException ex) when (ex.Code == 96)
             {
-                throw new DomainException("Result set is too large to be retrieved. Use $take parameter to reduce the number of items.");
+                throw new DomainException(T.Get("common.resultTooLarge"));
             }
             catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
             {
-                throw new DomainException("Result set is too large to be retrieved. Use $take parameter to reduce the number of items.");
+                throw new DomainException(T.Get("common.resultTooLarge"));
             }
         }
 
