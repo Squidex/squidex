@@ -12,13 +12,13 @@ using Xunit;
 namespace Squidex.Infrastructure.EventSourcing
 {
     [Trait("Category", "Dependencies")]
-    public class MongoEventStoreTests : EventStoreTests<MongoEventStore>, IClassFixture<MongoEventStoreFixture>
+    public class MongoEventStoreTests_ReplicaSet : EventStoreTests<MongoEventStore>, IClassFixture<MongoEventStoreReplicaSetFixture>
     {
         public MongoEventStoreFixture _ { get; }
 
         protected override int SubscriptionDelayInMs { get; } = 1000;
 
-        public MongoEventStoreTests(MongoEventStoreFixture fixture)
+        public MongoEventStoreTests_ReplicaSet(MongoEventStoreReplicaSetFixture fixture)
         {
             _ = fixture;
         }
