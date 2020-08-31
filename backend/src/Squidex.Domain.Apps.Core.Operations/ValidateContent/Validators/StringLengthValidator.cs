@@ -16,9 +16,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         private readonly int? minLength;
         private readonly int? maxLength;
 
-        public StringLengthValidator(int? minLength, int? maxLength)
+        public StringLengthValidator(int? minLength = null, int? maxLength = null)
         {
-            if (minLength.HasValue && maxLength.HasValue && minLength.Value > maxLength.Value)
+            if (minLength > maxLength)
             {
                 throw new ArgumentException("Min length must be greater than max length.", nameof(minLength));
             }
@@ -44,12 +44,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 }
                 else
                 {
-                    if (minLength.HasValue && stringValue.Length < minLength.Value)
+                    if (minLength.HasValue && stringValue.Length < minLength)
                     {
                         addError(context.Path, T.Get("contents.validation.minLength", new { min = minLength }));
                     }
 
-                    if (maxLength.HasValue && stringValue.Length > maxLength.Value)
+                    if (maxLength.HasValue && stringValue.Length > maxLength)
                     {
                         addError(context.Path, T.Get("contents.validation.maxLength", new { max = maxLength }));
                     }

@@ -8,8 +8,7 @@
             </sqx-query-path>
 
             <select class="form-control ml-1" [ngModel]="sorting.order" (ngModelChange)="changeOrder($event)">
-                <option>ascending</option>
-                <option>descending</option>
+                <option *ngFor="let mode of modes" [ngValue]="mode">{{mode}}</option>
             </select>
         </div>
     </div>

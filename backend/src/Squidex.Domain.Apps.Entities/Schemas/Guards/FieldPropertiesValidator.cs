@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -33,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public IEnumerable<ValidationError> Visit(ArrayFieldProperties properties)
         {
-            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
+            if (IsMaxGreaterThanMin(properties.MaxItems, properties.MinItems))
             {
                 yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
                     nameof(properties.MinItems),
@@ -43,28 +45,28 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public IEnumerable<ValidationError> Visit(AssetsFieldProperties properties)
         {
-            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
+            if (IsMaxGreaterThanMin(properties.MaxItems, properties.MinItems))
             {
                 yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
 
-            if (properties.MaxHeight.HasValue && properties.MinHeight.HasValue && properties.MinHeight.Value > properties.MaxHeight.Value)
+            if (IsMaxGreaterThanMin(properties.MaxHeight, properties.MinHeight))
             {
                 yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxHeight), nameof(properties.MinHeight)),
                     nameof(properties.MaxHeight),
                     nameof(properties.MinHeight));
             }
 
-            if (properties.MaxWidth.HasValue && properties.MinWidth.HasValue && properties.MinWidth.Value > properties.MaxWidth.Value)
+            if (IsMaxGreaterThanMin(properties.MaxWidth, properties.MinWidth))
             {
                 yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxWidth), nameof(properties.MinWidth)),
                     nameof(properties.MaxWidth),
                     nameof(properties.MinWidth));
             }
 
-            if (properties.MaxSize.HasValue && properties.MinSize.HasValue && properties.MinSize.Value >= properties.MaxSize.Value)
+            if (IsMaxGreaterThanMin(properties.MaxSize, properties.MinSize))
             {
                 yield return new ValidationError(Not.GreaterThan(nameof(properties.MaxSize), nameof(properties.MinSize)),
                     nameof(properties.MaxSize),
@@ -96,19 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.Editor));
             }
 
-            if (properties.DefaultValue.HasValue && properties.MinValue.HasValue && properties.DefaultValue.Value < properties.MinValue.Value)
-            {
-                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.DefaultValue), nameof(properties.MinValue)),
-                    nameof(properties.DefaultValue));
-            }
-
-            if (properties.DefaultValue.HasValue && properties.MaxValue.HasValue && properties.DefaultValue.Value > properties.MaxValue.Value)
-            {
-                yield return new ValidationError(Not.LessEqualsThan(nameof(properties.DefaultValue), nameof(properties.MaxValue)),
-                    nameof(properties.DefaultValue));
-            }
-
-            if (properties.MaxValue.HasValue && properties.MinValue.HasValue && properties.MinValue.Value >= properties.MaxValue.Value)
+            if (IsMaxGreaterThanMin(properties.MaxValue, properties.MinValue))
             {
                 yield return new ValidationError(Not.GreaterThan(nameof(properties.MaxValue), nameof(properties.MinValue)),
                     nameof(properties.MinValue),
@@ -154,35 +144,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.Editor));
             }
 
-            if ((properties.Editor == NumberFieldEditor.Radio || properties.Editor == NumberFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
+            if ((properties.Editor == NumberFieldEditor.Radio || properties.Editor == NumberFieldEditor.Dropdown) && properties.AllowedValues?.Any() != true)
             {
                 yield return new ValidationError(T.Get("schemas.stringEditorsNeedAllowedValuesError"),
                     nameof(properties.AllowedValues));
             }
 
-            if (properties.DefaultValue.HasValue && properties.MinValue.HasValue && properties.DefaultValue.Value < properties.MinValue.Value)
-            {
-                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.DefaultValue), nameof(properties.MinValue)),
-                    nameof(properties.DefaultValue));
-            }
-
-            if (properties.DefaultValue.HasValue && properties.MaxValue.HasValue && properties.DefaultValue.Value > properties.MaxValue.Value)
-            {
-                yield return new ValidationError(Not.LessEqualsThan(nameof(properties.DefaultValue), nameof(properties.MaxValue)),
-                    nameof(properties.DefaultValue));
-            }
-
-            if (properties.MaxValue.HasValue && properties.MinValue.HasValue && properties.MinValue.Value >= properties.MaxValue.Value)
+            if (properties.MaxValue.HasValue && properties.MinValue.HasValue && properties.MinValue >= properties.MaxValue)
             {
                 yield return new ValidationError(Not.GreaterThan(nameof(properties.MaxValue), nameof(properties.MinValue)),
-                    nameof(properties.MinValue),
-                    nameof(properties.MaxValue));
-            }
-
-            if (properties.AllowedValues != null && properties.AllowedValues.Count > 0 && (properties.MinValue.HasValue || properties.MaxValue.HasValue))
-            {
-                yield return new ValidationError(T.Get("schemas.string.eitherMinMaxOrAllowedValuesError"),
-                    nameof(properties.AllowedValues),
                     nameof(properties.MinValue),
                     nameof(properties.MaxValue));
             }
@@ -203,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.Editor));
             }
 
-            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
+            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems > properties.MaxItems)
             {
                 yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
                     nameof(properties.MinItems),
@@ -226,7 +196,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.Editor));
             }
 
-            if ((properties.Editor == StringFieldEditor.Radio || properties.Editor == StringFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
+            if (!properties.ContentType.IsEnumValue())
+            {
+                yield return new ValidationError(Not.Valid(nameof(properties.ContentType)),
+                    nameof(properties.ContentType));
+            }
+
+            if ((properties.Editor == StringFieldEditor.Radio || properties.Editor == StringFieldEditor.Dropdown) && properties.AllowedValues?.Any() != true)
             {
                 yield return new ValidationError(T.Get("schemas.stringEditorsNeedAllowedValuesError"),
                     nameof(properties.AllowedValues));
@@ -238,19 +214,25 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.Pattern));
             }
 
-            if (properties.MaxLength.HasValue && properties.MinLength.HasValue && properties.MinLength.Value > properties.MaxLength.Value)
+            if (IsMaxGreaterThanMin(properties.MaxLength, properties.MinLength))
             {
                 yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxLength), nameof(properties.MinLength)),
                     nameof(properties.MinLength),
                     nameof(properties.MaxLength));
             }
 
-            if (properties.AllowedValues != null && properties.AllowedValues.Count > 0 && (properties.MinLength.HasValue || properties.MaxLength.HasValue))
+            if (IsMaxGreaterThanMin(properties.MaxWords, properties.MinWords))
             {
-                yield return new ValidationError(T.Get("schemas.number.eitherMinMaxOrAllowedValuesError"),
-                    nameof(properties.AllowedValues),
-                    nameof(properties.MinLength),
-                    nameof(properties.MaxLength));
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxWords), nameof(properties.MinWords)),
+                    nameof(properties.MinWords),
+                    nameof(properties.MaxWords));
+            }
+
+            if (IsMaxGreaterThanMin(properties.MaxCharacters, properties.MinCharacters))
+            {
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxCharacters), nameof(properties.MinCharacters)),
+                    nameof(properties.MinCharacters),
+                    nameof(properties.MaxCharacters));
             }
 
             if (properties.InlineEditable && properties.Editor != StringFieldEditor.Dropdown && properties.Editor != StringFieldEditor.Input && properties.Editor != StringFieldEditor.Slug)
@@ -269,13 +251,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.Editor));
             }
 
-            if ((properties.Editor == TagsFieldEditor.Checkboxes || properties.Editor == TagsFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
+            if ((properties.Editor == TagsFieldEditor.Checkboxes || properties.Editor == TagsFieldEditor.Dropdown) && properties.AllowedValues?.Any() != true)
             {
                 yield return new ValidationError(T.Get("schemas.tags.editorNeedsAllowedValues"),
                     nameof(properties.AllowedValues));
             }
 
-            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
+            if (IsMaxGreaterThanMin(properties.MaxItems, properties.MinItems))
             {
                 yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
                     nameof(properties.MinItems),
@@ -290,6 +272,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
+        }
+
+        private static bool IsMaxGreaterThanMin<T>(T? min, T? max) where T : struct, IComparable
+        {
+            return max.HasValue && min.HasValue && min.Value.CompareTo(max.Value) < 0;
         }
     }
 }

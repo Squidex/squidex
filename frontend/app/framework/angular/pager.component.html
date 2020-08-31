@@ -1,10 +1,7 @@
 <div class="clearfix" *ngIf="pager && (!autoHide || pager.canGoPrev || pager.canGoNext)">
     <div class="float-right pagination">
         <select class="form-control form-control-sm" [ngModel]="pager.pageSize" (ngModelChange)="setPageSize($event)">
-            <option [ngValue]="10">10</option>
-            <option [ngValue]="20">20</option>
-            <option [ngValue]="30">30</option>
-            <option [ngValue]="50">50</option>
+            <option *ngFor="let pageSize of pageSizes" [ngValue]="pageSize">{{pageSize}}</option>
         </select>
 
         <span class="page-info">

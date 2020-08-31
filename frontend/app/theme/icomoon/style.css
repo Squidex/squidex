@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?uop9lr');
-  src:  url('fonts/icomoon.eot?uop9lr#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?uop9lr') format('truetype'),
-    url('fonts/icomoon.woff?uop9lr') format('woff'),
-    url('fonts/icomoon.svg?uop9lr#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?epjxtr');
+  src:  url('fonts/icomoon.eot?epjxtr#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?epjxtr') format('truetype'),
+    url('fonts/icomoon.woff?epjxtr') format('woff'),
+    url('fonts/icomoon.svg?epjxtr#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -13,7 +13,7 @@
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;
-  speak: none;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -116,6 +116,9 @@
   content: "\e963";
 }
 .icon-control-Checkboxes:before {
+  content: "\e962";
+}
+.icon-control-List:before {
   content: "\e962";
 }
 .icon-control-Html:before {

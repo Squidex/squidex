@@ -87,6 +87,11 @@ export interface QuerySorting {
     order: SortMode;
 }
 
+export const SORT_MODES: ReadonlyArray<SortMode> = [
+    'ascending',
+    'descending'
+];
+
 export type SortMode = 'ascending' | 'descending';
 
 export interface Query {
