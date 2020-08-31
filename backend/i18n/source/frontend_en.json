@@ -528,7 +528,7 @@
   "roles.updateFailed": "Failed to update role. Please reload.",
   "rules.actionEdit": "Edit Action",
   "rules.cancelFailed": "Failed to cancel rule. Please reload.",
-  "rules.create": "Create new Rule",
+  "rules.create": "New Rule",
   "rules.createFailed": "Failed to create rule. Please reload.",
   "rules.createTooltip": "New Rule (CTRL + SHIFT + G)",
   "rules.deleteConfirmText": "Do you really want to delete the rule?",
