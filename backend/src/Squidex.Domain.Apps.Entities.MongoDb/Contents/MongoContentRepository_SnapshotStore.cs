@@ -132,7 +132,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity
             {
-                Id = value.Id,
                 IndexedAppId = value.AppId.Id,
                 IndexedSchemaId = value.SchemaId.Id,
                 Version = newVersion
