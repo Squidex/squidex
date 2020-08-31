@@ -6,9 +6,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Resources;
 using System.Text;
 
@@ -16,29 +14,16 @@ namespace Squidex.Infrastructure.Translations
 {
     public sealed class ResourcesLocalizer : ILocalizer
     {
-        private const string MissingFileName = "__missing.txt";
-
-        private static readonly object LockObject = new object();
+#if DEBUG
+        private static readonly MissingKeys MissingKeys = new MissingKeys();
+#endif
         private readonly ResourceManager resourceManager;
-        private readonly HashSet<string> missingTranslations;
 
         public ResourcesLocalizer(ResourceManager resourceManager)
         {
             Guard.NotNull(resourceManager, nameof(resourceManager));
 
             this.resourceManager = resourceManager;
-#if DEBUG
-            if (File.Exists(MissingFileName))
-            {
-                var missing = File.ReadAllLines(MissingFileName);
-
-                missingTranslations = new HashSet<string>(missing);
-            }
-            else
-            {
-                missingTranslations = new HashSet<string>();
-            }
-#endif
         }
 
         public (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null)
@@ -166,13 +151,7 @@ namespace Squidex.Infrastructure.Translations
             if (translation == null)
             {
 #if DEBUG
-                lock (LockObject)
-                {
-                    if (!missingTranslations.Add(key))
-                    {
-                        File.AppendAllLines(MissingFileName, new string[] { key });
-                    }
-                }
+                MissingKeys.Log(key);
 #endif
             }
 

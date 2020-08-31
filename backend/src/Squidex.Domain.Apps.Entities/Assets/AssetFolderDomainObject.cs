@@ -54,7 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
-            VerifyCommand(command);
 
             switch (command)
             {
@@ -92,24 +91,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         Delete(c);
                     });
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        private void VerifyCommand(IAggregateCommand command)
-        {
-            switch (command)
-            {
-                case AssetFolderCommand assetFolderCommand:
-                    if (Version >= 0 && (
-                        !assetFolderCommand.AssetFolderId.Equals(Snapshot.Id) ||
-                        !assetFolderCommand.AppId.Equals(Snapshot.AppId)))
-                    {
-                        throw new InvalidOperationException();
-                    }
-
-                    break;
                 default:
                     throw new NotSupportedException();
             }

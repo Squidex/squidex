@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -37,7 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly DomainId assetId = DomainId.NewGuid();
-        private readonly Stream stream = new MemoryStream();
         private readonly AssetDomainObjectGrain asset;
         private readonly AssetFile file;
         private readonly Context requestContext = Context.Anonymous();
@@ -281,7 +279,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = Id, File = file });
+            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
 
             return asset.ExecuteAsync(CommandRequest.Create(command));
         }
