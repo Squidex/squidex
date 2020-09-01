@@ -190,6 +190,10 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 throw new ValidationException(T.Get("common.jsError", new { message = ex.Message }));
             }
+            catch (DomainException)
+            {
+                throw;
+            }
             catch
             {
                 throw new ValidationException(T.Get("common.jsError", new { message = "RuntimeError" }));
