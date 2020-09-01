@@ -30,6 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
 
         Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, SearchScope scope);
 
+        Task ResetScheduledAsync(Guid contentId);
+
         Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback);
     }
 }

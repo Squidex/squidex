@@ -18,6 +18,8 @@ export class CallsUsageDto {
         public readonly blockingCalls: number,
         public readonly totalBytes: number,
         public readonly totalCalls: number,
+        public readonly monthBytes: number,
+        public readonly monthCalls: number,
         public readonly averageElapsedMs: number,
         public readonly details: { [category: string]: ReadonlyArray<CallsUsagePerDateDto> }
     ) {
@@ -102,6 +104,8 @@ export class UsagesService {
                         body.blockingCalls,
                         body.totalBytes,
                         body.totalCalls,
+                        body.monthBytes,
+                        body.monthCalls,
                         body.averageElapsedMs,
                         details);
 
