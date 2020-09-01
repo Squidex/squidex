@@ -5,18 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Squidex.Text;
-
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public static class AssetSlug
+    public enum StringContentType
     {
-        private static readonly HashSet<char> Dot = new HashSet<char>(new[] { '.' });
-
-        public static string ToAssetSlug(this string value)
-        {
-            return value.Slugify(Dot);
-        }
+        Unspecified,
+        Html,
+        Markdown
     }
 }

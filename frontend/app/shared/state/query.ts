@@ -87,6 +87,11 @@ export interface QuerySorting {
     order: SortMode;
 }
 
+export const SORT_MODES: ReadonlyArray<SortMode> = [
+    'ascending',
+    'descending'
+];
+
 export type SortMode = 'ascending' | 'descending';
 
 export interface Query {
@@ -292,6 +297,13 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
              ...TypeStatus,
              displayName: MetaFields.status,
              description: 'i18n:contents.statusFieldDescription',
+             extra: statuses
+        };
+
+        model.fields['newStatus'] = {
+             ...TypeStatus,
+             displayName: MetaFields.statusNext,
+             description: 'i18n:contents.newStatusFieldDescription',
              extra: statuses
         };
     }

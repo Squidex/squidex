@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System.Linq;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
 {

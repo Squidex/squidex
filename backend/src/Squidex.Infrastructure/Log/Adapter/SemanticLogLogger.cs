@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure.Log.Adapter
 {

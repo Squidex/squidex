@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { fadeAnimation, FieldDto, hasNoValue$, hasValue$, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, Types, value$ } from '@app/shared';
+import { fadeAnimation, FieldDto, hasNoValue$, hasValue$, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, Types, value$, STRING_CONTENT_TYPES } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -31,6 +31,8 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     @Input()
     public patterns: ReadonlyArray<PatternDto>;
 
+    public contentTypes = STRING_CONTENT_TYPES;
+
     public showDefaultValue: Observable<boolean>;
     public showPatternMessage: Observable<boolean>;
     public showPatternSuggestions: Observable<boolean>;
@@ -53,6 +55,21 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
 
         this.fieldForm.setControl('minLength',
             new FormControl(this.properties.minLength));
+
+        this.fieldForm.setControl('maxWords',
+            new FormControl(this.properties.maxWords));
+
+        this.fieldForm.setControl('minWords',
+            new FormControl(this.properties.minWords));
+
+        this.fieldForm.setControl('maxCharacters',
+            new FormControl(this.properties.maxCharacters));
+
+        this.fieldForm.setControl('minCharacters',
+            new FormControl(this.properties.minCharacters));
+
+        this.fieldForm.setControl('contentType',
+            new FormControl(this.properties.contentType));
 
         this.fieldForm.setControl('pattern',
             new FormControl(this.properties.pattern));

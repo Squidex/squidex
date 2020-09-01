@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { FieldDto, FloatConverter, NumberFieldPropertiesDto } from '@app/shared';
+import { DateTimeFieldPropertiesDto, DATETIME_FIELD_EDITORS, FieldDto, FloatConverter } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -25,7 +25,9 @@ export class DateTimeUIComponent implements OnInit {
     public field: FieldDto;
 
     @Input()
-    public properties: NumberFieldPropertiesDto;
+    public properties: DateTimeFieldPropertiesDto;
+
+    public editors = DATETIME_FIELD_EDITORS;
 
     public hideAllowedValues: Observable<boolean>;
 

@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {

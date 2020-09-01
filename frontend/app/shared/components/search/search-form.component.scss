@@ -34,6 +34,14 @@
         padding: 0 .5rem;
     }
 
+    &:focus {
+        text-decoration: none;
+    }
+
+    &:hover {
+        text-decoration: none;
+    }
+
     &.highlighted {
         color: $color-title !important;
     }

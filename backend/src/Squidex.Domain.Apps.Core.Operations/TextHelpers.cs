@@ -93,45 +93,5 @@ namespace Squidex.Domain.Apps.Core
                 WriteTextTo(child, sb);
             }
         }
-
-        public static int CharacterCount(string text)
-        {
-            var characterCount = 0;
-
-            for (int i = 0; i < text.Length; i++)
-            {
-                if (char.IsLetter(text[i]))
-                {
-                    characterCount++;
-                }
-            }
-
-            return characterCount;
-        }
-
-        public static int WordCount(string text)
-        {
-            var numWords = 0;
-
-            for (int i = 1; i < text.Length; i++)
-            {
-                if (char.IsWhiteSpace(text[i - 1]))
-                {
-                    var character = text[i];
-
-                    if (char.IsLetterOrDigit(character) || char.IsPunctuation(character))
-                    {
-                        numWords++;
-                    }
-                }
-            }
-
-            if (text.Length > 2)
-            {
-                numWords++;
-            }
-
-            return numWords;
-        }
     }
 }

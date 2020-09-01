@@ -165,10 +165,18 @@ export class ArrayFieldPropertiesDto extends FieldPropertiesDto {
     }
 }
 
+export type AssetPreviewMode = 'ImageAndFileName' | 'Image' | 'FileName';
+
+export const ASSET_PREVIEW_MODES: ReadonlyArray<AssetPreviewMode> = [
+    'ImageAndFileName',
+    'Image',
+    'FileName'
+];
+
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Assets';
 
-    public readonly previewMode: 'ImageAndFileName' | 'Image' | 'FileName';
+    public readonly previewMode: AssetPreviewMode;
     public readonly allowDuplicates?: boolean;
     public readonly allowedExtensions?: ReadonlyArray<string>;
     public readonly resolveFirst: boolean;
@@ -195,6 +203,11 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
 
 export type BooleanFieldEditor = 'Checkbox' | 'Toggle';
 
+export const BOOLEAN_FIELD_EDITORS: ReadonlyArray<BooleanFieldEditor> = [
+    'Checkbox',
+    'Toggle'
+];
+
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Boolean';
 
@@ -212,6 +225,11 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export type DateTimeFieldEditor = 'DateTime' | 'Date';
+
+export const DATETIME_FIELD_EDITORS: ReadonlyArray<DateTimeFieldEditor> = [
+    'DateTime',
+    'Date'
+];
 
 export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'DateTime';
@@ -232,6 +250,10 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export type GeolocationFieldEditor = 'Map';
+
+export const GEOLOCATION_FIELD_EDITORS: ReadonlyArray<GeolocationFieldEditor> = [
+    'Map'
+];
 
 export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Geolocation';
@@ -261,6 +283,13 @@ export class JsonFieldPropertiesDto extends FieldPropertiesDto {
 
 export type NumberFieldEditor = 'Input' | 'Radio' | 'Dropdown' | 'Stars';
 
+export const NUMBER_FIELD_EDITORS: ReadonlyArray<NumberFieldEditor> = [
+    'Input',
+    'Radio',
+    'Dropdown',
+    'Stars'
+];
+
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Number';
 
@@ -282,6 +311,13 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export type ReferencesFieldEditor = 'List' | 'Dropdown' | 'Checkboxes' | 'Tags';
+
+export const REFERENCES_FIELD_EDITORS: ReadonlyArray<ReferencesFieldEditor> = [
+    'List',
+    'Dropdown',
+    'Checkboxes',
+    'Tags'
+];
 
 export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'References';
@@ -306,18 +342,43 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     }
 }
 
-export type StringEditor = 'Color' | 'Dropdown' | 'Html' | 'Input' | 'Markdown' | 'Radio' | 'RichText' | 'Slug' | 'StockPhoto' | 'TextArea';
+export type StringFieldEditor = 'Color' | 'Dropdown' | 'Html' | 'Input' | 'Markdown' | 'Radio' | 'RichText' | 'Slug' | 'StockPhoto' | 'TextArea';
+export type StringContentType = 'Unspecified' | 'Markdown' | 'Html';
+
+export const STRING_FIELD_EDITORS: ReadonlyArray<StringFieldEditor> = [
+    'Input',
+    'TextArea',
+    'RichText',
+    'Slug',
+    'Markdown',
+    'Dropdown',
+    'Radio',
+    'Html',
+    'StockPhoto',
+    'Color'
+];
+
+export const STRING_CONTENT_TYPES: ReadonlyArray<StringContentType> = [
+    'Unspecified',
+    'Markdown',
+    'Html'
+];
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'String';
 
     public readonly allowedValues?: ReadonlyArray<string>;
     public readonly defaultValue?: string;
-    public readonly editor: StringEditor = 'Input';
+    public readonly editor: StringFieldEditor = 'Input';
     public readonly inlineEditable: boolean = false;
     public readonly isUnique: boolean = false;
     public readonly maxLength?: number;
     public readonly minLength?: number;
+    public readonly maxWords?: number;
+    public readonly minWords?: number;
+    public readonly maxCharacters?: number;
+    public readonly minCharacters?: number;
+    public readonly contentType?: StringContentType;
     public readonly pattern?: string;
     public readonly patternMessage?: string;
 
@@ -331,6 +392,12 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export type TagsFieldEditor = 'Tags' | 'Checkboxes' | 'Dropdown';
+
+export const TAGS_FIELD_EDITORS: ReadonlyArray<TagsFieldEditor> = [
+    'Tags',
+    'Checkboxes',
+    'Dropdown'
+];
 
 export class TagsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Tags';

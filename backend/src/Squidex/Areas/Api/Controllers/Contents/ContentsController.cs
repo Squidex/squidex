@@ -55,9 +55,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/graphql/")]
         [ApiPermission]
         [ApiCosts(2)]
-        public async Task<IActionResult> GetGraphQL(string app, [FromQuery] GraphQLQuery? queries = null)
+        public async Task<IActionResult> GetGraphQL(string app, [FromQuery] GraphQLGetDto? queries = null)
         {
-            var (hasError, response) = await graphQl.QueryAsync(Context, queries ?? new GraphQLQuery());
+            var request = queries?.ToQuery() ?? new GraphQLQuery();
+
+            var (hasError, response) = await graphQl.QueryAsync(Context, request);
 
             if (hasError)
             {
@@ -85,9 +87,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/graphql/")]
         [ApiPermission]
         [ApiCosts(2)]
-        public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLQuery query)
+        public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLPostDto query)
         {
-            var (hasError, response) = await graphQl.QueryAsync(Context, query);
+            var request = query?.ToQuery() ?? new GraphQLQuery();
+
+            var (hasError, response) = await graphQl.QueryAsync(Context, request);
 
             if (hasError)
             {
@@ -115,9 +119,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/graphql/batch")]
         [ApiPermission]
         [ApiCosts(2)]
-        public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLQuery[] batch)
+        public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLPostDto[] batch)
         {
-            var (hasError, response) = await graphQl.QueryAsync(Context, batch);
+            var request = batch.Select(x => x.ToQuery()).ToArray();
+
+            var (hasError, response) = await graphQl.QueryAsync(Context, request);
 
             if (hasError)
             {

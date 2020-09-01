@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { FieldDto, TagsFieldPropertiesDto } from '@app/shared';
+import { FieldDto, TagsFieldPropertiesDto, TAGS_FIELD_EDITORS } from '@app/shared';
 
 @Component({
     selector: 'sqx-tags-ui',
@@ -23,6 +23,8 @@ export class TagsUIComponent implements OnInit {
 
     @Input()
     public properties: TagsFieldPropertiesDto;
+
+    public editors = TAGS_FIELD_EDITORS;
 
     public ngOnInit() {
         this.fieldForm.setControl('editor',
