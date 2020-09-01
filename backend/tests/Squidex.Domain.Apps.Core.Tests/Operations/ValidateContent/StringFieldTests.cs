@@ -83,6 +83,28 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
+        public async Task Should_add_error_if_string_is_shorter_than_min_characters()
+        {
+            var sut = Field(new StringFieldProperties { MinCharacters = 10 });
+
+            await sut.ValidateAsync(CreateValue("123"), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must have at least 10 text character(s)." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_string_is_longer_than_max_characters()
+        {
+            var sut = Field(new StringFieldProperties { MaxCharacters = 5 });
+
+            await sut.ValidateAsync(CreateValue("12345678"), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must not have more than 5 text character(s)." });
+        }
+
+        [Fact]
         public async Task Should_add_error_if_string_not_allowed()
         {
             var sut = Field(new StringFieldProperties { AllowedValues = ReadOnlyCollection.Create("Foo") });

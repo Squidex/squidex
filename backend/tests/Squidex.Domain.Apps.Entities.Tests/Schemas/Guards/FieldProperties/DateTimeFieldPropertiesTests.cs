@@ -35,35 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         }
 
         [Fact]
-        public void Should_add_error_if_default_value_is_less_than_min()
-        {
-            var sut = new DateTimeFieldProperties { MinValue = FutureDays(10), DefaultValue = FutureDays(5) };
-
-            var errors = FieldPropertiesValidator.Validate(sut).ToList();
-
-            errors.Should().BeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Default value must be greater or equal to min value.", "DefaultValue")
-                });
-        }
-
-        [Fact]
-        public void Should_add_error_if_default_value_is_greater_than_min()
-        {
-            var sut = new DateTimeFieldProperties { MaxValue = FutureDays(10), DefaultValue = FutureDays(15) };
-
-            var errors = FieldPropertiesValidator.Validate(sut).ToList();
-
-            errors.Should().BeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Default value must be less or equal to max value.", "DefaultValue")
-                });
-        }
-
-        [Fact]
-        public void Should_add_error_if_min_greater_than_max()
+        public void Should_add_error_if_min_value_greater_than_max_value()
         {
             var sut = new DateTimeFieldProperties { MinValue = FutureDays(10), MaxValue = FutureDays(5) };
 

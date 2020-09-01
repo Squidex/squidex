@@ -435,7 +435,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecuteCreateAsync();
             await ExecuteChangeStatusAsync(Status.Archived, dueTime);
 
-            var command = new ChangeContentStatus { Status = Status.Archived, JobId = sut.Snapshot.ScheduleJob!.Id };
+            var command = new ChangeContentStatus { Status = Status.Archived, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
             A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Archived, User))
                 .Returns(true);
@@ -463,7 +463,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecuteCreateAsync();
             await ExecuteChangeStatusAsync(Status.Published, dueTime);
 
-            var command = new ChangeContentStatus { Status = Status.Published, JobId = sut.Snapshot.ScheduleJob!.Id };
+            var command = new ChangeContentStatus { Status = Status.Published, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
             A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Published, User))
                 .Returns(false);

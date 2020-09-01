@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -34,9 +35,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IEnumerable<IValidator> Visit(IArrayField field)
         {
-            if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
+            var properties = field.Properties;
+
+            if (properties.IsRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+                yield return new CollectionValidator(properties.IsRequired, properties.MinItems, properties.MaxItems);
             }
 
             var nestedSchema = new Dictionary<string, (bool IsOptional, IValidator Validator)>(field.Fields.Count);
@@ -51,12 +54,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)
         {
-            if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
+            var properties = field.Properties;
+
+            if (properties.IsRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+                yield return new CollectionValidator(properties.IsRequired, properties.MinItems, properties.MaxItems);
             }
 
-            if (!field.Properties.AllowDuplicates)
+            if (!properties.AllowDuplicates)
             {
                 yield return new UniqueValuesValidator<string>();
             }
@@ -64,7 +69,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IEnumerable<IValidator> Visit(IField<BooleanFieldProperties> field)
         {
-            if (field.Properties.IsRequired)
+            var properties = field.Properties;
+
+            if (properties.IsRequired)
             {
                 yield return new RequiredValidator();
             }
@@ -72,20 +79,24 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IEnumerable<IValidator> Visit(IField<DateTimeFieldProperties> field)
         {
-            if (field.Properties.IsRequired)
+            var properties = field.Properties;
+
+            if (properties.IsRequired)
             {
                 yield return new RequiredValidator();
             }
 
-            if (field.Properties.MinValue.HasValue || field.Properties.MaxValue.HasValue)
+            if (properties.MinValue.HasValue || properties.MaxValue.HasValue)
             {
-                yield return new RangeValidator<Instant>(field.Properties.MinValue, field.Properties.MaxValue);
+                yield return new RangeValidator<Instant>(properties.MinValue, properties.MaxValue);
             }
         }
 
         public IEnumerable<IValidator> Visit(IField<GeolocationFieldProperties> field)
         {
-            if (field.Properties.IsRequired)
+            var properties = field.Properties;
+
+            if (properties.IsRequired)
             {
                 yield return new RequiredValidator();
             }
@@ -93,7 +104,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IEnumerable<IValidator> Visit(IField<JsonFieldProperties> field)
         {
-            if (field.Properties.IsRequired)
+            var properties = field.Properties;
+
+            if (properties.IsRequired)
             {
                 yield return new RequiredValidator();
             }
@@ -101,30 +114,34 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IEnumerable<IValidator> Visit(IField<NumberFieldProperties> field)
         {
-            if (field.Properties.IsRequired)
+            var properties = field.Properties;
+
+            if (properties.IsRequired)
             {
                 yield return new RequiredValidator();
             }
 
-            if (field.Properties.MinValue.HasValue || field.Properties.MaxValue.HasValue)
+            if (properties.MinValue.HasValue || properties.MaxValue.HasValue)
             {
-                yield return new RangeValidator<double>(field.Properties.MinValue, field.Properties.MaxValue);
+                yield return new RangeValidator<double>(properties.MinValue, properties.MaxValue);
             }
 
-            if (field.Properties.AllowedValues != null)
+            if (properties.AllowedValues != null)
             {
-                yield return new AllowedValuesValidator<double>(field.Properties.AllowedValues);
+                yield return new AllowedValuesValidator<double>(properties.AllowedValues);
             }
         }
 
         public IEnumerable<IValidator> Visit(IField<ReferencesFieldProperties> field)
         {
-            if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
+            var properties = field.Properties;
+
+            if (properties.IsRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+                yield return new CollectionValidator(properties.IsRequired, properties.MinItems, properties.MaxItems);
             }
 
-            if (!field.Properties.AllowDuplicates)
+            if (!properties.AllowDuplicates)
             {
                 yield return new UniqueValuesValidator<string>();
             }
@@ -132,37 +149,65 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IEnumerable<IValidator> Visit(IField<StringFieldProperties> field)
         {
-            if (field.Properties.IsRequired)
+            var properties = field.Properties;
+
+            if (properties.IsRequired)
             {
                 yield return new RequiredStringValidator(true);
             }
 
-            if (field.Properties.MinLength.HasValue || field.Properties.MaxLength.HasValue)
+            if (properties.MinLength.HasValue || properties.MaxLength.HasValue)
             {
-                yield return new StringLengthValidator(field.Properties.MinLength, field.Properties.MaxLength);
+                yield return new StringLengthValidator(properties.MinLength, properties.MaxLength);
             }
 
-            if (!string.IsNullOrWhiteSpace(field.Properties.Pattern))
+            if (properties.MinCharacters.HasValue ||
+                properties.MaxCharacters.HasValue ||
+                properties.MinWords.HasValue ||
+                properties.MaxWords.HasValue)
             {
-                yield return new PatternValidator(field.Properties.Pattern, field.Properties.PatternMessage);
+                Func<string, string>? transform = null;
+
+                switch (properties.ContentType)
+                {
+                    case StringContentType.Markdown:
+                        transform = TextHelpers.Markdown2Text;
+                        break;
+                    case StringContentType.Html:
+                        transform = TextHelpers.Html2Text;
+                        break;
+                }
+
+                yield return new StringTextValidator(transform,
+                   properties.MinCharacters,
+                   properties.MaxCharacters,
+                   properties.MinWords,
+                   properties.MaxWords);
             }
 
-            if (field.Properties.AllowedValues != null)
+            if (!string.IsNullOrWhiteSpace(properties.Pattern))
             {
-                yield return new AllowedValuesValidator<string>(field.Properties.AllowedValues);
+                yield return new PatternValidator(properties.Pattern, properties.PatternMessage);
+            }
+
+            if (properties.AllowedValues != null)
+            {
+                yield return new AllowedValuesValidator<string>(properties.AllowedValues);
             }
         }
 
         public IEnumerable<IValidator> Visit(IField<TagsFieldProperties> field)
         {
-            if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
+            var properties = field.Properties;
+
+            if (properties.IsRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+                yield return new CollectionValidator(properties.IsRequired, properties.MinItems, properties.MaxItems);
             }
 
-            if (field.Properties.AllowedValues != null)
+            if (properties.AllowedValues != null)
             {
-                yield return new CollectionItemValidator(new AllowedValuesValidator<string>(field.Properties.AllowedValues));
+                yield return new CollectionItemValidator(new AllowedValuesValidator<string>(properties.AllowedValues));
             }
 
             yield return new CollectionItemValidator(new RequiredStringValidator(true));

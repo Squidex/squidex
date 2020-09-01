@@ -14,19 +14,12 @@
         <label class="col-3 col-form-label">{{ 'schemas.field.editor' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Checkbox'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Checkbox">
+            <label class="btn btn-radio" *ngFor="let editor of editors" [class.active]="fieldForm.controls['editor'].value === editor">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" [value]="editor">
 
-                <i class="icon-control-Checkbox"></i>
+                <i class="icon-control-{{editor}}"></i>
 
-                <span class="radio-label">Checkbox</span>
-            </label>
-            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Toggle'">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Toggle">
-
-                <i class="icon-control-Toggle"></i>
-
-                <span class="radio-label">Toggle</span>
+                <span class="radio-label">{{editor}}</span>
             </label>
         </div>
     </div>

@@ -34,35 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         }
 
         [Fact]
-        public void Should_add_error_if_default_value_is_less_than_min()
-        {
-            var sut = new NumberFieldProperties { MinValue = 10, DefaultValue = 5 };
-
-            var errors = FieldPropertiesValidator.Validate(sut).ToList();
-
-            errors.Should().BeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Default value must be greater or equal to min value.", "DefaultValue")
-                });
-        }
-
-        [Fact]
-        public void Should_add_error_if_default_value_is_greater_than_min()
-        {
-            var sut = new NumberFieldProperties { MaxValue = 0, DefaultValue = 5 };
-
-            var errors = FieldPropertiesValidator.Validate(sut).ToList();
-
-            errors.Should().BeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Default value must be less or equal to max value.", "DefaultValue")
-                });
-        }
-
-        [Fact]
-        public void Should_add_error_if_min_greater_than_max()
+        public void Should_add_error_if_min_value_greater_than_max_value()
         {
             var sut = new NumberFieldProperties { MinValue = 10, MaxValue = 5 };
 
@@ -72,34 +44,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
                 new List<ValidationError>
                 {
                     new ValidationError("Max value must be greater than min value.", "MinValue", "MaxValue")
-                });
-        }
-
-        [Fact]
-        public void Should_add_error_if_allowed_values_and_max_value_is_specified()
-        {
-            var sut = new NumberFieldProperties { MaxValue = 10, AllowedValues = ReadOnlyCollection.Create(4d) };
-
-            var errors = FieldPropertiesValidator.Validate(sut).ToList();
-
-            errors.Should().BeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Either allowed values or min and max value can be defined.", "AllowedValues", "MinValue", "MaxValue")
-                });
-        }
-
-        [Fact]
-        public void Should_add_error_if_allowed_values_and_min_value_is_specified()
-        {
-            var sut = new NumberFieldProperties { MinValue = 10, AllowedValues = ReadOnlyCollection.Create(4d) };
-
-            var errors = FieldPropertiesValidator.Validate(sut).ToList();
-
-            errors.Should().BeEquivalentTo(
-                new List<ValidationError>
-                {
-                    new ValidationError("Either allowed values or min and max value can be defined.", "AllowedValues", "MinValue", "MaxValue")
                 });
         }
 

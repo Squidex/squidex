@@ -13,9 +13,7 @@
                         <sqx-control-errors for="action"></sqx-control-errors>
 
                         <select class="form-control" formControlName="action">
-                            <option>Disable</option>
-                            <option>Hide</option>
-                            <option>Require</option>
+                            <option *ngFor="let fieldAction of fieldActions" [ngValue]="fieldAction">{{fieldAction}}</option>
                         </select>
                     </div>
 

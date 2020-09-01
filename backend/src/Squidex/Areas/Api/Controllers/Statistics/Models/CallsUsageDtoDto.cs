@@ -28,6 +28,16 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         public long TotalBytes { get; set; }
 
         /// <summary>
+        /// The total number of API calls this month.
+        /// </summary>
+        public long MonthCalls { get; set; }
+
+        /// <summary>
+        /// The total number of bytes transferred this month.
+        /// </summary>
+        public long MonthBytes { get; set; }
+
+        /// <summary>
         /// The amount of calls that will block the app.
         /// </summary>
         public long BlockingApiCalls { get; set; }
@@ -63,6 +73,8 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
                 AllowedCalls = plan.MaxApiCalls,
                 TotalBytes = summary.TotalBytes,
                 TotalCalls = summary.TotalCalls,
+                MonthBytes = summary.MonthBytes,
+                MonthCalls = summary.MonthCalls,
                 Details = details.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsagePerDateDto.FromStats).ToArray())
             };
         }

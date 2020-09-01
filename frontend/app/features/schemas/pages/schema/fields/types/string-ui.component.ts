@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { FieldDto, ResourceOwner, StringFieldPropertiesDto, value$ } from '@app/shared';
+import { FieldDto, ResourceOwner, StringFieldPropertiesDto, STRING_FIELD_EDITORS, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -25,6 +25,8 @@ export class StringUIComponent extends ResourceOwner implements OnInit {
 
     @Input()
     public properties: StringFieldPropertiesDto;
+
+    public editors = STRING_FIELD_EDITORS;
 
     public hideAllowedValues: Observable<boolean>;
     public hideInlineEditable: Observable<boolean>;

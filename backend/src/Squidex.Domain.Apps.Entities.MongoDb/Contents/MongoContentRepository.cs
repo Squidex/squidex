@@ -114,6 +114,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
+        public Task ResetScheduledAsync(DomainId id)
+        {
+            return collectionAll.ResetScheduledAsync(id);
+        }
+
         public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
         {
             return collectionAll.QueryScheduledWithoutDataAsync(now, callback);

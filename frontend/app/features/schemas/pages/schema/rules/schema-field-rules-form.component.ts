@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { ConfigureFieldRulesForm, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { ConfigureFieldRulesForm, FIELD_RULE_ACTIONS, SchemaDetailsDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-field-rules-form',
@@ -21,6 +21,7 @@ export class SchemaFieldRulesFormComponent implements OnChanges {
     public editForm = new ConfigureFieldRulesForm(this.formBuilder);
 
     public fieldNames: ReadonlyArray<string>;
+    public fieldActions = FIELD_RULE_ACTIONS;
 
     public isEditable = false;
 

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
     public class StringFieldPropertiesTests : IClassFixture<TranslationsFixture>
     {
         [Fact]
-        public void Should_add_error_if_min_greater_than_max()
+        public void Should_add_error_if_min_length_greater_than_max()
         {
             var sut = new StringFieldProperties { MinLength = 10, MaxLength = 5 };
 
@@ -43,31 +43,51 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         }
 
         [Fact]
-        public void Should_add_error_if_allowed_values_and_max_value_is_specified()
+        public void Should_add_error_if_min_characters_greater_than_max()
         {
-            var sut = new StringFieldProperties { MinLength = 10, AllowedValues = ReadOnlyCollection.Create("4") };
+            var sut = new StringFieldProperties { MinCharacters = 10, MaxCharacters = 5 };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Either allowed values or min and max length can be defined.", "AllowedValues", "MinLength", "MaxLength")
+                    new ValidationError("Max characters must be greater or equal to min characters.", "MinCharacters", "MaxCharacters")
                 });
         }
 
         [Fact]
-        public void Should_add_error_if_allowed_values_and_min_value_is_specified()
+        public void Should_not_add_error_if_min_characters_equal_to_max_characters()
         {
-            var sut = new StringFieldProperties { MaxLength = 10, AllowedValues = ReadOnlyCollection.Create("4") };
+            var sut = new StringFieldProperties { MinCharacters = 2, MaxCharacters = 2 };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public void Should_add_error_if_min_words_greater_than_max()
+        {
+            var sut = new StringFieldProperties { MinWords = 10, MaxWords = 5 };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Either allowed values or min and max length can be defined.", "AllowedValues", "MinLength", "MaxLength")
+                    new ValidationError("Max words must be greater or equal to min words.", "MinWords", "MaxWords")
                 });
+        }
+
+        [Fact]
+        public void Should_not_add_error_if_min_words_equal_to_max_words()
+        {
+            var sut = new StringFieldProperties { MinWords = 2, MaxWords = 2 };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -95,6 +115,20 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
                 new List<ValidationError>
                 {
                     new ValidationError("Editor is not a valid value.", "Editor")
+                });
+        }
+
+        [Fact]
+        public void Should_add_error_if_content_type_is_not_valid()
+        {
+            var sut = new StringFieldProperties { ContentType = (StringContentType)123 };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            errors.Should().BeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Content type is not a valid value.", "ContentType")
                 });
         }
 
