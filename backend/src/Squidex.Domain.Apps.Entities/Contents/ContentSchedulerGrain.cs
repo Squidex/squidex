@@ -69,6 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             return contentRepository.QueryScheduledWithoutDataAsync(now, content =>
             {
+                return Task.CompletedTask;
                 return Dispatch(async () =>
                 {
                     try

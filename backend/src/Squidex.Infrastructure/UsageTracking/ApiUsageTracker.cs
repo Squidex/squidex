@@ -90,7 +90,14 @@ namespace Squidex.Infrastructure.UsageTracking
 
             var summaryElapsedAvg = CalculateAverage(summaryCalls, summaryElapsed);
 
-            var summary = new ApiStatsSummary(summaryCalls, summaryElapsedAvg, summaryBytes);
+            var monthStats = await usageTracker.GetForMonthAsync(apiKey, DateTime.Today, null);
+
+            var summary = new ApiStatsSummary(
+                summaryElapsedAvg,
+                summaryCalls,
+                summaryBytes,
+                monthStats.GetInt64(CounterTotalCalls),
+                monthStats.GetInt64(CounterTotalBytes));
 
             return (summary, details);
         }

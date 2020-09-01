@@ -13,12 +13,19 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public long TotalBytes { get; }
 
+        public long MonthCalls { get; }
+
+        public long MonthBytes { get; }
+
         public double AverageElapsedMs { get; }
 
-        public ApiStatsSummary(long totalCalls, double averageElapsedMs, long totalBytes)
+        public ApiStatsSummary(double averageElapsedMs, long totalCalls, long totalBytes, long monthCalls, long monthBytes)
         {
             TotalCalls = totalCalls;
             TotalBytes = totalBytes;
+
+            MonthCalls = monthCalls;
+            MonthBytes = monthBytes;
 
             AverageElapsedMs = averageElapsedMs;
         }

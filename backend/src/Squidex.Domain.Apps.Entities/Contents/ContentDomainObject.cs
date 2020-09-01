@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         }
                         catch (Exception)
                         {
-                            if (Snapshot.ScheduleJob?.Id == c.JobId)
+                            if (Snapshot.ScheduleJob != null && Snapshot.ScheduleJob.Id == c.JobId)
                             {
                                 CancelChangeStatus(c);
                             }
