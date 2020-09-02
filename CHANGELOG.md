@@ -1,5 +1,42 @@
 # Changelog
 
+## 5.0.0 BETA 2 - 2020-09-02
+
+Includes new features in 4.6.0
+
+## 4.6.0 - 2020-09-02
+
+### Features
+
+* **API**: Client contigent or API calls to protected your API.
+* **API**: Special headers to simulate errors in the UI.
+* **API**: Allow anonymous access per client.
+* **Assets**: Better fallback handling when resizing assets failed.
+* **Assets**: Autorotate images with orientation metadata.
+* **Contents**: Better word count implementation which also works for CJK languages. (Chinese, Japanese, Korean).
+* **Contents**: Text based validation for string fields. You can define the content type now and the validator will extract the plain text from html and markdown to make character or word count validation.
+* **Contents**: Filter content by `newStatus` field.
+* **Contents / Schemas**: Field rules to disable or hide fields based on conditions.
+* **Workflows**: Visualization of the workflow with a readonly diagram.
+* **UI**: Button per field to unset a field value.
+* **UI**: Custom editors for all field types.
+* **UI**: Confirm dialog when removing assets or references.
+* **UI**: Open referenced content in new tab.
+* **UI**: Show current traffic usage in Dashboard.
+* **UI**: Toggle between locale and UTC mode for datetime editors.
+* **UI / General**: Support for localized UI and backend with support for `en` and `nl` for now. Italian is coming as well.
+* **Performance**: Replicated cache for some high load scenarios.
+
+
+### Bugfixes
+
+* **Contributors**: Ignore casing of email addresses, which was causing Squidex not to invite people with uppercase characters in email addresses.
+* **Contents**: Improved content scheduler to handle contents better, when the app or schema has already been deleted.
+* **Contents**: Fixes for authentication and GraphQl GET Endpoint.
+* **Contents**: Improve javascript error handling for schemas scripts. Some exceptions have been swallowed before.
+* **EventSourcing**: Fixed a bug for the event consumer, which was skipping some events in high load scenarios. Need a replica set and Mongo 4.2. to work properly.
+* **Algolia**: Fixed Algolia rule action.
+
 ## 5.0.0 BETA 1 - 2020-07-06
 
 This version introduces a new way to deal with ids. So far each content element has an id that is unique across all apps. This causes problems, because you cannot define your own ids and the ids have to change when you clone an app via backup and restore.
