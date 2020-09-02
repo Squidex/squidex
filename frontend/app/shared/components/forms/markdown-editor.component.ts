@@ -91,7 +91,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                 },
                 autoDownloadFontAwesome: true,
                 spellChecker: false,
-                status: true,
+                status: ['lines', 'words', 'cursor'],
                 toolbar: [
                     {
                         name: 'bold',
