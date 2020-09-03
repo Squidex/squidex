@@ -191,7 +191,7 @@
     <value>Clientgeheim</value>
   </data>
   <data name="common.contentType" xml:space="preserve">
-    <value>Content type</value>
+    <value>Inhoudstype</value>
   </data>
   <data name="common.contributorId" xml:space="preserve">
     <value>Bijdrager-ID of e-mailadres</value>
@@ -272,7 +272,7 @@
     <value>Uitloggen</value>
   </data>
   <data name="common.maxCharacters" xml:space="preserve">
-    <value>Max characters</value>
+    <value>Max. karakters</value>
   </data>
   <data name="common.maxHeight" xml:space="preserve">
     <value>Max. hoogte</value>
@@ -293,10 +293,10 @@
     <value>Max. breedte</value>
   </data>
   <data name="common.maxWords" xml:space="preserve">
-    <value>Max words</value>
+    <value>Max. woorden</value>
   </data>
   <data name="common.minCharacters" xml:space="preserve">
-    <value>Min characters</value>
+    <value>Min. karakters</value>
   </data>
   <data name="common.minHeight" xml:space="preserve">
     <value>Min. hoogte</value>
@@ -317,7 +317,7 @@
     <value>Min. breedte</value>
   </data>
   <data name="common.minWords" xml:space="preserve">
-    <value>Min words</value>
+    <value>Min. woorden</value>
   </data>
   <data name="common.name" xml:space="preserve">
     <value>Naam</value>
@@ -518,7 +518,7 @@
     <value>Moet kleiner zijn dan of gelijk zijn aan {max}.</value>
   </data>
   <data name="contents.validation.maxCharacters" xml:space="preserve">
-    <value>Must not have more than {max} text character(s).</value>
+    <value>Mag niet meer dan {max} tekstteken (s) bevatten.</value>
   </data>
   <data name="contents.validation.maximumHeight" xml:space="preserve">
     <value>Hoogte {hoogte} px moet kleiner zijn dan {max} px.</value>
@@ -536,7 +536,7 @@
     <value>Mag niet meer dan {max} teken (s) bevatten.</value>
   </data>
   <data name="contents.validation.maxWords" xml:space="preserve">
-    <value>Must not have more than {max} word(s).</value>
+    <value>Mag niet meer dan {max} woord(en) bevatten.</value>
   </data>
   <data name="contents.validation.min" xml:space="preserve">
     <value>Moet groter zijn dan of gelijk zijn aan {min}.</value>
@@ -557,19 +557,19 @@
     <value>Moet minstens {min} teken (s) bevatten.</value>
   </data>
   <data name="contents.validation.minNormalCharacters" xml:space="preserve">
-    <value>Must have at least {min} text character(s).</value>
+    <value>Moet minstens {min} tekstteken (s) bevatten.</value>
   </data>
   <data name="contents.validation.minWords" xml:space="preserve">
-    <value>Must have at least {min} word(s).</value>
+    <value>Moet minstens {min} woord(en) bevatten.</value>
   </data>
   <data name="contents.validation.mustBeEmpty" xml:space="preserve">
     <value>Waarde mag niet worden gedefinieerd.</value>
   </data>
   <data name="contents.validation.normalCharacterCount" xml:space="preserve">
-    <value>Must have exactly {count} text character(s).</value>
+    <value>Moet exact {count} tekstteken (s) bevatten.</value>
   </data>
   <data name="contents.validation.normalCharactersBetween" xml:space="preserve">
-    <value>Must have between {min} and {max} text character(s).</value>
+    <value>Moet tussen {min} en {max} tekstteken (s) bevatten.</value>
   </data>
   <data name="contents.validation.notAllowed" xml:space="preserve">
     <value>Geen toegestane waarde.</value>
@@ -590,10 +590,10 @@
     <value>Onbekend {fieldType}.</value>
   </data>
   <data name="contents.validation.wordCount" xml:space="preserve">
-    <value>Must have exactly {count} word(s).</value>
+    <value>Moet exact {count} woord (en) bevatten.</value>
   </data>
   <data name="contents.validation.wordsBetween" xml:space="preserve">
-    <value>Must have between {min} and {max} word(s).</value>
+    <value>Moet tussen {min} en {max} woord (en) bevatten.</value>
   </data>
   <data name="contents.workflowErorPublishing" xml:space="preserve">
     <value>Contentworkflow verhindert publiceren.</value>

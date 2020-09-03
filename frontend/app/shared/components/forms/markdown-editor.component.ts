@@ -90,6 +90,8 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                     return marked(text, { pedantic: true });
                 },
                 autoDownloadFontAwesome: true,
+                spellChecker: false,
+                status: ['lines', 'words', 'cursor'],
                 toolbar: [
                     {
                         name: 'bold',
