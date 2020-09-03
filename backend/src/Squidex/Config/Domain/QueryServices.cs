@@ -30,9 +30,6 @@ namespace Squidex.Config.Domain
                     exposeSourceUrl))
                 .As<IUrlGenerator>();
 
-            services.AddSingletonAs(x => new FuncDependencyResolver(x.GetRequiredService))
-                .As<IDependencyResolver>();
-
             services.AddSingletonAs<DataLoaderContextAccessor>()
                 .As<IDataLoaderContextAccessor>();
 
