@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public IObjectGraphType GetAssetType()
         {
-            return assetType as IObjectGraphType;
+            return assetType;
         }
 
         public IObjectGraphType GetContentType(Guid schemaId)
