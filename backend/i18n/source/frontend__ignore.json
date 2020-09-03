@@ -19,8 +19,8 @@
     "#{{index + 1}}"
   ],
   "/features/content/shared/forms/field-editor.component.html": [
-    "*",
-    "{{field.displayName}} {{displaySuffix}}"
+    "{{field.displayName}} {{displaySuffix}}",
+    "*"
   ],
   "/features/content/shared/references/references-editor.component.html": [
     "&middot;"
