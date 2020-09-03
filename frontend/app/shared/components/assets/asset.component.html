@@ -74,6 +74,8 @@
             <ng-container *ngIf="asset">
                 <div>
                     <div class="file-name truncate editable" (click)="edit()">
+                        <i class="icon-lock" *ngIf="asset?.isProtected"></i>
+
                         {{asset.fileName}}
                     </div>
                 </div>
@@ -108,6 +110,8 @@
                 <tr>
                     <td class="col-name">
                         <div class="file-name editable" (click)="edit()">
+                            <i class="icon-lock" *ngIf="asset?.isProtected"></i>
+                            
                             {{asset.fileName}}
                         </div>
                     </td>
