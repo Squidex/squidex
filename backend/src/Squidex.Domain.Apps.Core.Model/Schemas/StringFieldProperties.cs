@@ -18,6 +18,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxLength { get; set; }
 
+        public int? MinCharacters { get; set; }
+
+        public int? MaxCharacters { get; set; }
+
+        public int? MinWords { get; set; }
+
+        public int? MaxWords { get; set; }
+
         public bool IsUnique { get; set; }
 
         public bool InlineEditable { get; set; }
@@ -27,6 +35,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public string? Pattern { get; set; }
 
         public string? PatternMessage { get; set; }
+
+        public StringContentType ContentType { get; set; }
 
         public StringFieldEditor Editor { get; set; }
 

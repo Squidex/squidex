@@ -190,6 +190,9 @@
   <data name="common.clientSecret" xml:space="preserve">
     <value>Clientgeheim</value>
   </data>
+  <data name="common.contentType" xml:space="preserve">
+    <value>Content type</value>
+  </data>
   <data name="common.contributorId" xml:space="preserve">
     <value>Bijdrager-ID of e-mailadres</value>
   </data>
@@ -268,6 +271,9 @@
   <data name="common.logout" xml:space="preserve">
     <value>Uitloggen</value>
   </data>
+  <data name="common.maxCharacters" xml:space="preserve">
+    <value>Max characters</value>
+  </data>
   <data name="common.maxHeight" xml:space="preserve">
     <value>Max. hoogte</value>
   </data>
@@ -286,6 +292,12 @@
   <data name="common.maxWidth" xml:space="preserve">
     <value>Max. breedte</value>
   </data>
+  <data name="common.maxWords" xml:space="preserve">
+    <value>Max words</value>
+  </data>
+  <data name="common.minCharacters" xml:space="preserve">
+    <value>Min characters</value>
+  </data>
   <data name="common.minHeight" xml:space="preserve">
     <value>Min. hoogte</value>
   </data>
@@ -303,6 +315,9 @@
   </data>
   <data name="common.minWidth" xml:space="preserve">
     <value>Min. breedte</value>
+  </data>
+  <data name="common.minWords" xml:space="preserve">
+    <value>Min words</value>
   </data>
   <data name="common.name" xml:space="preserve">
     <value>Naam</value>
@@ -502,6 +517,9 @@
   <data name="contents.validation.max" xml:space="preserve">
     <value>Moet kleiner zijn dan of gelijk zijn aan {max}.</value>
   </data>
+  <data name="contents.validation.maxCharacters" xml:space="preserve">
+    <value>Must not have more than {max} text character(s).</value>
+  </data>
   <data name="contents.validation.maximumHeight" xml:space="preserve">
     <value>Hoogte {hoogte} px moet kleiner zijn dan {max} px.</value>
   </data>
@@ -516,6 +534,9 @@
   </data>
   <data name="contents.validation.maxLength" xml:space="preserve">
     <value>Mag niet meer dan {max} teken (s) bevatten.</value>
+  </data>
+  <data name="contents.validation.maxWords" xml:space="preserve">
+    <value>Must not have more than {max} word(s).</value>
   </data>
   <data name="contents.validation.min" xml:space="preserve">
     <value>Moet groter zijn dan of gelijk zijn aan {min}.</value>
@@ -535,8 +556,20 @@
   <data name="contents.validation.minLength" xml:space="preserve">
     <value>Moet minstens {min} teken (s) bevatten.</value>
   </data>
+  <data name="contents.validation.minNormalCharacters" xml:space="preserve">
+    <value>Must have at least {min} text character(s).</value>
+  </data>
+  <data name="contents.validation.minWords" xml:space="preserve">
+    <value>Must have at least {min} word(s).</value>
+  </data>
   <data name="contents.validation.mustBeEmpty" xml:space="preserve">
     <value>Waarde mag niet worden gedefinieerd.</value>
+  </data>
+  <data name="contents.validation.normalCharacterCount" xml:space="preserve">
+    <value>Must have exactly {count} text character(s).</value>
+  </data>
+  <data name="contents.validation.normalCharactersBetween" xml:space="preserve">
+    <value>Must have between {min} and {max} text character(s).</value>
   </data>
   <data name="contents.validation.notAllowed" xml:space="preserve">
     <value>Geen toegestane waarde.</value>
@@ -555,6 +588,12 @@
   </data>
   <data name="contents.validation.unknownField" xml:space="preserve">
     <value>Onbekend {fieldType}.</value>
+  </data>
+  <data name="contents.validation.wordCount" xml:space="preserve">
+    <value>Must have exactly {count} word(s).</value>
+  </data>
+  <data name="contents.validation.wordsBetween" xml:space="preserve">
+    <value>Must have between {min} and {max} word(s).</value>
   </data>
   <data name="contents.workflowErorPublishing" xml:space="preserve">
     <value>Contentworkflow verhindert publiceren.</value>
@@ -745,9 +784,6 @@
   <data name="schemas.notFoundId" xml:space="preserve">
     <value>Schema {id} bestaat niet.</value>
   </data>
-  <data name="schemas.number.eitherMinMaxOrAllowedValuesError" xml:space="preserve">
-    <value>Ofwel toegestane waarden of min en max lengte kunnen worden gedefinieerd.</value>
-  </data>
   <data name="schemas.number.inlineEditorError" xml:space="preserve">
     <value>Inline bewerken is niet toegestaan ​​voor Radio-editor.</value>
   </data>
@@ -759,9 +795,6 @@
   </data>
   <data name="schemas.references.resolveError" xml:space="preserve">
     <value>Kan alleen verwijzingen omzetten als MaxItems 1 is.</value>
-  </data>
-  <data name="schemas.string.eitherMinMaxOrAllowedValuesError" xml:space="preserve">
-    <value>Ofwel toegestane waarden of min en max waarde kunnen worden gedefinieerd.</value>
   </data>
   <data name="schemas.string.inlineEditorError" xml:space="preserve">
     <value>Inline bewerken is alleen toegestaan ​​voor dropdowns, slugs en invoervelden.</value>

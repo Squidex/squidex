@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { FieldDto, FloatConverter, NumberFieldPropertiesDto, ResourceOwner, value$ } from '@app/shared';
+import { FieldDto, FloatConverter, NumberFieldPropertiesDto, NUMBER_FIELD_EDITORS, ResourceOwner, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -27,6 +27,8 @@ export class NumberUIComponent extends ResourceOwner implements OnInit {
 
     @Input()
     public properties: NumberFieldPropertiesDto;
+
+    public editors = NUMBER_FIELD_EDITORS;
 
     public hideAllowedValues: Observable<boolean>;
     public hideInlineEditable: Observable<boolean>;

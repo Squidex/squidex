@@ -53,8 +53,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private void Unsubscribe()
         {
-            currentSubscription?.StopAsync().Forget();
-            currentSubscription = null;
+            var subscription = Interlocked.Exchange(ref currentSubscription, null);
+
+            if (subscription != null)
+            {
+                subscription.StopAsync().Forget();
+            }
         }
 
         public void WakeUp()

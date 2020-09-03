@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await WaitAndStopAsync(sut);
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))
-                .MustNotHaveHappened();
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await WaitAndStopAsync(sut);
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))
-                .MustNotHaveHappened();
+                .MustHaveHappened();
         }
 
         [Fact]

@@ -25,12 +25,12 @@ export class ApiTrafficSummaryCardComponent implements OnChanges {
     @Input()
     public usage: CallsUsageDto;
 
-    public bytesTotal = 0;
+    public bytesMonth = 0;
     public bytesAllowed = 0;
 
     public ngOnChanges() {
         if (this.usage) {
-            this.bytesTotal = this.usage.totalBytes;
+            this.bytesMonth = this.usage.monthBytes;
             this.bytesAllowed = this.usage.allowedBytes;
         }
     }

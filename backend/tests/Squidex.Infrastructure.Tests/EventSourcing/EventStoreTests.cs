@@ -179,8 +179,8 @@ namespace Squidex.Infrastructure.EventSourcing
                 new StoredEvent(streamName, "Position", 3, events2[1])
             };
 
-            ShouldBeEquivalentTo(readEventsFromPosition, expectedFromPosition);
-            ShouldBeEquivalentTo(readEventsFromBeginning, expectedFromBeginning);
+            ShouldBeEquivalentTo(readEventsFromPosition.TakeLast(2), expectedFromPosition);
+            ShouldBeEquivalentTo(readEventsFromBeginning.TakeLast(4), expectedFromBeginning);
         }
 
         [Fact]

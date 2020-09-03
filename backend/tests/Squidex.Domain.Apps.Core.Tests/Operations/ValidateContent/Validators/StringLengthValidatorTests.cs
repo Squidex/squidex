@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         [Fact]
         public async Task Should_not_add_error_if_value_is_null()
         {
-            var sut = new StringLengthValidator(100, 200);
+            var sut = new StringLengthValidator();
 
             await sut.ValidateAsync(null, errors);
 
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         [Fact]
         public async Task Should_not_add_error_if_value_is_empty()
         {
-            var sut = new StringLengthValidator(100, 200);
+            var sut = new StringLengthValidator();
 
             await sut.ValidateAsync(string.Empty, errors);
 
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
-        public async Task Should_add_error_if_collection_has_not_exact_number_of_items()
+        public async Task Should_add_error_if_value_has_not_exact_number_of_characters()
         {
             var sut = new StringLengthValidator(2000, 2000);
 

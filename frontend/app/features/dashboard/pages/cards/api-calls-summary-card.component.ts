@@ -24,12 +24,12 @@ export class ApiCallsSummaryCardComponent implements OnChanges {
     @Input()
     public usage: CallsUsageDto;
 
-    public callsTotal = 0;
+    public callsMonth = 0;
     public callsAllowed = 0;
 
     public ngOnChanges() {
         if (this.usage) {
-            this.callsTotal = this.usage.totalCalls;
+            this.callsMonth = this.usage.monthCalls;
             this.callsAllowed = this.usage.allowedCalls;
         }
     }

@@ -3,7 +3,10 @@ $background: #fff;
 :host ::ng-deep {
     // sass-lint:disable class-name-format
     .CodeMirror {
+        box-sizing: content-box;
         height: 300px;
+        padding-bottom: 10px;
+        padding-top: 10px;
     }
 }
 

@@ -71,18 +71,28 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 return Dispatch(async () =>
                 {
+                    var id = content.Id;
+
                     try
                     {
                         var job = content.ScheduleJob;
 
                         if (job != null)
                         {
-                            var command = new ChangeContentStatus { ContentId = content.Id, Status = job.Status, JobId = job.Id };
-
-                            command.Actor = job.ScheduledBy;
+                            var command = new ChangeContentStatus
+                            {
+                                Actor = job.ScheduledBy,
+                                ContentId = id,
+                                Status = job.Status,
+                                StatusJobId = job.Id
+                            };
 
                             await commandBus.PublishAsync(command);
                         }
+                    }
+                    catch (DomainObjectNotFoundException)
+                    {
+                        await contentRepository.ResetScheduledAsync(content.Id);
                     }
                     catch (Exception ex)
                     {

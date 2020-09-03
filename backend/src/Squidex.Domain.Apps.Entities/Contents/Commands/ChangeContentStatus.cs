@@ -17,6 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public Instant? DueTime { get; set; }
 
-        public Guid? JobId { get; set; }
+        public Guid? StatusJobId { get; set; }
     }
 }

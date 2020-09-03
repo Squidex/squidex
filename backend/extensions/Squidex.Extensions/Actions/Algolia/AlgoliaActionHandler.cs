@@ -102,7 +102,7 @@ namespace Squidex.Extensions.Actions.Algolia
             {
                 if (job.Content != null)
                 {
-                    var response = await index.PartialUpdateObjectAsync(job.Content, null, ct, true);
+                    var response = await index.SaveObjectAsync(job.Content, null, ct, true);
 
                     return Result.Success(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }

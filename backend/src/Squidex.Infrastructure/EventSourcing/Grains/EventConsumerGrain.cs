@@ -7,6 +7,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
@@ -261,10 +262,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private void Unsubscribe()
         {
-            if (currentSubscription != null)
+            var subscription = Interlocked.Exchange(ref currentSubscription, null);
+
+            if (subscription != null)
             {
-                currentSubscription.StopAsync().Forget();
-                currentSubscription = null;
+                subscription.StopAsync().Forget();
             }
         }
 
@@ -309,9 +311,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return new RetrySubscription(store, subscriber, filter, position);
         }
 
+        protected virtual TaskScheduler GetScheduler()
+        {
+            return scheduler!;
+        }
+
         private IEventSubscription CreateSubscription(string streamFilter, string? position)
         {
-            return CreateSubscription(eventStore, new WrapperSubscription(GetSelf(), scheduler!), streamFilter, position);
+            return CreateSubscription(eventStore, new WrapperSubscription(GetSelf(), GetScheduler()), streamFilter, position);
         }
     }
 }

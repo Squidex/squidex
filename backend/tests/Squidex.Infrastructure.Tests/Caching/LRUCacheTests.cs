@@ -28,7 +28,20 @@ namespace Squidex.Infrastructure.Caching
         }
 
         [Fact]
-        public void Should_remove_old_items_when_capacity_reached()
+        public void Should_clear_items()
+        {
+            sut.Set("1", 1);
+            sut.Set("2", 2);
+
+            Assert.Equal(2, sut.Count);
+
+            sut.Clear();
+
+            Assert.Equal(0, sut.Count);
+        }
+
+        [Fact]
+        public void Should_remove_old_items_whentC_capacity_reached()
         {
             for (var i = 0; i < 15; i++)
             {

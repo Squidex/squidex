@@ -184,11 +184,19 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
             catch (JavaScriptException ex)
             {
-                throw new ValidationException(T.Get("common.jsError", new { error = ex.Message }));
+                throw new ValidationException(T.Get("common.jsError", new { message = ex.Message }));
             }
             catch (ParserException ex)
             {
-                throw new ValidationException(T.Get("common.jsError", new { error = ex.Message }));
+                throw new ValidationException(T.Get("common.jsError", new { message = ex.Message }));
+            }
+            catch (DomainException)
+            {
+                throw;
+            }
+            catch
+            {
+                throw new ValidationException(T.Get("common.jsError", new { message = "RuntimeError" }));
             }
         }
     }

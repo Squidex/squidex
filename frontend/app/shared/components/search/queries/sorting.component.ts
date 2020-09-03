@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { QueryModel, QuerySorting } from '@app/shared/internal';
+import { QueryModel, QuerySorting, SORT_MODES } from '@app/shared/internal';
 
  @Component({
      selector: 'sqx-sorting',
@@ -26,6 +26,8 @@ export class SortingComponent {
 
     @Input()
     public sorting: QuerySorting;
+
+    public modes = SORT_MODES;
 
     public changeOrder(order: any) {
         this.sorting.order = order;
