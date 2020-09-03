@@ -293,10 +293,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             };
 
             var script = @"
-Script(JSON.stringify(
-{
-    'categories': event.data.categories.iv
-}))";
+                Script(JSON.stringify(
+                {
+                    'categories': event.data.categories.iv
+                }))";
 
             var result = await sut.FormatAsync(script, @event);
 
