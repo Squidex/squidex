@@ -38,7 +38,7 @@
                             </a>
 
                             <a class="file-delete ml-2" *ngIf="removeMode"
-                                (sqxConfirmClick)="delete.emit()"
+                                (sqxConfirmClick)="remove.emit()"
                                 confirmTitle="i18n:assets.removeConfirmTitle"
                                 confirmText="i18n:assets.removeConfirmText">
                                 <i class="icon-close"></i>
@@ -139,7 +139,7 @@
                         </button>
 
                         <button type="button" class="btn btn-text-secondary" *ngIf="removeMode"
-                            (sqxConfirmClick)="delete.emit()"
+                            (sqxConfirmClick)="remove.emit()"
                             confirmTitle="i18n:contents.removeConfirmTitle"
                             confirmText="i18n:contents.removeConfirmText">
                             <i class="icon-close"></i>
