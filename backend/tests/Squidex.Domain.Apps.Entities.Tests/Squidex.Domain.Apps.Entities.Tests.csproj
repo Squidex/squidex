@@ -20,6 +20,7 @@
     <PackageReference Include="FakeItEasy" Version="6.0.1" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="GraphQL" Version="3.0.0" />
+    <PackageReference Include="GraphQL.NewtonsoftJson" Version="3.0.0" />
     <PackageReference Include="Lorem.Universal.Net" Version="3.0.64" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />

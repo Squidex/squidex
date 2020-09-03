@@ -8,7 +8,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL;
+using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -55,6 +57,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         .Select(x => $"${x.Key}={x.Value}"));
 
             return odataQuery;
+        }
+
+        public static FieldType WithSourceName(this FieldType field, object value)
+        {
+            field.Metadata["sourceName"] = value;
+
+            return field;
+        }
+
+        public static string GetSourceName(this FieldType field)
+        {
+            return field.Metadata.GetOrAddDefault("sourceName") as string ?? field.Name;
+        }
+
+        public static IGraphType Flatten(this QueryArgument type)
+        {
+            return type.ResolvedType.Flatten();
+        }
+
+        public static IGraphType Flatten(this IGraphType type)
+        {
+            if (type is IProvideResolvedType provider)
+            {
+                return provider.ResolvedType.Flatten();
+            }
+
+            return type;
         }
     }
 }

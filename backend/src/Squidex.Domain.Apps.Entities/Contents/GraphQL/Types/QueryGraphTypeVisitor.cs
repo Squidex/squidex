@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             var resolver = new ValueResolver((value, c) =>
             {
-                if (c.Arguments.TryGetValue(AllTypes.PathName, out var p) && p is string path)
+                if (c.Arguments.TryGetValue("data", out var p) && p is string path)
                 {
                     value.TryGetByPath(path, out var result);
 
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 return value;
             });
 
-            return (AllTypes.NoopJson, resolver, AllTypes.PathArguments);
+            return (AllTypes.NoopJson, resolver, ContentArguments.JsonPath);
         }
 
         private (IGraphType?, ValueResolver?, QueryArguments?) ResolveAssets()

@@ -180,6 +180,70 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_create_and_query_with_inline_graphql()
+        {
+            var query = new
+            {
+                query = @"
+                    mutation {
+                        createMyReadsContent(data: {
+                            number: {
+                                iv: 999
+                            }
+                        }) {
+                            id,
+                            data {
+                                number {
+                                    iv
+                                }
+                            }
+                        }
+                    }"
+            };
+
+            var result = await _.Contents.GraphQlAsync<JObject>(query);
+
+            var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
+
+            Assert.Equal(999, value);
+        }
+
+        [Fact]
+        public async Task Should_create_and_query_with_variable_graphql()
+        {
+            var query = new
+            {
+                query = @"
+                    mutation Mutation($data: MyReadsDataInputDto!) {
+                        createMyReadsContent(data: $data) {
+                            id,
+                            data {
+                                number {
+                                    iv
+                                }
+                            }
+                        }
+                    }",
+                variables = new
+                {
+                    data = new
+                    {
+                        number = new
+                        {
+                            iv = 998
+                        }
+                    }
+                }
+            };
+
+            var result = await _.Contents.GraphQlAsync<JObject>(query);
+
+            var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
+
+            Assert.Equal(998, value);
+        }
+
+        [Fact]
         public async Task Should_query_items_with_graphql()
         {
             var query = new

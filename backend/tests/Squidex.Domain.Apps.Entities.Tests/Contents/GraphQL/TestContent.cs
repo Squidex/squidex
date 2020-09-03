@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -26,10 +27,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             statusColor
             url
             data {
+                gql_2Numbers {
+                    iv
+                }
+                gql_2Numbers2 {
+                    iv
+                }
                 myString {
                     de
                 }
                 myNumber {
+                    iv
+                }
+                myNumber2 {
                     iv
                 }
                 myBoolean {
@@ -53,6 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 myArray {
                     iv {
                         nestedNumber
+                        nestedNumber2
                         nestedBoolean
                     }
                 }
@@ -175,69 +186,120 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 status = "DRAFT",
                 statusColor = "red",
                 url = $"contents/my-schema/{content.Id}",
-                data = new
+                data = Data(content)
+            };
+        }
+
+        public static object Data(IContentEntity content, Guid refId = default, Guid assetId = default)
+        {
+            var result = new Dictionary<string, object>
+            {
+                ["gql_2Numbers"] = new
                 {
-                    myString = new
+                    iv = 22
+                },
+                ["gql_2Numbers2"] = new
+                {
+                    iv = 23
+                },
+                ["myString"] = new
+                {
+                    de = "value"
+                },
+                ["myNumber"] = new
+                {
+                    iv = 1
+                },
+                ["myNumber2"] = new
+                {
+                    iv = 2
+                },
+                ["myBoolean"] = new
+                {
+                    iv = true
+                },
+                ["myDatetime"] = new
+                {
+                    iv = content.LastModified.ToString()
+                },
+                ["myJson"] = new
+                {
+                    iv = new
                     {
-                        de = "value"
-                    },
-                    myNumber = new
+                        value = 1
+                    }
+                },
+                ["myGeolocation"] = new
+                {
+                    iv = new
                     {
-                        iv = 1
-                    },
-                    myBoolean = new
+                        latitude = 10,
+                        longitude = 20
+                    }
+                },
+                ["myTags"] = new
+                {
+                    iv = new[]
                     {
-                        iv = true
-                    },
-                    myDatetime = new
+                        "tag1",
+                        "tag2"
+                    }
+                },
+                ["myLocalized"] = new
+                {
+                    de_DE = "de-DE"
+                },
+                ["myArray"] = new
+                {
+                    iv = new[]
                     {
-                        iv = content.LastModified
-                    },
-                    myJson = new
-                    {
-                        iv = new
+                        new
                         {
-                            value = 1
-                        }
-                    },
-                    myGeolocation = new
-                    {
-                        iv = new
+                            nestedNumber = 10,
+                            nestedNumber2 = 11,
+                            nestedBoolean = true
+                        },
+                        new
                         {
-                            latitude = 10,
-                            longitude = 20
-                        }
-                    },
-                    myTags = new
-                    {
-                        iv = new[]
-                                    {
-                                        "tag1",
-                                        "tag2"
-                                    }
-                    },
-                    myLocalized = new
-                    {
-                        de_DE = "de-DE"
-                    },
-                    myArray = new
-                    {
-                        iv = new[]
-                        {
-                            new
-                            {
-                                nestedNumber = 10,
-                                nestedBoolean = true
-                            },
-                            new
-                            {
-                                nestedNumber = 20,
-                                nestedBoolean = false
-                            }
+                            nestedNumber = 20,
+                            nestedNumber2 = 21,
+                            nestedBoolean = false
                         }
                     }
                 }
             };
+
+            if (refId != default)
+            {
+                result["myReferences"] = new
+                {
+                    iv = new[]
+                    {
+                        refId
+                    }
+                };
+
+                result["myUnion"] = new
+                {
+                    iv = new[]
+                    {
+                        refId
+                    }
+                };
+            }
+
+            if (assetId != default)
+            {
+                result["myAssets"] = new
+                {
+                    iv = new[]
+                    {
+                        assetId
+                    }
+                };
+            }
+
+            return result;
         }
     }
 }

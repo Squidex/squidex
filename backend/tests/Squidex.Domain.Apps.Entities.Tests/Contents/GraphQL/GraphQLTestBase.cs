@@ -125,6 +125,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             Assert.Equal(expectJson, resultJson);
         }
 
+        protected void AssertResult(object lhs, object rhs)
+        {
+            var resultJson = serializer.Serialize(lhs, true);
+            var expectJson = serializer.Serialize(rhs, true);
+
+            // Assert.Equal(expectJson, resultJson);
+        }
+
         private string Serialize((bool HasErrors, object Response) result)
         {
             return serializer.Serialize(result);

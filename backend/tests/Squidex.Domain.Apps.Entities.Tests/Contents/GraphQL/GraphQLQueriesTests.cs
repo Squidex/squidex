@@ -272,7 +272,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   queryMySchemaContents(top: 30, skip: 5) {
                     <FIELDS>
                   }
-                }".Replace("<FIELD>", TestContent.AllFields);
+                }".Replace("<FIELDS>", TestContent.AllFields);
 
             var content = TestContent.Create(schemaId, Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
@@ -306,7 +306,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       <FIELDS>
                     }
                   }
-                }".Replace("<FIELD>", TestContent.AllFields);
+                }".Replace("<FIELDS>", TestContent.AllFields);
 
             var content = TestContent.Create(schemaId, Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
@@ -325,91 +325,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         items = new dynamic[]
                         {
                             TestContent.Response(content)
-                        }
-                    }
-                }
-            };
-
-            AssertResult(expected, result);
-        }
-
-        [Fact]
-        public async Task Should_return_single_content_with_fixed_names()
-        {
-            var contentId = Guid.NewGuid();
-            var content = TestContent.Create(schemaId, contentId, Guid.Empty, Guid.Empty);
-
-            var query = @"
-                query {
-                  findMySchemaContent(id: ""<ID>"") {
-                    data {
-                      gql_2Numbers {
-                        iv
-                      }
-                      gql_2Numbers2 {
-                        iv
-                      }
-                      myNumber {
-                        iv
-                      }
-                      myNumber2 {
-                        iv
-                      }
-                      myArray {
-                        iv {
-                          nestedNumber
-                          nestedNumber2
-                        }
-                      }
-                    }
-                  }
-                }".Replace("<ID>", contentId.ToString());
-
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
-                .Returns(ResultList.CreateFrom(1, content));
-
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
-
-            var expected = new
-            {
-                data = new
-                {
-                    findMySchemaContent = new
-                    {
-                        data = new
-                        {
-                            gql_2Numbers = new
-                            {
-                                iv = 22
-                            },
-                            gql_2Numbers2 = new
-                            {
-                                iv = 23
-                            },
-                            myNumber = new
-                            {
-                                iv = 1
-                            },
-                            myNumber2 = new
-                            {
-                                iv = 2
-                            },
-                            myArray = new
-                            {
-                                iv = new[]
-                                {
-                                    new
-                                    {
-                                        nestedNumber = 10,
-                                        nestedNumber2 = 11
-                                    },
-                                    new
-                                    {
-                                        nestedNumber = 20,
-                                        nestedNumber2 = 21
-                                    }
-                                }
-                            }
                         }
                     }
                 }
@@ -455,43 +370,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var query = @"
                 query {
                   findMySchemaContent(id: ""<ID>"") {
-                    id
-                    version
-                    created
-                    createdBy
-                    lastModified
-                    lastModifiedBy
-                    status
-                    statusColor
-                    url
-                    data {
-                      myString {
-                        de
-                      }
-                      myNumber {
-                        iv
-                      }
-                      myBoolean {
-                        iv
-                      }
-                      myDatetime {
-                        iv
-                      }
-                      myJson {
-                        iv
-                      }
-                      myGeolocation {
-                        iv
-                      }
-                      myTags {
-                        iv
-                      }
-                      myLocalized {
-                        de_DE
-                      }
-                    }
+                    <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString());
+                }".Replace("<FIELDS>", TestContent.AllFields).Replace("<ID>", contentId.ToString());
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), MatchId(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
@@ -502,64 +383,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 data = new
                 {
-                    findMySchemaContent = new
-                    {
-                        id = content.Id,
-                        version = 1,
-                        created = content.Created,
-                        createdBy = "subject:user1",
-                        lastModified = content.LastModified,
-                        lastModifiedBy = "subject:user2",
-                        status = "DRAFT",
-                        statusColor = "red",
-                        url = $"contents/my-schema/{content.Id}",
-                        data = new
-                        {
-                            myString = new
-                            {
-                                de = "value"
-                            },
-                            myNumber = new
-                            {
-                                iv = 1
-                            },
-                            myBoolean = new
-                            {
-                                iv = true
-                            },
-                            myDatetime = new
-                            {
-                                iv = content.LastModified
-                            },
-                            myJson = new
-                            {
-                                iv = new
-                                {
-                                    value = 1
-                                }
-                            },
-                            myGeolocation = new
-                            {
-                                iv = new
-                                {
-                                    latitude = 10,
-                                    longitude = 20
-                                }
-                            },
-                            myTags = new
-                            {
-                                iv = new[]
-                                {
-                                    "tag1",
-                                    "tag2"
-                                }
-                            },
-                            myLocalized = new
-                            {
-                                de_DE = "de-DE"
-                            }
-                        }
-                    }
+                    findMySchemaContent = TestContent.Response(content)
                 }
             };
 

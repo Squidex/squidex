@@ -27,15 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IGraphType? Visit(IArrayField field)
         {
-            return AllTypes.Json;
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedGraphType(model, schema, field, fieldName)));
+            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedInputGraphType(model, schema, field, fieldName)));
 
             return schemaFieldType;
         }
 
         public IGraphType? Visit(IField<AssetsFieldProperties> field)
         {
-            return AllTypes.Json;
+            return AllTypes.References;
         }
 
         public IGraphType? Visit(IField<BooleanFieldProperties> field)
@@ -75,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IGraphType? Visit(IField<TagsFieldProperties> field)
         {
-            return AllTypes.Json;
+            return AllTypes.Tags;
         }
 
         public IGraphType? Visit(IField<UIFieldProperties> field)

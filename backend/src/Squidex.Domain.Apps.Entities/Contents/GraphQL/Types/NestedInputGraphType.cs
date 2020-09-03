@@ -21,26 +21,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             var fieldDisplayName = field.DisplayName();
 
-            Name = $"{schemaType}{fieldName}ChildDto";
+            Name = $"{schemaType}{fieldName}InputChildDto";
 
-            foreach (var (nestedField, nestedName, _) in field.Fields.SafeFields().Where(x => x.Field.IsForApi(true)))
+            foreach (var (nestedField, nestedName, typeName) in field.Fields.SafeFields().Where(x => x.Field.IsForApi(true)))
             {
-                var resolvedType = model.GetInputGraphType(schema, nestedField, nestedName);
+                var resolvedType = model.GetInputGraphType(schema, nestedField, typeName);
 
                 if (resolvedType != null)
                 {
-                    if (field.RawProperties.IsRequired)
-                    {
-                        resolvedType = new NonNullGraphType(resolvedType);
-                    }
-
                     AddField(new FieldType
                     {
                         Name = nestedName,
                         Resolver = null,
                         ResolvedType = resolvedType,
                         Description = $"The {fieldDisplayName}/{nestedField.DisplayName()} nested field."
-                    });
+                    }).WithSourceName(nestedField.Name);
                 }
             }
 

@@ -11,10 +11,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
+using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
@@ -160,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             var contentId = c.GetArgument<Guid>("id");
             var contentData = GetContentData(c);
 
-            var command = new UpdateContent { ContentId = contentId, Data = contentData };
+            var command = new PatchContent { ContentId = contentId, Data = contentData };
             var commandContext = await publish(command);
 
             return commandContext.Result<IEnrichedContentEntity>();
@@ -189,7 +191,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private static NamedContentData GetContentData(IResolveFieldContext c)
         {
-            return c.GetArgument<NamedContentData>("data");
+            var source = c.GetArgument<IDictionary<string, object>>("data");
+
+            return source.ToNamedContentData((IComplexGraphType)c.FieldDefinition.Arguments.Find("data").Flatten());
         }
 
         private static IFieldResolver ResolveAsync<T>(Func<IResolveFieldContext, Func<SquidexCommand, Task<CommandContext>>, Task<T>> action)

@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IFieldResolver Metadata = Resolve((asset, c, _) =>
         {
-            if (c.Arguments.TryGetValue(AllTypes.PathName, out var path))
+            if (c.Arguments.TryGetValue("data", out var path))
             {
                 asset.Metadata.TryGetByPath(path as string, out var result);
 

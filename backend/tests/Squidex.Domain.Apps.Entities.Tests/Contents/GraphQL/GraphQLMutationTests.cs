@@ -6,16 +6,17 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FakeItEasy;
 using GraphQL;
+using GraphQL.NewtonsoftJson;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Json.Objects;
-using Squidex.Text;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -28,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public GraphQLMutationTests()
         {
-            content = TestContent.Create(schemaId, contentId, Guid.NewGuid(), Guid.NewGuid(), null);
+            content = TestContent.Create(schemaId, contentId, schemaRefId1.Id, schemaRefId2.Id, null);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored))
                 .Returns(commandContext);
@@ -38,21 +39,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_return_single_content_when_creating_content()
         {
             var query = @"
-                mutation OP($data: MySchemaDataInputDto!) {
-                  createMySchemaContent(data: $data, expectedVersion: 10) {
+                mutation {
+                  createMySchemaContent(data: <DATA>) {
                     <FIELDS>
                   }
-                }".Replace("<FIELDS>", TestContent.AllFields);
+                }".Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
 
             commandContext.Complete(content);
 
-            var inputContent = GetInputContent(content);
-            var inputs = new Inputs(new Dictionary<string, object>
-            {
-                ["data"] = inputContent
-            });
-
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = inputs });
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -63,27 +58,60 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             };
 
             AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<CreateContent>.That.Matches(x =>
+                    x.SchemaId.Equals(schemaId) &&
+                    x.ExpectedVersion == EtagVersion.Any &&
+                    x.Data.Equals(content.Data))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_return_single_content_when_creating_content_with_variable()
+        {
+            var query = @"
+                mutation OP($data: MySchemaDataInputDto!) {
+                  createMySchemaContent(data: $data) {
+                    <FIELDS>
+                  }
+                }".Replace("<FIELDS>", TestContent.AllFields);
+
+            commandContext.Complete(content);
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = GetInput() });
+
+            var expected = new
+            {
+                data = new
+                {
+                    createMySchemaContent = TestContent.Response(content)
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<CreateContent>.That.Matches(x =>
+                    x.SchemaId.Equals(schemaId) &&
+                    x.ExpectedVersion == EtagVersion.Any &&
+                    x.Data.Equals(content.Data))))
+                .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_return_single_content_when_updating_content()
         {
             var query = @"
-                mutation OP($data: MySchemaInputDto!) {
-                  updateMySchemaContent(id: ""<ID>"", data: $data, expectedVersion: 10) {
+                mutation {
+                  updateMySchemaContent(id: ""<ID>"", data: <DATA>, expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+                }".Replace("<ID>", contentId.ToString()).Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
 
             commandContext.Complete(content);
 
-            var inputContent = GetInputContent(content);
-            var inputs = new Inputs(new Dictionary<string, object>
-            {
-                ["data"] = inputContent
-            });
-
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = inputs });
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -94,27 +122,60 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             };
 
             AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<UpdateContent>.That.Matches(x =>
+                    x.ContentId == content.Id &&
+                    x.ExpectedVersion == 10 &&
+                    x.Data.Equals(content.Data))))
+                .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_patching_content()
+        public async Task Should_return_single_content_when_updating_content_with_variable()
         {
             var query = @"
-                mutation OP($data: MySchemaInputDto!) {
-                  patchMySchemaContent(id: ""{contentId}"", data: $data, expectedVersion: 10) {
+                mutation OP($data: MySchemaDataInputDto!) {
+                  updateMySchemaContent(id: ""<ID>"", data: $data, expectedVersion: 10) {
                     <FIELDS>
                   }
                 }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
 
             commandContext.Complete(content);
 
-            var inputContent = GetInputContent(content);
-            var inputs = new Inputs(new Dictionary<string, object>
-            {
-                ["data"] = inputContent
-            });
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = GetInput() });
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = inputs });
+            var expected = new
+            {
+                data = new
+                {
+                    updateMySchemaContent = TestContent.Response(content)
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<UpdateContent>.That.Matches(x =>
+                    x.ContentId == content.Id &&
+                    x.ExpectedVersion == 10 &&
+                    x.Data.Equals(content.Data))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_return_single_content_when_patching_content()
+        {
+            var query = @"
+                mutation {
+                  patchMySchemaContent(id: ""<ID>"", data: <DATA>, expectedVersion: 10) {
+                    <FIELDS>
+                  }
+                }".Replace("<ID>", contentId.ToString()).Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
+
+            commandContext.Complete(content);
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -125,6 +186,45 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             };
 
             AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<PatchContent>.That.Matches(x =>
+                    x.ContentId == content.Id &&
+                    x.ExpectedVersion == 10 &&
+                    x.Data.Equals(content.Data))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_return_single_content_when_patching_content_with_variable()
+        {
+            var query = @"
+                mutation OP($data: MySchemaDataInputDto!) {
+                  patchMySchemaContent(id: ""<ID>"", data: $data, expectedVersion: 10) {
+                    <FIELDS>
+                  }
+                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+
+            commandContext.Complete(content);
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = GetInput() });
+
+            var expected = new
+            {
+                data = new
+                {
+                    patchMySchemaContent = TestContent.Response(content)
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<PatchContent>.That.Matches(x =>
+                    x.ContentId == content.Id &&
+                    x.ExpectedVersion == 10 &&
+                    x.Data.Equals(content.Data))))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -154,8 +254,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => commandBus.PublishAsync(
                 A<ChangeContentStatus>.That.Matches(x =>
                     x.ContentId == contentId &&
-                    x.Status == Status.Published &&
-                    x.ExpectedVersion == 10)))
+                    x.ExpectedVersion == 10 &&
+                    x.Status == Status.Published)))
                 .MustHaveHappened();
         }
 
@@ -193,51 +293,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 .MustHaveHappened();
         }
 
-        private static object GetInputContent(IContentEntity content)
+        private Inputs GetInput()
         {
-            var camelContent = new Dictionary<string, object?>();
-
-            foreach (var (fieldName, fieldValue) in content.Data)
+            var input = new
             {
-                var name = CasingExtensions.ToCamelCase(fieldName);
+                data = TestContent.Data(content, schemaRefId1.Id, schemaRefId2.Id)
+            };
 
-                if (fieldValue != null)
-                {
-                    var fieldValueResult = new Dictionary<string, object?>();
-
-                    foreach (var (partition, value) in fieldValue)
-                    {
-                        fieldValueResult[partition] = GetInputContent(value);
-                    }
-
-                    camelContent[name] = fieldValue;
-                }
-                else
-                {
-                    camelContent[name] = null;
-                }
-            }
-
-            return camelContent;
+            return JObject.FromObject(input).ToInputs();
         }
 
-        private static object? GetInputContent(IJsonValue? json)
+        private string GetDataString()
         {
-            switch (json)
-            {
-                case JsonNull _:
-                    return null;
-                case JsonNumber n:
-                    return n.Value;
-                case JsonString s:
-                    return s.Value;
-                case JsonArray a:
-                    return a.Select(x => GetInputContent(x)).ToList();
-                case JsonObject o:
-                    return o.ToDictionary(x => x.Key, x => GetInputContent(x.Value));
-                default:
-                    return null;
-            }
+            var data = TestContent.Data(content, schemaRefId1.Id, schemaRefId2.Id);
+
+            var json = JsonConvert.SerializeObject(data);
+
+            return Regex.Replace(json, "\"([^\"]+)\":", x => x.Groups[1].Value + ":");
         }
     }
 }

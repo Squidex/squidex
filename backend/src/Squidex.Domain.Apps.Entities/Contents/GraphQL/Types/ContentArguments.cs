@@ -14,6 +14,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     {
         private static QueryArguments? query;
 
+        public static readonly QueryArguments JsonPath = new QueryArguments
+        {
+            new QueryArgument(AllTypes.None)
+            {
+                Name = "path",
+                Description = "The path to the json value",
+                DefaultValue = null,
+                ResolvedType = AllTypes.String
+            }
+        };
+
         public static readonly QueryArguments Find = new QueryArguments
         {
             new QueryArgument(AllTypes.None)

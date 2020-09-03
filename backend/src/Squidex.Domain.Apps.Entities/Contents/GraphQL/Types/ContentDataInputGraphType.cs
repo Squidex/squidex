@@ -20,15 +20,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var (field, fieldName, typeName) in schema.SchemaDef.Fields.SafeFields().Where(x => x.Field.IsForApi(true)))
             {
-                var resolvedType = model.GetInputGraphType(schema, field, fieldName);
+                var resolvedType = model.GetInputGraphType(schema, field, typeName);
 
                 if (resolvedType != null)
                 {
-                    if (field.RawProperties.IsRequired)
-                    {
-                        resolvedType = new NonNullGraphType(resolvedType);
-                    }
-
                     var displayName = field.DisplayName();
 
                     var fieldGraphType = new InputObjectGraphType
@@ -46,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                             Resolver = null,
                             ResolvedType = resolvedType,
                             Description = field.RawProperties.Hints
-                        });
+                        }).WithSourceName( partitionKey);
                     }
 
                     fieldGraphType.Description = $"The structure of the {displayName} field of the {schemaName} content input type.";
@@ -57,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Resolver = null,
                         ResolvedType = fieldGraphType,
                         Description = $"The {displayName} field."
-                    });
+                    }).WithSourceName(field.Name);
                 }
             }
 

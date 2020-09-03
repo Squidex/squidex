@@ -24,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             Name = $"{schemaType}{fieldName}ChildDto";
 
-            foreach (var (nestedField, nestedName, _) in field.Fields.SafeFields().Where(x => x.Field.IsForApi()))
+            foreach (var (nestedField, nestedName, typeName) in field.Fields.SafeFields().Where(x => x.Field.IsForApi()))
             {
-                var (resolvedType, valueResolver, args) = model.GetGraphType(schema, nestedField, nestedName);
+                var (resolvedType, valueResolver, args) = model.GetGraphType(schema, nestedField, typeName);
 
                 if (resolvedType != null && valueResolver != null)
                 {
