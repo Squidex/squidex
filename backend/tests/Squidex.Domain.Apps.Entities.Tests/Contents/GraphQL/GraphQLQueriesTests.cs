@@ -129,38 +129,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_multiple_assets_when_querying_assets()
         {
-            const string query = @"
+            var query = @"
                 query {
                   queryAssets(filter: ""my-query"", top: 30, skip: 5) {
-                    id
-                    version
-                    created
-                    createdBy
-                    lastModified
-                    lastModifiedBy
-                    url
-                    thumbnailUrl
-                    sourceUrl
-                    mimeType
-                    fileName
-                    fileHash
-                    fileSize
-                    fileVersion
-                    isImage
-                    isProtected
-                    pixelWidth
-                    pixelHeight
-                    type
-                    metadataText
-                    metadataPixelWidth: metadata(path: ""pixelWidth"")
-                    metadataUnknown: metadata(path: ""unknown"")
-                    metadata
-                    tags
-                    slug
+                    <FIELDS>
                   }
-                }";
+                }".Replace("<FIELDS>", Assets.AllFields);
 
-            var asset = CreateAsset(Guid.NewGuid());
+            var asset = Assets.Test(Guid.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(0, asset));
@@ -173,42 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     queryAssets = new dynamic[]
                     {
-                        new
-                        {
-                            id = asset.Id,
-                            version = 1,
-                            created = asset.Created,
-                            createdBy = "subject:user1",
-                            lastModified = asset.LastModified,
-                            lastModifiedBy = "subject:user2",
-                            url = $"assets/{asset.Id}",
-                            thumbnailUrl = $"assets/{asset.Id}?width=100",
-                            sourceUrl = $"assets/source/{asset.Id}",
-                            mimeType = "image/png",
-                            fileName = "MyFile.png",
-                            fileHash = "ABC123",
-                            fileSize = 1024,
-                            fileVersion = 123,
-                            isImage = true,
-                            isProtected = false,
-                            pixelWidth = 800,
-                            pixelHeight = 600,
-                            type = "IMAGE",
-                            metadataText = "metadata-text",
-                            metadataPixelWidth = 800,
-                            metadataUnknown = (string?)null,
-                            metadata = new
-                            {
-                                pixelWidth = 800,
-                                pixelHeight = 600
-                            },
-                            tags = new[]
-                            {
-                                "tag1",
-                                "tag2"
-                            },
-                            slug = "myfile.png"
-                        }
+                        Assets.Response(asset)
                     }
                 }
             };
@@ -219,41 +160,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_multiple_assets_with_total_when_querying_assets_with_total()
         {
-            const string query = @"
+            var query = @"
                 query {
                   queryAssetsWithTotal(filter: ""my-query"", top: 30, skip: 5) {
                     total
                     items {
-                      id
-                      version
-                      created
-                      createdBy
-                      lastModified
-                      lastModifiedBy
-                      url
-                      thumbnailUrl
-                      sourceUrl
-                      mimeType
-                      fileName
-                      fileHash
-                      fileSize
-                      fileVersion
-                      isImage
-                      isProtected
-                      pixelWidth
-                      pixelHeight
-                      type
-                      metadataText
-                      metadataPixelWidth: metadata(path: ""pixelWidth"")
-                      metadataUnknown: metadata(path: ""unknown"")
-                      metadata
-                      tags
-                      slug
+                      <FIELDS>
                     }
                   }
-                }";
+                }".Replace("<FIELDS>", Assets.AllFields);
 
-            var asset = CreateAsset(Guid.NewGuid());
+            var asset = Assets.Test(Guid.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(10, asset));
@@ -269,42 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         total = 10,
                         items = new dynamic[]
                         {
-                            new
-                            {
-                                id = asset.Id,
-                                version = 1,
-                                created = asset.Created,
-                                createdBy = "subject:user1",
-                                lastModified = asset.LastModified,
-                                lastModifiedBy = "subject:user2",
-                                url = $"assets/{asset.Id}",
-                                thumbnailUrl = $"assets/{asset.Id}?width=100",
-                                sourceUrl = $"assets/source/{asset.Id}",
-                                mimeType = "image/png",
-                                fileName = "MyFile.png",
-                                fileHash = "ABC123",
-                                fileSize = 1024,
-                                fileVersion = 123,
-                                isImage = true,
-                                isProtected = false,
-                                pixelWidth = 800,
-                                pixelHeight = 600,
-                                type = "IMAGE",
-                                metadataText = "metadata-text",
-                                metadataPixelWidth = 800,
-                                metadataUnknown = (string?)null,
-                                metadata = new
-                                {
-                                    pixelWidth = 800,
-                                    pixelHeight = 600
-                                },
-                                tags = new[]
-                                {
-                                    "tag1",
-                                    "tag2"
-                                },
-                                slug = "myfile.png"
-                            }
+                            Assets.Response(asset)
                         }
                     }
                 }
@@ -345,32 +227,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_return_single_asset_when_finding_asset()
         {
             var assetId = Guid.NewGuid();
-            var asset = CreateAsset(assetId);
+            var asset = Assets.Test(assetId);
 
             var query = @"
                 query {
                   findAsset(id: ""<ID>"") {
-                    id
-                    version
-                    created
-                    createdBy
-                    lastModified
-                    lastModifiedBy
-                    url
-                    thumbnailUrl
-                    sourceUrl
-                    mimeType
-                    fileName
-                    fileHash
-                    fileSize
-                    fileVersion
-                    isImage
-                    pixelWidth
-                    pixelHeight
-                    tags
-                    slug
+                    <FIELDS>
                   }
-                }".Replace("<ID>", assetId.ToString());
+                }".Replace("<ID>", assetId.ToString()).Replace("<FIELDS>", Assets.AllFields);
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, MatchIdQuery(assetId)))
                 .Returns(ResultList.CreateFrom(1, asset));
@@ -381,28 +245,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 data = new
                 {
-                    findAsset = new
-                    {
-                        id = asset.Id,
-                        version = 1,
-                        created = asset.Created,
-                        createdBy = "subject:user1",
-                        lastModified = asset.LastModified,
-                        lastModifiedBy = "subject:user2",
-                        url = $"assets/{asset.Id}",
-                        thumbnailUrl = $"assets/{asset.Id}?width=100",
-                        sourceUrl = $"assets/source/{asset.Id}",
-                        mimeType = "image/png",
-                        fileName = "MyFile.png",
-                        fileHash = "ABC123",
-                        fileSize = 1024,
-                        fileVersion = 123,
-                        isImage = true,
-                        pixelWidth = 800,
-                        pixelHeight = 600,
-                        tags = new[] { "tag1", "tag2" },
-                        slug = "myfile.png"
-                    }
+                    findAsset = Assets.Response(asset)
                 }
             };
 
@@ -1166,7 +1009,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_also_fetch_referenced_assets_when_field_is_included_in_query()
         {
             var assetRefId = Guid.NewGuid();
-            var assetRef = CreateAsset(assetRefId);
+            var assetRef = Assets.Test(assetRefId);
 
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, Guid.Empty, assetRefId);
@@ -1225,8 +1068,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var assetId1 = Guid.NewGuid();
             var assetId2 = Guid.NewGuid();
-            var asset1 = CreateAsset(assetId1);
-            var asset2 = CreateAsset(assetId2);
+            var asset1 = Assets.Test(assetId1);
+            var asset2 = Assets.Test(assetId2);
 
             var query1 = @"
                 query {

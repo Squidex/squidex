@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -16,7 +17,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public delegate object ValueResolver(IJsonValue value, ResolveFieldContext context);
+    public delegate object ValueResolver(IJsonValue value, IResolveFieldContext context);
 
     public sealed class QueryGraphTypeVisitor : IFieldVisitor<(IGraphType?, ValueResolver?, QueryArguments?)>
     {
@@ -106,11 +107,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             var resolver = new ValueResolver((value, c) =>
             {
-                var path = c.Arguments.GetOrDefault(AllTypes.PathName);
+                if (c.Arguments.TryGetValue(AllTypes.PathName, out var p) && p is string path)
+                {
+                    value.TryGetByPath(path, out var result);
 
-                value.TryGetByPath(path as string, out var result);
+                    return result!;
+                }
 
-                return result!;
+                return value;
             });
 
             return (AllTypes.NoopJson, resolver, AllTypes.PathArguments);

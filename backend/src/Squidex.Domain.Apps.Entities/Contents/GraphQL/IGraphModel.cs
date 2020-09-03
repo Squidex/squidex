@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -20,14 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         bool CanGenerateAssetSourceUrl { get; }
 
         IFieldPartitioning ResolvePartition(Partitioning key);
-
-        IFieldResolver ResolveAssetUrl();
-
-        IFieldResolver ResolveAssetSourceUrl();
-
-        IFieldResolver ResolveAssetThumbnailUrl();
-
-        IFieldResolver ResolveContentUrl(ISchemaEntity schema);
 
         IObjectGraphType GetAssetType();
 

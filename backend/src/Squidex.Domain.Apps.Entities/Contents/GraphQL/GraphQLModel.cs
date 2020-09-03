@@ -15,7 +15,6 @@ using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -91,42 +90,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             };
 
             return schema;
-        }
-
-        public IFieldResolver ResolveAssetUrl()
-        {
-            var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.AssetContent(c.Source.Id);
-            });
-
-            return resolver;
-        }
-
-        public IFieldResolver ResolveAssetSourceUrl()
-        {
-            var resolver = new FuncFieldResolver<IAssetEntity, object?>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.AssetSource(c.Source.Id, c.Source.FileVersion);
-            });
-
-            return resolver;
-        }
-
-        public IFieldResolver ResolveAssetThumbnailUrl()
-        {
-            var resolver = new FuncFieldResolver<IAssetEntity, object?>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.AssetThumbnail(c.Source.Id, c.Source.Type);
-            });
-
-            return resolver;
         }
 
         public IFieldResolver ResolveContentUrl(ISchemaEntity schema)

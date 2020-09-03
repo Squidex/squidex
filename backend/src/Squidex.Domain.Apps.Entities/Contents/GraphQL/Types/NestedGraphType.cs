@@ -36,8 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     {
                         Name = nestedName,
                         Arguments = args,
-                        Resolver = resolver,
                         ResolvedType = resolveType,
+                        Resolver = resolver,
                         Description = $"The {fieldDisplayName}/{nestedField.DisplayName()} nested field."
                     });
                 }

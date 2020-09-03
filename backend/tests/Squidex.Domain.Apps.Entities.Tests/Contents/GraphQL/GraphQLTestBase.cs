@@ -7,16 +7,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using FakeItEasy;
-using GraphQL;
 using GraphQL.DataLoader;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -220,36 +217,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return content;
         }
 
-        protected static IEnrichedAssetEntity CreateAsset(Guid id)
-        {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            var asset = new AssetEntity
-            {
-                Id = id,
-                Version = 1,
-                Created = now,
-                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
-                LastModified = now,
-                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
-                FileName = "MyFile.png",
-                Slug = "myfile.png",
-                FileSize = 1024,
-                FileHash = "ABC123",
-                FileVersion = 123,
-                MimeType = "image/png",
-                Type = AssetType.Image,
-                MetadataText = "metadata-text",
-                Metadata =
-                    new AssetMetadata()
-                        .SetPixelWidth(800)
-                        .SetPixelHeight(600),
-                TagNames = new[] { "tag1", "tag2" }.ToHashSet()
-            };
-
-            return asset;
-        }
-
         protected void AssertResult(object expected, (bool HasErrors, object Response) result, bool checkErrors = true)
         {
             if (checkErrors && result.HasErrors)
@@ -268,33 +235,44 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return serializer.Serialize(result);
         }
 
+        public sealed class TestServiceProvider : IServiceProvider
+        {
+            private readonly Dictionary<Type, object> services;
+
+            public TestServiceProvider(GraphQLTestBase testBase)
+            {
+                var appProvider = A.Fake<IAppProvider>();
+
+                A.CallTo(() => appProvider.GetSchemasAsync(testBase.appId.Id))
+                    .Returns(new List<ISchemaEntity> { testBase.schema, testBase.schemaRef1, testBase.schemaRef2 });
+
+                var dataLoaderContext = new DataLoaderContextAccessor();
+
+                services = new Dictionary<Type, object>
+                {
+                    [typeof(IAppProvider)] = appProvider,
+                    [typeof(IAssetQueryService)] = testBase.assetQuery,
+                    [typeof(IContentQueryService)] = testBase.contentQuery,
+                    [typeof(IDataLoaderContextAccessor)] = dataLoaderContext,
+                    [typeof(IOptions<AssetOptions>)] = Options.Create(new AssetOptions()),
+                    [typeof(IOptions<ContentOptions>)] = Options.Create(new ContentOptions()),
+                    [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
+                    [typeof(IUrlGenerator)] = new FakeUrlGenerator(),
+                    [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext)
+                };
+            }
+
+            public object GetService(Type serviceType)
+            {
+                return services.GetOrDefault(serviceType);
+            }
+        }
+
         private CachingGraphQLService CreateSut()
         {
-            var appProvider = A.Fake<IAppProvider>();
-
-            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
-                .Returns(new List<ISchemaEntity> { schema, schemaRef1, schemaRef2 });
-
-            var dataLoaderContext = new DataLoaderContextAccessor();
-
-            var services = new Dictionary<Type, object>
-            {
-                [typeof(IAppProvider)] = appProvider,
-                [typeof(IAssetQueryService)] = assetQuery,
-                [typeof(IContentQueryService)] = contentQuery,
-                [typeof(IDataLoaderContextAccessor)] = dataLoaderContext,
-                [typeof(IOptions<AssetOptions>)] = Options.Create(new AssetOptions()),
-                [typeof(IOptions<ContentOptions>)] = Options.Create(new ContentOptions()),
-                [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
-                [typeof(IUrlGenerator)] = new FakeUrlGenerator(),
-                [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext)
-            };
-
-            var resolver = new FuncDependencyResolver(t => services[t]);
-
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            return new CachingGraphQLService(cache, resolver);
+            return new CachingGraphQLService(cache, new TestServiceProvider(this));
         }
     }
 }

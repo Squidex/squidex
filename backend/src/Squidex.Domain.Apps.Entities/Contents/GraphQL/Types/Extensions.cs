@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Text;
 
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private static IEnumerable<(T Field, string Name, string Type)> FieldNames<T>(this IEnumerable<T> fields) where T : IField
         {
-            return fields.ForApi().Select(field => (field, field.Name.ToCamelCase(), field.TypeName()));
+            return fields.ForApi().Select(field => (field, CasingExtensions.ToCamelCase(field.Name), field.TypeName()));
         }
 
         private static string SafeString(this string value, int index)
@@ -43,6 +44,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             return value;
+        }
+
+        public static string BuildODataQuery(this IResolveFieldContext context)
+        {
+            var odataQuery = "?" +
+                string.Join("&",
+                    context.Arguments
+                        .Select(x => new { x.Key, Value = x.Value.ToString() }).Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                        .Select(x => $"${x.Key}={x.Value}"));
+
+            return odataQuery;
         }
     }
 }

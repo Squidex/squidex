@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
