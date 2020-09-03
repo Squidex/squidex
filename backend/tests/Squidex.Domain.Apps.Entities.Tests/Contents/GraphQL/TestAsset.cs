@@ -14,7 +14,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public static class Assets
+    public static class TestAsset
     {
         public const string AllFields = @"
             id
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             metadata
             slug";
 
-        public static IEnrichedAssetEntity Test(Guid id)
+        public static IEnrichedAssetEntity Create(Guid id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 

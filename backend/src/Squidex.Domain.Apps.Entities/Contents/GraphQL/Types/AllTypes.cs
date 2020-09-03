@@ -22,9 +22,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType Int = new IntGraphType();
 
+        public static readonly IGraphType Long = new LongGraphType();
+
         public static readonly IGraphType Guid = new GuidGraphType2();
 
         public static readonly IGraphType Date = new InstantGraphType();
+
+        public static readonly IGraphType Tags = new ListGraphType<NonNullGraphType<StringGraphType>>();
 
         public static readonly IGraphType Json = new JsonGraphType();
 
@@ -36,7 +40,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType AssetType = new EnumerationGraphType<AssetType>();
 
+        public static readonly IGraphType References = new ListGraphType<NonNullGraphType<StringGraphType>>();
+
         public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
+
+        public static readonly IGraphType NonNullLong = new NonNullGraphType(Long);
 
         public static readonly IGraphType NonNullGuid = new NonNullGraphType(Guid);
 

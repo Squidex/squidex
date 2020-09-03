@@ -9,13 +9,12 @@ using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class NestedGraphType : ObjectGraphType<JsonObject>
+    public sealed class NestedInputGraphType : InputObjectGraphType
     {
-        public NestedGraphType(IGraphModel model, ISchemaEntity schema, IArrayField field, string fieldName)
+        public NestedInputGraphType(IGraphModel model, ISchemaEntity schema, IArrayField field, string fieldName)
         {
             var schemaType = schema.TypeName();
             var schemaName = schema.DisplayName();
@@ -24,20 +23,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             Name = $"{schemaType}{fieldName}ChildDto";
 
-            foreach (var (nestedField, nestedName, _) in field.Fields.SafeFields().Where(x => x.Field.IsForApi()))
+            foreach (var (nestedField, nestedName, _) in field.Fields.SafeFields().Where(x => x.Field.IsForApi(true)))
             {
-                var (resolvedType, valueResolver, args) = model.GetGraphType(schema, nestedField, nestedName);
+                var resolvedType = model.GetInputGraphType(schema, nestedField, nestedName);
 
-                if (resolvedType != null && valueResolver != null)
+                if (resolvedType != null)
                 {
-                    var resolver = ContentResolvers.NestedValue(valueResolver, nestedField.Name);
+                    if (field.RawProperties.IsRequired)
+                    {
+                        resolvedType = new NonNullGraphType(resolvedType);
+                    }
 
                     AddField(new FieldType
                     {
                         Name = nestedName,
-                        Arguments = args,
+                        Resolver = null,
                         ResolvedType = resolvedType,
-                        Resolver = resolver,
                         Description = $"The {fieldDisplayName}/{nestedField.DisplayName()} nested field."
                     });
                 }

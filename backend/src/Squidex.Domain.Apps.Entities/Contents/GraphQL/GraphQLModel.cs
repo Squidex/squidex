@@ -86,7 +86,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var schema = new GraphQLSchema
             {
-                Query = new AppQueriesGraphType(model, pageSizeContents, pageSizeAssets, schemas)
+                Query =
+                    new AppQueriesGraphType(
+                        model,
+                        pageSizeContents,
+                        pageSizeAssets,
+                        schemas
+                    ),
+                Mutation = new AppMutationsGraphType(model, schemas)
             };
 
             return schema;
@@ -107,6 +114,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public IFieldPartitioning ResolvePartition(Partitioning key)
         {
             return partitionResolver(key);
+        }
+
+        public IGraphType? GetInputGraphType(ISchemaEntity schema, IField field, string fieldName)
+        {
+            return field.Accept(new InputFieldVisitor(schema, this, fieldName));
         }
 
         public (IGraphType?, ValueResolver?, QueryArguments?) GetGraphType(ISchemaEntity schema, IField field, string fieldName)

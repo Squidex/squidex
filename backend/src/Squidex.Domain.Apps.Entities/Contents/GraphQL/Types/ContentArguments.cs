@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using GraphQL.Types;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -23,6 +24,104 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = AllTypes.NonNullGuid
             }
         };
+
+        public static QueryArguments Create(IGraphType inputType, string schemaName)
+        {
+            return new QueryArguments
+            {
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "data",
+                    Description = $"The data for the {schemaName} content.",
+                    DefaultValue = null,
+                    ResolvedType = new NonNullGraphType(inputType),
+                },
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "publish",
+                    Description = "Set to true to autopublish content.",
+                    DefaultValue = false,
+                    ResolvedType = AllTypes.Boolean
+                }
+            };
+        }
+
+        public static QueryArguments Delete(string schemaName)
+        {
+            return new QueryArguments
+            {
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "id",
+                    Description = $"The id of the {schemaName} content (GUID)",
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.NonNullGuid
+                },
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "expectedVersion",
+                    Description = "The expected version",
+                    DefaultValue = EtagVersion.Any,
+                    ResolvedType = AllTypes.Int
+                }
+            };
+        }
+
+        public static QueryArguments ChangeStatus(string schemaName)
+        {
+            return new QueryArguments
+            {
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "id",
+                    Description = $"The id of the {schemaName} content (GUID)",
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.NonNullGuid
+                },
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "status",
+                    Description = $"The new status",
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.NonNullString
+                },
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "expectedVersion",
+                    Description = "The expected version",
+                    DefaultValue = EtagVersion.Any,
+                    ResolvedType = AllTypes.Int
+                }
+            };
+        }
+
+        public static QueryArguments UpdateOrPatch(IGraphType inputType, string schemaName)
+        {
+            return new QueryArguments
+            {
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "id",
+                    Description = $"The id of the {schemaName} content (GUID)",
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.NonNullGuid
+                },
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "data",
+                    Description = $"The data for the {schemaName} content.",
+                    DefaultValue = null,
+                    ResolvedType = new NonNullGraphType(inputType),
+                },
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "expectedVersion",
+                    Description = "The expected version",
+                    DefaultValue = EtagVersion.Any,
+                    ResolvedType = AllTypes.Int
+                }
+            };
+        }
 
         public static QueryArguments Query(int pageSize)
         {

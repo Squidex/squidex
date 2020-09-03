@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private static IEnumerable<(T Field, string Name, string Type)> FieldNames<T>(this IEnumerable<T> fields) where T : IField
         {
-            return fields.ForApi().Select(field => (field, CasingExtensions.ToCamelCase(field.Name), field.TypeName()));
+            return fields.ForApi(true).Select(field => (field, CasingExtensions.ToCamelCase(field.Name), field.TypeName()));
         }
 
         private static string SafeString(this string value, int index)

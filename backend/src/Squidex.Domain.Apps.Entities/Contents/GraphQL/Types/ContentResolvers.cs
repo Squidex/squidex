@@ -7,18 +7,35 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public static class ContentResolvers
     {
+        public static IFieldResolver NestedValue(ValueResolver valueResolver, string key)
+        {
+            return new FuncFieldResolver<JsonObject, object?>(c =>
+            {
+                if (c.Source.TryGetValue(key, out var value))
+                {
+                    return valueResolver(value, c);
+                }
+
+                return null;
+            });
+        }
+
         public static IFieldResolver Partition(ValueResolver valueResolver, string key)
         {
             return new FuncFieldResolver<ContentFieldData, object?>(c =>
@@ -110,6 +127,99 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private static IFieldResolver ResolveRoot<T>(Func<AppQueriesGraphType, IResolveFieldContext, GraphQLExecutionContext, T> action)
         {
             return new FuncFieldResolver<AppQueriesGraphType, object?>(c => action(c.Source, c, (GraphQLExecutionContext)c.UserContext));
+        }
+
+        public static IFieldResolver Create(NamedId<Guid> schemaId)
+        {
+            return ResolveAsync(async (c, publish) =>
+            {
+                var argPublish = c.GetArgument<bool>("publish");
+
+                var contentData = GetContentData(c);
+
+                var command = new CreateContent { SchemaId = schemaId, Data = contentData, Publish = argPublish };
+                var commandContext = await publish(command);
+
+                return commandContext.Result<IEnrichedContentEntity>();
+            });
+        }
+
+        public static readonly IFieldResolver Update = ResolveAsync(async (c, publish) =>
+        {
+            var contentId = c.GetArgument<Guid>("id");
+            var contentData = GetContentData(c);
+
+            var command = new UpdateContent { ContentId = contentId, Data = contentData };
+            var commandContext = await publish(command);
+
+            return commandContext.Result<IEnrichedContentEntity>();
+        });
+
+        public static readonly IFieldResolver Patch = ResolveAsync(async (c, publish) =>
+        {
+            var contentId = c.GetArgument<Guid>("id");
+            var contentData = GetContentData(c);
+
+            var command = new UpdateContent { ContentId = contentId, Data = contentData };
+            var commandContext = await publish(command);
+
+            return commandContext.Result<IEnrichedContentEntity>();
+        });
+
+        public static readonly IFieldResolver ChangeStatus = ResolveAsync(async (c, publish) =>
+        {
+            var contentId = c.GetArgument<Guid>("id");
+            var contentStatus = c.GetArgument<string>("status");
+
+            var command = new ChangeContentStatus { ContentId = contentId, Status = new Status(contentStatus) };
+            var commandContext = await publish(command);
+
+            return commandContext.Result<IEnrichedContentEntity>();
+        });
+
+        public static readonly IFieldResolver Delete = ResolveAsync(async (c, publish) =>
+        {
+            var contentId = c.GetArgument<Guid>("id");
+
+            var command = new DeleteContent { ContentId = contentId };
+            var commandContext = await publish(command);
+
+            return commandContext.Result<EntitySavedResult>();
+        });
+
+        private static NamedContentData GetContentData(IResolveFieldContext c)
+        {
+            return c.GetArgument<NamedContentData>("data");
+        }
+
+        private static IFieldResolver ResolveAsync<T>(Func<IResolveFieldContext, Func<SquidexCommand, Task<CommandContext>>, Task<T>> action)
+        {
+            return new FuncFieldResolver<Task<T>>(async c =>
+            {
+                var e = (GraphQLExecutionContext)c.UserContext;
+
+                try
+                {
+                    return await action(c, command =>
+                    {
+                        command.ExpectedVersion = c.GetArgument("expectedVersion", EtagVersion.Any);
+
+                        return e.CommandBus.PublishAsync(command);
+                    });
+                }
+                catch (ValidationException ex)
+                {
+                    c.Errors.Add(new ExecutionError(ex.Message));
+
+                    throw;
+                }
+                catch (DomainException ex)
+                {
+                    c.Errors.Add(new ExecutionError(ex.Message));
+
+                    throw;
+                }
+            });
         }
     }
 }
