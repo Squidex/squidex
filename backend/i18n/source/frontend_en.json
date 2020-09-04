@@ -860,5 +860,7 @@
   "workflows.tabVisualize": "Visualize",
   "workflows.updateFailed": "Failed to update Workflow. Please reload.",
   "workflows.workflowNameHint": "Optional name for the workflow.",
-  "workflows.workflowNamePlaceholder": "Enter workflow name"
+  "workflows.workflowNamePlaceholder": "Enter workflow name",
+  "assets.specialFolder.root": "Assets",
+  "assets.specialFolder.parent": "Parent"
 }

@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Users
@@ -241,13 +242,30 @@ namespace Squidex.Domain.Users
 
             if (!result.Succeeded)
             {
-                throw new ValidationException(result.Errors.Select(x => new ValidationError(x.Description)).ToList());
+                throw new ValidationException(result.Errors.Select(x => new ValidationError(x.Localize())).ToList());
             }
         }
 
         public static Task<IdentityResult> SyncClaims(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)
         {
             return values.SyncClaims(userManager, user);
+        }
+
+        public static string Localize(this IdentityResult result)
+        {
+            return string.Join(". ", result.Errors.Select(x => x.Localize()));
+        }
+
+        public static string Localize(this IdentityError error)
+        {
+            if (!string.IsNullOrWhiteSpace(error.Code))
+            {
+                return T.Get($"aspnet_identity_{error.Code}", error.Description);
+            }
+            else
+            {
+                return error.Description;
+            }
         }
     }
 }
