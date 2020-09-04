@@ -7,7 +7,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL;
+using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -27,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private static IEnumerable<(T Field, string Name, string Type)> FieldNames<T>(this IEnumerable<T> fields) where T : IField
         {
-            return fields.ForApi().Select(field => (field, field.Name.ToCamelCase(), field.TypeName()));
+            return fields.ForApi(true).Select(field => (field, CasingExtensions.ToCamelCase(field.Name), field.TypeName()));
         }
 
         private static string SafeString(this string value, int index)
@@ -43,6 +46,44 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             return value;
+        }
+
+        public static string BuildODataQuery(this IResolveFieldContext context)
+        {
+            var odataQuery = "?" +
+                string.Join("&",
+                    context.Arguments
+                        .Select(x => new { x.Key, Value = x.Value.ToString() }).Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                        .Select(x => $"${x.Key}={x.Value}"));
+
+            return odataQuery;
+        }
+
+        public static FieldType WithSourceName(this FieldType field, object value)
+        {
+            field.Metadata["sourceName"] = value;
+
+            return field;
+        }
+
+        public static string GetSourceName(this FieldType field)
+        {
+            return field.Metadata.GetOrAddDefault("sourceName") as string ?? field.Name;
+        }
+
+        public static IGraphType Flatten(this QueryArgument type)
+        {
+            return type.ResolvedType.Flatten();
+        }
+
+        public static IGraphType Flatten(this IGraphType type)
+        {
+            if (type is IProvideResolvedType provider)
+            {
+                return provider.ResolvedType.Flatten();
+            }
+
+            return type;
         }
     }
 }

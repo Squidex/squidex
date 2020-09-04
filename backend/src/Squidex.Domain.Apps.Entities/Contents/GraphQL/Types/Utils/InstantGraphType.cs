@@ -25,17 +25,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 
         public override object? ParseLiteral(IValue value)
         {
-            if (value is InstantValue timeValue)
+            switch (value)
             {
-                return ParseValue(timeValue.Value);
+                case InstantValueNode timeValue:
+                    return timeValue.Value;
+                case StringValue stringValue:
+                    return ParseValue(stringValue.Value);
+                default:
+                    return null;
             }
-
-            if (value is StringValue stringValue)
-            {
-                return ParseValue(stringValue.Value);
-            }
-
-            return null;
         }
     }
 }

@@ -21,11 +21,11 @@ using Xunit;
 namespace TestSuite.ApiTests
 {
     [Trait("Category", "NotAutomated")]
-    public sealed class GraphQLTests : IClassFixture<CreatedAppFixture>
+    public sealed class GraphQLTests : IClassFixture<ContentFixture>
     {
-        public CreatedAppFixture _ { get; }
+        public ContentFixture _ { get; }
 
-        public GraphQLTests(CreatedAppFixture fixture)
+        public GraphQLTests(ContentFixture fixture)
         {
             _ = fixture;
         }

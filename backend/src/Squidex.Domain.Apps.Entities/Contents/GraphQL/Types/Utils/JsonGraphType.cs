@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 
         public override object ParseValue(object value)
         {
-            return value;
+            return JsonConverter.ParseJson(value);
         }
 
         public override object ParseLiteral(IValue value)
