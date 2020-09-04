@@ -21,7 +21,7 @@ export type Tag = { name: string, count: number; };
 
 const EMPTY_FOLDERS: { canCreate: boolean, items: ReadonlyArray<AssetFolderDto>, path?: ReadonlyArray<AssetFolderDto> } = { canCreate: false, items: [] };
 
-const ROOT_ITEM: AssetPathItem = { id: MathHelper.EMPTY_GUID, folderName: 'assets.specialFolder.root' };
+const ROOT_ITEM: AssetPathItem = { id: MathHelper.EMPTY_GUID, folderName: 'i18n:assets.specialFolder.root' };
 
 interface Snapshot {
     // All assets tags.
@@ -457,7 +457,7 @@ function hasQuery(state: Snapshot) {
 }
 
 function getParent(path: ReadonlyArray<AssetPathItem>) {
-    return path.length > 1 ? { folderName: 'assets.specialFolder.parent', id: path[path.length - 2].id } : undefined;
+    return path.length > 1 ? { folderName: 'i18n:assets.specialFolder.parent', id: path[path.length - 2].id } : undefined;
 }
 
 @Injectable()

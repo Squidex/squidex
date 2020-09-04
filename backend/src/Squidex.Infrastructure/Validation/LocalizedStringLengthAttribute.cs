@@ -25,11 +25,14 @@ namespace Squidex.Infrastructure.Validation
             var min = MinimumLength;
             var max = MaximumLength;
 
-            var key = min > 0 ?
-                "dotnet_annotations_StringLengthMinimum" :
-                "dotnet_annotations_StringLength";
+            var args = new { property, min, max };
 
-            return T.Get(key, base.FormatErrorMessage(name), new { property, min, max });
+            if (min > 0)
+            {
+                return T.Get("annotations_StringLengthMinimum", base.FormatErrorMessage(name), args);
+            }
+
+            return T.Get("annotations_StringLength", base.FormatErrorMessage(name), args);
         }
     }
 }

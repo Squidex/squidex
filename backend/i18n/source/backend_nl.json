@@ -1,4 +1,7 @@
 {
+  "annotations_AbsoluteUrl": "Het veld {name|lower} moet een absolute URL zijn.",
+  "annotations_Compare": "Het veld {name|lower} moet hetzelfde zijn als {other|lower}.",
+  "annotations_Required": "Het veld {name|lower} is verplicht.",
   "apps.alreadyArchieved": "App is al gearchiveerd.",
   "apps.clients.idAlreadyExists": "Er bestaat al een client met dezelfde id.",
   "apps.contributors.cannotChangeYourself": "Je kunt jouw eigen rol niet wijzigen.",
@@ -174,9 +177,6 @@
   "contents.validation.wordsBetween": "Moet tussen {min} en {max} woord (en) bevatten.",
   "contents.workflowErorPublishing": "Contentworkflow verhindert publiceren.",
   "contents.workflowErrorUpdate": "De werkstroom staat geen updates toe met status {status}",
-  "dotnet_annotations_AbsoluteUrl": "Het veld {name|lower} moet een absolute URL zijn.",
-  "dotnet_annotations_Compare": "Het veld {name|lower} moet hetzelfde zijn als {other|lower}.",
-  "dotnet_annotations_Required": "Het veld {name|lower} is verplicht.",
   "dotnet_identity_DefaultEror": "Er is een onbekende fout opgetreden.",
   "dotnet_identity_DuplicateEmail": "E-mail is al in gebruik.",
   "dotnet_identity_DuplicateUserName": "Gebruikersnaam is al in gebruik.",

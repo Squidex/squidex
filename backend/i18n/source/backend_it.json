@@ -1,4 +1,7 @@
 {
+  "annotations_AbsoluteUrl": "Il campo {name|lower} deve essere un URL assoluto.",
+  "annotations_Compare": "Il campo {name|lower} deve essere uguale a {other|lower}.",
+  "annotations_Required": "Il campo è {name|lower} obbligatorio.",
   "apps.alreadyArchieved": "La App è stata già archiviata.",
   "apps.clients.idAlreadyExists": "Un client con lo stesso id esiste già.",
   "apps.contributors.cannotChangeYourself": "Non puoi cambiare il tuo ruolo.",
@@ -161,9 +164,6 @@
   "contents.validation.unknownField": "Non è noto {fieldType}.",
   "contents.workflowErorPublishing": "Il workflow del contenuto impedisce la pubblicazione.",
   "contents.workflowErrorUpdate": "Il workflow non consente le modifiche per lo stato {status}",
-  "dotnet_annotations_AbsoluteUrl": "Il campo {name|lower} deve essere un URL assoluto.",
-  "dotnet_annotations_Compare": "Il campo {name|lower} deve essere uguale a {other|lower}.",
-  "dotnet_annotations_Required": "Il campo è {name|lower} obbligatorio.",
   "exception.invalidJsonQuery": "La query Json non è valida: {message}",
   "exception.invalidJsonQueryJson": "La query Json non è valida: {message}",
   "exceptions.domainObjectDeleted": "L'entità ({id}) è stata cancellata.",
