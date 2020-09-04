@@ -90,6 +90,8 @@
   "assets.searchByName": "Search by name",
   "assets.searchByTags": "Search by tags",
   "assets.selectMany": "Select assets",
+  "assets.specialFolder.parent": "<Parent>",
+  "assets.specialFolder.root": "Assets",
   "assets.tabFocusPoint": "Focus Point",
   "assets.tabHistory": "History",
   "assets.tabImage": "Image",

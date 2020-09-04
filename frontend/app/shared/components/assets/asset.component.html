@@ -38,7 +38,7 @@
                             </a>
 
                             <a class="file-delete ml-2" *ngIf="removeMode"
-                                (sqxConfirmClick)="delete.emit()"
+                                (sqxConfirmClick)="remove.emit()"
                                 confirmTitle="i18n:assets.removeConfirmTitle"
                                 confirmText="i18n:assets.removeConfirmText">
                                 <i class="icon-close"></i>
@@ -74,6 +74,8 @@
             <ng-container *ngIf="asset">
                 <div>
                     <div class="file-name truncate editable" (click)="edit()">
+                        <i class="icon-lock" *ngIf="asset?.isProtected"></i>
+
                         {{asset.fileName}}
                     </div>
                 </div>
@@ -108,6 +110,8 @@
                 <tr>
                     <td class="col-name">
                         <div class="file-name editable" (click)="edit()">
+                            <i class="icon-lock" *ngIf="asset?.isProtected"></i>
+                            
                             {{asset.fileName}}
                         </div>
                     </td>
@@ -135,7 +139,7 @@
                         </button>
 
                         <button type="button" class="btn btn-text-secondary" *ngIf="removeMode"
-                            (sqxConfirmClick)="delete.emit()"
+                            (sqxConfirmClick)="remove.emit()"
                             confirmTitle="i18n:assets.removeConfirmTitle"
                             confirmText="i18n:assets.removeConfirmText">
                             <i class="icon-close"></i>

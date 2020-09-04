@@ -111,6 +111,10 @@ $list-height: 2.25rem;
 
     &-name {
         line-height: 2rem;
+
+        i {
+            font-size: 80%;
+        }
     }
 
     &-tags {
@@ -169,12 +173,6 @@ $list-height: 2.25rem;
     &-user {
         @include absolute(auto, auto, 1rem, 1rem);
     }
-}
-
-.editable {
-    border-bottom: 1px solid transparent;
-    border-top: 0;
-    height: 2rem;
 }
 
 .table-items-row {

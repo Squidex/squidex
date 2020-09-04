@@ -90,6 +90,8 @@
   "assets.searchByName": "Zoeken op naam",
   "assets.searchByTags": "Zoeken op tags",
   "assets.selectMany": "Selecteer middelen",
+  "assets.specialFolder.parent": "<Parent>",
+  "assets.specialFolder.root": "Assets",
   "assets.tabFocusPoint": "Focuspunt",
   "assets.tabHistory": "Geschiedenis",
   "assets.tabImage": "Afbeelding",

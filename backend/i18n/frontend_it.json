@@ -90,6 +90,8 @@
   "assets.searchByName": "Ricerca per nome",
   "assets.searchByTags": "Ricerca per tag",
   "assets.selectMany": "Seleziona le risorse",
+  "assets.specialFolder.parent": "<Parent>",
+  "assets.specialFolder.root": "Assets",
   "assets.tabFocusPoint": "Punto focale",
   "assets.tabHistory": "Cronologia",
   "assets.tabImage": "Immagine",
