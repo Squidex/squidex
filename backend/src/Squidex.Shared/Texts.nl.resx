@@ -584,10 +584,10 @@
     <value>De werkstroom staat geen updates toe met status {status}</value>
   </data>
   <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>The field {name|lower} must be an absolute URL.</value>
+    <value>Het veld {name|lower} moet een absolute URL zijn.</value>
   </data>
   <data name="dotnet_annotations_Compare" xml:space="preserve">
-    <value>The field {name|lower} must be the same as {other|lower}.</value>
+    <value>Het veld {name|lower} moet hetzelfde zijn als {other|lower}.</value>
   </data>
   <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
     <value>The field {name|lower} is not a valid email address.</value>
@@ -599,7 +599,7 @@
     <value>The field {name|lower} is not.</value>
   </data>
   <data name="dotnet_annotations_Required" xml:space="preserve">
-    <value>The field {name|lower} is required.</value>
+    <value>Het veld {name|lower} is verplicht.</value>
   </data>
   <data name="dotnet_annotations_StringLength" xml:space="preserve">
     <value>The field {name|lower} must be a string with a maximum length of {max}.</value>

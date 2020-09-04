@@ -73,7 +73,7 @@ namespace Squidex.Translator.Processes
             {
                 if (!translations.Contains(key) &&
                     !key.StartsWith("validation.", StringComparison.OrdinalIgnoreCase) &&
-                    !key.StartsWith("aspnet_", StringComparison.OrdinalIgnoreCase))
+                    !key.StartsWith("dotnet_", StringComparison.OrdinalIgnoreCase))
                 {
                     notUsed.Add(key);
                 }

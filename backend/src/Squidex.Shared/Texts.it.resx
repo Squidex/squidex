@@ -584,10 +584,10 @@
     <value>Il workflow non consente le modifiche per lo stato {status}</value>
   </data>
   <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>The field {name|lower} must be an absolute URL.</value>
+    <value>Il campo {name|lower} deve essere un URL assoluto.</value>
   </data>
   <data name="dotnet_annotations_Compare" xml:space="preserve">
-    <value>The field {name|lower} must be the same as {other|lower}.</value>
+    <value>Il campo {name|lower} deve essere uguale a {other|lower}.</value>
   </data>
   <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
     <value>The field {name|lower} is not a valid email address.</value>
@@ -599,7 +599,7 @@
     <value>The field {name|lower} is not.</value>
   </data>
   <data name="dotnet_annotations_Required" xml:space="preserve">
-    <value>The field {name|lower} is required.</value>
+    <value>Il campo è {name|lower} obbligatorio.</value>
   </data>
   <data name="dotnet_annotations_StringLength" xml:space="preserve">
     <value>The field {name|lower} must be a string with a maximum length of {max}.</value>
