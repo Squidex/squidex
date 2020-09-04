@@ -43,7 +43,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IArrayField field)
         {
-            return ResolveNested(field);
+            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedGraphType(model, schema, field, fieldName)));
+
+            return (schemaFieldType, NoopResolver, null);
         }
 
         public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field)
@@ -91,33 +93,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return (null, null, null);
         }
 
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<JsonFieldProperties> field)
+        {
+            return (AllTypes.NoopJson, ContentActions.Json.Resolver, ContentActions.Json.Arguments);
+        }
+
         private static (IGraphType?, ValueResolver?, QueryArguments?) ResolveDefault(IGraphType type)
         {
             return (type, NoopResolver, null);
-        }
-
-        private (IGraphType?, ValueResolver?, QueryArguments?) ResolveNested(IArrayField field)
-        {
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedGraphType(model, schema, field, fieldName)));
-
-            return (schemaFieldType, NoopResolver, null);
-        }
-
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<JsonFieldProperties> field)
-        {
-            var resolver = new ValueResolver((value, c) =>
-            {
-                if (c.Arguments.TryGetValue("data", out var p) && p is string path)
-                {
-                    value.TryGetByPath(path, out var result);
-
-                    return result!;
-                }
-
-                return value;
-            });
-
-            return (AllTypes.NoopJson, resolver, ContentArguments.JsonPath);
         }
 
         private (IGraphType?, ValueResolver?, QueryArguments?) ResolveAssets()

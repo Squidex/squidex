@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using GraphQL.Types;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Squidex.Domain.Apps.Entities.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -200,9 +199,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "metadata",
-                Arguments = AssetArguments.JsonPath,
+                Arguments = AssetActions.Metadata.Arguments,
                 ResolvedType = AllTypes.NoopJson,
-                Resolver = AssetResolvers.Metadata,
+                Resolver = AssetActions.Metadata.Resolver,
                 Description = "The asset metadata."
             });
 

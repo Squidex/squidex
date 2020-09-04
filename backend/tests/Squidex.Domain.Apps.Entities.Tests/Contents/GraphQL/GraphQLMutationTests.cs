@@ -13,6 +13,7 @@ using GraphQL;
 using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
@@ -230,12 +231,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_publish_command_for_status_change()
         {
+            var dueTime = SystemClock.Instance.GetCurrentInstant().WithoutMs();
+
             var query = @"
                 mutation {
-                  publishMySchemaContent(id: ""<ID>"", status: ""Published"", expectedVersion: 10) {
+                  publishMySchemaContent(id: ""<ID>"", status: ""Published"", dueTime: ""<TIME>"", expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+                }".Replace("<ID>", contentId.ToString()).Replace("<TIME>", dueTime.ToString()).Replace("<FIELDS>", TestContent.AllFields);
 
             commandContext.Complete(content);
 
@@ -254,6 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => commandBus.PublishAsync(
                 A<ChangeContentStatus>.That.Matches(x =>
                     x.ContentId == contentId &&
+                    x.DueTime == dueTime &&
                     x.ExpectedVersion == 10 &&
                     x.Status == Status.Published)))
                 .MustHaveHappened();

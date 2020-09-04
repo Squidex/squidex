@@ -42,9 +42,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"create{schemaType}Content",
-                Arguments = ContentArguments.Create(inputType, schemaName),
+                Arguments = ContentActions.Create.Arguments(inputType),
                 ResolvedType = contentType,
-                Resolver = ContentResolvers.Create(schemaId),
+                Resolver = ContentActions.Create.Resolver(schemaId),
                 Description = $"Creates an {schemaName} content."
             });
         }
@@ -54,9 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"update{schemaType}Content",
-                Arguments = ContentArguments.UpdateOrPatch(inputType, schemaName),
+                Arguments = ContentActions.UpdateOrPatch.Arguments(inputType),
                 ResolvedType = contentType,
-                Resolver = ContentResolvers.Update,
+                Resolver = ContentActions.UpdateOrPatch.Update,
                 Description = $"Update an {schemaName} content by id."
             });
         }
@@ -66,9 +66,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"patch{schemaType}Content",
-                Arguments = ContentArguments.UpdateOrPatch(inputType, schemaName),
+                Arguments = ContentActions.UpdateOrPatch.Arguments(inputType),
                 ResolvedType = contentType,
-                Resolver = ContentResolvers.Patch,
+                Resolver = ContentActions.UpdateOrPatch.Patch,
                 Description = $"Patch an {schemaName} content by id."
             });
         }
@@ -78,9 +78,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"publish{schemaType}Content",
-                Arguments = ContentArguments.ChangeStatus(schemaName),
+                Arguments = ContentActions.ChangeStatus.Arguments,
                 ResolvedType = contentType,
-                Resolver = ContentResolvers.ChangeStatus,
+                Resolver = ContentActions.ChangeStatus.Resolver,
                 Description = $"Publish a {schemaName} content."
             });
         }
@@ -90,9 +90,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"delete{schemaType}Content",
-                Arguments = ContentArguments.Delete(schemaName),
+                Arguments = ContentActions.Delete.Arguments,
                 ResolvedType = EntitySavedGraphType.NonNull,
-                Resolver = ContentResolvers.Delete,
+                Resolver = ContentActions.Delete.Resolver,
                 Description = $"Delete an {schemaName} content."
             });
         }

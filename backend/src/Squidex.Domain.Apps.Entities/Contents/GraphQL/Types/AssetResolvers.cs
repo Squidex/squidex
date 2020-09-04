@@ -16,20 +16,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public static class AssetResolvers
     {
-        public static readonly IFieldResolver FindAsset = ResolveRoot((_, c, context) =>
-        {
-            var id = c.GetArgument<Guid>("id");
-
-            return context.FindAssetAsync(id);
-        });
-
-        public static readonly IFieldResolver QueryAssets = ResolveRoot((_, c, context) =>
-        {
-            var query = c.BuildODataQuery();
-
-            return context.QueryAssetsAsync(query);
-        });
-
         public static readonly IFieldResolver Url = Resolve((asset, _, context) =>
         {
             return context.UrlGenerator.AssetContent(asset.Id);
@@ -43,18 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IFieldResolver ThumbnailUrl = Resolve((asset, _, context) =>
         {
             return context.UrlGenerator.AssetThumbnail(asset.Id, asset.Type);
-        });
-
-        public static readonly IFieldResolver Metadata = Resolve((asset, c, _) =>
-        {
-            if (c.Arguments.TryGetValue("data", out var path))
-            {
-                asset.Metadata.TryGetByPath(path as string, out var result);
-
-                return result;
-            }
-
-            return asset.Metadata;
         });
 
         public static readonly IFieldResolver FileHash = Resolve(x => x.FileHash);
@@ -87,11 +61,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private static IFieldResolver ResolveList<T>(Func<IResultList<IEnrichedAssetEntity>, T> action)
         {
             return new FuncFieldResolver<IResultList<IEnrichedAssetEntity>, object?>(c => action(c.Source));
-        }
-
-        private static IFieldResolver ResolveRoot<T>(Func<AppQueriesGraphType, IResolveFieldContext, GraphQLExecutionContext, T> action)
-        {
-            return new FuncFieldResolver<AppQueriesGraphType, object?>(c => action(c.Source, c, (GraphQLExecutionContext)c.UserContext));
         }
     }
 }

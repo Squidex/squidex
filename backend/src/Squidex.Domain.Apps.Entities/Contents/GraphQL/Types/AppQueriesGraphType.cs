@@ -41,9 +41,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "findAsset",
-                Arguments = AssetArguments.Find,
+                Arguments = AssetActions.Find.Arguments,
                 ResolvedType = assetType,
-                Resolver = AssetResolvers.FindAsset,
+                Resolver = AssetActions.Find.Resolver,
                 Description = "Find an asset by id."
             });
         }
@@ -53,21 +53,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"find{schemaType}Content",
-                Arguments = ContentArguments.Find,
+                Arguments = ContentActions.Find.Arguments,
                 ResolvedType = contentType,
-                Resolver = ContentResolvers.FindContent,
+                Resolver = ContentActions.Find.Resolver,
                 Description = $"Find an {schemaName} content by id."
             });
         }
 
         private void AddAssetsQueries(IGraphType assetType, int pageSize)
         {
-            var resolver = AssetResolvers.QueryAssets;
+            var resolver = AssetActions.Query.Resolver;
 
             AddField(new FieldType
             {
                 Name = "queryAssets",
-                Arguments = AssetArguments.Query(pageSize),
+                Arguments = AssetActions.Query.Arguments(pageSize),
                 ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
                 Resolver = resolver,
                 Description = "Get assets."
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "queryAssetsWithTotal",
-                Arguments = AssetArguments.Query(pageSize),
+                Arguments = AssetActions.Query.Arguments(pageSize),
                 ResolvedType = new AssetsResultGraphType(assetType),
                 Resolver = resolver,
                 Description = "Get assets and total count."
@@ -85,12 +85,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private void AddContentQueries(Guid schemaId, string schemaType, string schemaName, IGraphType contentType, int pageSize)
         {
-            var resolver = ContentResolvers.QueryContents(schemaId);
+            var resolver = ContentActions.Query.Resolver(schemaId);
 
             AddField(new FieldType
             {
                 Name = $"query{schemaType}Contents",
-                Arguments = ContentArguments.Query(pageSize),
+                Arguments = ContentActions.Query.Arguments(pageSize),
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
                 Resolver = resolver,
                 Description = $"Query {schemaName} content items."
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"query{schemaType}ContentsWithTotal",
-                Arguments = ContentArguments.Query(pageSize),
+                Arguments = ContentActions.Query.Arguments(pageSize),
                 ResolvedType = new ContentsResultGraphType(schemaType, schemaName, contentType),
                 Resolver = resolver,
                 Description = $"Query {schemaName} content items with total count."
