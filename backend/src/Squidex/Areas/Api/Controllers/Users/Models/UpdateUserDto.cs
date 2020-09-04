@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models
 {
@@ -16,14 +16,14 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         /// <summary>
         /// The email of the user. Unique value.
         /// </summary>
-        [Required]
-        [EmailAddress]
+        [LocalizedRequired]
+        [LocalizedEmailAddress]
         public string Email { get; set; }
 
         /// <summary>
         /// The display name (usually first name and last name) of the user.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string DisplayName { get; set; }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         /// <summary>
         /// Additional permissions for the user.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string[] Permissions { get; set; }
 
         public UserValues ToValues()

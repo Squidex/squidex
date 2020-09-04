@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
@@ -18,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The new status.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Status Status { get; set; }
 
         /// <summary>

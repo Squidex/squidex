@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Associated list of permissions.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string[] Permissions { get; set; }
 
         public UpdateRole ToCommand(string name)

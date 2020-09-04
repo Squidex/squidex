@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 {
@@ -19,7 +19,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
         /// <summary>
         /// The schema settings.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public ContentChangedRuleTriggerSchemaDto[] Schemas { get; set; }
 
         /// <summary>

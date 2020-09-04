@@ -13,7 +13,6 @@ using GraphQL;
 using GraphQL.DataLoader;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;

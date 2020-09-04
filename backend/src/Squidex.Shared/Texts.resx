@@ -58,15 +58,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="annotations_AbsoluteUrl" xml:space="preserve">
-    <value>The field {name|lower} must be an absolute URL.</value>
-  </data>
-  <data name="annotations_Compare" xml:space="preserve">
-    <value>The field {name|lower} must be the same as {other|lower}.</value>
-  </data>
-  <data name="annotations_Required" xml:space="preserve">
-    <value>The field {name|lower} is required.</value>
-  </data>
   <data name="apps.alreadyArchieved" xml:space="preserve">
     <value>App has already been archived.</value>
   </data>
@@ -129,60 +120,6 @@
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>Cannot remove a role when a contributor is assigned.</value>
-  </data>
-  <data name="aspnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>The field {0} must be an absolute URL.</value>
-  </data>
-  <data name="aspnet_annotations_Compare" xml:space="preserve">
-    <value>The field {0} must be the same as {other|lower}.</value>
-  </data>
-  <data name="aspnet_annotations_Required" xml:space="preserve">
-    <value>The field {0} is required.</value>
-  </data>
-  <data name="aspnet_identity_DefaultEror" xml:space="preserve">
-    <value>An unknown failure has occurred.</value>
-  </data>
-  <data name="aspnet_identity_DuplicateEmail" xml:space="preserve">
-    <value>Email is already taken.</value>
-  </data>
-  <data name="aspnet_identity_DuplicateUserName" xml:space="preserve">
-    <value>User name is already taken.</value>
-  </data>
-  <data name="aspnet_identity_InvalidEmail" xml:space="preserve">
-    <value>Email is invalid.</value>
-  </data>
-  <data name="aspnet_identity_InvalidUserName" xml:space="preserve">
-    <value>User name '{0}' is invalid, can only contain letters or digits.</value>
-  </data>
-  <data name="aspnet_identity_LoginAlreadyAssociated" xml:space="preserve">
-    <value>A user with this login already exists.</value>
-  </data>
-  <data name="aspnet_identity_PasswordMismatch" xml:space="preserve">
-    <value>Incorrect password.</value>
-  </data>
-  <data name="aspnet_identity_PasswordRequiresDigit" xml:space="preserve">
-    <value>Passwords must have at least one digit ('0'-'9').</value>
-  </data>
-  <data name="aspnet_identity_PasswordRequiresLower" xml:space="preserve">
-    <value>Passwords must have at least one lowercase ('a'-'z').</value>
-  </data>
-  <data name="aspnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
-    <value>Passwords must have at least one non alphanumeric character.</value>
-  </data>
-  <data name="aspnet_identity_PasswordRequiresUniqueChars" xml:space="preserve">
-    <value>Passwords must use at least {0} different characters.</value>
-  </data>
-  <data name="aspnet_identity_PasswordRequiresUpper" xml:space="preserve">
-    <value>Passwords must have at least one uppercase ('A'-'Z').</value>
-  </data>
-  <data name="aspnet_identity_PasswordTooShort" xml:space="preserve">
-    <value>Passwords is too short.</value>
-  </data>
-  <data name="aspnet_identity_PwnedError" xml:space="preserve">
-    <value>This password has previously appeared in a data breach and should never be used. If you have ever used it anywhere before, change it!</value>
-  </data>
-  <data name="aspnet_identity_UserLockedOut" xml:space="preserve">
-    <value>User is locked out.</value>
   </data>
   <data name="assets.assetAlreadyDeleted" xml:space="preserve">
     <value>Asset has already been deleted</value>
@@ -645,6 +582,75 @@
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">
     <value>The workflow does not allow updates at status {status}</value>
+  </data>
+  <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
+    <value>The field {name|lower} must be an absolute URL.</value>
+  </data>
+  <data name="dotnet_annotations_Compare" xml:space="preserve">
+    <value>The field {name|lower} must be the same as {other|lower}.</value>
+  </data>
+  <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
+    <value>The field {name|lower} is not a valid email address.</value>
+  </data>
+  <data name="dotnet_annotations_Range" xml:space="preserve">
+    <value>The field {name|lower} must be between {min} and {max}.</value>
+  </data>
+  <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
+    <value>The field {name|lower} is not.</value>
+  </data>
+  <data name="dotnet_annotations_Required" xml:space="preserve">
+    <value>The field {name|lower} is required.</value>
+  </data>
+  <data name="dotnet_annotations_StringLength" xml:space="preserve">
+    <value>The field {name|lower} must be a string with a maximum length of {max}.</value>
+  </data>
+  <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
+    <value>The field {name|lower} must be a string with a minimum length of {min} and a maximum length of {max}.</value>
+  </data>
+  <data name="dotnet_identity_DefaultEror" xml:space="preserve">
+    <value>An unknown failure has occurred.</value>
+  </data>
+  <data name="dotnet_identity_DuplicateEmail" xml:space="preserve">
+    <value>Email is already taken.</value>
+  </data>
+  <data name="dotnet_identity_DuplicateUserName" xml:space="preserve">
+    <value>User name is already taken.</value>
+  </data>
+  <data name="dotnet_identity_InvalidEmail" xml:space="preserve">
+    <value>Email is invalid.</value>
+  </data>
+  <data name="dotnet_identity_InvalidUserName" xml:space="preserve">
+    <value>User name '{0}' is invalid, can only contain letters or digits.</value>
+  </data>
+  <data name="dotnet_identity_LoginAlreadyAssociated" xml:space="preserve">
+    <value>A user with this login already exists.</value>
+  </data>
+  <data name="dotnet_identity_PasswordMismatch" xml:space="preserve">
+    <value>Incorrect password.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresDigit" xml:space="preserve">
+    <value>Passwords must have at least one digit ('0'-'9').</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresLower" xml:space="preserve">
+    <value>Passwords must have at least one lowercase ('a'-'z').</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Passwords must have at least one non alphanumeric character.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>Passwords must use at least {0} different characters.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUpper" xml:space="preserve">
+    <value>Passwords must have at least one uppercase ('A'-'Z').</value>
+  </data>
+  <data name="dotnet_identity_PasswordTooShort" xml:space="preserve">
+    <value>Passwords is too short.</value>
+  </data>
+  <data name="dotnet_identity_PwnedError" xml:space="preserve">
+    <value>This password has previously appeared in a data breach and should never be used. If you have ever used it anywhere before, change it!</value>
+  </data>
+  <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
+    <value>User is locked out.</value>
   </data>
   <data name="exception.invalidJsonQuery" xml:space="preserve">
     <value>Json query not valid: {message}</value>

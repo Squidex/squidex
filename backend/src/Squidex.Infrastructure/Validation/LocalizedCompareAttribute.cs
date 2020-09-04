@@ -6,9 +6,10 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Translations
+namespace Squidex.Infrastructure.Validation
 {
     public sealed class LocalizedCompareAttribute : CompareAttribute
     {
@@ -23,7 +24,7 @@ namespace Squidex.Infrastructure.Translations
 
             var other = T.Get($"common.{OtherProperty.ToCamelCase()}", OtherProperty);
 
-            return T.Get("annotations_Compare", new { property, other });
+            return T.Get("dotnet_annotations_Compare", base.FormatErrorMessage(name), new { property, other });
         }
     }
 }

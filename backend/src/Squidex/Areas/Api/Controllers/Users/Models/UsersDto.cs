@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models
@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         /// <summary>
         /// The users.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public UserDto[] Items { get; set; }
 
         public static UsersDto FromResults(IEnumerable<UserWithClaims> items, long total, Resources resources)

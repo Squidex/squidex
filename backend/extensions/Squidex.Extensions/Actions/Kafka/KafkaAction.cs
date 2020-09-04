@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Kafka
 {
@@ -20,7 +21,7 @@ namespace Squidex.Extensions.Actions.Kafka
         ReadMore = "https://kafka.apache.org/quickstart")]
     public sealed class KafkaAction : RuleAction
     {
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Topic Name", Description = "The name of the topic.")]
         [DataType(DataType.Text)]
         [Formattable]

@@ -260,7 +260,7 @@ namespace Squidex.Domain.Users
         {
             if (!string.IsNullOrWhiteSpace(error.Code))
             {
-                return T.Get($"aspnet_identity_{error.Code}", error.Description);
+                return T.Get($"dotnet_identity_{error.Code}", error.Description);
             }
             else
             {

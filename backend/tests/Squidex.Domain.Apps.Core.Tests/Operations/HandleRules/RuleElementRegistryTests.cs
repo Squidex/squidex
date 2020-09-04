@@ -11,6 +11,7 @@ using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
@@ -49,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             ReadMore = "https://www.readmore.com/")]
         public sealed class MyRuleAction : RuleAction
         {
-            [Required]
+            [LocalizedRequired]
             [Display(Name = "Url Name", Description = "Url Description")]
             [DataType(DataType.Url)]
             [Formattable]

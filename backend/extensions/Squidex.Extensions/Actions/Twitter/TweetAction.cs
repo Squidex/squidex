@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Twitter
 {
@@ -20,17 +21,17 @@ namespace Squidex.Extensions.Actions.Twitter
         ReadMore = "https://twitter.com")]
     public sealed class TweetAction : RuleAction
     {
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Access Token", Description = " The generated access token.")]
         [DataType(DataType.Text)]
         public string AccessToken { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Access Secret", Description = " The generated access secret.")]
         [DataType(DataType.Text)]
         public string AccessSecret { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Text", Description = "The text that is sent as tweet to twitter.")]
         [DataType(DataType.MultilineText)]
         [Formattable]

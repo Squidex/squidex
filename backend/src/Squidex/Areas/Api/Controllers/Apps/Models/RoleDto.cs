@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -19,7 +19,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The role name.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Name { get; set; }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Associated list of permissions.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public IEnumerable<string> Permissions { get; set; }
 
         public static RoleDto FromRole(Role role, IAppEntity app)

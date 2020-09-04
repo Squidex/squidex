@@ -39,7 +39,7 @@ namespace Squidex.Web.Services
 
                 TranslateProperty(name, arguments, currentCulture);
 
-                var (result, found) = translationService.Get(currentCulture, $"aspnet_{name}", name);
+                var (result, found) = translationService.Get(currentCulture, name, name);
 
                 if (arguments != null && found)
                 {

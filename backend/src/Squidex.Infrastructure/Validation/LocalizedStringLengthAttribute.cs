@@ -5,20 +5,31 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Translations
+namespace Squidex.Infrastructure.Validation
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class LocalizedRequired : RequiredAttribute
+    public sealed class LocalizedStringLengthAttribute : StringLengthAttribute
     {
+        public LocalizedStringLengthAttribute(int maximumLength)
+            : base(maximumLength)
+        {
+        }
+
         public override string FormatErrorMessage(string name)
         {
             var property = T.Get($"common.{name.ToCamelCase()}", name);
 
-            return T.Get("annotations_Required", new { property });
+            var min = MinimumLength;
+            var max = MaximumLength;
+
+            var key = min > 0 ?
+                "dotnet_annotations_StringLengthMinimum" :
+                "dotnet_annotations_StringLength";
+
+            return T.Get(key, base.FormatErrorMessage(name), new { property, min, max });
         }
     }
 }

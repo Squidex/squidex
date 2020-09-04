@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers
 {
@@ -16,13 +16,13 @@ namespace Squidex.Areas.Api.Controllers
         /// <summary>
         /// The iso code of the language.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Iso2Code { get; set; }
 
         /// <summary>
         /// The english name of the language.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string EnglishName { get; set; }
 
         public static LanguageDto FromLanguage(Language language)

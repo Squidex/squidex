@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -18,13 +18,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Optional label for the editor.
         /// </summary>
-        [StringLength(100)]
+        [LocalizedStringLength(100)]
         public string? Label { get; set; }
 
         /// <summary>
         /// Hints to describe the schema.
         /// </summary>
-        [StringLength(1000)]
+        [LocalizedStringLength(1000)]
         public string? Hints { get; set; }
 
         /// <summary>

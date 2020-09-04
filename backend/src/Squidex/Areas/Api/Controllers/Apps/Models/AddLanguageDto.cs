@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -17,7 +17,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The language to add.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Language Language { get; set; }
 
         public AddLanguage ToCommand()
