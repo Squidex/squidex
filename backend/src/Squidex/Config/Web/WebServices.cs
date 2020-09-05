@@ -98,8 +98,6 @@ namespace Squidex.Config.Web
                 options.Filters.Add<AppResolver>();
                 options.Filters.Add<SchemaResolver>();
                 options.Filters.Add<MeasureResultFilter>();
-
-                options.ModelBindingMessageProvider
             })
             .AddDataAnnotationsLocalization()
             .AddRazorRuntimeCompilation()
