@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
             {
                 var assetEntities =
-                    await Collection.Find(BuildFilter(appId, ids)).Only(x => x.DocumentId)
+                    await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
                         .ToListAsync();
 
                 return assetEntities.Select(x => DomainId.Create(x[IdField.Value].AsString)).ToList();
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             var documentIds = ids.Select(x => DomainId.Combine(appId, x));
 
             return Filter.And(
-                Filter.In(x => x.Id, documentIds),
+                Filter.In(x => x.DocumentId, documentIds),
                 Filter.Ne(x => x.IsDeleted, true));
         }
 

@@ -82,7 +82,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             var command = new ChangeContentStatus
                             {
                                 Actor = job.ScheduledBy,
+                                AppId = content.AppId,
                                 ContentId = id,
+                                SchemaId = content.SchemaId,
                                 Status = job.Status,
                                 StatusJobId = job.Id
                             };

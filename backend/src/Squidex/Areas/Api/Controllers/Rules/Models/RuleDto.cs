@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models.Converters;

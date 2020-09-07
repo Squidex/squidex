@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             var filter = BuildFilter(filterNode.AdjustToModel(schema.SchemaDef), appId, schemaId);
 
             var contentEntities =
-                await Collection.Find(filter).Only(x => x.DocumentId, x => x.IndexedSchemaId)
+                await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
                     .ToListAsync();
 
             return contentEntities.Select(x => (DomainId.Create(x[SchemaIdField.Value].AsString), DomainId.Create(x[IdField.Value].AsString))).ToList();

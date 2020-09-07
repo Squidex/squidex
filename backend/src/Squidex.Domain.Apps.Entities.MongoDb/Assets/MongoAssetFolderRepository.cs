@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         private static string GetIdField()
         {
-            return BsonClassMap.LookupClassMap(typeof(MongoAssetFolderEntity)).GetMemberMap(nameof(MongoAssetFolderEntity.Id)).ElementName;
+            return BsonClassMap.LookupClassMap(typeof(MongoAssetFolderEntity)).GetMemberMap(nameof(MongoAssetFolderEntity.DocumentId)).ElementName;
         }
     }
 }
