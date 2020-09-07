@@ -5,10 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using System;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -23,13 +24,13 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The name of the suggestion.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Name { get; set; }
 
         /// <summary>
         /// The regex pattern.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Pattern { get; set; }
 
         /// <summary>

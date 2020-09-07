@@ -43,7 +43,7 @@ namespace Squidex.Web
                             {
                                 if (!string.IsNullOrWhiteSpace(error.ErrorMessage) && ShouldExpose(error))
                                 {
-                                    errors.Add(new ValidationError(error.ErrorMessage, key));
+                                    errors.Add(new ValidationError(error.ErrorMessage));
                                 }
                                 else if (error.Exception is JsonException jsonException)
                                 {

@@ -32,18 +32,24 @@ namespace Squidex.Translator.Processes
             {
                 var content = File.ReadAllText(file.FullName);
 
-                var matches = Regex.Matches(content, "T\\.Get\\(\"(?<Key>[^\"]*)\"");
-
                 var translations = new HashSet<string>();
 
-                foreach (Match match in matches)
+                void AddTranslations(string regex)
                 {
-                    var key = match.Groups["Key"].Value;
+                    var matches = Regex.Matches(content, regex, RegexOptions.Singleline);
 
-                    translations.Add(key);
+                    foreach (Match match in matches)
+                    {
+                        var key = match.Groups["Key"].Value;
 
-                    all.Add(key);
+                        translations.Add(key);
+
+                        all.Add(key);
+                    }
                 }
+
+                AddTranslations("T\\.Get\\(\"(?<Key>[^\"]*)\"");
+                AddTranslations("\"(?<Key>history\\.[^\"]*)\"");
 
                 Helper.CheckForFile(service, relativeName, translations);
             }

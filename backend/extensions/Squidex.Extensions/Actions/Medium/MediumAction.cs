@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Medium
 {
@@ -20,18 +21,18 @@ namespace Squidex.Extensions.Actions.Medium
         ReadMore = "https://medium.com/")]
     public sealed class MediumAction : RuleAction
     {
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Access Token", Description = "The self issued access token.")]
         [DataType(DataType.Text)]
         public string AccessToken { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Title", Description = "The title, used for the url.")]
         [DataType(DataType.Text)]
         [Formattable]
         public string Title { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Content", Description = "The content, either html or markdown.")]
         [DataType(DataType.MultilineText)]
         [Formattable]

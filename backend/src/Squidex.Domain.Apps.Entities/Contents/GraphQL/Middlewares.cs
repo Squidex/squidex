@@ -8,6 +8,7 @@
 using System;
 using GraphQL;
 using GraphQL.Instrumentation;
+using GraphQL.Types;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
@@ -15,11 +16,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public static class Middlewares
     {
-        public static Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Logging(ISemanticLog log)
+        public static Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> Logging(ISemanticLog log)
         {
             Guard.NotNull(log, nameof(log));
 
-            return next =>
+            return (_, next) =>
             {
                 return async context =>
                 {
@@ -40,9 +41,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             };
         }
 
-        public static Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Errors()
+        public static Func<ISchema, FieldMiddlewareDelegate, FieldMiddlewareDelegate> Errors()
         {
-            return next =>
+            return (_, next) =>
             {
                 return async context =>
                 {

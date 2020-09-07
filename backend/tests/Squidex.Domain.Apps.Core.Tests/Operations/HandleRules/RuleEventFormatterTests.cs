@@ -276,5 +276,28 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Equal("Created", result);
         }
+
+        [Fact]
+        public async Task Should_return_json_string_when_array()
+        {
+            var @event = new EnrichedContentEvent
+            {
+                Data =
+                    new NamedContentData()
+                        .AddField("categories",
+                            new ContentFieldData()
+                                .AddJsonValue(JsonValue.Array("ref1", "ref2", "ref3")))
+            };
+
+            var script = @"
+                Script(JSON.stringify(
+                {
+                    'categories': event.data.categories.iv
+                }))";
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal("{'categories':['ref1','ref2','ref3']}", result?.Replace(" ", string.Empty).Replace("\"", "'"));
+        }
     }
 }

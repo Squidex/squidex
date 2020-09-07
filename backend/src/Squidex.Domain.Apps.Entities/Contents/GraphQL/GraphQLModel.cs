@@ -14,7 +14,6 @@ using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -29,7 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         private readonly Dictionary<DomainId, ContentGraphType> contentTypes = new Dictionary<DomainId, ContentGraphType>();
         private readonly PartitionResolver partitionResolver;
-        private readonly IAppEntity app;
         private readonly IObjectGraphType assetType;
         private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
@@ -42,8 +40,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             int pageSizeAssets,
             IUrlGenerator urlGenerator)
         {
-            this.app = app;
-
             partitionResolver = app.PartitionResolver();
 
             CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
@@ -57,6 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             graphQLSchema = BuildSchema(this, pageSizeContents, pageSizeAssets, allSchemas);
             graphQLSchema.RegisterValueConverter(JsonConverter.Instance);
+            graphQLSchema.RegisterValueConverter(InstantConverter.Instance);
 
             InitializeContentTypes();
         }
@@ -86,63 +83,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var schema = new GraphQLSchema
             {
-                Query = new AppQueriesGraphType(model, pageSizeContents, pageSizeAssets, schemas)
+                Query =
+                    new AppQueriesGraphType(
+                        model,
+                        pageSizeContents,
+                        pageSizeAssets,
+                        schemas
+                    ),
+                Mutation = new AppMutationsGraphType(model, schemas)
             };
 
             return schema;
         }
 
-        public IFieldResolver ResolveAssetUrl()
-        {
-            var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.AssetContent(c.Source.AppId, c.Source.Id);
-            });
-
-            return resolver;
-        }
-
-        public IFieldResolver ResolveAssetSourceUrl()
-        {
-            var resolver = new FuncFieldResolver<IAssetEntity, object?>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.AssetSource(c.Source.AppId, c.Source.Id, c.Source.FileVersion);
-            });
-
-            return resolver;
-        }
-
-        public IFieldResolver ResolveAssetThumbnailUrl()
-        {
-            var resolver = new FuncFieldResolver<IAssetEntity, object?>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.AssetThumbnail(c.Source.AppId, c.Source.Id, c.Source.Type);
-            });
-
-            return resolver;
-        }
-
-        public IFieldResolver ResolveContentUrl(ISchemaEntity schema)
-        {
-            var resolver = new FuncFieldResolver<IContentEntity, object>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.ContentUI(app.NamedId(), schema.NamedId(), c.Source.Id);
-            });
-
-            return resolver;
-        }
-
         public IFieldPartitioning ResolvePartition(Partitioning key)
         {
             return partitionResolver(key);
+        }
+
+        public IGraphType? GetInputGraphType(ISchemaEntity schema, IField field, string fieldName)
+        {
+            return field.Accept(new InputFieldVisitor(schema, this, fieldName));
         }
 
         public (IGraphType?, ValueResolver?, QueryArguments?) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
@@ -152,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public IObjectGraphType GetAssetType()
         {
-            return assetType as IObjectGraphType;
+            return assetType;
         }
 
         public IObjectGraphType GetContentType(DomainId schemaId)

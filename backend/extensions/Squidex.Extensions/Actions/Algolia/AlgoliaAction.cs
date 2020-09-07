@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Algolia
 {
@@ -20,19 +21,19 @@ namespace Squidex.Extensions.Actions.Algolia
         ReadMore = "https://www.algolia.com/")]
     public sealed class AlgoliaAction : RuleAction
     {
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Application Id", Description = "The application ID.")]
         [DataType(DataType.Text)]
         [Formattable]
         public string AppId { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Api Key", Description = "The API key to grant access to Squidex.")]
         [DataType(DataType.Text)]
         [Formattable]
         public string ApiKey { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Index Name", Description = "The name of the index.")]
         [DataType(DataType.Text)]
         [Formattable]

@@ -61,11 +61,50 @@
   <data name="annotations_AbsoluteUrl" xml:space="preserve">
     <value>Het veld {name|lower} moet een absolute URL zijn.</value>
   </data>
+  <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
+    <value>Het veld {0} moet een absolute URL zijn.</value>
+  </data>
   <data name="annotations_Compare" xml:space="preserve">
     <value>Het veld {name|lower} moet hetzelfde zijn als {other|lower}.</value>
   </data>
+  <data name="dotnet_annotations_Compare" xml:space="preserve">
+    <value>Het veld {0} moet hetzelfde zijn als {1}.</value>
+  </data>
+  <data name="annotations_EmailAddress" xml:space="preserve">
+    <value>The field {name|lower} is not a valid email address.</value>
+  </data>
+  <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
+    <value>The field {0} is not a valid email address.</value>
+  </data>
+  <data name="annotations_Range" xml:space="preserve">
+    <value>The field {name|lower} must be between {min} and {max}.</value>
+  </data>
+  <data name="dotnet_annotations_Range" xml:space="preserve">
+    <value>The field {0} must be between {1} and {2}.</value>
+  </data>
+  <data name="annotations_RegularExpression" xml:space="preserve">
+    <value>The field {name|lower} is not.</value>
+  </data>
+  <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
+    <value>The field {0} is not.</value>
+  </data>
   <data name="annotations_Required" xml:space="preserve">
     <value>Het veld {name|lower} is verplicht.</value>
+  </data>
+  <data name="dotnet_annotations_Required" xml:space="preserve">
+    <value>Het veld {0} is verplicht.</value>
+  </data>
+  <data name="annotations_StringLength" xml:space="preserve">
+    <value>The field {name|lower} must be a string with a maximum length of {max}.</value>
+  </data>
+  <data name="dotnet_annotations_StringLength" xml:space="preserve">
+    <value>The field {0} must be a string with a maximum length of {1}.</value>
+  </data>
+  <data name="annotations_StringLengthMinimum" xml:space="preserve">
+    <value>The field {name|lower} must be a string with a minimum length of {min} and a maximum length of {max}.</value>
+  </data>
+  <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
+    <value>The field {0} must be a string with a minimum length of {1} and a maximum length of {2}.</value>
   </data>
   <data name="apps.alreadyArchieved" xml:space="preserve">
     <value>App is al gearchiveerd.</value>
@@ -130,15 +169,6 @@
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>Kan een rol niet verwijderen wanneer een bijdrager is toegewezen.</value>
   </data>
-  <data name="aspnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Het veld {0} moet een absolute URL zijn.</value>
-  </data>
-  <data name="aspnet_annotations_Compare" xml:space="preserve">
-    <value>Het veld {0} moet hetzelfde zijn als {other|lower}.</value>
-  </data>
-  <data name="aspnet_annotations_Required" xml:space="preserve">
-    <value>Het veld {0} is verplicht.</value>
-  </data>
   <data name="assets.assetAlreadyDeleted" xml:space="preserve">
     <value>Asset is al verwijderd</value>
   </data>
@@ -191,7 +221,7 @@
     <value>Clientgeheim</value>
   </data>
   <data name="common.contentType" xml:space="preserve">
-    <value>Content type</value>
+    <value>Inhoudstype</value>
   </data>
   <data name="common.contributorId" xml:space="preserve">
     <value>Bijdrager-ID of e-mailadres</value>
@@ -272,7 +302,7 @@
     <value>Uitloggen</value>
   </data>
   <data name="common.maxCharacters" xml:space="preserve">
-    <value>Max characters</value>
+    <value>Max. karakters</value>
   </data>
   <data name="common.maxHeight" xml:space="preserve">
     <value>Max. hoogte</value>
@@ -293,10 +323,10 @@
     <value>Max. breedte</value>
   </data>
   <data name="common.maxWords" xml:space="preserve">
-    <value>Max words</value>
+    <value>Max. woorden</value>
   </data>
   <data name="common.minCharacters" xml:space="preserve">
-    <value>Min characters</value>
+    <value>Min. karakters</value>
   </data>
   <data name="common.minHeight" xml:space="preserve">
     <value>Min. hoogte</value>
@@ -317,7 +347,7 @@
     <value>Min. breedte</value>
   </data>
   <data name="common.minWords" xml:space="preserve">
-    <value>Min words</value>
+    <value>Min. woorden</value>
   </data>
   <data name="common.name" xml:space="preserve">
     <value>Naam</value>
@@ -518,7 +548,7 @@
     <value>Moet kleiner zijn dan of gelijk zijn aan {max}.</value>
   </data>
   <data name="contents.validation.maxCharacters" xml:space="preserve">
-    <value>Must not have more than {max} text character(s).</value>
+    <value>Mag niet meer dan {max} tekstteken (s) bevatten.</value>
   </data>
   <data name="contents.validation.maximumHeight" xml:space="preserve">
     <value>Hoogte {hoogte} px moet kleiner zijn dan {max} px.</value>
@@ -536,7 +566,7 @@
     <value>Mag niet meer dan {max} teken (s) bevatten.</value>
   </data>
   <data name="contents.validation.maxWords" xml:space="preserve">
-    <value>Must not have more than {max} word(s).</value>
+    <value>Mag niet meer dan {max} woord(en) bevatten.</value>
   </data>
   <data name="contents.validation.min" xml:space="preserve">
     <value>Moet groter zijn dan of gelijk zijn aan {min}.</value>
@@ -557,19 +587,19 @@
     <value>Moet minstens {min} teken (s) bevatten.</value>
   </data>
   <data name="contents.validation.minNormalCharacters" xml:space="preserve">
-    <value>Must have at least {min} text character(s).</value>
+    <value>Moet minstens {min} tekstteken (s) bevatten.</value>
   </data>
   <data name="contents.validation.minWords" xml:space="preserve">
-    <value>Must have at least {min} word(s).</value>
+    <value>Moet minstens {min} woord(en) bevatten.</value>
   </data>
   <data name="contents.validation.mustBeEmpty" xml:space="preserve">
     <value>Waarde mag niet worden gedefinieerd.</value>
   </data>
   <data name="contents.validation.normalCharacterCount" xml:space="preserve">
-    <value>Must have exactly {count} text character(s).</value>
+    <value>Moet exact {count} tekstteken (s) bevatten.</value>
   </data>
   <data name="contents.validation.normalCharactersBetween" xml:space="preserve">
-    <value>Must have between {min} and {max} text character(s).</value>
+    <value>Moet tussen {min} en {max} tekstteken (s) bevatten.</value>
   </data>
   <data name="contents.validation.notAllowed" xml:space="preserve">
     <value>Geen toegestane waarde.</value>
@@ -590,16 +620,61 @@
     <value>Onbekend {fieldType}.</value>
   </data>
   <data name="contents.validation.wordCount" xml:space="preserve">
-    <value>Must have exactly {count} word(s).</value>
+    <value>Moet exact {count} woord (en) bevatten.</value>
   </data>
   <data name="contents.validation.wordsBetween" xml:space="preserve">
-    <value>Must have between {min} and {max} word(s).</value>
+    <value>Moet tussen {min} en {max} woord (en) bevatten.</value>
   </data>
   <data name="contents.workflowErorPublishing" xml:space="preserve">
     <value>Contentworkflow verhindert publiceren.</value>
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">
     <value>De werkstroom staat geen updates toe met status {status}</value>
+  </data>
+  <data name="dotnet_identity_DefaultEror" xml:space="preserve">
+    <value>Er is een onbekende fout opgetreden.</value>
+  </data>
+  <data name="dotnet_identity_DuplicateEmail" xml:space="preserve">
+    <value>E-mail is al in gebruik.</value>
+  </data>
+  <data name="dotnet_identity_DuplicateUserName" xml:space="preserve">
+    <value>Gebruikersnaam is al in gebruik.</value>
+  </data>
+  <data name="dotnet_identity_InvalidEmail" xml:space="preserve">
+    <value>E-mail is ongeldig.</value>
+  </data>
+  <data name="dotnet_identity_InvalidUserName" xml:space="preserve">
+    <value>Gebruikersnaam '{0}' is ongeldig, mag alleen letters of cijfers bevatten.</value>
+  </data>
+  <data name="dotnet_identity_LoginAlreadyAssociated" xml:space="preserve">
+    <value>Er bestaat al een gebruiker met deze login.</value>
+  </data>
+  <data name="dotnet_identity_PasswordMismatch" xml:space="preserve">
+    <value>Onjuist wachtwoord.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresDigit" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens één cijfer bevatten ('0' - '9').</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresLower" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens één kleine letter ('a' - 'z') bevatten.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens één niet-alfanumeriek teken bevatten.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens {0} verschillende tekens bevatten.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUpper" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens één hoofdletter ('A' - 'Z') hebben.</value>
+  </data>
+  <data name="dotnet_identity_PasswordTooShort" xml:space="preserve">
+    <value>Wachtwoorden zijn te kort.</value>
+  </data>
+  <data name="dotnet_identity_PwnedError" xml:space="preserve">
+    <value>Dit wachtwoord is eerder verschenen in een datalek en mag nooit worden gebruikt. Als je het ooit eerder ergens hebt gebruikt, verander het dan!</value>
+  </data>
+  <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
+    <value>Gebruiker is uitgesloten.</value>
   </data>
   <data name="exception.invalidJsonQuery" xml:space="preserve">
     <value>Json-query niet geldig: {message}</value>

@@ -5,25 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Translations
+namespace Squidex.Infrastructure.Validation
 {
-    public sealed class LocalizedCompareAttribute : CompareAttribute
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class LocalizedRequiredAttribute : RequiredAttribute
     {
-        public LocalizedCompareAttribute(string otherProperty)
-            : base(otherProperty)
-        {
-        }
-
         public override string FormatErrorMessage(string name)
         {
             var property = T.Get($"common.{name.ToCamelCase()}", name);
 
-            var other = T.Get($"common.{OtherProperty.ToCamelCase()}", OtherProperty);
-
-            return T.Get("annotations_Compare", new { property, other });
+            return T.Get("annotations_Required", base.FormatErrorMessage(name), new { property });
         }
     }
 }

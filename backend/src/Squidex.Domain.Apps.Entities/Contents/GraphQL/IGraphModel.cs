@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL.Resolvers;
+using System;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -21,17 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         IFieldPartitioning ResolvePartition(Partitioning key);
 
-        IFieldResolver ResolveAssetUrl();
-
-        IFieldResolver ResolveAssetSourceUrl();
-
-        IFieldResolver ResolveAssetThumbnailUrl();
-
-        IFieldResolver ResolveContentUrl(ISchemaEntity schema);
-
         IObjectGraphType GetAssetType();
 
         IObjectGraphType GetContentType(DomainId schemaId);
+
+        IGraphType? GetInputGraphType(ISchemaEntity schema, IField field, string fieldName);
 
         (IGraphType?, ValueResolver?, QueryArguments?) GetGraphType(ISchemaEntity schema, IField field, string fieldName);
     }

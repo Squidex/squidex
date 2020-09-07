@@ -5,11 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using System;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.History.Models
 {
@@ -18,19 +19,19 @@ namespace Squidex.Areas.Api.Controllers.History.Models
         /// <summary>
         /// The message for the event.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Message { get; set; }
 
         /// <summary>
         /// The type of the original event.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string EventType { get; set; }
 
         /// <summary>
         /// The user who called the action.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Actor { get; set; }
 
         /// <summary>

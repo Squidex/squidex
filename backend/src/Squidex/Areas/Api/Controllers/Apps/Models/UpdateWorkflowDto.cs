@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -24,7 +24,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The workflow steps.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Dictionary<Status, WorkflowStepDto> Steps { get; set; }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The initial step.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Status Initial { get; set; }
 
         public UpdateWorkflow ToCommand(string id)

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL.Resolvers;
+using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -24,41 +24,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             Name = $"{schemaType}{fieldName}ChildDto";
 
-            foreach (var (nestedField, nestedName, _) in field.Fields.SafeFields())
+            foreach (var (nestedField, nestedName, typeName) in field.Fields.SafeFields().Where(x => x.Field.IsForApi()))
             {
-                var (resolveType, valueResolver, args) = model.GetGraphType(schema, nestedField, nestedName);
+                var (resolvedType, valueResolver, args) = model.GetGraphType(schema, nestedField, typeName);
 
-                if (resolveType != null && valueResolver != null)
+                if (resolvedType != null && valueResolver != null)
                 {
-                    var resolver = ValueResolver(nestedField, valueResolver);
+                    var resolver = ContentResolvers.NestedValue(valueResolver, nestedField.Name);
 
                     AddField(new FieldType
                     {
                         Name = nestedName,
                         Arguments = args,
+                        ResolvedType = resolvedType,
                         Resolver = resolver,
-                        ResolvedType = resolveType,
                         Description = $"The {fieldDisplayName}/{nestedField.DisplayName()} nested field."
                     });
                 }
             }
 
             Description = $"The structure of the {schemaName}.{fieldDisplayName} nested schema.";
-        }
-
-        private static FuncFieldResolver<object?> ValueResolver(NestedField nestedField, ValueResolver resolver)
-        {
-            return new FuncFieldResolver<object?>(c =>
-            {
-                if (((JsonObject)c.Source).TryGetValue(nestedField.Name, out var value))
-                {
-                    return resolver(value, c);
-                }
-                else
-                {
-                    return null;
-                }
-            });
         }
     }
 }

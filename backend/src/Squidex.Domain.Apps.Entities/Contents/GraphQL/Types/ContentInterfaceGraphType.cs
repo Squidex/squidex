@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class ContentInterfaceGraphType : InterfaceGraphType<IContentEntity>
+    public sealed class ContentInterfaceGraphType : InterfaceGraphType<IEnrichedContentEntity>
     {
         public ContentInterfaceGraphType()
         {
@@ -20,8 +18,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "id",
-                ResolvedType = AllTypes.NonNullDomainId,
-                Resolver = Resolve(x => x.Id),
+                ResolvedType = AllTypes.NonNullGuid,
+                Resolver = EntityResolvers.Id,
                 Description = "The id of the content."
             });
 
@@ -29,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "version",
                 ResolvedType = AllTypes.NonNullInt,
-                Resolver = Resolve(x => x.Version),
+                Resolver = EntityResolvers.Version,
                 Description = "The version of the content."
             });
 
@@ -37,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "created",
                 ResolvedType = AllTypes.NonNullDate,
-                Resolver = Resolve(x => x.Created),
+                Resolver = EntityResolvers.Created,
                 Description = "The date and time when the content has been created."
             });
 
@@ -45,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "createdBy",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.CreatedBy.ToString()),
+                Resolver = EntityResolvers.CreatedBy,
                 Description = "The user that has created the content."
             });
 
@@ -53,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "lastModified",
                 ResolvedType = AllTypes.NonNullDate,
-                Resolver = Resolve(x => x.LastModified),
+                Resolver = EntityResolvers.LastModified,
                 Description = "The date and time when the content has been modified last."
             });
 
@@ -61,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "lastModifiedBy",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.LastModifiedBy.ToString()),
+                Resolver = EntityResolvers.LastModifiedBy,
                 Description = "The user that has updated the content last."
             });
 
@@ -69,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "status",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.Status.Name.ToUpperInvariant()),
+                Resolver = ContentResolvers.Status,
                 Description = "The the status of the content."
             });
 
@@ -77,16 +75,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "statusColor",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.StatusColor),
+                Resolver = ContentResolvers.StatusColor,
                 Description = "The color status of the content."
             });
 
             Description = "The structure of all content types.";
-        }
-
-        private static IFieldResolver Resolve(Func<IEnrichedContentEntity, object> action)
-        {
-            return new FuncFieldResolver<IEnrichedContentEntity, object>(c => action(c.Source));
         }
     }
 }

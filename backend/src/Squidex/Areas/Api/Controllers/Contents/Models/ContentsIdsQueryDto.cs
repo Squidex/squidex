@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The list of ids to query.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public List<DomainId> Ids { get; set; }
     }
 }

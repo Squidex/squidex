@@ -29,7 +29,8 @@
                         (cdkDropListDropped)="move($event)">
                         <div class="folder-container-over"></div>
             
-                        <sqx-asset-folder [assetFolder]="parent" (navigate)="state.navigate($event.id)">
+                        <sqx-asset-folder [assetFolder]="parent"
+                            (navigate)="state.navigate($event.id)">
                         </sqx-asset-folder>
                     </div>
                     
@@ -40,8 +41,7 @@
                         [cdkDropListEnterPredicate]="canEnter">
                         <div class="folder-container-over"></div>
         
-                        <sqx-asset-folder
-                            [assetFolder]="assetFolder"
+                        <sqx-asset-folder [assetFolder]="assetFolder"
                             cdkDrag
                             [cdkDragData]="assetFolder"
                             [cdkDragDisabled]="isDisabled || !assetFolder.canMove"

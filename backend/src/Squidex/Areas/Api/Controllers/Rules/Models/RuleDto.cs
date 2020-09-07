@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using System;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
@@ -27,13 +28,13 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The user that has created the rule.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RefToken CreatedBy { get; set; }
 
         /// <summary>
         /// The user that has updated the rule.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RefToken LastModifiedBy { get; set; }
 
         /// <summary>
@@ -64,13 +65,13 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The trigger properties.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RuleTriggerDto Trigger { get; set; }
 
         /// <summary>
         /// The action properties.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         [JsonConverter(typeof(RuleActionConverter))]
         public RuleAction Action { get; set; }
 

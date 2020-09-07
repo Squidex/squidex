@@ -14,9 +14,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public class QueryExecutionContext
+    public class QueryExecutionContext : Dictionary<string, object>
     {
-        private readonly ConcurrentDictionary<DomainId, IContentEntity?> cachedContents = new ConcurrentDictionary<DomainId, IContentEntity?>();
+        private readonly ConcurrentDictionary<DomainId, IEnrichedContentEntity?> cachedContents = new ConcurrentDictionary<DomainId, IEnrichedContentEntity?>();
         private readonly ConcurrentDictionary<DomainId, IEnrichedAssetEntity?> cachedAssets = new ConcurrentDictionary<DomainId, IEnrichedAssetEntity?>();
         private readonly IContentQueryService contentQuery;
         private readonly IAssetQueryService assetQuery;
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return asset;
         }
 
-        public virtual async Task<IContentEntity?> FindContentAsync(DomainId schemaId, DomainId id)
+        public virtual async Task<IEnrichedContentEntity?> FindContentAsync(DomainId schemaId, DomainId id)
         {
             var content = cachedContents.GetOrDefault(id);
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return content;
         }
 
-        public virtual async Task<IResultList<IAssetEntity>> QueryAssetsAsync(string query)
+        public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(string query)
         {
             var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithODataQuery(query));
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return assets;
         }
 
-        public virtual async Task<IResultList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
+        public virtual async Task<IResultList<IEnrichedContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
         {
             var result = await contentQuery.QueryAsync(context, schemaIdOrName, Q.Empty.WithODataQuery(query));
 
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return ids.Select(cachedAssets.GetOrDefault).NotNull().ToList();
         }
 
-        public virtual async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(ICollection<DomainId> ids)
+        public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(ICollection<DomainId> ids)
         {
             Guard.NotNull(ids, nameof(ids));
 

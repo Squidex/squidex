@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Translations;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
@@ -14,7 +14,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [LocalizedRequired]
         public string Email { get; set; }
 
-        [LocalizedRequired]
+        [LocalizedRequiredAttribute]
         public string Password { get; set; }
     }
 }

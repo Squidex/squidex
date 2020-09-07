@@ -5,24 +5,20 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { allParams } from '@app/shared';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-comments-page',
     styleUrls: ['./comments-page.component.scss'],
     templateUrl: './comments-page.component.html'
 })
-export class CommentsPageComponent implements OnInit {
-    public commentsId: string;
+export class CommentsPageComponent {
+    public commentsId = this.route.parent!.params.pipe(map(x => x['contentId']));
 
     constructor(
         private readonly route: ActivatedRoute
     ) {
-    }
-
-    public ngOnInit() {
-        this.commentsId = allParams(this.route)['contentId'];
     }
 }

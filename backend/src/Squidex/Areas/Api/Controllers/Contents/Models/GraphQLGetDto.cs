@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using GraphQL;
+using GraphQL.NewtonsoftJson;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Reflection;
 

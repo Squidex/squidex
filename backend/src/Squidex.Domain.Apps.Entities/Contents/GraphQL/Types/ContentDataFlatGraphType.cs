@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -28,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     {
                         Name = fieldName,
                         Arguments = args,
-                        Resolver = PartitionResolver(valueResolver, field.Name),
+                        Resolver = ContentResolvers.FlatPartition(valueResolver, field.Name),
                         ResolvedType = resolvedType,
                         Description = field.RawProperties.Hints
                     });
@@ -36,23 +35,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             Description = $"The structure of the flat {schemaName} data type.";
-        }
-
-        private static FuncFieldResolver<object?> PartitionResolver(ValueResolver valueResolver, string key)
-        {
-            return new FuncFieldResolver<object?>(c =>
-            {
-                var source = (FlatContentData)c.Source;
-
-                if (source.TryGetValue(key, out var value) && value != null)
-                {
-                    return valueResolver(value, c);
-                }
-                else
-                {
-                    return null;
-                }
-            });
         }
     }
 }

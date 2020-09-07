@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
@@ -24,13 +24,13 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The assets folders.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public AssetFolderDto[] Items { get; set; }
 
         /// <summary>
         /// The path to the current folder.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public AssetFolderDto[] Path { get; set; }
 
         public static AssetFoldersDto FromAssets(IResultList<IAssetFolderEntity> assetFolders, IEnumerable<IAssetFolderEntity> path, Resources resources)

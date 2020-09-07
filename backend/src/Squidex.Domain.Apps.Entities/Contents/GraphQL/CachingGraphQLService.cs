@@ -8,7 +8,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL;
+using GraphQL.Utilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     public sealed class CachingGraphQLService : CachingProviderBase, IGraphQLService
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
-        private readonly IDependencyResolver resolver;
+        private readonly IServiceProvider resolver;
 
-        public CachingGraphQLService(IMemoryCache cache, IDependencyResolver resolver)
+        public CachingGraphQLService(IMemoryCache cache, IServiceProvider resolver)
             : base(cache)
         {
             Guard.NotNull(resolver, nameof(resolver));
@@ -87,24 +87,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
-                var allSchemas = await resolver.Resolve<IAppProvider>().GetSchemasAsync(app.Id);
+                var allSchemas = await resolver.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
 
                 return new GraphQLModel(app,
                     allSchemas,
                     GetPageSizeForContents(),
                     GetPageSizeForAssets(),
-                    resolver.Resolve<IUrlGenerator>());
+                    resolver.GetRequiredService<IUrlGenerator>());
             });
         }
 
         private int GetPageSizeForContents()
         {
-            return resolver.Resolve<IOptions<ContentOptions>>().Value.DefaultPageSizeGraphQl;
+            return resolver.GetRequiredService<IOptions<ContentOptions>>().Value.DefaultPageSizeGraphQl;
         }
 
         private int GetPageSizeForAssets()
         {
-            return resolver.Resolve<IOptions<AssetOptions>>().Value.DefaultPageSizeGraphQl;
+            return resolver.GetRequiredService<IOptions<AssetOptions>>().Value.DefaultPageSizeGraphQl;
         }
 
         private static object CreateCacheKey(DomainId appId, string etag)

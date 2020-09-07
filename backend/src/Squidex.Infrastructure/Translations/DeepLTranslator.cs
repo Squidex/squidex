@@ -70,25 +70,29 @@ namespace Squidex.Infrastructure.Translations
                 parameters["source_lang"] = GetLanguageCode(sourceLanguage);
             }
 
-            var response = await httpClient.PostAsync(Url, new FormUrlEncodedContent(parameters), ct);
-            var responseString = await response.Content.ReadAsStringAsync();
+            var body = new FormUrlEncodedContent(parameters);
 
-            if (response.IsSuccessStatusCode)
+            using (var response = await httpClient.PostAsync(Url, body, ct))
             {
-                var result = jsonSerializer.Deserialize<Response>(responseString);
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                if (result?.Translations?.Length == 1)
+                if (response.IsSuccessStatusCode)
                 {
-                    return new Translation(TranslationResult.Translated, result.Translations[0].Text);
+                    var result = jsonSerializer.Deserialize<Response>(responseString);
+
+                    if (result?.Translations?.Length == 1)
+                    {
+                        return new Translation(TranslationResult.Translated, result.Translations[0].Text);
+                    }
                 }
-            }
 
-            if (response.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return new Translation(TranslationResult.LanguageNotSupported, resultText: responseString);
-            }
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    return new Translation(TranslationResult.LanguageNotSupported, resultText: responseString);
+                }
 
-            return new Translation(TranslationResult.Failed, resultText: responseString);
+                return new Translation(TranslationResult.Failed, resultText: responseString);
+            }
         }
 
         private static string GetLanguageCode(Language language)

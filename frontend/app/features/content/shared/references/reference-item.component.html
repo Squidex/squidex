@@ -26,7 +26,10 @@
                     <i class="icon-pencil"></i>
                 </a>
 
-                <button type="button" class="btn btn-text-secondary" (click)="delete.emit()">
+                <button type="button" class="btn btn-text-secondary"
+                    (sqxConfirmClick)="delete.emit()"
+                    confirmTitle="i18n:contents.removeConfirmTitle"
+                    confirmText="i18n:contents.removeConfirmText">
                     <i class="icon-close"></i>
                 </button>
             </div>

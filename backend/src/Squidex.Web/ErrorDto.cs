@@ -6,12 +6,13 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Web
 {
     public sealed class ErrorDto
     {
-        [Required]
+        [LocalizedRequired]
         [Display(Description = "Error message.")]
         public string? Message { get; set; }
 

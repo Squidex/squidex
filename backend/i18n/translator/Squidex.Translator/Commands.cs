@@ -120,7 +120,7 @@ namespace Squidex.Translator
                     throw new ArgumentException("Folder does not exist.");
                 }
 
-                var locales = new string[] { "en", "nl" };
+                var locales = new string[] { "en", "nl", "it" };
 
                 var translationsDirectory = new DirectoryInfo(Path.Combine(arguments.Folder, "backend", "i18n"));
                 var translationsService = new TranslationService(translationsDirectory, fileName, locales, arguments.SingleWords);

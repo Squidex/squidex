@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Users;
-using Squidex.Infrastructure.Translations;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
@@ -15,7 +15,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [LocalizedRequired]
         public string Email { get; set; }
 
-        [LocalizedRequired]
+        [LocalizedRequiredAttribute]
         public string DisplayName { get; set; }
 
         public bool IsHidden { get; set; }

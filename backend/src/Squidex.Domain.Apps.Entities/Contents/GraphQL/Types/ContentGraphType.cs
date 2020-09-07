@@ -5,12 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Linq;
-using GraphQL.Resolvers;
 using GraphQL.Types;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -33,8 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "id",
-                ResolvedType = AllTypes.NonNullDomainId,
-                Resolver = Resolve(x => x.Id),
+                ResolvedType = AllTypes.NonNullGuid,
+                Resolver = EntityResolvers.Id,
                 Description = $"The id of the {schemaName} content."
             });
 
@@ -42,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "version",
                 ResolvedType = AllTypes.NonNullInt,
-                Resolver = Resolve(x => x.Version),
+                Resolver = EntityResolvers.Version,
                 Description = $"The version of the {schemaName} content."
             });
 
@@ -50,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "created",
                 ResolvedType = AllTypes.NonNullDate,
-                Resolver = Resolve(x => x.Created),
+                Resolver = EntityResolvers.Created,
                 Description = $"The date and time when the {schemaName} content has been created."
             });
 
@@ -58,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "createdBy",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.CreatedBy.ToString()),
+                Resolver = EntityResolvers.CreatedBy,
                 Description = $"The user that has created the {schemaName} content."
             });
 
@@ -66,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "lastModified",
                 ResolvedType = AllTypes.NonNullDate,
-                Resolver = Resolve(x => x.LastModified),
+                Resolver = EntityResolvers.LastModified,
                 Description = $"The date and time when the {schemaName} content has been modified last."
             });
 
@@ -74,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "lastModifiedBy",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.LastModifiedBy.ToString()),
+                Resolver = EntityResolvers.LastModifiedBy,
                 Description = $"The user that has updated the {schemaName} content last."
             });
 
@@ -82,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "status",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.Status.Name.ToUpperInvariant()),
+                Resolver = ContentResolvers.Status,
                 Description = $"The the status of the {schemaName} content."
             });
 
@@ -90,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "statusColor",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.StatusColor),
+                Resolver = ContentResolvers.StatusColor,
                 Description = $"The color status of the {schemaName} content."
             });
 
@@ -112,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "url",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = model.ResolveContentUrl(schema),
+                Resolver = ContentResolvers.Url,
                 Description = $"The url to the the {schemaName} content."
             });
 
@@ -124,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     Name = "data",
                     ResolvedType = new NonNullGraphType(contentDataType),
-                    Resolver = Resolve(x => x.Data),
+                    Resolver = ContentResolvers.Data,
                     Description = $"The data of the {schemaName} content."
                 });
             }
@@ -137,25 +133,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     Name = "flatData",
                     ResolvedType = new NonNullGraphType(contentDataTypeFlat),
-                    Resolver = ResolveFlat(x => x.Data),
+                    Resolver = ContentResolvers.FlatData,
                     Description = $"The flat data of the {schemaName} content."
                 });
             }
-        }
-
-        private static IFieldResolver Resolve(Func<IEnrichedContentEntity, object?> action)
-        {
-            return new FuncFieldResolver<IEnrichedContentEntity, object?>(c => action(c.Source));
-        }
-
-        private static IFieldResolver ResolveFlat(Func<IEnrichedContentEntity, NamedContentData?> action)
-        {
-            return new FuncFieldResolver<IEnrichedContentEntity, FlatContentData?>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return action(c.Source)?.ToFlatten(context.Context.App.LanguagesConfig.Master);
-            });
         }
     }
 }

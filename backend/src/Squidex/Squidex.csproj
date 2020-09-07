@@ -35,6 +35,7 @@
   
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="3.1.1" />
+    <PackageReference Include="GraphQL.NewtonsoftJson" Version="3.0.0" />
     <PackageReference Include="IdentityServer4" Version="3.1.3" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
     <PackageReference Include="IdentityServer4.AspNetIdentity" Version="3.1.3" />
@@ -125,6 +126,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="..\..\i18n\frontend_en.json" Link="Areas\Frontend\Resources\frontend_en.json" />
+    <EmbeddedResource Include="..\..\i18n\frontend_it.json" Link="Areas\Frontend\Resources\frontend_it.json" />
+    <EmbeddedResource Include="..\..\i18n\frontend_nl.json" Link="Areas\Frontend\Resources\frontend_nl.json" />
   </ItemGroup>
 
   <PropertyGroup>

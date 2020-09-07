@@ -14,8 +14,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public static class AllTypes
     {
-        public const string PathName = "path";
-
         public static readonly Type None = typeof(NoopGraphType);
 
         public static readonly Type NonNullTagsType = typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>);
@@ -24,7 +22,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType DomainId = new StringGraphType();
 
+        public static readonly IGraphType Long = new LongGraphType();
+
+        public static readonly IGraphType Guid = new GuidGraphType();
+
         public static readonly IGraphType Date = new InstantGraphType();
+
+        public static readonly IGraphType Tags = new ListGraphType(new NonNullGraphType(new StringGraphType()));
 
         public static readonly IGraphType Json = new JsonGraphType();
 
@@ -36,9 +40,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType AssetType = new EnumerationGraphType<AssetType>();
 
+        public static readonly IGraphType References = new ListGraphType(new NonNullGraphType(new StringGraphType()));
+
         public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
 
         public static readonly IGraphType NonNullDomainId = new NonNullGraphType(DomainId);
+
+        public static readonly IGraphType NonNullLong = new NonNullGraphType(Long);
+
+        public static readonly IGraphType NonNullGuid = new NonNullGraphType(Guid);
 
         public static readonly IGraphType NonNullDate = new NonNullGraphType(Date);
 
@@ -63,13 +73,5 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType NoopTags = new NoopGraphType("TagsScalar");
 
         public static readonly IGraphType NoopGeolocation = new NoopGraphType("GeolocationScalar");
-
-        public static readonly QueryArguments PathArguments = new QueryArguments(new QueryArgument(None)
-        {
-            Name = PathName,
-            Description = "The path to the json value",
-            DefaultValue = null,
-            ResolvedType = String
-        });
     }
 }

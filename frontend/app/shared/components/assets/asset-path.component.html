@@ -6,7 +6,7 @@
         <i class="icon-angle-right" *ngIf="i > 0"></i>
 
         <a class="btn" (click)="navigate.emit(item)" [class.force]="i < path.length - 1">
-            {{item.folderName}}
+            {{item.folderName | sqxTranslate}}
         </a>
     </ng-container>
 </ng-template>

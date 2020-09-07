@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Translations;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
@@ -14,7 +14,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [LocalizedRequired]
         public string OldPassword { get; set; }
 
-        [LocalizedRequired]
+        [LocalizedRequiredAttribute]
         public string Password { get; set; }
 
         [LocalizedCompare(nameof(Password))]
