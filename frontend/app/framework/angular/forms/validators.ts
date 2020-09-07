@@ -126,7 +126,7 @@ export module ValidatorsEx {
                     }
                 } else {
                     if (isNaN(length) || length < minLength || length > maxLength) {
-                        return { betweenlength: { minLength, maxLength, actual: length }};
+                        return { betweenlength: { minlength: minLength, maxlength: maxLength, actual: length }};
                     }
                 }
 

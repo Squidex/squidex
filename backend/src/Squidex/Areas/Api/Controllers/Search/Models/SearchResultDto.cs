@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Search.Models
@@ -17,13 +17,13 @@ namespace Squidex.Areas.Api.Controllers.Search.Models
         /// <summary>
         /// The name of the search result.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Name { get; set; }
 
         /// <summary>
         /// The type of the search result.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public SearchResultType Type { get; set; }
 
         /// <summary>

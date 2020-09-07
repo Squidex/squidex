@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.News.Models
 {
@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.News.Models
         /// <summary>
         /// The latest features.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public List<FeatureDto> Features { get; set; }
 
         /// <summary>

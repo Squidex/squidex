@@ -7,9 +7,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
@@ -19,7 +19,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The rules.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RuleDto[] Items { get; set; }
 
         /// <summary>

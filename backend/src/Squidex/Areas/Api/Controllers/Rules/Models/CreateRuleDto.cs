@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
@@ -17,13 +17,13 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The trigger properties.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RuleTriggerDto Trigger { get; set; }
 
         /// <summary>
         /// The action properties.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         [JsonConverter(typeof(RuleActionConverter))]
         public RuleAction Action { get; set; }
 

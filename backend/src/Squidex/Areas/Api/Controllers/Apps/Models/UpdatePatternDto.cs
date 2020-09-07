@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -17,13 +17,13 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The name of the suggestion.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Name { get; set; }
 
         /// <summary>
         /// The regex pattern.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Pattern { get; set; }
 
         /// <summary>

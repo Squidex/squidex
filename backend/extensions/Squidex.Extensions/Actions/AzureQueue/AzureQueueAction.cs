@@ -23,13 +23,13 @@ namespace Squidex.Extensions.Actions.AzureQueue
         ReadMore = "https://azure.microsoft.com/en-us/services/storage/queues/")]
     public sealed class AzureQueueAction : RuleAction
     {
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Connection", Description = "The connection string to the storage account.")]
         [DataType(DataType.Text)]
         [Formattable]
         public string ConnectionString { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Queue", Description = "The name of the queue.")]
         [DataType(DataType.Text)]
         [Formattable]

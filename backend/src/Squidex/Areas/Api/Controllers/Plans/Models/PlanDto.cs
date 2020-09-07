@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
 {
@@ -16,19 +16,19 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// <summary>
         /// The id of the plan.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Id { get; set; }
 
         /// <summary>
         /// The name of the plan.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Name { get; set; }
 
         /// <summary>
         /// The monthly costs of the plan.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Costs { get; set; }
 
         /// <summary>

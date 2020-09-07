@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -17,13 +17,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The action to perform when the condition is met.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public FieldRuleAction Action { get; set; }
 
         /// <summary>
         /// The field to update.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Field { get; set; }
 
         /// <summary>

@@ -23,12 +23,12 @@ namespace Squidex.Extensions.Actions.ElasticSearch
     public sealed class ElasticSearchAction : RuleAction
     {
         [AbsoluteUrl]
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Server Url", Description = "The url to the elastic search instance or cluster.")]
         [DataType(DataType.Url)]
         public Uri Host { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Index Name", Description = "The name of the index.")]
         [DataType(DataType.Text)]
         [Formattable]

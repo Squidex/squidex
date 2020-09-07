@@ -5,7 +5,7 @@
                 <img src="./images/folder.svg">
             </div>
             <div class="col truncate">
-                {{assetFolder.folderName}}
+                {{assetFolder.folderName | sqxTranslate}}
             </div>
             <div class="col-auto">
                 <div class="dropdown dropdown-options" *ngIf="canDelete || canUpdate">
@@ -39,6 +39,7 @@
 
 
 <ng-container *sqxModal="editDialog">
-    <sqx-asset-folder-dialog [assetFolder]="assetFolder" (complete)="editDialog.hide()">
+    <sqx-asset-folder-dialog [assetFolder]="assetFolder"
+        (complete)="editDialog.hide()">
     </sqx-asset-folder-dialog>
 </ng-container>

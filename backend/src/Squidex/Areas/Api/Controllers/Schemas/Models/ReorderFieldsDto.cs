@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The field ids in the target order.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public List<long> FieldIds { get; set; }
 
         public ReorderFields ToCommand(long? parentId = null)

@@ -25,7 +25,7 @@ export type QueryValueType =
 
 export interface FilterOperator {
     // The optional display value.
-    name?: string;
+    name: string;
 
     // The operator value.
     value: string;
@@ -201,25 +201,25 @@ export function hasFilter(query?: Query) {
 }
 
 const EqualOperators: ReadonlyArray<FilterOperator> = [
-    { name: 'is equals to', value: 'eq' },
-    { name: 'is not equals to', value: 'ne' }
+    { name: 'i18n:common.queryOperators.eq', value: 'eq' },
+    { name: 'i18n:common.queryOperators.ne', value: 'ne' }
 ];
 
 const CompareOperator: ReadonlyArray<FilterOperator> = [
-    { name: 'is less than', value: 'lt' },
-    { name: 'is less than or equals to', value: 'le' },
-    { name: 'is greater than', value: 'gt' },
-    { name: 'is greater than or equals to', value: 'ge' }
+    { name: 'i18n:common.queryOperators.lt', value: 'lt' },
+    { name: 'i18n:common.queryOperators.le', value: 'le' },
+    { name: 'i18n:common.queryOperators.gt', value: 'gt' },
+    { name: 'i18n:common.queryOperators.ge', value: 'ge' }
 ];
 
 const StringOperators: ReadonlyArray<FilterOperator> = [
-    { name: 'starts with', value: 'startsWith' },
-    { name: 'ends with', value: 'endsWith' },
-    { name: 'contains', value: 'contains' }
+    { name: 'i18n:common.queryOperators.startsWith', value: 'startsWith' },
+    { name: 'i18n:common.queryOperators.endsWith', value: 'endsWith' },
+    { name: 'i18n:common.queryOperators.contains', value: 'contains' }
 ];
 
 const ArrayOperators: ReadonlyArray<FilterOperator> = [
-    { value: 'is empty', noValue: true }
+    { name: 'i18n:common.queryOperators.empty', value: 'is empty', noValue: true }
 ];
 
 const TypeBoolean: QueryFieldModel = {
@@ -332,7 +332,8 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
                 for (const code of languagesCodes) {
                     const infos = {
                         displayName: `${field.name} (${code})`,
-                        description: `The '${field.displayName}' field of the content item (localized).`
+                        description: 'i18n:contents.localizedFieldDescription',
+                        fieldName: field.displayName
                     };
 
                     model.fields[`data.${field.name}.${code}`] = { ...type, ...infos };
@@ -340,7 +341,8 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
             } else {
                 const infos = {
                     displayName: field.name,
-                    description: `The '${field.displayName}' field of the content item.`
+                    description: 'i18n:contents.invariantFieldDescription',
+                    fieldName: field.displayName
                 };
 
                 model.fields[`data.${field.name}.iv`] = { ...type, ...infos };

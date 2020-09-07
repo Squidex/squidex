@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -15,8 +15,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The name of the schema.
         /// </summary>
-        [Required]
-        [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
+        [LocalizedRequired]
+        [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
 
         /// <summary>
