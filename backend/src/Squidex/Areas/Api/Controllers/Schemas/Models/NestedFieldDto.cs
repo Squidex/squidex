@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -20,8 +20,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The name of the field. Must be unique within the schema.
         /// </summary>
-        [Required]
-        [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
+        [LocalizedRequired]
+        [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The field properties.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public FieldPropertiesDto Properties { get; set; }
 
         public void CreateLinks(Resources resources, string schema, long parentId, bool allowUpdate)

@@ -7,10 +7,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models
 {
@@ -19,13 +19,13 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// <summary>
         /// The uri to load from.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Uri Url { get; set; }
 
         /// <summary>
         /// The status log.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public List<string> Log { get; set; }
 
         /// <summary>

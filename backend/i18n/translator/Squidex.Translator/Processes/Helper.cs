@@ -72,8 +72,9 @@ namespace Squidex.Translator.Processes
             foreach (var key in service.MainTranslations.Keys)
             {
                 if (!translations.Contains(key) &&
-                    !key.StartsWith("validation.", StringComparison.OrdinalIgnoreCase) &&
-                    !key.StartsWith("aspnet_", StringComparison.OrdinalIgnoreCase))
+                    !key.StartsWith("common.", StringComparison.OrdinalIgnoreCase) &&
+                    !key.StartsWith("dotnet_", StringComparison.OrdinalIgnoreCase) &&
+                    !key.StartsWith("validation.", StringComparison.OrdinalIgnoreCase))
                 {
                     notUsed.Add(key);
                 }
@@ -106,7 +107,7 @@ namespace Squidex.Translator.Processes
 
                     var parts = key.Split(".");
 
-                    if (parts[0] != "common" && parts[0] != "validation")
+                    if (parts.Length > 1 && parts[0] != "common" && parts[0] != "validation")
                     {
                         prefixes.Add(parts[0]);
                     }

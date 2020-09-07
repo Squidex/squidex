@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
@@ -18,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The contents to update or insert.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public List<BulkUpdateJobDto> Jobs { get; set; }
 
         /// <summary>

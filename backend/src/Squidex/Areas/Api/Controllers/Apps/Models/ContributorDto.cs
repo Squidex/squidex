@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Translations;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
@@ -18,19 +18,19 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The id of the user that contributes to the app.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string ContributorId { get; set; }
 
         /// <summary>
         /// The display name.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string ContributorName { get; set; }
 
         /// <summary>
         /// The email address.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string ContributorEmail { get; set; }
 
         /// <summary>

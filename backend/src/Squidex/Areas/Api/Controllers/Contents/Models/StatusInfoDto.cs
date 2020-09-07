@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
@@ -15,13 +15,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The name of the status.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Status Status { get; set; }
 
         /// <summary>
         /// The color of the status.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Color { get; set; }
 
         public static StatusInfoDto FromStatusInfo(StatusInfo statusInfo)

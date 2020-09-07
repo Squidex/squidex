@@ -8,7 +8,7 @@
     </div>
     <div class="col-auto operator pl-1">
         <select class="form-control" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">
-            <option *ngFor="let operator of fieldModel.operators" [ngValue]="operator.value">{{operator.name || operator.value}}</option>
+            <option *ngFor="let operator of fieldModel.operators" [ngValue]="operator.value">{{operator.name | sqxTranslate}}</option>
         </select>
     </div>
     <div class="col pl-1" *ngIf="!noValue" [ngSwitch]="fieldModel.type">

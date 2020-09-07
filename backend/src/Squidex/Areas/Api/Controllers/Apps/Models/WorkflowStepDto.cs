@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 using NoUpdateType = Squidex.Domain.Apps.Core.Contents.NoUpdate;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -19,7 +19,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The transitions.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Dictionary<Status, WorkflowTransitionDto> Transitions { get; set; }
 
         /// <summary>

@@ -7,9 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
 
@@ -44,14 +41,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "findAsset",
-                Arguments = CreateAssetFindArguments(),
+                Arguments = AssetActions.Find.Arguments,
                 ResolvedType = assetType,
-                Resolver = ResolveAsync((c, e) =>
-                {
-                    var assetId = c.GetArgument<Guid>("id");
-
-                    return e.FindAssetAsync(assetId);
-                }),
+                Resolver = AssetActions.Find.Resolver,
                 Description = "Find an asset by id."
             });
         }
@@ -61,203 +53,56 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"find{schemaType}Content",
-                Arguments = CreateContentFindArguments(schemaName),
+                Arguments = ContentActions.Find.Arguments,
                 ResolvedType = contentType,
-                Resolver = ResolveAsync((c, e) =>
-                {
-                    var contentId = c.GetArgument<Guid>("id");
-
-                    return e.FindContentAsync(contentId);
-                }),
+                Resolver = ContentActions.Find.Resolver,
                 Description = $"Find an {schemaName} content by id."
             });
         }
 
         private void AddAssetsQueries(IGraphType assetType, int pageSize)
         {
+            var resolver = AssetActions.Query.Resolver;
+
             AddField(new FieldType
             {
                 Name = "queryAssets",
-                Arguments = CreateAssetQueryArguments(pageSize),
+                Arguments = AssetActions.Query.Arguments(pageSize),
                 ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
-                Resolver = ResolveAsync((c, e) =>
-                {
-                    var assetQuery = BuildODataQuery(c);
-
-                    return e.QueryAssetsAsync(assetQuery);
-                }),
+                Resolver = resolver,
                 Description = "Get assets."
             });
 
             AddField(new FieldType
             {
                 Name = "queryAssetsWithTotal",
-                Arguments = CreateAssetQueryArguments(pageSize),
+                Arguments = AssetActions.Query.Arguments(pageSize),
                 ResolvedType = new AssetsResultGraphType(assetType),
-                Resolver = ResolveAsync((c, e) =>
-                {
-                    var assetQuery = BuildODataQuery(c);
-
-                    return e.QueryAssetsAsync(assetQuery);
-                }),
+                Resolver = resolver,
                 Description = "Get assets and total count."
             });
         }
 
         private void AddContentQueries(Guid schemaId, string schemaType, string schemaName, IGraphType contentType, int pageSize)
         {
+            var resolver = ContentActions.Query.Resolver(schemaId);
+
             AddField(new FieldType
             {
                 Name = $"query{schemaType}Contents",
-                Arguments = CreateContentQueryArguments(pageSize),
+                Arguments = ContentActions.Query.Arguments(pageSize),
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
-                Resolver = ResolveAsync((c, e) =>
-                {
-                    var contentQuery = BuildODataQuery(c);
-
-                    return e.QueryContentsAsync(schemaId.ToString(), contentQuery);
-                }),
+                Resolver = resolver,
                 Description = $"Query {schemaName} content items."
             });
 
             AddField(new FieldType
             {
                 Name = $"query{schemaType}ContentsWithTotal",
-                Arguments = CreateContentQueryArguments(pageSize),
+                Arguments = ContentActions.Query.Arguments(pageSize),
                 ResolvedType = new ContentsResultGraphType(schemaType, schemaName, contentType),
-                Resolver = ResolveAsync((c, e) =>
-                {
-                    var contentQuery = BuildODataQuery(c);
-
-                    return e.QueryContentsAsync(schemaId.ToString(), contentQuery);
-                }),
+                Resolver = resolver,
                 Description = $"Query {schemaName} content items with total count."
-            });
-        }
-
-        private static QueryArguments CreateAssetFindArguments()
-        {
-            return new QueryArguments
-            {
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "id",
-                    Description = "The id of the asset (GUID).",
-                    DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.NonNullGuid
-                }
-            };
-        }
-
-        private static QueryArguments CreateContentFindArguments(string schemaName)
-        {
-            return new QueryArguments
-            {
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "id",
-                    Description = $"The id of the {schemaName} content (GUID)",
-                    DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.NonNullGuid
-                }
-            };
-        }
-
-        private static QueryArguments CreateAssetQueryArguments(int pageSize)
-        {
-            return new QueryArguments
-            {
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "top",
-                    Description = $"Optional number of assets to take (Default: {pageSize}).",
-                    DefaultValue = pageSize,
-                    ResolvedType = AllTypes.Int
-                },
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "skip",
-                    Description = "Optional number of assets to skip.",
-                    DefaultValue = 0,
-                    ResolvedType = AllTypes.Int
-                },
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "filter",
-                    Description = "Optional OData filter.",
-                    DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.String
-                },
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "orderby",
-                    Description = "Optional OData order definition.",
-                    DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.String
-                }
-            };
-        }
-
-        private static QueryArguments CreateContentQueryArguments(int pageSize)
-        {
-            return new QueryArguments
-            {
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "top",
-                    Description = $"Optional number of contents to take (Default: {pageSize}).",
-                    DefaultValue = pageSize,
-                    ResolvedType = AllTypes.Int
-                },
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "skip",
-                    Description = "Optional number of contents to skip.",
-                    DefaultValue = 0,
-                    ResolvedType = AllTypes.Int
-                },
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "filter",
-                    Description = "Optional OData filter.",
-                    DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.String
-                },
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "search",
-                    Description = "Optional OData full text search.",
-                    DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.String
-                },
-                new QueryArgument(AllTypes.None)
-                {
-                    Name = "orderby",
-                    Description = "Optional OData order definition.",
-                    DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.String
-                }
-            };
-        }
-
-        private static string BuildODataQuery(ResolveFieldContext c)
-        {
-            var odataQuery = "?" +
-                string.Join("&",
-                    c.Arguments
-                        .Select(x => new { x.Key, Value = x.Value.ToString() }).Where(x => !string.IsNullOrWhiteSpace(x.Value))
-                        .Select(x => $"${x.Key}={x.Value}"));
-
-            return odataQuery;
-        }
-
-        private static IFieldResolver ResolveAsync<T>(Func<ResolveFieldContext, GraphQLExecutionContext, Task<T>> action)
-        {
-            return new FuncFieldResolver<Task<T>>(c =>
-            {
-                var e = (GraphQLExecutionContext)c.UserContext;
-
-                return action(c, e);
             });
         }
     }

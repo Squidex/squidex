@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Assets;
 using Squidex.Areas.Api.Controllers.Backups;
@@ -19,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 using P = Squidex.Shared.Permissions;
 
@@ -31,8 +31,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The name of the app.
         /// </summary>
-        [Required]
-        [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
+        [LocalizedRequired]
+        [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
 
         /// <summary>

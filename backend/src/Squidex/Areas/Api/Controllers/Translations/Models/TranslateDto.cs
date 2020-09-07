@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Translations.Models
 {
@@ -15,13 +15,13 @@ namespace Squidex.Areas.Api.Controllers.Translations.Models
         /// <summary>
         /// The text to translate.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Text { get; set; }
 
         /// <summary>
         /// The target language.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Language TargetLanguage { get; set; }
 
         /// <summary>

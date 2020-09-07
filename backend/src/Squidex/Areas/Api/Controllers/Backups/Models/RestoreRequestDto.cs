@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models
 {
@@ -15,13 +15,13 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// <summary>
         /// The name of the app.
         /// </summary>
-        [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
+        [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
 
         /// <summary>
         /// The url to the restore file.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Uri Url { get; set; }
     }
 }

@@ -39,11 +39,18 @@ namespace Squidex.Web.Services
 
                 TranslateProperty(name, arguments, currentCulture);
 
-                var (result, found) = translationService.Get(currentCulture, $"aspnet_{name}", name);
+                var (result, found) = translationService.Get(currentCulture, $"dotnet_{name}", name);
 
                 if (arguments != null && found)
                 {
-                    result = string.Format(currentCulture, result, arguments);
+                    try
+                    {
+                        result = string.Format(currentCulture, result, arguments);
+                    }
+                    catch (FormatException)
+                    {
+                        return new LocalizedString(name, name, true);
+                    }
                 }
 
                 return new LocalizedString(name, result, !found);

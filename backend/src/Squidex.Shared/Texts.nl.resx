@@ -61,11 +61,50 @@
   <data name="annotations_AbsoluteUrl" xml:space="preserve">
     <value>Het veld {name|lower} moet een absolute URL zijn.</value>
   </data>
+  <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
+    <value>Het veld {0} moet een absolute URL zijn.</value>
+  </data>
   <data name="annotations_Compare" xml:space="preserve">
     <value>Het veld {name|lower} moet hetzelfde zijn als {other|lower}.</value>
   </data>
+  <data name="dotnet_annotations_Compare" xml:space="preserve">
+    <value>Het veld {0} moet hetzelfde zijn als {1}.</value>
+  </data>
+  <data name="annotations_EmailAddress" xml:space="preserve">
+    <value>The field {name|lower} is not a valid email address.</value>
+  </data>
+  <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
+    <value>The field {0} is not a valid email address.</value>
+  </data>
+  <data name="annotations_Range" xml:space="preserve">
+    <value>The field {name|lower} must be between {min} and {max}.</value>
+  </data>
+  <data name="dotnet_annotations_Range" xml:space="preserve">
+    <value>The field {0} must be between {1} and {2}.</value>
+  </data>
+  <data name="annotations_RegularExpression" xml:space="preserve">
+    <value>The field {name|lower} is not.</value>
+  </data>
+  <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
+    <value>The field {0} is not.</value>
+  </data>
   <data name="annotations_Required" xml:space="preserve">
     <value>Het veld {name|lower} is verplicht.</value>
+  </data>
+  <data name="dotnet_annotations_Required" xml:space="preserve">
+    <value>Het veld {0} is verplicht.</value>
+  </data>
+  <data name="annotations_StringLength" xml:space="preserve">
+    <value>The field {name|lower} must be a string with a maximum length of {max}.</value>
+  </data>
+  <data name="dotnet_annotations_StringLength" xml:space="preserve">
+    <value>The field {0} must be a string with a maximum length of {1}.</value>
+  </data>
+  <data name="annotations_StringLengthMinimum" xml:space="preserve">
+    <value>The field {name|lower} must be a string with a minimum length of {min} and a maximum length of {max}.</value>
+  </data>
+  <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
+    <value>The field {0} must be a string with a minimum length of {1} and a maximum length of {2}.</value>
   </data>
   <data name="apps.alreadyArchieved" xml:space="preserve">
     <value>App is al gearchiveerd.</value>
@@ -129,15 +168,6 @@
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>Kan een rol niet verwijderen wanneer een bijdrager is toegewezen.</value>
-  </data>
-  <data name="aspnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Het veld {0} moet een absolute URL zijn.</value>
-  </data>
-  <data name="aspnet_annotations_Compare" xml:space="preserve">
-    <value>Het veld {0} moet hetzelfde zijn als {other|lower}.</value>
-  </data>
-  <data name="aspnet_annotations_Required" xml:space="preserve">
-    <value>Het veld {0} is verplicht.</value>
   </data>
   <data name="assets.assetAlreadyDeleted" xml:space="preserve">
     <value>Asset is al verwijderd</value>
@@ -600,6 +630,51 @@
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">
     <value>De werkstroom staat geen updates toe met status {status}</value>
+  </data>
+  <data name="dotnet_identity_DefaultEror" xml:space="preserve">
+    <value>Er is een onbekende fout opgetreden.</value>
+  </data>
+  <data name="dotnet_identity_DuplicateEmail" xml:space="preserve">
+    <value>E-mail is al in gebruik.</value>
+  </data>
+  <data name="dotnet_identity_DuplicateUserName" xml:space="preserve">
+    <value>Gebruikersnaam is al in gebruik.</value>
+  </data>
+  <data name="dotnet_identity_InvalidEmail" xml:space="preserve">
+    <value>E-mail is ongeldig.</value>
+  </data>
+  <data name="dotnet_identity_InvalidUserName" xml:space="preserve">
+    <value>Gebruikersnaam '{0}' is ongeldig, mag alleen letters of cijfers bevatten.</value>
+  </data>
+  <data name="dotnet_identity_LoginAlreadyAssociated" xml:space="preserve">
+    <value>Er bestaat al een gebruiker met deze login.</value>
+  </data>
+  <data name="dotnet_identity_PasswordMismatch" xml:space="preserve">
+    <value>Onjuist wachtwoord.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresDigit" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens één cijfer bevatten ('0' - '9').</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresLower" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens één kleine letter ('a' - 'z') bevatten.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens één niet-alfanumeriek teken bevatten.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens {0} verschillende tekens bevatten.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUpper" xml:space="preserve">
+    <value>Wachtwoorden moeten minstens één hoofdletter ('A' - 'Z') hebben.</value>
+  </data>
+  <data name="dotnet_identity_PasswordTooShort" xml:space="preserve">
+    <value>Wachtwoorden zijn te kort.</value>
+  </data>
+  <data name="dotnet_identity_PwnedError" xml:space="preserve">
+    <value>Dit wachtwoord is eerder verschenen in een datalek en mag nooit worden gebruikt. Als je het ooit eerder ergens hebt gebruikt, verander het dan!</value>
+  </data>
+  <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
+    <value>Gebruiker is uitgesloten.</value>
   </data>
   <data name="exception.invalidJsonQuery" xml:space="preserve">
     <value>Json-query niet geldig: {message}</value>

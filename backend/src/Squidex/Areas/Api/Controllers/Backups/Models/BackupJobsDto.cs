@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models
@@ -18,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// <summary>
         /// The backups.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public BackupJobDto[] Items { get; set; }
 
         public static BackupJobsDto FromBackups(IEnumerable<IBackupJob> backups, Resources resources)

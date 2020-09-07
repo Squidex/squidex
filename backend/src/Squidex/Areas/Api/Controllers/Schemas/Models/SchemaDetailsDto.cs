@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -21,25 +21,25 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The scripts.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public SchemaScriptsDto Scripts { get; set; } = new SchemaScriptsDto();
 
         /// <summary>
         /// The preview Urls.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Dictionary<string, string> PreviewUrls { get; set; } = EmptyPreviewUrls;
 
         /// <summary>
         /// The name of fields that are used in content lists.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public List<string> FieldsInLists { get; set; }
 
         /// <summary>
         /// The name of fields that are used in content references.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public List<string> FieldsInReferences { get; set; }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The list of fields.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public List<FieldDto> Fields { get; set; }
 
         public static SchemaDetailsDto FromSchemaWithDetails(ISchemaEntity schema, Resources resources)

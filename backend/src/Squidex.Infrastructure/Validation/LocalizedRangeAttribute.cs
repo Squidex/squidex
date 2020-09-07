@@ -7,18 +7,32 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
-namespace Squidex.Infrastructure.Translations
+namespace Squidex.Infrastructure.Validation
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class LocalizedRequired : RequiredAttribute
+    public sealed class LocalizedRangeAttribute : RangeAttribute
     {
+        public LocalizedRangeAttribute(int minimum, int maximum)
+            : base(minimum, maximum)
+        {
+        }
+
+        public LocalizedRangeAttribute(double minimum, double maximum)
+            : base(minimum, maximum)
+        {
+        }
+
         public override string FormatErrorMessage(string name)
         {
             var property = T.Get($"common.{name.ToCamelCase()}", name);
 
-            return T.Get("annotations_Required", new { property });
+            var min = Minimum;
+            var max = Maximum;
+
+            return T.Get("annotations_Range", base.FormatErrorMessage(name), new { property, min, max });
         }
     }
 }

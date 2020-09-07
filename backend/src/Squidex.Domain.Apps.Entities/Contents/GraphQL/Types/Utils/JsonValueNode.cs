@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 
         protected override bool Equals(ValueNode<IJsonValue> node)
         {
-            return false;
+            return Equals(Value, node.Value);
         }
     }
 }

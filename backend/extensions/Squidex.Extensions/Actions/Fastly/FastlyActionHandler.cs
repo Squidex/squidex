@@ -50,11 +50,13 @@ namespace Squidex.Extensions.Actions.Fastly
                 httpClient.Timeout = TimeSpan.FromSeconds(2);
 
                 var requestUrl = $"https://api.fastly.com/service/{job.FastlyServiceID}/purge/{job.Key}";
-                var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
 
-                request.Headers.Add("Fastly-Key", job.FastlyApiKey);
+                using (var request = new HttpRequestMessage(HttpMethod.Post, requestUrl))
+                {
+                    request.Headers.Add("Fastly-Key", job.FastlyApiKey);
 
-                return await httpClient.OneWayRequestAsync(request, ct: ct);
+                    return await httpClient.OneWayRequestAsync(request, ct: ct);
+                }
             }
         }
     }

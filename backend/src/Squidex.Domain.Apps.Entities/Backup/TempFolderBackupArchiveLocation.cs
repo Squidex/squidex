@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     {
                         client.Timeout = TimeSpan.FromHours(1);
 
-                        response = await client.GetAsync(url);
+                        response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                         response.EnsureSuccessStatusCode();
 
                         using (var sourceStream = await response.Content.ReadAsStreamAsync())
@@ -66,6 +66,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 catch (HttpRequestException ex)
                 {
                     throw new BackupRestoreException($"Cannot download the archive. Got status code: {response?.StatusCode}.", ex);
+                }
+                finally
+                {
+                    response?.Dispose();
                 }
             }
 

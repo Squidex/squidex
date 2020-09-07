@@ -25,7 +25,12 @@
         <div class="filter mt-3" *ngFor="let filter of filters; let i = index">
             <span class="filter-line-h"></span>
     
-            <sqx-filter-node [filter]="filter" [language]="language" [level]="nestedLevel" [model]="model" (remove)="removeFilter(i)" (change)="emitChange()">
+            <sqx-filter-node
+                [filter]="filter"
+                [language]="language"
+                [level]="nestedLevel"
+                [model]="model"
+                (remove)="removeFilter(i)" (change)="emitChange()">
             </sqx-filter-node>
         </div>
 

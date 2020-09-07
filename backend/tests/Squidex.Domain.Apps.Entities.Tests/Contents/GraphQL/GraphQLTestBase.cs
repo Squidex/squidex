@@ -7,17 +7,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using FakeItEasy;
-using GraphQL;
 using GraphQL.DataLoader;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using NodaTime;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -26,8 +21,8 @@ using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Xunit;
 
@@ -40,6 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         protected readonly IAppEntity app;
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
+        protected readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
         protected readonly ISchemaEntity schema;
@@ -116,140 +112,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = CreateSut();
         }
 
-        protected IEnrichedContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData? data = null)
-        {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            data ??=
-                new NamedContentData()
-                    .AddField("my-string",
-                        new ContentFieldData()
-                            .AddValue("de", "value"))
-                    .AddField("my-assets",
-                        new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(assetId.ToString())))
-                    .AddField("2_numbers",
-                        new ContentFieldData()
-                            .AddValue("iv", 22))
-                    .AddField("2-numbers",
-                        new ContentFieldData()
-                            .AddValue("iv", 23))
-                    .AddField("my-number",
-                        new ContentFieldData()
-                            .AddValue("iv", 1.0))
-                    .AddField("my_number",
-                        new ContentFieldData()
-                            .AddValue("iv", 2.0))
-                    .AddField("my-boolean",
-                        new ContentFieldData()
-                            .AddValue("iv", true))
-                    .AddField("my-datetime",
-                        new ContentFieldData()
-                            .AddValue("iv", now))
-                    .AddField("my-tags",
-                        new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array("tag1", "tag2")))
-                    .AddField("my-references",
-                        new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(refId.ToString())))
-                    .AddField("my-union",
-                        new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(refId.ToString())))
-                    .AddField("my-geolocation",
-                        new ContentFieldData()
-                            .AddValue("iv", JsonValue.Object().Add("latitude", 10).Add("longitude", 20)))
-                    .AddField("my-json",
-                        new ContentFieldData()
-                            .AddValue("iv", JsonValue.Object().Add("value", 1)))
-                    .AddField("my-localized",
-                        new ContentFieldData()
-                            .AddValue("de-DE", "de-DE"))
-                    .AddField("my-array",
-                        new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(
-                                JsonValue.Object()
-                                    .Add("nested-boolean", true)
-                                    .Add("nested-number", 10)
-                                    .Add("nested_number", 11),
-                                JsonValue.Object()
-                                    .Add("nested-boolean", false)
-                                    .Add("nested-number", 20)
-                                    .Add("nested_number", 21))));
-
-            var content = new ContentEntity
-            {
-                Id = id,
-                Version = 1,
-                Created = now,
-                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
-                LastModified = now,
-                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
-                Data = data,
-                SchemaId = schemaId,
-                Status = Status.Draft,
-                StatusColor = "red"
-            };
-
-            return content;
-        }
-
-        protected static IEnrichedContentEntity CreateRefContent(NamedId<Guid> schemaId, Guid id, string field, string value)
-        {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            var data =
-                new NamedContentData()
-                    .AddField(field,
-                        new ContentFieldData()
-                            .AddValue("iv", value));
-
-            var content = new ContentEntity
-            {
-                Id = id,
-                Version = 1,
-                Created = now,
-                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
-                LastModified = now,
-                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
-                Data = data,
-                SchemaId = schemaId,
-                Status = Status.Draft,
-                StatusColor = "red"
-            };
-
-            return content;
-        }
-
-        protected static IEnrichedAssetEntity CreateAsset(Guid id)
-        {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            var asset = new AssetEntity
-            {
-                Id = id,
-                Version = 1,
-                Created = now,
-                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
-                LastModified = now,
-                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
-                FileName = "MyFile.png",
-                Slug = "myfile.png",
-                FileSize = 1024,
-                FileHash = "ABC123",
-                FileVersion = 123,
-                MimeType = "image/png",
-                Type = AssetType.Image,
-                MetadataText = "metadata-text",
-                Metadata =
-                    new AssetMetadata()
-                        .SetPixelWidth(800)
-                        .SetPixelHeight(600),
-                TagNames = new[] { "tag1", "tag2" }.ToHashSet()
-            };
-
-            return asset;
-        }
-
         protected void AssertResult(object expected, (bool HasErrors, object Response) result, bool checkErrors = true)
         {
             if (checkErrors && result.HasErrors)
@@ -268,33 +130,45 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return serializer.Serialize(result);
         }
 
+        public sealed class TestServiceProvider : IServiceProvider
+        {
+            private readonly Dictionary<Type, object> services;
+
+            public TestServiceProvider(GraphQLTestBase testBase)
+            {
+                var appProvider = A.Fake<IAppProvider>();
+
+                A.CallTo(() => appProvider.GetSchemasAsync(testBase.appId.Id))
+                    .Returns(new List<ISchemaEntity> { testBase.schema, testBase.schemaRef1, testBase.schemaRef2 });
+
+                var dataLoaderContext = new DataLoaderContextAccessor();
+
+                services = new Dictionary<Type, object>
+                {
+                    [typeof(IAppProvider)] = appProvider,
+                    [typeof(IAssetQueryService)] = testBase.assetQuery,
+                    [typeof(ICommandBus)] = testBase.commandBus,
+                    [typeof(IContentQueryService)] = testBase.contentQuery,
+                    [typeof(IDataLoaderContextAccessor)] = dataLoaderContext,
+                    [typeof(IOptions<AssetOptions>)] = Options.Create(new AssetOptions()),
+                    [typeof(IOptions<ContentOptions>)] = Options.Create(new ContentOptions()),
+                    [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
+                    [typeof(IUrlGenerator)] = new FakeUrlGenerator(),
+                    [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext)
+                };
+            }
+
+            public object GetService(Type serviceType)
+            {
+                return services.GetOrDefault(serviceType);
+            }
+        }
+
         private CachingGraphQLService CreateSut()
         {
-            var appProvider = A.Fake<IAppProvider>();
-
-            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
-                .Returns(new List<ISchemaEntity> { schema, schemaRef1, schemaRef2 });
-
-            var dataLoaderContext = new DataLoaderContextAccessor();
-
-            var services = new Dictionary<Type, object>
-            {
-                [typeof(IAppProvider)] = appProvider,
-                [typeof(IAssetQueryService)] = assetQuery,
-                [typeof(IContentQueryService)] = contentQuery,
-                [typeof(IDataLoaderContextAccessor)] = dataLoaderContext,
-                [typeof(IOptions<AssetOptions>)] = Options.Create(new AssetOptions()),
-                [typeof(IOptions<ContentOptions>)] = Options.Create(new ContentOptions()),
-                [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
-                [typeof(IUrlGenerator)] = new FakeUrlGenerator(),
-                [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext)
-            };
-
-            var resolver = new FuncDependencyResolver(t => services[t]);
-
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            return new CachingGraphQLService(cache, resolver);
+            return new CachingGraphQLService(cache, new TestServiceProvider(this));
         }
     }
 }

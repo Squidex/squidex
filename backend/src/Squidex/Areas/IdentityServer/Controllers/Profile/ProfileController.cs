@@ -169,7 +169,9 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         {
             if (file.Count != 1)
             {
-                return IdentityResult.Failed(new IdentityError { Description = T.Get("validation.onlyOneFile") });
+                var description = T.Get("validation.onlyOneFile");
+
+                return IdentityResult.Failed(new IdentityError { Code = "PictureNotOneFile", Description = description });
             }
 
             using (var thumbnailStream = new MemoryStream())
@@ -182,7 +184,9 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 }
                 catch
                 {
-                    return IdentityResult.Failed(new IdentityError { Description = T.Get("validation.notAnImage") });
+                    var description = T.Get("validation.notAnImage");
+
+                    return IdentityResult.Failed(new IdentityError { Code = "PictureNotAnImage", Description = description });
                 }
 
                 await userPictureStore.UploadAsync(user.Id, thumbnailStream);
@@ -217,7 +221,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                     return RedirectToAction(nameof(Profile), new { successMessage });
                 }
 
-                errorMessage = string.Join(". ", result.Errors.Select(x => x.Description));
+                errorMessage = result.Localize();
             }
             catch
             {

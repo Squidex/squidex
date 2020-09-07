@@ -6,20 +6,27 @@
 // ==========================================================================
 
 using GraphQL.Language.AST;
+using GraphQL.Types;
 using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
-    public sealed class InstantValue : ValueNode<Instant>
+    public sealed class InstantConverter : IAstFromValueConverter
     {
-        public InstantValue(Instant value)
+        public static readonly InstantConverter Instance = new InstantConverter();
+
+        private InstantConverter()
         {
-            Value = value;
         }
 
-        protected override bool Equals(ValueNode<Instant> node)
+        public IValue Convert(object value, IGraphType type)
         {
-            return Value.Equals(node.Value);
+            return new InstantValueNode((Instant)value);
+        }
+
+        public bool Matches(object value, IGraphType type)
+        {
+            return type is InstantGraphType;
         }
     }
 }

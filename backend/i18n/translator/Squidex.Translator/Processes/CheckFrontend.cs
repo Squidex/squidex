@@ -64,26 +64,19 @@ namespace Squidex.Translator.Processes
 
             var translations = new HashSet<string>();
 
-            var matches0 = Regex.Matches(content, "\"i18n\\:(?<Key>[^\"]+)\"", RegexOptions.Singleline);
-
-            foreach (Match match in matches0)
+            void AddTranslations(string regex)
             {
-                translations.Add(match.Groups["Key"].Value);
+                var matches = Regex.Matches(content, regex, RegexOptions.Singleline);
+
+                foreach (Match match in matches)
+                {
+                    translations.Add(match.Groups["Key"].Value);
+                }
             }
 
-            var matches1 = Regex.Matches(content, "'i18n\\:(?<Key>[^\']+)'", RegexOptions.Singleline);
-
-            foreach (Match match in matches1)
-            {
-                translations.Add(match.Groups["Key"].Value);
-            }
-
-            var matches2 = Regex.Matches(content, "'(?<Key>[^\']+)' \\| sqxTranslate", RegexOptions.Singleline);
-
-            foreach (Match match in matches2)
-            {
-                translations.Add(match.Groups["Key"].Value);
-            }
+            AddTranslations("\"i18n\\:(?<Key>[^\"]+)\"");
+            AddTranslations("'i18n\\:(?<Key>[^\']+)'");
+            AddTranslations("'(?<Key>[^\']+)' \\| sqxTranslate");
 
             return translations;
         }
@@ -94,26 +87,19 @@ namespace Squidex.Translator.Processes
 
             var translations = new HashSet<string>();
 
-            var matches1 = Regex.Matches(content, "'i18n\\:(?<Key>[^\']+)'", RegexOptions.Singleline);
-
-            foreach (Match match in matches1)
+            void AddTranslations(string regex)
             {
-                translations.Add(match.Groups["Key"].Value);
+                var matches = Regex.Matches(content, regex, RegexOptions.Singleline);
+
+                foreach (Match match in matches)
+                {
+                    translations.Add(match.Groups["Key"].Value);
+                }
             }
 
-            var matches2 = Regex.Matches(content, "localizer.get\\('(?<Key>[^\']+)'\\)", RegexOptions.Singleline);
-
-            foreach (Match match in matches2)
-            {
-                translations.Add(match.Groups["Key"].Value);
-            }
-
-            var matches3 = Regex.Matches(content, "localizer.getOrKey\\('(?<Key>[^\']+)'\\)", RegexOptions.Singleline);
-
-            foreach (Match match in matches3)
-            {
-                translations.Add(match.Groups["Key"].Value);
-            }
+            AddTranslations("'i18n\\:(?<Key>[^\']+)'");
+            AddTranslations("localizer.get\\('(?<Key>[^\']+)'\\)");
+            AddTranslations("localizer.getOrKey\\('(?<Key>[^\']+)'\\)");
 
             return translations;
         }

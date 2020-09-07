@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL;
 using GraphQL.DataLoader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,9 +28,6 @@ namespace Squidex.Config.Domain
                     c.GetRequiredService<IAssetFileStore>(),
                     exposeSourceUrl))
                 .As<IUrlGenerator>();
-
-            services.AddSingletonAs(x => new FuncDependencyResolver(x.GetRequiredService))
-                .As<IDependencyResolver>();
 
             services.AddSingletonAs<DataLoaderContextAccessor>()
                 .As<IDataLoaderContextAccessor>();

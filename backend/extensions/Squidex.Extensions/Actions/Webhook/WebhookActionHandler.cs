@@ -57,16 +57,17 @@ namespace Squidex.Extensions.Actions.Webhook
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
+                using (var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
                 {
                     Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
-                };
+                })
+                {
+                    request.Headers.Add("X-Signature", job.RequestSignature);
+                    request.Headers.Add("X-Application", "Squidex Webhook");
+                    request.Headers.Add("User-Agent", "Squidex Webhook");
 
-                request.Headers.Add("X-Signature", job.RequestSignature);
-                request.Headers.Add("X-Application", "Squidex Webhook");
-                request.Headers.Add("User-Agent", "Squidex Webhook");
-
-                return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
+                    return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
+                }
             }
         }
     }

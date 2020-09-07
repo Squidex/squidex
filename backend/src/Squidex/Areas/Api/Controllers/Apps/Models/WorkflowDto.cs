@@ -7,10 +7,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The workflow steps.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Dictionary<Status, WorkflowStepDto> Steps { get; set; }
 
         /// <summary>

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
@@ -23,24 +21,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "total",
                 ResolvedType = AllTypes.Int,
-                Resolver = Resolve(x => x.Total),
+                Resolver = AssetResolvers.ListTotal,
                 Description = "The total count of assets."
             });
 
             AddField(new FieldType
             {
                 Name = "items",
-                Resolver = Resolve(x => x),
+                Resolver = AssetResolvers.ListItems,
                 ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
                 Description = "The assets."
             });
 
             Description = "List of assets and total count of assets.";
-        }
-
-        private static IFieldResolver Resolve(Func<IResultList<IAssetEntity>, object> action)
-        {
-            return new FuncFieldResolver<IResultList<IAssetEntity>, object>(c => action(c.Source));
         }
     }
 }

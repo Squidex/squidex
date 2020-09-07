@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
@@ -21,7 +21,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The contributors.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public ContributorDto[] Items { get; set; }
 
         /// <summary>

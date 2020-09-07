@@ -7,12 +7,13 @@
 
 using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Web
 {
     public sealed class EntityCreatedDto
     {
-        [Required]
+        [LocalizedRequired]
         [Display(Description = "Id of the created entity.")]
         public string? Id { get; set; }
 

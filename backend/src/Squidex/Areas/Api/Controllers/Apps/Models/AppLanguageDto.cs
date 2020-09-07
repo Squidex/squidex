@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -19,19 +19,19 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The iso code of the language.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Iso2Code { get; set; }
 
         /// <summary>
         /// The english name of the language.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string EnglishName { get; set; }
 
         /// <summary>
         /// The fallback languages.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Language[] Fallback { get; set; }
 
         /// <summary>
