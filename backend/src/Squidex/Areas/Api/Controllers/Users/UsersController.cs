@@ -189,23 +189,22 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                         if (!string.IsNullOrWhiteSpace(url))
                         {
-                            using (var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+                            var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+
+                            if (response.IsSuccessStatusCode)
                             {
-                                if (response.IsSuccessStatusCode)
+                                var contentType = response.Content.Headers.ContentType.ToString();
+
+                                var etag = response.Headers.ETag;
+
+                                var result = new FileStreamResult(await response.Content.ReadAsStreamAsync(), contentType);
+
+                                if (!string.IsNullOrWhiteSpace(etag?.Tag))
                                 {
-                                    var contentType = response.Content.Headers.ContentType.ToString();
-
-                                    var etag = response.Headers.ETag;
-
-                                    var result = new FileStreamResult(await response.Content.ReadAsStreamAsync(), contentType);
-
-                                    if (!string.IsNullOrWhiteSpace(etag?.Tag))
-                                    {
-                                        result.EntityTag = new EntityTagHeaderValue(etag.Tag, etag.IsWeak);
-                                    }
-
-                                    return result;
+                                    result.EntityTag = new EntityTagHeaderValue(etag.Tag, etag.IsWeak);
                                 }
+
+                                return result;
                             }
                         }
                     }
