@@ -362,13 +362,13 @@
     <value>Failed to parse query: {message}</value>
   </data>
   <data name="common.odataFilterNotValid" xml:space="preserve">
-    <value>OData $filter clause not valid: {ex.Message}</value>
+    <value>OData $filter clause not valid: {message}</value>
   </data>
   <data name="common.odataNotSupported" xml:space="preserve">
     <value>OData operation is not supported.</value>
   </data>
   <data name="common.odataSearchNotValid" xml:space="preserve">
-    <value>OData $search clause not valid: {ex.Message}</value>
+    <value>OData $search clause not valid: {message}</value>
   </data>
   <data name="common.oldPassword" xml:space="preserve">
     <value>Old password</value>
