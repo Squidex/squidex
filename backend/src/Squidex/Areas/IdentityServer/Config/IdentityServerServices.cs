@@ -37,9 +37,6 @@ namespace Squidex.Areas.IdentityServer.Config
 
             services.AddDataProtection().SetApplicationName("Squidex");
 
-            services.AddSingleton(GetApiResources());
-            services.AddSingleton(GetIdentityResources());
-
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddDefaultTokenProviders();
 
@@ -64,18 +61,12 @@ namespace Squidex.Areas.IdentityServer.Config
                 })
                 .AddAspNetIdentity<IdentityUser>()
                 .AddInMemoryApiScopes(GetApiScopes())
-                .AddInMemoryApiResources(GetApiResources())
                 .AddInMemoryIdentityResources(GetIdentityResources());
         }
 
         private static IEnumerable<ApiScope> GetApiScopes()
         {
-            yield return new ApiScope(Constants.ApiScope);
-        }
-
-        private static IEnumerable<ApiResource> GetApiResources()
-        {
-            yield return new ApiResource(Constants.ApiScope)
+            yield return new ApiScope(Constants.ApiScope)
             {
                 UserClaims = new List<string>
                 {
