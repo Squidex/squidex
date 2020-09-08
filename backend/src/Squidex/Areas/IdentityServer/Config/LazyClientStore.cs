@@ -109,9 +109,9 @@ namespace Squidex.Areas.IdentityServer.Config
                     Constants.RoleScope,
                     Constants.PermissionsScope
                 },
-                Claims = new List<Claim>
+                Claims = new List<ClientClaim>
                 {
-                    new Claim(OpenIdClaims.Subject, user.Id)
+                    new ClientClaim(OpenIdClaims.Subject, user.Id)
                 }
             };
         }
@@ -228,9 +228,9 @@ namespace Squidex.Areas.IdentityServer.Config
                         Constants.RoleScope,
                         Constants.PermissionsScope
                     },
-                    Claims = new List<Claim>
+                    Claims = new List<ClientClaim>
                     {
-                        new Claim(SquidexClaimTypes.Permissions, Permissions.All)
+                        new ClientClaim(SquidexClaimTypes.Permissions, Permissions.All)
                     }
                 };
             }
