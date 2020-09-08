@@ -63,8 +63,14 @@ namespace Squidex.Areas.IdentityServer.Config
                     options.UserInteraction.ErrorUrl = "/error/";
                 })
                 .AddAspNetIdentity<IdentityUser>()
+                .AddInMemoryApiScopes(GetApiScopes())
                 .AddInMemoryApiResources(GetApiResources())
                 .AddInMemoryIdentityResources(GetIdentityResources());
+        }
+
+        private static IEnumerable<ApiScope> GetApiScopes()
+        {
+            yield return new ApiScope(Constants.ApiScope);
         }
 
         private static IEnumerable<ApiResource> GetApiResources()
