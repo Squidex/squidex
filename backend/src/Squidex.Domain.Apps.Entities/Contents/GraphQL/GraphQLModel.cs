@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLModel : IGraphModel
     {
+        private static readonly IDocumentExecuter Executor = new DocumentExecuter();
         private readonly Dictionary<Guid, ContentGraphType> contentTypes = new Dictionary<Guid, ContentGraphType>();
         private readonly PartitionResolver partitionResolver;
         private readonly IGraphType assetType;
@@ -125,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             Guard.NotNull(context, nameof(context));
 
-            var result = await new DocumentExecuter().ExecuteAsync(execution =>
+            var result = await Executor.ExecuteAsync(execution =>
             {
                 context.Setup(execution);
 
@@ -134,7 +135,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 execution.Query = query.Query;
             }).ConfigureAwait(false);
 
-            return (result.Data, result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray());
+            var errors = result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray();
+
+            return (result.Data, errors);
         }
     }
 }
