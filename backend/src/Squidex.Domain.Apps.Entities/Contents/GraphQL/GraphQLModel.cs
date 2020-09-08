@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -29,8 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         private readonly Dictionary<Guid, ContentGraphType> contentTypes = new Dictionary<Guid, ContentGraphType>();
         private readonly PartitionResolver partitionResolver;
-        private readonly IAppEntity app;
-        private readonly IObjectGraphType assetType;
+        private readonly IGraphType assetType;
         private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
 
@@ -42,8 +40,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             int pageSizeAssets,
             IUrlGenerator urlGenerator)
         {
-            this.app = app;
-
             partitionResolver = app.PartitionResolver();
 
             CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
@@ -100,18 +96,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return schema;
         }
 
-        public IFieldResolver ResolveContentUrl(ISchemaEntity schema)
-        {
-            var resolver = new FuncFieldResolver<IContentEntity, object>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.ContentUI(app.NamedId(), schema.NamedId(), c.Source.Id);
-            });
-
-            return resolver;
-        }
-
         public IFieldPartitioning ResolvePartition(Partitioning key)
         {
             return partitionResolver(key);
@@ -127,12 +111,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return field.Accept(new QueryGraphTypeVisitor(schema, contentTypes, this, assetListType, fieldName));
         }
 
-        public IObjectGraphType GetAssetType()
+        public IGraphType GetAssetType()
         {
             return assetType;
         }
 
-        public IObjectGraphType GetContentType(Guid schemaId)
+        public IGraphType GetContentType(Guid schemaId)
         {
             return contentTypes.GetOrDefault(schemaId);
         }

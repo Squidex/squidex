@@ -20,9 +20,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         IFieldPartitioning ResolvePartition(Partitioning key);
 
-        IObjectGraphType GetAssetType();
+        IGraphType GetAssetType();
 
-        IObjectGraphType GetContentType(Guid schemaId);
+        IGraphType GetContentType(Guid schemaId);
 
         IGraphType? GetInputGraphType(ISchemaEntity schema, IField field, string fieldName);
 
