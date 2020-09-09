@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.History.Repositories;
@@ -117,6 +118,9 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
                         .As<IContentRepository>().As<ISnapshotStore<ContentState, Guid>>();
+
+                    services.AddSingletonAs<MongoTextIndex>()
+                        .AsOptional<ITextIndex>();
 
                     services.AddSingletonAs<MongoTextIndexerState>()
                         .As<ITextIndexerState>();

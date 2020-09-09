@@ -18,14 +18,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
     [ExcludeFromCodeCoverage]
     public sealed class ElasticSearchTextIndex : ITextIndex
     {
-        private const string IndexName = "contents";
         private readonly ElasticLowLevelClient client;
+        private readonly string indexName;
+        private readonly bool waitForTesting;
 
-        public ElasticSearchTextIndex()
+        public ElasticSearchTextIndex(string configurationString, string indexName, bool waitForTesting = false)
         {
-            var config = new ConnectionConfiguration(new Uri("http://localhost:9200"));
+            Guard.NotNull(configurationString, nameof(configurationString));
+            Guard.NotNull(indexName, nameof(indexName));
+
+            var config = new ConnectionConfiguration(new Uri(configurationString));
 
             client = new ElasticLowLevelClient(config);
+
+            this.indexName = indexName;
+
+            this.waitForTesting = waitForTesting;
         }
 
         public Task ClearAsync()
@@ -50,6 +58,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                         break;
                 }
             }
+
+            if (waitForTesting)
+            {
+                await Task.Delay(1000);
+            }
         }
 
         private async Task UpsertAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, UpsertIndexEntry upsert)
@@ -66,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 texts = upsert.Texts,
             };
 
-            var result = await client.IndexAsync<StringResponse>(IndexName, upsert.DocId, CreatePost(data));
+            var result = await client.IndexAsync<StringResponse>(indexName, upsert.DocId, CreatePost(data));
 
             if (!result.Success)
             {
@@ -80,12 +93,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             {
                 doc = new
                 {
-                    update.ServeAll,
-                    update.ServePublished
+                    serveAll = update.ServeAll,
+                    servePublished = update.ServePublished
                 }
             };
 
-            var result = await client.UpdateAsync<StringResponse>(IndexName, update.DocId, CreatePost(data));
+            var result = await client.UpdateAsync<StringResponse>(indexName, update.DocId, CreatePost(data));
 
             if (!result.Success)
             {
@@ -95,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
         private Task DeleteAsync(DeleteIndexEntry delete)
         {
-            return client.DeleteAsync<StringResponse>(IndexName, delete.DocId);
+            return client.DeleteAsync<StringResponse>(indexName, delete.DocId);
         }
 
         private static PostData CreatePost<T>(T data)
@@ -155,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             {
                 var bySchema = new
                 {
-                    term = new Dictionary<string, object>
+                    terms = new Dictionary<string, object>
                     {
                         ["schemaId.keyword"] = filter.SchemaIds
                     }
@@ -171,7 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 }
             }
 
-            var result = await client.SearchAsync<DynamicResponse>(IndexName, CreatePost(query));
+            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(query));
 
             if (!result.Success)
             {

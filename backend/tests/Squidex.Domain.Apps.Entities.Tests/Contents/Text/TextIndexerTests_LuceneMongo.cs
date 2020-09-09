@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Xunit;
+
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public class TextIndexerTests_FS : TextIndexerTestsBase
+    [Trait("Category", "Dependencies")]
+    public class TextIndexerTests_LuceneMongo : TextIndexerTestsBase
     {
-        public override IIndexerFactory Factory { get; } = new LuceneIndexFactory(TestStorages.TempFolder());
+        public override IIndexerFactory Factory { get; } = new LuceneIndexFactory(TestStorages.MongoDB());
     }
 }

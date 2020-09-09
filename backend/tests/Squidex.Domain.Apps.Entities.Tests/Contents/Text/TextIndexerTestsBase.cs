@@ -37,23 +37,79 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public abstract IIndexerFactory Factory { get; }
 
+        public virtual bool SupportsCleanup { get; set; } = false;
+
+        public virtual bool SupportsSearchSyntax { get; set; } = true;
+
+        public virtual bool SupportsMultiLanguage { get; set; } = true;
+
         public virtual InMemoryTextIndexerState State { get; } = new InMemoryTextIndexerState();
 
         protected TextIndexerTestsBase()
         {
             app =
-                Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"),
+                Mocks.App(appId,
                     Language.DE,
                     Language.EN);
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Should_throw_exception_for_invalid_query()
         {
+            Skip.IfNot(SupportsSearchSyntax);
+
             await Assert.ThrowsAsync<ValidationException>(async () =>
             {
                 await TestCombinations(Search(expected: null, text: "~hello"));
             });
+        }
+
+        [SkippableFact]
+        public async Task Should_index_invariant_content_and_retrieve_with_fuzzy()
+        {
+            Skip.IfNot(SupportsSearchSyntax);
+
+            await TestCombinations(
+                Create(ids1[0], "iv", "Hello"),
+                Create(ids2[0], "iv", "World"),
+
+                Search(expected: ids1, text: "helo~"),
+                Search(expected: ids2, text: "wold~", SearchScope.All)
+            );
+        }
+
+        [SkippableFact]
+        public async Task Should_search_by_field()
+        {
+            Skip.IfNot(SupportsSearchSyntax);
+
+            await TestCombinations(
+                Create(ids1[0], "en", "City"),
+                Create(ids2[0], "de", "Stadt"),
+
+                Search(expected: ids1, text: "en:city"),
+                Search(expected: ids2, text: "de:Stadt")
+            );
+        }
+
+        [SkippableFact]
+        public async Task Should_index_localized_content_and_retrieve()
+        {
+            Skip.IfNot(SupportsMultiLanguage);
+
+            await TestCombinations(
+                Create(ids1[0], "de", "Stadt und Land and Fluss"),
+
+                Create(ids2[0], "en", "City and Country und River"),
+
+                Search(expected: ids1, text: "Stadt"),
+                Search(expected: ids1, text: "and"),
+                Search(expected: ids2, text: "und"),
+
+                Search(expected: ids2, text: "City"),
+                Search(expected: ids2, text: "und"),
+                Search(expected: ids1, text: "and")
+            );
         }
 
         [Fact]
@@ -68,18 +124,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 Search(expected: null, text: "Hello", SearchScope.Published),
                 Search(expected: null, text: "World", SearchScope.Published)
-            );
-        }
-
-        [Fact]
-        public async Task Should_index_invariant_content_and_retrieve_with_fuzzy()
-        {
-            await TestCombinations(
-                Create(ids1[0], "iv", "Hello"),
-                Create(ids2[0], "iv", "World"),
-
-                Search(expected: ids1, text: "helo~"),
-                Search(expected: ids2, text: "wold~", SearchScope.All)
             );
         }
 
@@ -282,36 +326,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             );
         }
 
-        [Fact]
-        public async Task Should_search_by_field()
-        {
-            await TestCombinations(
-                Create(ids1[0], "en", "City"),
-                Create(ids2[0], "de", "Stadt"),
-
-                Search(expected: ids1, text: "en:city"),
-                Search(expected: ids2, text: "de:Stadt")
-            );
-        }
-
-        [Fact]
-        public async Task Should_index_localized_content_and_retrieve()
-        {
-            await TestCombinations(
-                Create(ids1[0], "de", "Stadt und Land and Fluss"),
-
-                Create(ids2[0], "en", "City and Country und River"),
-
-                Search(expected: ids1, text: "Stadt"),
-                Search(expected: ids1, text: "and"),
-                Search(expected: ids2, text: "und"),
-
-                Search(expected: ids2, text: "City"),
-                Search(expected: ids2, text: "und"),
-                Search(expected: ids1, text: "and")
-            );
-        }
-
         private IndexOperation Create(Guid id, string language, string text)
         {
             var data =
@@ -400,9 +414,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private async Task TestCombinations(params IndexOperation[] actions)
         {
-            for (var i = 0; i < actions.Length; i++)
+            if (SupportsCleanup)
             {
-                await TestCombinations(i, actions);
+                for (var i = 0; i < actions.Length; i++)
+                {
+                    await TestCombinations(i, actions);
+                }
+            }
+            else
+            {
+                await TestCombinations(0, actions);
             }
         }
 

@@ -7,8 +7,8 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public class TextIndexerTests_Assets : TextIndexerTestsBase
+    public class TextIndexerTests_LuceneFS : TextIndexerTestsBase
     {
-        public override IIndexerFactory Factory { get; } = new LuceneIndexFactory(TestStorages.Assets());
+        public override IIndexerFactory Factory { get; } = new LuceneIndexFactory(TestStorages.TempFolder());
     }
 }
