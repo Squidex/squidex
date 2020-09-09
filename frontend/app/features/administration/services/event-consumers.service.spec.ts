@@ -134,6 +134,7 @@ describe('EventConsumersService', () => {
         return {
             name: `event-consumer${id}`,
             position: `position${id}`,
+            count: id,
             isStopped: true,
             isResetting: true,
             error: `failure${id}`,
@@ -151,6 +152,7 @@ export function createEventConsumer(id: number, suffix = '') {
 
     return new EventConsumerDto(links,
         `event-consumer${id}`,
+        id,
         true,
         true,
         `failure${id}${suffix}`,

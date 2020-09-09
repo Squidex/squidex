@@ -481,6 +481,7 @@
   "dashboard.trafficSummaryCard": "API Traffic Summary",
   "dashboard.welcomeText": "Welcome to **{app}** dashboard.",
   "dashboard.welcomeTitle": "Hi {user}",
+  "eventConsumers.count": "Count",
   "eventConsumers.loadFailed": "Failed to load event consumers. Please reload.",
   "eventConsumers.pageTitle": "Event Consumers",
   "eventConsumers.position": "Position",

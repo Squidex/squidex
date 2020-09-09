@@ -481,6 +481,7 @@
   "dashboard.trafficSummaryCard": "API Verkeer Samenvatting",
   "dashboard.welcomeText": "Welkom bij **{app}** dashboard.",
   "dashboard.welcomeTitle": "Hallo {user}",
+  "eventConsumers.count": "Count",
   "eventConsumers.loadFailed": "Kan gebeurtenisgebruikers niet laden. Laad opnieuw.",
   "eventConsumers.pageTitle": "Evenementconsumenten",
   "eventConsumers.position": "Positie",

@@ -481,6 +481,7 @@
   "dashboard.trafficSummaryCard": "Riepilogo del traffico delle API",
   "dashboard.welcomeText": "Benvenuto su **{app}** dashboard.",
   "dashboard.welcomeTitle": "Ciao {user}",
+  "eventConsumers.count": "Count",
   "eventConsumers.loadFailed": "Non è stato possibile caricare event consumers. Per favore ricarica.",
   "eventConsumers.pageTitle": "Eventi degli utenti",
   "eventConsumers.position": "Posizione",
