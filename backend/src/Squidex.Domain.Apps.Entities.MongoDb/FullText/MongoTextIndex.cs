@@ -23,24 +23,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
     public sealed class MongoTextIndex : MongoRepositoryBase<MongoTextIndexEntity>, ITextIndex
     {
         private static readonly List<Guid> EmptyResults = new List<Guid>();
-        private static readonly HashSet<string> SupportedLanguages = new HashSet<string>()
-        {
-            "da",
-            "de",
-            "en",
-            "es",
-            "fi",
-            "fr",
-            "hu",
-            "it",
-            "nb",
-            "nl",
-            "pt",
-            "ro",
-            "ru",
-            "sv",
-            "tr"
-        };
 
         public MongoTextIndex(IMongoDatabase database, bool setup = false)
             : base(database, setup)
@@ -170,21 +152,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     .ToListAsync();
 
             return bySchema.Select(x => Guid.Parse(x["_ci"].AsString)).Distinct().ToList();
-        }
-
-        private static string GetLanguage(string language)
-        {
-            return "none";
-            var parent = language.Substring(0, 2);
-
-            if (SupportedLanguages.Contains(parent))
-            {
-                return parent;
-            }
-            else
-            {
-                return "en";
-            }
         }
 
         private static FilterDefinition<MongoTextIndexEntity> Filter_ByScope(SearchScope scope)
