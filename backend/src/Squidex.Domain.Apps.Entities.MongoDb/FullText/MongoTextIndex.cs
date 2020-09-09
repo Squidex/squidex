@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                                     SchemaId = schemaId.Id,
                                     ServeAll = upsert.ServeAll,
                                     ServePublished = upsert.ServePublished,
-                                    Texts = upsert.Texts.Select(x => new MongoTextIndexEntityText { Language = GetLanguage(x.Key), Text = x.Value }).ToList(),
+                                    Texts = upsert.Texts.Select(x => new MongoTextIndexEntityText { Text = x.Value }).ToList(),
                                     AppId = appId.Id
                                 })
                             {

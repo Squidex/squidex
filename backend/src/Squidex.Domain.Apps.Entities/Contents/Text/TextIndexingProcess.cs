@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public string Name
         {
-            get { return "TextIndexer4"; }
+            get { return "TextIndexer5"; }
         }
 
         public string EventsFilter

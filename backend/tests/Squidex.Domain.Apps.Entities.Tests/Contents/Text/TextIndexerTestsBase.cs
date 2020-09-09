@@ -92,24 +92,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             );
         }
 
-        [SkippableFact]
+        [Fact]
         public async Task Should_index_localized_content_and_retrieve()
         {
-            Skip.IfNot(SupportsMultiLanguage);
+            if (SupportsMultiLanguage)
+            {
+                await TestCombinations(
+                    Create(ids1[0], "de", "Stadt und Land and Fluss"),
 
-            await TestCombinations(
-                Create(ids1[0], "de", "Stadt und Land and Fluss"),
+                    Create(ids2[0], "en", "City and Country und River"),
 
-                Create(ids2[0], "en", "City and Country und River"),
+                    Search(expected: ids1, text: "Stadt"),
+                    Search(expected: ids2, text: "City"),
 
-                Search(expected: ids1, text: "Stadt"),
-                Search(expected: ids1, text: "and"),
-                Search(expected: ids2, text: "und"),
+                    Search(expected: ids1, text: "and"),
+                    Search(expected: ids2, text: "und")
+                );
+            }
+            else
+            {
+                var both = ids2.Union(ids1).ToList();
 
-                Search(expected: ids2, text: "City"),
-                Search(expected: ids2, text: "und"),
-                Search(expected: ids1, text: "and")
-            );
+                await TestCombinations(
+                    Create(ids1[0], "de", "Stadt und Land and Fluss"),
+
+                    Create(ids2[0], "en", "City and Country und River"),
+
+                    Search(expected: ids1, text: "Stadt"),
+                    Search(expected: ids2, text: "City"),
+
+                    Search(expected: null, text: "and"),
+                    Search(expected: both, text: "und")
+                );
+            }
         }
 
         [Fact]

@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         [BsonElement("t")]
         public string Text { get; set; }
 
-        [BsonRequired]
+        [BsonIgnoreIfNull]
         [BsonElement("language")]
         public string Language { get; set; }
     }
