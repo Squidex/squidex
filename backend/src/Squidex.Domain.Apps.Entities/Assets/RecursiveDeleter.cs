@@ -57,11 +57,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             folderDeletedType = typeNameRegistry.GetName<AssetFolderDeleted>();
         }
 
-        public Task ClearAsync()
-        {
-            return Task.CompletedTask;
-        }
-
         public bool Handles(StoredEvent @event)
         {
             return @event.Data.Type == folderDeletedType;

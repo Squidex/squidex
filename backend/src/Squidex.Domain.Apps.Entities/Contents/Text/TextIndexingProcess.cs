@@ -44,11 +44,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             this.textIndexerState = textIndexerState;
         }
 
-        public bool Handles(StoredEvent @event)
-        {
-            return true;
-        }
-
         public async Task ClearAsync()
         {
             await textIndexer.ClearAsync();

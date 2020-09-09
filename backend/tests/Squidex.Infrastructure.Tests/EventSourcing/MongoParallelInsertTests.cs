@@ -206,16 +206,6 @@ namespace Squidex.Infrastructure.EventSourcing
                 this.expectedCount = expectedCount;
             }
 
-            public Task ClearAsync()
-            {
-                return Task.CompletedTask;
-            }
-
-            public bool Handles(StoredEvent @event)
-            {
-                return true;
-            }
-
             public async Task On(Envelope<IEvent> @event)
             {
                 Received++;

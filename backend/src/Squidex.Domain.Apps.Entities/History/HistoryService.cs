@@ -54,11 +54,6 @@ namespace Squidex.Domain.Apps.Entities.History
             this.notifo = notifo;
         }
 
-        public bool Handles(StoredEvent @event)
-        {
-            return true;
-        }
-
         public Task ClearAsync()
         {
             return repository.ClearAsync();

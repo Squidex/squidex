@@ -46,9 +46,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return new EventConsumerState();
         }
 
-        public EventConsumerState Handled(string position)
+        public EventConsumerState Handled(string position, int offset = 1)
         {
-            return new EventConsumerState(position, Count + 1);
+            return new EventConsumerState(position, Count + offset);
         }
 
         public EventConsumerState Stopped(Exception? ex = null)

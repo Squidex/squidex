@@ -55,16 +55,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.localCache = localCache;
         }
 
-        public bool Handles(StoredEvent @event)
-        {
-            return true;
-        }
-
-        public Task ClearAsync()
-        {
-            return Task.CompletedTask;
-        }
-
         public async Task Enqueue(Rule rule, Guid ruleId, Envelope<IEvent> @event)
         {
             Guard.NotNull(rule, nameof(rule));

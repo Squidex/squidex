@@ -25,16 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             get { return "^asset-"; }
         }
 
-        public bool Handles(StoredEvent @event)
-        {
-            return true;
-        }
-
-        public Task ClearAsync()
-        {
-            return Task.CompletedTask;
-        }
-
         public Task On(Envelope<IEvent> @event)
         {
             switch (@event.Payload)

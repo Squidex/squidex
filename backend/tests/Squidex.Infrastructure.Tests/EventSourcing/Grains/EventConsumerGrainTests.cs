@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
@@ -70,6 +72,15 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.Handles(A<StoredEvent>._))
                 .Returns(true);
 
+            A.CallTo(() => eventConsumer.On(A<IEnumerable<Envelope<IEvent>>>._))
+                .Invokes((IEnumerable<Envelope<IEvent>> events) =>
+                {
+                    foreach (var @event in events)
+                    {
+                        eventConsumer.On(@event).Wait();
+                    }
+                });
+
             A.CallTo(() => formatter.Parse(eventData, null))
                 .Returns(envelope);
 
@@ -89,6 +100,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = null });
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
@@ -101,10 +114,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = false, Position = initialPosition, Error = null });
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -115,10 +130,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = false, Position = initialPosition, Error = null });
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -127,10 +144,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = false, Position = initialPosition, Error = null });
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -141,13 +160,15 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.StopAsync();
             await sut.StopAsync();
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = null });
 
             A.CallTo(() => grainState.WriteAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -158,22 +179,24 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.StopAsync();
             await sut.ResetAsync();
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = false, Position = null, Error = null });
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened(2, Times.Exactly);
 
             A.CallTo(() => eventConsumer.ClearAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, grainState.Value.Position))
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, null))
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -186,13 +209,71 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnEventAsync(eventSubscription, @event);
 
-            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null });
+            await sut.OnDeactivateAsync();
+
+            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null, Count = 1 });
 
             A.CallTo(() => grainState.WriteAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventConsumer.On(envelope))
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_invoke_and_update_position_when_event_received_one_by_one()
+        {
+            var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
+
+            A.CallTo(() => eventConsumer.BatchSize)
+                .Returns(1);
+
+            await sut.ActivateAsync(consumerName);
+            await sut.ActivateAsync();
+
+            await OnEventAsync(eventSubscription, @event);
+            await OnEventAsync(eventSubscription, @event);
+            await OnEventAsync(eventSubscription, @event);
+            await OnEventAsync(eventSubscription, @event);
+            await OnEventAsync(eventSubscription, @event);
+
+            await sut.OnDeactivateAsync();
+
+            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null, Count = 5 });
+
+            A.CallTo(() => grainState.WriteAsync())
+                .MustHaveHappened(5, Times.Exactly);
+
+            A.CallTo(() => eventConsumer.On(A<IEnumerable<Envelope<IEvent>>>._))
+                .MustHaveHappened(5, Times.Exactly);
+        }
+
+        [Fact]
+        public async Task Should_invoke_and_update_position_when_event_received_batched()
+        {
+            var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
+
+            A.CallTo(() => eventConsumer.BatchSize)
+                .Returns(100);
+
+            await sut.ActivateAsync(consumerName);
+            await sut.ActivateAsync();
+
+            await OnEventAsync(eventSubscription, @event);
+            await OnEventAsync(eventSubscription, @event);
+            await OnEventAsync(eventSubscription, @event);
+            await OnEventAsync(eventSubscription, @event);
+            await OnEventAsync(eventSubscription, @event);
+
+            await sut.OnDeactivateAsync();
+
+            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null, Count = 5 });
+
+            A.CallTo(() => grainState.WriteAsync())
+                .MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => eventConsumer.On(A<IEnumerable<Envelope<IEvent>>>._))
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -208,10 +289,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnEventAsync(eventSubscription, @event);
 
-            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null });
+            await sut.OnDeactivateAsync();
+
+            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null, Count = 1 });
 
             A.CallTo(() => grainState.WriteAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustNotHaveHappened();
@@ -230,10 +313,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnEventAsync(eventSubscription, @event);
 
-            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null });
+            await sut.OnDeactivateAsync();
+
+            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null, Count = 1 });
 
             A.CallTo(() => grainState.WriteAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustNotHaveHappened();
@@ -248,6 +333,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.ActivateAsync();
 
             await OnEventAsync(A.Fake<IEventSubscription>(), @event);
+
+            await sut.OnDeactivateAsync();
 
             AssetGrainState(new EventConsumerState { IsStopped = false, Position = initialPosition, Error = null });
 
@@ -265,13 +352,15 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnErrorAsync(eventSubscription, ex);
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = ex.ToString() });
 
             A.CallTo(() => grainState.WriteAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -283,6 +372,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.ActivateAsync();
 
             await OnErrorAsync(A.Fake<IEventSubscription>(), ex);
+
+            await sut.OnDeactivateAsync();
 
             AssetGrainState(new EventConsumerState { IsStopped = false, Position = initialPosition, Error = null });
 
@@ -296,6 +387,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
             await sut.ActivateAsync();
+
+            await sut.OnDeactivateAsync();
 
             A.CallTo(() => eventSubscription.WakeUp())
                 .MustHaveHappened();
@@ -313,13 +406,15 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.ActivateAsync();
             await sut.ResetAsync();
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = ex.ToString() });
 
             A.CallTo(() => grainState.WriteAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -337,16 +432,18 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnEventAsync(eventSubscription, @event);
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = ex.ToString() });
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened();
 
             A.CallTo(() => grainState.WriteAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -364,16 +461,18 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnEventAsync(eventSubscription, @event);
 
+            await sut.OnDeactivateAsync();
+
             AssetGrainState(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = ex.ToString() });
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustNotHaveHappened();
 
             A.CallTo(() => grainState.WriteAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -391,6 +490,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnEventAsync(eventSubscription, @event);
 
+            await sut.OnDeactivateAsync();
+
             await sut.StopAsync();
             await sut.StartAsync();
             await sut.StartAsync();
@@ -404,7 +505,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 .MustHaveHappened(2, Times.Exactly);
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
                 .MustHaveHappened(2, Times.Exactly);

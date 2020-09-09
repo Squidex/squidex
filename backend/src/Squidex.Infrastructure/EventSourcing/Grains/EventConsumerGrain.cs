@@ -6,9 +6,12 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Orleans;
 using Orleans.Concurrency;
 using Squidex.Infrastructure.Log;
@@ -25,9 +28,22 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
+        private ITargetBlock<Job> pipelineStart;
+        private IDataflowBlock pipelineEnd;
         private TaskScheduler? scheduler;
         private IEventSubscription? currentSubscription;
         private IEventConsumer? eventConsumer;
+
+        private sealed class Job
+        {
+            public bool ShouldHandle { get; set; }
+
+            public StoredEvent Stored { get; set; }
+
+            public Envelope<IEvent>? Event { get; set; }
+
+            public IEventSubscription Subscription { get; set; }
+        }
 
         private EventConsumerState State
         {
@@ -62,7 +78,78 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             eventConsumer = eventConsumerFactory(key);
 
+            var parse = new TransformBlock<Job, Job>(async job =>
+            {
+                if (job.ShouldHandle)
+                {
+                    await DoAndUpdateStateAsync(() =>
+                    {
+                        job.Event = ParseKnownEvent(job.Stored);
+                    });
+                }
+
+                return job;
+            }, new ExecutionDataflowBlockOptions
+            {
+                BoundedCapacity = 2,
+                MaxDegreeOfParallelism = 1,
+                MaxMessagesPerTask = 1
+            });
+
+            var batchSize = Math.Max(1, eventConsumer.BatchSize);
+
+            var buffer = AsyncHelper.CreateBatchBlock<Job>(batchSize, 500, new GroupingDataflowBlockOptions
+            {
+                BoundedCapacity = batchSize * 2
+            });
+
+            var handle = new ActionBlock<IList<Job>>(async jobs =>
+            {
+                if (jobs.First().Subscription != currentSubscription)
+                {
+                    return;
+                }
+
+                var events = jobs.Where(x => x.ShouldHandle && x.Event != null && x.Subscription == currentSubscription).Select(x => x.Event).NotNull().ToArray();
+
+                await DoAndUpdateStateAsync(async () =>
+                {
+                    await eventConsumer.On(events);
+
+                    var position = jobs.Last().Stored.EventPosition;
+
+                    State = State.Handled(position, jobs.Count);
+                });
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                BoundedCapacity = 2,
+                MaxDegreeOfParallelism = 1,
+                MaxMessagesPerTask = 1,
+                TaskScheduler = scheduler
+            });
+
+            parse!.LinkTo(buffer, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            buffer!.LinkTo(handle, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            pipelineStart = parse;
+            pipelineEnd = handle;
+
             return Task.CompletedTask;
+        }
+
+        public override Task OnDeactivateAsync()
+        {
+            pipelineStart.Complete();
+
+            return pipelineEnd.Completion;
         }
 
         public Task<Immutable<EventConsumerInfo>> GetStateAsync()
@@ -82,20 +169,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 return Task.CompletedTask;
             }
 
-            return DoAndUpdateStateAsync(async () =>
+            var job = new Job
             {
-                if (eventConsumer!.Handles(storedEvent.Value))
-                {
-                    var @event = ParseKnownEvent(storedEvent.Value);
+                ShouldHandle = eventConsumer!.Handles(storedEvent.Value),
+                Stored = storedEvent.Value,
+                Subscription = subscription.Value
+            };
 
-                    if (@event != null)
-                    {
-                        await DispatchConsumerAsync(@event);
-                    }
-                }
-
-                State = State.Handled(storedEvent.Value.EventPosition);
-            });
+            return pipelineStart.SendAsync(job);
         }
 
         public Task OnErrorAsync(Immutable<IEventSubscription> subscription, Immutable<Exception> exception)
@@ -187,6 +268,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private async Task DoAndUpdateStateAsync(Func<Task> action, [CallerMemberName] string? caller = null)
         {
+            var previousState = State;
+
             try
             {
                 await action();
@@ -210,7 +293,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 State = State.Stopped(ex);
             }
 
-            await state.WriteAsync();
+            if (State != previousState)
+            {
+                await state.WriteAsync();
+            }
         }
 
         private async Task ClearAsync()
@@ -230,33 +316,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 .WriteProperty("eventConsumer", ctx.consumer)))
             {
                 await eventConsumer.ClearAsync();
-            }
-        }
-
-        private async Task DispatchConsumerAsync(Envelope<IEvent> @event)
-        {
-            var eventId = @event.Headers.EventId().ToString();
-            var eventType = @event.Payload.GetType().Name;
-
-            var logContext = (eventId, eventType, consumer: eventConsumer!.Name);
-
-            log.LogDebug(logContext, (ctx, w) => w
-                .WriteProperty("action", "HandleEvent")
-                .WriteProperty("actionId", ctx.eventId)
-                .WriteProperty("status", "Started")
-                .WriteProperty("eventId", ctx.eventId)
-                .WriteProperty("eventType", ctx.eventType)
-                .WriteProperty("eventConsumer", ctx.consumer));
-
-            using (log.MeasureInformation(logContext, (ctx, w) => w
-                .WriteProperty("action", "HandleEvent")
-                .WriteProperty("actionId", ctx.eventId)
-                .WriteProperty("status", "Completed")
-                .WriteProperty("eventId", ctx.eventId)
-                .WriteProperty("eventType", ctx.eventType)
-                .WriteProperty("eventConsumer", ctx.consumer)))
-            {
-                await eventConsumer.On(@event);
             }
         }
 
