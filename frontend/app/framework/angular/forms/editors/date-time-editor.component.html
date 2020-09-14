@@ -27,7 +27,7 @@
             </button>
         </div>
         <div class="form-group" *ngIf="!isDateTimeMode && shouldShowDateButtons">
-            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="i18n:common.dateTimeEditor.todayTooltip">
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeToday()" title="i18n:common.dateTimeEditor.todayTooltip">
                 {{ 'common.dateTimeEditor.today' | sqxTranslate }}
             </button>
         </div>

@@ -79,7 +79,11 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
     }
 
     public createDraft() {
-        this.contentsState.createDraft(this.content);
+        this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
+                filter(x => !!x),
+                switchMap(d => this.contentsState.createDraft(this.content)),
+                onErrorResumeNext())
+            .subscribe();
     }
 
     public delete() {
