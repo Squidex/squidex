@@ -11,7 +11,30 @@ import { formatError } from './error-formatting';
 import { ValidatorsEx } from './validators';
 
 describe('formatErrors', () => {
-    const localizer = new LocalizerService(require('./../../../../../backend/i18n/frontend_en.json'));
+    const localizer = new LocalizerService({
+        'validation.between': '{field} must be between \'{min}\' and \'{max}\'.',
+        'validation.betweenlength': '{field|upper} must have between {minlength} and {maxlength} item(s).',
+        'validation.betweenlengthstring': '{field|upper} must have between {minlength} and {maxlength} character(s).',
+        'validation.email': '{field|upper} must be an email address.',
+        'validation.exactly': '{field|upper} must be exactly \'{expected}\'.',
+        'validation.exactlylength': '{field|upper} must have exactly {expected} item(s).',
+        'validation.exactlylengthstring': '{field|upper} must have exactly {expected} character(s).',
+        'validation.match': '{message}',
+        'validation.max': '{field|upper} must be less or equal to \'{max}\'.',
+        'validation.maxlength': '{field|upper} must not have more than {requiredlength} item(s).',
+        'validation.maxlengthstring': '{field|upper} must not have more than {requiredlength} character(s).',
+        'validation.min': '{field|upper} must be greater or equal to \'{min}\'.',
+        'validation.minlength': '{field|upper} must have at least {requiredlength} item(s).',
+        'validation.minlengthstring': '{field|upper} must have at least {requiredlength} character(s).',
+        'validation.pattern': '{field|upper} does not match to the pattern.',
+        'validation.patternmessage': '{message}',
+        'validation.required': '{field|upper} is required.',
+        'validation.requiredTrue': '{field|upper} is required.',
+        'validation.uniquestrings': '{field|upper} must not contain duplicate values.',
+        'validation.validarrayvalues': '{field|upper} contains an invalid value: {invalidvalue}.',
+        'validation.validdatetime': '{field|upper} is not a valid date time.',
+        'validation.validvalues': '{field|upper} is not a valid value.',
+    });
 
     it('should format min', () => {
         const error = validate(1, Validators.min(2));
