@@ -19,15 +19,26 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly IEventSubscription eventSubscription = A.Fake<IEventSubscription>();
         private readonly IEventSubscriber sutSubscriber;
         private readonly RetrySubscription sut;
-        private readonly string streamFilter = Guid.NewGuid().ToString();
 
         public RetrySubscriptionTests()
         {
-            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._)).Returns(eventSubscription);
+            A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
+                .Returns(eventSubscription);
 
-            sut = new RetrySubscription(eventStore, eventSubscriber, streamFilter, null) { ReconnectWaitMs = 50 };
+            A.CallTo(() => eventSubscription.Sender)
+                .Returns(eventSubscription);
+
+            sut = new RetrySubscription(eventSubscriber, s => eventStore.CreateSubscription(s)) { ReconnectWaitMs = 50 };
 
             sutSubscriber = sut;
+        }
+
+        [Fact]
+        public void Should_return_original_subscription_as_sender()
+        {
+            var sender = sut.Sender;
+
+            Assert.Same(eventSubscription, sender);
         }
 
         [Fact]
@@ -35,7 +46,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             sut.Unsubscribe();
 
-            A.CallTo(() => eventStore.CreateSubscription(sut, streamFilter, null))
+            A.CallTo(() => eventStore.CreateSubscription(sut, A<string>._, A<string>._))
                 .MustHaveHappened();
         }
 
@@ -54,7 +65,7 @@ namespace Squidex.Infrastructure.EventSourcing
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
                 .MustHaveHappened(2, Times.Exactly);
 
-            A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>._, A<Exception>._))
+            A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -64,28 +75,28 @@ namespace Squidex.Infrastructure.EventSourcing
             var ex = new InvalidOperationException();
 
             await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(null!, ex);
-            await OnErrorAsync(null!, ex);
-            await OnErrorAsync(null!, ex);
-            await OnErrorAsync(null!, ex);
-            await OnErrorAsync(null!, ex);
+            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex);
 
             sut.Unsubscribe();
 
-            A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))
+            A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, ex))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_not_forward_error_when_exception_is_from_another_subscription()
+        public async Task Should_not_forward_error_when_exception_is_raised_after_unsubscribe()
         {
             var ex = new InvalidOperationException();
 
-            await OnErrorAsync(A.Fake<IEventSubscription>(), ex);
+            await OnErrorAsync(eventSubscription, ex);
 
             sut.Unsubscribe();
 
-            A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>._, A<Exception>._))
+            A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, A<Exception>._))
                 .MustNotHaveHappened();
         }
 
@@ -98,12 +109,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
             sut.Unsubscribe();
 
-            A.CallTo(() => eventSubscriber.OnEventAsync(sut, ev))
+            A.CallTo(() => eventSubscriber.OnEventAsync(eventSubscription, ev))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_not_forward_event_when_message_is_from_another_subscription()
+        public async Task Should_forward_event_when_message_is_from_another_subscription()
         {
             var ev = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
@@ -112,7 +123,7 @@ namespace Squidex.Infrastructure.EventSourcing
             sut.Unsubscribe();
 
             A.CallTo(() => eventSubscriber.OnEventAsync(A<IEventSubscription>._, A<StoredEvent>._))
-                .MustNotHaveHappened();
+                .MustHaveHappened();
         }
 
         private Task OnErrorAsync(IEventSubscription subscriber, Exception ex)

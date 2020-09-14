@@ -9,10 +9,14 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventSubscription
     {
-        void WakeUp()
+        object? Sender => this;
+
+        void Unsubscribe()
         {
         }
 
-        void Unsubscribe();
+        void WakeUp()
+        {
+        }
     }
 }

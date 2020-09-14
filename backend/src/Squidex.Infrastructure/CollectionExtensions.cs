@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure
             return source.Where(x => x != null)!;
         }
 
-        public static IEnumerable<TOut> NotNull<TIn, TOut>(this IEnumerable<TIn> source, Func<TIn, TOut?> selector) where TIn : class where TOut : class
+        public static IEnumerable<TOut> NotNull<TIn, TOut>(this IEnumerable<TIn> source, Func<TIn, TOut?> selector) where TOut : class
         {
             return source.Select(selector).Where(x => x != null)!;
         }
