@@ -40,6 +40,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             public StoredEvent Stored { get; set; }
 
+            public Exception? Exception { get; set; }
+
             public Envelope<IEvent>? Event { get; set; }
 
             public IEventSubscription Subscription { get; set; }
@@ -78,14 +80,25 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             eventConsumer = eventConsumerFactory(key);
 
-            var parse = new TransformBlock<Job, Job>(async job =>
+            CreatePipeline();
+
+            return Task.CompletedTask;
+        }
+
+        private void CreatePipeline()
+        {
+            var parse = new TransformBlock<Job, Job>(job =>
             {
                 if (job.ShouldHandle)
                 {
-                    await DoAndUpdateStateAsync(() =>
+                    try
                     {
                         job.Event = ParseKnownEvent(job.Stored);
-                    });
+                    }
+                    catch (Exception ex)
+                    {
+                        job.Exception = ex;
+                    }
                 }
 
                 return job;
@@ -96,7 +109,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 MaxMessagesPerTask = 1
             });
 
-            var batchSize = Math.Max(1, eventConsumer.BatchSize);
+            var batchSize = Math.Max(1, eventConsumer!.BatchSize);
 
             var buffer = AsyncHelper.CreateBatchBlock<Job>(batchSize, 500, new GroupingDataflowBlockOptions
             {
@@ -105,15 +118,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             var handle = new ActionBlock<IList<Job>>(async jobs =>
             {
-                if (jobs.First().Subscription != currentSubscription)
-                {
-                    return;
-                }
-
-                var events = jobs.Where(x => x.ShouldHandle && x.Event != null && x.Subscription == currentSubscription).Select(x => x.Event).NotNull().ToArray();
+                var exception = jobs.FirstOrDefault(x => x.Exception != null)?.Exception;
 
                 await DoAndUpdateStateAsync(async () =>
                 {
+                    if (exception != null)
+                    {
+                        throw exception;
+                    }
+
+                    var events = jobs.Where(x => x.Subscription == currentSubscription).NotNull(x => x.Event).ToArray();
+
                     await eventConsumer.On(events);
 
                     var position = jobs.Last().Stored.EventPosition;
@@ -126,23 +141,21 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 BoundedCapacity = 2,
                 MaxDegreeOfParallelism = 1,
                 MaxMessagesPerTask = 1,
-                TaskScheduler = scheduler
+                TaskScheduler = GetScheduler()
             });
 
-            parse!.LinkTo(buffer, new DataflowLinkOptions
+            parse.LinkTo(buffer, new DataflowLinkOptions
             {
                 PropagateCompletion = true
             });
 
-            buffer!.LinkTo(handle, new DataflowLinkOptions
+            buffer.LinkTo(handle, new DataflowLinkOptions
             {
                 PropagateCompletion = true
             });
 
             pipelineStart = parse;
             pipelineEnd = handle;
-
-            return Task.CompletedTask;
         }
 
         public override Task OnDeactivateAsync()
@@ -323,10 +336,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             var subscription = Interlocked.Exchange(ref currentSubscription, null);
 
-            if (subscription != null)
-            {
-                subscription.StopAsync().Forget();
-            }
+            subscription?.Unsubscribe();
         }
 
         private void Subscribe(string? position)
@@ -360,6 +370,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
+        protected virtual TaskScheduler GetScheduler()
+        {
+            return scheduler!;
+        }
+
         protected virtual IEventConsumerGrain GetSelf()
         {
             return this.AsReference<IEventConsumerGrain>();
@@ -368,11 +383,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         protected virtual IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string filter, string? position)
         {
             return new RetrySubscription(store, subscriber, filter, position);
-        }
-
-        protected virtual TaskScheduler GetScheduler()
-        {
-            return scheduler!;
         }
 
         private IEventSubscription CreateSubscription(string streamFilter, string? position)

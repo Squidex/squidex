@@ -44,15 +44,9 @@ namespace Squidex.Infrastructure.EventSourcing
             subscription = SubscribeToStream(streamName);
         }
 
-        public Task StopAsync()
+        public void Unsubscribe()
         {
             subscription.Stop();
-
-            return Task.CompletedTask;
-        }
-
-        public void WakeUp()
-        {
         }
 
         private EventStoreCatchUpSubscription SubscribeToStream(string streamName)

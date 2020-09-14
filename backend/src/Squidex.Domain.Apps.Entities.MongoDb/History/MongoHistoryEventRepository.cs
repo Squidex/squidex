@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
@@ -64,9 +65,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             }
         }
 
-        public Task InsertAsync(HistoryEvent item)
+        public async Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents)
         {
-            return Collection.ReplaceOneAsync(x => x.Id == item.Id, item, UpsertReplace);
+            var writes = historyEvents
+                .Select(x =>
+                    new ReplaceOneModel<HistoryEvent>(Filter.Eq(y => y.Id, x.Id), x)
+                    {
+                        IsUpsert = true
+                    })
+                .ToList();
+
+            if (writes.Count > 0)
+            {
+                await Collection.BulkWriteAsync(writes);
+            }
         }
 
         public Task RemoveAsync(Guid appId)

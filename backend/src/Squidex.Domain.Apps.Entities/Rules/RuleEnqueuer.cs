@@ -33,11 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             get { return GetType().Name; }
         }
 
-        public string EventsFilter
-        {
-            get { return ".*"; }
-        }
-
         public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, ILocalCache localCache, IRuleEventRepository ruleEventRepository,
             RuleService ruleService)
         {

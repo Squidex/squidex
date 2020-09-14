@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.StopAsync())
+            A.CallTo(() => eventSubscription.Unsubscribe())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -189,7 +189,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.ClearAsync())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.StopAsync())
+            A.CallTo(() => eventSubscription.Unsubscribe())
                 .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, grainState.Value.Position))
@@ -359,7 +359,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.StopAsync())
+            A.CallTo(() => eventSubscription.Unsubscribe())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -413,7 +413,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.StopAsync())
+            A.CallTo(() => eventSubscription.Unsubscribe())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -442,7 +442,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.StopAsync())
+            A.CallTo(() => eventSubscription.Unsubscribe())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -471,7 +471,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => eventSubscription.StopAsync())
+            A.CallTo(() => eventSubscription.Unsubscribe())
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -504,7 +504,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened(2, Times.Exactly);
 
-            A.CallTo(() => eventSubscription.StopAsync())
+            A.CallTo(() => eventSubscription.Unsubscribe())
                 .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))

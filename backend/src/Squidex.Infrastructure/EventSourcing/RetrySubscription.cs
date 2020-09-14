@@ -40,10 +40,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
             this.streamFilter = streamFilter;
 
-            Subscribe();
+            SubscribeInner();
         }
 
-        private void Subscribe()
+        private void SubscribeInner()
         {
             if (currentSubscription == null)
             {
@@ -51,14 +51,11 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private void Unsubscribe()
+        private void UnsubscribeInner()
         {
             var subscription = Interlocked.Exchange(ref currentSubscription, null);
 
-            if (subscription != null)
-            {
-                subscription.StopAsync().Forget();
-            }
+            subscription?.Unsubscribe();
         }
 
         public void WakeUp()
@@ -84,20 +81,15 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 if (retryWindow.CanRetryAfterFailure())
                 {
-                    RetryAsync().Forget();
+                    await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
+
+                    SubscribeInner();
                 }
                 else
                 {
                     await eventSubscriber.OnErrorAsync(this, exception);
                 }
             }
-        }
-
-        private async Task RetryAsync()
-        {
-            await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
-
-            await dispatcher.DispatchAsync(Subscribe);
         }
 
         Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
@@ -110,10 +102,11 @@ namespace Squidex.Infrastructure.EventSourcing
             return dispatcher.DispatchAsync(() => HandleErrorAsync(subscription, exception));
         }
 
-        public async Task StopAsync()
+        public void Unsubscribe()
         {
-            await dispatcher.DispatchAsync(Unsubscribe);
-            await dispatcher.StopAndWaitAsync();
+            UnsubscribeInner();
+
+            dispatcher.StopAndWaitAsync().Forget();
 
             if (!timerCancellation.IsCancellationRequested)
             {

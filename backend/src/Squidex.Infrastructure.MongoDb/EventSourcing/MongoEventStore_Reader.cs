@@ -138,7 +138,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             using (Profiler.TraceMethod<MongoEventStore>())
             {
-                await Collection.Find(filter, options: Batching.Options).Sort(Sort.Ascending(TimestampField)).ForEachPipelineAsync(async commit =>
+                await Collection.Find(filter, options: Batching.Options).Sort(Sort.Ascending(TimestampField)).ForEachPipedAsync(async commit =>
                 {
                     foreach (var @event in commit.Filtered(position, predicate))
                     {

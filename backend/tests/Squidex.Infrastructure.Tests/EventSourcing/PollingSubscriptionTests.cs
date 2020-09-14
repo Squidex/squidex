@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             await Task.Delay(200);
 
-            await sut.StopAsync();
+            sut.Unsubscribe();
         }
     }
 }

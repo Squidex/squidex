@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventSubscription
     {
-        void WakeUp();
+        void WakeUp()
+        {
+        }
 
-        Task StopAsync();
+        void Unsubscribe();
     }
 }

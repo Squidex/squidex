@@ -31,9 +31,9 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
-        public async Task Should_subscribe_after_constructor()
+        public void Should_subscribe_after_constructor()
         {
-            await sut.StopAsync();
+            sut.Unsubscribe();
 
             A.CallTo(() => eventStore.CreateSubscription(sut, streamFilter, null))
                 .MustHaveHappened();
@@ -46,9 +46,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await Task.Delay(1000);
 
-            await sut.StopAsync();
+            sut.Unsubscribe();
 
-            A.CallTo(() => eventSubscription.StopAsync())
+            A.CallTo(() => eventSubscription.Unsubscribe())
                 .MustHaveHappened(2, Times.Exactly);
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
@@ -69,7 +69,8 @@ namespace Squidex.Infrastructure.EventSourcing
             await OnErrorAsync(null!, ex);
             await OnErrorAsync(null!, ex);
             await OnErrorAsync(null!, ex);
-            await sut.StopAsync();
+
+            sut.Unsubscribe();
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))
                 .MustHaveHappened();
@@ -81,7 +82,8 @@ namespace Squidex.Infrastructure.EventSourcing
             var ex = new InvalidOperationException();
 
             await OnErrorAsync(A.Fake<IEventSubscription>(), ex);
-            await sut.StopAsync();
+
+            sut.Unsubscribe();
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>._, A<Exception>._))
                 .MustNotHaveHappened();
@@ -93,7 +95,8 @@ namespace Squidex.Infrastructure.EventSourcing
             var ev = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
             await OnEventAsync(eventSubscription, ev);
-            await sut.StopAsync();
+
+            sut.Unsubscribe();
 
             A.CallTo(() => eventSubscriber.OnEventAsync(sut, ev))
                 .MustHaveHappened();
@@ -105,7 +108,8 @@ namespace Squidex.Infrastructure.EventSourcing
             var ev = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
             await OnEventAsync(A.Fake<IEventSubscription>(), ev);
-            await sut.StopAsync();
+
+            sut.Unsubscribe();
 
             A.CallTo(() => eventSubscriber.OnEventAsync(A<IEventSubscription>._, A<StoredEvent>._))
                 .MustNotHaveHappened();

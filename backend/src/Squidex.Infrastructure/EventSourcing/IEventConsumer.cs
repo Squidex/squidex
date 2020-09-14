@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         string Name { get; }
 
-        string EventsFilter { get; }
+        string EventsFilter => ".*";
 
         bool Handles(StoredEvent @event)
         {
@@ -30,6 +31,11 @@ namespace Squidex.Infrastructure.EventSourcing
             return Task.CompletedTask;
         }
 
+        Task On(Envelope<IEvent> @event)
+        {
+            return Task.CompletedTask;
+        }
+
         async Task On(IEnumerable<Envelope<IEvent>> @events)
         {
             foreach (var @event in events)
@@ -37,7 +43,5 @@ namespace Squidex.Infrastructure.EventSourcing
                 await On(@event);
             }
         }
-
-        Task On(Envelope<IEvent> @event);
     }
 }

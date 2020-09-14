@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -19,14 +20,13 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly MongoEventStore eventStore;
         private readonly IEventSubscriber eventSubscriber;
         private readonly CancellationTokenSource stopToken = new CancellationTokenSource();
-        private readonly Task task;
 
         public MongoEventStoreSubscription(MongoEventStore eventStore, IEventSubscriber eventSubscriber, string? streamFilter, string? position)
         {
             this.eventStore = eventStore;
             this.eventSubscriber = eventSubscriber;
 
-            task = QueryAsync(streamFilter, position);
+            QueryAsync(streamFilter, position).Forget();
         }
 
         private async Task QueryAsync(string? streamFilter, string? position)
@@ -155,15 +155,9 @@ namespace Squidex.Infrastructure.EventSourcing
             return result;
         }
 
-        public Task StopAsync()
+        public void Unsubscribe()
         {
             stopToken.Cancel();
-
-            return task;
-        }
-
-        public void WakeUp()
-        {
         }
     }
 }

@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -117,32 +119,33 @@ namespace Squidex.Domain.Apps.Entities.History
             await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.User.ApiKey);
         }
 
-        public async Task HandleEventAsync(Envelope<IEvent> @event)
+        public async Task HandleEventsAsync(IEnumerable<(Envelope<AppEvent> AppEvent, HistoryEvent? HistoryEvent)> events)
         {
-            Guard.NotNull(@event, nameof(@event));
+            Guard.NotNull(events, nameof(events));
 
             if (client == null)
             {
                 return;
             }
 
-            switch (@event.Payload)
+            var now = clock.GetCurrentInstant();
+
+            var publishedEvents = events
+                .Where(x => IsTooOld(x.AppEvent.Headers, now) == false)
+                .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null)
+                .ToList();
+
+            if (publishedEvents.Any())
             {
-                case CommentCreated comment:
+                using (var stream = client.PublishMany())
+                {
+                    foreach (var @event in publishedEvents)
                     {
-                        if (IsTooOld(@event.Headers))
-                        {
-                            return;
-                        }
+                        var payload = @event.AppEvent.Payload;
 
-                        if (comment.Mentions == null || comment.Mentions.Length == 0)
+                        if (payload is CommentCreated comment && IsComment(payload))
                         {
-                            break;
-                        }
-
-                        using (var stream = client.PublishMany())
-                        {
-                            foreach (var userId in comment.Mentions)
+                            foreach (var userId in comment.Mentions!)
                             {
                                 var publishRequest = new PublishRequest
                                 {
@@ -164,52 +167,87 @@ namespace Squidex.Domain.Apps.Entities.History
 
                                 await stream.RequestStream.WriteAsync(publishRequest);
                             }
-
-                            await stream.RequestStream.CompleteAsync();
-                            await stream.ResponseAsync;
                         }
+                        else if (@event.HistoryEvent != null)
+                        {
+                            var historyEvent = @event.HistoryEvent;
 
-                        break;
+                            var publishRequest = new PublishRequest
+                            {
+                                AppId = options.AppId
+                            };
+
+                            foreach (var (key, value) in historyEvent.Parameters)
+                            {
+                                publishRequest.Properties.Add(key, value);
+                            }
+
+                            publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
+
+                            if (payload is ContentEvent c && !(payload is ContentDeleted))
+                            {
+                                var url = urlGenerator.ContentUI(c.AppId, c.SchemaId, c.ContentId);
+
+                                publishRequest.Properties["SquidexUrl"] = url;
+                            }
+
+                            publishRequest.TemplateCode = @event.HistoryEvent.EventType;
+
+                            SetUser(payload, publishRequest);
+                            SetTopic(payload, publishRequest, historyEvent);
+
+                            await stream.RequestStream.WriteAsync(publishRequest);
+                        }
                     }
 
-                case AppContributorAssigned contributorAssigned:
-                    {
-                        var user = await userResolver.FindByIdAsync(contributorAssigned.ContributorId);
+                    await stream.RequestStream.CompleteAsync();
+                    await stream.ResponseAsync;
+                }
+            }
 
-                        if (user != null)
+            foreach (var @event in events)
+            {
+                switch (@event.AppEvent.Payload)
+                {
+                    case AppContributorAssigned contributorAssigned:
                         {
-                            await UpsertUserAsync(user);
-                        }
+                            var user = await userResolver.FindByIdAsync(contributorAssigned.ContributorId);
 
-                        var request = BuildAllowedTopicRequest(contributorAssigned, contributorAssigned.ContributorId);
+                            if (user != null)
+                            {
+                                await UpsertUserAsync(user);
+                            }
 
-                        try
-                        {
-                            await client.AddAllowedTopicAsync(request);
-                        }
-                        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-                        {
+                            var request = BuildAllowedTopicRequest(contributorAssigned, contributorAssigned.ContributorId);
+
+                            try
+                            {
+                                await client.AddAllowedTopicAsync(request);
+                            }
+                            catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+                            {
+                                break;
+                            }
+
                             break;
                         }
 
-                        break;
-                    }
-
-                case AppContributorRemoved contributorRemoved:
-                    {
-                        var request = BuildAllowedTopicRequest(contributorRemoved, contributorRemoved.ContributorId);
-
-                        try
+                    case AppContributorRemoved contributorRemoved:
                         {
-                            await client.RemoveAllowedTopicAsync(request);
-                        }
-                        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
-                        {
+                            var request = BuildAllowedTopicRequest(contributorRemoved, contributorRemoved.ContributorId);
+
+                            try
+                            {
+                                await client.RemoveAllowedTopicAsync(request);
+                            }
+                            catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+                            {
+                                break;
+                            }
+
                             break;
                         }
-
-                        break;
-                    }
+                }
             }
         }
 
@@ -226,52 +264,14 @@ namespace Squidex.Domain.Apps.Entities.History
             return topicRequest;
         }
 
-        public async Task HandleHistoryEventAsync(Envelope<AppEvent> @event, HistoryEvent historyEvent)
+        private static bool IsTooOld(EnvelopeHeaders headers, Instant now)
         {
-            if (client == null)
-            {
-                return;
-            }
-
-            if (IsTooOld(@event.Headers))
-            {
-                return;
-            }
-
-            var appEvent = @event.Payload;
-
-            var publishRequest = new PublishRequest
-            {
-                AppId = options.AppId
-            };
-
-            foreach (var (key, value) in historyEvent.Parameters)
-            {
-                publishRequest.Properties.Add(key, value);
-            }
-
-            publishRequest.Properties["SquidexApp"] = appEvent.AppId.Name;
-
-            if (appEvent is ContentEvent c && !(appEvent is ContentDeleted))
-            {
-                var url = urlGenerator.ContentUI(c.AppId, c.SchemaId, c.ContentId);
-
-                publishRequest.Properties["SquidexUrl"] = url;
-            }
-
-            publishRequest.TemplateCode = historyEvent.EventType;
-
-            SetUser(appEvent, publishRequest);
-            SetTopic(appEvent, publishRequest, historyEvent);
-
-            await client.PublishAsync(publishRequest);
+            return now - headers.Timestamp() > MaxAge;
         }
 
-        private bool IsTooOld(EnvelopeHeaders headers)
+        private static bool IsComment(AppEvent appEvent)
         {
-            var now = clock.GetCurrentInstant();
-
-            return now - headers.Timestamp() > MaxAge;
+            return appEvent is CommentCreated comment && comment.Mentions?.Length > 0;
         }
 
         private static void SetUser(AppEvent appEvent, PublishRequest publishRequest)
