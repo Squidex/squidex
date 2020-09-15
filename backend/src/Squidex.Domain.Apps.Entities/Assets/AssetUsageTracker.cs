@@ -9,14 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.UsageTracking;
 
 #pragma warning disable CS0649
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public partial class AssetUsageTracker : IAssetUsageTracker, IEventConsumer
+    public partial class AssetUsageTracker : IAssetUsageTracker
     {
         private const string CounterTotalCount = "TotalAssets";
         private const string CounterTotalSize = "TotalSize";

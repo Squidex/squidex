@@ -81,31 +81,18 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return State.ToInfo(eventConsumer!.Name).AsImmutable();
         }
 
-        public Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
+        public Task OnEventsAsync(IReadOnlyList<Envelope<IEvent>> events, string position)
         {
-            if (!ReferenceEquals(currentSubscriber?.Sender, sender))
-            {
-                return Task.CompletedTask;
-            }
-
             return DoAndUpdateStateAsync(async () =>
             {
-                if (events.Count > 0)
-                {
-                    await eventConsumer!.On(events);
-                }
+                await DispatchAsync(events);
 
                 State = State.Handled(position, events.Count);
             });
         }
 
-        public Task OnErrorAsync(object sender, Exception exception)
+        public Task OnErrorAsync(Exception exception)
         {
-            if (!ReferenceEquals(currentSubscriber?.Sender, sender))
-            {
-                return Task.CompletedTask;
-            }
-
             return DoAndUpdateStateAsync(() =>
             {
                 Unsubscribe();
@@ -179,6 +166,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             });
 
             return CreateInfo();
+        }
+
+        private async Task DispatchAsync(IReadOnlyList<Envelope<IEvent>> events)
+        {
+            if (events.Count > 0)
+            {
+                await eventConsumer!.On(events);
+            }
         }
 
         private Task DoAndUpdateStateAsync(Action action, [CallerMemberName] string? caller = null)

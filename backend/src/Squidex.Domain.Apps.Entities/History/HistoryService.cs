@@ -25,7 +25,12 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public int BatchSize
         {
-            get { return 500; }
+            get { return 1000; }
+        }
+
+        public int BatchDelay
+        {
+            get { return 1000; }
         }
 
         public string Name

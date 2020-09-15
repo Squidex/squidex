@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
@@ -19,6 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         Task ClearAsync();
 
-        Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IndexCommand[] commands);
+        Task ExecuteAsync(params IndexCommand[] commands);
     }
 }

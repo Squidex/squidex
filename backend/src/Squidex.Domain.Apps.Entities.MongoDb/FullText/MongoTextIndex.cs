@@ -14,7 +14,6 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
 
@@ -48,21 +47,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return "TextIndex";
         }
 
-        public Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IndexCommand[] commands)
+        public Task ExecuteAsync(params IndexCommand[] commands)
         {
-            var updates = new List<WriteModel<MongoTextIndexEntity>>(commands.Length);
+            var writes = new List<WriteModel<MongoTextIndexEntity>>(commands.Length);
 
             foreach (var command in commands)
             {
                 switch (command)
                 {
                     case DeleteIndexEntry delete:
-                        updates.Add(
+                        writes.Add(
                             new DeleteOneModel<MongoTextIndexEntity>(
                                 Filter.Eq(x => x.DocId, command.DocId)));
                         break;
                     case UpdateIndexEntry update:
-                        updates.Add(
+                        writes.Add(
                             new UpdateOneModel<MongoTextIndexEntity>(
                                 Filter.Eq(x => x.DocId, command.DocId),
                                 Update
@@ -70,18 +69,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                                     .Set(x => x.ServePublished, update.ServePublished)));
                         break;
                     case UpsertIndexEntry upsert when upsert.Texts.Count > 0:
-                        updates.Add(
+                        writes.Add(
                             new ReplaceOneModel<MongoTextIndexEntity>(
                                 Filter.Eq(x => x.DocId, command.DocId),
                                 new MongoTextIndexEntity
                                 {
                                     DocId = upsert.DocId,
                                     ContentId = upsert.ContentId,
-                                    SchemaId = schemaId.Id,
+                                    SchemaId = upsert.SchemaId.Id,
                                     ServeAll = upsert.ServeAll,
                                     ServePublished = upsert.ServePublished,
                                     Texts = upsert.Texts.Select(x => new MongoTextIndexEntityText { Text = x.Value }).ToList(),
-                                    AppId = appId.Id
+                                    AppId = upsert.AppId.Id
                                 })
                             {
                                 IsUpsert = true
@@ -90,12 +89,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 }
             }
 
-            if (updates.Count == 0)
+            if (writes.Count == 0)
             {
                 return Task.CompletedTask;
             }
 
-            return Collection.BulkWriteAsync(updates);
+            return Collection.BulkWriteAsync(writes);
         }
 
         public async Task<List<Guid>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)

@@ -22,8 +22,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventSubscription eventSubscription;
         private readonly IDataflowBlock pipelineEnd;
 
-        public object? Sender => eventSubscription.Sender;
-
         private sealed class Job
         {
             public StoredEvent? StoredEvent { get; set; }
@@ -45,6 +43,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             TaskScheduler scheduler)
         {
             this.eventDataFormatter = eventDataFormatter;
+
+            var batchSize = Math.Max(1, eventConsumer!.BatchSize);
+            var batchDelay = Math.Max(100, eventConsumer.BatchDelay);
 
             var parse = new TransformBlock<Job, Job>(job =>
             {
@@ -68,37 +69,34 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 return job;
             }, new ExecutionDataflowBlockOptions
             {
-                BoundedCapacity = 2,
+                BoundedCapacity = batchSize,
                 MaxDegreeOfParallelism = 1,
                 MaxMessagesPerTask = 1
             });
 
-            var batchSize = Math.Max(1, eventConsumer!.BatchSize);
-
-            var buffer = AsyncHelper.CreateBatchBlock<Job>(batchSize, 500, new GroupingDataflowBlockOptions
+            var buffer = AsyncHelper.CreateBatchBlock<Job>(batchSize, batchDelay, new GroupingDataflowBlockOptions
             {
                 BoundedCapacity = batchSize * 2
             });
 
             var handle = new ActionBlock<IList<Job>>(async jobs =>
             {
-                foreach (var jobsBySender in jobs.GroupBy(x => x.Sender))
+                foreach (var jobsBySender in jobs.GroupBy<Job, object>(x => x.Sender))
                 {
                     var sender = jobsBySender.Key;
 
-                    var exception = jobs.FirstOrDefault(x => x.Exception != null)?.Exception;
-
-                    if (exception != null)
+                    if (ReferenceEquals(sender, eventSubscription.Sender))
                     {
-                        await grain.OnErrorAsync(sender, exception);
-                    }
-                    else
-                    {
-                        var position = jobsBySender.Last().StoredEvent!.EventPosition;
+                        var exception = jobs.FirstOrDefault(x => x.Exception != null)?.Exception;
 
-                        var events = jobsBySender.NotNull(x => x.Event).ToList();
-
-                        await grain.OnEventsAsync(sender, events, position);
+                        if (exception != null)
+                        {
+                            await grain.OnErrorAsync(exception);
+                        }
+                        else
+                        {
+                            await grain.OnEventsAsync(GetEvents(jobsBySender), GetPosition(jobsBySender));
+                        }
                     }
                 }
             },
@@ -124,6 +122,16 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             pipelineEnd = handle;
 
             eventSubscription = factory(this);
+        }
+
+        private static List<Envelope<IEvent>> GetEvents(IEnumerable<Job> jobsBySender)
+        {
+            return jobsBySender.NotNull(x => x.Event).ToList();
+        }
+
+        private static string GetPosition(IEnumerable<Job> jobsBySender)
+        {
+            return jobsBySender.Last().StoredEvent!.EventPosition;
         }
 
         public Task CompleteAsync()

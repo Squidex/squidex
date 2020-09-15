@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -56,6 +58,39 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         public Task SetAsync(TextContentState state)
         {
             return Collection.ReplaceOneAsync(x => x.ContentId == state.ContentId, state, UpsertReplace);
+        }
+
+        public async Task<Dictionary<Guid, TextContentState>> GetAsync(HashSet<Guid> ids)
+        {
+            var entities = await Collection.Find(Filter.In(x => x.ContentId, ids)).ToListAsync();
+
+            return entities.ToDictionary(x => x.ContentId);
+        }
+
+        public Task SetAsync(List<TextContentState> updates)
+        {
+            var writes = new List<WriteModel<TextContentState>>();
+
+            foreach (var update in updates)
+            {
+                if (update.IsDeleted)
+                {
+                    writes.Add(
+                        new DeleteOneModel<TextContentState>(
+                            Filter.Eq(x => x.ContentId, update.ContentId)));
+                }
+                else
+                {
+                    writes.Add(
+                        new ReplaceOneModel<TextContentState>(
+                            Filter.Eq(x => x.ContentId, update.ContentId), update)
+                        {
+                            IsUpsert = true
+                        });
+                }
+            }
+
+            return Collection.BulkWriteAsync(writes);
         }
     }
 }

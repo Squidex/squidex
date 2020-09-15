@@ -405,7 +405,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             contentEvent.AppId = appId;
             contentEvent.SchemaId = schemaId;
 
-            return p => p.On(Envelope.Create(contentEvent));
+            return p => p.On(Enumerable.Repeat(Envelope.Create<IEvent>(contentEvent), 1));
         }
 
         private IndexOperation Search(List<Guid>? expected, string text, SearchScope target = SearchScope.All)
@@ -414,7 +414,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var searchFilter = SearchFilter.ShouldHaveSchemas(schemaId.Id);
 
-                var result = await p.TextIndexer.SearchAsync(text, app, searchFilter, target);
+                var result = await p.TextIndex.SearchAsync(text, app, searchFilter, target);
 
                 if (expected != null)
                 {

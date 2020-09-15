@@ -14,6 +14,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
     public interface IEventConsumer
     {
+        int BatchDelay => 500;
+
         int BatchSize => 1;
 
         string Name { get; }

@@ -41,14 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             return Task.CompletedTask;
         }
 
-        public async Task ExecuteAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, params IndexCommand[] commands)
+        public async Task ExecuteAsync(params IndexCommand[] commands)
         {
             foreach (var command in commands)
             {
                 switch (command)
                 {
                     case UpsertIndexEntry upsert:
-                        await UpsertAsync(appId, schemaId, upsert);
+                        await UpsertAsync(upsert);
                         break;
                     case UpdateIndexEntry update:
                         await UpdateAsync(update);
@@ -65,15 +65,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             }
         }
 
-        private async Task UpsertAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, UpsertIndexEntry upsert)
+        private async Task UpsertAsync(UpsertIndexEntry upsert)
         {
             var data = new
             {
-                appId = appId.Id,
-                appName = appId.Name,
+                appId = upsert.AppId.Id,
+                appName = upsert.AppId.Name,
                 contentId = upsert.ContentId,
-                schemaId = schemaId.Id,
-                schemaName = schemaId.Name,
+                schemaId = upsert.SchemaId.Id,
+                schemaName = upsert.SchemaId.Name,
                 serveAll = upsert.ServeAll,
                 servePublished = upsert.ServePublished,
                 texts = upsert.Texts,

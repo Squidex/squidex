@@ -39,9 +39,27 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public void Should_return_assets_filter_for_events_filter()
+        {
+            IEventConsumer consumer = sut;
+
+            Assert.Equal("^assets\\-", consumer.EventsFilter);
+        }
+
+        [Fact]
         public async Task Should_do_nothing_on_clear()
         {
-            await sut.ClearAsync();
+            IEventConsumer consumer = sut;
+
+            await consumer.ClearAsync();
+        }
+
+        [Fact]
+        public void Should_return_type_name_for_name()
+        {
+            IEventConsumer consumer = sut;
+
+            Assert.Equal(typeof(RecursiveDeleter).Name, consumer.Name);
         }
 
         [Fact]

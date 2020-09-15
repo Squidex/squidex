@@ -67,9 +67,10 @@ namespace Squidex.Infrastructure.Tasks
                 return value;
             }, new ExecutionDataflowBlockOptions()
             {
-                BoundedCapacity = dataflowBlockOptions.BoundedCapacity,
+                BoundedCapacity = 1,
                 CancellationToken = dataflowBlockOptions.CancellationToken,
                 EnsureOrdered = dataflowBlockOptions.EnsureOrdered,
+                MaxDegreeOfParallelism = 1,
                 MaxMessagesPerTask = dataflowBlockOptions.MaxMessagesPerTask,
                 NameFormat = dataflowBlockOptions.NameFormat,
                 TaskScheduler = dataflowBlockOptions.TaskScheduler

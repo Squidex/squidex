@@ -39,6 +39,16 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 return currentSubscriber.OnEventAsync(subscription, storedEvent);
             }
 
+            public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
+            {
+                return currentSubscriber.OnErrorAsync(subscription, exception);
+            }
+
+            protected override IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
+            {
+                return CreateSubscription(subscriber);
+            }
+
             protected override IEventSubscription CreateSubscription(IEventSubscriber subscriber)
             {
                 currentSubscriber = subscriber;
@@ -516,9 +526,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 .MustHaveHappened(2, Times.Exactly);
         }
 
-        private Task OnErrorAsync(object sender, Exception ex)
+        private Task OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
-            return sut.OnErrorAsync(sender, ex);
+            return sut.OnErrorAsync(subscription, exception);
         }
 
         private Task OnEventAsync(IEventSubscription subscription, StoredEvent ev)
