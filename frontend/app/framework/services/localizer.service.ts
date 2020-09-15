@@ -6,6 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
+import { compareStrings } from '../utils/array-helper';
 
 export const LocalizerServiceFactory = (translations: Object) => {
     return new LocalizerService(translations);
@@ -56,46 +57,62 @@ export class LocalizerService {
         return text;
     }
 
-    private replaceVariables(text: string, args: ReadonlyArray<object>): string {
-        while (true) {
-            const indexOfStart = text.indexOf('{');
+    private replaceVariables(text: string, args: object): string {
+        text = text.replace(/{[^}]*}/g, (matched: string) => {
+            const inner = matched.substr(1, matched.length - 2);
 
-            if (indexOfStart < 0) {
-                break;
+            let replaceValue: string;
+
+            if (matched.includes('|')) {
+                const splittedValue = inner.split('|');
+
+                const key = splittedValue[0];
+
+                replaceValue = this.getVar(args, key);
+
+                if (replaceValue) {
+                    const transforms = splittedValue.slice(1);
+
+                    replaceValue = this.transform(replaceValue, transforms);
+                }
+            } else {
+                replaceValue = this.getVar(args, inner);
             }
 
-            const indexOfEnd = text.indexOf('}');
-
-            const replace = text.substring(indexOfStart, indexOfEnd + 1);
-
-            text = text.replace(replace, (matched: string) => {
-                let replaceValue: string;
-
-                if (matched.includes('|')) {
-                    const splittedValue = matched.split('|');
-
-                    replaceValue = this.handlePipeOption(args[splittedValue[0].substr(1)], splittedValue[1].slice(0, -1));
-                } else {
-                    const key = matched.substring(1, matched.length - 1);
-
-                    replaceValue = args[key];
-                }
-
-                return replaceValue;
-            });
-        }
+            return replaceValue;
+        });
 
         return text;
     }
 
-    private handlePipeOption(value: string, pipeOption: string) {
-        switch (pipeOption) {
-            case 'lower':
-                return value.charAt(0).toLowerCase() + value.slice(1);
-            case 'upper':
-                return value.charAt(0).toUpperCase() + value.slice(1);
-            default:
-                return value;
+    private getVar(args: object, key: string) {
+        let value = args[key];
+
+        if (!value) {
+            for (const name in args) {
+                if (args.hasOwnProperty(name) && compareStrings(key, name) === 0) {
+                    value = args[name];
+
+                    break;
+                }
+            }
         }
+
+        return value;
+    }
+
+    private transform(value: string, transforms: ReadonlyArray<string>) {
+        for (const transform of transforms) {
+            switch (transform) {
+                case 'lower':
+                    value = value.charAt(0).toLowerCase() + value.slice(1);
+                    break;
+                case 'upper':
+                    value = value.charAt(0).toUpperCase() + value.slice(1);
+                    break;
+            }
+        }
+
+        return value;
     }
 }
