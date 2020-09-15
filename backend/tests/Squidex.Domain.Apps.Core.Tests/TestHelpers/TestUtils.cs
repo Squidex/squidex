@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new SchemaConverter(),
                     new StatusConverter(),
                     new StringEnumConverter(),
-                    new WorkflowConverter(),
+                    new WorkflowsConverter(),
                     new WorkflowStepConverter()),
 
                 TypeNameHandling = typeNameHandling
