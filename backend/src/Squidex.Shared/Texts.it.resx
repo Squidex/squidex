@@ -71,22 +71,22 @@
     <value>Il campo {0} deve essere uguale a {1}.</value>
   </data>
   <data name="annotations_EmailAddress" xml:space="preserve">
-    <value>The field {name|lower} is not a valid email address.</value>
+    <value>Il campo {name|lower} non è un indirizzo email valido.</value>
   </data>
   <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
-    <value>The field {0} is not a valid email address.</value>
+    <value>Il campo {0} non è un indirizzo email valido.</value>
   </data>
   <data name="annotations_Range" xml:space="preserve">
-    <value>The field {name|lower} must be between {min} and {max}.</value>
+    <value>Il campo {name|lower} deve essere tra {min} e {max}.</value>
   </data>
   <data name="dotnet_annotations_Range" xml:space="preserve">
-    <value>The field {0} must be between {1} and {2}.</value>
+    <value>Il campo {0} deve essere tra {1} e {2}.</value>
   </data>
   <data name="annotations_RegularExpression" xml:space="preserve">
-    <value>The field {name|lower} is not.</value>
+    <value>Il campo {name|lower} non è.</value>
   </data>
   <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
-    <value>The field {0} is not.</value>
+    <value>Il campo {0} non è.</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
     <value>Il campo è {name|lower} obbligatorio.</value>
@@ -128,7 +128,7 @@
     <value>La lingua è stata già inserita.</value>
   </data>
   <data name="apps.languages.masterLanguageNoFallbacks" xml:space="preserve">
-    <value>La lingua master language non ha lingue alternative.</value>
+    <value>La lingua master non ha lingue alternative.</value>
   </data>
   <data name="apps.languages.masterLanguageNotOptional" xml:space="preserve">
     <value>La lingua master non può essere opzionale.</value>
@@ -302,7 +302,7 @@
     <value>Esci</value>
   </data>
   <data name="common.maxCharacters" xml:space="preserve">
-    <value>Max characters</value>
+    <value>Numero massimo di caratteri</value>
   </data>
   <data name="common.maxHeight" xml:space="preserve">
     <value>Altezza massima</value>
@@ -323,10 +323,10 @@
     <value>Larghezza massima</value>
   </data>
   <data name="common.maxWords" xml:space="preserve">
-    <value>Max words</value>
+    <value>Numero massimo di parole</value>
   </data>
   <data name="common.minCharacters" xml:space="preserve">
-    <value>Min characters</value>
+    <value>Numero minimo di caratteri</value>
   </data>
   <data name="common.minHeight" xml:space="preserve">
     <value>Altezza minima</value>
@@ -347,7 +347,7 @@
     <value>Larghezza massima</value>
   </data>
   <data name="common.minWords" xml:space="preserve">
-    <value>Min words</value>
+    <value>Numero minimo di parole</value>
   </data>
   <data name="common.name" xml:space="preserve">
     <value>Nome</value>
@@ -548,7 +548,7 @@
     <value>Deve esseer minore o uguale a {max}.</value>
   </data>
   <data name="contents.validation.maxCharacters" xml:space="preserve">
-    <value>Must not have more than {max} text character(s).</value>
+    <value>Il testo non deve avere più di {max} carattere(i).</value>
   </data>
   <data name="contents.validation.maximumHeight" xml:space="preserve">
     <value>L'altezza {height}px deve essere inferiore a {max}px.</value>
@@ -566,7 +566,7 @@
     <value>Non deve avere più di {max} carattere(i).</value>
   </data>
   <data name="contents.validation.maxWords" xml:space="preserve">
-    <value>Must not have more than {max} word(s).</value>
+    <value>Non deve avere più di {max} parola(e).</value>
   </data>
   <data name="contents.validation.min" xml:space="preserve">
     <value>Deve essere maggiore o uguale a {min}.</value>
@@ -587,19 +587,19 @@
     <value>Deve avere almeno {min} carattere(i).</value>
   </data>
   <data name="contents.validation.minNormalCharacters" xml:space="preserve">
-    <value>Must have at least {min} text character(s).</value>
+    <value>Deve avere almeno un testo di {min} carattere(i).</value>
   </data>
   <data name="contents.validation.minWords" xml:space="preserve">
-    <value>Must have at least {min} word(s).</value>
+    <value>Deve avere almeno {min} parola(e).</value>
   </data>
   <data name="contents.validation.mustBeEmpty" xml:space="preserve">
     <value>Il valore non deve essere definito.</value>
   </data>
   <data name="contents.validation.normalCharacterCount" xml:space="preserve">
-    <value>Must have exactly {count} text character(s).</value>
+    <value>Deve essere esattamente un testo di {count} carattere(i).</value>
   </data>
   <data name="contents.validation.normalCharactersBetween" xml:space="preserve">
-    <value>Must have between {min} and {max} text character(s).</value>
+    <value>Deve essere un testo tra {min} e {max} carattere(i).</value>
   </data>
   <data name="contents.validation.notAllowed" xml:space="preserve">
     <value>Non è un valore consentito.</value>
@@ -620,10 +620,10 @@
     <value>Non è noto {fieldType}.</value>
   </data>
   <data name="contents.validation.wordCount" xml:space="preserve">
-    <value>Must have exactly {count} word(s).</value>
+    <value>Deve avere esattamente {count} parola(e).</value>
   </data>
   <data name="contents.validation.wordsBetween" xml:space="preserve">
-    <value>Must have between {min} and {max} word(s).</value>
+    <value>Deve essere tra {min} e {max} parola(e).</value>
   </data>
   <data name="contents.workflowErorPublishing" xml:space="preserve">
     <value>Il workflow del contenuto impedisce la pubblicazione.</value>
@@ -632,49 +632,49 @@
     <value>Il workflow non consente le modifiche per lo stato {status}</value>
   </data>
   <data name="dotnet_identity_DefaultEror" xml:space="preserve">
-    <value>An unknown failure has occurred.</value>
+    <value>Si è verificato un errore sconosciuto.</value>
   </data>
   <data name="dotnet_identity_DuplicateEmail" xml:space="preserve">
-    <value>Email is already taken.</value>
+    <value>Email già in uso.</value>
   </data>
   <data name="dotnet_identity_DuplicateUserName" xml:space="preserve">
-    <value>User name is already taken.</value>
+    <value>Nome utente già in uso.</value>
   </data>
   <data name="dotnet_identity_InvalidEmail" xml:space="preserve">
-    <value>Email is invalid.</value>
+    <value>L'Email non è valida.</value>
   </data>
   <data name="dotnet_identity_InvalidUserName" xml:space="preserve">
-    <value>User name '{0}' is invalid, can only contain letters or digits.</value>
+    <value>Il nome utente '{0}' non è valido, può contenere solo lettere e numeri.</value>
   </data>
   <data name="dotnet_identity_LoginAlreadyAssociated" xml:space="preserve">
-    <value>A user with this login already exists.</value>
+    <value>Esiste già un utente con queste credenziali di accesso.</value>
   </data>
   <data name="dotnet_identity_PasswordMismatch" xml:space="preserve">
-    <value>Incorrect password.</value>
+    <value>Password errata.</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresDigit" xml:space="preserve">
-    <value>Passwords must have at least one digit ('0'-'9').</value>
+    <value>La Password devono contenere almeno un numero ('0'-'9').</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresLower" xml:space="preserve">
-    <value>Passwords must have at least one lowercase ('a'-'z').</value>
+    <value>La passowrd deve avere almeno una lettera minuscola ('a'-'z').</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
-    <value>Passwords must have at least one non alphanumeric character.</value>
+    <value>La passowrd deve avere almeno un carattere non alfanumerico.</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresUniqueChars" xml:space="preserve">
-    <value>Passwords must use at least {0} different characters.</value>
+    <value>La password deve essere composta almeno da {0} caratteri differenti.</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresUpper" xml:space="preserve">
-    <value>Passwords must have at least one uppercase ('A'-'Z').</value>
+    <value>La password deve avere almeno una lettera maiuscola ('A'-'Z').</value>
   </data>
   <data name="dotnet_identity_PasswordTooShort" xml:space="preserve">
-    <value>Passwords is too short.</value>
+    <value>La password è troppo corta.</value>
   </data>
   <data name="dotnet_identity_PwnedError" xml:space="preserve">
-    <value>This password has previously appeared in a data breach and should never be used. If you have ever used it anywhere before, change it!</value>
+    <value>Questa password è apparsa in un database di password compromesso e non dovrebbe più essere utilizzata. Se l'hai usata, cambiala!</value>
   </data>
   <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
-    <value>User is locked out.</value>
+    <value>L'utente è bloccato.</value>
   </data>
   <data name="exception.invalidJsonQuery" xml:space="preserve">
     <value>La query Json non è valida: {message}</value>
@@ -719,37 +719,37 @@
     <value>aggiornata la lingua {[Language]}</value>
   </data>
   <data name="history.apps.patternAdded" xml:space="preserve">
-    <value>adggiunto pattern {[Name]}</value>
+    <value>ha aggiunto pattern {[Name]}</value>
   </data>
   <data name="history.apps.patternDeleted" xml:space="preserve">
-    <value>eliminato pattern {[PatternId]}</value>
+    <value>ha eliminato pattern {[PatternId]}</value>
   </data>
   <data name="history.apps.patternUpdated" xml:space="preserve">
-    <value>modificato pattern {[Name]}</value>
+    <value>ha modificato pattern {[Name]}</value>
   </data>
   <data name="history.apps.planChanged" xml:space="preserve">
-    <value>cambiato il piano in {[Plan]}</value>
+    <value>ha cambiato il piano in {[Plan]}</value>
   </data>
   <data name="history.apps.planReset" xml:space="preserve">
-    <value>riconfigurato il piano</value>
+    <value>ha riconfigurato il piano</value>
   </data>
   <data name="history.apps.roleAdded" xml:space="preserve">
-    <value>aggiunto il ruolo {[Name]}</value>
+    <value>ha aggiunto il ruolo {[Name]}</value>
   </data>
   <data name="history.apps.roleDeleted" xml:space="preserve">
-    <value>eliminato role {[Name]}</value>
+    <value>ha eliminato role {[Name]}</value>
   </data>
   <data name="history.apps.roleUpdated" xml:space="preserve">
-    <value>aggiornato role {[Name]}</value>
+    <value>ha aggiornato role {[Name]}</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
-    <value>risorsa sostituita.</value>
+    <value>ha sostituito la risorsa.</value>
   </data>
   <data name="history.assets.updated" xml:space="preserve">
-    <value>risorsa aggiornata.</value>
+    <value>ha aggiornato la risorsa.</value>
   </data>
   <data name="history.assets.uploaded" xml:space="preserve">
-    <value>risorsa caricata.</value>
+    <value>ha caricato la risorsa.</value>
   </data>
   <data name="history.contents.created" xml:space="preserve">
     <value>creato il contenuto {[Schema]}.</value>
@@ -800,22 +800,22 @@
     <value>riordinati i campi dello schema {[Name]}.</value>
   </data>
   <data name="history.schemas.fieldUpdated" xml:space="preserve">
-    <value>aggiornato il campo {[Field]} dello schema {[Name]}.</value>
+    <value>ha aggiornato il campo {[Field]} dello schema {[Name]}.</value>
   </data>
   <data name="history.schemas.published" xml:space="preserve">
-    <value>pubblicato lo schema {[Name]}.</value>
+    <value>ha pubblicato lo schema {[Name]}.</value>
   </data>
   <data name="history.schemas.scriptsConfigured" xml:space="preserve">
-    <value>configurato lo script per lo schema {[Name]}.</value>
+    <value>ha configurato lo script per lo schema {[Name]}.</value>
   </data>
   <data name="history.schemas.unpublished" xml:space="preserve">
-    <value>rimosso dalla pubblicazione lo schema {[Name]}.</value>
+    <value>ha rimosso dalla pubblicazione lo schema {[Name]}.</value>
   </data>
   <data name="history.schemas.updated" xml:space="preserve">
-    <value>aggiornato lo schema {[Name]}.</value>
+    <value>ha aggiornato lo schema {[Name]}.</value>
   </data>
   <data name="history.statusChanged" xml:space="preserve">
-    <value>cambiato lo stato del contenuto {[Schema]} in {[Status]}.</value>
+    <value>ha cambiato lo stato del contenuto {[Schema]} in {[Status]}.</value>
   </data>
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Il tuo indirizzo email è impostato su privato in Github. Impostalo come pubblico per poter utilizzare il login Github.</value>
@@ -1028,7 +1028,7 @@
     <value>Profile modificato</value>
   </data>
   <data name="users.profile.hideProfile" xml:space="preserve">
-    <value>Non mostrare il mio profilo agli altri utentiDo not show my profile to other users</value>
+    <value>Non mostrare il mio profilo agli altri utenti</value>
   </data>
   <data name="users.profile.loginsTitle" xml:space="preserve">
     <value>Login</value>
