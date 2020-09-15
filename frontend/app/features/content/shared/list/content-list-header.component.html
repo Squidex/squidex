@@ -1,9 +1,9 @@
 <ng-container [ngSwitch]="fieldName">
     <ng-container *ngSwitchCase="metaFields.id">
-        <sqx-table-header text="Id"></sqx-table-header>
+        <sqx-table-header text="i18n:contents.tableHeaders.id"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.created">
-        <sqx-table-header text="Created"
+        <sqx-table-header text="i18n:contents.tableHeaders.created"
             [sortable]="true"
             [fieldPath]="'created'"
             [query]="query"
@@ -12,13 +12,13 @@
         </sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.createdByAvatar">
-        <sqx-table-header text="By"></sqx-table-header>
+        <sqx-table-header text="i18n:contents.tableHeaders.createdByShort"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.createdByName">
-        <sqx-table-header text="Created By"></sqx-table-header>
+        <sqx-table-header text="i18n:contents.tableHeaders.createdBy"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.lastModified">
-        <sqx-table-header text="Updated"
+        <sqx-table-header text="i18n:contents.tableHeaders.lastModified"
             [sortable]="true"
             [fieldPath]="'lastModified'"
             [query]="query"
@@ -27,22 +27,22 @@
         </sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.lastModifiedByAvatar">
-        <sqx-table-header text="By"></sqx-table-header>
+        <sqx-table-header text="i18n:contents.tableHeaders.lastModifiedByShort"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.lastModifiedByName">
-        <sqx-table-header text="Modified By"></sqx-table-header>
+        <sqx-table-header text="i18n:contents.tableHeaders.lastModifiedBy"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.status">
-        <sqx-table-header text="Status"></sqx-table-header>
+        <sqx-table-header text="i18n:contents.tableHeaders.status"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.statusNext">
-        <sqx-table-header text="Next Status"></sqx-table-header>
+        <sqx-table-header text="i18n:contents.tableHeaders.nextStatus"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.statusColor">
-        <sqx-table-header text="Status"></sqx-table-header>
+        <sqx-table-header text="i18n:contents.tableHeaders.status"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.version">
-        <sqx-table-header text="Version"></sqx-table-header>
+        <sqx-table-header text="i18n:contents.tableHeaders.version"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchDefault>
         <sqx-table-header [text]="fieldDisplayName"

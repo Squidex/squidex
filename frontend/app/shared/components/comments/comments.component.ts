@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppsState, AuthService, CommentDto, CommentsService, CommentsState, ContributorsState, DialogService, ResourceOwner, UpsertCommentForm } from '@app/shared/internal';
@@ -19,7 +19,7 @@ import { CommentComponent } from './comment.component';
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html'
 })
-export class CommentsComponent extends ResourceOwner implements OnInit {
+export class CommentsComponent extends ResourceOwner implements OnChanges {
     @ViewChild('commentsList', { static: false })
     public commentsList: ElementRef<HTMLDivElement>;
 
@@ -52,7 +52,7 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
         this.userToken = authService.user!.token;
     }
 
-    public ngOnInit() {
+    public ngOnChanges() {
         this.contributorsState.load();
 
         this.commentsUrl = `apps/${this.appsState.appName}/comments/${this.commentsId}`;

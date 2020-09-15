@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -26,13 +26,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The content items.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public ContentDto[] Items { get; set; }
 
         /// <summary>
         /// The possible statuses.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public StatusInfoDto[] Statuses { get; set; }
 
         public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents, Context context, Resources resources,

@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
+import { FieldDto, ReferencesFieldPropertiesDto, REFERENCES_FIELD_EDITORS } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-ui',
@@ -23,6 +23,8 @@ export class ReferencesUIComponent implements OnInit {
 
     @Input()
     public properties: ReferencesFieldPropertiesDto;
+
+    public editors = REFERENCES_FIELD_EDITORS;
 
     public ngOnInit() {
         this.fieldForm.setControl('editor',

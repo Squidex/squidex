@@ -99,6 +99,12 @@ export type TableField = RootFieldDto | string;
 export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
 export type FieldRule = { field: string, action: FieldRuleAction, condition: string };
 
+export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
+    'Disable',
+    'Hide',
+    'Require'
+];
+
 export class SchemaDetailsDto extends SchemaDto {
     public readonly contentFields: ReadonlyArray<RootFieldDto>;
 

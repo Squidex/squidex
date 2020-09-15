@@ -6,12 +6,12 @@
 // ==========================================================================
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -26,8 +26,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The name of the schema. Unique within the app.
         /// </summary>
-        [Required]
-        [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
+        [LocalizedRequired]
+        [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The schema properties.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public SchemaPropertiesDto Properties { get; set; } = new SchemaPropertiesDto();
 
         /// <summary>
@@ -54,13 +54,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The user that has created the schema.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RefToken CreatedBy { get; set; }
 
         /// <summary>
         /// The user that has updated the schema.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RefToken LastModifiedBy { get; set; }
 
         /// <summary>

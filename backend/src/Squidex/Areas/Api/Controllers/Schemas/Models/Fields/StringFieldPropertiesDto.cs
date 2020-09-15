@@ -39,6 +39,26 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public int? MaxLength { get; set; }
 
         /// <summary>
+        /// The minimum allowed of normal characters for the field value.
+        /// </summary>
+        public int? MinCharacters { get; set; }
+
+        /// <summary>
+        /// The maximum allowed of normal characters for the field value.
+        /// </summary>
+        public int? MaxCharacters { get; set; }
+
+        /// <summary>
+        /// The minimum allowed number of words for the field value.
+        /// </summary>
+        public int? MinWords { get; set; }
+
+        /// <summary>
+        /// The maximum allowed number of words for the field value.
+        /// </summary>
+        public int? MaxWords { get; set; }
+
+        /// <summary>
         /// The allowed values for the field value.
         /// </summary>
         public ReadOnlyCollection<string>? AllowedValues { get; set; }
@@ -52,6 +72,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// Indicates that the inline editor is enabled for this field.
         /// </summary>
         public bool InlineEditable { get; set; }
+
+        /// <summary>
+        /// How the string content should be interpreted.
+        /// </summary>
+        public StringContentType ContentType { get; set; }
 
         /// <summary>
         /// The editor that is used to manage this field.

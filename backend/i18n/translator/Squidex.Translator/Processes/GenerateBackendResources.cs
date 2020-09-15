@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Resources.NetStandard;
+using System.Text.RegularExpressions;
 using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes
@@ -41,6 +43,16 @@ namespace Squidex.Translator.Processes
                     foreach (var (key, value) in texts)
                     {
                         writer.AddResource(key, value);
+
+                        if (key.StartsWith("annotations_", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var i = 0;
+
+                            var dotnetKey = $"dotnet_{key}";
+                            var dotnetValue = Regex.Replace(value, "{[^}]*}", m => $"{{{i++}}}");
+
+                            writer.AddResource(dotnetKey, dotnetValue);
+                        }
                     }
                 }
 

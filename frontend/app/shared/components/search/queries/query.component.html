@@ -1,10 +1,12 @@
-<sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model" [language]="language" (change)="emitQueryChange()">
+<sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model" [language]="language"
+    (change)="emitQueryChange()">
 </sqx-filter-logical>
 
 <h4 class="mt-4">{{ 'search.sorting' | sqxTranslate }}</h4>
 
 <div class="mb-2" *ngFor="let sorting of queryValue.sort; let i = index">
-    <sqx-sorting [sorting]="sorting" [model]="model" (remove)="removeSorting(i)" (change)="emitQueryChange()">
+    <sqx-sorting [sorting]="sorting" [model]="model"
+        (remove)="removeSorting(i)" (change)="emitQueryChange()">
     </sqx-sorting>
 </div>
 

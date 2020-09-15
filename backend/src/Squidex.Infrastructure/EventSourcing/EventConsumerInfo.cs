@@ -11,6 +11,8 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public bool IsStopped { get; set; }
 
+        public int Count { get; set; }
+
         public string Name { get; set; }
 
         public string Error { get; set; }

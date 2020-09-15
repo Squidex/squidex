@@ -125,6 +125,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
+        public Task ResetScheduledAsync(Guid id)
+        {
+            return Collection.UpdateOneAsync(x => x.Id == id, Update.Unset(x => x.ScheduleJob).Unset(x => x.ScheduledAt));
+        }
+
         public Task<MongoContentEntity> FindAsync(Guid id)
         {
             return Collection.Find(x => x.Id == id).FirstOrDefaultAsync();

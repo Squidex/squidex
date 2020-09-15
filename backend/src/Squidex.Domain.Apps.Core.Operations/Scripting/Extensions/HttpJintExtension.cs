@@ -52,16 +52,19 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             {
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
-                    var request = CreateRequest(url, headers);
-                    var response = await httpClient.SendAsync(request, context.CancellationToken);
+                    using (var request = CreateRequest(url, headers))
+                    {
+                        using (var response = await httpClient.SendAsync(request, context.CancellationToken))
+                        {
+                            response.EnsureSuccessStatusCode();
 
-                    response.EnsureSuccessStatusCode();
+                            var responseObject = await ParseResponse(context, response);
 
-                    var responseObject = await ParseResponse(context, response);
+                            context.Engine.ResetConstraints();
 
-                    context.Engine.ResetConstraints();
-
-                    callback(responseObject);
+                            callback(responseObject);
+                        }
+                    }
                 }
             }
             catch (Exception ex)

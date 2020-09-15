@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -19,13 +19,13 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The workflow.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public WorkflowDto[] Items { get; set; }
 
         /// <summary>
         /// The errros that should be fixed.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string[] Errors { get; set; }
 
         public static async Task<WorkflowsDto> FromAppAsync(IWorkflowsValidator workflowsValidator, IAppEntity app, Resources resources)

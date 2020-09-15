@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.UsageTracking;
+using Squidex.Infrastructure.Validation;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 
@@ -26,6 +26,16 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// The total number of bytes transferred.
         /// </summary>
         public long TotalBytes { get; set; }
+
+        /// <summary>
+        /// The total number of API calls this month.
+        /// </summary>
+        public long MonthCalls { get; set; }
+
+        /// <summary>
+        /// The total number of bytes transferred this month.
+        /// </summary>
+        public long MonthBytes { get; set; }
 
         /// <summary>
         /// The amount of calls that will block the app.
@@ -50,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// <summary>
         /// The statistics by date and group.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public Dictionary<string, CallsUsagePerDateDto[]> Details { get; set; }
 
         public static CallsUsageDtoDto FromStats(IAppLimitsPlan plan, ApiStatsSummary summary, Dictionary<string, List<ApiStats>> details)
@@ -63,6 +73,8 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
                 AllowedCalls = plan.MaxApiCalls,
                 TotalBytes = summary.TotalBytes,
                 TotalCalls = summary.TotalCalls,
+                MonthBytes = summary.MonthBytes,
+                MonthCalls = summary.MonthCalls,
                 Details = details.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsagePerDateDto.FromStats).ToArray())
             };
         }

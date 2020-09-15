@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
@@ -17,13 +17,13 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// Describes the action or trigger type.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Description { get; set; }
 
         /// <summary>
         /// The label for the action or trigger type.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Display { get; set; }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The properties.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RuleElementPropertyDto[] Properties { get; set; }
 
         public static RuleElementDto FromDefinition(RuleActionDefinition definition)

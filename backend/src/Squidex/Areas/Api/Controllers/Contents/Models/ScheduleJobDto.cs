@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The user who schedule the content.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RefToken ScheduledBy { get; set; }
     }
 }

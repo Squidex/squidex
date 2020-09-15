@@ -3,10 +3,10 @@
         <i *ngIf="order === 'ascending'" class="icon-caret-down"></i>
         <i *ngIf="order === 'descending'" class="icon-caret-up"></i>
 
-        {{text}}
+        {{text | sqxTranslate}}
     </span>
 </a>
 
 <ng-template #notSortable>
-    <span class="truncate">{{text}}</span>
+    <span class="truncate">{{text | sqxTranslate}}</span>
 </ng-template>

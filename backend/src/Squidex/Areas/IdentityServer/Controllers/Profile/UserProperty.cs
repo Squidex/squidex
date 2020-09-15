@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Translations;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
@@ -14,7 +14,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [LocalizedRequired]
         public string Name { get; set; }
 
-        [LocalizedRequired]
+        [LocalizedRequiredAttribute]
         public string Value { get; set; }
 
         public (string Name, string Value) ToTuple()

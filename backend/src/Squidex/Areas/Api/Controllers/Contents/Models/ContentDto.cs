@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
@@ -16,6 +15,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -30,19 +30,19 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The user that has created the content item.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RefToken CreatedBy { get; set; }
 
         /// <summary>
         /// The user that has updated the content item.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public RefToken LastModifiedBy { get; set; }
 
         /// <summary>
         /// The data of the content item.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public object Data { get; set; }
 
         /// <summary>

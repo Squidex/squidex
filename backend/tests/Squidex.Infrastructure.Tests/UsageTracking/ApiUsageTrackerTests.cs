@@ -106,6 +106,15 @@ namespace Squidex.Infrastructure.UsageTracking
                 }
             };
 
+            var forMonth = new Counters
+            {
+                [ApiUsageTracker.CounterTotalCalls] = 120,
+                [ApiUsageTracker.CounterTotalBytes] = 400
+            };
+
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", DateTime.Today, null))
+                .Returns(forMonth);
+
             A.CallTo(() => usageTracker.QueryAsync($"{key}_API", dateFrom, dateTo))
                 .Returns(counters);
 
@@ -131,7 +140,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 }
             });
 
-            summary.Should().BeEquivalentTo(new ApiStatsSummary(15, 20, 3728));
+            summary.Should().BeEquivalentTo(new ApiStatsSummary(20, 15, 3728, 120, 400));
         }
 
         private static Counters Counters(long calls, long elapsed, long bytes)

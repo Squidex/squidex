@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.News.Models
 {
@@ -14,13 +14,13 @@ namespace Squidex.Areas.Api.Controllers.News.Models
         /// <summary>
         /// The name of the feature.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Name { get; set; }
 
         /// <summary>
         /// The description text.
         /// </summary>
-        [Required]
+        [LocalizedRequired]
         public string Text { get; set; }
     }
 }

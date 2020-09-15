@@ -23,12 +23,12 @@ namespace Squidex.Extensions.Actions.Slack
     public sealed class SlackAction : RuleAction
     {
         [AbsoluteUrl]
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Webhook Url", Description = "The slack webhook url.")]
         [DataType(DataType.Text)]
         public Uri WebhookUrl { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Text", Description = "The text that is sent as message to slack.")]
         [DataType(DataType.MultilineText)]
         [Formattable]

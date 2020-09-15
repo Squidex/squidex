@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public CollectionValidator(bool isRequired, int? minItems = null, int? maxItems = null)
         {
-            if (minItems.HasValue && maxItems.HasValue && minItems.Value > maxItems.Value)
+            if (minItems.HasValue && maxItems.HasValue && minItems > maxItems)
             {
                 throw new ArgumentException("Min length must be greater than max length.", nameof(minItems));
             }
@@ -55,12 +55,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             }
             else
             {
-                if (minItems.HasValue && items.Count < minItems.Value)
+                if (minItems.HasValue && items.Count < minItems)
                 {
                     addError(context.Path, T.Get("contents.validation.minItems", new { min = minItems }));
                 }
 
-                if (maxItems.HasValue && items.Count > maxItems.Value)
+                if (maxItems.HasValue && items.Count > maxItems)
                 {
                     addError(context.Path, T.Get("contents.validation.maxItems", new { max = maxItems }));
                 }

@@ -55,21 +55,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task LoadAsync(NamedId<Guid> appId, NamedId<Guid> schemaId, ContentCommand command, bool optimized)
         {
+            this.command = command;
+
             var (app, schema) = await appProvider.GetAppWithSchemaAsync(appId.Id, schemaId.Id);
 
             if (app == null)
             {
-                throw new InvalidOperationException($"Cannot resolve app with id {appId}.");
-            }
-
-            if (schema == null)
-            {
-                throw new InvalidOperationException($"Cannot resolve schema with id id {schemaId}.");
+                throw new DomainObjectNotFoundException(appId.ToString());
             }
 
             this.app = app;
+
+            if (schema == null)
+            {
+                throw new DomainObjectNotFoundException(schemaId.ToString());
+            }
+
             this.schema = schema;
-            this.command = command;
 
             validationContext = new ValidationContext(appId, schemaId, schema.SchemaDef, command.ContentId).Optimized(optimized);
         }

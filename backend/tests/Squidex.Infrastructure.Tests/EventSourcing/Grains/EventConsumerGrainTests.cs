@@ -186,7 +186,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnEventAsync(eventSubscription, @event);
 
-            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null });
+            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null, Count = 1 });
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened(1, Times.Exactly);
@@ -208,7 +208,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnEventAsync(eventSubscription, @event);
 
-            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null });
+            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null, Count = 1 });
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened(1, Times.Exactly);
@@ -230,7 +230,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await OnEventAsync(eventSubscription, @event);
 
-            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null });
+            AssetGrainState(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null, Count = 1 });
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened(1, Times.Exactly);

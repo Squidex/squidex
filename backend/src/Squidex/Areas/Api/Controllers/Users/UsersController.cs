@@ -189,7 +189,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                         if (!string.IsNullOrWhiteSpace(url))
                         {
-                            var response = await client.GetAsync(url);
+                            var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
 
                             if (response.IsSuccessStatusCode)
                             {

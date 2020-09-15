@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Fastly
 {
@@ -20,12 +21,12 @@ namespace Squidex.Extensions.Actions.Fastly
         ReadMore = "https://www.fastly.com/")]
     public sealed class FastlyAction : RuleAction
     {
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Api Key", Description = "The API key to grant access to Squidex.")]
         [DataType(DataType.Text)]
         public string ApiKey { get; set; }
 
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Service Id", Description = "The ID of the fastly service.")]
         [DataType(DataType.Text)]
         public string ServiceId { get; set; }

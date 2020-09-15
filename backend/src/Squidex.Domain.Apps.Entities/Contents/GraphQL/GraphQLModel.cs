@@ -10,12 +10,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -28,10 +26,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLModel : IGraphModel
     {
+        private static readonly IDocumentExecuter Executor = new DocumentExecuter();
         private readonly Dictionary<Guid, ContentGraphType> contentTypes = new Dictionary<Guid, ContentGraphType>();
         private readonly PartitionResolver partitionResolver;
-        private readonly IAppEntity app;
-        private readonly IObjectGraphType assetType;
+        private readonly IGraphType assetType;
         private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
 
@@ -43,8 +41,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             int pageSizeAssets,
             IUrlGenerator urlGenerator)
         {
-            this.app = app;
-
             partitionResolver = app.PartitionResolver();
 
             CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
@@ -58,6 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             graphQLSchema = BuildSchema(this, pageSizeContents, pageSizeAssets, allSchemas);
             graphQLSchema.RegisterValueConverter(JsonConverter.Instance);
+            graphQLSchema.RegisterValueConverter(InstantConverter.Instance);
 
             InitializeContentTypes();
         }
@@ -87,58 +84,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var schema = new GraphQLSchema
             {
-                Query = new AppQueriesGraphType(model, pageSizeContents, pageSizeAssets, schemas)
+                Query =
+                    new AppQueriesGraphType(
+                        model,
+                        pageSizeContents,
+                        pageSizeAssets,
+                        schemas
+                    ),
+                Mutation = new AppMutationsGraphType(model, schemas)
             };
 
             return schema;
-        }
-
-        public IFieldResolver ResolveAssetUrl()
-        {
-            var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.AssetContent(c.Source.Id);
-            });
-
-            return resolver;
-        }
-
-        public IFieldResolver ResolveAssetSourceUrl()
-        {
-            var resolver = new FuncFieldResolver<IAssetEntity, object?>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.AssetSource(c.Source.Id, c.Source.FileVersion);
-            });
-
-            return resolver;
-        }
-
-        public IFieldResolver ResolveAssetThumbnailUrl()
-        {
-            var resolver = new FuncFieldResolver<IAssetEntity, object?>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.AssetThumbnail(c.Source.Id, c.Source.Type);
-            });
-
-            return resolver;
-        }
-
-        public IFieldResolver ResolveContentUrl(ISchemaEntity schema)
-        {
-            var resolver = new FuncFieldResolver<IContentEntity, object>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
-                return context.UrlGenerator.ContentUI(app.NamedId(), schema.NamedId(), c.Source.Id);
-            });
-
-            return resolver;
         }
 
         public IFieldPartitioning ResolvePartition(Partitioning key)
@@ -146,17 +102,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return partitionResolver(key);
         }
 
+        public IGraphType? GetInputGraphType(ISchemaEntity schema, IField field, string fieldName)
+        {
+            return field.Accept(new InputFieldVisitor(schema, this, fieldName));
+        }
+
         public (IGraphType?, ValueResolver?, QueryArguments?) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
         {
             return field.Accept(new QueryGraphTypeVisitor(schema, contentTypes, this, assetListType, fieldName));
         }
 
-        public IObjectGraphType GetAssetType()
+        public IGraphType GetAssetType()
         {
-            return assetType as IObjectGraphType;
+            return assetType;
         }
 
-        public IObjectGraphType GetContentType(Guid schemaId)
+        public IGraphType GetContentType(Guid schemaId)
         {
             return contentTypes.GetOrDefault(schemaId);
         }
@@ -165,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             Guard.NotNull(context, nameof(context));
 
-            var result = await new DocumentExecuter().ExecuteAsync(execution =>
+            var result = await Executor.ExecuteAsync(execution =>
             {
                 context.Setup(execution);
 
@@ -174,7 +135,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 execution.Query = query.Query;
             }).ConfigureAwait(false);
 
-            return (result.Data, result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray());
+            var errors = result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray();
+
+            return (result.Data, errors);
         }
     }
 }

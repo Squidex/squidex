@@ -5,14 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -24,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var (field, fieldName, typeName) in schema.SchemaDef.Fields.SafeFields())
             {
-                var (resolvedType, valueResolver, args) = model.GetGraphType(schema, field, fieldName);
+                var (resolvedType, valueResolver, args) = model.GetGraphType(schema, field, typeName);
 
                 if (valueResolver != null)
                 {
@@ -43,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         {
                             Name = partitionKey.EscapePartition(),
                             Arguments = args,
-                            Resolver = PartitionResolver(valueResolver, partitionKey),
+                            Resolver = ContentResolvers.Partition(valueResolver, partitionKey),
                             ResolvedType = resolvedType,
                             Description = field.RawProperties.Hints
                         });
@@ -54,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     AddField(new FieldType
                     {
                         Name = fieldName,
-                        Resolver = FieldResolver(field),
+                        Resolver = ContentResolvers.Field(field),
                         ResolvedType = fieldGraphType,
                         Description = $"The {displayName} field."
                     });
@@ -62,31 +58,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             Description = $"The structure of the {schemaName} data type.";
-        }
-
-        private static FuncFieldResolver<object?> PartitionResolver(ValueResolver valueResolver, string key)
-        {
-            return new FuncFieldResolver<object?>(c =>
-            {
-                var source = (ContentFieldData)c.Source;
-
-                if (source.TryGetValue(key, out var value) && value != null)
-                {
-                    return valueResolver(value, c);
-                }
-                else
-                {
-                    return null;
-                }
-            });
-        }
-
-        private static FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>?> FieldResolver(RootField field)
-        {
-            return new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>?>(c =>
-            {
-                return c.Source?.GetOrDefault(field.Name);
-            });
         }
     }
 }

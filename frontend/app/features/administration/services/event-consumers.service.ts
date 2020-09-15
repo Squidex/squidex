@@ -30,6 +30,7 @@ export class EventConsumerDto {
 
     constructor(links: ResourceLinks,
         public readonly name: string,
+        public readonly count: number,
         public readonly isStopped?: boolean,
         public readonly isResetting?: boolean,
         public readonly error?: string,
@@ -104,6 +105,7 @@ function parseEventConsumer(response: any): EventConsumerDto {
     return new EventConsumerDto(
         response._links,
         response.name,
+        response.count,
         response.isStopped,
         response.isResetting,
         response.error,

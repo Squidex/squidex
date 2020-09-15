@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Comment
 {
@@ -19,7 +20,7 @@ namespace Squidex.Extensions.Actions.Comment
         Description = "Create a comment for a content event.")]
     public sealed class CommentAction : RuleAction
     {
-        [Required]
+        [LocalizedRequired]
         [Display(Name = "Text", Description = "The comment text.")]
         [DataType(DataType.MultilineText)]
         [Formattable]

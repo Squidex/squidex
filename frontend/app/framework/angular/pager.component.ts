@@ -8,6 +8,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Pager } from '@app/framework/internal';
 
+export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
+
 @Component({
     selector: 'sqx-pager',
     styleUrls: ['./pager.component.scss'],
@@ -23,6 +25,8 @@ export class PagerComponent {
 
     @Input()
     public autoHide = false;
+
+    public pageSizes = PAGE_SIZES;
 
     public goPrev() {
         this.pagerChange.emit(this.pager.goPrev());
