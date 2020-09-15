@@ -49,6 +49,24 @@ namespace Squidex.Config
 
         public string[] OidcScopes { get; set; }
 
+        public string OAuthSchemaName { get; set; }
+
+        public string OAuthDisplayName { get; set; }
+
+        public string OAuthClientId { get; set; }
+
+        public string OAuthSecret { get; set; }
+
+        public string OAuthTokenURI { get; set; }
+
+        public string OAuthAuthorizationURI { get; set; }
+
+        public string OAuthUserInfoURI { get; set; }
+
+        public string OAuthAccessManagerLogoutURI { get; set; }
+
+        public string[] OAuthScopes { get; set; }
+
         public Dictionary<string, string[]> OidcRoleMapping { get; set; }
 
         public bool AdminRecreate { get; set; }
@@ -91,6 +109,11 @@ namespace Squidex.Config
         public bool IsMicrosoftAuthConfigured()
         {
             return !string.IsNullOrWhiteSpace(MicrosoftClient) && !string.IsNullOrWhiteSpace(MicrosoftSecret);
+        }
+
+        public bool IsOAuthConfigured()
+        {
+            return !string.IsNullOrWhiteSpace(OAuthClientId) && !string.IsNullOrWhiteSpace(OAuthSecret);
         }
     }
 }

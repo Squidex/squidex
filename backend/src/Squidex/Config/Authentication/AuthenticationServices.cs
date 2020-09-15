@@ -23,6 +23,7 @@ namespace Squidex.Config.Authentication
                 .AddSquidexExternalGoogleAuthentication(identityOptions)
                 .AddSquidexExternalMicrosoftAuthentication(identityOptions)
                 .AddSquidexExternalOdic(identityOptions)
+                .AddSquidexExternalOAuth2Authentication(identityOptions)
                 .AddSquidexIdentityServerAuthentication(identityOptions, config);
         }
 
