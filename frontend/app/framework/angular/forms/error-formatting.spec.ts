@@ -12,6 +12,7 @@ import { ValidatorsEx } from './validators';
 
 describe('formatErrors', () => {
     const localizer = new LocalizerService({
+        'users.passwordConfirmValidationMessage': 'Passwords must be the same.',
         'validation.between': '{field} must be between \'{min}\' and \'{max}\'.',
         'validation.betweenlength': '{field|upper} must have between {minlength} and {maxlength} item(s).',
         'validation.betweenlengthstring': '{field|upper} must have between {minlength} and {maxlength} character(s).',
@@ -33,7 +34,7 @@ describe('formatErrors', () => {
         'validation.uniquestrings': '{field|upper} must not contain duplicate values.',
         'validation.validarrayvalues': '{field|upper} contains an invalid value: {invalidvalue}.',
         'validation.validdatetime': '{field|upper} is not a valid date time.',
-        'validation.validvalues': '{field|upper} is not a valid value.',
+        'validation.validvalues': '{field|upper} is not a valid value.'
     });
 
     it('should format min', () => {
