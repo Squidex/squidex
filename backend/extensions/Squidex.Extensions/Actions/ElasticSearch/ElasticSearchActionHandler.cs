@@ -9,8 +9,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Scripting;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
 
@@ -19,8 +21,9 @@ namespace Squidex.Extensions.Actions.ElasticSearch
     public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearchAction, ElasticSearchJob>
     {
         private readonly ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient> clients;
+        private readonly IScriptEngine scriptEngine;
 
-        public ElasticSearchActionHandler(RuleEventFormatter formatter)
+        public ElasticSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine)
             : base(formatter)
         {
             clients = new ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient>(key =>
@@ -34,16 +37,19 @@ namespace Squidex.Extensions.Actions.ElasticSearch
 
                 return new ElasticLowLevelClient(config);
             });
+
+            this.scriptEngine = scriptEngine;
         }
 
         protected override async Task<(string Description, ElasticSearchJob Data)> CreateJobAsync(EnrichedEvent @event, ElasticSearchAction action)
         {
-            if (@event is EnrichedContentEvent contentEvent)
+            if (@event is IEnrichedEntityEvent entityEvent)
             {
-                var contentId = contentEvent.Id.ToString();
+                var delete = @event.ShouldDelete(scriptEngine, action.Delete);
+
+                var contentId = entityEvent.Id.ToString();
 
                 var ruleDescription = string.Empty;
-
                 var ruleJob = new ElasticSearchJob
                 {
                     IndexName = await FormatAsync(action.IndexName, @event),
@@ -53,8 +59,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                     ContentId = contentId
                 };
 
-                if (contentEvent.Type == EnrichedContentEventType.Deleted ||
-                    contentEvent.Type == EnrichedContentEventType.Unpublished)
+                if (delete)
                 {
                     ruleDescription = $"Delete entry index: {action.IndexName}";
                 }
@@ -62,9 +67,31 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 {
                     ruleDescription = $"Upsert to index: {action.IndexName}";
 
-                    var json = ToJson(contentEvent);
+                    JObject json;
+                    try
+                    {
+                        string jsonString;
 
-                    ruleJob.Content = $"{{ \"objectId\": \"{contentId}\", {json.Substring(1)}";
+                        if (!string.IsNullOrEmpty(action.Document))
+                        {
+                            jsonString = await FormatAsync(action.Document, @event);
+                            jsonString = jsonString?.Trim();
+                        }
+                        else
+                        {
+                            jsonString = ToJson(@event);
+                        }
+
+                        json = JObject.Parse(jsonString);
+                    }
+                    catch (Exception ex)
+                    {
+                        json = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
+                    }
+
+                    json.AddFirst(new JProperty("contentId", contentId));
+
+                    ruleJob.Content = json.ToString();
                 }
 
                 return (ruleDescription, ruleJob);

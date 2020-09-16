@@ -41,5 +41,14 @@ namespace Squidex.Extensions.Actions.ElasticSearch
         [Display(Name = "Password", Description = "The optional password.")]
         [DataType(DataType.Text)]
         public string Password { get; set; }
+
+        [Display(Name = "Document", Description = "The optional custom document.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
+        public string Document { get; set; }
+
+        [Display(Name = "Deletion", Description = "The condition when to delete the document.")]
+        [DataType(DataType.Text)]
+        public string Delete { get; set; }
     }
 }

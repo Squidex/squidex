@@ -10,12 +10,42 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure.Http;
 
 namespace Squidex.Extensions.Actions
 {
-    public static class HttpHelper
+    public static class RuleHelper
     {
+        public static bool ShouldDelete(this EnrichedEvent @event, IScriptEngine scriptEngine, string? expression)
+        {
+            if (!string.IsNullOrWhiteSpace(expression))
+            {
+                var vars = new ScriptVars
+                {
+                    ["event"] = @event
+                };
+
+                return scriptEngine.Evaluate(vars, expression);
+            }
+
+            return IsContentDeletion(@event) || IsAssetDeletion(@event);
+        }
+
+        public static bool IsContentDeletion(this EnrichedEvent @event)
+        {
+            return @event is EnrichedContentEvent contentEvent &&
+                (contentEvent.Type == EnrichedContentEventType.Deleted ||
+                 contentEvent.Type == EnrichedContentEventType.Unpublished);
+        }
+
+        public static bool IsAssetDeletion(this EnrichedEvent @event)
+        {
+            return @event is EnrichedAssetEvent assetEvent &&
+                (assetEvent.Type == EnrichedAssetEventType.Deleted);
+        }
+
         public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null, CancellationToken ct = default)
         {
             HttpResponseMessage response = null;

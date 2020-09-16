@@ -43,5 +43,9 @@ namespace Squidex.Extensions.Actions.Algolia
         [DataType(DataType.MultilineText)]
         [Formattable]
         public string Document { get; set; }
+
+        [Display(Name = "Deletion", Description = "The condition when to delete the entry.")]
+        [DataType(DataType.Text)]
+        public string Delete { get; set; }
     }
 }

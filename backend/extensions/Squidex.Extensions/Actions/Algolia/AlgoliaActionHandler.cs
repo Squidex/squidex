@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Scripting;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
 
@@ -21,8 +22,9 @@ namespace Squidex.Extensions.Actions.Algolia
     public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, AlgoliaJob>
     {
         private readonly ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex> clients;
+        private readonly IScriptEngine scriptEngine;
 
-        public AlgoliaActionHandler(RuleEventFormatter formatter)
+        public AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine)
             : base(formatter)
         {
             clients = new ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex>(key =>
@@ -31,13 +33,17 @@ namespace Squidex.Extensions.Actions.Algolia
 
                 return client.InitIndex(key.IndexName);
             });
+
+            this.scriptEngine = scriptEngine;
         }
 
         protected override async Task<(string Description, AlgoliaJob Data)> CreateJobAsync(EnrichedEvent @event, AlgoliaAction action)
         {
-            if (@event is EnrichedContentEvent contentEvent)
+            if (@event is IEnrichedEntityEvent entityEvent)
             {
-                var contentId = contentEvent.Id.ToString();
+                var delete = @event.ShouldDelete(scriptEngine, action.Delete);
+
+                var contentId = entityEvent.Id.ToString();
 
                 var ruleDescription = string.Empty;
                 var ruleJob = new AlgoliaJob
@@ -48,8 +54,7 @@ namespace Squidex.Extensions.Actions.Algolia
                     IndexName = await FormatAsync(action.IndexName, @event)
                 };
 
-                if (contentEvent.Type == EnrichedContentEventType.Deleted ||
-                    contentEvent.Type == EnrichedContentEventType.Unpublished)
+                if (delete)
                 {
                     ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
                 }
@@ -69,7 +74,7 @@ namespace Squidex.Extensions.Actions.Algolia
                         }
                         else
                         {
-                            jsonString = ToJson(contentEvent);
+                            jsonString = ToJson(@event);
                         }
 
                         json = JObject.Parse(jsonString);
