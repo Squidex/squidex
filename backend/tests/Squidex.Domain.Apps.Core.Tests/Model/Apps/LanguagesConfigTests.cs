@@ -203,7 +203,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_same_langauges_if_removing_single_language()
+        public void Should_same_languages_if_removing_single_language()
         {
             var config_1 = config_0.Remove(Language.EN);
 
