@@ -1,9 +1,10 @@
 <ng-container *ngIf="show">
     <div [class.form-bubble]="bubble">
         <div class="form-alert form-alert-error" [class.closeable]="closeable">
-            <a class="form-alert-close" (click)="close()">
+            <span class="form-alert-close" (click)="close()">
                 <i class="icon-close"></i>
-            </a>
+            </span>
+
             <div [innerHTML]="error | sqxTranslate | sqxMarkdown"></div>
         </div>
     </div>
