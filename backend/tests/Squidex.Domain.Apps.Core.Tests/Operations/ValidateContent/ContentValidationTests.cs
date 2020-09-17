@@ -5,13 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
@@ -24,6 +28,68 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
         private readonly List<ValidationError> errors = new List<ValidationError>();
         private Schema schema = new Schema("my-schema");
+
+        [Fact]
+        public async Task Should_add_error_if_value_validator_throws_exception()
+        {
+            var validator = A.Fake<IValidator>();
+
+            A.CallTo(() => validator.ValidateAsync(A<object?>._, A<ValidationContext>._, A<AddError>._))
+                .Throws(new InvalidOperationException());
+
+            var validatorFactory = A.Fake<IValidatorsFactory>();
+
+            A.CallTo(() => validatorFactory.CreateValueValidators(A<ValidationContext>._, A<IField>._, A<FieldValidatorFactory>._))
+                .Returns(Enumerable.Repeat(validator, 1));
+
+            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,
+                new NumberFieldProperties());
+
+            var data =
+                new NamedContentData()
+                    .AddField("my-field",
+                        new ContentFieldData()
+                            .AddValue("iv", 1000));
+
+            await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema, factory: validatorFactory);
+
+            errors.Should().BeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Validation failed with internal error.", "my-field")
+                });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_field_validator_throws_exception()
+        {
+            var validator = A.Fake<IValidator>();
+
+            A.CallTo(() => validator.ValidateAsync(A<object?>._, A<ValidationContext>._, A<AddError>._))
+                .Throws(new InvalidOperationException());
+
+            var validatorFactory = A.Fake<IValidatorsFactory>();
+
+            A.CallTo(() => validatorFactory.CreateFieldValidators(A<ValidationContext>._, A<IField>._, A<FieldValidatorFactory>._))
+                .Returns(Enumerable.Repeat(validator, 1));
+
+            schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,
+                new NumberFieldProperties());
+
+            var data =
+                new NamedContentData()
+                    .AddField("my-field",
+                        new ContentFieldData()
+                            .AddValue("iv", 1000));
+
+            await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema, factory: validatorFactory);
+
+            errors.Should().BeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Validation failed with internal error.", "my-field")
+                });
+        }
 
         [Fact]
         public async Task Should_add_error_if_validating_data_with_unknown_field()

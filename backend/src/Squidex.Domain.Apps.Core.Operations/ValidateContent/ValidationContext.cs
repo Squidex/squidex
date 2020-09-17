@@ -48,13 +48,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             ValidationMode mode = ValidationMode.Default)
         {
             AppId = appId;
+
             ContentId = contentId;
-            IsOptional = isOptional;
+
             Mode = mode;
-            Path = path;
 
             Schema = schema;
             SchemaId = schemaId;
+
+            IsOptional = isOptional;
+
+            Path = path;
         }
 
         public ValidationContext Optimized(bool isOptimized = true)
@@ -69,14 +73,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return Clone(Path, IsOptional, mode);
         }
 
-        public ValidationContext Optional(bool isOptional)
+        public ValidationContext Optional(bool fieldIsOptional)
         {
-            if (IsOptional == isOptional)
+            if (IsOptional == fieldIsOptional)
             {
                 return this;
             }
 
-            return Clone(Path, isOptional, Mode);
+            return Clone(Path, fieldIsOptional, Mode);
         }
 
         public ValidationContext Nested(string property)

@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             patched = patch.MergeInto(data);
 
-            var context = new ContentOperationContext(appProvider, Enumerable.Repeat(new DefaultValidatorsFactory(), 1), scriptEngine);
+            var context = new ContentOperationContext(appProvider, Enumerable.Repeat(new DefaultValidatorsFactory(), 1), scriptEngine, A.Fake<ISemanticLog>());
 
             sut = new ContentDomainObject(Store, contentWorkflow, context, A.Dummy<ISemanticLog>());
             sut.Setup(Id);

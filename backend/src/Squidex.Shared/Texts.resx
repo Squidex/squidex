@@ -526,6 +526,9 @@
   <data name="contents.validation.duplicates" xml:space="preserve">
     <value>Must not contain duplicate values.</value>
   </data>
+  <data name="contents.validation.error" xml:space="preserve">
+    <value>Validation failed with internal error.</value>
+  </data>
   <data name="contents.validation.exactValue" xml:space="preserve">
     <value>Must be exactly {value}.</value>
   </data>
