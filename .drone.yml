@@ -111,6 +111,7 @@ steps:
         - push
       branch:
         - master
+        - release/*
 
   - name: push_release
     image: docker
