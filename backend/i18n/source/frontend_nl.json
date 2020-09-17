@@ -368,7 +368,7 @@
   "contents.referencesCreatePublish": "Maken en publiceren",
   "contents.referencesLink": "Link geselecteerde inhoud ({count})",
   "contents.referencesSelectExisting": "Selecteer bestaande",
-  "contents.referencesSelectSchema": "Selecteer {scheme}",
+  "contents.referencesSelectSchema": "Selecteer {schema}",
   "contents.refreshTooltip": "Ververs inhoud (CTRL + SHIFT + R)",
   "contents.reloaded": "Inhoud opnieuw geladen.",
   "contents.removeConfirmText": "Wil je de inhoud echt verwijderen?",
