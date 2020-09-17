@@ -40,13 +40,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Guard.NotNull(tagService, nameof(tagService));
 
             this.jsonSerializer = jsonSerializer;
-            this.options = options.Value;
             this.tagService = tagService;
+
+            this.options = options.Value;
         }
 
         public virtual async ValueTask<ClrQuery> ParseQueryAsync(Context context, Q q)
         {
             Guard.NotNull(context, nameof(context));
+            Guard.NotNull(q, nameof(q));
 
             using (Profiler.TraceMethod<AssetQueryParser>())
             {

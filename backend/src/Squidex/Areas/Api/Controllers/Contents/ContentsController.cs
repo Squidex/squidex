@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/graphql/")]
-        [ApiPermission]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(2)]
         public async Task<IActionResult> GetGraphQL(string app, [FromQuery] GraphQLGetDto? queries = null)
         {
@@ -85,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/graphql/")]
-        [ApiPermission]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLPostDto query)
         {
@@ -117,7 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/graphql/batch")]
-        [ApiPermission]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLPostDto[] batch)
         {
@@ -150,7 +150,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpGet]
         [Route("content/{app}/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids)
         {
@@ -179,7 +179,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] ContentsIdsQueryDto query)
         {
@@ -210,7 +210,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpGet]
         [Route("content/{app}/{name}/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
@@ -242,7 +242,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/query")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentsPost(string app, string name, [FromBody] QueryDto query)
         {
@@ -274,7 +274,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpGet]
         [Route("content/{app}/{name}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, Guid id)
         {

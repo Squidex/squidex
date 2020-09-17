@@ -117,8 +117,9 @@
 
     .form-alert {
         @include absolute(.25rem, 0, auto, auto);
-        font-size: 1rem;
+        font-size: .9rem;
         font-weight: normal;
+        line-height: 1.75;
         max-width: 600px;
         min-width: 200px;
         padding: 1rem;
