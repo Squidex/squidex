@@ -25,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLModel : IGraphModel
     {
+        private static readonly IDocumentExecuter Executor = new DocumentExecuter();
         private readonly Dictionary<DomainId, ContentGraphType> contentTypes = new Dictionary<DomainId, ContentGraphType>();
         private readonly PartitionResolver partitionResolver;
         private readonly IObjectGraphType assetType;
@@ -110,12 +111,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return field.Accept(new QueryGraphTypeVisitor(schema, contentTypes, this, assetListType, fieldName));
         }
 
-        public IObjectGraphType GetAssetType()
+        public IGraphType GetAssetType()
         {
             return assetType;
         }
 
-        public IObjectGraphType GetContentType(DomainId schemaId)
+        public IGraphType GetContentType(DomainId schemaId)
         {
             return contentTypes.GetOrDefault(schemaId);
         }
@@ -124,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             Guard.NotNull(context, nameof(context));
 
-            var result = await new DocumentExecuter().ExecuteAsync(execution =>
+            var result = await Executor.ExecuteAsync(execution =>
             {
                 context.Setup(execution);
 
@@ -133,7 +134,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 execution.Query = query.Query;
             }).ConfigureAwait(false);
 
-            return (result.Data, result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray());
+            var errors = result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray();
+
+            return (result.Data, errors);
         }
     }
 }

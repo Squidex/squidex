@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnC
 import { AbstractControl, FormArray, FormGroupDirective } from '@angular/forms';
 import { fadeAnimation, LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
 import { merge } from 'rxjs';
+import { formatError } from './error-formatting';
 
 interface State {
     // The error messages to show.
@@ -121,40 +122,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         if (this.control && this.control.invalid && this.isTouched && this.control.errors) {
             for (const key in <any>this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
-                    let type = key.toLowerCase();
-
-                    if (Types.isString(this.control.value)) {
-                        if (type === 'minlength') {
-                            type = 'minlengthstring';
-                        }
-
-                        if (type === 'maxlength') {
-                            type = 'maxlengthstring';
-                        }
-
-                        if (type === 'exactlylength') {
-                            type = 'exactlylengthstring';
-                        }
-
-                        if (type === 'betweenlength') {
-                            type = 'betweenlengthstring';
-                        }
-                    }
-
-                    const error = this.control.errors[key];
-
-                    let message: string | null = null;
-
-                    if (Types.isString(error['message'])) {
-                        message = this.localizer.get(error['message']);
-                    }
-
-                    if (!message) {
-                        const args = { ...error, field: this.displayFieldName };
-
-                        message = this.localizer.getOrKey(`validation.${type}`, args);
-
-                    }
+                    const message = formatError(this.localizer, this.displayFieldName, key, this.control.errors[key], this.control.value);
 
                     if (message) {
                         errors.push(message);

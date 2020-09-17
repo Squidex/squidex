@@ -362,13 +362,13 @@
     <value>Ontleden zoekopdracht: {message}</value>
   </data>
   <data name="common.odataFilterNotValid" xml:space="preserve">
-    <value>OData $ filterclausule niet geldig: {ex.Message}</value>
+    <value>OData $ filterclausule niet geldig: {message}</value>
   </data>
   <data name="common.odataNotSupported" xml:space="preserve">
     <value>OData-bewerking wordt niet ondersteund.</value>
   </data>
   <data name="common.odataSearchNotValid" xml:space="preserve">
-    <value>OData $ zoekclausule niet geldig: {ex.Message}</value>
+    <value>OData $ zoekclausule niet geldig: {message}</value>
   </data>
   <data name="common.oldPassword" xml:space="preserve">
     <value>Oud wachtwoord</value>

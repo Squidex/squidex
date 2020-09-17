@@ -12,6 +12,7 @@ describe('LocalizerService', () => {
         simple: 'Simple Result',
         withLowerVar: 'Var: {var|lower}.',
         withUpperVar: 'Var: {var|upper}.',
+        withMultiple: 'Text1: {text1}, Text2: {Text2}.',
         withVar: 'Var: {var}.'
     };
 
@@ -81,5 +82,13 @@ describe('LocalizerService', () => {
         const result = localizer.get('withUpperVar', { var: 'upper' });
 
         expect(result).toEqual('Var: Upper.');
+    });
+
+    it('should return text with multiple variables', () => {
+        const localizer = new LocalizerService(translations);
+
+        const result = localizer.get('withMultiple', { Text1: 'Hello', Text2: 'World' });
+
+        expect(result).toEqual('Text1: Hello, Text2: World.');
     });
 });

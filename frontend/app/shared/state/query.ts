@@ -219,7 +219,7 @@ const StringOperators: ReadonlyArray<FilterOperator> = [
 ];
 
 const ArrayOperators: ReadonlyArray<FilterOperator> = [
-    { name: 'i18n:common.queryOperators.empty', value: 'is empty', noValue: true }
+    { name: 'i18n:common.queryOperators.empty', value: 'empty', noValue: true }
 ];
 
 const TypeBoolean: QueryFieldModel = {

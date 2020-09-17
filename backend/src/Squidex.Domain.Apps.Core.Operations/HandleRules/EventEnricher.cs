@@ -42,7 +42,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     userEvent.Actor = squidexEvent.Actor;
                 }
 
-                userEvent.User = await FindUserAsync(userEvent.Actor);
+                if (userEvent.Actor != null)
+                {
+                    userEvent.User = await FindUserAsync(userEvent.Actor);
+                }
             }
 
             enrichedEvent.AppId = @event.Payload.AppId;

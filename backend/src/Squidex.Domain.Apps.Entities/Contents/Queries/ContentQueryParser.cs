@@ -42,7 +42,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public ContentQueryParser(IMemoryCache cache, IJsonSerializer jsonSerializer, IOptions<ContentOptions> options)
             : base(cache)
         {
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNull(options, nameof(options));
+
             this.jsonSerializer = jsonSerializer;
+
             this.options = options.Value;
         }
 
@@ -50,6 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(q, nameof(q));
 
             using (Profiler.TraceMethod<ContentQueryParser>())
             {

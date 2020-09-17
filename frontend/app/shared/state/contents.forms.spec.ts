@@ -259,10 +259,16 @@ describe('DateTimeField', () => {
         expect(FieldFormatter.format(dateField, '2017-12-12')).toBe('12/12/2017');
     });
 
-    it('should format to date', () => {
+    it('should format datetime to date', () => {
         const dateField = createField({ properties: createProperties('DateTime', { editor: 'Date' }) });
 
         expect(FieldFormatter.format(dateField, '2017-12-12T16:00:00Z')).toBe('12/12/2017');
+    });
+
+    it('should format date to date', () => {
+        const dateField = createField({ properties: createProperties('DateTime', { editor: 'Date' }) });
+
+        expect(FieldFormatter.format(dateField, '2017-12-12T00:00:00Z')).toBe('12/12/2017');
     });
 
     it('should format to date time', () => {

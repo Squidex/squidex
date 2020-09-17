@@ -130,7 +130,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
             const parsed = DateTime.parseISO(this.value);
 
             if (properties.editor === 'Date') {
-                return parsed.toStringFormat('P');
+                return parsed.toStringFormatUTC('P');
             } else {
                 return parsed.toStringFormat('Ppp');
             }
@@ -398,68 +398,6 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 
     public visitTags(_: TagsFieldPropertiesDto): any {
         return null;
-    }
-
-    public visitUI(_: UIFieldPropertiesDto): any {
-        return null;
-    }
-}
-
-type UpdateOn = 'change' | 'blur';
-
-export class FieldUpdateOn implements FieldPropertiesVisitor<UpdateOn> {
-    private static INSTANCE = new FieldUpdateOn();
-
-    private constructor(
-    ) {
-    }
-
-    public static get(field: FieldDto): UpdateOn {
-        if (field.properties.editorUrl) {
-            return 'change';
-        }
-
-        return field.properties.accept(FieldUpdateOn.INSTANCE);
-    }
-
-    public visitDateTime(_: DateTimeFieldPropertiesDto): any {
-        return 'blur';
-    }
-
-    public visitArray(_: ArrayFieldPropertiesDto): any {
-        return 'blur';
-    }
-
-    public visitAssets(_: AssetsFieldPropertiesDto): any {
-        return 'blur';
-    }
-
-    public visitBoolean(_: BooleanFieldPropertiesDto): any {
-        return 'change';
-    }
-
-    public visitGeolocation(_: GeolocationFieldPropertiesDto): any {
-        return 'blur';
-    }
-
-    public visitJson(_: JsonFieldPropertiesDto): any {
-        return 'blur';
-    }
-
-    public visitNumber(properties: NumberFieldPropertiesDto): any {
-        return properties.editor === 'Radio' || properties.editor === 'Dropdown' ? 'change' : 'blur';
-    }
-
-    public visitReferences(properties: ReferencesFieldPropertiesDto): any {
-        return properties.editor === 'Dropdown' || properties.editor === 'Checkboxes' ? 'change' : 'blur';
-    }
-
-    public visitString(properties: StringFieldPropertiesDto): any {
-        return properties.editor === 'Radio' || properties.editor === 'Dropdown' ? 'change' : 'blur';
-    }
-
-    public visitTags(properties: TagsFieldPropertiesDto): any {
-        return properties.editor === 'Checkboxes' || properties.editor === 'Dropdown' ? 'change' : 'blur';
     }
 
     public visitUI(_: UIFieldPropertiesDto): any {

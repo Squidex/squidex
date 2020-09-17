@@ -98,7 +98,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .Hints("The title of the post."))
                     .AddString("Text", f => f
                         .AsRichText()
-                        .Length(100)
                         .Required()
                         .Hints("The text of the post."))
                     .AddString("Slug", f => f
@@ -124,7 +123,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .Hints("The title of the page."))
                     .AddString("Text", f => f
                         .AsRichText()
-                        .Length(100)
                         .Required()
                         .Hints("The text of the page."))
                     .AddString("Slug", f => f

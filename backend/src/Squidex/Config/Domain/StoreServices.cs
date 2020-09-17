@@ -122,9 +122,6 @@ namespace Squidex.Config.Domain
                         .As<IContentRepository>().As<ISnapshotStore<ContentState, DomainId>>();
 
                     services.AddSingletonAs<MongoTextIndexerState>()
-                        .AsSelf();
-
-                    services.AddSingletonAs(c => new CachingTextIndexerState(c.GetRequiredService<MongoTextIndexerState>()))
                         .As<ITextIndexerState>();
 
                     var registration = services.FirstOrDefault(x => x.ServiceType == typeof(IPersistedGrantStore));

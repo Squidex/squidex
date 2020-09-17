@@ -142,6 +142,16 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         this.updateControls();
     }
 
+    public writeToday() {
+        this.dateTime = new DateTime(DateHelper.getLocalDate(DateTime.today().raw));
+
+        this.updateControls();
+        this.callChangeFormatted();
+        this.callTouched();
+
+        return false;
+    }
+
     public writeNow() {
         this.dateTime = DateTime.now();
 

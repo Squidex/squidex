@@ -5,11 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents
@@ -18,6 +21,26 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
     {
         [Fact]
         public void Should_serialize_and_deserialize()
+        {
+            var workflow = new Workflow(
+                Status.Draft, new Dictionary<Status, WorkflowStep>
+                {
+                    [Status.Draft] = new WorkflowStep(
+                        new Dictionary<Status, WorkflowTransition>
+                        {
+                            [Status.Published] = WorkflowTransition.When("Expression", "Role1", "Role2")
+                        },
+                        "#00ff00",
+                        NoUpdate.When("Expression", "Role1", "Role2"))
+                }, new List<DomainId> { DomainId.NewGuid() }, "MyName");
+
+            var serialized = workflow.SerializeAndDeserialize();
+
+            serialized.Should().BeEquivalentTo(workflow);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_default()
         {
             var workflow = Workflow.Default;
 

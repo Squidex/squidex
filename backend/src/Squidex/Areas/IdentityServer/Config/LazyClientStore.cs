@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -109,9 +108,9 @@ namespace Squidex.Areas.IdentityServer.Config
                     Constants.RoleScope,
                     Constants.PermissionsScope
                 },
-                Claims = new List<Claim>
+                Claims = new List<ClientClaim>
                 {
-                    new Claim(OpenIdClaims.Subject, user.Id)
+                    new ClientClaim(OpenIdClaims.Subject, user.Id)
                 }
             };
         }
@@ -228,9 +227,9 @@ namespace Squidex.Areas.IdentityServer.Config
                         Constants.RoleScope,
                         Constants.PermissionsScope
                     },
-                    Claims = new List<Claim>
+                    Claims = new List<ClientClaim>
                     {
-                        new Claim(SquidexClaimTypes.Permissions, Permissions.All)
+                        new ClientClaim(SquidexClaimTypes.Permissions, Permissions.All)
                     }
                 };
             }

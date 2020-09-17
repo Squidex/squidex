@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json
 {
-    public sealed class WorkflowConverter : JsonClassConverter<Workflows>
+    public sealed class WorkflowsConverter : JsonClassConverter<Workflows>
     {
         protected override void WriteValue(JsonWriter writer, Workflows value, JsonSerializer serializer)
         {
