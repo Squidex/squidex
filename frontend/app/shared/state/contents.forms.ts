@@ -15,7 +15,7 @@ import { LanguageDto } from './../services/languages.service';
 import { FieldDto, NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
 import { CompiledRule, FieldSection, Hidden, PartitionConfig } from './contents.forms-helpers';
-import { FieldDefaultValue, FieldsValidators, FieldUpdateOn } from './contents.forms.visitors';
+import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
 export { FieldSection } from './contents.forms-helpers';
 
@@ -48,7 +48,7 @@ export class PatchContentForm extends Form<FormGroup, any> {
         for (const field of this.editableFields) {
             const validators = FieldsValidators.create(field, this.language.isOptional);
 
-            this.form.setControl(field.name, new FormControl(undefined, { updateOn: FieldUpdateOn.get(field), validators }));
+            this.form.setControl(field.name, new FormControl(undefined, { validators }));
         }
     }
 
@@ -86,9 +86,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto,
         private readonly user: any = {}
     ) {
-        super(new FormGroup({}, {
-            updateOn: 'blur'
-        }));
+        super(new FormGroup({}));
 
         const compiledPartitions = new PartitionConfig(languages);
         const compiledConditions = schema.fieldRules.map(x => new CompiledRule(x));
@@ -339,7 +337,7 @@ export class FieldValueForm extends AbstractContentForm<RootFieldDto, FormContro
 
         const validators = FieldsValidators.create(field, isOptional);
 
-        return new FormControl(value, { updateOn: FieldUpdateOn.get(field), validators });
+        return new FormControl(value, { validators });
     }
 }
 
@@ -517,7 +515,7 @@ export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto,
 
         const validators = FieldsValidators.create(field, isOptional);
 
-        return new FormControl(value, { updateOn: FieldUpdateOn.get(field), validators });
+        return new FormControl(value, { validators });
     }
 }
 
