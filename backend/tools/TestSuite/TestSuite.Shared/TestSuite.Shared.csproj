@@ -9,7 +9,7 @@
     </PackageReference>
     <PackageReference Include="Lazy.Fody" Version="1.8.0" PrivateAssets="all" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="5.5.0-beta2" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="5.5.0-beta3" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>

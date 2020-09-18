@@ -119,7 +119,7 @@ namespace TestSuite.ApiTests
             {
                 var downloaded = new MemoryStream();
 
-                using (var assetStream = await _.Assets.GetAssetContentBySlugAsync(_.AppName, asset_2.Id))
+                using (var assetStream = await _.Assets.GetAssetContentBySlugAsync(_.AppName, asset_2.Id, string.Empty))
                 {
                     await assetStream.Stream.CopyToAsync(downloaded);
                 }
