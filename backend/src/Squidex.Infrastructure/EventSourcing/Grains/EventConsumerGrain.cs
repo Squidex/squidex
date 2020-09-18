@@ -81,8 +81,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return State.ToInfo(eventConsumer!.Name).AsImmutable();
         }
 
-        public Task OnEventsAsync(IReadOnlyList<Envelope<IEvent>> events, string position)
+        public Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
         {
+            if (!ReferenceEquals(sender, currentSubscriber?.Sender))
+            {
+                return Task.CompletedTask;
+            }
+
             return DoAndUpdateStateAsync(async () =>
             {
                 await DispatchAsync(events);
@@ -91,8 +96,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             });
         }
 
-        public Task OnErrorAsync(Exception exception)
+        public Task OnErrorAsync(object sender, Exception exception)
         {
+            if (!ReferenceEquals(sender, currentSubscriber?.Sender))
+            {
+                return Task.CompletedTask;
+            }
+
             return DoAndUpdateStateAsync(() =>
             {
                 Unsubscribe();

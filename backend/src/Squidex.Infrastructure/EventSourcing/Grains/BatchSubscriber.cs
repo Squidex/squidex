@@ -22,6 +22,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventSubscription eventSubscription;
         private readonly IDataflowBlock pipelineEnd;
 
+        public object Sender
+        {
+            get { return eventSubscription.Sender; }
+        }
+
         private sealed class Job
         {
             public StoredEvent? StoredEvent { get; set; }
@@ -91,11 +96,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                         if (exception != null)
                         {
-                            await grain.OnErrorAsync(exception);
+                            await grain.OnErrorAsync(Sender, exception);
                         }
                         else
                         {
-                            await grain.OnEventsAsync(GetEvents(jobsBySender), GetPosition(jobsBySender));
+                            await grain.OnEventsAsync(Sender, GetEvents(jobsBySender), GetPosition(jobsBySender));
                         }
                     }
                 }

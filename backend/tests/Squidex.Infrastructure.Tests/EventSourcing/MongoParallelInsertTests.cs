@@ -212,6 +212,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public MongoParallelInsertTests(MongoEventStoreReplicaSetFixture fixture)
         {
             _ = fixture;
+            _.Cleanup();
 
             var typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent), "My");
 
