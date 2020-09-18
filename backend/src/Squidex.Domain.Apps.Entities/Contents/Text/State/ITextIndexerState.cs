@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
@@ -12,11 +13,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public interface ITextIndexerState
     {
-        Task<TextContentState?> GetAsync(DomainId appId, DomainId contentId);
+        Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids);
 
-        Task SetAsync(DomainId appId, TextContentState state);
-
-        Task RemoveAsync(DomainId appId, DomainId contentId);
+        Task SetAsync(List<TextContentState> updates);
 
         Task ClearAsync();
     }

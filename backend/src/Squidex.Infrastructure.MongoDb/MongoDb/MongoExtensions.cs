@@ -168,15 +168,15 @@ namespace Squidex.Infrastructure.MongoDb
             return BsonClassMap.LookupClassMap(typeof(TEntity)).GetMemberMap(nameof(IVersionedEntity<TKey>.Version)).ElementName;
         }
 
-        public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursorSource<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
+        public static async Task ForEachPipedAsync<TDocument>(this IAsyncCursorSource<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
         {
             using (var cursor = await source.ToCursorAsync(cancellationToken))
             {
-                await cursor.ForEachPipelineAsync(processor, cancellationToken);
+                await cursor.ForEachPipedAsync(processor, cancellationToken);
             }
         }
 
-        public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursor<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
+        public static async Task ForEachPipedAsync<TDocument>(this IAsyncCursor<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
         {
             using (var selfToken = new CancellationTokenSource())
             {

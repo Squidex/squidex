@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public sealed class TextContentState
     {
-        public DomainId ContentId { get; set; }
+        public DomainId UniqueContentId { get; set; }
 
         public string DocIdCurrent { get; set; }
 
@@ -19,15 +19,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
         public string? DocIdForPublished { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public void GenerateDocIdNew()
         {
             if (DocIdCurrent?.EndsWith("_2") != false)
             {
-                DocIdNew = $"{ContentId}_1";
+                DocIdNew = $"{UniqueContentId}_1";
             }
             else
             {
-                DocIdNew = $"{ContentId}_2";
+                DocIdNew = $"{UniqueContentId}_2";
             }
         }
 
@@ -35,11 +37,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
         {
             if (DocIdNew?.EndsWith("_2") != false)
             {
-                DocIdCurrent = $"{ContentId}_1";
+                DocIdCurrent = $"{UniqueContentId}_1";
             }
             else
             {
-                DocIdCurrent = $"{ContentId}_2";
+                DocIdCurrent = $"{UniqueContentId}_2";
             }
         }
     }

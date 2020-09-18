@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
 
 #pragma warning disable SA1028, IDE0004 // Code must not contain trailing whitespace
@@ -25,6 +26,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         private readonly PartitionResolver partitionResolver;
         private readonly ValidationContext context;
         private readonly IEnumerable<IValidatorsFactory> factories;
+        private readonly ISemanticLog log;
         private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
 
         public IReadOnlyCollection<ValidationError> Errors
@@ -32,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             get { return errors; }
         }
 
-        public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories)
+        public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories, ISemanticLog log)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(factories, nameof(factories));
@@ -40,6 +42,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             this.context = context;
             this.factories = factories;
+            this.log = log;
             this.partitionResolver = partitionResolver;
         }
 
@@ -72,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             Guard.NotNull(data, nameof(data));
 
-            var validator = new AggregateValidator(CreateContentValidators());
+            var validator = new AggregateValidator(CreateContentValidators(), log);
 
             return validator.ValidateAsync(data, context, AddError);
         }
@@ -108,7 +111,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return new AggregateValidator(
                 CreateFieldValidators(field)
                     .Union(Enumerable.Repeat(
-                        new ObjectValidator<IJsonValue>(fieldsValidators, isPartial, typeName), 1)));
+                        new ObjectValidator<IJsonValue>(fieldsValidators, isPartial, typeName), 1)), log);
         }
 
         private IValidator CreateFieldValidator(IField field)

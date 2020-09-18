@@ -18,6 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         Task ClearAsync();
 
-        Task ExecuteAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, params IndexCommand[] commands);
+        Task ExecuteAsync(params IndexCommand[] commands);
     }
 }

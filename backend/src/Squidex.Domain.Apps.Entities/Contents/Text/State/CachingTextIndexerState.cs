@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
@@ -15,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
     public sealed class CachingTextIndexerState : ITextIndexerState
     {
         private readonly ITextIndexerState inner;
-        private LRUCache<(DomainId, DomainId), Tuple<TextContentState?>> cache = new LRUCache<(DomainId, DomainId), Tuple<TextContentState?>>(1000);
+        private readonly LRUCache<DomainId, Tuple<TextContentState?>> cache = new LRUCache<DomainId, Tuple<TextContentState?>>(10000);
 
         public CachingTextIndexerState(ITextIndexerState inner)
         {
@@ -28,37 +29,69 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
         {
             await inner.ClearAsync();
 
-            cache = new LRUCache<(DomainId, DomainId), Tuple<TextContentState?>>(1000);
+            cache.Clear();
         }
 
-        public async Task<TextContentState?> GetAsync(DomainId appId, DomainId contentId)
+        public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids)
         {
-            if (cache.TryGetValue((appId, contentId), out var value))
+            Guard.NotNull(ids, nameof(ids));
+
+            var missingIds = new HashSet<DomainId>();
+
+            var result = new Dictionary<DomainId, TextContentState>();
+
+            foreach (var id in ids)
             {
-                return value.Item1;
+                if (cache.TryGetValue(id, out var state))
+                {
+                    if (state.Item1 != null)
+                    {
+                        result[id] = state.Item1;
+                    }
+                }
+                else
+                {
+                    missingIds.Add(id);
+                }
             }
 
-            var result = await inner.GetAsync(appId, contentId);
+            if (missingIds.Count > 0)
+            {
+                var fromInner = await inner.GetAsync(missingIds);
 
-            cache.Set((appId, contentId), Tuple.Create(result));
+                foreach (var (id, state) in fromInner)
+                {
+                    result[id] = state;
+                }
+
+                foreach (var id in missingIds)
+                {
+                    var state = fromInner.GetOrDefault(id);
+
+                    cache.Set(id, Tuple.Create<TextContentState?>(state));
+                }
+            }
 
             return result;
         }
 
-        public Task SetAsync(DomainId appId, TextContentState state)
+        public Task SetAsync(List<TextContentState> updates)
         {
-            Guard.NotNull(state, nameof(state));
+            Guard.NotNull(updates, nameof(updates));
 
-            cache.Set((appId, state.ContentId), Tuple.Create<TextContentState?>(state));
+            foreach (var update in updates)
+            {
+                if (update.IsDeleted)
+                {
+                    cache.Set(update.UniqueContentId, Tuple.Create<TextContentState?>(null));
+                }
+                else
+                {
+                    cache.Set(update.UniqueContentId, Tuple.Create<TextContentState?>(update));
+                }
+            }
 
-            return inner.SetAsync(appId, state);
-        }
-
-        public Task RemoveAsync(DomainId appId, DomainId contentId)
-        {
-            cache.Set((appId, contentId), Tuple.Create<TextContentState?>(null));
-
-            return inner.RemoveAsync(appId, contentId);
+            return inner.SetAsync(updates);
         }
     }
 }

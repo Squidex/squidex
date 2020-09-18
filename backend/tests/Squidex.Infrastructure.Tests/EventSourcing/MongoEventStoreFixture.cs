@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.EventSourcing
             mongoClient = new MongoClient(connectionString);
             mongoDatabase = mongoClient.GetDatabase($"EventStoreTest");
 
-            Dispose();
+            Cleanup();
 
             BsonJsonConvention.Register(JsonSerializer.Create(JsonHelper.DefaultSettings()));
 
@@ -35,9 +35,14 @@ namespace Squidex.Infrastructure.EventSourcing
             EventStore.InitializeAsync().Wait();
         }
 
-        public void Dispose()
+        public void Cleanup()
         {
             mongoClient.DropDatabase("EventStoreTest");
+        }
+
+        public void Dispose()
+        {
+            Cleanup();
         }
     }
 

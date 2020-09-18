@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.States
         {
             using (Profiler.TraceMethod<MongoSnapshotStore<T, TKey>>())
             {
-                await Collection.Find(new BsonDocument(), options: Batching.Options).ForEachPipelineAsync(x => callback(x.Doc, x.Version), ct);
+                await Collection.Find(new BsonDocument(), options: Batching.Options).ForEachPipedAsync(x => callback(x.Doc, x.Version), ct);
             }
         }
 

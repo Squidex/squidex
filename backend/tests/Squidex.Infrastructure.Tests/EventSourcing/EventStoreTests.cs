@@ -335,10 +335,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
             finally
             {
-                if (subscription != null)
-                {
-                    await subscription.StopAsync();
-                }
+                subscription?.Unsubscribe();
             }
         }
 

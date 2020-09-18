@@ -52,8 +52,8 @@ namespace Squidex.Infrastructure.Commands
 
             var sut = CommandRequest.Create(null!);
 
-            Assert.Same(culture.Name, sut.Culture);
-            Assert.Same(cultureUI.Name, sut.CultureUI);
+            Assert.Equal(culture.Name, sut.Culture);
+            Assert.Equal(cultureUI.Name, sut.CultureUI);
         }
 
         [Fact, Trait("Category", "Dependencies")]
@@ -76,10 +76,10 @@ namespace Squidex.Infrastructure.Commands
             var request = CommandRequest.Create(null!);
 
             var cultureFromGrain = await grain.GetCultureAsync(request);
-            var cultureUIFromGrain = await grain.GetCultureAsync(request);
+            var cultureUIFromGrain = await grain.GetCultureUIAsync(request);
 
-            Assert.Same(culture.Name, cultureFromGrain);
-            Assert.Same(cultureUI.Name, cultureUIFromGrain);
+            Assert.Equal(culture.Name, cultureFromGrain);
+            Assert.Equal(cultureUI.Name, cultureUIFromGrain);
         }
     }
 }

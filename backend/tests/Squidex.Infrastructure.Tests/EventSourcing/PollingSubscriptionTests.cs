@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await WaitAndStopAsync(sut);
 
             A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>._, "^my-stream", position, A<CancellationToken>._))
-                .MustHaveHappened(1, Times.Exactly);
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             await Task.Delay(200);
 
-            await sut.StopAsync();
+            sut.Unsubscribe();
         }
     }
 }

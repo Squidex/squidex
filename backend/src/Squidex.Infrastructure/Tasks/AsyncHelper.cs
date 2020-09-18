@@ -8,6 +8,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Squidex.Infrastructure.Tasks
 {
@@ -49,6 +50,38 @@ namespace Squidex.Infrastructure.Tasks
                 .Unwrap()
                 .GetAwaiter()
                 .GetResult();
+        }
+
+        public static IPropagatorBlock<T, T[]> CreateBatchBlock<T>(int batchSize, int timeout, GroupingDataflowBlockOptions? dataflowBlockOptions = null)
+        {
+            dataflowBlockOptions ??= new GroupingDataflowBlockOptions();
+
+            var batchBlock = new BatchBlock<T>(batchSize, dataflowBlockOptions);
+
+            var timer = new Timer(_ => batchBlock.TriggerBatch());
+
+            var timerBlock = new TransformBlock<T, T>((T value) =>
+            {
+                timer.Change(timeout, Timeout.Infinite);
+
+                return value;
+            }, new ExecutionDataflowBlockOptions()
+            {
+                BoundedCapacity = 1,
+                CancellationToken = dataflowBlockOptions.CancellationToken,
+                EnsureOrdered = dataflowBlockOptions.EnsureOrdered,
+                MaxDegreeOfParallelism = 1,
+                MaxMessagesPerTask = dataflowBlockOptions.MaxMessagesPerTask,
+                NameFormat = dataflowBlockOptions.NameFormat,
+                TaskScheduler = dataflowBlockOptions.TaskScheduler
+            });
+
+            timerBlock.LinkTo(batchBlock, new DataflowLinkOptions()
+            {
+                PropagateCompletion = true
+            });
+
+            return DataflowBlock.Encapsulate(timerBlock, batchBlock);
         }
     }
 }

@@ -5,19 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Lucene.Net.Index;
-using Lucene.Net.Store;
-using Squidex.Infrastructure;
+using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text.Lucene
+namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
-    public interface IIndexStorage
+    public sealed class MongoTextIndexEntityText
     {
-        Task<Directory> CreateDirectoryAsync(DomainId ownerId);
+        [BsonRequired]
+        [BsonElement("t")]
+        public string Text { get; set; }
 
-        Task WriteAsync(Directory directory, SnapshotDeletionPolicy snapshotter);
-
-        Task ClearAsync();
+        [BsonIgnoreIfNull]
+        [BsonElement("language")]
+        public string Language { get; set; }
     }
 }
