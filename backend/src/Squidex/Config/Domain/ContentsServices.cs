@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
-using Squidex.Domain.Apps.Entities.Contents.Text.Lucene;
+using Squidex.Domain.Apps.Entities.Contents.Text.Elastic;
 using Squidex.Domain.Apps.Entities.Contents.Validation;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
@@ -86,20 +86,27 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DefaultWorkflowsValidator>()
                 .AsOptional<IWorkflowsValidator>();
 
-            services.AddSingletonAs<LuceneTextIndex>()
-                .As<ITextIndex>();
-
             services.AddSingletonAs<TextIndexingProcess>()
                 .As<IEventConsumer>();
 
             services.AddSingletonAs<ContentsSearchSource>()
                 .As<ISearchSource>();
 
-            services.AddSingletonAs<IndexManager>()
-                .AsSelf();
-
             services.AddSingletonAs<GrainBootstrap<IContentSchedulerGrain>>()
                 .AsSelf();
+
+            config.ConfigureByOption("fullText:type", new Alternatives
+            {
+                ["Elastic"] = () =>
+                {
+                    var elasticConfiguration = config.GetRequiredValue("fullText:elastic:configuration");
+                    var elasticIndexName = config.GetRequiredValue("fullText:elastic:indexName");
+
+                    services.AddSingletonAs(c => new ElasticSearchTextIndex(elasticConfiguration, elasticIndexName))
+                        .As<ITextIndex>();
+                },
+                ["Default"] = () => { }
+            });
         }
     }
 }

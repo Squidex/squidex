@@ -45,16 +45,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             this.log = log;
         }
 
-        public bool Handles(StoredEvent @event)
-        {
-            return true;
-        }
-
-        public Task ClearAsync()
-        {
-            return Task.CompletedTask;
-        }
-
         public async Task On(Envelope<IEvent> @event)
         {
             if (!emailSender.IsActive)

@@ -7,39 +7,32 @@
 
 using System;
 using System.Threading.Tasks;
-using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.MongoDb.FullText;
+using Squidex.Domain.Apps.Entities.Contents.Text.Elastic;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     [Trait("Category", "Dependencies")]
-    public class TextIndexerTests_Mongo : TextIndexerTestsBase
+    public class TextIndexerTests_Elastic : TextIndexerTestsBase
     {
         private sealed class TheFactory : IIndexerFactory
         {
-            private readonly MongoClient mongoClient = new MongoClient("mongodb://localhost");
-
             public Task CleanupAsync()
             {
                 return Task.CompletedTask;
             }
 
-            public async Task<ITextIndex> CreateAsync(Guid schemaId)
+            public Task<ITextIndex> CreateAsync(Guid schemaId)
             {
-                var database = mongoClient.GetDatabase("FullText");
+                var index = new ElasticSearchTextIndex("http://localhost:9200", "squidex", true);
 
-                var index = new MongoTextIndex(database, false);
-
-                await index.InitializeAsync();
-
-                return index;
+                return Task.FromResult<ITextIndex>(index);
             }
         }
 
         public override IIndexerFactory Factory { get; } = new TheFactory();
 
-        public TextIndexerTests_Mongo()
+        public TextIndexerTests_Elastic()
         {
             SupportsSearchSyntax = false;
             SupportsMultiLanguage = false;

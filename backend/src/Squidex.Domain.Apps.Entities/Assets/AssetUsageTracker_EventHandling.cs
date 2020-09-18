@@ -13,8 +13,18 @@ using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public partial class AssetUsageTracker
+    public partial class AssetUsageTracker : IEventConsumer
     {
+        public int BatchSize
+        {
+            get { return 1000; }
+        }
+
+        public int BatchDelay
+        {
+            get { return 1000; }
+        }
+
         public string Name
         {
             get { return GetType().Name; }
@@ -23,16 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public string EventsFilter
         {
             get { return "^asset-"; }
-        }
-
-        public bool Handles(StoredEvent @event)
-        {
-            return true;
-        }
-
-        public Task ClearAsync()
-        {
-            return Task.CompletedTask;
         }
 
         public Task On(Envelope<IEvent> @event)

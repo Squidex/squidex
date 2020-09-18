@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -47,9 +47,9 @@ namespace Squidex.Infrastructure.EventSourcing
             timer.SkipCurrentDelay();
         }
 
-        public Task StopAsync()
+        public void Unsubscribe()
         {
-            return timer.StopAsync();
+            timer.StopAsync().Forget();
         }
     }
 }

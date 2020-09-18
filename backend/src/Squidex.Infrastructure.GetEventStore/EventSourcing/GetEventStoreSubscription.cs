@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using Squidex.Infrastructure.Json;
@@ -44,15 +43,9 @@ namespace Squidex.Infrastructure.EventSourcing
             subscription = SubscribeToStream(streamName);
         }
 
-        public Task StopAsync()
+        public void Unsubscribe()
         {
             subscription.Stop();
-
-            return Task.CompletedTask;
-        }
-
-        public void WakeUp()
-        {
         }
 
         private EventStoreCatchUpSubscription SubscribeToStream(string streamName)

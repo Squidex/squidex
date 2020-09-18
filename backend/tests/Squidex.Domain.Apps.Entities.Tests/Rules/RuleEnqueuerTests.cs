@@ -51,21 +51,27 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public void Should_return_contents_filter_for_events_filter()
+        public void Should_return_wildcard_filter_for_events_filter()
         {
-            Assert.Equal(".*", sut.EventsFilter);
-        }
+            IEventConsumer consumer = sut;
 
-        [Fact]
-        public void Should_return_type_name_for_name()
-        {
-            Assert.Equal(typeof(RuleEnqueuer).Name, sut.Name);
+            Assert.Equal(".*", consumer.EventsFilter);
         }
 
         [Fact]
         public async Task Should_do_nothing_on_clear()
         {
-            await sut.ClearAsync();
+            IEventConsumer consumer = sut;
+
+            await consumer.ClearAsync();
+        }
+
+        [Fact]
+        public void Should_return_type_name_for_name()
+        {
+            IEventConsumer consumer = sut;
+
+            Assert.Equal(typeof(RuleEnqueuer).Name, consumer.Name);
         }
 
         [Fact]

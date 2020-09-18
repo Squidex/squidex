@@ -223,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     log.LogError(ex, logContext, (ctx, w) =>
                     {
-                        w.WriteProperty("action", "retore");
+                        w.WriteProperty("action", "restore");
                         w.WriteProperty("status", "failed");
                         w.WriteProperty("operationId", ctx.jobId);
                         w.WriteProperty("url", ctx.jobUrl);

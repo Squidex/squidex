@@ -33,11 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             get { return GetType().Name; }
         }
 
-        public string EventsFilter
-        {
-            get { return ".*"; }
-        }
-
         public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, ILocalCache localCache, IRuleEventRepository ruleEventRepository,
             RuleService ruleService)
         {
@@ -53,16 +48,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
             this.localCache = localCache;
-        }
-
-        public bool Handles(StoredEvent @event)
-        {
-            return true;
-        }
-
-        public Task ClearAsync()
-        {
-            return Task.CompletedTask;
         }
 
         public async Task Enqueue(Rule rule, Guid ruleId, Envelope<IEvent> @event)

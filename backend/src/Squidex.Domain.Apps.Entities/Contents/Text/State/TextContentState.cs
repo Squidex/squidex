@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
         public string? DocIdForPublished { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public void GenerateDocIdNew()
         {
             if (DocIdCurrent?.EndsWith("_2") != false)

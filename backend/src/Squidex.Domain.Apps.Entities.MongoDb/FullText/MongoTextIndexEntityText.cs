@@ -5,10 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
-    public class TextIndexerTests_FS : TextIndexerTestsBase
+    public sealed class MongoTextIndexEntityText
     {
-        public override IIndexerFactory Factory { get; } = new LuceneIndexFactory(TestStorages.TempFolder());
+        [BsonRequired]
+        [BsonElement("t")]
+        public string Text { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement("language")]
+        public string Language { get; set; }
     }
 }

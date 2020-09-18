@@ -113,11 +113,16 @@ namespace Squidex.Infrastructure.Translations
                     {
                         try
                         {
-                            variableValue = Convert.ToString(property.GetValue(args), culture);
+                            var value = property.GetValue(args);
+
+                            if (value != null)
+                            {
+                                variableValue = Convert.ToString(value, culture) ?? variableName;
+                            }
                         }
                         catch
                         {
-                            variableValue = null;
+                            variableValue = variableName;
                         }
                     }
 

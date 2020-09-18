@@ -8,7 +8,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
 
 #pragma warning disable RECS0002 // Convert anonymous method to method group
 
@@ -16,48 +15,52 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
     {
-        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(10);
-        private readonly CancellationTokenSource timerCancellation = new CancellationTokenSource();
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
-        private readonly IEventStore eventStore;
         private readonly IEventSubscriber eventSubscriber;
-        private readonly string? streamFilter;
+        private readonly Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory;
+        private CancellationTokenSource timerCancellation = new CancellationTokenSource();
         private IEventSubscription? currentSubscription;
-        private string? position;
 
         public int ReconnectWaitMs { get; set; } = 5000;
 
-        public RetrySubscription(IEventStore eventStore, IEventSubscriber eventSubscriber, string? streamFilter, string? position)
+        public object? Sender => currentSubscription?.Sender;
+
+        public RetrySubscription(IEventSubscriber eventSubscriber, Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory)
         {
-            Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
-            Guard.NotNull(streamFilter, nameof(streamFilter));
+            Guard.NotNull(eventSubscriptionFactory, nameof(eventSubscriptionFactory));
 
-            this.position = position;
-
-            this.eventStore = eventStore;
             this.eventSubscriber = eventSubscriber;
-
-            this.streamFilter = streamFilter;
+            this.eventSubscriptionFactory = eventSubscriptionFactory;
 
             Subscribe();
         }
 
         private void Subscribe()
         {
-            if (currentSubscription == null)
+            lock (this)
             {
-                currentSubscription = eventStore.CreateSubscription(this, streamFilter, position);
+                if (currentSubscription == null)
+                {
+                    currentSubscription = eventSubscriptionFactory(this);
+                }
             }
         }
 
-        private void Unsubscribe()
+        public void Unsubscribe()
         {
-            var subscription = Interlocked.Exchange(ref currentSubscription, null);
-
-            if (subscription != null)
+            lock (this)
             {
-                subscription.StopAsync().Forget();
+                if (currentSubscription != null)
+                {
+                    timerCancellation.Cancel();
+                    timerCancellation.Dispose();
+
+                    currentSubscription.Unsubscribe();
+                    currentSubscription = null;
+
+                    timerCancellation = new CancellationTokenSource();
+                }
             }
         }
 
@@ -66,59 +69,24 @@ namespace Squidex.Infrastructure.EventSourcing
             currentSubscription?.WakeUp();
         }
 
-        private async Task HandleEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
+        public async Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
         {
-            if (subscription == currentSubscription)
-            {
-                await eventSubscriber.OnEventAsync(this, storedEvent);
+            await eventSubscriber.OnEventAsync(subscription, storedEvent);
+        }
 
-                position = storedEvent.EventPosition;
+        public async Task OnErrorAsync(IEventSubscription subscription, Exception exception)
+        {
+            Unsubscribe();
+
+            if (retryWindow.CanRetryAfterFailure())
+            {
+                await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
+
+                Subscribe();
             }
-        }
-
-        private async Task HandleErrorAsync(IEventSubscription subscription, Exception exception)
-        {
-            if (subscription == currentSubscription)
+            else
             {
-                Unsubscribe();
-
-                if (retryWindow.CanRetryAfterFailure())
-                {
-                    RetryAsync().Forget();
-                }
-                else
-                {
-                    await eventSubscriber.OnErrorAsync(this, exception);
-                }
-            }
-        }
-
-        private async Task RetryAsync()
-        {
-            await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
-
-            await dispatcher.DispatchAsync(Subscribe);
-        }
-
-        Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
-        {
-            return dispatcher.DispatchAsync(() => HandleEventAsync(subscription, storedEvent));
-        }
-
-        Task IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
-        {
-            return dispatcher.DispatchAsync(() => HandleErrorAsync(subscription, exception));
-        }
-
-        public async Task StopAsync()
-        {
-            await dispatcher.DispatchAsync(Unsubscribe);
-            await dispatcher.StopAndWaitAsync();
-
-            if (!timerCancellation.IsCancellationRequested)
-            {
-                timerCancellation.Cancel();
-                timerCancellation.Dispose();
+                await eventSubscriber.OnErrorAsync(subscription, exception);
             }
         }
     }

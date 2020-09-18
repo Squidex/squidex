@@ -32,20 +32,20 @@ namespace Migrations.Migrations
 
                 var filter = Builders<BsonDocument>.Filter;
 
-                var writesBatches = new List<WriteModel<BsonDocument>>();
+                var writes = new List<WriteModel<BsonDocument>>();
 
                 async Task WriteAsync(WriteModel<BsonDocument>? model, bool force)
                 {
                     if (model != null)
                     {
-                        writesBatches.Add(model);
+                        writes.Add(model);
                     }
 
-                    if (writesBatches.Count == 1000 || (force && writesBatches.Count > 0))
+                    if (writes.Count == 1000 || (force && writes.Count > 0))
                     {
-                        await collection.BulkWriteAsync(writesBatches);
+                        await collection.BulkWriteAsync(writes);
 
-                        writesBatches.Clear();
+                        writes.Clear();
                     }
                 }
 

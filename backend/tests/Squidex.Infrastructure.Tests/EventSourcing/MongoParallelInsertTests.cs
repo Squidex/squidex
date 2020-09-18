@@ -164,21 +164,6 @@ namespace Squidex.Infrastructure.EventSourcing
                 : base(eventConsumerFactory, state, eventStore, eventDataFormatter, log)
             {
             }
-
-            protected override IEventConsumerGrain GetSelf()
-            {
-                return this;
-            }
-
-            protected override TaskScheduler GetScheduler()
-            {
-                return scheduler;
-            }
-
-            protected override IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string? filter, string? position)
-            {
-                return store.CreateSubscription(subscriber, filter, position);
-            }
         }
 
         public class MyEvent : IEvent
@@ -204,16 +189,6 @@ namespace Squidex.Infrastructure.EventSourcing
             public MyEventConsumer(int expectedCount)
             {
                 this.expectedCount = expectedCount;
-            }
-
-            public Task ClearAsync()
-            {
-                return Task.CompletedTask;
-            }
-
-            public bool Handles(StoredEvent @event)
-            {
-                return true;
             }
 
             public async Task On(Envelope<IEvent> @event)

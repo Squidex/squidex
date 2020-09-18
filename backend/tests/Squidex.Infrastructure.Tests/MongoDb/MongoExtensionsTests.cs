@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             var cursor = new Cursor<int>().Add(0, 1, 2, 3, 4, 5);
 
-            await cursor.ForEachPipelineAsync(x =>
+            await cursor.ForEachPipedAsync(x =>
             {
                 result.Add(x);
                 return Task.CompletedTask;
@@ -98,7 +98,7 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 {
-                    return cursor.ForEachPipelineAsync(x =>
+                    return cursor.ForEachPipedAsync(x =>
                     {
                         result.Add(x);
                         return Task.CompletedTask;
@@ -120,7 +120,7 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 {
-                    return cursor.ForEachPipelineAsync(x =>
+                    return cursor.ForEachPipedAsync(x =>
                     {
                         if (x == 2)
                         {
@@ -147,7 +147,7 @@ namespace Squidex.Infrastructure.MongoDb
                 {
                     await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
                     {
-                        return cursor.ForEachPipelineAsync(x =>
+                        return cursor.ForEachPipedAsync(x =>
                         {
                             if (x == 2)
                             {
