@@ -35,7 +35,7 @@ namespace TestSuite.ApiTests
         {
             var items = await _.Contents.GetAsync(new ContentQuery { OrderBy = "data/number/iv asc" });
 
-            var itemsById = await _.Contents.GetAsync(new HashSet<Guid>(items.Items.Take(3).Select(x => x.Id)));
+            var itemsById = await _.Contents.GetAsync(new HashSet<string>(items.Items.Take(3).Select(x => x.Id)));
 
             Assert.Equal(3, itemsById.Items.Count);
             Assert.Equal(3, itemsById.Total);

@@ -22,7 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class BulkUpdateCommandMiddlewareTests
     {
-        private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
@@ -35,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            sut = new BulkUpdateCommandMiddleware(serviceProvider, contentQuery, contextProvider);
+            sut = new BulkUpdateCommandMiddleware(contentQuery, contextProvider);
         }
 
         [Fact]
@@ -48,9 +47,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await sut.HandleAsync(context);
 
             Assert.True(context.PlainResult is BulkUpdateResult);
-
-            A.CallTo(() => serviceProvider.GetService(A<Type>._))
-                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -63,20 +59,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await sut.HandleAsync(context);
 
             Assert.True(context.PlainResult is BulkUpdateResult);
-
-            A.CallTo(() => serviceProvider.GetService(A<Type>._))
-                .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_import_contents_when_no_query_defined()
+        public async Task Should_upsert_content_with_random_id_if_no_query_and_id_defined()
         {
             var (_, data, _) = CreateTestData(false);
-
-            var domainObject = A.Fake<ContentDomainObject>();
-
-            A.CallTo(() => serviceProvider.GetService(typeof(ContentDomainObject)))
-                .Returns(domainObject);
 
             var command = new BulkUpdateContents
             {
@@ -100,22 +88,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Single(result);
             Assert.Equal(1, result.Count(x => x.ContentId != default && x.Exception == null));
 
-            A.CallTo(() => domainObject.ExecuteAsync(A<CreateContent>.That.Matches(x => x.Data == data)))
-                .MustHaveHappenedOnceExactly();
-
-            A.CallTo(() => domainObject.Setup(A<DomainId>._))
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
                 .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
-        public async Task Should_import_contents_when_query_returns_no_result()
+        public async Task Should_upsert_content_with_random_id_if_query_returns_no_result()
         {
             var (_, data, query) = CreateTestData(false);
-
-            var domainObject = A.Fake<ContentDomainObject>();
-
-            A.CallTo(() => serviceProvider.GetService(typeof(ContentDomainObject)))
-                .Returns(domainObject);
 
             var command = new BulkUpdateContents
             {
@@ -140,15 +121,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Single(result);
             Assert.Equal(1, result.Count(x => x.ContentId != default && x.Exception == null));
 
-            A.CallTo(() => domainObject.ExecuteAsync(A<CreateContent>.That.Matches(x => x.Data == data)))
-                .MustHaveHappenedOnceExactly();
-
-            A.CallTo(() => domainObject.Setup(A<DomainId>._))
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
                 .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
-        public async Task Should_update_content_when_id_defined()
+        public async Task Should_upsert_content_when_id_defined()
         {
             var (id, data, _) = CreateTestData(false);
 
@@ -175,12 +154,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Single(result);
             Assert.Equal(1, result.Count(x => x.ContentId != default && x.Exception == null));
 
-            A.CallTo(() => commandBus.PublishAsync(A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data)))
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
                 .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
-        public async Task Should_update_content_when_query_defined()
+        public async Task Should_upsert_content_with_custom_id()
         {
             var (id, data, query) = CreateTestData(true);
 
@@ -210,7 +190,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Single(result);
             Assert.Equal(1, result.Count(x => x.ContentId != default && x.Exception == null));
 
-            A.CallTo(() => commandBus.PublishAsync(A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data)))
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -338,7 +319,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Single(result);
             Assert.Equal(1, result.Count(x => x.ContentId == id));
 
-            A.CallTo(() => commandBus.PublishAsync(A<DeleteContent>.That.Matches(x => x.ContentId == id)))
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<DeleteContent>.That.Matches(x => x.ContentId == id)))
                 .MustHaveHappened();
         }
 

@@ -65,7 +65,7 @@ namespace TestSuite.ApiTests
                 }
             };
 
-            var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id.ToString(), metadataRequest);
+            var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, metadataRequest);
 
             // Should provide metadata.
             Assert.Equal(metadataRequest.Metadata, asset_2.Metadata);
@@ -74,7 +74,7 @@ namespace TestSuite.ApiTests
             // STEP 3: Annotate slug.
             var slugRequest = new AnnotateAssetDto { Slug = "my-image" };
 
-            var asset_3 = await _.Assets.PutAssetAsync(_.AppName, asset_2.Id.ToString(), slugRequest);
+            var asset_3 = await _.Assets.PutAssetAsync(_.AppName, asset_2.Id, slugRequest);
 
             // Should provide updated slug.
             Assert.Equal(slugRequest.Slug, asset_3.Slug);
@@ -83,7 +83,7 @@ namespace TestSuite.ApiTests
             // STEP 3: Annotate file name.
             var fileNameRequest = new AnnotateAssetDto { FileName = "My Image" };
 
-            var asset_4 = await _.Assets.PutAssetAsync(_.AppName, asset_3.Id.ToString(), fileNameRequest);
+            var asset_4 = await _.Assets.PutAssetAsync(_.AppName, asset_3.Id, fileNameRequest);
 
             // Should provide updated file name.
             Assert.Equal(fileNameRequest.FileName, asset_4.FileName);
@@ -111,7 +111,7 @@ namespace TestSuite.ApiTests
             // STEP 4: Protect asset
             var protectRequest = new AnnotateAssetDto { IsProtected = true };
 
-            var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id.ToString(), protectRequest);
+            var asset_2 = await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, protectRequest);
 
 
             // STEP 5: Download asset with authentication.
@@ -119,7 +119,7 @@ namespace TestSuite.ApiTests
             {
                 var downloaded = new MemoryStream();
 
-                using (var assetStream = await _.Assets.GetAssetContentAsync(asset_2.Id.ToString()))
+                using (var assetStream = await _.Assets.GetAssetContentBySlugAsync(_.AppName, asset_2.Id))
                 {
                     await assetStream.Stream.CopyToAsync(downloaded);
                 }
@@ -147,10 +147,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Delete asset
-            await _.Assets.DeleteAssetAsync(_.AppName, asset_1.Id.ToString());
+            await _.Assets.DeleteAssetAsync(_.AppName, asset_1.Id);
 
             // Should return 404 when asset deleted.
-            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id.ToString()));
+            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id));
 
             Assert.Equal(404, ex.StatusCode);
         }
@@ -174,7 +174,7 @@ namespace TestSuite.ApiTests
             // STEP 3: Add custom metadata.
             asset_1.Metadata["custom"] = "foo";
 
-            await _.Assets.PutAssetAsync(_.AppName, asset_1.Id.ToString(), new AnnotateAssetDto
+            await _.Assets.PutAssetAsync(_.AppName, asset_1.Id, new AnnotateAssetDto
             {
                 Metadata = asset_1.Metadata
             });
@@ -209,7 +209,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Delete folder.
-            await _.Assets.DeleteAssetFolderAsync(_.AppName, folder_1.Id.ToString());
+            await _.Assets.DeleteAssetFolderAsync(_.AppName, folder_1.Id);
 
 
             // STEP 5: Wait for recursive deleter to delete the asset.

@@ -174,6 +174,50 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public async Task Upsert_should_create_contnet_when_not_found()
+        {
+            var command = new UpsertContent { Data = data };
+
+            var result = await PublishAsync(CreateContentCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Same(data, sut.Snapshot.CurrentVersion.Data);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
+                );
+
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Draft), "<create-script>", ScriptOptions()))
+                .MustHaveHappened();
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions()))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Upsert_should_update_contnet_when_found()
+        {
+            var command = new UpsertContent { Data = otherData };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishAsync(CreateContentCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUpdated { Data = otherData })
+                );
+
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(otherData, data, Status.Draft), "<update-script>", ScriptOptions()))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Update_should_create_events_and_update_data()
         {
             var command = new UpdateContent { Data = otherData };

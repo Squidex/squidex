@@ -319,6 +319,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The full data for the content item.</param>
         /// <param name="publish">True to automatically publish the content.</param>
+        /// <param name="id">The optional custom content id.</param>
         /// <returns>
         /// 201 => Content created.
         /// 404 => Content, schema or app not found.
@@ -332,9 +333,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 201)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
+        public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false, [FromQuery] string? id = null)
         {
             var command = new CreateContent { Data = request.ToCleaned(), Publish = publish };
+
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                command.ContentId = id;
+            }
 
             var response = await InvokeCommandAsync(command);
 
@@ -399,6 +405,36 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var result = context.Result<BulkUpdateResult>();
             var response = result.Select(x => BulkResultDto.FromImportResult(x, HttpContext)).ToArray();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Upsert a content item.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the content item to update.</param>
+        /// <param name="publish">True to automatically publish the content.</param>
+        /// <param name="request">The full data for the content item.</param>
+        /// <returns>
+        /// 200 => Content updated.
+        /// 404 => Content references, schema or app not found.
+        /// 400 => Content data is not valid.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpPost]
+        [Route("content/{app}/{name}/{id}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PostContent(string app, string name, string id, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
+        {
+            var command = new UpsertContent { ContentId = id, Data = request.ToCleaned(), Publish = publish };
+
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }

@@ -125,6 +125,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
                 operation.AddBody("data", dataSchema, NSwagHelper.SchemaBodyDocs);
                 operation.AddQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.");
+                operation.AddQuery("id", JsonObjectType.String, "The optional custom content id.");
 
                 operation.AddResponse("201", $"{schemaName} content created.", contentSchema);
                 operation.AddResponse("400", $"{schemaName} content not valid.");

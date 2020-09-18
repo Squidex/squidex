@@ -18,7 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     public class CachingTextIndexerStateTests
     {
         private readonly ITextIndexerState inner = A.Fake<ITextIndexerState>();
-        private readonly DomainId appId = DomainId.NewGuid();
         private readonly DomainId contentId = DomainId.NewGuid();
         private readonly CachingTextIndexerState sut;
 

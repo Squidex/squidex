@@ -148,7 +148,7 @@ namespace TestSuite.ApiTests
                         Name = "cities",
                         Properties = new ReferencesFieldPropertiesDto
                         {
-                            SchemaIds = new List<Guid> { cities.Id }
+                            SchemaIds = new List<string> { cities.Id }
                         }
                     }
                 },
@@ -174,7 +174,7 @@ namespace TestSuite.ApiTests
                         Name = "states",
                         Properties = new ReferencesFieldPropertiesDto
                         {
-                            SchemaIds = new List<Guid> { states.Id }
+                            SchemaIds = new List<string> { states.Id }
                         }
                     }
                 },

@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is ContentCommand;
+            return command is CreateContent;
         }
 
         protected override bool CanAccept(ICommand command)
@@ -64,6 +64,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             switch (command)
             {
+                case UpsertContent uspertContent:
+                    {
+                        if (Version > EtagVersion.Empty)
+                        {
+                            var updateContent = SimpleMapper.Map(uspertContent, new UpdateContent());
+
+                            return ExecuteAsync(updateContent);
+                        }
+                        else
+                        {
+                            var createContent = SimpleMapper.Map(uspertContent, new CreateContent());
+
+                            return ExecuteAsync(createContent);
+                        }
+                    }
+
                 case CreateContent createContent:
                     return CreateReturnAsync(createContent, async c =>
                     {

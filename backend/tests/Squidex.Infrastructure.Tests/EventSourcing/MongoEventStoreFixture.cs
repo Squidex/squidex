@@ -27,8 +27,6 @@ namespace Squidex.Infrastructure.EventSourcing
             mongoClient = new MongoClient(connectionString);
             mongoDatabase = mongoClient.GetDatabase($"EventStoreTest");
 
-            Cleanup();
-
             BsonJsonConvention.Register(JsonSerializer.Create(JsonHelper.DefaultSettings()));
 
             EventStore = new MongoEventStore(mongoDatabase, notifier);

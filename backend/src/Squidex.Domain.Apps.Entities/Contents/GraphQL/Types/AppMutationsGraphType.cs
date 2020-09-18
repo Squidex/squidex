@@ -39,18 +39,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 AddField(new FieldType
                 {
                     Name = $"update{schemaType}Content",
-                    Arguments = ContentActions.UpdateOrPatch.Arguments(inputType),
+                    Arguments = ContentActions.Update.Arguments(inputType),
                     ResolvedType = contentType,
-                    Resolver = ContentActions.UpdateOrPatch.Update(appId, schemaId),
+                    Resolver = ContentActions.Update.Resolver(appId, schemaId),
                     Description = $"Update an {schemaName} content by id."
                 });
 
                 AddField(new FieldType
                 {
-                    Name = $"patch{schemaType}Content",
-                    Arguments = ContentActions.UpdateOrPatch.Arguments(inputType),
+                    Name = $"upsert{schemaType}Content",
+                    Arguments = ContentActions.Upsert.Arguments(inputType),
                     ResolvedType = contentType,
-                    Resolver = ContentActions.UpdateOrPatch.Patch(appId, schemaId),
+                    Resolver = ContentActions.Upsert.Resolver(appId, schemaId),
+                    Description = $"Upsert an {schemaName} content by id."
+                });
+
+                AddField(new FieldType
+                {
+                    Name = $"patch{schemaType}Content",
+                    Arguments = ContentActions.Patch.Arguments(inputType),
+                    ResolvedType = contentType,
+                    Resolver = ContentActions.Patch.Resolver(appId, schemaId),
                     Description = $"Patch an {schemaName} content by id."
                 });
 

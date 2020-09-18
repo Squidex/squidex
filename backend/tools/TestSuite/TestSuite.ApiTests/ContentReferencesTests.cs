@@ -55,7 +55,7 @@ namespace TestSuite.ApiTests
             // STEP 5: Query new item again
             var contentB_3 = await _.Contents.GetAsync(contentB_1.Id);
 
-            Assert.Equal(new Guid[] { contentA_1.Id }, contentB_3.Data.References);
+            Assert.Equal(new string[] { contentA_1.Id }, contentB_3.Data.References);
         }
     }
 }

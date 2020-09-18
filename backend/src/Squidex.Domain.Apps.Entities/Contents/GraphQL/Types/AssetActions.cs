@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "id",
-                    Description = "The id of the asset (GUID).",
+                    Description = "The id of the asset (usually GUID).",
                     DefaultValue = string.Empty,
                     ResolvedType = AllTypes.NonNullDomainId
                 }

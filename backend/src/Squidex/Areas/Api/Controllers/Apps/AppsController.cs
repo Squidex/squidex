@@ -162,7 +162,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Get the app image.
+        /// Upload the app image.
         /// </summary>
         /// <param name="app">The name of the app to update.</param>
         /// <param name="file">The file to upload.</param>

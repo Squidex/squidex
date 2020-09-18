@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "id",
-                    Description = "The id of the content (GUID).",
+                    Description = "The id of the content (usually GUID).",
                     DefaultValue = string.Empty,
                     ResolvedType = AllTypes.NonNullDomainId
                 }
@@ -160,6 +160,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Description = "Set to true to autopublish content.",
                         DefaultValue = false,
                         ResolvedType = AllTypes.Boolean
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "id",
+                        Description = "The optional custom content id.",
+                        DefaultValue = null,
+                        ResolvedType = AllTypes.String
                     }
                 };
             }
@@ -170,13 +177,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     var contentPublish = c.GetArgument<bool>("publish");
                     var contentData = GetContentData(c);
+                    var contentId = c.GetArgument<string?>("id");
 
-                    return new CreateContent { Data = contentData, Publish = contentPublish };
+                    var command = new CreateContent { Data = contentData, Publish = contentPublish };
+
+                    if (!string.IsNullOrWhiteSpace(contentId))
+                    {
+                        command.ContentId = contentId;
+                    }
+
+                    return command;
                 });
             }
         }
 
-        public static class UpdateOrPatch
+        public static class Upsert
         {
             public static QueryArguments Arguments(IGraphType inputType)
             {
@@ -187,7 +202,57 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Name = "id",
                         Description = "The id of the content (GUID)",
                         DefaultValue = string.Empty,
-                        ResolvedType = AllTypes.NonNullGuid
+                        ResolvedType = AllTypes.NonNullString
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "data",
+                        Description = "The data for the content.",
+                        DefaultValue = null,
+                        ResolvedType = new NonNullGraphType(inputType),
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "publish",
+                        Description = "Set to true to autopublish content on create.",
+                        DefaultValue = false,
+                        ResolvedType = AllTypes.Boolean
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "expectedVersion",
+                        Description = "The expected version",
+                        DefaultValue = EtagVersion.Any,
+                        ResolvedType = AllTypes.Int
+                    }
+                };
+            }
+
+            public static IFieldResolver Resolver(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
+            {
+                return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
+                {
+                    var contentPublish = c.GetArgument<bool>("publish");
+                    var contentData = GetContentData(c);
+                    var contentId = c.GetArgument<string>("id");
+
+                    return new UpsertContent { ContentId = contentId, Data = contentData, Publish = contentPublish };
+                });
+            }
+        }
+
+        public static class Update
+        {
+            public static QueryArguments Arguments(IGraphType inputType)
+            {
+                return new QueryArguments
+                {
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "id",
+                        Description = "The id of the content (usually GUID)",
+                        DefaultValue = string.Empty,
+                        ResolvedType = AllTypes.NonNullString
                     },
                     new QueryArgument(AllTypes.None)
                     {
@@ -206,7 +271,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 };
             }
 
-            public static IFieldResolver Update(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
+            public static IFieldResolver Resolver(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
             {
                 return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
                 {
@@ -216,8 +281,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     return new UpdateContent { ContentId = contentId, Data = contentData };
                 });
             }
+        }
 
-            public static IFieldResolver Patch(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
+        public static class Patch
+        {
+            public static QueryArguments Arguments(IGraphType inputType)
+            {
+                return new QueryArguments
+                {
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "id",
+                        Description = "The id of the content (usually GUID)",
+                        DefaultValue = string.Empty,
+                        ResolvedType = AllTypes.NonNullString
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "data",
+                        Description = "The data for the content.",
+                        DefaultValue = null,
+                        ResolvedType = new NonNullGraphType(inputType),
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "expectedVersion",
+                        Description = "The expected version",
+                        DefaultValue = EtagVersion.Any,
+                        ResolvedType = AllTypes.Int
+                    }
+                };
+            }
+
+            public static IFieldResolver Resolver(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
             {
                 return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
                 {
@@ -236,9 +332,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "id",
-                    Description = "The id of the content (GUID)",
+                    Description = "The id of the content (usually GUID)",
                     DefaultValue = string.Empty,
-                    ResolvedType = AllTypes.NonNullGuid
+                    ResolvedType = AllTypes.NonNullString
                 },
                 new QueryArgument(AllTypes.None)
                 {
@@ -283,7 +379,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "id",
-                    Description = "The id of the content (GUID)",
+                    Description = "The id of the content (usually GUID)",
                     DefaultValue = string.Empty,
                     ResolvedType = AllTypes.NonNullGuid
                 },

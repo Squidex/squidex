@@ -287,7 +287,7 @@ namespace TestSuite.ApiTests
             // STEP 2: Update pattern.
             var updateRequest = new UpdatePatternDto { Name = patternName, Pattern = patternRegex2 };
 
-            var patterns_2 = await _.Apps.PutPatternAsync(_.AppName, pattern_1.Id.ToString(), updateRequest);
+            var patterns_2 = await _.Apps.PutPatternAsync(_.AppName, pattern_1.Id, updateRequest);
             var pattern_2 = patterns_2.Items.Single(x => x.Name == patternName);
 
             // Should return pattern with correct regex.
@@ -295,7 +295,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Remove pattern.
-            var patterns_3 = await _.Apps.DeletePatternAsync(_.AppName, pattern_2.Id.ToString());
+            var patterns_3 = await _.Apps.DeletePatternAsync(_.AppName, pattern_2.Id);
 
             // Should not return deleted pattern.
             Assert.DoesNotContain(patterns_3.Items, x => x.Id == pattern_2.Id);

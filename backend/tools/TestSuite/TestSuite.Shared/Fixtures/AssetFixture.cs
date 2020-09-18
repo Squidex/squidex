@@ -46,11 +46,11 @@ namespace TestSuite.Fixtures
             {
                 var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo), asset.MimeType);
 
-                return await Assets.PutAssetContentAsync(AppName, asset.Id.ToString(), upload);
+                return await Assets.PutAssetContentAsync(AppName, asset.Id, upload);
             }
         }
 
-        public async Task<AssetDto> UploadFileAsync(string path, string mimeType, string fileName = null, Guid? parentId = null)
+        public async Task<AssetDto> UploadFileAsync(string path, string mimeType, string fileName = null, string parentId = null)
         {
             var fileInfo = new FileInfo(path);
 
@@ -58,7 +58,7 @@ namespace TestSuite.Fixtures
             {
                 var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo), mimeType);
 
-                return await Assets.PostAssetAsync(AppName, upload, parentId);
+                return await Assets.PostAssetAsync(AppName, parentId?.ToString(), upload);
             }
         }
 

@@ -42,6 +42,6 @@ namespace TestSuite.Model
     public sealed class TestEntityWithReferencesData
     {
         [JsonConverter(typeof(InvariantConverter))]
-        public Guid[] References { get; set; }
+        public string[] References { get; set; }
     }
 }

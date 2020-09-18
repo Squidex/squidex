@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "id",
-                ResolvedType = AllTypes.NonNullGuid,
+                ResolvedType = AllTypes.NonNullString,
                 Resolver = EntityResolvers.Id,
                 Description = "The id of the asset."
             });

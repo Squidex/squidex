@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var query = @"
                 mutation {
-                  createMySchemaContent(data: <DATA>) {
+                  createMySchemaContent(data: <DATA>, publish: true) {
                     <FIELDS>
                   }
                 }".Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
@@ -64,6 +64,41 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<CreateContent>.That.Matches(x =>
                     x.SchemaId.Equals(schemaId) &&
                     x.ExpectedVersion == EtagVersion.Any &&
+                    x.Publish &&
+                    x.Data.Equals(content.Data))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_return_single_content_when_creating_content_with_custom_id()
+        {
+            var query = @"
+                mutation {
+                  createMySchemaContent(data: <DATA>, id: ""123"", publish: true) {
+                    <FIELDS>
+                  }
+                }".Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
+
+            commandContext.Complete(content);
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    createMySchemaContent = TestContent.Response(content)
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<CreateContent>.That.Matches(x =>
+                    x.SchemaId.Equals(schemaId) &&
+                    x.ExpectedVersion == EtagVersion.Any &&
+                    x.ContentId == DomainId.Create("123") &&
+                    x.Publish &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -73,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var query = @"
                 mutation OP($data: MySchemaDataInputDto!) {
-                  createMySchemaContent(data: $data) {
+                  createMySchemaContent(data: $data, publish: true) {
                     <FIELDS>
                   }
                 }".Replace("<FIELDS>", TestContent.AllFields);
@@ -96,6 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<CreateContent>.That.Matches(x =>
                     x.SchemaId.Equals(schemaId) &&
                     x.ExpectedVersion == EtagVersion.Any &&
+                    x.Publish &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -160,6 +196,72 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<UpdateContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
+                    x.Data.Equals(content.Data))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_return_single_content_when_upserting_content()
+        {
+            var query = @"
+                mutation {
+                  upsertMySchemaContent(id: ""<ID>"", data: <DATA>, publish: true, expectedVersion: 10) {
+                    <FIELDS>
+                  }
+                }".Replace("<ID>", contentId.ToString()).Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
+
+            commandContext.Complete(content);
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    upsertMySchemaContent = TestContent.Response(content)
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<UpsertContent>.That.Matches(x =>
+                    x.ContentId == content.Id &&
+                    x.ExpectedVersion == 10 &&
+                    x.Publish &&
+                    x.Data.Equals(content.Data))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_return_single_content_when_upserting_content_with_variable()
+        {
+            var query = @"
+                mutation OP($data: MySchemaDataInputDto!) {
+                  upsertMySchemaContent(id: ""<ID>"", data: $data, publish: true, expectedVersion: 10) {
+                    <FIELDS>
+                  }
+                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+
+            commandContext.Complete(content);
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = GetInput() });
+
+            var expected = new
+            {
+                data = new
+                {
+                    upsertMySchemaContent = TestContent.Response(content)
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<UpsertContent>.That.Matches(x =>
+                    x.ContentId == content.Id &&
+                    x.ExpectedVersion == 10 &&
+                    x.Publish &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
@@ -23,67 +24,6 @@ namespace TestSuite.ApiTests
         public ContentUpdateTests(ContentFixture fixture)
         {
             _ = fixture;
-        }
-
-        [Fact]
-        public async Task Should_create_strange_text()
-        {
-            const string text = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36";
-
-            TestEntity content = null;
-            try
-            {
-                content = await _.Contents.CreateAsync(new TestEntityData { String = text }, true);
-
-                var updated = await _.Contents.GetAsync(content.Id);
-
-                Assert.Equal(text, updated.Data.String);
-            }
-            finally
-            {
-                if (content != null)
-                {
-                    await _.Contents.DeleteAsync(content.Id);
-                }
-            }
-        }
-
-        [Fact]
-        public async Task Should_not_return_not_published_item()
-        {
-            TestEntity content = null;
-            try
-            {
-                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 });
-
-                await Assert.ThrowsAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
-            }
-            finally
-            {
-                if (content != null)
-                {
-                    await _.Contents.DeleteAsync(content.Id);
-                }
-            }
-        }
-
-        [Fact]
-        public async Task Should_return_item_published_with_creation()
-        {
-            TestEntity content = null;
-            try
-            {
-                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, true);
-
-                await _.Contents.GetAsync(content.Id);
-            }
-            finally
-            {
-                if (content != null)
-                {
-                    await _.Contents.DeleteAsync(content.Id);
-                }
-            }
         }
 
         [Fact]
@@ -139,6 +79,134 @@ namespace TestSuite.ApiTests
                 await _.Contents.ChangeStatusAsync(content.Id, Status.Draft);
 
                 await Assert.ThrowsAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_strange_text()
+        {
+            const string text = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36";
+
+            TestEntity content = null;
+            try
+            {
+                content = await _.Contents.CreateAsync(new TestEntityData { String = text }, true);
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(text, updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_non_published_item()
+        {
+            TestEntity content = null;
+            try
+            {
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 });
+
+                await Assert.ThrowsAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_published_item()
+        {
+            TestEntity content = null;
+            try
+            {
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, true);
+
+                await _.Contents.GetAsync(content.Id);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_item_with_custom_id()
+        {
+            TestEntity content = null;
+            try
+            {
+                var id = Guid.NewGuid().ToString();
+
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, id, true);
+
+                Assert.Equal(id, content.Id);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_item_with_custom_id_and_upsert()
+        {
+            TestEntity content = null;
+            try
+            {
+                var id = Guid.NewGuid().ToString();
+
+                content = await _.Contents.UpsertAsync(id, new TestEntityData { Number = 1 }, true);
+
+                Assert.Equal(id, content.Id);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_upsert_item()
+        {
+            TestEntity content = null;
+            try
+            {
+                var id = Guid.NewGuid().ToString();
+
+                content = await _.Contents.UpsertAsync(id, new TestEntityData { Number = 1 }, true);
+
+                await _.Contents.UpsertAsync(id, new TestEntityData { Number = 2 });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, updated.Data.Number);
             }
             finally
             {
