@@ -8,8 +8,10 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Assets\Images\logo-wide-rotated.jpg" />
-    <None Remove="Assets\Images\logo.jpg" />
+    <None Remove="Assets\Images\logo.gif" />
+    <None Remove="Assets\Images\logo.jpeg" />
     <None Remove="Assets\Images\logo.png" />
+    <None Remove="Assets\Images\logo.tga" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.Amazon\Squidex.Infrastructure.Amazon.csproj" />
@@ -47,8 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Images\logo-wide-rotated.jpg" />
-    <EmbeddedResource Include="Assets\Images\logo.jpg" />
+    <EmbeddedResource Include="Assets\Images\logo.gif" />
+    <EmbeddedResource Include="Assets\Images\logo.jpeg" />
     <EmbeddedResource Include="Assets\Images\logo.png" />
+    <EmbeddedResource Include="Assets\Images\logo.tga" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Translations\SampleResources.Designer.cs">
