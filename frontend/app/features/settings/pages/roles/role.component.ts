@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AddPermissionForm, AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState } from '@app/shared';
+import { AddPermissionForm, AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, Settings } from '@app/shared';
 
 const Descriptions = {
     Developer: 'i18n:roles.defaults.developer',
@@ -23,6 +23,8 @@ const Descriptions = {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RoleComponent implements OnChanges {
+    public readonly standalone = { standalone: true };
+
     @Input()
     public role: RoleDto;
 
@@ -33,6 +35,9 @@ export class RoleComponent implements OnChanges {
     public addPermissionInput: AutocompleteComponent;
 
     public descriptions = Descriptions;
+
+    public propertiesList = Settings.AppProperties;
+    public properties: {};
 
     public isEditing = false;
     public isEditable = false;
@@ -51,13 +56,23 @@ export class RoleComponent implements OnChanges {
         if (changes['role']) {
             this.isEditable = this.role.canUpdate;
 
+            this.properties = this.role.properties;
+
             this.editForm.load(this.role);
             this.editForm.setEnabled(this.isEditable);
         }
     }
 
+    public getProperty(name: string) {
+        return this.properties[name];
+    }
+
     public toggleEditing() {
         this.isEditing = !this.isEditing;
+    }
+
+    public setProperty(name: string, value: boolean) {
+        this.properties[name] = value;
     }
 
     public delete() {
@@ -83,7 +98,7 @@ export class RoleComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            this.rolesState.update(this.role, value)
+            this.rolesState.update(this.role, { ...value, properties: this.properties })
                 .subscribe(() => {
                     this.editForm.submitCompleted({ noReset: true });
 

@@ -18,7 +18,7 @@ namespace Squidex.Extensions.Actions
 {
     public static class RuleHelper
     {
-        public static bool ShouldDelete(this EnrichedEvent @event, IScriptEngine scriptEngine, string? expression)
+        public static bool ShouldDelete(this EnrichedEvent @event, IScriptEngine scriptEngine, string expression)
         {
             if (!string.IsNullOrWhiteSpace(expression))
             {

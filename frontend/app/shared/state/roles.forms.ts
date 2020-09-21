@@ -27,7 +27,7 @@ export class EditRoleForm extends Form<FormArray, UpdateRoleDto, RoleDto> {
     }
 
     public transformSubmit(value: any) {
-        return { permissions: value };
+        return { permissions: value, properties: {} };
     }
 
     public transformLoad(value: Partial<UpdateRoleDto>) {

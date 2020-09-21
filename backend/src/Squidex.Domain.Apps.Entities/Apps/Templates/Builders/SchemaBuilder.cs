@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Text;
@@ -144,8 +144,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
                 }
             };
 
-            command.Fields ??= new List<UpsertSchemaField>();
-            command.Fields.Add(field);
+            if (command.Fields == null)
+            {
+                command.Fields = new[] { field };
+            }
+            else
+            {
+                command.Fields = command.Fields.Union(Enumerable.Repeat(field, 1)).ToArray();
+            }
 
             return field;
         }

@@ -30,6 +30,7 @@ export class RoleDto {
         public readonly numClients: number,
         public readonly numContributors: number,
         public readonly permissions: ReadonlyArray<string>,
+        public readonly properties: {},
         public readonly isDefaultRole: boolean
     ) {
         this._links = links;
@@ -45,6 +46,7 @@ export interface CreateRoleDto {
 
 export interface UpdateRoleDto {
     readonly permissions: ReadonlyArray<string>;
+    readonly properties: {};
 }
 
 @Injectable()
@@ -126,6 +128,7 @@ export function parseRoles(response: any) {
             item.numClients,
             item.numContributors,
             item.permissions,
+            item.properties,
             item.isDefaultRole));
 
     const _links = response._links;

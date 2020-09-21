@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, AppsState, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, StringFieldPropertiesDto, TranslationsService, Types, value$ } from '@app/shared';
+import { AppLanguageDto, AppsState, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, StringFieldPropertiesDto, TranslationsService, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { combineLatest } from 'rxjs/operators';
 
@@ -157,6 +157,6 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     private configKey() {
-        return `squidex.schemas.${this.schema?.id}.fields.${this.formModel.field.fieldId}.show-all`;
+        return Settings.Local.FIELD_ALL(this.schema?.id, this.formModel.field.fieldId);
     }
 }

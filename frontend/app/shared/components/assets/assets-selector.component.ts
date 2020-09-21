@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { AssetDto, AssetsState, LocalStoreService, Query, StatefulComponent } from '@app/shared/internal';
+import { AssetDto, AssetsState, LocalStoreService, Query, Settings, StatefulComponent } from '@app/shared/internal';
 
 interface State {
     // The selected assets.
@@ -36,7 +36,7 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
         super(changeDector, {
             selectedAssets: {},
             selectionCount: 0,
-            isListView: localStore.getBoolean('squidex.assets.list-view')
+            isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE)
         });
     }
 
@@ -83,6 +83,6 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     public changeView(isListView: boolean) {
         this.next(s => ({ ...s, isListView }));
 
-        this.localStore.setBoolean('squidex.assets.list-view', isListView);
+        this.localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
     }
 }

@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
@@ -171,14 +171,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<UpsertSchemaNestedField>
+                        Nested = new[]
                         {
                             new UpsertSchemaNestedField
                             {
@@ -202,14 +202,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<UpsertSchemaNestedField>
+                        Nested = new[]
                         {
                             new UpsertSchemaNestedField
                             {
@@ -233,14 +233,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<UpsertSchemaNestedField>
+                        Nested = new[]
                         {
                             new UpsertSchemaNestedField
                             {
@@ -264,14 +264,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<UpsertSchemaNestedField>
+                        Nested = new[]
                         {
                             new UpsertSchemaNestedField
                             {
@@ -296,14 +296,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<UpsertSchemaNestedField>
+                        Nested = new[]
                         {
                             new UpsertSchemaNestedField
                             {
@@ -332,7 +332,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
@@ -364,7 +364,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new CreateSchema
             {
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
@@ -402,7 +402,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new CreateSchema
             {
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
@@ -456,7 +456,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<UpsertSchemaField>
+                Fields = new[]
                 {
                     new UpsertSchemaField
                     {
@@ -477,7 +477,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         Name = "field3",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<UpsertSchemaNestedField>
+                        Nested = new[]
                         {
                             new UpsertSchemaNestedField
                             {
@@ -575,7 +575,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ConfigureFieldRules
             {
-                FieldRules = new List<FieldRuleCommand>
+                FieldRules = new[]
                 {
                     new FieldRuleCommand { Field = "field", Action = (FieldRuleAction)5 },
                     new FieldRuleCommand(),
@@ -594,7 +594,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ConfigureFieldRules
             {
-                FieldRules = new List<FieldRuleCommand>
+                FieldRules = new[]
                 {
                     new FieldRuleCommand { Field = "field1", Action = FieldRuleAction.Disable, Condition = "a == b" },
                     new FieldRuleCommand { Field = "field2" }
@@ -634,7 +634,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanReorder_should_throw_exception_if_field_ids_contains_invalid_id()
         {
-            var command = new ReorderFields { FieldIds = new List<long> { 1, 3 } };
+            var command = new ReorderFields { FieldIds = new[] { 1L, 3L } };
 
             ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
                 new ValidationError("Field ids do not cover all fields.", "FieldIds"));
@@ -643,7 +643,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanReorder_should_throw_exception_if_field_ids_do_not_covers_all_fields()
         {
-            var command = new ReorderFields { FieldIds = new List<long> { 1 } };
+            var command = new ReorderFields { FieldIds = new[] { 1L } };
 
             ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
                 new ValidationError("Field ids do not cover all fields.", "FieldIds"));
@@ -661,7 +661,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanReorder_should_throw_exception_if_parent_field_not_found()
         {
-            var command = new ReorderFields { FieldIds = new List<long> { 1, 2 }, ParentFieldId = 99 };
+            var command = new ReorderFields { FieldIds = new[] { 1L, 2L }, ParentFieldId = 99 };
 
             Assert.Throws<DomainObjectNotFoundException>(() => GuardSchema.CanReorder(command, schema_0));
         }
@@ -669,7 +669,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanReorder_should_not_throw_exception_if_field_ids_are_valid()
         {
-            var command = new ReorderFields { FieldIds = new List<long> { 1, 2, 4 } };
+            var command = new ReorderFields { FieldIds = new[] { 1L, 2L, 4L } };
 
             GuardSchema.CanReorder(command, schema_0);
         }

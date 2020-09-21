@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
@@ -15,5 +17,12 @@ namespace Squidex.Domain.Apps.Events.Apps
         public string Name { get; set; }
 
         public string[] Permissions { get; set; }
+
+        public JsonObject Properties { get; set; }
+
+        public PermissionSet ToPermissions()
+        {
+            return new PermissionSet(Permissions);
+        }
     }
 }

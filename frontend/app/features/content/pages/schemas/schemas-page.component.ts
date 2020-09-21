@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { LocalStoreService, SchemaCategory, SchemasState } from '@app/shared';
+import { LocalStoreService, SchemaCategory, SchemasState, Settings } from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -27,7 +27,7 @@ export class SchemasPageComponent implements OnInit {
         public readonly schemasState: SchemasState,
         private readonly localStore: LocalStoreService
     ) {
-        this.isCollapsed = localStore.getBoolean('content.schemas.collapsed');
+        this.isCollapsed = localStore.getBoolean(Settings.Local.SCHEMAS_COLLAPSED);
     }
 
     public ngOnInit() {
@@ -37,7 +37,7 @@ export class SchemasPageComponent implements OnInit {
     public toggle() {
         this.isCollapsed = !this.isCollapsed;
 
-        this.localStore.setBoolean('content.schemas.collapsed', this.isCollapsed);
+        this.localStore.setBoolean(Settings.Local.SCHEMAS_COLLAPSED, this.isCollapsed);
     }
 
     public trackByCategory(_index: number, category: SchemaCategory) {

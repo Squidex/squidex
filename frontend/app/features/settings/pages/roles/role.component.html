@@ -37,6 +37,12 @@
             </div>
 
             <div class="table-items-row-details-tab">
+                <h3>{{ 'roles.permissions' | sqxTranslate }}</h3>
+
+                <sqx-form-hint marginBottom="2">
+                    {{ 'roles.permissionsDescription' | sqxTranslate }}
+                </sqx-form-hint>
+
                 <ng-container *ngIf="!role.isDefaultRole; else defaultRole">
                     <div class="form-group row no-gutters" *ngFor="let control of editForm.controls; let i = index">
                         <div class="col">
@@ -64,7 +70,9 @@
 
                 <form class="form-group row no-gutters" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
                     <div class="col">
-                        <sqx-autocomplete [autoFocus]="true" formControlName="permission" [source]="allPermissions" #addInput></sqx-autocomplete>
+                        <sqx-autocomplete [autoFocus]="true" formControlName="permission" [source]="allPermissions" #addInput
+                            placeholder="{{ 'i18n:roles.permissionsPlaceholder' | sqxTranslate }}">
+                        </sqx-autocomplete>
                     </div>
                     <div class="col-auto pl-1">
                         <button type="submit" class="btn btn-success">
@@ -72,6 +80,45 @@
                         </button>
                     </div>
                 </form>
+
+                <div class="mt-4" *ngIf="!role.isDefaultRole">
+                    <h3>{{ 'roles.properties' | sqxTranslate }}</h3>
+
+                    <sqx-form-hint marginBottom="2">
+                        {{ 'roles.propertiesDescription' | sqxTranslate }}
+                    </sqx-form-hint>
+
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="{{role.name}}_hideSchemas"
+                            [ngModel]="getProperty(propertiesList.HIDE_SCHEMAS)"
+                            (ngModelChange)="setProperty(propertiesList.HIDE_SCHEMAS, $event)"
+                            [ngModelOptions]="standalone">
+                        <label class="form-check-label" for="{{role.name}}_hideSchemas">
+                            {{ 'roles.properties.hideSchemas' | sqxTranslate }}
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="{{role.name}}_hideAssets"
+                            [ngModel]="getProperty(propertiesList.HIDE_ASSETS)"
+                            (ngModelChange)="setProperty(propertiesList.HIDE_ASSETS, $event)"
+                            [ngModelOptions]="standalone">
+                        <label class="form-check-label" for="{{role.name}}_hideAssets">
+                            {{ 'roles.properties.hideAssets' | sqxTranslate }}
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="{{role.name}}_hideSettings"
+                            [ngModel]="getProperty(propertiesList.HIDE_SETTINGS)"
+                            (ngModelChange)="setProperty(propertiesList.HIDE_SETTINGS, $event)"
+                            [ngModelOptions]="standalone">
+                        <label class="form-check-label" for="{{role.name}}_hideSettings">
+                            {{ 'roles.properties.hideSettings' | sqxTranslate }}
+                        </label>
+                    </div>
+                </div>
             </div>
         </form>
     </div>

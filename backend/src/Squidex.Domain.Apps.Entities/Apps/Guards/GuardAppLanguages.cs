@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                             e(T.Get("apps.languages.masterLanguageNotOptional"), nameof(command.IsMaster));
                         }
 
-                        if (command.Fallback?.Count > 0)
+                        if (command.Fallback?.Length > 0)
                         {
                             e(T.Get("apps.languages.masterLanguageNoFallbacks"), nameof(command.Fallback));
                         }

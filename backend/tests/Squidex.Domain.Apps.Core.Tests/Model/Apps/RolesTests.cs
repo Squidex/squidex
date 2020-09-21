@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 using Xunit;
 
@@ -40,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var roles_1 = roles_0.Add(role);
 
-            roles_1[role].Should().BeEquivalentTo(new Role(role, PermissionSet.Empty));
+            roles_1[role].Should().BeEquivalentTo(Role.Create(role));
         }
 
         [Fact]
@@ -61,15 +62,23 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_update_role()
+        public void Should_update_role_permissions()
         {
-            var roles_1 = roles_0.Update(firstRole, "P1", "P2");
+            var roles_1 = roles_0.Update(firstRole, permissions: new PermissionSet("P1", "P2"));
 
-            roles_1[firstRole].Should().BeEquivalentTo(new Role(firstRole, new PermissionSet("P1", "P2")));
+            roles_1[firstRole].Should().BeEquivalentTo(Role.WithPermissions(firstRole, "P1", "P2"));
         }
 
         [Fact]
-        public void Should_return_same_roles_if_role_is_updated_with_same_values()
+        public void Should_update_role_properties()
+        {
+            var roles_1 = roles_0.Update(firstRole, properties: JsonValue.Object().Add("P1", true));
+
+            roles_1[firstRole].Should().BeEquivalentTo(Role.WithProperties(firstRole, JsonValue.Object().Add("P1", true)));
+        }
+
+        [Fact]
+        public void Should_return_same_roles_if_role_is_updated_with_same_permissions()
         {
             var roles_1 = roles_0.Update(firstRole);
 
@@ -79,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_return_same_roles_if_role_not_found()
         {
-            var roles_1 = roles_0.Update(role, "P1", "P2");
+            var roles_1 = roles_0.Update(role, permissions: new PermissionSet("P1", "P2"));
 
             Assert.Same(roles_0, roles_1);
         }

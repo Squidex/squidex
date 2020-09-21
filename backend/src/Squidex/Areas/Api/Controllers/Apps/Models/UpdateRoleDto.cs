@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -18,9 +19,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRequired]
         public string[] Permissions { get; set; }
 
+        /// <summary>
+        /// Associated list of UI properties.
+        /// </summary>
+        [LocalizedRequired]
+        public JsonObject Properties { get; set; }
+
         public UpdateRole ToCommand(string name)
         {
-            return new UpdateRole { Name = name, Permissions = Permissions };
+            return new UpdateRole { Name = name, Permissions = Permissions, Properties = Properties };
         }
     }
 }

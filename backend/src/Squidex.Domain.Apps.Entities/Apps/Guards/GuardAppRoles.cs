@@ -84,6 +84,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                     e(Not.Defined(nameof(command.Permissions)), nameof(command.Permissions));
                 }
+
+                if (command.Properties == null)
+                {
+                    e(Not.Defined(nameof(command.Properties)), nameof(command.Properties));
+                }
             });
         }
 

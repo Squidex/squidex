@@ -48,6 +48,7 @@ export class AppDto {
         public readonly canAccessContent: boolean,
         public readonly planName: string | undefined,
         public readonly planUpgrade: string | undefined,
+        public readonly roleProperties: {},
         public readonly version: Version
     ) {
         this._links = links;
@@ -220,5 +221,6 @@ function parseApp(response: any) {
         response.canAccessContent,
         response.planName,
         response.planUpgrade,
+        response.roleProperties,
         new Version(response.version.toString()));
 }

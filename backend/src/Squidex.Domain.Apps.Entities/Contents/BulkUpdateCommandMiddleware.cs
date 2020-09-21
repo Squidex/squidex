@@ -39,12 +39,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             if (context.Command is BulkUpdateContents bulkUpdates)
             {
-                if (bulkUpdates.Jobs?.Count > 0)
+                if (bulkUpdates.Jobs?.Length > 0)
                 {
                     var requestContext = contextProvider.Context.WithoutContentEnrichment().WithUnpublished(true);
                     var requestedSchema = bulkUpdates.SchemaId.Name;
 
-                    var results = new BulkUpdateResultItem[bulkUpdates.Jobs.Count];
+                    var results = new BulkUpdateResultItem[bulkUpdates.Jobs.Length];
 
                     var actionBlock = new ActionBlock<int>(async index =>
                     {
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
                     });
 
-                    for (var i = 0; i < bulkUpdates.Jobs.Count; i++)
+                    for (var i = 0; i < bulkUpdates.Jobs.Length; i++)
                     {
                         await actionBlock.SendAsync(i);
                     }

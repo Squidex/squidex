@@ -16,6 +16,7 @@ using Squidex.Areas.Api.Controllers.Rules;
 using Squidex.Areas.Api.Controllers.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
@@ -90,6 +91,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string? PlanUpgrade { get; set; }
 
+        /// <summary>
+        /// The properties from the role.
+        /// </summary>
+        [LocalizedRequired]
+        public JsonObject RoleProperties { get; set; }
+
         public static AppDto FromApp(IAppEntity app, string userId, IAppPlansProvider plans, Resources resources)
         {
             var permissions = GetPermissions(app, userId);
@@ -110,6 +117,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             result.SetPlan(app, plans, resources, permissions);
             result.SetImage(app, resources);
+
+            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGet(app.Name, roleName, out var role))
+            {
+                result.RoleProperties = role.Properties;
+            }
+            else
+            {
+                result.RoleProperties = JsonValue.Object();
+            }
 
             return result.CreateLinks(resources, permissions);
         }

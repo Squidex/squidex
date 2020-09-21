@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -117,10 +118,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var roles_1 = roles_0.Add(roleName);
 
-            var command = new UpdateRole { Name = null!, Permissions = new[] { "P1" } };
+            var command = new UpdateRole { Name = null!, Permissions = new[] { "P1" }, Properties = JsonValue.Object() };
 
             ValidationAssert.Throws(() => GuardAppRoles.CanUpdate(roles_1, command),
                 new ValidationError("Name is required.", "Name"));
+        }
+
+        [Fact]
+        public void CanUpdate_should_throw_exception_if_properties_is_null()
+        {
+            var roles_1 = roles_0.Add(roleName);
+
+            var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" } };
+
+            ValidationAssert.Throws(() => GuardAppRoles.CanUpdate(roles_1, command),
+                new ValidationError("Properties is required.", "Properties"));
         }
 
         [Fact]
@@ -128,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var roles_1 = roles_0.Add(roleName);
 
-            var command = new UpdateRole { Name = roleName, Permissions = null! };
+            var command = new UpdateRole { Name = roleName, Properties = JsonValue.Object() };
 
             ValidationAssert.Throws(() => GuardAppRoles.CanUpdate(roles_1, command),
                 new ValidationError("Permissions is required.", "Permissions"));
@@ -139,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var roles_1 = roles_0.Add(Role.Developer);
 
-            var command = new UpdateRole { Name = Role.Developer, Permissions = new[] { "P1" } };
+            var command = new UpdateRole { Name = Role.Developer, Permissions = new[] { "P1" }, Properties = JsonValue.Object() };
 
             ValidationAssert.Throws(() => GuardAppRoles.CanUpdate(roles_1, command),
                 new ValidationError("Cannot update a default role."));
@@ -148,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdate_should_throw_exception_if_role_does_not_exists()
         {
-            var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" } };
+            var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" }, Properties = JsonValue.Object() };
 
             Assert.Throws<DomainObjectNotFoundException>(() => GuardAppRoles.CanUpdate(roles_0, command));
         }
@@ -158,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var roles_1 = roles_0.Add(roleName);
 
-            var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" } };
+            var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" }, Properties = JsonValue.Object() };
 
             GuardAppRoles.CanUpdate(roles_1, command);
         }

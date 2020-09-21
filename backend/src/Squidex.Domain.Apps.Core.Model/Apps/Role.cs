@@ -7,9 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 using P = Squidex.Shared.Permissions;
 
@@ -23,7 +25,11 @@ namespace Squidex.Domain.Apps.Core.Apps
         public const string Owner = "Owner";
         public const string Reader = "Reader";
 
+        public static readonly ReadOnlyCollection<string> EmptyProperties = new ReadOnlyCollection<string>(new List<string>());
+
         public PermissionSet Permissions { get; }
+
+        public JsonObject Properties { get; }
 
         [IgnoreDuringEquals]
         public bool IsDefault
@@ -31,23 +37,35 @@ namespace Squidex.Domain.Apps.Core.Apps
             get { return Roles.IsDefault(this); }
         }
 
-        public Role(string name, PermissionSet permissions)
+        public Role(string name, PermissionSet permissions, JsonObject properties)
             : base(name)
         {
             Guard.NotNull(permissions, nameof(permissions));
+            Guard.NotNull(properties, nameof(properties));
 
             Permissions = permissions;
+            Properties = properties;
         }
 
-        public Role(string name, params string[] permissions)
-            : this(name, new PermissionSet(permissions))
+        public static Role WithPermissions(string role, params string[] permissions)
         {
+            return new Role(role, new PermissionSet(permissions), JsonValue.Object());
+        }
+
+        public static Role WithProperties(string role, JsonObject properties)
+        {
+            return new Role(role, PermissionSet.Empty, properties);
+        }
+
+        public static Role Create(string role)
+        {
+            return new Role(role, PermissionSet.Empty, JsonValue.Object());
         }
 
         [Pure]
-        public Role Update(string[] permissions)
+        public Role Update(PermissionSet? permissions, JsonObject? properties)
         {
-            return new Role(Name, new PermissionSet(permissions));
+            return new Role(Name, permissions ?? Permissions, properties ?? Properties);
         }
 
         public bool Equals(string name)
@@ -72,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 }
             }
 
-            return new Role(Name, new PermissionSet(result));
+            return new Role(Name, new PermissionSet(result), Properties);
         }
     }
 }

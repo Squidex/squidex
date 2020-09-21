@@ -12,6 +12,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
@@ -24,20 +25,20 @@ namespace Squidex.Domain.Apps.Core.Apps
         public static readonly IReadOnlyDictionary<string, Role> Defaults = new Dictionary<string, Role>
         {
             [Role.Owner] =
-                new Role(Role.Owner, new PermissionSet(
-                    Clean(Permissions.App))),
+                Role.WithPermissions(Role.Owner,
+                    Clean(Permissions.App)),
             [Role.Reader] =
-                new Role(Role.Reader, new PermissionSet(
+                Role.WithPermissions(Role.Reader,
                     Clean(Permissions.AppAssetsRead),
-                    Clean(Permissions.AppContentsRead))),
+                    Clean(Permissions.AppContentsRead)),
             [Role.Editor] =
-                new Role(Role.Editor, new PermissionSet(
+                Role.WithPermissions(Role.Editor,
                     Clean(Permissions.AppAssets),
                     Clean(Permissions.AppContents),
                     Clean(Permissions.AppRolesRead),
-                    Clean(Permissions.AppWorkflowsRead))),
+                    Clean(Permissions.AppWorkflowsRead)),
             [Role.Developer] =
-                new Role(Role.Developer, new PermissionSet(
+                Role.WithPermissions(Role.Developer,
                     Clean(Permissions.AppApi),
                     Clean(Permissions.AppAssets),
                     Clean(Permissions.AppContents),
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                     Clean(Permissions.AppRolesRead),
                     Clean(Permissions.AppRules),
                     Clean(Permissions.AppSchemas),
-                    Clean(Permissions.AppWorkflows)))
+                    Clean(Permissions.AppWorkflows))
         };
 
         public static readonly Roles Empty = new Roles(new ImmutableDictionary<string, Role>());
@@ -89,8 +90,6 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public Roles Add(string name)
         {
-            var newRole = new Role(name);
-
             if (inner.ContainsKey(name))
             {
                 return this;
@@ -101,21 +100,24 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
+            var newRole = Role.Create(name);
+
             return Create(inner.With(name, newRole));
         }
 
         [Pure]
-        public Roles Update(string name, params string[] permissions)
+        public Roles Update(string name, PermissionSet? permissions = null, JsonObject? properties = null)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNull(permissions, nameof(permissions));
 
             if (!inner.TryGetValue(name, out var role))
             {
                 return this;
             }
 
-            return Create(inner.With(name, role.Update(permissions)));
+            var newRole = role.Update(permissions, properties);
+
+            return Create(inner.With(name, newRole));
         }
 
         public static bool IsDefault(string role)

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -101,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdateLanguage_should_throw_exception_if_fallback_language_defined_and_master()
         {
-            var command = new UpdateLanguage { Language = Language.EN, Fallback = new List<Language> { Language.DE } };
+            var command = new UpdateLanguage { Language = Language.EN, Fallback = new[] { Language.DE } };
 
             ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages, command),
                 new ValidationError("Master language cannot have fallback languages.", "Fallback"));
@@ -110,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdateLanguage_should_throw_exception_if_language_has_invalid_fallback()
         {
-            var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.IT } };
+            var command = new UpdateLanguage { Language = Language.DE, Fallback = new[] { Language.IT } };
 
             ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages, command),
                 new ValidationError("App does not have fallback language 'Italian'.", "Fallback"));
@@ -127,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdateLanguage_should_not_throw_exception_if_language_is_valid()
         {
-            var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.EN } };
+            var command = new UpdateLanguage { Language = Language.DE, Fallback = new[] { Language.EN } };
 
             GuardAppLanguages.CanUpdate(languages, command);
         }
