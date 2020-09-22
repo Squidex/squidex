@@ -173,8 +173,8 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             Assert.Equal(permissionCount, result!.Permissions.Count);
         }
 
-        [InlineData("Developer", 18)]
-        [InlineData("Editor", 15)]
+        [InlineData("Developer", 17)]
+        [InlineData("Editor", 14)]
         [InlineData("Reader", 13)]
         [InlineData("Owner", 1)]
         [Theory]
