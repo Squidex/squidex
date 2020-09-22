@@ -9,6 +9,8 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class ImageInfo
     {
+        public string? Format { get; set; }
+
         public int PixelWidth { get; }
 
         public int PixelHeight { get; }
