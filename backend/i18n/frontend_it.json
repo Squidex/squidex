@@ -552,7 +552,7 @@
   "roles.loadPermissionsFailed": "Non è stato possibile caricare i permessi. Per favore ricarica.",
   "roles.permissions": "Permissions",
   "roles.permissionsDescription": "Permissions restrict the allowed operations and queries at API level and are a security feature.",
-  "roles.permissionsPlaceholder": "Start typing to search for permission",
+  "roles.permissionsPlaceholder": "Start typing to search for permissions",
   "roles.properties": "Properties",
   "roles.properties.hideAPI": "Hide API",
   "roles.properties.hideAssets": "Hide Assets",

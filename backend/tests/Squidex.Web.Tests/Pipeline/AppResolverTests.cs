@@ -288,7 +288,7 @@ namespace Squidex.Web.Pipeline
 
             if (appUser != null)
             {
-                contributors = contributors.Assign(appUser, Role.Owner);
+                contributors = contributors.Assign(appUser, Role.Reader);
             }
 
             var clients = AppClients.Empty;
