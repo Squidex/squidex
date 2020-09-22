@@ -50,12 +50,27 @@ namespace Squidex.Shared
         public const string AdminUsersLock = "squidex.admin.users.lock";
 
         public const string App = "squidex.apps.{app}";
-        public const string AppCommon = "squidex.apps.{app}.common";
 
         public const string AppDelete = "squidex.apps.{app}.delete";
         public const string AppUpdate = "squidex.apps.{app}.update";
         public const string AppUpdateImage = "squidex.apps.{app}.update";
         public const string AppUpdateGeneral = "squidex.apps.{app}.general";
+
+        public const string AppHistory = "squidex.apps.{app}.history";
+
+        public const string AppPing = "squidex.apps.{app}.ping";
+
+        public const string AppSearch = "squidex.apps.{app}.search";
+
+        public const string AppTranslate = "squidex.apps.{app}.translate";
+
+        public const string AppUsage = "squidex.apps.{app}.usage";
+
+        public const string AppComments = "squidex.apps.{app}.comments";
+        public const string AppCommentsRead = "squidex.apps.{app}.comments.read";
+        public const string AppCommentsCreate = "squidex.apps.{app}.comments.create";
+        public const string AppCommentsUpdate = "squidex.apps.{app}.comments.update";
+        public const string AppCommentsDelete = "squidex.apps.{app}.comments.delete";
 
         public const string AppClients = "squidex.apps.{app}.clients";
         public const string AppClientsRead = "squidex.apps.{app}.clients.read";
@@ -69,6 +84,7 @@ namespace Squidex.Shared
         public const string AppContributorsRevoke = "squidex.apps.{app}.contributors.revoke";
 
         public const string AppLanguages = "squidex.apps.{app}.languages";
+        public const string AppLanguagesRead = "squidex.apps.{app}.languages.read";
         public const string AppLanguagesCreate = "squidex.apps.{app}.languages.create";
         public const string AppLanguagesUpdate = "squidex.apps.{app}.languages.update";
         public const string AppLanguagesDelete = "squidex.apps.{app}.languages.delete";
@@ -80,6 +96,7 @@ namespace Squidex.Shared
         public const string AppRolesDelete = "squidex.apps.{app}.roles.delete";
 
         public const string AppPatterns = "squidex.apps.{app}.patterns";
+        public const string AppPatternsRead = "squidex.apps.{app}.patterns.read";
         public const string AppPatternsCreate = "squidex.apps.{app}.patterns.create";
         public const string AppPatternsUpdate = "squidex.apps.{app}.patterns.update";
         public const string AppPatternsDelete = "squidex.apps.{app}.patterns.delete";
@@ -115,6 +132,7 @@ namespace Squidex.Shared
         public const string AppRulesDelete = "squidex.apps.{app}.rules.delete";
 
         public const string AppSchemas = "squidex.apps.{app}.schemas";
+        public const string AppSchemasRead = "squidex.apps.{app}.schemas.read";
         public const string AppSchemasCreate = "squidex.apps.{app}.schemas.create";
         public const string AppSchemasUpdate = "squidex.apps.{app}.schemas.{name}.update";
         public const string AppSchemasScripts = "squidex.apps.{app}.schemas.{name}.scripts";
@@ -129,8 +147,6 @@ namespace Squidex.Shared
         public const string AppContentsVersionCreate = "squidex.apps.{app}.contents.{name}.version.create";
         public const string AppContentsVersionDelete = "squidex.apps.{app}.contents.{name}.version.delete";
         public const string AppContentsDelete = "squidex.apps.{app}.contents.{name}.delete";
-
-        public const string AppApi = "squidex.apps.{app}.api";
 
         static Permissions()
         {

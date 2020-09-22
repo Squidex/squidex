@@ -20,6 +20,22 @@ namespace Squidex.Domain.Apps.Core.Apps
     [Equals(DoNotAddEqualityOperators = true)]
     public sealed class Role : Named
     {
+        private static readonly HashSet<string> ExtraPermissions = new HashSet<string>
+        {
+            P.AppComments,
+            P.AppContributorsRead,
+            P.AppHistory,
+            P.AppHistory,
+            P.AppLanguagesRead,
+            P.AppPatternsRead,
+            P.AppPing,
+            P.AppRolesRead,
+            P.AppSchemasRead,
+            P.AppSearch,
+            P.AppTranslate,
+            P.AppUsage
+        };
+
         public const string Editor = "Editor";
         public const string Developer = "Developer";
         public const string Owner = "Owner";
@@ -73,12 +89,11 @@ namespace Squidex.Domain.Apps.Core.Apps
             return name != null && name.Equals(Name, StringComparison.Ordinal);
         }
 
-        public Role ForApp(string app)
+        public Role ForApp(string app, bool isFrontend = false)
         {
-            var result = new HashSet<Permission>
-            {
-                P.ForApp(P.AppCommon, app)
-            };
+            Guard.NotNullOrEmpty(app, nameof(app));
+
+            var result = new HashSet<Permission>();
 
             if (Permissions.Any())
             {
@@ -87,6 +102,16 @@ namespace Squidex.Domain.Apps.Core.Apps
                 foreach (var permission in Permissions)
                 {
                     result.Add(new Permission(string.Concat(prefix, ".", permission.Id)));
+                }
+            }
+
+            if (isFrontend)
+            {
+                foreach (var extraPermissionId in ExtraPermissions)
+                {
+                    var extraPermission = P.ForApp(extraPermissionId, app);
+
+                    result.Add(extraPermission);
                 }
             }
 

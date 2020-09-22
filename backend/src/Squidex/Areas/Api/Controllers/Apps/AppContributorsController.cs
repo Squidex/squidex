@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/contributors/")]
         [ProducesResponseType(typeof(ContributorsDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppContributorsRead)]
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {

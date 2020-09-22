@@ -25,28 +25,37 @@ namespace Squidex.Domain.Apps.Core.Apps
         public static readonly IReadOnlyDictionary<string, Role> Defaults = new Dictionary<string, Role>
         {
             [Role.Owner] =
-                Role.WithPermissions(Role.Owner,
-                    Clean(Permissions.App)),
+                new Role(Role.Owner,
+                    new PermissionSet(
+                        Clean(Permissions.App)),
+                    JsonValue.Object()),
             [Role.Reader] =
-                Role.WithPermissions(Role.Reader,
-                    Clean(Permissions.AppAssetsRead),
-                    Clean(Permissions.AppContentsRead)),
+                new Role(Role.Reader,
+                    new PermissionSet(
+                        Clean(Permissions.AppAssetsRead),
+                        Clean(Permissions.AppContentsRead)),
+                    JsonValue.Object()
+                        .Add("ui.api.hide", true)),
             [Role.Editor] =
-                Role.WithPermissions(Role.Editor,
-                    Clean(Permissions.AppAssets),
-                    Clean(Permissions.AppContents),
-                    Clean(Permissions.AppRolesRead),
-                    Clean(Permissions.AppWorkflowsRead)),
+                new Role(Role.Editor,
+                    new PermissionSet(
+                        Clean(Permissions.AppAssets),
+                        Clean(Permissions.AppContents),
+                        Clean(Permissions.AppRolesRead),
+                        Clean(Permissions.AppWorkflowsRead)),
+                    JsonValue.Object()
+                        .Add("ui.api.hide", true)),
             [Role.Developer] =
-                Role.WithPermissions(Role.Developer,
-                    Clean(Permissions.AppApi),
-                    Clean(Permissions.AppAssets),
-                    Clean(Permissions.AppContents),
-                    Clean(Permissions.AppPatterns),
-                    Clean(Permissions.AppRolesRead),
-                    Clean(Permissions.AppRules),
-                    Clean(Permissions.AppSchemas),
-                    Clean(Permissions.AppWorkflows))
+                new Role(Role.Developer,
+                    new PermissionSet(
+                        Clean(Permissions.AppAssets),
+                        Clean(Permissions.AppContents),
+                        Clean(Permissions.AppPatterns),
+                        Clean(Permissions.AppRolesRead),
+                        Clean(Permissions.AppRules),
+                        Clean(Permissions.AppSchemas),
+                        Clean(Permissions.AppWorkflows)),
+                    JsonValue.Object()),
         };
 
         public static readonly Roles Empty = new Roles(new ImmutableDictionary<string, Role>());
@@ -140,19 +149,22 @@ namespace Squidex.Domain.Apps.Core.Apps
             return inner.ContainsKey(name) || Defaults.ContainsKey(name);
         }
 
-        public bool TryGet(string app, string name, [MaybeNullWhen(false)] out Role value)
+        public bool TryGet(string app, string name, bool isFrontend, [MaybeNullWhen(false)] out Role value)
         {
             Guard.NotNull(app, nameof(app));
 
-            if (Defaults.TryGetValue(name, out var role) || inner.TryGetValue(name, out role))
-            {
-                value = role.ForApp(app);
-                return true;
-            }
-
             value = null!;
 
-            return false;
+            if (Defaults.TryGetValue(name, out var role))
+            {
+                value = role.ForApp(app, isFrontend && name != Role.Owner);
+            }
+            else if (inner.TryGetValue(name, out role))
+            {
+                value = role.ForApp(app, isFrontend);
+            }
+
+            return value != null;
         }
 
         private static string Clean(string permission)

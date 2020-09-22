@@ -80,7 +80,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = Deferred.Response(() =>
             {
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, appPlansProvider, Resources)).ToArray();
+                var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
+
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, isFrontend, appPlansProvider, Resources)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -108,7 +110,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 var userOrClientId = HttpContext.User.UserOrClientId()!;
                 var userPermissions = Resources.Permissions;
 
-                return AppDto.FromApp(App, userOrClientId, appPlansProvider, Resources);
+                var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
+
+                return AppDto.FromApp(App, userOrClientId, isFrontend, appPlansProvider, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -299,8 +303,10 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var userOrClientId = HttpContext.User.UserOrClientId()!;
 
+            var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
+
             var result = context.Result<IAppEntity>();
-            var response = AppDto.FromApp(result, userOrClientId, appPlansProvider, Resources);
+            var response = AppDto.FromApp(result, userOrClientId, isFrontend, appPlansProvider, Resources);
 
             return response;
         }

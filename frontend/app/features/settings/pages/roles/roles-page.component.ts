@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { AppsState, AutocompleteSource, RoleDto, RolesService, RolesState } from '@app/shared';
+import { AppsState, AutocompleteSource, RoleDto, RolesService, RolesState, SchemasState } from '@app/shared';
 import { Observable, of } from 'rxjs';
 
 class PermissionsAutocomplete implements AutocompleteSource {
@@ -32,11 +32,14 @@ export class RolesPageComponent implements OnInit {
     constructor(
         private readonly appsState: AppsState,
         public readonly rolesService: RolesService,
-        public readonly rolesState: RolesState
+        public readonly rolesState: RolesState,
+        public readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnInit() {
+        this.schemasState.loadIfNotLoaded();
+
         this.rolesState.load();
     }
 

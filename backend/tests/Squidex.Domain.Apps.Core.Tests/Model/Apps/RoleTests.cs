@@ -30,13 +30,13 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_add_common_permission()
+        public void Should_not_add_common_permission()
         {
             var role = Role.Create("Name");
 
             var result = role.ForApp("my-app").Permissions.ToIds();
 
-            Assert.Equal(new[] { "squidex.apps.my-app.common" }, result);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             var result = role.ForApp("my-app").Permissions.ToIds();
 
-            Assert.Equal("squidex.apps.my-app.clients.read", result.ElementAt(1));
+            Assert.Equal("squidex.apps.my-app.clients.read", result.ElementAt(0));
         }
 
         [Fact]

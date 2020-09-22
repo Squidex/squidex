@@ -31,4 +31,8 @@ export class LeftMenuComponent {
     public isSchemasHidden(app: AppDto) {
         return app.roleProperties[Settings.AppProperties.HIDE_SCHEMAS] === true;
     }
+
+    public isApiHidden(app: AppDto) {
+        return app.roleProperties[Settings.AppProperties.HIDE_API] === true;
+    }
 }

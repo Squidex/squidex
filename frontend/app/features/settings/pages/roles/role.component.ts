@@ -7,14 +7,30 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AddPermissionForm, AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, Settings } from '@app/shared';
+import { AddPermissionForm, AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, SchemaDto, Settings } from '@app/shared';
 
-const Descriptions = {
+const DESCRIPTIONS = {
     Developer: 'i18n:roles.defaults.developer',
     Editor: 'i18n:roles.defaults.editor',
     Owner: 'i18n:roles.default.owner',
     Reader: 'i18n:roles.default.reader'
 };
+
+type Property = { name: string, key: string };
+
+const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
+    name: 'roles.properties.hideSchemas',
+    key: Settings.AppProperties.HIDE_SCHEMAS
+}, {
+    name: 'roles.properties.hideAssets',
+    key: Settings.AppProperties.HIDE_ASSETS
+}, {
+    name: 'roles.properties.hideSettings',
+    key: Settings.AppProperties.HIDE_SETTINGS
+}, {
+    name: 'roles.properties.hideAPI',
+    key: Settings.AppProperties.HIDE_API
+}];
 
 @Component({
     selector: 'sqx-role',
@@ -31,13 +47,17 @@ export class RoleComponent implements OnChanges {
     @Input()
     public allPermissions: AutocompleteSource;
 
+    @Input()
+    public schemas: ReadonlyArray<SchemaDto>;
+
     @ViewChild('addInput', { static: false })
     public addPermissionInput: AutocompleteComponent;
 
-    public descriptions = Descriptions;
+    public descriptions = DESCRIPTIONS;
 
     public propertiesList = Settings.AppProperties;
     public properties: {};
+    public propertiesSimple = SIMPLE_PROPERTIES;
 
     public isEditing = false;
     public isEditable = false;
@@ -101,11 +121,17 @@ export class RoleComponent implements OnChanges {
             this.rolesState.update(this.role, { ...value, properties: this.properties })
                 .subscribe(() => {
                     this.editForm.submitCompleted({ noReset: true });
-
-                    this.toggleEditing();
                 }, error => {
                     this.editForm.submitFailed(error);
                 });
         }
+    }
+
+    public trackByProperty(_index: number, property: Property) {
+        return property.key;
+    }
+
+    public trackBySchema(_index: number, schema: SchemaDto) {
+        return schema.id;
     }
 }

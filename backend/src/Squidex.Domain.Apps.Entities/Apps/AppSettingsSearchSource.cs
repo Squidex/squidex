@@ -56,19 +56,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Search("Clients", Permissions.AppClientsRead,
                 urlGenerator.ClientsUI, SearchResultType.Setting);
 
-            Search("Contents", Permissions.AppCommon,
-                urlGenerator.ContentsUI, SearchResultType.Content);
-
             Search("Contributors", Permissions.AppContributorsRead,
                 urlGenerator.ContributorsUI, SearchResultType.Setting);
 
-            Search("Dashboard", Permissions.AppCommon,
+            Search("Dashboard", Permissions.AppUsage,
                 urlGenerator.DashboardUI, SearchResultType.Dashboard);
 
-            Search("Languages", Permissions.AppCommon,
+            Search("Languages", Permissions.AppLanguagesRead,
                 urlGenerator.LanguagesUI, SearchResultType.Setting);
 
-            Search("Patterns", Permissions.AppCommon,
+            Search("Patterns", Permissions.AppPatternsRead,
                 urlGenerator.PatternsUI, SearchResultType.Setting);
 
             Search("Roles", Permissions.AppRolesRead,
@@ -77,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Search("Rules", Permissions.AppRulesRead,
                 urlGenerator.RulesUI, SearchResultType.Rule);
 
-            Search("Schemas", Permissions.AppCommon,
+            Search("Schemas", Permissions.AppSchemasRead,
                 urlGenerator.SchemasUI, SearchResultType.Schema);
 
             Search("Subscription", Permissions.AppPlansRead,

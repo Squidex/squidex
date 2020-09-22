@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(PatternsDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppPatternsRead)]
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {

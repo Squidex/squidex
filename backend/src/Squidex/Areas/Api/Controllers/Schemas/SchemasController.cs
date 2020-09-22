@@ -44,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/")]
         [ProducesResponseType(typeof(SchemasDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasRead)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchemas(string app)
         {
@@ -72,7 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpGet]
         [Route("apps/{app}/schemas/{name}/")]
         [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppSchemasRead)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchema(string app, string name)
         {

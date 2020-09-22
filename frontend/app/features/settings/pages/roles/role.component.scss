@@ -16,6 +16,11 @@
     padding-right: 0;
 }
 
+.schemas {
+    margin-left: 0;
+    margin-right: 0;
+}
+
 .rule-name {
     @include truncate;
 }

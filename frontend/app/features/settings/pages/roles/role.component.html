@@ -70,7 +70,7 @@
 
                 <form class="form-group row no-gutters" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
                     <div class="col">
-                        <sqx-autocomplete [autoFocus]="true" formControlName="permission" [source]="allPermissions" #addInput
+                        <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput
                             placeholder="{{ 'i18n:roles.permissionsPlaceholder' | sqxTranslate }}">
                         </sqx-autocomplete>
                     </div>
@@ -89,34 +89,32 @@
                     </sqx-form-hint>
 
                     
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="{{role.name}}_hideSchemas"
-                            [ngModel]="getProperty(propertiesList.HIDE_SCHEMAS)"
-                            (ngModelChange)="setProperty(propertiesList.HIDE_SCHEMAS, $event)"
+                    <div class="form-check" *ngFor="let property of propertiesSimple; trackBy: trackByProperty">
+                        <input class="form-check-input" type="checkbox" id="{{role.name}}_{{property.key}}"
+                            [disabled]="!isEditable"
+                            [ngModel]="getProperty(property.key)"
+                            (ngModelChange)="setProperty(property.key, $event)"
                             [ngModelOptions]="standalone">
-                        <label class="form-check-label" for="{{role.name}}_hideSchemas">
-                            {{ 'roles.properties.hideSchemas' | sqxTranslate }}
+                        <label class="form-check-label" for="{{role.name}}{{property.key}}">
+                            {{ property.name | sqxTranslate }}
                         </label>
                     </div>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="{{role.name}}_hideAssets"
-                            [ngModel]="getProperty(propertiesList.HIDE_ASSETS)"
-                            (ngModelChange)="setProperty(propertiesList.HIDE_ASSETS, $event)"
-                            [ngModelOptions]="standalone">
-                        <label class="form-check-label" for="{{role.name}}_hideAssets">
-                            {{ 'roles.properties.hideAssets' | sqxTranslate }}
-                        </label>
-                    </div>
+                    <div class="mt-4" *ngIf="schemas && schemas.length > 0">
+                        <h5>{{ 'common.schemas' | sqxTranslate }}</h5>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="{{role.name}}_hideSettings"
-                            [ngModel]="getProperty(propertiesList.HIDE_SETTINGS)"
-                            (ngModelChange)="setProperty(propertiesList.HIDE_SETTINGS, $event)"
-                            [ngModelOptions]="standalone">
-                        <label class="form-check-label" for="{{role.name}}_hideSettings">
-                            {{ 'roles.properties.hideSettings' | sqxTranslate }}
-                        </label>
+                        <div class="schemas row">
+                            <div class="form-check col-6" *ngFor="let schema of schemas; trackBy: trackBySchema">
+                                <input class="form-check-input" type="checkbox" id="{{role.name}}_schema_{{schema.name}}"
+                                    [disabled]="!isEditable"
+                                    [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
+                                    (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
+                                    [ngModelOptions]="standalone">
+                                <label class="form-check-label truncate" for="{{role.name}}_schema_{{schema.name}}">
+                                    {{ 'roles.properties.hideContents' | sqxTranslate: { schema: schema.displayName } }}
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

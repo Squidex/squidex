@@ -7,8 +7,10 @@
 
 export const Settings = {
     AppProperties: {
-        HIDE_SCHEMAS: 'ui.schemas.hide',
+        HIDE_API: 'ui.api.hide',
         HIDE_ASSETS: 'ui.assets.hide',
+        HIDE_CONTENTS: (schema: any) => `ui.contents.${schema}.hide`,
+        HIDE_SCHEMAS: 'ui.schemas.hide',
         HIDE_SETTINGS: 'ui.settings.hide'
     },
     Local: {
