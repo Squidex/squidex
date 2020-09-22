@@ -273,6 +273,10 @@ label {
 }
 
 input {
+    &.form-empty {
+        border: 0;
+    }
+
     &.form-underlined {
         & {
             border: 0;

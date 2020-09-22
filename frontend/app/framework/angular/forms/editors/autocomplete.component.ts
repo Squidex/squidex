@@ -57,6 +57,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public inputName = 'autocompletion';
 
     @Input()
+    public inputStyle: 'underlined' | 'empty';
+
+    @Input()
     public displayProperty: string;
 
     @Input()
@@ -67,9 +70,6 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
 
     @Input()
     public autoFocus = false;
-
-    @Input()
-    public underlined = false;
 
     @Input()
     public debounceTime = 300;

@@ -59,7 +59,7 @@ export class RoleComponent implements OnChanges {
     public properties: {};
     public propertiesSimple = SIMPLE_PROPERTIES;
 
-    public isEditing = false;
+    public isEditing = true;
     public isEditable = false;
 
     public addPermissionForm = new AddPermissionForm(this.formBuilder);

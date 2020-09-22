@@ -559,7 +559,7 @@
   "roles.properties.hideContents": "Hide {schema} Contents",
   "roles.properties.hideSchemas": "Hide Schemas",
   "roles.properties.hideSettings": "Hide Settings",
-  "roles.propertiesDescription": "Properties describe the behavior of the Management UI, even if you hide an area of the element you can still access the content via the API.",
+  "roles.propertiesDescription": "Properties describe the behavior of the Management UI, but do not provide security for the API.",
   "roles.refreshTooltip": "Ververs rollen (CTRL + SHIFT + R)",
   "roles.reloaded": "Rollen opnieuw geladen.",
   "roles.revokeFailed": "Kan rol niet intrekken. Laad opnieuw.",
