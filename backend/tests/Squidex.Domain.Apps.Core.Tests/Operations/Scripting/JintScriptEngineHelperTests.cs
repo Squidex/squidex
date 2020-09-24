@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             sut = new JintScriptEngine(cache, extensions)
             {
-                Timeout = TimeSpan.FromSeconds(1)
+                TimeoutScript = TimeSpan.FromSeconds(1)
             };
         }
 
