@@ -6,7 +6,8 @@
         autocomplete="off" 
         autocorrect="off"
         autocapitalize="off"
-        [class.form-underlined]="underlined"
+        [class.form-empty]="inputStyle === 'empty'"
+        [class.form-underlined]="inputStyle === 'underlined'"
         [class.form-icon]="!!icon"
         [formControl]="queryInput">
 

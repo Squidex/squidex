@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                     return UpdateImage(e, ev => null);
 
                 case AppPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
-                    return UpdatePlan(e, ev => new AppPlan(ev.Actor, ev.PlanId));
+                    return UpdatePlan(e, ev => ev.ToAppPlan());
 
                 case AppPlanReset e when Plan != null:
                     return UpdatePlan(e, ev => null);
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                     return UpdateRoles(e, (ev, r) => r.Add(ev.Name));
 
                 case AppRoleUpdated e:
-                    return UpdateRoles(e, (ev, r) => r.Update(ev.Name, ev.Permissions));
+                    return UpdateRoles(e, (ev, r) => r.Update(ev.Name, ev.ToPermissions(), ev.Properties));
 
                 case AppRoleDeleted e:
                     return UpdateRoles(e, (ev, r) => r.Remove(ev.Name));
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
                 case AppLanguageUpdated e:
                     return UpdateLanguages(e, (ev, l) =>
                     {
-                        l = l.Set(ev.Language, ev.IsOptional, ev.Fallback?.ToArray());
+                        l = l.Set(ev.Language, ev.IsOptional, ev.Fallback);
 
                         if (ev.IsMaster)
                         {

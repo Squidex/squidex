@@ -7,6 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { AssetsState, DialogModel, LocalStoreService, Queries, Query, ResourceOwner, Router2State, UIState } from '@app/shared';
+import { Settings } from '@app/shared/state/settings';
 
 @Component({
     selector: 'sqx-assets-page',
@@ -31,7 +32,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     ) {
         super();
 
-        this.isListView = this.localStore.getBoolean('squidex.assets.list-view');
+        this.isListView = this.localStore.getBoolean(Settings.Local.ASSETS_MODE);
     }
 
     public ngOnInit() {
@@ -57,6 +58,6 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public changeView(isListView: boolean) {
         this.isListView = isListView;
 
-        this.localStore.setBoolean('squidex.assets.list-view', isListView);
+        this.localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
     }
 }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -41,9 +42,9 @@ namespace Squidex.Web.Pipeline
 
             if (!string.IsNullOrWhiteSpace(appName))
             {
-                var canCache = !user.IsInClient(DefaultClients.Frontend);
+                var isFrontend = user.IsInClient(DefaultClients.Frontend);
 
-                var app = await appProvider.GetAppAsync(appName, canCache);
+                var app = await appProvider.GetAppAsync(appName, !isFrontend);
 
                 if (app == null)
                 {
@@ -51,16 +52,16 @@ namespace Squidex.Web.Pipeline
                     return;
                 }
 
-                var (role, permissions) = FindByOpenIdSubject(app, user);
+                var (role, permissions) = FindByOpenIdSubject(app, user, isFrontend);
 
                 if (permissions == null)
                 {
-                    (role, permissions) = FindByOpenIdClient(app, user);
+                    (role, permissions) = FindByOpenIdClient(app, user, isFrontend);
                 }
 
                 if (permissions == null)
                 {
-                    (role, permissions) = FindAnonymousClient(app);
+                    (role, permissions) = FindAnonymousClient(app, isFrontend);
                 }
 
                 if (permissions != null)
@@ -132,7 +133,7 @@ namespace Squidex.Web.Pipeline
             return context.ActionDescriptor.EndpointMetadata.Any(x => x is AllowAnonymousAttribute);
         }
 
-        private static (string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
+        private static (string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user, bool isFrontend)
         {
             var (appName, clientId) = user.GetClient();
 
@@ -141,7 +142,7 @@ namespace Squidex.Web.Pipeline
                 return (null, null);
             }
 
-            if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, out var role))
+            if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, isFrontend, out var role))
             {
                 return (client.Role, role.Permissions);
             }
@@ -149,11 +150,11 @@ namespace Squidex.Web.Pipeline
             return (null, null);
         }
 
-        private static (string?, PermissionSet?) FindAnonymousClient(IAppEntity app)
+        private static (string?, PermissionSet?) FindAnonymousClient(IAppEntity app, bool isFrontend)
         {
             var client = app.Clients.Values.FirstOrDefault(x => x.AllowAnonymous);
 
-            if (client != null && app.Roles.TryGet(app.Name, client.Role, out var role))
+            if (client != null && app.Roles.TryGet(app.Name, client.Role, isFrontend, out var role))
             {
                 return (client.Role, role.Permissions);
             }
@@ -161,11 +162,11 @@ namespace Squidex.Web.Pipeline
             return (null, null);
         }
 
-        private static (string?, PermissionSet?) FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
+        private static (string?, PermissionSet?) FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user, bool isFrontend)
         {
             var subjectId = user.OpenIdSubject();
 
-            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGet(app.Name, roleName, out var role))
+            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGet(app.Name, roleName, isFrontend, out var role))
             {
                 return (roleName, role.Permissions);
             }

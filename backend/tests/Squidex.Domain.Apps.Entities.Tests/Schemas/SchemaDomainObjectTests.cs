@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var properties = new SchemaProperties();
 
-            var fields = new List<UpsertSchemaField>
+            var fields = new[]
             {
                 new UpsertSchemaField { Name = "field1", Properties = ValidProperties() },
                 new UpsertSchemaField { Name = "field2", Properties = ValidProperties() },
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     Name = "field3",
                     Partitioning = Partitioning.Language.Key,
                     Properties = new ArrayFieldProperties(),
-                    Nested = new List<UpsertSchemaNestedField>
+                    Nested = new[]
                     {
                         new UpsertSchemaNestedField { Name = "nested1", Properties = ValidProperties() },
                         new UpsertSchemaNestedField { Name = "nested2", Properties = ValidProperties() }
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var command = new ConfigureFieldRules
             {
-                FieldRules = new List<FieldRuleCommand>
+                FieldRules = new[]
                 {
                     new FieldRuleCommand { Field = "field1" }
                 }
@@ -332,7 +332,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Reorder_should_create_events_and_reorder_fields()
         {
-            var command = new ReorderFields { FieldIds = new List<long> { 2, 1 } };
+            var command = new ReorderFields { FieldIds = new[] { 2L, 1L } };
 
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync("field1");
@@ -351,7 +351,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Reorder_should_create_events_and_reorder_nestedy_fields()
         {
-            var command = new ReorderFields { ParentFieldId = 1, FieldIds = new List<long> { 3, 2 } };
+            var command = new ReorderFields { ParentFieldId = 1, FieldIds = new[] { 3L, 2L } };
 
             await ExecuteCreateAsync();
             await ExecuteAddArrayFieldAsync();

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -131,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
                 case SchemaFieldsReordered e:
                     {
-                        SchemaDef = SchemaDef.ReorderFields(e.FieldIds, e.ParentFieldId?.Id);
+                        SchemaDef = SchemaDef.ReorderFields(e.FieldIds.ToList(), e.ParentFieldId?.Id);
 
                         break;
                     }

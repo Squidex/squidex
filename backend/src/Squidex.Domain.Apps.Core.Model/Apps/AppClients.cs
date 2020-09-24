@@ -53,11 +53,16 @@ namespace Squidex.Domain.Apps.Core.Apps
                 throw new ArgumentException("Id already exists.", nameof(id));
             }
 
-            return Add(id, new AppClient(id, secret, Role.Editor));
+            var newClient = new AppClient(id, secret, Role.Editor);
+
+            return Add(id, newClient);
         }
 
         [Pure]
-        public AppClients Update(string id, string? name = null, string? role = null, long? apiCallsLimit = null, long? apiTrafficLimit = null, bool? allowAnonymous = false)
+        public AppClients Update(string id, string? name = null, string? role = null,
+            long? apiCallsLimit = null,
+            long? apiTrafficLimit = null,
+            bool? allowAnonymous = false)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
@@ -66,7 +71,9 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return With<AppClients>(id, client.Update(name, role, apiCallsLimit, apiTrafficLimit, allowAnonymous));
+            var newClient = client.Update(name, role, apiCallsLimit, apiTrafficLimit, allowAnonymous);
+
+            return With<AppClients>(id, newClient);
         }
     }
 }

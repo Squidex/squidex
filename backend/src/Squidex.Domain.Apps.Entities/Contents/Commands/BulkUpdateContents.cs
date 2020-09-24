@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
@@ -25,6 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool OptimizeValidation { get; set; }
 
-        public List<BulkUpdateJob>? Jobs { get; set; }
+        public BulkUpdateJob[]? Jobs { get; set; }
     }
 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -48,6 +47,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The nested fields.
         /// </summary>
-        public List<UpsertSchemaNestedFieldDto>? Nested { get; set; }
+        public UpsertSchemaNestedFieldDto[]? Nested { get; set; }
     }
 }

@@ -47,6 +47,7 @@ namespace Squidex.Config.Domain
                 new NamedStringIdConverter(),
                 new PropertyPathConverter(),
                 new RefTokenConverter(),
+                new RoleConverter(),
                 new RolesConverter(),
                 new RuleConverter(),
                 new SchemaConverter(),

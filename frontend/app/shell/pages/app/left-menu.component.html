@@ -1,5 +1,5 @@
 <ul class="nav flex-column" *ngIf="appsState.selectedApp | async; let app">
-    <li class="nav-item" *ngIf="app.canReadSchemas">
+    <li class="nav-item" *ngIf="!isSchemasHidden(app) && app.canReadSchemas">
         <a class="nav-link" routerLink="schemas" routerLinkActive="active">
             <i class="nav-icon icon-schemas"></i> <div class="nav-text">{{ 'common.schemas' | sqxTranslate }}</div>
         </a>
@@ -9,7 +9,7 @@
             <i class="nav-icon icon-contents"></i> <div class="nav-text">{{ 'common.content' | sqxTranslate }}</div>
         </a>
     </li>
-    <li class="nav-item" *ngIf="app.canReadAssets">
+    <li class="nav-item" *ngIf="!isAssetsHidden(app) && app.canReadAssets">
         <a class="nav-link" routerLink="assets" routerLinkActive="active">
             <i class="nav-icon icon-assets"></i> <div class="nav-text">{{ 'common.assets' | sqxTranslate }}</div> 
         </a>
@@ -19,12 +19,12 @@
             <i class="nav-icon icon-rules"></i> <div class="nav-text">{{ 'common.rules' | sqxTranslate }}</div>
         </a>
     </li>
-    <li class="nav-item">
+    <li class="nav-item" *ngIf="!isSettingsHidden(app)">
         <a class="nav-link" routerLink="settings" routerLinkActive="active">
             <i class="nav-icon icon-settings"></i> <div class="nav-text">{{ 'common.settings' | sqxTranslate }}</div>
         </a>
     </li>
-    <li class="nav-item" *ngIf="app.canAccessApi">
+    <li class="nav-item" *ngIf="!isApiHidden(app)">
         <a class="nav-link" routerLink="api" routerLinkActive="active">
             <i class="nav-icon icon-api"></i> <div class="nav-text">{{ 'common.api' | sqxTranslate }}</div>
         </a>

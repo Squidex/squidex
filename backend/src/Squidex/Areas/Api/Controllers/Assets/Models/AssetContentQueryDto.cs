@@ -88,7 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public bool ForceResize { get; set; }
 
         /// <summary>
-        /// True to force a new resize even if it already stored.
+        /// The target image format.
         /// </summary>
         [FromQuery(Name = "format")]
         public ImageFormat Format { get; set; }

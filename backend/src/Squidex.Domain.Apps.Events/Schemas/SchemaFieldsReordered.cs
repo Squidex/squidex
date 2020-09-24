@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Schemas
@@ -13,6 +12,6 @@ namespace Squidex.Domain.Apps.Events.Schemas
     [EventType(nameof(SchemaFieldsReordered))]
     public sealed class SchemaFieldsReordered : ParentFieldEvent
     {
-        public List<long> FieldIds { get; set; }
+        public long[] FieldIds { get; set; }
     }
 }

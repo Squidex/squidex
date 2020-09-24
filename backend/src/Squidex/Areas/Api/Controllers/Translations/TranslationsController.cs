@@ -40,9 +40,9 @@ namespace Squidex.Areas.Api.Controllers.Translations
         [HttpPost]
         [Route("apps/{app}/translations/")]
         [ProducesResponseType(typeof(TranslationDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppTranslate)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetLanguages(string app, [FromBody] TranslateDto request)
+        public async Task<IActionResult> PostTranslation(string app, [FromBody] TranslateDto request)
         {
             var result = await translator.Translate(request.Text, request.TargetLanguage, request.SourceLanguage, HttpContext.RequestAborted);
             var response = TranslationDto.FromTranslation(result);

@@ -52,7 +52,7 @@ namespace Migrations.OldEvents
 
                     var field = eventField.Properties.CreateRootField(totalFields, eventField.Name, partitioning);
 
-                    if (field is ArrayField arrayField && eventField.Nested?.Count > 0)
+                    if (field is ArrayField arrayField && eventField.Nested?.Length > 0)
                     {
                         foreach (var nestedEventField in eventField.Nested)
                         {

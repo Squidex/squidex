@@ -59,6 +59,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new NamedStringIdConverter(),
                     new PropertyPathConverter(),
                     new RefTokenConverter(),
+                    new RoleConverter(),
                     new RolesConverter(),
                     new RuleConverter(),
                     new SchemaConverter(),

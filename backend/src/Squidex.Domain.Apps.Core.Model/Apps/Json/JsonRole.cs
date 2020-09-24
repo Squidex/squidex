@@ -5,24 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using Newtonsoft.Json;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Security;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Domain.Apps.Core.Apps.Json
 {
-    [EventType(nameof(AppRoleUpdated))]
-    public sealed class AppRoleUpdated : AppEvent
+    public sealed class JsonRole
     {
-        public string Name { get; set; }
-
+        [JsonProperty]
         public string[] Permissions { get; set; }
 
-        public JsonObject? Properties { get; set; }
-
-        public PermissionSet ToPermissions()
-        {
-            return new PermissionSet(Permissions);
-        }
+        [JsonProperty]
+        public JsonObject Properties { get; set; }
     }
 }

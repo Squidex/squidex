@@ -42,9 +42,9 @@ namespace Squidex.Areas.Api.Controllers.Search
         [HttpGet]
         [Route("apps/{app}/search/")]
         [ProducesResponseType(typeof(SearchResultDto[]), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppSearch)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetSchemas(string app, [FromQuery] string? query = null)
+        public async Task<IActionResult> GetSearchResults(string app, [FromQuery] string? query = null)
         {
             var result = await searchManager.SearchAsync(query, Context);
 

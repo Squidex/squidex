@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { LocalStoreService, ResourceLoaderService, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
+import { LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
 declare var L: any;
 declare var google: any;
@@ -76,7 +76,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         private readonly formBuilder: FormBuilder,
         private readonly uiOptions: UIOptions
     ) {
-        super(changeDetector, { isMapHidden: localStore.getBoolean('hideMap') });
+        super(changeDetector, { isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP) });
 
         this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';
     }
@@ -84,7 +84,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     public hideMap(isMapHidden: boolean) {
         this.next({ isMapHidden });
 
-        this.localStore.setBoolean('hideMap', isMapHidden);
+        this.localStore.setBoolean(Settings.Local.HIDE_MAP, isMapHidden);
     }
 
     public writeValue(obj: any) {

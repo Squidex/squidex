@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -20,6 +21,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Xunit;
 
@@ -94,7 +96,7 @@ namespace Squidex.Web.Pipeline
         {
             var user = SetupUser();
 
-            var app = CreateApp(appName, appUser: "user1");
+            var app = CreateApp(appName);
 
             user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
@@ -104,8 +106,59 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
+            var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
+
+            Assert.Same(app, httpContext.Context().App);
+            Assert.True(user.Claims.Any());
+            Assert.True(permissions.Count < 3);
+            Assert.True(permissions.All(x => x.Value.StartsWith("squidex.apps.my-app", StringComparison.OrdinalIgnoreCase)));
+            Assert.True(isNextCalled);
+        }
+
+        [Fact]
+        public async Task Should_resolve_app_from_contributor()
+        {
+            var user = SetupUser();
+
+            var app = CreateApp(appName, appUser: "user1");
+
+            user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
+
+            A.CallTo(() => appProvider.GetAppAsync(appName, true))
+                .Returns(app);
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
+
             Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Count() > 2);
+            Assert.True(permissions.Count < 3);
+            Assert.True(permissions.All(x => x.Value.StartsWith("squidex.apps.my-app", StringComparison.OrdinalIgnoreCase)));
+            Assert.True(isNextCalled);
+        }
+
+        [Fact]
+        public async Task Should_provide_extra_permissions_if_client_is_frontend()
+        {
+            var user = SetupUser();
+
+            var app = CreateApp(appName, appUser: "user1");
+
+            user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
+            user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
+
+            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+                .Returns(app);
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
+
+            Assert.Same(app, httpContext.Context().App);
+            Assert.True(user.Claims.Count() > 2);
+            Assert.True(permissions.Count > 10);
+            Assert.True(permissions.All(x => x.Value.StartsWith("squidex.apps.my-app", StringComparison.OrdinalIgnoreCase)));
             Assert.True(isNextCalled);
         }
 
@@ -231,27 +284,25 @@ namespace Squidex.Web.Pipeline
         {
             var appEntity = A.Fake<IAppEntity>();
 
+            var contributors = AppContributors.Empty;
+
             if (appUser != null)
             {
-                A.CallTo(() => appEntity.Contributors)
-                    .Returns(AppContributors.Empty.Assign(appUser, Role.Owner));
+                contributors = contributors.Assign(appUser, Role.Reader);
             }
-            else
-            {
-                A.CallTo(() => appEntity.Contributors)
-                    .Returns(AppContributors.Empty);
-            }
+
+            var clients = AppClients.Empty;
 
             if (appClient != null)
             {
-                A.CallTo(() => appEntity.Clients)
-                    .Returns(AppClients.Empty.Add(appClient, "secret").Update(appClient, apiCallsLimit: apiCallsLimit, allowAnonymous: allowAnonymous));
+                clients = clients.Add(appClient, "secret").Update(appClient, apiCallsLimit: apiCallsLimit, allowAnonymous: allowAnonymous);
             }
-            else
-            {
-                A.CallTo(() => appEntity.Clients)
-                    .Returns(AppClients.Empty);
-            }
+
+            A.CallTo(() => appEntity.Contributors)
+                .Returns(contributors);
+
+            A.CallTo(() => appEntity.Clients)
+                .Returns(clients);
 
             A.CallTo(() => appEntity.Name)
                 .Returns(name);

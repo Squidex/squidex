@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { ContentDto, fadeAnimation, interpolate, LocalStoreService, ModalModel, SchemaDetailsDto, StatefulComponent } from '@app/shared';
+import { ContentDto, fadeAnimation, interpolate, LocalStoreService, ModalModel, SchemaDetailsDto, Settings, StatefulComponent } from '@app/shared';
 
 interface State {
     // The name of the selected preview config.
@@ -88,6 +88,6 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     }
 
     private configKey() {
-        return `squidex.schemas.${this.schema.id}.preview-button`;
+        return Settings.Local.SCHEMA_PREVIEW(this.schema.id);
     }
 }
