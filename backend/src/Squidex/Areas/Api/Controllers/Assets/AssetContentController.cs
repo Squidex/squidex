@@ -120,6 +120,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (asset.IsProtected && !Resources.CanReadAssets)
             {
+                Response.Headers[HeaderNames.CacheControl] = $"public,max-age=0";
+
                 return StatusCode(403);
             }
 
