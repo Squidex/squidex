@@ -175,7 +175,7 @@ namespace Squidex.Infrastructure.Translations
                 {
                     if (!missingTranslations.Add(key))
                     {
-                        File.AppendAllLines(MissingFileName, new string[] { key });
+                        File.AppendAllLines(MissingFileName, new[] { key });
                     }
                 }
 #endif

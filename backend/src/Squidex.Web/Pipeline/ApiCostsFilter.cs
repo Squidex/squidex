@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -64,7 +65,7 @@ namespace Squidex.Web.Pipeline
                     }
                 }
 
-                context.HttpContext.Response.Headers.Add("X-Costs", FilterDefinition.Costs.ToString());
+                context.HttpContext.Response.Headers.Add("X-Costs", FilterDefinition.Costs.ToString(CultureInfo.InvariantCulture));
             }
 
             await next();

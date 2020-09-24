@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Assert.Empty(formatted);
         }
 
-        private UploadAssetCommand Command(string path)
+        private static UploadAssetCommand Command(string path)
         {
             var file = new FileInfo(Path.Combine("Assets", "TestFiles", path));
 
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             };
         }
 
-        private UploadAssetCommand FakeCommand(string name)
+        private static UploadAssetCommand FakeCommand(string name)
         {
             var stream = new MemoryStream();
 

@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             return value;
         }
 
-        private void AddReferenceIds(HashSet<Guid> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
+        private static void AddReferenceIds(HashSet<Guid> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
         {
             foreach (var content in contents)
             {

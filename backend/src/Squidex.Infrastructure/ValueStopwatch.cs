@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace Squidex.Infrastructure
 {
-    public struct ValueStopwatch
+    public readonly struct ValueStopwatch
     {
         private const long TicksPerMillisecond = 10000;
         private const long TicksPerSecond = TicksPerMillisecond * 1000;

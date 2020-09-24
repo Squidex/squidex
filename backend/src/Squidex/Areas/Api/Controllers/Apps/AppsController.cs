@@ -108,7 +108,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var response = Deferred.Response(() =>
             {
                 var userOrClientId = HttpContext.User.UserOrClientId()!;
-                var userPermissions = Resources.Permissions;
 
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
@@ -217,7 +216,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                 try
                 {
-                    await assetStore.DownloadAsync(resizedAsset, body);
+                    await assetStore.DownloadAsync(resizedAsset, body, ct: ct);
                 }
                 catch (AssetNotFoundException)
                 {

@@ -58,8 +58,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             var contentId = Guid.NewGuid();
             var contentIds = HashSet.Of(contentId);
 
-            var state = new TextContentState { ContentId = contentId };
-
             A.CallTo(() => inner.GetAsync(A<HashSet<Guid>>.That.Is(contentIds)))
                 .Returns(new Dictionary<Guid, TextContentState>());
 

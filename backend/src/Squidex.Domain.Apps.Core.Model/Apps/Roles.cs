@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                         Clean(Permissions.AppRules),
                         Clean(Permissions.AppSchemas),
                         Clean(Permissions.AppWorkflows)),
-                    JsonValue.Object()),
+                    JsonValue.Object())
         };
 
         public static readonly Roles Empty = new Roles(new ImmutableDictionary<string, Role>());

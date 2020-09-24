@@ -33,8 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public ICommandBus CommandBus { get; }
 
-        public ISemanticLog Log { get; }
-
         public GraphQLExecutionContext(Context context, IServiceProvider resolver)
             : base(context
                     .WithoutCleanup()

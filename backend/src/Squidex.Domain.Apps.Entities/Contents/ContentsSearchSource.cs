@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context.Permissions.Allows(permission);
         }
 
-        private string FormatName(IEnrichedContentEntity content, string masterLanguage)
+        private static string FormatName(IEnrichedContentEntity content, string masterLanguage)
         {
             var sb = new StringBuilder();
 

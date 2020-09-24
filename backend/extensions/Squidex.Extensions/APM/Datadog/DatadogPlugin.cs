@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.APM.Datadoq
+namespace Squidex.Extensions.APM.Datadog
 {
     public sealed class DatadogPlugin : IPlugin, IStartupFilter
     {

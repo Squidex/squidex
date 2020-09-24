@@ -61,7 +61,7 @@
   "common.httpValidationError": "Validatiefout",
   "common.initialStep": "Eerste stap",
   "common.jsError": "Kan script niet uitvoeren met Javascript-fout: {message}",
-  "common.jsNotAlloweed": "Script heeft de bewerking verboden.",
+  "common.jsNotAllowed": "Script heeft de bewerking verboden.",
   "common.jsParseError": "Kan script niet uitvoeren met Javascript-syntaxisfout: {message}",
   "common.jsRejected": "Script heeft de bewerking afgewezen.",
   "common.language": "Taalcode",

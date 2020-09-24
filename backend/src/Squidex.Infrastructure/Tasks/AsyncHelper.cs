@@ -60,12 +60,12 @@ namespace Squidex.Infrastructure.Tasks
 
             var timer = new Timer(_ => batchBlock.TriggerBatch());
 
-            var timerBlock = new TransformBlock<T, T>((T value) =>
+            var timerBlock = new TransformBlock<T, T>(value =>
             {
                 timer.Change(timeout, Timeout.Infinite);
 
                 return value;
-            }, new ExecutionDataflowBlockOptions()
+            }, new ExecutionDataflowBlockOptions
             {
                 BoundedCapacity = 1,
                 CancellationToken = dataflowBlockOptions.CancellationToken,
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.Tasks
                 TaskScheduler = dataflowBlockOptions.TaskScheduler
             });
 
-            timerBlock.LinkTo(batchBlock, new DataflowLinkOptions()
+            timerBlock.LinkTo(batchBlock, new DataflowLinkOptions
             {
                 PropagateCompletion = true
             });

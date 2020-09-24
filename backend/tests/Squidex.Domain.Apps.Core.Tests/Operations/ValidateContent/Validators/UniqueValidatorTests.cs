@@ -86,12 +86,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
         private CheckUniqueness Check(Guid id, Action<string>? filter = null)
         {
-            return new CheckUniqueness(filterNode =>
+            return filterNode =>
             {
                 filter?.Invoke(filterNode.ToString());
 
                 return Task.FromResult<IReadOnlyList<(Guid, Guid)>>(new List<(Guid, Guid)> { (schemaId, id) });
-            });
+            };
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var source = new Dictionary<string, string[]>
             {
-                ["Custom"] = new string[]
+                ["Custom"] = new[]
                 {
                     "Permission1",
                     "Permission2"

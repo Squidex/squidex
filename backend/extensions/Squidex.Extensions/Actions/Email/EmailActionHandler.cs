@@ -69,13 +69,13 @@ namespace Squidex.Extensions.Actions.Email
             return Result.Complete();
         }
 
-        private async Task CheckConnectionAsync(EmailJob job, CancellationToken ct)
+        private static async Task CheckConnectionAsync(EmailJob job, CancellationToken ct)
         {
             using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
                 var tcs = new TaskCompletionSource<IAsyncResult>();
 
-                var state = socket.BeginConnect(job.ServerHost, job.ServerPort, tcs.SetResult, null);
+                socket.BeginConnect(job.ServerHost, job.ServerPort, tcs.SetResult, null);
 
                 using (ct.Register(() =>
                 {

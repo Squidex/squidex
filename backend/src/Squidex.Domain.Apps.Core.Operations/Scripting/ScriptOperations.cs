@@ -16,19 +16,19 @@ namespace Squidex.Domain.Apps.Core.Scripting
     {
         private delegate void MessageDelegate(string? message);
 
-        private static readonly MessageDelegate Disallow = new MessageDelegate(message =>
+        private static readonly MessageDelegate Disallow = message =>
         {
-            message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsNotAlloweed");
+            message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsNotAllowed");
 
             throw new DomainForbiddenException(message);
-        });
+        };
 
-        private static readonly MessageDelegate Reject = new MessageDelegate(message =>
+        private static readonly MessageDelegate Reject = message =>
         {
             message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsRejected");
 
             throw new ValidationException(message);
-        });
+        };
 
         public static Engine AddDisallow(this Engine engine)
         {

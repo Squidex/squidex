@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.MongoDb
                 Filter = new BsonDocument("name", collectionName)
             };
 
-            return (await database.ListCollectionNamesAsync(options)).Any();
+            return await (await database.ListCollectionNamesAsync(options)).AnyAsync();
         }
 
         public static async Task<bool> InsertOneIfNotExistsAsync<T>(this IMongoCollection<T> collection, T document, CancellationToken ct = default)

@@ -193,7 +193,7 @@ namespace Squidex.Infrastructure.Assets
 
                     using (tempStream)
                     {
-                        await stream.CopyToAsync(tempStream);
+                        await stream.CopyToAsync(tempStream, ct);
 
                         request.InputStream = tempStream;
 

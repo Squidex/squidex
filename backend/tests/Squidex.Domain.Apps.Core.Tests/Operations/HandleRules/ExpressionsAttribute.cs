@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 yield return new object[]
                 {
-                    string.Format("Script(`{0}`)", script)
+                    $"Script(`{script}`)"
                 };
             }
 
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 yield return new object[]
                 {
-                    string.Format("Liquid({0})", liquid)
+                    $"Liquid({liquid})"
                 };
             }
         }

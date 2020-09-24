@@ -143,7 +143,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (asset.Type == AssetType.Image && resizeOptions.IsValid)
             {
-                callback = new FileCallback(async (bodyStream, range, ct) =>
+                callback = async (bodyStream, range, ct) =>
                 {
                     var resizedAsset = $"{asset.Id}_{asset.FileVersion}_{resizeOptions}";
 
@@ -162,16 +162,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
                             await ResizeAsync(asset, bodyStream, resizedAsset, resizeOptions, false, ct);
                         }
                     }
-                });
+                };
             }
             else
             {
                 contentLength = asset.FileSize;
 
-                callback = new FileCallback(async (bodyStream, range, ct) =>
+                callback = async (bodyStream, range, ct) =>
                 {
                     await assetFileStore.DownloadAsync(asset.Id, asset.FileVersion, bodyStream, range, ct);
-                });
+                };
             }
 
             return new FileCallbackResult(asset.MimeType, callback)

@@ -107,8 +107,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
-            var enriched1 = contents[0];
-
             A.CallTo(() => requestCache.AddDependency(refSchemaId1.Id, 0))
                 .MustHaveHappened();
 

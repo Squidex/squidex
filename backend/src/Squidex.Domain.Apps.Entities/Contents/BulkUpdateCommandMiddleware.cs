@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                                 case BulkUpdateType.Delete:
                                     {
-                                        if (id == null || id == default)
+                                        if (id == null || id.Value == default)
                                         {
                                             throw new DomainObjectNotFoundException("undefined");
                                         }

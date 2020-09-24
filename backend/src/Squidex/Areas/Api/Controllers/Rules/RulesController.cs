@@ -120,7 +120,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetRules), new { app }, response);
         }
@@ -164,7 +164,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var command = request.ToCommand(id);
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -187,7 +187,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var command = new EnableRule { RuleId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -210,7 +210,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var command = new DisableRule { RuleId = id };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -356,7 +356,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
             return NoContent();
         }
 
-        private async Task<RuleDto> InvokeCommandAsync(string app, ICommand command)
+        private async Task<RuleDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 

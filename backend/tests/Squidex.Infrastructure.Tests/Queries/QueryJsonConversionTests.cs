@@ -465,7 +465,7 @@ namespace Squidex.Infrastructure.Queries
 
         public static IEnumerable<object[]> BuildTests(string field, Predicate<string> opFilter, object value, string valueString)
         {
-            var fields = new string[]
+            var fields = new[]
             {
                 $"{field}",
                 $"json.{field}",

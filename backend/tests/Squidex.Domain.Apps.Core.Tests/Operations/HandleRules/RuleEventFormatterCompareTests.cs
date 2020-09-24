@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             public (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
             {
-                if (path[0] == "data" && value is JsonArray _)
+                if (path[0] == "data" && value is JsonArray)
                 {
                     return (true, GetValueAsync());
                 }
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 return default;
             }
 
-            private async ValueTask<string?> GetValueAsync()
+            private static async ValueTask<string?> GetValueAsync()
             {
                 await Task.Delay(5);
 
@@ -78,8 +78,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
-
-            JintScriptEngine scriptEngine = BuildScriptEngine();
 
             var formatters = new IRuleEventFormatter[]
             {

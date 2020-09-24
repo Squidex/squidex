@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure
             var errors = new List<ValidationError>
             {
                 new ValidationError("Error1"),
-                new ValidationError("Error2"),
+                new ValidationError("Error2")
             };
 
             var ex = new ValidationException(errors);
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure
             var errors = new List<ValidationError>
             {
                 new ValidationError("Error1"),
-                new ValidationError("Error2"),
+                new ValidationError("Error2")
             };
 
             var source = new ValidationException(errors);

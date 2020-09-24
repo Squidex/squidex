@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Orleans
             {
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                Guid.NewGuid(),
+                Guid.NewGuid()
             };
 
             var received1 = await CreateSubscriber(cluster.Client, sent.Count);
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.Orleans
             Assert.True(received2.Result.SetEquals(sent));
         }
 
-        private async Task<Task<HashSet<Guid>>> CreateSubscriber(IGrainFactory grainFactory, int expectedCount)
+        private static async Task<Task<HashSet<Guid>>> CreateSubscriber(IGrainFactory grainFactory, int expectedCount)
         {
             var pubSub = new OrleansPubSub(grainFactory);
 

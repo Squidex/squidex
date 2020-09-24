@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             {
                 switch (command)
                 {
-                    case DeleteIndexEntry delete:
+                    case DeleteIndexEntry _:
                         writes.Add(
                             new DeleteOneModel<MongoTextIndexEntity>(
                                 Filter.Eq(x => x.DocId, command.DocId)));

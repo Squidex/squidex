@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Squidex.Domain.Apps.Core.Contents
 {
     [TypeConverter(typeof(StatusConverter))]
-    public struct Status : IEquatable<Status>, IComparable<Status>
+    public readonly struct Status : IEquatable<Status>, IComparable<Status>
     {
         public static readonly Status Archived = new Status("Archived");
         public static readonly Status Draft = new Status("Draft");

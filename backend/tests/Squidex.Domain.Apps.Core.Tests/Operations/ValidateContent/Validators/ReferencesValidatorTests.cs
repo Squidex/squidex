@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static CheckContentsByIds FoundReferences(params (Guid SchemaId, Guid Id)[] references)
         {
-            return new CheckContentsByIds(x => Task.FromResult<IReadOnlyList<(Guid SchemaId, Guid Id)>>(references.ToList()));
+            return x => Task.FromResult<IReadOnlyList<(Guid SchemaId, Guid Id)>>(references.ToList());
         }
     }
 }

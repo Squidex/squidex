@@ -134,6 +134,8 @@ namespace Squidex.Infrastructure.UsageTracking
                     (dateFrom.AddDays(4), new Counters())
                 }
             };
+
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Fact]

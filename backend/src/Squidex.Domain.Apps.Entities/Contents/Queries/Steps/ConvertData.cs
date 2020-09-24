@@ -38,8 +38,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
         {
-            var resolveDataDraft = context.ShouldProvideUnpublished() || context.IsFrontendClient;
-
             var referenceCleaner = await CleanReferencesAsync(context, contents, schemas);
 
             var converters = GenerateConverters(context, referenceCleaner).ToArray();

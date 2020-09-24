@@ -94,7 +94,6 @@ namespace Squidex.Domain.Users
 
             using (var scope = serviceProvider.CreateScope())
             {
-                var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
                 return await userManager.FindByIdWithClaimsAsync(id);

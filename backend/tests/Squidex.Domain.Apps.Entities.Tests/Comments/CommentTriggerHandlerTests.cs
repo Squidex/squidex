@@ -255,7 +255,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
             });
         }
 
-        private IUser CreateUser(string id, string email = "sebastian@squidex.io")
+        private static IUser CreateUser(string id, string email = "sebastian@squidex.io")
         {
             var user = A.Fake<IUser>();
 

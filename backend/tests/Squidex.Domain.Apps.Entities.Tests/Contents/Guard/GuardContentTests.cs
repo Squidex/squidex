@@ -233,8 +233,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CreateDraft_should_throw_exception_if_not_published()
         {
-            var schema = CreateSchema(false);
-
             var content = CreateContent(Status.Draft);
             var command = new CreateContentDraft();
 
@@ -244,8 +242,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CreateDraft_should_not_throw_exception()
         {
-            var schema = CreateSchema(false);
-
             var content = CreateContent(Status.Published);
             var command = new CreateContentDraft();
 
@@ -255,8 +251,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDeleteDraft_should_throw_exception_if_no_draft_found()
         {
-            var schema = CreateSchema(false);
-
             var content = new ContentState();
             var command = new DeleteContentDraft();
 
@@ -266,8 +260,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDeleteDraft_should_not_throw_exception()
         {
-            var schema = CreateSchema(false);
-
             var content = CreateDraftContent(Status.Draft);
             var command = new DeleteContentDraft();
 
@@ -311,7 +303,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             return Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "my-schema"), new Schema("schema", isSingleton: isSingleton));
         }
 
-        private ContentState CreateDraftContent(Status status)
+        private static ContentState CreateDraftContent(Status status)
         {
             return new ContentState
             {
@@ -319,7 +311,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             };
         }
 
-        private ContentState CreateContent(Status status)
+        private static ContentState CreateContent(Status status)
         {
             return new ContentState
             {

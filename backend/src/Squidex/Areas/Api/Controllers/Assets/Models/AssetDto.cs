@@ -201,8 +201,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
                 response.AddDeleteLink("delete", resources.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
             }
 
-            var version = response.FileVersion;
-
             if (!string.IsNullOrWhiteSpace(response.Slug))
             {
                 response.AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id, more = response.Slug }));

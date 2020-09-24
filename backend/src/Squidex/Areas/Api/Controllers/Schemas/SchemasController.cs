@@ -121,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetSchema), new { app, name = request.Name }, response);
         }
@@ -146,7 +146,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -171,7 +171,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -195,7 +195,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -220,7 +220,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -245,7 +245,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -270,7 +270,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -293,7 +293,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new PublishSchema();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -316,7 +316,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var command = new UnpublishSchema();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -341,7 +341,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             return NoContent();
         }
 
-        private async Task<SchemaDetailsDto> InvokeCommandAsync(string app, ICommand command)
+        private async Task<SchemaDetailsDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 

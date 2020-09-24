@@ -131,7 +131,7 @@ namespace Squidex.Extensions.Actions.Kafka
             }
         }
 
-        private async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job, CancellationToken ct)
+        private static async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job, CancellationToken ct)
         {
             message.Key = job.MessageKey;
 
@@ -161,7 +161,7 @@ namespace Squidex.Extensions.Actions.Kafka
         {
             try
             {
-                var schema = (RecordSchema)Avro.Schema.Parse(avroSchema);
+                var schema = (RecordSchema)Schema.Parse(avroSchema);
 
                 var jsonObject = jsonSerializer.Deserialize<JsonObject>(json);
 
@@ -181,7 +181,7 @@ namespace Squidex.Extensions.Actions.Kafka
             avroProducer?.Dispose();
         }
 
-        private object GetValue(IJsonValue value, Schema schema)
+        private static object GetValue(IJsonValue value, Schema schema)
         {
             switch (value)
             {

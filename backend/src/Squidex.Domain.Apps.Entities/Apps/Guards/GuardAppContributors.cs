@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                             throw new DomainForbiddenException(T.Get("apps.contributors.cannotChangeYourself"));
                         }
 
-                        if (!contributors.TryGetValue(command.ContributorId, out var role))
+                        if (!contributors.TryGetValue(command.ContributorId, out _))
                         {
                             if (plan != null && plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
                             {

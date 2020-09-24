@@ -26,9 +26,9 @@ namespace Squidex.Domain.Apps.Entities
 
         public ClaimsPrincipal User { get; }
 
-        public ClaimsPermissions Permissions { get; } = ClaimsPermissions.Empty;
+        public ClaimsPermissions Permissions { get; }
 
-        public bool IsFrontendClient { get; private set; }
+        public bool IsFrontendClient { get; }
 
         public Context(ClaimsPrincipal user)
         {

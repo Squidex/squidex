@@ -3,14 +3,14 @@
 @{
     ViewBag.Class = "profile-lg";
 
-    ViewBag.Title = @T.Get("users.profile.title");
+    ViewBag.Title = T.Get("users.profile.title");
 
     void RenderValidation(string field)
     {
         @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
         {
             <div class="errors-container">
-                <span class="errors">@Html.ValidationMessage(field)</span>
+                <span class="errors">Html.ValidationMessage(field)</span>
             </div>
         }
     }
@@ -278,13 +278,13 @@
     }
 
     document.addEventListener('click',
-        function (event) {
+        function(event) {
             if (event.target.className.indexOf('remove-item') >= 0) {
                 event.target.parentNode.parentNode.remove();
 
                 updateNames();
             }
-        })
+        });
 
     pictureButton.addEventListener('click',
         function () {

@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 schemaName = upsert.SchemaId.Name,
                 serveAll = upsert.ServeAll,
                 servePublished = upsert.ServePublished,
-                texts = upsert.Texts,
+                texts = upsert.Texts
             };
 
             var result = await client.IndexAsync<StringResponse>(indexName, upsert.DocId, CreatePost(data));

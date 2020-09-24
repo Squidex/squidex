@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
                 json.Add(role.Name, new JsonRole
                 {
                     Permissions = role.Permissions.ToIds().ToArray(),
-                    Properties = role.Properties,
+                    Properties = role.Properties
                 });
             }
 

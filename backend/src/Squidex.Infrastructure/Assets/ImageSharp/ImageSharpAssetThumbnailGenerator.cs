@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
             if (!options.IsValid)
             {
-                source.CopyTo(destination);
+                await source.CopyToAsync(destination);
 
                 return;
             }
@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                         image.Mutate(x => x.Resize(resizeOptions));
                     }
 
-                    image.Save(destination, encoder);
+                    await image.SaveAsync(destination, encoder);
                 }
             }
             finally
@@ -93,7 +93,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             }
         }
 
-        private static IImageEncoder GetEncoder(ResizeOptions options, SixLabors.ImageSharp.Formats.IImageFormat? format)
+        private static IImageEncoder GetEncoder(ResizeOptions options, IImageFormat? format)
         {
             var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);
 

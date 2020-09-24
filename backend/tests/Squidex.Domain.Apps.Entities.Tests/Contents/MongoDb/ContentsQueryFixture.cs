@@ -37,13 +37,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public IContentRepository ContentRepository { get; }
 
-        public NamedId<Guid>[] AppIds { get; } = new[]
+        public NamedId<Guid>[] AppIds { get; } =
         {
             NamedId.Of(Guid.Parse("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
             NamedId.Of(Guid.Parse("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1")
         };
 
-        public NamedId<Guid>[] SchemaIds { get; } = new[]
+        public NamedId<Guid>[] SchemaIds { get; } =
         {
             NamedId.Of(Guid.Parse("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-schema1"),
             NamedId.Of(Guid.Parse("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-schema2"),

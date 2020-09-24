@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             var response = new AssetFoldersDto
             {
                 Total = assetFolders.Total,
-                Items = assetFolders.Select(x => AssetFolderDto.FromAssetFolder(x, resources)).ToArray(),
+                Items = assetFolders.Select(x => AssetFolderDto.FromAssetFolder(x, resources)).ToArray()
             };
 
             response.Path = path.Select(x => AssetFolderDto.FromAssetFolder(x, resources)).ToArray();

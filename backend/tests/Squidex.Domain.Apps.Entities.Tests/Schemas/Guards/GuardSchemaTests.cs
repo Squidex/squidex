@@ -578,7 +578,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 FieldRules = new[]
                 {
                     new FieldRuleCommand { Field = "field", Action = (FieldRuleAction)5 },
-                    new FieldRuleCommand(),
+                    new FieldRuleCommand()
                 }
             };
 

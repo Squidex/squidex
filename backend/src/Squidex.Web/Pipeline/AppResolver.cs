@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -106,7 +105,7 @@ namespace Squidex.Web.Pipeline
             await next();
         }
 
-        private Context SetContext(HttpContext httpContext, IAppEntity app)
+        private static Context SetContext(HttpContext httpContext, IAppEntity app)
         {
             var requestContext = new Context(httpContext.User, app);
 
