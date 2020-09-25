@@ -42,8 +42,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             sut = new JintScriptEngine(cache, extensions)
             {
-                TimeoutScript = TimeSpan.FromSeconds(10),
-                TimeoutExecution = TimeSpan.FromSeconds(2)
+                TimeoutScript = TimeSpan.FromSeconds(2),
+                TimeoutExecution = TimeSpan.FromSeconds(10)
             };
         }
 
