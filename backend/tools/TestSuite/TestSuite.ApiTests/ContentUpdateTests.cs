@@ -242,7 +242,7 @@ namespace TestSuite.ApiTests
 
                 content = await _.Contents.UpsertAsync(id, new TestEntityData { Number = 2 }, true);
 
-                Assert.Equal(1, content.Version);
+                Assert.Equal(2, content.Version);
             }
             finally
             {
