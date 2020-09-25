@@ -240,6 +240,7 @@ namespace TestSuite.ApiTests
                 Assert.Equal(id, content.Id);
 
 
+                // STEP 2: Make an update with the upsert endpoint.
                 content = await _.Contents.UpsertAsync(id, new TestEntityData { Number = 2 }, true);
 
                 Assert.Equal(2, content.Version);
