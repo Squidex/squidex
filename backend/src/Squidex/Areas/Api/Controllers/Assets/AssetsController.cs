@@ -172,6 +172,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="app">The name of the app.</param>
         /// <param name="parentId">The optional parent folder id.</param>
         /// <param name="file">The file to upload.</param>
+        /// <param name="id">The optional custom asset id.</param>
+        /// <param name="duplicate">True to duplicate the asset, event if the file has been uploaded.</param>
         /// <returns>
         /// 201 => Asset created.
         /// 404 => App not found.
@@ -186,11 +188,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, [FromQuery] string parentId, IFormFile file)
+        public async Task<IActionResult> PostAsset(string app, [FromQuery] string parentId, IFormFile file, [FromQuery] string? id = null, [FromQuery] bool duplicate = false)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
-            var command = new CreateAsset { File = assetFile, ParentId = parentId };
+            var command = new CreateAsset { File = assetFile, ParentId = parentId, Duplicate = duplicate };
+
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                command.AssetId = id;
+            }
 
             var response = await InvokeCommandAsync(command);
 

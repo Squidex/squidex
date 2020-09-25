@@ -685,6 +685,9 @@
   <data name="exception.invalidJsonQueryJson" xml:space="preserve">
     <value>Json-query is niet geldig json: {message}</value>
   </data>
+  <data name="exceptions.domainObjectConflict" xml:space="preserve">
+    <value>Entity ({id}) already exists.</value>
+  </data>
   <data name="exceptions.domainObjectDeleted" xml:space="preserve">
     <value>Entiteit ({id}) is verwijderd.</value>
   </data>

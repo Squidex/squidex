@@ -117,6 +117,19 @@ namespace Squidex.Web
         }
 
         [Fact]
+        public void Should_generate_409_for_DomainObjectConflictException()
+        {
+            var context = Error(new DomainObjectConflictException("1"));
+
+            sut.OnException(context);
+
+            Validate(409, context.Result, context.Exception);
+
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public void Should_generate_412_for_DomainObjectVersionException()
         {
             var context = Error(new DomainObjectVersionException("1", 1, 2));

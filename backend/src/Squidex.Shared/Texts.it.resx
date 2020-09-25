@@ -685,6 +685,9 @@
   <data name="exception.invalidJsonQueryJson" xml:space="preserve">
     <value>La query Json non è valida: {message}</value>
   </data>
+  <data name="exceptions.domainObjectConflict" xml:space="preserve">
+    <value>Entity ({id}) already exists.</value>
+  </data>
   <data name="exceptions.domainObjectDeleted" xml:space="preserve">
     <value>L'entità ({id}) è stata cancellata.</value>
   </data>

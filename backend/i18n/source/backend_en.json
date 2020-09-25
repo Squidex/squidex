@@ -200,6 +200,7 @@
   "dotnet_identity_UserLockedOut": "User is locked out.",
   "exception.invalidJsonQuery": "Json query not valid: {message}",
   "exception.invalidJsonQueryJson": "Json query not valid json: {message}",
+  "exceptions.domainObjectConflict": "Entity ({id}) already exists.",
   "exceptions.domainObjectDeleted": "Entity ({id}) has been deleted.",
   "exceptions.domainObjectNotFound": "Entity ({id}) does not exist.",
   "exceptions.domainObjectVersion": "Entity ({id}) requested version {expectedVersion}, but found {currentVersion}.",

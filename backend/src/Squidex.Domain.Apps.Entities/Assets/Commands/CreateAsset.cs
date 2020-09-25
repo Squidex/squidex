@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 
         public HashSet<string> Tags { get; } = new HashSet<string>();
 
+        public bool Duplicate { get; set; }
+
         public CreateAsset()
         {
             AssetId = DomainId.NewGuid();

@@ -176,6 +176,21 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
+        {
+            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file, Duplicate = true });
+            var context = CreateContextForCommand(command);
+
+            SetupSameHashAsset(file.FileName, file.FileSize, out _);
+
+            await sut.HandleAsync(context);
+
+            var result = context.Result<AssetCreatedResult>();
+
+            Assert.False(result.IsDuplicate);
+        }
+
+        [Fact]
         public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_but_other_name_found()
         {
             var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });

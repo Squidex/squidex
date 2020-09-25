@@ -30,6 +30,47 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_upload_asset()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+            {
+                var downloaded = await _.DownloadAsync(asset_1);
+
+                // Should dowload with correct size.
+                Assert.Equal(stream.Length, downloaded.Length);
+            }
+        }
+
+        [Fact]
+        public async Task Should_upload_asset_with_custom_id()
+        {
+            var id = Guid.NewGuid().ToString();
+
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id);
+
+            Assert.Equal(id, asset_1.Id);
+        }
+
+        [Fact]
+        public async Task Should_not_create_asset_with_custom_id_twice()
+        {
+            var id = Guid.NewGuid().ToString();
+
+            // STEP 1: Create asset
+            await _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id);
+
+
+            // STEP 2: Create a new item with a custom id.
+            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id));
+
+            Assert.Equal(409, ex.StatusCode);
+        }
+
+        [Fact]
         public async Task Should_replace_asset()
         {
             // STEP 1: Create asset

@@ -146,10 +146,7 @@ namespace Squidex.Infrastructure.Commands
             Guard.NotNull(command, nameof(command));
             Guard.NotNull(handler, nameof(handler));
 
-            if (isUpdate)
-            {
-                await EnsureLoadedAsync();
-            }
+            await EnsureLoadedAsync();
 
             if (IsDeleted())
             {
@@ -160,14 +157,19 @@ namespace Squidex.Infrastructure.Commands
             {
                 if (!CanAccept(command))
                 {
-                    throw new NotSupportedException("Invalid command.");
+                    throw new DomainException("Invalid command.");
                 }
             }
             else
             {
+                if (Version > EtagVersion.Empty)
+                {
+                    throw new DomainObjectConflictException(uniqueId.ToString());
+                }
+
                 if (!CanAcceptCreation(command))
                 {
-                    throw new NotSupportedException("Invalid command.");
+                    throw new DomainException("Invalid command.");
                 }
             }
 

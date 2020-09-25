@@ -91,6 +91,9 @@ namespace Squidex.Web
                 case DomainObjectVersionException _:
                     return (CreateError(412, exception.Message), true);
 
+                case DomainObjectConflictException _:
+                    return (CreateError(409, exception.Message), true);
+
                 case DomainForbiddenException _:
                     return (CreateError(403, exception.Message), true);
 

@@ -60,18 +60,21 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             var ctx = contextProvider.Context.Clone().WithoutAssetEnrichment();
 
-                            var existings = await assetQuery.QueryByHashAsync(ctx, createAsset.AppId.Id, createAsset.FileHash);
-
-                            foreach (var existing in existings)
+                            if (!createAsset.Duplicate)
                             {
-                                if (IsDuplicate(existing, createAsset.File))
+                                var existings = await assetQuery.QueryByHashAsync(ctx, createAsset.AppId.Id, createAsset.FileHash);
+
+                                foreach (var existing in existings)
                                 {
-                                    var result = new AssetCreatedResult(existing, true);
+                                    if (IsDuplicate(existing, createAsset.File))
+                                    {
+                                        var result = new AssetCreatedResult(existing, true);
 
-                                    context.Complete(result);
+                                        context.Complete(result);
 
-                                    await next(context);
-                                    return;
+                                        await next(context);
+                                        return;
+                                    }
                                 }
                             }
 

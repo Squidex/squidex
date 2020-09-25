@@ -32,6 +32,26 @@ namespace Squidex.Infrastructure.Commands
             {
             }
 
+            protected override bool CanAcceptCreation(ICommand command)
+            {
+                if (command is CreateAuto update)
+                {
+                    return update.Value != 99;
+                }
+
+                return true;
+            }
+
+            protected override bool CanAccept(ICommand command)
+            {
+                if (command is UpdateAuto update)
+                {
+                    return update.Value != 99;
+                }
+
+                return true;
+            }
+
             public override Task<object?> ExecuteAsync(IAggregateCommand command)
             {
                 switch (command)
@@ -92,7 +112,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
             A.CallTo(() => persistence.ReadAsync(A<long>._))
-                .MustNotHaveHappened();
+                .MustHaveHappened();
 
             Assert.True(result is EntityCreatedResult<DomainId>);
 
@@ -116,7 +136,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
             A.CallTo(() => persistence.ReadAsync(A<long>._))
-                .MustNotHaveHappened();
+                .MustHaveHappened();
 
             Assert.True(result is EntitySavedResult);
 
@@ -149,7 +169,15 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_only_load_once_on_update()
+        public async Task Should_load_on_create()
+        {
+            SetupEmpty();
+
+            await sut.ExecuteAsync(new CreateAuto());
+        }
+
+        [Fact]
+        public async Task Should_load_once_on_update()
         {
             SetupCreated(4);
 
@@ -200,11 +228,11 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_not_throw_exception_when_already_created()
+        public async Task Should_throw_exception_when_already_created()
         {
             SetupCreated(4);
 
-            await sut.ExecuteAsync(new CreateAuto());
+            await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto()));
         }
 
         [Fact]
@@ -213,6 +241,22 @@ namespace Squidex.Infrastructure.Commands
             SetupEmpty();
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.ExecuteAsync(new UpdateAuto()));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_create_command_not_accepted()
+        {
+            SetupEmpty();
+
+            await Assert.ThrowsAsync<DomainException>(() => sut.ExecuteAsync(new CreateAuto { Value = 99 }));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_update_command_not_accepted()
+        {
+            SetupCreated(4);
+
+            await Assert.ThrowsAsync<DomainException>(() => sut.ExecuteAsync(new UpdateAuto { Value = 99 }));
         }
 
         [Fact]
