@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 }
             };
 
-            public static readonly ValueResolver Resolver = new ValueResolver((value, c) =>
+            public static readonly ValueResolver Resolver = (value, c) =>
             {
                 if (c.Arguments.TryGetValue("path", out var p) && p is string path)
                 {
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 }
 
                 return value;
-            });
+            };
         }
 
         public static readonly QueryArguments JsonPath = new QueryArguments
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Description = "Optional OData full text search.",
                         DefaultValue = string.Empty,
                         ResolvedType = AllTypes.String
-                    },
+                    }
                 };
             }
 
@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Name = "data",
                         Description = "The data for the content.",
                         DefaultValue = null,
-                        ResolvedType = new NonNullGraphType(inputType),
+                        ResolvedType = new NonNullGraphType(inputType)
                     },
                     new QueryArgument(AllTypes.None)
                     {
@@ -209,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Name = "data",
                         Description = "The data for the content.",
                         DefaultValue = null,
-                        ResolvedType = new NonNullGraphType(inputType),
+                        ResolvedType = new NonNullGraphType(inputType)
                     },
                     new QueryArgument(AllTypes.None)
                     {

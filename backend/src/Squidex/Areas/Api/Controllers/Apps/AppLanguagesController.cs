@@ -41,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(AppLanguagesDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppLanguagesRead)]
         [ApiCosts(0)]
         public IActionResult GetLanguages(string app)
         {

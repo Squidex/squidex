@@ -56,8 +56,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var contentIds = HashSet.Of(contentId);
 
-            var state = new TextContentState { UniqueContentId = contentId };
-
             A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds)))
                 .Returns(new Dictionary<DomainId, TextContentState>());
 

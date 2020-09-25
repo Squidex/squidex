@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.Reflection
             yield return new object[]
             {
                 new Uri("/url1", UriKind.Relative),
-                new Uri("/url2", UriKind.Relative),
+                new Uri("/url2", UriKind.Relative)
             };
         }
 

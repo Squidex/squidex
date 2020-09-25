@@ -66,6 +66,7 @@ export * from './state/rules.state';
 export * from './state/schema-tag-source';
 export * from './state/schemas.forms';
 export * from './state/schemas.state';
+export * from './state/settings';
 export * from './state/table-fields';
 export * from './state/ui.state';
 export * from './state/workflows.forms';

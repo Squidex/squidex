@@ -8,7 +8,7 @@
 // tslint:disable: readonly-array
 
 import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { AppsState, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, fadeAnimation, LocalStoreService, ResourceOwner, StorageUsagePerDateDto, UsagesService } from '@app/shared';
+import { AppsState, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, fadeAnimation, LocalStoreService, ResourceOwner, Settings, StorageUsagePerDateDto, UsagesService } from '@app/shared';
 import { GridsterComponent, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
 import { switchMap } from 'rxjs/operators';
 
@@ -46,7 +46,7 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     ) {
         super();
 
-        this.isStacked = localStore.getBoolean('dashboard.charts.stacked');
+        this.isStacked = localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED);
     }
 
     public ngOnInit() {
@@ -92,7 +92,7 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     }
 
     public changeIsStacked(value: boolean) {
-        this.localStore.setBoolean('dashboard.charts.stacked', value);
+        this.localStore.setBoolean(Settings.Local.DASHBOARD_CHART_STACKED, value);
 
         this.isStacked = value;
     }

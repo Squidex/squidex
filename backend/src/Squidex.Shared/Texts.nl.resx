@@ -283,7 +283,7 @@
   <data name="common.jsError" xml:space="preserve">
     <value>Kan script niet uitvoeren met Javascript-fout: {message}</value>
   </data>
-  <data name="common.jsNotAlloweed" xml:space="preserve">
+  <data name="common.jsNotAllowed" xml:space="preserve">
     <value>Script heeft de bewerking verboden.</value>
   </data>
   <data name="common.jsParseError" xml:space="preserve">

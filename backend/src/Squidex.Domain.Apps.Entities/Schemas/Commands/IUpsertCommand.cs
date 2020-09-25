@@ -9,8 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
-using FieldRules = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.FieldRuleCommand>;
-using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaField>;
+using SchemaField = Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaField;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
@@ -20,13 +19,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         string Category { get; set; }
 
-        SchemaFields Fields { get; set; }
+        SchemaField[]? Fields { get; set; }
 
         FieldNames? FieldsInReferences { get; set; }
 
         FieldNames? FieldsInLists { get; set; }
 
-        FieldRules? FieldRules { get; set; }
+        FieldRuleCommand[]? FieldRules { get; set; }
 
         SchemaScripts? Scripts { get; set; }
 
@@ -85,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
                     var field = eventField.Properties.CreateRootField(totalFields, eventField.Name, partitioning);
 
-                    if (field is ArrayField arrayField && eventField.Nested?.Count > 0)
+                    if (field is ArrayField arrayField && eventField.Nested?.Length > 0)
                     {
                         foreach (var nestedEventField in eventField.Nested)
                         {

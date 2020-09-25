@@ -211,12 +211,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return schema;
         }
 
-        private string GetCacheKey(DomainId appId, string name)
+        private static string GetCacheKey(DomainId appId, string name)
         {
             return $"SCHEMAS_NAME_{appId}_{name}";
         }
 
-        private string GetCacheKey(DomainId appId, DomainId id)
+        private static string GetCacheKey(DomainId appId, DomainId id)
         {
             return $"SCHEMAS_ID_{appId}_{id}";
         }

@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                 if (sourceNames.SetEquals(targetNames) && !sourceNames.SequenceEqual(targetNames))
                 {
-                    var fieldIds = targetNames.Select(x => sourceIds.Find(y => y.Name == x)!.Id).ToList();
+                    var fieldIds = targetNames.Select(x => sourceIds.Find(y => y.Name == x)!.Id).ToArray();
 
                     yield return new SchemaFieldsReordered { FieldIds = fieldIds, ParentFieldId = parentId };
                 }

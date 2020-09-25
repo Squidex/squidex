@@ -30,9 +30,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
         private readonly IJintExtension[] extensions;
         private readonly Parser parser;
 
-        public TimeSpan Timeout { get; set; } = TimeSpan.FromMilliseconds(200);
+        public TimeSpan TimeoutScript { get; set; } = TimeSpan.FromMilliseconds(200);
 
-        public TimeSpan ExecutionTimeout { get; set; } = TimeSpan.FromMilliseconds(4000);
+        public TimeSpan TimeoutExecution { get; set; } = TimeSpan.FromMilliseconds(4000);
 
         public JintScriptEngine(IMemoryCache memoryCache, IEnumerable<IJintExtension>? extensions = null)
         {
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
-            using (var cts = new CancellationTokenSource(ExecutionTimeout))
+            using (var cts = new CancellationTokenSource(TimeoutExecution))
             {
                 var tcs = new TaskCompletionSource<IJsonValue>();
 
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
-            using (var cts = new CancellationTokenSource(ExecutionTimeout))
+            using (var cts = new CancellationTokenSource(TimeoutExecution))
             {
                 var tcs = new TaskCompletionSource<NamedContentData>();
 
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 options.AddObjectConverter(DefaultConverter.Instance);
                 options.SetReferencesResolver(NullPropagation.Instance);
                 options.Strict();
-                options.TimeoutInterval(Timeout);
+                options.TimeoutInterval(TimeoutScript);
             });
 
             if (options.CanDisallow)

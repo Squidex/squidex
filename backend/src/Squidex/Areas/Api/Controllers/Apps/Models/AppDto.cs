@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Assets;
@@ -16,6 +17,7 @@ using Squidex.Areas.Api.Controllers.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
@@ -73,6 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Indicates if the user can access the api.
         /// </summary>
+        [Obsolete("Usage role properties")]
         public bool CanAccessApi { get; set; }
 
         /// <summary>
@@ -90,17 +93,30 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string? PlanUpgrade { get; set; }
 
-        public static AppDto FromApp(IAppEntity app, string userId, IAppPlansProvider plans, Resources resources)
+        /// <summary>
+        /// The properties from the role.
+        /// </summary>
+        [LocalizedRequired]
+        public JsonObject RoleProperties { get; set; }
+
+        public static AppDto FromApp(IAppEntity app, string userId, bool isFrontend, IAppPlansProvider plans, Resources resources)
         {
-            var permissions = GetPermissions(app, userId);
+            var permissions = GetPermissions(app, userId, isFrontend);
 
             var result = SimpleMapper.Map(app, new AppDto());
 
             result.Permissions = permissions.ToIds();
 
-            if (resources.Includes(P.ForApp(P.AppApi, app.Name), permissions))
+            result.SetPlan(app, plans, resources, permissions);
+            result.SetImage(app, resources);
+
+            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGet(app.Name, roleName, isFrontend, out var role))
             {
-                result.CanAccessApi = true;
+                result.RoleProperties = role.Properties;
+            }
+            else
+            {
+                result.RoleProperties = JsonValue.Object();
             }
 
             if (resources.Includes(P.ForApp(P.AppContents, app.Name), permissions))
@@ -108,17 +124,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.CanAccessContent = true;
             }
 
-            result.SetPlan(app, plans, resources, permissions);
-            result.SetImage(app, resources);
-
             return result.CreateLinks(resources, permissions);
         }
 
-        private static PermissionSet GetPermissions(IAppEntity app, string userId)
+        private static PermissionSet GetPermissions(IAppEntity app, string userId, bool isFrontend)
         {
             var permissions = new List<Permission>();
 
-            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGet(app.Name, roleName, out var role))
+            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGet(app.Name, roleName, isFrontend, out var role))
             {
                 permissions.AddRange(role.Permissions);
             }
@@ -187,12 +200,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 AddGetLink("contributors", resources.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
             }
 
-            if (resources.IsAllowed(P.AppCommon, Name, additional: permissions))
+            if (resources.IsAllowed(P.AppLanguagesRead, Name, additional: permissions))
             {
                 AddGetLink("languages", resources.Url<AppLanguagesController>(x => nameof(x.GetLanguages), values));
             }
 
-            if (resources.IsAllowed(P.AppCommon, Name, additional: permissions))
+            if (resources.IsAllowed(P.AppPatternsRead, Name, additional: permissions))
             {
                 AddGetLink("patterns", resources.Url<AppPatternsController>(x => nameof(x.GetPatterns), values));
             }
@@ -212,7 +225,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 AddGetLink("rules", resources.Url<RulesController>(x => nameof(x.GetRules), values));
             }
 
-            if (resources.IsAllowed(P.AppCommon, Name, additional: permissions))
+            if (resources.IsAllowed(P.AppSchemasRead, Name, additional: permissions))
             {
                 AddGetLink("schemas", resources.Url<SchemasController>(x => nameof(x.GetSchemas), values));
             }

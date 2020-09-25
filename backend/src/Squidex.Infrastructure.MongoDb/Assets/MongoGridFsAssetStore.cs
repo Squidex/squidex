@@ -49,9 +49,9 @@ namespace Squidex.Infrastructure.Assets
         {
             var name = GetFileName(fileName, nameof(fileName));
 
-            var find = await bucket.FindAsync(Builders<GridFSFileInfo<string>>.Filter.Eq(x => x.Id, name), cancellationToken: ct);
+            var query = await bucket.FindAsync(Builders<GridFSFileInfo<string>>.Filter.Eq(x => x.Id, name), cancellationToken: ct);
 
-            var file = await find.FirstOrDefaultAsync(ct);
+            var file = await query.FirstOrDefaultAsync(cancellationToken: ct);
 
             if (file == null)
             {

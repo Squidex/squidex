@@ -161,7 +161,7 @@ namespace Squidex.Extensions.Actions.Kafka
         {
             try
             {
-                var schema = (RecordSchema)Avro.Schema.Parse(avroSchema);
+                var schema = (RecordSchema)Schema.Parse(avroSchema);
 
                 var jsonObject = jsonSerializer.Deserialize<JsonObject>(json);
 

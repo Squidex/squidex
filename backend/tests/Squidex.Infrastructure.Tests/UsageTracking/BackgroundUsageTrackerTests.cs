@@ -135,7 +135,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 }
             };
 
-            Assert.Equal(expected, result);
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Fact]

@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             CheckErrors(validator);
         }
 
-        private void CheckErrors(ContentValidator validator)
+        private static void CheckErrors(ContentValidator validator)
         {
             if (validator.Errors.Count > 0)
             {

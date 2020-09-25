@@ -8,7 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppsState, AssetDto, AssetsService, DialogModel, LocalStoreService, MessageBus, sorted, StatefulControlComponent, Types } from '@app/shared';
+import { AppsState, AssetDto, AssetsService, DialogModel, LocalStoreService, MessageBus, Settings, sorted, StatefulControlComponent, Types } from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true
@@ -59,7 +59,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         super(changeDetector, {
             assets: [],
             assetFiles: [],
-            isListView: localStore.getBoolean('squidex.assets.list-view')
+            isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE)
         });
     }
 

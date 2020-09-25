@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     pixelWidth = asset.Metadata.GetPixelWidth(),
                     pixelHeight = asset.Metadata.GetPixelHeight()
                 },
-                slug = asset.Slug,
+                slug = asset.Slug
             };
         }
     }

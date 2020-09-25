@@ -99,7 +99,7 @@ describe('RolesService', () => {
     it('should make put request to update role',
         inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
 
-        const dto = { permissions: ['P4', 'P5'] };
+        const dto = { permissions: ['P4', 'P5'], properties: createProperties(1) };
 
         const resource: Resource = {
             _links: {
@@ -162,7 +162,8 @@ describe('RolesService', () => {
                 name: `name${id}`,
                 numClients: id * 2,
                 numContributors: id * 3,
-                permissions: [`permission${id}`],
+                permissions: createPermissions(id),
+                properties: createProperties(id),
                 isDefaultRole: id % 2 === 0,
                 _links: {
                     update: { method: 'PUT', href: `/roles/id${id}` }
@@ -190,5 +191,24 @@ export function createRole(id: number) {
         update: { method: 'PUT', href: `/roles/id${id}` }
     };
 
-    return new RoleDto(links, `name${id}`, id * 2, id * 3, [`permission${id}`], id % 2 === 0);
+    return new RoleDto(links, `name${id}`, id * 2, id * 3,
+        createPermissions(id),
+        createProperties(id),
+        id % 2 === 0);
+}
+
+function createPermissions(id: number) {
+    const result: string[] = [];
+
+    result.push(`permission${id}`);
+
+    return result;
+}
+
+function createProperties(id: number) {
+    const result = {};
+
+    result[`property${id}`] = true;
+
+    return result;
 }

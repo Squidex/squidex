@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
@@ -18,6 +17,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 using Xunit;
@@ -529,7 +529,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task UpdateLanguage_should_create_events_and_update_language()
         {
-            var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.EN } };
+            var command = new UpdateLanguage { Language = Language.DE, Fallback = new[] { Language.EN } };
 
             await ExecuteCreateAsync();
             await ExecuteAddLanguageAsync(Language.DE);
@@ -542,7 +542,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppLanguageUpdated { Language = Language.DE, Fallback = new List<Language> { Language.EN } })
+                    CreateEvent(new AppLanguageUpdated { Language = Language.DE, Fallback = new[] { Language.EN } })
                 );
         }
 
@@ -588,7 +588,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task UpdateRole_should_create_events_and_update_role()
         {
-            var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" } };
+            var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" }, Properties = JsonValue.Object() };
 
             await ExecuteCreateAsync();
             await ExecuteAddRoleAsync();
@@ -599,7 +599,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppRoleUpdated { Name = roleName, Permissions = new[] { "clients.read" } })
+                    CreateEvent(new AppRoleUpdated { Name = roleName, Permissions = command.Permissions, Properties = command.Properties })
                 );
         }
 

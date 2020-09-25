@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Validation;
 
@@ -17,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// The field ids in the target order.
         /// </summary>
         [LocalizedRequired]
-        public List<long> FieldIds { get; set; }
+        public long[] FieldIds { get; set; }
 
         public ReorderFields ToCommand(long? parentId = null)
         {

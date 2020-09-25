@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
@@ -20,6 +19,6 @@ namespace Squidex.Domain.Apps.Events.Apps
 
         public bool IsMaster { get; set; }
 
-        public List<Language>? Fallback { get; set; }
+        public Language[]? Fallback { get; set; }
     }
 }

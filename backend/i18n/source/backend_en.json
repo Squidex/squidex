@@ -66,7 +66,7 @@
   "common.httpValidationError": "Validation error",
   "common.initialStep": "Initial step",
   "common.jsError": "Failed to execute script with Javascript error: {message}",
-  "common.jsNotAlloweed": "Script has forbidden the operation.",
+  "common.jsNotAllowed": "Script has forbidden the operation.",
   "common.jsParseError": "Failed to execute script with Javascript syntax error: {message}",
   "common.jsRejected": "Script rejected the operation.",
   "common.language": "Language code",

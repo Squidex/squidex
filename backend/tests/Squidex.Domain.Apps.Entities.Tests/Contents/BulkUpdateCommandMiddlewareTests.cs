@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_do_nothing_if_jobs_is_empty()
         {
-            var command = new BulkUpdateContents { Jobs = new List<BulkUpdateJob>() };
+            var command = new BulkUpdateContents { Jobs = Array.Empty<BulkUpdateJob>() };
 
             var context = new CommandContext(command, commandBus);
 
@@ -68,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new BulkUpdateContents
             {
-                Jobs = new List<BulkUpdateJob>
+                Jobs = new[]
                 {
                     new BulkUpdateJob
                     {
@@ -100,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new BulkUpdateContents
             {
-                Jobs = new List<BulkUpdateJob>
+                Jobs = new[]
                 {
                     new BulkUpdateJob
                     {
@@ -133,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new BulkUpdateContents
             {
-                Jobs = new List<BulkUpdateJob>
+                Jobs = new[]
                 {
                     new BulkUpdateJob
                     {
@@ -169,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new BulkUpdateContents
             {
-                Jobs = new List<BulkUpdateJob>
+                Jobs = new[]
                 {
                     new BulkUpdateJob
                     {
@@ -205,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new BulkUpdateContents
             {
-                Jobs = new List<BulkUpdateJob>
+                Jobs = new[]
                 {
                     new BulkUpdateJob
                     {
@@ -237,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new BulkUpdateContents
             {
-                Jobs = new List<BulkUpdateJob>
+                Jobs = new[]
                 {
                     new BulkUpdateJob
                     {
@@ -268,7 +267,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new BulkUpdateContents
             {
-                Jobs = new List<BulkUpdateJob>
+                Jobs = new[]
                 {
                     new BulkUpdateJob
                     {
@@ -299,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new BulkUpdateContents
             {
-                Jobs = new List<BulkUpdateJob>
+                Jobs = new[]
                 {
                     new BulkUpdateJob
                     {
@@ -331,7 +330,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new BulkUpdateContents
             {
-                Jobs = new List<BulkUpdateJob>
+                Jobs = new[]
                 {
                     new BulkUpdateJob
                     {

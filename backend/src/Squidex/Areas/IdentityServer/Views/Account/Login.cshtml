@@ -1,7 +1,7 @@
 ﻿@model Squidex.Areas.IdentityServer.Controllers.Account.LoginVM
 
 @{
-    var action = Model.IsLogin ? @T.Get("common.login") : @T.Get("common.signup");
+    var action = Model.IsLogin ? T.Get("common.login") : T.Get("common.signup");
 
     ViewBag.Title = action;
 }

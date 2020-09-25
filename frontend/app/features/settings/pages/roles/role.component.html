@@ -37,19 +37,27 @@
             </div>
 
             <div class="table-items-row-details-tab">
+                <h3>{{ 'roles.permissions' | sqxTranslate }}</h3>
+
+                <sqx-form-hint marginBottom="3">
+                    {{ 'roles.permissionsDescription' | sqxTranslate }}
+                </sqx-form-hint>
+
                 <ng-container *ngIf="!role.isDefaultRole; else defaultRole">
-                    <div class="form-group row no-gutters" *ngFor="let control of editForm.controls; let i = index">
-                        <div class="col">
-                            <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
+                    <table class="table table-bordered table-fixed table-sm">
+                        <tr *ngFor="let control of editForm.controls; let i = index">
+                            <td class="col-name">
+                                <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
     
-                            <sqx-autocomplete [underlined]="true" [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
-                        </div>
-                        <div class="col-auto pl-1" *ngIf="isEditable">
-                            <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
-                                <i class="icon-bin2"></i>
-                            </button>
-                        </div>
-                    </div>
+                                <sqx-autocomplete inputStyle="empty" [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
+                            </td>
+                            <td class="col-action" *ngIf="isEditable">
+                                <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
+                                    <i class="icon-bin2"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
                 </ng-container>
 
                 <ng-template #defaultRole>
@@ -57,21 +65,65 @@
                         {{descriptions[role.name] | sqxTranslate}}
                     </sqx-form-alert>
                     
-                    <div class="form-group" *ngFor="let control of editForm.controls">
-                       <input class="form-control form-underlined" [formControl]="control">
-                    </div>
+                    <table class="table table-bordered table-fixed table-sm">
+                        <tr *ngFor="let control of editForm.controls; let i = index">
+                            <td>
+                                <input class="form-control form-control-empty" [formControl]="control" />
+                            </td>
+                        </tr>
+                    </table>
                 </ng-template>
 
                 <form class="form-group row no-gutters" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
                     <div class="col">
-                        <sqx-autocomplete [autoFocus]="true" formControlName="permission" [source]="allPermissions" #addInput></sqx-autocomplete>
+                        <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput
+                            placeholder="{{ 'i18n:roles.permissionsPlaceholder' | sqxTranslate }}">
+                        </sqx-autocomplete>
                     </div>
                     <div class="col-auto pl-1">
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-success col-action">
                             <i class="icon-plus"></i>
                         </button>
                     </div>
                 </form>
+
+                <div class="mt-4" *ngIf="!role.isDefaultRole">
+                    <h3>{{ 'roles.properties' | sqxTranslate }}</h3>
+
+                    <sqx-form-hint marginBottom="3">
+                        {{ 'roles.propertiesDescription' | sqxTranslate }}
+                    </sqx-form-hint>
+
+                    <div class="row rule-section">
+                        <div class="form-check col-6" *ngFor="let property of propertiesSimple; trackBy: trackByProperty">
+                            <input class="form-check-input" type="checkbox" id="{{role.name}}_{{property.key}}"
+                                [disabled]="!isEditable"
+                                [ngModel]="getProperty(property.key)"
+                                (ngModelChange)="setProperty(property.key, $event)"
+                                [ngModelOptions]="standalone">
+                            <label class="form-check-label" for="{{role.name}}{{property.key}}">
+                                {{ property.name | sqxTranslate }}
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-4" *ngIf="schemas && schemas.length > 0">
+                        <h5>{{ 'common.schemas' | sqxTranslate }}</h5>
+
+                        <div class="row rule-section">
+                            <div class="form-check col-6" *ngFor="let schema of schemas; trackBy: trackBySchema">
+                                <input class="form-check-input" type="checkbox" id="{{role.name}}_schema_{{schema.name}}"
+                                    [disabled]="!isEditable"
+                                    [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
+                                    (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
+                                    [ngModelOptions]="standalone">
+                                <label class="form-check-label truncate" for="{{role.name}}_schema_{{schema.name}}">
+                                    {{ 'roles.properties.hideContents' | sqxTranslate: { schema: schema.displayName } }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>

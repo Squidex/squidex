@@ -85,9 +85,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var roles_1 = roles_0.Add(roleName);
 
+            var clients_1 = clients.Add("1", new AppClient("client", "1", roleName));
+
             var command = new DeleteRole { Name = roleName };
 
-            ValidationAssert.Throws(() => GuardAppRoles.CanDelete(roles_1, command, contributors, clients.Add("1", new AppClient("client", "1", roleName))),
+            ValidationAssert.Throws(() => GuardAppRoles.CanDelete(roles_1, command, contributors, clients_1),
                 new ValidationError("Cannot remove a role when a client is assigned."));
         }
 
@@ -128,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var roles_1 = roles_0.Add(roleName);
 
-            var command = new UpdateRole { Name = roleName, Permissions = null! };
+            var command = new UpdateRole { Name = roleName };
 
             ValidationAssert.Throws(() => GuardAppRoles.CanUpdate(roles_1, command),
                 new ValidationError("Permissions is required.", "Permissions"));
@@ -151,6 +153,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" } };
 
             Assert.Throws<DomainObjectNotFoundException>(() => GuardAppRoles.CanUpdate(roles_0, command));
+        }
+
+        [Fact]
+        public void CanUpdate_should_not_throw_exception_if_properties_is_null()
+        {
+            var roles_1 = roles_0.Add(roleName);
+
+            var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" } };
+
+            GuardAppRoles.CanUpdate(roles_1, command);
         }
 
         [Fact]

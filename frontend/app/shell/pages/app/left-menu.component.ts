@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AppsState } from '@app/shared';
+import { AppDto, AppsState, Settings } from '@app/shared';
 
 @Component({
     selector: 'sqx-left-menu',
@@ -18,5 +18,21 @@ export class LeftMenuComponent {
     constructor(
         public readonly appsState: AppsState
     ) {
+    }
+
+    public isAssetsHidden(app: AppDto) {
+        return app.roleProperties[Settings.AppProperties.HIDE_ASSETS] === true;
+    }
+
+    public isSettingsHidden(app: AppDto) {
+        return app.roleProperties[Settings.AppProperties.HIDE_SETTINGS] === true;
+    }
+
+    public isSchemasHidden(app: AppDto) {
+        return app.roleProperties[Settings.AppProperties.HIDE_SCHEMAS] === true;
+    }
+
+    public isApiHidden(app: AppDto) {
+        return app.roleProperties[Settings.AppProperties.HIDE_API] === true;
     }
 }

@@ -87,6 +87,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [FromQuery(Name = "force")]
         public bool ForceResize { get; set; }
 
+        /// <summary>
+        /// The target image format.
+        /// </summary>
+        [FromQuery(Name = "format")]
+        public ImageFormat Format { get; set; }
+
         public ResizeOptions ToResizeOptions(IAssetEntity asset)
         {
             Guard.NotNull(asset, nameof(asset));

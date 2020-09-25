@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Log
 {
     public delegate void LogFormatter(IObjectWriter writer);
 
-    public delegate void LogFormatter<T>(T context, IObjectWriter writer);
+    public delegate void LogFormatter<in T>(T context, IObjectWriter writer);
 
     public interface ISemanticLog
     {

@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         private static readonly MessageDelegate Disallow = message =>
         {
-            message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsNotAlloweed");
+            message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsNotAllowed");
 
             throw new DomainForbiddenException(message);
         };

@@ -7,6 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, OnboardingService, UIOptions, UIState } from '@app/shared';
+import { Settings } from '@app/shared/state/settings';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -48,7 +49,7 @@ export class AppsPageComponent implements OnInit {
                     this.onboardingService.disable('dialog');
                     this.onboardingDialog.show();
                 } else if (!this.uiOptions.get('hideNews')) {
-                    const newsVersion = this.localStore.getInt('squidex.news.version');
+                    const newsVersion = this.localStore.getInt(Settings.Local.NEWS_VERSION);
 
                     this.newsService.getFeatures(newsVersion)
                         .subscribe(result => {
@@ -58,7 +59,7 @@ export class AppsPageComponent implements OnInit {
                                     this.newsDialog.show();
                                 }
 
-                                this.localStore.setInt('squidex.news.version', result.version);
+                                this.localStore.setInt(Settings.Local.NEWS_VERSION, result.version);
                             }
                         });
                 }

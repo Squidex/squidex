@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             IEventConsumer consumer = sut;
 
-            Assert.Equal(typeof(RuleEnqueuer).Name, consumer.Name);
+            Assert.Equal(nameof(RuleEnqueuer), consumer.Name);
         }
 
         [Fact]

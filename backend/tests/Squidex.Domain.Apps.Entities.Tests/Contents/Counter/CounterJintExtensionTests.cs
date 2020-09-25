@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 
             sut = new JintScriptEngine(cache, extensions)
             {
-                Timeout = TimeSpan.FromSeconds(1)
+                TimeoutScript = TimeSpan.FromSeconds(1)
             };
         }
 

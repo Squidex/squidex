@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         private static void ValidateUpsert(IUpsertCommand command, AddValidation e)
         {
-            if (command.Fields?.Count > 0)
+            if (command.Fields?.Length > 0)
             {
                 command.Fields.Foreach((field, fieldIndex) =>
                 {
@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                 ValidateField(field, prefix, e);
 
-                if (field.Nested?.Count > 0)
+                if (field.Nested?.Length > 0)
                 {
                     if (field.Properties is ArrayFieldProperties)
                     {
@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                             ValidateNestedField(nestedField, nestedPrefix, e);
                         });
                     }
-                    else if (field.Nested.Count > 0)
+                    else if (field.Nested.Length > 0)
                     {
                         e(T.Get("schemas.onlyArraysHaveNested"), $"{prefix}.{nameof(field.Partitioning)}");
                     }
@@ -292,7 +292,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static void ValidateFieldRules(List<FieldRuleCommand>? fieldRules, string path, AddValidation e)
+        private static void ValidateFieldRules(FieldRuleCommand[]? fieldRules, string path, AddValidation e)
         {
             fieldRules?.Foreach((rule, ruleIndex) =>
             {
@@ -318,7 +318,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     var fieldPrefix = $"{path}[{fieldIndex}]";
 
-                    var field = command?.Fields?.Find(x => x.Name == fieldName);
+                    var field = command?.Fields?.FirstOrDefault(x => x.Name == fieldName);
 
                     if (string.IsNullOrWhiteSpace(fieldName))
                     {
@@ -356,7 +356,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         private static void ValidateFieldIds<TField>(ReorderFields c, IReadOnlyDictionary<long, TField> fields, AddValidation e)
         {
-            if (c.FieldIds != null && (c.FieldIds.Count != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
+            if (c.FieldIds != null && (c.FieldIds.Length != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
             {
                 e(T.Get("schemas.fieldsNotCovered"), nameof(c.FieldIds));
             }

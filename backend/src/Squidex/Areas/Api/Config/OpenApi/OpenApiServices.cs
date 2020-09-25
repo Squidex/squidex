@@ -17,6 +17,7 @@ using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Areas.Api.Config.OpenApi
 {
@@ -77,16 +78,22 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 CreateStringMap<RefToken>(),
                 CreateStringMap<Status>(),
 
-                new PrimitiveTypeMapper(typeof(AssetMetadata), schema =>
-                {
-                    schema.Type = JsonObjectType.Object;
-
-                    schema.AdditionalPropertiesSchema = new JsonSchema
-                    {
-                        Description = "Any JSON type"
-                    };
-                })
+                CreateObjectMap<JsonObject>(),
+                CreateObjectMap<AssetMetadata>()
             };
+        }
+
+        private static ITypeMapper CreateObjectMap<T>()
+        {
+            return new PrimitiveTypeMapper(typeof(T), schema =>
+            {
+                schema.Type = JsonObjectType.Object;
+
+                schema.AdditionalPropertiesSchema = new JsonSchema
+                {
+                    Description = "Any JSON type"
+                };
+            });
         }
 
         private static ITypeMapper CreateStringMap<T>(string? format = null)

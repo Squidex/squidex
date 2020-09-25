@@ -66,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/log/")]
         [ProducesResponseType(typeof(LogDownloadDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
         public IActionResult GetLog(string app)
         {
@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
         [ProducesResponseType(typeof(CallsUsageDtoDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
         {
@@ -122,7 +122,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/storage/today/")]
         [ProducesResponseType(typeof(CurrentStorageDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetCurrentStorageSize(string app)
         {
@@ -149,7 +149,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/storage/{fromDate}/{toDate}/")]
         [ProducesResponseType(typeof(StorageUsagePerDateDto[]), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppCommon)]
+        [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetStorageSizes(string app, DateTime fromDate, DateTime toDate)
         {

@@ -10,7 +10,11 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Tga;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
 using ISResizeMode = SixLabors.ImageSharp.Processing.ResizeMode;
@@ -30,7 +34,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
             if (!options.IsValid)
             {
-                source.CopyTo(destination);
+                await source.CopyToAsync(destination);
 
                 return;
             }
@@ -44,17 +48,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             {
                 using (var image = Image.Load(source, out var format))
                 {
-                    var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);
-
-                    if (encoder == null)
-                    {
-                        throw new NotSupportedException();
-                    }
-
-                    if (options.Quality.HasValue && (encoder is JpegEncoder || !options.KeepFormat))
-                    {
-                        encoder = new JpegEncoder { Quality = options.Quality.Value };
-                    }
+                    var encoder = GetEncoder(options, format);
 
                     image.Mutate(x => x.AutoOrient());
 
@@ -90,13 +84,46 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                         image.Mutate(x => x.Resize(resizeOptions));
                     }
 
-                    image.Save(destination, encoder);
+                    await image.SaveAsync(destination, encoder);
                 }
             }
             finally
             {
                 semaphoreSlim.Release();
             }
+        }
+
+        private static IImageEncoder GetEncoder(ResizeOptions options, IImageFormat? format)
+        {
+            var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);
+
+            if (encoder == null)
+            {
+                throw new NotSupportedException();
+            }
+
+            if (options.Quality.HasValue && (encoder is JpegEncoder || !options.KeepFormat) && options.Format == ImageFormat.Auto)
+            {
+                encoder = new JpegEncoder { Quality = options.Quality.Value };
+            }
+            else if (options.Format == ImageFormat.JPEG)
+            {
+                encoder = new JpegEncoder();
+            }
+            else if (options.Format == ImageFormat.PNG)
+            {
+                encoder = new PngEncoder();
+            }
+            else if (options.Format == ImageFormat.TGA)
+            {
+                encoder = new TgaEncoder();
+            }
+            else if (options.Format == ImageFormat.GIF)
+            {
+                encoder = new GifEncoder();
+            }
+
+            return encoder;
         }
 
         public Task<ImageInfo?> GetImageInfoAsync(Stream source)
@@ -107,11 +134,13 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
             try
             {
-                var image = Image.Identify(source);
+                var image = Image.Identify(source, out var format);
 
                 if (image != null)
                 {
                     result = GetImageInfo(image);
+
+                    result.Format = format.Name;
                 }
             }
             catch

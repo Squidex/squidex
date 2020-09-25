@@ -18,11 +18,15 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
     {
         protected override void WriteValue(JsonWriter writer, Roles value, JsonSerializer serializer)
         {
-            var json = new Dictionary<string, string[]>(value.CustomCount);
+            var json = new Dictionary<string, JsonRole>(value.CustomCount);
 
             foreach (var role in value.Custom)
             {
-                json.Add(role.Name, role.Permissions.ToIds().ToArray());
+                json.Add(role.Name, new JsonRole
+                {
+                    Permissions = role.Permissions.ToIds().ToArray(),
+                    Properties = role.Properties
+                });
             }
 
             serializer.Serialize(writer, json);
@@ -30,14 +34,24 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
         protected override Roles ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<Dictionary<string, string[]>>(reader)!;
+            var json = serializer.Deserialize<Dictionary<string, JsonRole>>(reader)!;
 
             if (json.Count == 0)
             {
                 return Roles.Empty;
             }
 
-            return new Roles(json.ToDictionary(x => x.Key, x => new Role(x.Key, new PermissionSet(x.Value))));
+            return new Roles(json.ToDictionary(x => x.Key, x =>
+            {
+                var permissions = PermissionSet.Empty;
+
+                if (x.Value.Permissions.Length > 0)
+                {
+                    permissions = new PermissionSet(x.Value.Permissions);
+                }
+
+                return new Role(x.Key, permissions, x.Value.Properties);
+            }));
         }
     }
 }

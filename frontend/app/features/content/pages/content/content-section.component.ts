@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto } from '@app/shared';
+import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-section',
@@ -65,6 +65,6 @@ export class ContentSectionComponent implements OnChanges {
     }
 
     private configKey(): string {
-        return `squidex.schemas.${this.schema?.id}.fields.${this.formSection?.separator?.fieldId}.closed`;
+        return Settings.Local.FIELD_COLLAPSED(this.schema?.id, this.formSection?.separator?.fieldId);
     }
 }

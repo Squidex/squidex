@@ -47,7 +47,9 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return With<AppPatterns>(id, appPattern.Update(name, pattern, message));
+            var newPattern = appPattern.Update(name, pattern, message);
+
+            return With<AppPatterns>(id, newPattern);
         }
     }
 }

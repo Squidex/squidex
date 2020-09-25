@@ -227,6 +227,7 @@ describe('AppsService', () => {
             canAccessContent: id % 2 === 0,
             planName: 'Free',
             planUpgrade: 'Basic',
+            roleProperties: createProperties(id),
             version: id,
             _links: {
                 schemas: { method: 'GET', href: '/schemas' }
@@ -251,5 +252,14 @@ export function createApp(id: number, suffix = '') {
         id % 2 === 0,
         id % 2 === 0,
         'Free', 'Basic',
+        createProperties(id),
         new Version(`${id}${suffix}`));
+}
+
+function createProperties(id: number) {
+    const result = {};
+
+    result[`property${id}`] = true;
+
+    return result;
 }

@@ -8,6 +8,8 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { fadeAnimation, LocalStoreService, SchemaCategory, SchemaDto, SchemasList, SchemasState } from '@app/shared/internal';
+import { AppsState } from '../state/apps.state';
+import { Settings } from '../state/settings';
 
 @Component({
     selector: 'sqx-schema-category',
@@ -36,6 +38,7 @@ export class SchemaCategoryComponent implements OnChanges {
     public isCollapsed = false;
 
     constructor(
+        private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
         private readonly schemasState: SchemasState
     ) {
@@ -51,7 +54,10 @@ export class SchemaCategoryComponent implements OnChanges {
         this.filteredSchemas = this.schemaCategory.schemas;
 
         if (this.forContent) {
+            const app = this.appsState.snapshot.selectedApp!;
+
             this.filteredSchemas = this.filteredSchemas.filter(x => x.canReadContents && x.isPublished);
+            this.filteredSchemas = this.filteredSchemas.filter(x => !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(x.name)]);
         }
 
         if (this.schemasFilter) {

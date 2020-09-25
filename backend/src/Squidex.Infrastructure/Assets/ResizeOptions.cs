@@ -11,6 +11,8 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class ResizeOptions
     {
+        public ImageFormat Format { get; set; }
+
         public ResizeMode Mode { get; set; }
 
         public int? Width { get; set; }
@@ -27,7 +29,7 @@ namespace Squidex.Infrastructure.Assets
 
         public bool IsValid
         {
-            get { return Width > 0 || Height > 0 || Quality > 0; }
+            get { return Width > 0 || Height > 0 || Quality > 0 || Format != ImageFormat.Auto; }
         }
 
         public override string ToString()
@@ -56,6 +58,12 @@ namespace Squidex.Infrastructure.Assets
             {
                 sb.Append("_focusY_");
                 sb.Append(FocusY);
+            }
+
+            if (Format != ImageFormat.Auto)
+            {
+                sb.Append("_format_");
+                sb.Append(Format.ToString());
             }
 
             return sb.ToString();

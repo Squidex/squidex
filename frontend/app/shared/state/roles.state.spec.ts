@@ -93,7 +93,7 @@ describe('RolesState', () => {
         it('should update roles when role updated', () => {
             const updated = createRoles(4, 5);
 
-            const request = { permissions: ['P4', 'P5'] };
+            const request = { permissions: ['P4', 'P5'], properties: {} };
 
             rolesService.setup(x => x.putRole(app, oldRoles.items[1], request, version))
                 .returns(() => of(versioned(newVersion, updated)));

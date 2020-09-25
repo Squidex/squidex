@@ -59,17 +59,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
                         Add(c);
 
-                        long id;
-
-                        if (c.ParentFieldId == null)
-                        {
-                            id = Snapshot.SchemaDef.FieldsByName[c.Name].Id;
-                        }
-                        else
-                        {
-                            id = ((IArrayField)Snapshot.SchemaDef.FieldsById[c.ParentFieldId.Value]).FieldsByName[c.Name].Id;
-                        }
-
                         return Snapshot;
                     });
 
