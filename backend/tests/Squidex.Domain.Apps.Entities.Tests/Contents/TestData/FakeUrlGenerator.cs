@@ -31,6 +31,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             return $"assets/{assetId}";
         }
 
+        public string AssetContent(NamedId<Guid> appId, string idOrSlug)
+        {
+            return $"assets/{appId.Name}/{idOrSlug}";
+        }
+
         public string ContentUI(NamedId<Guid> appId, NamedId<Guid> schemaId, Guid contentId)
         {
             return $"contents/{schemaId.Name}/{contentId}";

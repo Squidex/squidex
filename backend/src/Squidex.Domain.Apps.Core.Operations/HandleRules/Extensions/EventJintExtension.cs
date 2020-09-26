@@ -9,6 +9,7 @@ using Jint.Native;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
 {
@@ -51,6 +52,26 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
                 if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
                 {
                     return urlGenerator.AssetContent(assetEvent.Id);
+                }
+
+                return JsValue.Null;
+            }));
+
+            context.Engine.SetValue("assetContentAppUrl", new EventDelegate(() =>
+            {
+                if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
+                {
+                    return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id.ToString());
+                }
+
+                return JsValue.Null;
+            }));
+
+            context.Engine.SetValue("assetContentSlugUrl", new EventDelegate(() =>
+            {
+                if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
+                {
+                    return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.FileName.Slugify());
                 }
 
                 return JsValue.Null;

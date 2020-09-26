@@ -11,6 +11,7 @@ using System.Globalization;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -28,6 +29,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             AddPattern("APP_ID", AppId);
             AddPattern("APP_NAME", AppName);
             AddPattern("ASSET_CONTENT_URL", AssetContentUrl);
+            AddPattern("ASSET_CONTENT_APP_URL", AssetContentAppUrl);
+            AddPattern("ASSET_CONTENT_SLUG_URL", AssetContentSlugUrl);
             AddPattern("CONTENT_ACTION", ContentAction);
             AddPattern("CONTENT_URL", ContentUrl);
             AddPattern("MENTIONED_ID", MentionedId);
@@ -119,6 +122,26 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             if (@event is EnrichedAssetEvent assetEvent)
             {
                 return urlGenerator.AssetContent(assetEvent.Id);
+            }
+
+            return null;
+        }
+
+        private string? AssetContentAppUrl(EnrichedEvent @event)
+        {
+            if (@event is EnrichedAssetEvent assetEvent)
+            {
+                return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id.ToString());
+            }
+
+            return null;
+        }
+
+        private string? AssetContentSlugUrl(EnrichedEvent @event)
+        {
+            if (@event is EnrichedAssetEvent assetEvent)
+            {
+                return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.FileName.Slugify());
             }
 
             return null;

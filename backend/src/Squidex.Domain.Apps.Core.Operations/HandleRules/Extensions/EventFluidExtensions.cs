@@ -11,6 +11,7 @@ using Fluid.Values;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Infrastructure;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
 {
@@ -29,21 +30,34 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
         {
             TemplateContext.GlobalFilters.AddFilter("contentUrl", ContentUrl);
             TemplateContext.GlobalFilters.AddFilter("assetContentUrl", AssetContentUrl);
+            TemplateContext.GlobalFilters.AddFilter("assetContentAppUrl", AssetContentAppUrl);
+            TemplateContext.GlobalFilters.AddFilter("assetContentSlugUrl", AssetContentSlugUrl);
         }
 
         private FluidValue ContentUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
         {
-            if (input is ObjectValue objectValue)
+            var value = input.ToObjectValue();
+
+            switch (value)
             {
-                if (context.GetValue("event")?.ToObjectValue() is EnrichedContentEvent contentEvent)
-                {
-                    if (objectValue.ToObjectValue() is Guid guid && guid != Guid.Empty)
+                case Guid guid when guid != Guid.Empty:
                     {
-                        var result = urlGenerator.ContentUI(contentEvent.AppId, contentEvent.SchemaId, guid);
+                        if (context.GetValue("event")?.ToObjectValue() is EnrichedContentEvent contentEvent)
+                        {
+                            var result = urlGenerator.ContentUI(contentEvent.AppId, contentEvent.SchemaId, guid);
+
+                            return new StringValue(result);
+                        }
+
+                        break;
+                    }
+
+                case EnrichedContentEvent contentEvent:
+                    {
+                        var result = urlGenerator.ContentUI(contentEvent.AppId, contentEvent.SchemaId, contentEvent.Id);
 
                         return new StringValue(result);
                     }
-                }
             }
 
             return NilValue.Empty;
@@ -51,14 +65,81 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
 
         private FluidValue AssetContentUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
         {
-            if (input is ObjectValue objectValue)
-            {
-                if (objectValue.ToObjectValue() is Guid guid && guid != Guid.Empty)
-                {
-                    var result = urlGenerator.AssetContent(guid);
+            var value = input.ToObjectValue();
 
-                    return new StringValue(result);
-                }
+            switch (value)
+            {
+                case Guid guid when guid != Guid.Empty:
+                    {
+                        var result = urlGenerator.AssetContent(guid);
+
+                        return new StringValue(result);
+                    }
+
+                case EnrichedAssetEvent assetEvent:
+                    {
+                        var result = urlGenerator.AssetContent(assetEvent.Id);
+
+                        return new StringValue(result);
+                    }
+            }
+
+            return NilValue.Empty;
+        }
+
+        private FluidValue AssetContentAppUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
+        {
+            var value = input.ToObjectValue();
+
+            switch (value)
+            {
+                case Guid guid when guid != Guid.Empty:
+                    {
+                        if (context.GetValue("event")?.ToObjectValue() is EnrichedAssetEvent assetEvent)
+                        {
+                            var result = urlGenerator.AssetContent(assetEvent.AppId, guid.ToString());
+
+                            return new StringValue(result);
+                        }
+
+                        break;
+                    }
+
+                case EnrichedAssetEvent assetEvent:
+                    {
+                        var result = urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id.ToString());
+
+                        return new StringValue(result);
+                    }
+            }
+
+            return NilValue.Empty;
+        }
+
+        private FluidValue AssetContentSlugUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
+        {
+            var value = input.ToObjectValue();
+
+            switch (value)
+            {
+                case string s:
+                    {
+                        if (context.GetValue("event")?.ToObjectValue() is EnrichedAssetEvent assetEvent)
+                        {
+                            var result = urlGenerator.AssetContent(assetEvent.AppId, s.Slugify());
+
+                            return new StringValue(result);
+                        }
+
+                        break;
+                    }
+
+                case EnrichedAssetEvent assetEvent:
+                    {
+                        var result = urlGenerator.AssetContent(assetEvent.AppId, assetEvent.FileName.Slugify());
+
+                        return new StringValue(result);
+                    }
             }
 
             return NilValue.Empty;

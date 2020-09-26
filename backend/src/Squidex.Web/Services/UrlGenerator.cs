@@ -53,6 +53,11 @@ namespace Squidex.Web.Services
             return urlsOptions.BuildUrl($"api/assets/{assetId}");
         }
 
+        public string AssetContent(NamedId<Guid> appId, string idOrSlug)
+        {
+            return urlsOptions.BuildUrl($"assets/{appId.Name}/{idOrSlug}");
+        }
+
         public string? AssetSource(Guid assetId, long fileVersion)
         {
             return assetFileStore.GeneratePublicUrl(assetId, fileVersion);
