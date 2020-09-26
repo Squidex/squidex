@@ -1,1 +1,9 @@
-<sqx-comments [commentsId]="commentsId | async"></sqx-comments>
+<sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false" grid="true">
+    <ng-container title>
+        {{ 'comments.title' | sqxTranslate }}
+    </ng-container>
+
+    <ng-container content>
+        <sqx-comments [commentsId]="commentsId | async"></sqx-comments>
+    </ng-container>
+</sqx-panel>

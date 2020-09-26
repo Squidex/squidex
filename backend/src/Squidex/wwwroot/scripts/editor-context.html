@@ -6,10 +6,26 @@
 
     <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
     <script src="editor-sdk.js"></script>
+
+    <style>
+        textarea {
+            box-sizing: border-box; 
+            resize: none;
+            overflow: hidden;
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
-    <textarea style="width: 100%; box-sizing: border-box; height: 100px;" name="content" id="editor"></textarea>
+    <script>
+        function grow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight)+"px";
+        }
+    </script>
+
+    <textarea  oninput="grow(this)" name="content" id="editor"></textarea>
 
     <script>
         var element = document.getElementById('editor');
@@ -20,6 +36,8 @@
         field.onInit(function (context) {
             if (context) {
                 element.innerHTML = JSON.stringify(context, null, 2);
+
+                grow(element);
             }
         });
     </script>

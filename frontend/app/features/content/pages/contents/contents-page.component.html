@@ -130,6 +130,10 @@
             <a class="panel-link" routerLink="filters" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.filters" titlePosition="left">
                 <i class="icon-filter"></i>
             </a>
+
+            <a class="panel-link" routerLink="sidebar" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.sidebar" titlePosition="left" *ngIf="schema.properties.contentsSidebarUrl">
+                <i class="icon-plugin"></i>
+            </a>
         </div>
     </ng-container>
 </sqx-panel>

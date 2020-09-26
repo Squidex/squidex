@@ -65,11 +65,11 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public ngOnInit() {
         this.own(
-            combineLatest(
+            combineLatest([
                 this.schemasState.selectedSchema,
                 this.languagesState.languages,
                 this.contentsState.statuses
-            ).subscribe(([schema, languages, statuses]) => {
+            ]).subscribe(([schema, languages, statuses]) => {
                 this.queryModel = queryModelFromSchema(schema, languages.map(x => x.language), statuses);
             }));
 

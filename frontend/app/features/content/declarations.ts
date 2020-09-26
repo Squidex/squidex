@@ -16,6 +16,7 @@ export * from './pages/contents/contents-filters-page.component';
 export * from './pages/contents/contents-page.component';
 export * from './pages/contents/custom-view-editor.component';
 export * from './pages/schemas/schemas-page.component';
+export * from './pages/sidebar/sidebar-page.component';
 export * from './shared/content-status.component';
 export * from './shared/due-time-selector.component';
 export * from './shared/forms/array-editor.component';

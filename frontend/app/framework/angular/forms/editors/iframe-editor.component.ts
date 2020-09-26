@@ -7,6 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Router } from '@angular/router';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -40,7 +41,8 @@ export class IFrameEditorComponent extends StatefulControlComponent<any, any> im
     public url: string;
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
+        private readonly router: Router
     ) {
         super(changeDetector, {});
     }
@@ -80,6 +82,10 @@ export class IFrameEditorComponent extends StatefulControlComponent<any, any> im
                         const { height } = event.data;
 
                         this.iframe.nativeElement.height = height + 'px';
+                    } else if (type === 'navigate') {
+                        const { url } = event.data;
+
+                        this.router.navigateByUrl(url);
                     } else if (type === 'valueChanged') {
                         const { value } = event.data;
 

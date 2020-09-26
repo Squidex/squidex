@@ -323,6 +323,8 @@ export class SchemaPropertiesDto {
     constructor(
         public readonly label?: string,
         public readonly hints?: string,
+        public readonly contentsSidebarUrl?: string,
+        public readonly contentSidebarUrl?: string,
         public readonly tags?: ReadonlyArray<string>
     ) {
     }
@@ -362,6 +364,8 @@ export interface SynchronizeSchemaDto {
 export interface UpdateSchemaDto {
     readonly label?: string;
     readonly hints?: string;
+    readonly contentsSidebarUrl?: string;
+    readonly contentSidebarUrl?: string;
     readonly tags?: ReadonlyArray<string>;
 }
 
@@ -713,7 +717,12 @@ function parseSchemas(response: any) {
 function parseSchemaWithDetails(response: any) {
     const fields = response.fields.map((item: any) => parseField(item));
 
-    const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints, response.properties.tags);
+    const properties = new SchemaPropertiesDto(
+        response.properties.label,
+        response.properties.hints,
+        response.properties.contentsSidebarUrl,
+        response.properties.contentSidebarUrl,
+        response.properties.tags);
 
     return new SchemaDetailsDto(response._links,
         response.id,

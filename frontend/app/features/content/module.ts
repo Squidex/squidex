@@ -10,7 +10,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule, UnsetContentGuard } from '@app/shared';
-import { ArrayEditorComponent, ArrayItemComponent, ArraySectionComponent, AssetsEditorComponent, CommentsPageComponent, ContentComponent, ContentCreatorComponent, ContentEventComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentListCellDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthPipe, ContentPageComponent, ContentSectionComponent, ContentSelectorComponent, ContentSelectorItemComponent, ContentsFiltersPageComponent, ContentsPageComponent, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, StockPhotoEditorComponent } from './declarations';
+import { ArrayEditorComponent, ArrayItemComponent, ArraySectionComponent, AssetsEditorComponent, CommentsPageComponent, ContentComponent, ContentCreatorComponent, ContentEventComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentListCellDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthPipe, ContentPageComponent, ContentSectionComponent, ContentSelectorComponent, ContentSelectorItemComponent, ContentsFiltersPageComponent, ContentsPageComponent, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -28,12 +28,16 @@ const routes: Routes = [
                     {
                         path: '',
                         component: ContentsPageComponent,
-                        canActivate: [SchemaMustNotBeSingletonGuard],
+                        canActivate: [SchemaMustNotBeSingletonGuard, UnsetContentGuard],
                         canDeactivate: [CanDeactivateGuard],
                         children: [
                             {
                                 path: 'filters',
                                 component: ContentsFiltersPageComponent
+                            },
+                            {
+                               path: 'sidebar',
+                               component: SidebarPageComponent
                             }
                         ]
                     },
@@ -59,7 +63,11 @@ const routes: Routes = [
                             {
                                path: 'comments',
                                component: CommentsPageComponent
-                           }
+                            },
+                            {
+                               path: 'sidebar',
+                               component: SidebarPageComponent
+                            }
                         ]
                     }
                 ]
@@ -105,6 +113,7 @@ const routes: Routes = [
         ReferenceItemComponent,
         ReferencesEditorComponent,
         SchemasPageComponent,
+        SidebarPageComponent,
         StockPhotoEditorComponent
     ]
 })
