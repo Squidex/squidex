@@ -74,7 +74,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<any, any> im
                     if (type === 'started') {
                         this.isInitialized = true;
 
-                        this.sendMessage('init', { context: this.context || {} });
+                        this.sendInit();
                         this.sendFormValue();
                         this.sendDisabled();
                         this.sendValue();
@@ -111,6 +111,10 @@ export class IFrameEditorComponent extends StatefulControlComponent<any, any> im
         this.isDisabled = isDisabled;
 
         this.sendDisabled();
+    }
+
+    private sendInit() {
+        this.sendMessage('init', { context: this.context || {} });
     }
 
     private sendValue() {

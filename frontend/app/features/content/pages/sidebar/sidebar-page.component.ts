@@ -19,7 +19,8 @@ import { combineLatest } from 'rxjs';
 })
 export class SidebarPageComponent extends ResourceOwner implements AfterViewInit {
     private isInitialized = false;
-    private formContext: any;
+    private context: any;
+    private content: any;
 
     @ViewChild('iframe', { static: false })
     public iframe: ElementRef<HTMLIFrameElement>;
@@ -32,7 +33,7 @@ export class SidebarPageComponent extends ResourceOwner implements AfterViewInit
     ) {
         super();
 
-        this.formContext = {
+        this.context = {
             apiUrl: apiUrl.buildUrl('api'),
             appId: appsState.snapshot.selectedApp!.id,
             appName: appsState.snapshot.selectedApp!.name,
@@ -51,12 +52,19 @@ export class SidebarPageComponent extends ResourceOwner implements AfterViewInit
                     schema.properties.contentSidebarUrl :
                     schema.properties.contentsSidebarUrl;
 
-                this.formContext['schemaName'] = schema.name;
-                this.formContext['schemaId'] = schema.id;
-                this.formContext['contentId'] = content?.id;
+                this.context['schemaName'] = schema.name;
+                this.context['schemaId'] = schema.id;
 
                 this.iframe.nativeElement.src = url || '';
             }));
+
+        this.own(
+            this.contentsState.selectedContent
+                .subscribe(content => {
+                    this.content = content;
+
+                    this.sendContent();
+                }));
 
         this.own(
             this.renderer.listen('window', 'message', (event: MessageEvent) => {
@@ -66,7 +74,8 @@ export class SidebarPageComponent extends ResourceOwner implements AfterViewInit
                     if (type === 'started') {
                         this.isInitialized = true;
 
-                        this.sendMessage('init', { context: this.formContext || {} });
+                        this.sendInit();
+                        this.sendContent();
                     } else if (type === 'resize') {
                         const { height } = event.data;
 
@@ -78,6 +87,14 @@ export class SidebarPageComponent extends ResourceOwner implements AfterViewInit
                     }
                 }
             }));
+    }
+
+    private sendInit() {
+        this.sendMessage('init', { context: this.context });
+    }
+
+    private sendContent() {
+        this.sendMessage('contentChanged', { content: this.content });
     }
 
     private sendMessage(type: string, payload: any) {

@@ -57,57 +57,60 @@
     <script>
         var element = document.getElementById('editor');
 
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
         var plugin = new SquidexPlugin();
 
+        // Init is called once with a context that contains the app name, schema name and authentication information.
         plugin.onInit(function (context) {
-            if (context) {
-                var searchClient = algoliasearch('CFNTEE51PJ', 'afa3a7605277b85348c6fa160fb5cecc');
+            var searchClient = algoliasearch('CFNTEE51PJ', 'afa3a7605277b85348c6fa160fb5cecc');
 
-                var search = instantsearch({ indexName: 'test', searchClient });
+            var search = instantsearch({ indexName: 'test', searchClient });
 
-                document.addEventListener('click', event => {
-                    if (event.target.matches('.button-click')) {
-                        var id = event.target.getAttribute('data-object-id');
+            document.addEventListener('click', event => {
+                if (event.target.matches('.button-click')) {
+                    var id = event.target.getAttribute('data-object-id');
 
-                        plugin.navigate(`/app/${context.appName}/content/${context.schemaName}`);
-                        // plugin.navigate(`/app/${context.appName}/content/${context.schemaName}/${id}`);
-                    }
-                });
+                    // We cannot directly navigate to in the iframe because it would only change the URL of the iframe.
+                    plugin.navigate(`/app/${context.appName}/content/${context.schemaName}`);
+                    // plugin.navigate(`/app/${context.appName}/content/${context.schemaName}/${id}`);
+                }
+            });
 
-                search.addWidgets([
-                    instantsearch.widgets.searchBox({
-                        container: '#searchbox',
-                    }),
+            search.addWidgets([
+                instantsearch.widgets.searchBox({
+                    container: '#searchbox',
+                }),
 
-                    instantsearch.widgets.hits({
-                        container: '#hits',
-                        templates: {
-                            item(hit, bindEvent) {
-                                return `
-                                    <div>
-                                        <div class="hit-name">
-                                            ${instantsearch.highlight({
-                                                attribute: 'firstname',
-                                                hit,
-                                            })}
-                                            ${instantsearch.highlight({
-                                                attribute: 'lastname',
-                                                hit,
-                                            })}
+                instantsearch.widgets.hits({
+                    container: '#hits',
+                    templates: {
+                        item(hit, bindEvent) {
+                            return `
+                                <div>
+                                    <div class="hit-name">
+                                        ${instantsearch.highlight({
+                                            attribute: 'firstname',
+                                            hit,
+                                        })}
+                                        ${instantsearch.highlight({
+                                            attribute: 'lastname',
+                                            hit,
+                                        })}
 
-                                            <div>
-                                                <a data-object-id="${hit.objectID}" class="button-click">EDIT</a>
-                                            </div>
+                                        <div>
+                                            <a data-object-id="${hit.objectID}" class="button-click">EDIT</a>
                                         </div>
                                     </div>
-                                `;
-                            }
-                        },
-                    })
-                ]);
+                                </div>
+                            `;
+                        }
+                    },
+                })
+            ]);
 
-                search.start();
-            }
+            search.start();
         });
     </script>
 </body>

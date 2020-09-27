@@ -613,8 +613,12 @@ describe('SchemasService', () => {
             lastModifiedBy: `modifier${id}`,
             properties: {
                 label: `label${id}${suffix}`,
-                hints: `hints${id}${suffix}`,
-                tags: [`tags${id}${suffix}`]
+                contentsSidebarUrl: `url/to/contents/${id}${suffix}`,
+                contentSidebarUrl: `url/to/content/${id}${suffix}`,
+                tags: [
+                    `tags${id}${suffix}`
+                ],
+                hints: `hints${id}${suffix}`
             },
             version: `${id}`,
             _links: {
@@ -637,12 +641,12 @@ describe('SchemasService', () => {
             version: `${id}`,
             properties: {
                 label: `label${id}${suffix}`,
-                hints: `hints${id}${suffix}`,
                 contentsSidebarUrl: `url/to/contents/${id}${suffix}`,
                 contentSidebarUrl: `url/to/content/${id}${suffix}`,
                 tags: [
                     `tags${id}${suffix}`
-                ]
+                ],
+                hints: `hints${id}${suffix}`
             },
             previewUrls: {
                 Default: 'url'

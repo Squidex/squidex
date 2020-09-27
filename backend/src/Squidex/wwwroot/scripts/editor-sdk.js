@@ -30,8 +30,16 @@ function measureAndNotifyParent() {
 function SquidexPlugin() {
     var initHandler;
     var initCalled = false;
+    var contentHandler;
+    var content;
     var context;
     var timer;
+
+    function raiseContentChanged() {
+        if (contentHandler && content) {
+            contentHandler(content);
+        }
+    }
 
     function raiseInit() {
         if (initHandler && !initCalled && context) {
@@ -43,8 +51,12 @@ function SquidexPlugin() {
     function eventListener(event) {
         if (event.source !== window) {
             var type = event.data.type;
+            
+            if (type === 'contentChanged') {
+                content = event.data.content;
 
-            if (type === 'init') {
+                raiseContentChanged();
+            } else if (type === 'init') {
                 context = event.data.context;
 
                 raiseInit();
@@ -80,6 +92,15 @@ function SquidexPlugin() {
             initHandler = callback;
 
             raiseInit();
+        },
+
+        /**
+         * Register the content changed handler.
+         */
+        onContentChanged: function (callback) {
+            contentHandler = callback;
+
+            raiseContentChanged();
         },
 
         /**
