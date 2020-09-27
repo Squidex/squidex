@@ -613,8 +613,12 @@ describe('SchemasService', () => {
             lastModifiedBy: `modifier${id}`,
             properties: {
                 label: `label${id}${suffix}`,
-                hints: `hints${id}${suffix}`,
-                tags: [`tags${id}${suffix}`]
+                contentsSidebarUrl: `url/to/contents/${id}${suffix}`,
+                contentSidebarUrl: `url/to/content/${id}${suffix}`,
+                tags: [
+                    `tags${id}${suffix}`
+                ],
+                hints: `hints${id}${suffix}`
             },
             version: `${id}`,
             _links: {
@@ -637,6 +641,8 @@ describe('SchemasService', () => {
             version: `${id}`,
             properties: {
                 label: `label${id}${suffix}`,
+                contentsSidebarUrl: `url/to/contents/${id}${suffix}`,
+                contentSidebarUrl: `url/to/content/${id}${suffix}`,
                 tags: [
                     `tags${id}${suffix}`
                 ],
@@ -811,6 +817,18 @@ describe('SchemasService', () => {
     }
 });
 
+function createSchemaProperties(id: number, suffix = '') {
+    return new SchemaPropertiesDto(
+        `label${id}${suffix}`,
+        `hints${id}${suffix}`,
+        `url/to/contents/${id}${suffix}`,
+        `url/to/content/${id}${suffix}`,
+        [
+            `tags${id}${suffix}`
+        ]
+    );
+}
+
 export function createSchema(id: number, suffix = '') {
     const links: ResourceLinks = {
         update: { method: 'PUT', href: `/schemas/${id}` }
@@ -820,7 +838,7 @@ export function createSchema(id: number, suffix = '') {
         `schema-id${id}`,
         `schema-name${id}${suffix}`,
         `category${id}${suffix}`,
-        new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`, [`tags${id}${suffix}`]),
+        createSchemaProperties(id, suffix),
         id % 2 === 0,
         id % 3 === 0,
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
@@ -837,7 +855,7 @@ export function createSchemaDetails(id: number, suffix = '') {
         `schema-id${id}`,
         `schema-name${id}${suffix}`,
         `category${id}${suffix}`,
-        new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`, [`tags${id}${suffix}`]),
+        createSchemaProperties(id, suffix),
         id % 2 === 0,
         id % 3 === 0,
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,

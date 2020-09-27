@@ -25,6 +25,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string? Hints { get; set; }
 
         /// <summary>
+        /// The url to a the sidebar plugin for content lists.
+        /// </summary>
+        public string? ContentsSidebarUrl { get; set; }
+
+        /// <summary>
+        /// The url to a the sidebar plugin for content items.
+        /// </summary>
+        public string? ContentSidebarUrl { get; set; }
+
+        /// <summary>
         /// Tags for automation processes.
         /// </summary>
         public ReadOnlyCollection<string>? Tags { get; set; }

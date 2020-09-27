@@ -15,6 +15,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public ReadOnlyCollection<string>? Tags { get; set; }
 
+        public string? ContentsSidebarUrl { get; set; }
+
+        public string? ContentSidebarUrl { get; set; }
+
         public bool DeepEquals(SchemaProperties properties)
         {
             return SimpleEquals.IsEquals(this, properties);

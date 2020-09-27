@@ -16,13 +16,16 @@
 
         var button = document.getElementById('button');
 
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
         var field = new SquidexFormField();
 
         function logState(message) {
             console.log(`${message}. Value: <${JSON.stringify(field.getValue(), 2)}>, Form Value: <${JSON.stringify(field.getFormValue())}>`);
         }
-        
-        logState('Init');
+
+        logState('Setup');
 
         if (button) {
             button.addEventListener('click', function () {
@@ -33,6 +36,10 @@
                 logState('Click');
             });
         }
+
+        field.onInit(function () {
+            logState('Init');
+        });
 
         // Handle the value change event and set the text to the editor.
         field.onValueChanged(function (value) {

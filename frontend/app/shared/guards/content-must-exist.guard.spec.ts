@@ -18,8 +18,8 @@ describe('ContentMustExistGuard', () => {
         }
     };
 
-    let contentsState: IMock<ContentsState>;
     let router: IMock<Router>;
+    let contentsState: IMock<ContentsState>;
     let contentGuard: ContentMustExistGuard;
 
     beforeEach(() => {

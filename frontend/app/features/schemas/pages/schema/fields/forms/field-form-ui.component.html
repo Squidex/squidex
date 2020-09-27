@@ -3,7 +3,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">{{ 'schemas.field.editorUrl' | sqxTranslate }}</label>
 
         <div class="col-6">
-            <input type="text" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl">
+            <input type="url" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl">
 
             <sqx-form-hint>
                 {{ 'schemas.field.editorUrlHint' | sqxTranslate }}

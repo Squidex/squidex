@@ -232,6 +232,8 @@ export class EditSchemaForm extends Form<FormGroup, UpdateSchemaDto, SchemaPrope
                     Validators.maxLength(1000)
                 ]
             ],
+            contentsSidebarUrl: '',
+            contentSidebarUrl: '',
             tags: []
         }));
     }

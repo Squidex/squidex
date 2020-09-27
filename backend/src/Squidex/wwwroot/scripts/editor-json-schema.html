@@ -29,6 +29,9 @@
     <script>
         const Form = JSONSchemaForm.default;
         
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
         const field = new SquidexFormField();
 
         function Editor() {

@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+
+    <style>
+        textarea {
+            box-sizing: border-box; 
+            resize: none;
+            overflow: hidden;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        function grow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight)+"px";
+        }
+    </script>
+
+    <textarea  oninput="grow(this)" name="content" id="editor"></textarea>
+
+    <script>
+        var element = document.getElementById('editor');
+
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
+        var field = new SquidexFormField();
+
+        // Init is called once with a context that contains the app name, schema name and authentication information.
+        field.onInit(function (context) {
+            element.innerHTML = JSON.stringify(context, null, 2);
+
+            grow(element);
+        });
+    </script>
+</body>
+
+</html>

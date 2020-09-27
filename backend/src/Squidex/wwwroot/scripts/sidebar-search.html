@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.0.0/dist/algoliasearch-lite.umd.js" integrity="sha256-MfeKq2Aw9VAkaE9Caes2NOxQf6vUa8Av0JqcUXUGkd0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.0.0/dist/instantsearch.production.min.js" integrity="sha256-6S7q0JJs/Kx4kb/fv0oMjS855QTz5Rc2hh9AkIUjUsk=" crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@7.3.1/themes/algolia-min.css" integrity="sha256-HB49n/BZjuqiCtQQf49OdZn63XuKFaxcIHWf0HNKte8=" crossorigin="anonymous">
+
+    <style>
+        .container {
+            min-height: 400px;
+        }
+
+        .ais-Hits {
+            margin-top: 1rem;
+        }
+
+        .ais-Hits-item {
+            margin-right: 0;
+            margin-top: 5px;
+            width: 100%;
+        }
+
+        .button-click {
+            margin-top: 5px;
+            color: #3389ff;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .button-click:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        function grow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight)+"px";
+        }
+    </script>
+
+    <div class="container">
+        <div id="searchbox"></div>
+
+        <div id="hits"></div>
+    </div>
+
+    <script>
+        var element = document.getElementById('editor');
+
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
+        var plugin = new SquidexPlugin();
+
+        // Init is called once with a context that contains the app name, schema name and authentication information.
+        plugin.onInit(function (context) {
+            var searchClient = algoliasearch('CFNTEE51PJ', 'afa3a7605277b85348c6fa160fb5cecc');
+
+            var search = instantsearch({ indexName: 'test', searchClient });
+
+            document.addEventListener('click', event => {
+                if (event.target.matches('.button-click')) {
+                    var id = event.target.getAttribute('data-object-id');
+
+                    // We cannot directly navigate to in the iframe because it would only change the URL of the iframe.
+                    plugin.navigate(`/app/${context.appName}/content/${context.schemaName}`);
+                    // plugin.navigate(`/app/${context.appName}/content/${context.schemaName}/${id}`);
+                }
+            });
+
+            search.addWidgets([
+                instantsearch.widgets.searchBox({
+                    container: '#searchbox',
+                }),
+
+                instantsearch.widgets.hits({
+                    container: '#hits',
+                    templates: {
+                        item(hit, bindEvent) {
+                            return `
+                                <div>
+                                    <div class="hit-name">
+                                        ${instantsearch.highlight({
+                                            attribute: 'firstname',
+                                            hit,
+                                        })}
+                                        ${instantsearch.highlight({
+                                            attribute: 'lastname',
+                                            hit,
+                                        })}
+
+                                        <div>
+                                            <a data-object-id="${hit.objectID}" class="button-click">EDIT</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    },
+                })
+            ]);
+
+            search.start();
+        });
+    </script>
+</body>
+
+</html>
