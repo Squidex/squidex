@@ -223,29 +223,36 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, {silent: true}));
     }
 
-    public changeManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<any> {
-        return this.updateManyStatus(contents, status, dueTime).pipe(
+    public changeManyStatus(contentsToChange: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<any> {
+        return this.updateManyStatus(contentsToChange, status, dueTime).pipe(
             tap(results => {
                 const errors = results.filter(x => !!x.error);
 
                 if (errors.length > 0) {
                     const errror = errors[0].error!;
 
-                    if (errors.length === contents.length) {
+                    if (errors.length === contentsToChange.length) {
                         throw errror;
                     } else {
                         this.dialogs.notifyError(errror);
                     }
                 }
 
-                return of(results);
+                this.next(s => {
+                    let contents = s.contents;
+
+                    for (const updated of results.filter(x => !x.error).map(x => x.content)) {
+                        contents = contents.replaceBy('id', updated);
+                    }
+
+                    return { ...s, contents };
+                });
             }),
-            switchMap(() => this.loadInternalCore(false)),
             shareSubscribed(this.dialogs));
     }
 
-    public deleteMany(contents: ReadonlyArray<ContentDto>) {
-        return this.deleteManyCore(contents, true).pipe(
+    public deleteMany(contentsToDelete: ReadonlyArray<ContentDto>) {
+        return this.deleteManyCore(contentsToDelete, true).pipe(
             switchMap(results => {
                 const referenced = results.filter(x => x.error?.statusCode === 400).map(x => x.content);
 
@@ -273,16 +280,25 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 if (errors.length > 0) {
                     const errror = errors[0].error!;
 
-                    if (errors.length === contents.length) {
+                    if (errors.length === contentsToDelete.length) {
                         throw errror;
                     } else {
                         this.dialogs.notifyError(errror);
                     }
                 }
 
-                return of(results);
+                this.next(s => {
+                    let contents = s.contents;
+                    let contentsPager = s.contentsPager;
+
+                    for (const content of results.filter(x => !x.error).map(x => x.content)) {
+                        contents = contents.filter(x => x.id !== content.id);
+                        contentsPager = contentsPager.decrementCount();
+                    }
+
+                    return { ...s, contents, contentsPager };
+                });
             }),
-            switchMap(() => this.loadInternalCore(false)),
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
@@ -375,7 +391,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     private updateStatus(content: ContentDto, status: string, dueTime: string | null): Observable<Updated> {
         return this.contentsService.putStatus(this.appName, content, status, dueTime, content.version).pipe(
-            map(() => ({ content })), catchError(error => of({ content, error })));
+            map(x => ({ content: x })), catchError(error => of({ content, error })));
     }
 
     public abstract get schemaId(): string;
