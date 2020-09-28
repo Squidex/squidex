@@ -95,9 +95,7 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
 
     private finishRequest(value: boolean) {
         this.next(s => {
-            if (s.dialogRequest) {
-                s.dialogRequest.complete(value);
-            }
+            s.dialogRequest?.complete(value);
 
             return { ...s, dialogRequest: null };
         });

@@ -26,7 +26,7 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
     public view: EmbeddedViewRef<any>;
 
     public constructor(
-        private viewContainer: ViewContainerRef
+        private readonly viewContainer: ViewContainerRef
     ) {
     }
 

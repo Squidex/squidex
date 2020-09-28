@@ -40,7 +40,8 @@
             <button type="button" class="btn btn-text-danger mt-1" [disabled]="!backup.canDelete"
                 (sqxConfirmClick)="delete()"
                 confirmTitle="i18n:backups.deleteConfirmTitle"
-                confirmText="i18n:backups.deleteConfirmText">
+                confirmText="i18n:backups.deleteConfirmText"
+                confirmRememberKey="deleteBackup">
                 <i class="icon-bin2"></i>
             </button>
         </div>

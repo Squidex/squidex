@@ -1,3 +1,4 @@
+import { ErrorDto } from '@app/framework';
 /*
  * Squidex Headless CMS
  *
@@ -331,7 +332,7 @@ describe('AssetsState', () => {
         });
 
         it('should remove asset from snapshot when deleted', () => {
-            assetsService.setup(x => x.deleteAssetItem(app, asset1, asset1.version))
+            assetsService.setup(x => x.deleteAssetItem(app, asset1, true, asset1.version))
                 .returns(() => of(versioned(newVersion)));
 
             assetsState.deleteAsset(asset1).subscribe();
@@ -341,8 +342,37 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.tagsAvailable).toEqual({ shared: 1, tag2: 1 });
         });
 
+        it('should remove asset from snapshot when when referenced and not confirmed', () => {
+            assetsService.setup(x => x.deleteAssetItem(app, asset1, false, asset1.version))
+                .returns(() => throwError(new ErrorDto(404, 'Referenced')));
+
+            assetsService.setup(x => x.deleteAssetItem(app, asset1, true, asset1.version))
+                .returns(() => of(versioned(newVersion)));
+
+            dialogs.setup(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAnyString()))
+                .returns(() => of(true));
+
+            assetsState.deleteAsset(asset1).subscribe();
+
+            expect(assetsState.snapshot.assets.length).toBe(1);
+            expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(199);
+            expect(assetsState.snapshot.tagsAvailable).toEqual({ shared: 1, tag2: 1 });
+        });
+
+        it('should not remove asset when referenced and not confirmed', () => {
+            assetsService.setup(x => x.deleteAssetItem(app, asset1, true, asset1.version))
+                .returns(() => throwError(new ErrorDto(404, 'Referenced')));
+
+            dialogs.setup(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAnyString()))
+                .returns(() => of(false));
+
+            assetsState.deleteAsset(asset1).subscribe();
+
+            expect(assetsState.snapshot.assets.length).toBe(2);
+        });
+
         it('should remove asset folder from snapshot when deleted', () => {
-            assetsService.setup(x => x.deleteAssetItem(app, assetFolder1, assetFolder1.version))
+            assetsService.setup(x => x.deleteAssetItem(app, assetFolder1, false, assetFolder1.version))
                 .returns(() => of(versioned(newVersion)));
 
             assetsState.deleteAssetFolder(assetFolder1).subscribe();

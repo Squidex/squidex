@@ -8,7 +8,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ContributorsState, ErrorDto, ImportContributorsForm, RoleDto } from '@app/shared';
-import { empty, of } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 
 type ImportStatus = {
@@ -79,7 +79,7 @@ export class ImportContributorsDialogComponent {
                             status.result = 'Failed';
                         }
 
-                        return empty();
+                        return EMPTY;
                     })
                 ), 1)
         ).subscribe();

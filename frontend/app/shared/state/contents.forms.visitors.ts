@@ -39,7 +39,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                 fieldValue = reference[fieldInvariant];
             }
 
-            let value: string | undefined = undefined;
+            let value: string | undefined;
 
             if (Types.isObject(fieldValue)) {
                 value = fieldValue[language.iso2Code];

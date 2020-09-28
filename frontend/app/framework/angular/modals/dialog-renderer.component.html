@@ -1,13 +1,21 @@
 <ng-content></ng-content>
 
 <ng-container *sqxModal="dialogView">
-    <sqx-modal-dialog showClose="false" (close)="cancel()">
+    <sqx-modal-dialog showClose="false" (close)="cancel()" *ngIf="snapshot.dialogRequest; let request">
         <ng-container title>
-            {{snapshot.dialogRequest?.title | sqxTranslate}}
+            {{request.title | sqxTranslate}}
         </ng-container>
     
         <ng-container content>
-            <span [innerHTML]="snapshot.dialogRequest?.text | sqxTranslate | sqxMarkdown"></span>
+            <span [innerHTML]="request.text | sqxTranslate | sqxMarkdown"></span>
+
+            <div class="form-check mt-4" *ngIf="request.canRemember">
+                <input class="form-check-input" type="checkbox" id="remember" [(ngModel)]="request.remember">
+
+                <label class="form-check-label" for="remember">
+                    {{ 'common.remember' | sqxTranslate}}
+                </label>
+            </div>
         </ng-container>
     
         <ng-container footer>

@@ -48,7 +48,7 @@ export class SchemaPreviewUrlsFormComponent implements OnChanges {
 
         if (value) {
             this.schemasState.configurePreviewUrls(this.schema, value)
-                .subscribe(update => {
+                .subscribe(() => {
                     this.editForm.submitCompleted({ noReset: true });
                 }, error => {
                     this.editForm.submitFailed(error);

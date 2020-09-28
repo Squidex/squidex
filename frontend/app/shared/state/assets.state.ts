@@ -6,9 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, MathHelper, Pager, shareSubscribed, State, StateSynchronizer } from '@app/framework';
-import { empty, forkJoin, Observable, of, throwError } from 'rxjs';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { compareStrings, DialogService, ErrorDto, MathHelper, Pager, shareSubscribed, State, StateSynchronizer } from '@app/framework';
+import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
 import { AppsState } from './apps.state';
 import { Query, QueryFullTextSynchronizer } from './query';
@@ -274,7 +274,7 @@ export class AssetsState extends State<Snapshot> {
 
     public moveAsset(asset: AssetDto, parentId?: string) {
         if (asset.parentId === parentId) {
-            return empty();
+            return EMPTY;
         }
 
         this.next(s => {
@@ -298,7 +298,7 @@ export class AssetsState extends State<Snapshot> {
 
     public moveAssetFolder(assetFolder: AssetFolderDto, parentId?: string) {
         if (assetFolder.id === parentId || assetFolder.parentId === parentId) {
-            return empty();
+            return EMPTY;
         }
 
         this.next(s => {
@@ -320,8 +320,27 @@ export class AssetsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public deleteAsset(asset: AssetDto): Observable<any> {
-        return this.assetsService.deleteAssetItem(this.appName, asset, asset.version).pipe(
+    public deleteAsset(asset: AssetDto) {
+        return this.assetsService.deleteAssetItem(this.appName, asset, true, asset.version).pipe(
+            catchError((error: ErrorDto) => {
+                if (error.statusCode === 400) {
+                    return this.dialogs.confirm(
+                        'i18n:assets.deleteReferrerConfirmTitle',
+                        'i18n:assets.deleteReferrerConfirmText',
+                        'deleteReferencedAsset'
+                    ).pipe(
+                        switchMap(confirmed => {
+                            if (confirmed) {
+                                return this.assetsService.deleteAssetItem(this.appName, asset, false, asset.version);
+                            } else {
+                                return EMPTY;
+                            }
+                        })
+                    );
+                } else {
+                    return throwError(error);
+                }
+            }),
             tap(() => {
                 this.next(s => {
                     const assets = s.assets.filter(x => x.id !== asset.id);
@@ -336,7 +355,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public deleteAssetFolder(assetFolder: AssetFolderDto): Observable<any> {
-        return this.assetsService.deleteAssetItem(this.appName, assetFolder, assetFolder.version).pipe(
+        return this.assetsService.deleteAssetItem(this.appName, assetFolder, false, assetFolder.version).pipe(
             tap(() => {
                 this.next(s => {
                     const assetFolders = s.assetFolders.filter(x => x.id !== assetFolder.id);

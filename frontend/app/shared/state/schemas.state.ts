@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { compareStrings, defined, DialogService, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
-import { empty, Observable, of } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
 import { AppsState } from './apps.state';
@@ -125,7 +125,7 @@ export class SchemasState extends State<Snapshot> {
 
     public loadIfNotLoaded(): Observable<any> {
         if (this.snapshot.isLoaded) {
-            return empty();
+            return EMPTY;
         }
 
         return this.loadInternal(false);

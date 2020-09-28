@@ -20,14 +20,16 @@
                         <a class="dropdown-item" *ngIf="rule.canRun"
                             (sqxConfirmClick)="run()"
                             confirmTitle="i18n:rules.runRuleConfirmTitle"
-                            confirmText="i18n:rules.runRuleConfirmText">
+                            confirmText="i18n:rules.runRuleConfirmText"
+                            confirmRememberKey="runRule">
                             {{ 'rules.run' | sqxTranslate }}
                         </a>
             
                         <a class="dropdown-item dropdown-item-delete" *ngIf="rule.canDelete"
                             (sqxConfirmClick)="delete()"
                             confirmTitle="i18n:rules.deleteConfirmTitle"
-                            confirmText="i18n:rules.deleteConfirmText">
+                            confirmText="i18n:rules.deleteConfirmText"
+                            confirmRememberKey="deleteContent">
                             {{ 'common.delete' | sqxTranslate }}
                         </a>
                     </div>
@@ -58,7 +60,8 @@
                     <button class="btn btn-secondary" [disabled]="!rule.canTrigger"
                         (sqxConfirmClick)="trigger()"
                         confirmTitle="i18n:rules.triggerConfirmTitle"
-                        confirmText="i18n:rules.triggerConfirmText">
+                        confirmText="i18n:rules.triggerConfirmText"
+                        confirmRememberKey="triggerRule">
                         <i class="icon-play-line"></i>
                     </button>
                 </ng-container>

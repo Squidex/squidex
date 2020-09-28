@@ -29,10 +29,10 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<{}, string | null> implements OnInit, AfterViewInit, FocusComponent {
+    private readonly hideDateButtonsSettings: boolean;
+    private readonly hideDateTimeModeButtonSetting: boolean;
     private picker: any;
     private dateTime: DateTime | null;
-    private hideDateButtonsSettings: boolean;
-    private hideDateTimeModeButtonSetting: boolean;
     private suppressEvents = false;
 
     @Input()

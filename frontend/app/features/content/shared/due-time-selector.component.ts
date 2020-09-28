@@ -17,7 +17,7 @@ const OPTION_IMMEDIATELY = 'Immediately';
     templateUrl: './due-time-selector.component.html'
 })
 export class DueTimeSelectorComponent {
-    private disabled: boolean;
+    private readonly disabled: boolean;
     private dueTimeResult: Subject<string | null>;
 
     public dueTimeDialog = new DialogModel();

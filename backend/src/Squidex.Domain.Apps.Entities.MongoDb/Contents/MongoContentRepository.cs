@@ -129,6 +129,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionAll.QueryIdsAsync(appId, schemaId, filterNode);
         }
 
+        public Task<bool> HasReferrersAsync(Guid contentId)
+        {
+            return collectionAll.HasReferrersAsync(contentId);
+        }
+
         public IEnumerable<IMongoCollection<MongoContentEntity>> GetInternalCollections()
         {
             yield return collectionAll.GetInternalCollection();

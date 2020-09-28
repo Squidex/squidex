@@ -7,14 +7,16 @@
 
 import { Injectable } from '@angular/core';
 import { DialogService, ErrorDto, Pager, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
-import { empty, forkJoin, Observable, of } from 'rxjs';
-import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+import { EMPTY, forkJoin, Observable, of } from 'rxjs';
+import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { Query, QuerySynchronizer } from './query';
 import { SchemasState } from './schemas.state';
+
+type Updated = { content: ContentDto, error?: ErrorDto };
 
 interface Snapshot {
     // The current comments.
@@ -141,7 +143,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public loadIfNotLoaded(): Observable<any> {
         if (this.snapshot.isLoaded) {
-            return empty();
+            return EMPTY;
         }
 
         return this.loadInternal(false);
@@ -153,7 +155,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     private loadInternalCore(isReload: boolean) {
         if (!this.appName || !this.schemaName) {
-            return empty();
+            return EMPTY;
         }
 
         this.next({ isLoading: true });
@@ -222,38 +224,65 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public changeManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<any> {
-        return forkJoin(
-            contents.map(c =>
-                this.contentsService.putStatus(this.appName, c, status, dueTime, c.version).pipe(
-                    catchError(error => of(error))))).pipe(
+        return this.updateManyStatus(contents, status, dueTime).pipe(
             tap(results => {
-                const error = results.find(x => x instanceof ErrorDto);
+                const errors = results.filter(x => !!x.error);
 
-                if (error) {
-                    this.dialogs.notifyError(error);
+                if (errors.length > 0) {
+                    const errror = errors[0].error!;
+
+                    if (errors.length === contents.length) {
+                        throw errror;
+                    } else {
+                        this.dialogs.notifyError(errror);
+                    }
                 }
 
-                return of(error);
+                return of(results);
             }),
             switchMap(() => this.loadInternalCore(false)),
-            shareSubscribed(this.dialogs, { silent: true }));
+            shareSubscribed(this.dialogs));
     }
 
-    public deleteMany(contents: ReadonlyArray<ContentDto>): Observable<any> {
-        return forkJoin(
-            contents.map(c =>
-                this.contentsService.deleteContent(this.appName, c, c.version).pipe(
-                    catchError(error => of(error))))).pipe(
-            tap(results => {
-                const error = results.find(x => x instanceof ErrorDto);
+    public deleteMany(contents: ReadonlyArray<ContentDto>) {
+        return this.deleteManyCore(contents, true).pipe(
+            switchMap(results => {
+                const referenced = results.filter(x => x.error?.statusCode === 400).map(x => x.content);
 
-                if (error) {
-                    this.dialogs.notifyError(error);
+                if (referenced.length > 0) {
+                    return this.dialogs.confirm(
+                        'i18n:contents.deleteReferrerConfirmTitle',
+                        'i18n:contents.deleteReferrerConfirmText',
+                        'deleteReferencedAsset'
+                    ).pipe(
+                        switchMap(confirmed => {
+                            if (confirmed) {
+                                return this.deleteManyCore(referenced, false);
+                            } else {
+                                return of([]);
+                            }
+                        })
+                    );
+                } else {
+                    return of(results);
+                }
+            }),
+            tap(results => {
+                const errors = results.filter(x => !!x.error);
+
+                if (errors.length > 0) {
+                    const errror = errors[0].error!;
+
+                    if (errors.length === contents.length) {
+                        throw errror;
+                    } else {
+                        this.dialogs.notifyError(errror);
+                    }
                 }
 
-                return of(error);
+                return of(results);
             }),
-            switchMap(() => this.loadInternal(false)),
+            switchMap(() => this.loadInternalCore(false)),
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
@@ -327,6 +356,26 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 return { ...s, contents, selectedContent };
             });
         }
+    }
+
+    private deleteManyCore(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean): Observable<ReadonlyArray<Updated>> {
+        return forkJoin(
+            contents.map(c => this.deleteCore(c, checkReferrers)));
+    }
+
+    private updateManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<ReadonlyArray<Updated>> {
+        return forkJoin(
+            contents.map(c => this.updateStatus(c, status, dueTime)));
+    }
+
+    private deleteCore(content: ContentDto, checkReferrers: boolean): Observable<Updated> {
+        return this.contentsService.deleteContent(this.appName, content, checkReferrers, content.version).pipe(
+            map(() => ({ content })), catchError(error => of({ content, error })));
+    }
+
+    private updateStatus(content: ContentDto, status: string, dueTime: string | null): Observable<Updated> {
+        return this.contentsService.putStatus(this.appName, content, status, dueTime, content.version).pipe(
+            map(() => ({ content })), catchError(error => of({ content, error })));
     }
 
     public abstract get schemaId(): string;
