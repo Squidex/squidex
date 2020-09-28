@@ -366,7 +366,7 @@ describe('AssetsState', () => {
             dialogs.setup(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAnyString()))
                 .returns(() => of(false));
 
-            assetsState.deleteAsset(asset1).subscribe();
+            assetsState.deleteAsset(asset1).pipe(onErrorResumeNext()).subscribe();
 
             expect(assetsState.snapshot.assets.length).toBe(2);
         });
