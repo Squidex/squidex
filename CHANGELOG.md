@@ -1,5 +1,34 @@
 # Changelog
 
+## 4.7.0 - 2020-09-29
+
+### Features
+
+* **Assets**: Do not cache protected assets when user gets a 403.
+* **Assets**: Reduce the number of threads that resize images to improve performance.
+* **Assets**: New query string properties to change the format of assets, e.g. from PNG to JPG.
+* **Content**: New full text index based on MongoDB.
+* **Contents**: Better exception handling in validation.
+* **Events**: New event consumers with support for batching. Can process up to 10.000 events / second.
+* **Events**: Count the number of processed events to get an understanding of performance.
+* **GraphQL**: GraphQL Mutations.
+* **General**: Better default configuration.
+* **Roles**: Role properties to customize the UI.
+* **Rules**: New functions for rules.
+* **Rules**: Enable algolia and ElasticSearch rule actions for all events.
+* **UI**: Sidebar plugin for contents and content items.
+* **UI**: Disable add button for array field when max items is reached.
+* **UI**: Italian translation.
+* **UI**: Dutch translation.
+
+### Bugixes
+
+* **Backup**: Fix memory usage when downloading backups.
+* **Clients**: Fix anonymous access clients.
+* **Contents**: Fixes to the angular forms to revert a performance improvements.
+* **Contents**: Fixes to empty filter.
+* **UI**: Fix confirm button.
+
 ## 5.0.0 BETA 2 - 2020-09-02
 
 Includes new features in 4.6.0
