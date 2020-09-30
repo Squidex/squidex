@@ -31,6 +31,26 @@
             </div>
         
             <div class="form-group">
+                <label for="hints">{{ 'schemas.contentsSidebarUrl' | sqxTranslate }}</label>
+                
+                <sqx-control-errors for="contentsSidebarUrl"></sqx-control-errors>
+        
+                <input type="url" class="form-control" id="contentsSidebarUrl" formControlName="contentsSidebarUrl">
+
+                <sqx-form-hint>{{ 'schemas.contentsSidebarUrl' | sqxTranslate }}</sqx-form-hint>
+            </div>
+        
+            <div class="form-group">
+                <label for="hints">{{ 'schemas.contentSidebarUrl' | sqxTranslate }}</label>
+                
+                <sqx-control-errors for="contentSidebarUrl"></sqx-control-errors>
+        
+                <input type="url" class="form-control" id="contentSidebarUrl" formControlName="contentSidebarUrl">
+
+                <sqx-form-hint>{{ 'schemas.contentSidebarUrlHint' | sqxTranslate }}</sqx-form-hint>
+            </div>
+        
+            <div class="form-group">
                 <label for="tags">{{ 'common.tags' | sqxTranslate }}</label>
                 
                 <sqx-control-errors for="tags"></sqx-control-errors>

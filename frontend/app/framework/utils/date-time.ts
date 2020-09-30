@@ -95,7 +95,7 @@ export class DateTime {
         if (value.length === DATE_FORMAT.length) {
             date = parse(value, DATE_FORMAT, new Date());
         } else {
-            date = date = parseISO(value);
+            date = parseISO(value);
         }
 
         if (isNaN(date.getTime())) {

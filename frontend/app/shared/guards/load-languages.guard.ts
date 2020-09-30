@@ -19,6 +19,6 @@ export class LoadLanguagesGuard implements CanActivate {
     }
 
     public canActivate(): Observable<boolean> {
-        return this.languagesState.load().pipe(map(a => true));
+        return this.languagesState.load().pipe(map(_ => true));
     }
 }

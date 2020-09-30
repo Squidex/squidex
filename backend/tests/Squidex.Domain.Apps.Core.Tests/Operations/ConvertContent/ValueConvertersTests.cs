@@ -27,8 +27,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
         public ValueConvertersTests()
         {
-            A.CallTo(() => urlGenerator.AssetContent(appId, A<DomainId>._))
-                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<DomainId>(1)}");
+            A.CallTo(() => urlGenerator.AssetContent(appId, A<string>._))
+                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<string>(1)}");
         }
 
         [Fact]

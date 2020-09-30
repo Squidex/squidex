@@ -16,9 +16,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
     {
         public bool CanGenerateAssetSourceUrl { get; } = true;
 
-        public string? AssetThumbnail(NamedId<DomainId> appId, DomainId assetId, AssetType assetType)
+        public string? AssetThumbnail(NamedId<DomainId> appId, string idOrSlug, AssetType assetType)
         {
-            return $"assets/{assetId}?width=100";
+            return $"assets/{appId.Name}/{idOrSlug}?width=100";
         }
 
         public string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion)
@@ -26,9 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             return $"assets/source/{assetId}";
         }
 
-        public string AssetContent(NamedId<DomainId> appId, DomainId assetId)
+        public string AssetContent(NamedId<DomainId> appId, string idOrSlug)
         {
-            return $"assets/{assetId}";
+            return $"assets/{appId.Name}/{idOrSlug}";
         }
 
         public string ContentUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId contentId)
@@ -37,11 +37,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
         }
 
         public string AppSettingsUI(NamedId<DomainId> appId)
-        {
-            throw new NotSupportedException();
-        }
-
-        public string AssetsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();
         }

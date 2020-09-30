@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -34,6 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IAppEntity app;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>(x => x.Wrapping(new DefaultContentWorkflow()));
+        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly ISchemaEntity schema;
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
 
@@ -104,9 +106,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             patched = patch.MergeInto(data);
 
-            var context = new ContentOperationContext(appProvider, Enumerable.Repeat(new DefaultValidatorsFactory(), 1), scriptEngine, A.Fake<ISemanticLog>());
+            var validators = Enumerable.Repeat(new DefaultValidatorsFactory(), 1);
 
-            sut = new ContentDomainObject(Store, contentWorkflow, context, A.Dummy<ISemanticLog>());
+            var context = new ContentOperationContext(appProvider, validators, scriptEngine, A.Fake<ISemanticLog>());
+
+            sut = new ContentDomainObject(Store, A.Dummy<ISemanticLog>(), contentWorkflow, contentRepository, context);
             sut.Setup(Id);
         }
 
@@ -124,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new CreateContent { Data = data };
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -147,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new CreateContent { Data = data, Publish = true };
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -170,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new CreateContent { Data = invalidData };
 
-            await Assert.ThrowsAsync<ValidationException>(() => PublishAsync(CreateContentCommand(command)));
+            await Assert.ThrowsAsync<ValidationException>(() => PublishAsync(command));
         }
 
         [Fact]
@@ -224,7 +228,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -248,7 +252,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecutePublishAsync();
             await ExecuteCreateDraftAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -270,7 +274,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -287,7 +291,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            await Assert.ThrowsAsync<ValidationException>(() => PublishAsync(CreateContentCommand(command)));
+            await Assert.ThrowsAsync<ValidationException>(() => PublishAsync(command));
         }
 
         [Fact]
@@ -297,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -321,7 +325,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecutePublishAsync();
             await ExecuteCreateDraftAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -343,7 +347,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -360,7 +364,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -382,7 +386,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -405,7 +409,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -429,7 +433,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecutePublishAsync();
             await ExecuteCreateDraftAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -453,7 +457,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -484,7 +488,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Archived, User))
                 .Returns(true);
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -512,7 +516,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Published, User))
                 .Returns(false);
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -534,7 +538,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -550,6 +554,32 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public async Task Delete_should_throw_exception_if_referenced_by_other_item()
+        {
+            var command = new DeleteContent { CheckReferrers = true };
+
+            await ExecuteCreateAsync();
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id))
+                .Returns(true);
+
+            await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
+        }
+
+        [Fact]
+        public async Task Delete_should_not_throw_exception_if_referenced_by_other_item_but_forced()
+        {
+            var command = new DeleteContent();
+
+            await ExecuteCreateAsync();
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id))
+                .Returns(true);
+
+            await PublishAsync(command);
+        }
+
+        [Fact]
         public async Task CreateDraft_should_create_events_and_update_new_state()
         {
             var command = new CreateContentDraft();
@@ -557,7 +587,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
@@ -578,7 +608,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await ExecutePublishAsync();
             await ExecuteCreateDraftAsync();
 
-            var result = await PublishAsync(CreateContentCommand(command));
+            var result = await PublishAsync(command);
 
             result.ShouldBeEquivalent(new EntitySavedResult(3));
 
@@ -592,22 +622,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private Task ExecuteCreateAsync()
         {
-            return PublishAsync(CreateContentCommand(new CreateContent { Data = data }));
+            return PublishAsync(new CreateContent { Data = data });
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return PublishAsync(CreateContentCommand(new UpdateContent { Data = otherData }));
+            return PublishAsync(new UpdateContent { Data = otherData });
         }
 
         private Task ExecuteCreateDraftAsync()
         {
-            return PublishAsync(CreateContentCommand(new CreateContentDraft()));
+            return PublishAsync(new CreateContentDraft());
         }
 
         private Task ExecuteChangeStatusAsync(Status status, Instant? dueTime = null)
         {
-            return PublishAsync(CreateContentCommand(new ChangeContentStatus { Status = status, DueTime = dueTime }));
+            return PublishAsync(new ChangeContentStatus { Status = status, DueTime = dueTime });
         }
 
         private Task ExecuteDeleteAsync()

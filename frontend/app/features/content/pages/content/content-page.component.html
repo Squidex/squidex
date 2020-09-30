@@ -36,7 +36,8 @@
                                 <a class="dropdown-item dropdown-item-delete"
                                     (sqxConfirmClick)="delete()"
                                     confirmTitle="i18n:contents.deleteConfirmTitle"
-                                    confirmText="i18n:contents.deleteConfirmText">
+                                    confirmText="i18n:contents.deleteConfirmText"
+                                    confirmRememberKey="deleteContent">
                                     {{ 'common.delete' | sqxTranslate }}
                                 </a>
                             </div>
@@ -103,6 +104,10 @@
 
                 <a class="panel-link" routerLink="comments" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.comments" titlePosition="left">
                     <i class="icon-comments"></i>
+                </a>
+                
+                <a class="panel-link" routerLink="sidebar" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.sidebar" titlePosition="left" *ngIf="schema.properties.contentSidebarUrl">
+                    <i class="icon-plugin"></i>
                 </a>
 
                 <sqx-onboarding-tooltip helpId="history" [for]="linkHistory" position="left-top" after="120000">

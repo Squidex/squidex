@@ -65,17 +65,17 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public ngOnInit() {
         this.own(
-            combineLatest(
+            combineLatest([
                 this.schemasState.selectedSchema,
                 this.languagesState.languages,
                 this.contentsState.statuses
-            ).subscribe(([schema, languages, statuses]) => {
+            ]).subscribe(([schema, languages, statuses]) => {
                 this.queryModel = queryModelFromSchema(schema, languages.map(x => x.language), statuses);
             }));
 
         this.own(
             this.route.params.pipe(
-                    switchMap(x => this.schemasState.selectedSchema), distinctUntilChanged())
+                    switchMap(() => this.schemasState.selectedSchema), distinctUntilChanged())
                 .subscribe(schema => {
                     this.resetSelection();
 
@@ -202,8 +202,10 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 this.selectionCount++;
 
                 for (const action in this.nextStatuses) {
-                    if (!content.statusUpdates.find(x => x.status === action)) {
-                        delete this.nextStatuses[action];
+                    if (this.nextStatuses.hasOwnProperty(action)) {
+                        if (!content.statusUpdates.find(x => x.status === action)) {
+                            delete this.nextStatuses[action];
+                        }
                     }
                 }
 

@@ -174,6 +174,24 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
+        public async Task Should_not_create_job_if_event_created_by_rule()
+        {
+            var rule = ValidRule();
+
+            var @event = Envelope.Create(new ContentCreated { FromRule = true });
+
+            var jobs = await sut.CreateJobsAsync(rule, ruleId, @event);
+
+            Assert.Empty(jobs);
+
+            A.CallTo(() => ruleTriggerHandler.Trigger(@event.Payload, rule.Trigger, ruleId))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(A<Envelope<AppEvent>>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_not_create_job_if_not_triggered_with_precheck()
         {
             var rule = ValidRule();

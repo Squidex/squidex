@@ -15,6 +15,7 @@ using Orleans;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
@@ -31,6 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
         private readonly IAssetMetadataSource assetMetadataSource = A.Fake<IAssetMetadataSource>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
+        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
@@ -54,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             file = new NoopAssetFile();
 
-            var assetDomainObject = new AssetDomainObject(Store, tagService, assetQuery, A.Dummy<ISemanticLog>());
+            var assetDomainObject = new AssetDomainObject(Store, A.Dummy<ISemanticLog>(), tagService, assetQuery, contentRepository);
 
             A.CallTo(() => serviceProvider.GetService(typeof(AssetDomainObject)))
                 .Returns(assetDomainObject);

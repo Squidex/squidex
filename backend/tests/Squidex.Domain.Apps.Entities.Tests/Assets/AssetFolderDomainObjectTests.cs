@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
-            sut = new AssetFolderDomainObject(Store, assetQuery, A.Dummy<ISemanticLog>());
+            sut = new AssetFolderDomainObject(Store, A.Dummy<ISemanticLog>(), assetQuery);
             sut.Setup(Id);
         }
 

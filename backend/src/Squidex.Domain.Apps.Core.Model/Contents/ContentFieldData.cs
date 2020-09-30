@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -87,6 +88,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         public override int GetHashCode()
         {
             return this.DictionaryHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value.ToJsonString()}"))}}}";
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
 
             Search("Assets", Permissions.AppAssetsRead,
-                urlGenerator.AssetsUI, SearchResultType.Asset);
+                a => urlGenerator.AssetsUI(a), SearchResultType.Asset);
 
             Search("Backups", Permissions.AppBackupsRead,
                 urlGenerator.BackupsUI, SearchResultType.Setting);

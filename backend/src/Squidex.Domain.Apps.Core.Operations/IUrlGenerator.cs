@@ -16,15 +16,13 @@ namespace Squidex.Domain.Apps.Core
 
         string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion);
 
-        string? AssetThumbnail(NamedId<DomainId> appId, DomainId assetId, AssetType assetType);
+        string? AssetThumbnail(NamedId<DomainId> appId, string idOrSlug, AssetType assetType);
 
         string AppSettingsUI(NamedId<DomainId> appId);
 
-        string AssetsUI(NamedId<DomainId> appId);
-
         string AssetsUI(NamedId<DomainId> appId, string? query = null);
 
-        string AssetContent(NamedId<DomainId> appId, DomainId assetId);
+        string AssetContent(NamedId<DomainId> appId, string idOrSlug);
 
         string BackupsUI(NamedId<DomainId> appId);
 

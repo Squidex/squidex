@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Guards;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
@@ -28,15 +29,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public class ContentDomainObject : LogSnapshotDomainObject<ContentState>
     {
         private readonly IContentWorkflow contentWorkflow;
+        private readonly IContentRepository contentRepository;
         private readonly ContentOperationContext context;
 
-        public ContentDomainObject(IStore<DomainId> store, IContentWorkflow contentWorkflow, ContentOperationContext context, ISemanticLog log)
+        public ContentDomainObject(IStore<DomainId> store, ISemanticLog log,
+            IContentWorkflow contentWorkflow,
+            IContentRepository contentRepository,
+            ContentOperationContext context)
             : base(store, log)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
+            Guard.NotNull(context, nameof(context));
 
             this.contentWorkflow = contentWorkflow;
+            this.contentRepository = contentRepository;
             this.context = context;
         }
 
@@ -236,6 +243,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     Status = Snapshot.EditingStatus,
                                     StatusOld = default
                                 });
+                        }
+
+                        if (c.CheckReferrers)
+                        {
+                            var hasReferrer = await contentRepository.HasReferrersAsync(Snapshot.AppId.Id, c.AggregateId);
+
+                            if (hasReferrer)
+                            {
+                                throw new DomainException(T.Get("contents.referenced"));
+                            }
                         }
 
                         Delete(c);

@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                                 {
                                     var url = urlGenerator.AssetContent(
                                         referencedAsset.AppId,
-                                        referencedAsset.Id);
+                                        referencedAsset.Id.ToString());
 
                                     array = JsonValue.Array(url, referencedAsset.FileName);
                                 }

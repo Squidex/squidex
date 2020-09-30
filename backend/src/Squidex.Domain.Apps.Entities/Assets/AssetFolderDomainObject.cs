@@ -26,7 +26,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly IAssetQueryService assetQuery;
 
-        public AssetFolderDomainObject(IStore<DomainId> store, IAssetQueryService assetQuery, ISemanticLog log)
+        public AssetFolderDomainObject(IStore<DomainId> store, ISemanticLog log,
+            IAssetQueryService assetQuery)
             : base(store, log)
         {
             Guard.NotNull(assetQuery, nameof(assetQuery));

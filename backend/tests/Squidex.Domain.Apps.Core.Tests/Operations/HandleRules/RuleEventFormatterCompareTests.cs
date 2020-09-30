@@ -67,8 +67,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId, contentId))
                 .Returns("content-url");
 
-            A.CallTo(() => urlGenerator.AssetContent(appId, assetId))
+            A.CallTo(() => urlGenerator.AssetContent(appId, assetId.ToString()))
                 .Returns("asset-content-url");
+
+            A.CallTo(() => urlGenerator.AssetContent(appId, "file-name"))
+                .Returns("asset-content-slug-url");
 
             A.CallTo(() => user.Id)
                 .Returns("user123");
@@ -301,6 +304,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "Download at ${assetContentUrl()}",
             "Download at {{event.id | assetContentUrl}}"
         )]
+        [InlineData("Liquid(Download at {{event | assetContentUrl}})")]
         public async Task Should_format_asset_content_url_from_event(string script)
         {
             var @event = new EnrichedAssetEvent { Id = assetId, AppId = appId };
@@ -317,7 +321,76 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "Download at ${assetContentUrl()}",
             "Download at {{event.id | assetContentUrl | default: 'null'}}"
         )]
+        [InlineData("Liquid(Download at {{event | assetContentUrl | default: 'null'}})")]
         public async Task Should_return_null_when_asset_content_url_not_found(string script)
+        {
+            var @event = new EnrichedContentEvent();
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal("Download at null", result);
+        }
+
+        [Theory]
+        [Expressions(
+            "Download at $ASSET_CONTENT_APP_URL",
+            null,
+            "Download at ${assetContentAppUrl()}",
+            "Download at {{event.id | assetContentAppUrl | default: 'null'}}"
+        )]
+        [InlineData("Liquid(Download at {{event | assetContentAppUrl | default: 'null'}})")]
+        public async Task Should_format_asset_content_app_url_from_event(string script)
+        {
+            var @event = new EnrichedAssetEvent { AppId = appId, Id = assetId, FileName = "File Name" };
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal("Download at asset-content-url", result);
+        }
+
+        [Theory]
+        [Expressions(
+            "Download at $ASSET_CONTENT_APP_URL",
+            null,
+            "Download at ${assetContentAppUrl()}",
+            "Download at {{event.id | assetContentAppUrl | default: 'null'}}"
+        )]
+        [InlineData("Liquid(Download at {{event | assetContentAppUrl | default: 'null'}})")]
+        public async Task Should_return_null_when_asset_content_app_url_not_found(string script)
+        {
+            var @event = new EnrichedContentEvent();
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal("Download at null", result);
+        }
+
+        [Theory]
+        [Expressions(
+            "Download at $ASSET_CONTENT_SLUG_URL",
+            null,
+            "Download at ${assetContentSlugUrl()}",
+            "Download at {{event.fileName | assetContentSlugUrl | default: 'null'}}"
+        )]
+        [InlineData("Liquid(Download at {{event | assetContentSlugUrl | default: 'null'}})")]
+        public async Task Should_format_asset_content_slug_url_from_event(string script)
+        {
+            var @event = new EnrichedAssetEvent { AppId = appId, Id = assetId, FileName = "File Name" };
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal("Download at asset-content-slug-url", result);
+        }
+
+        [Theory]
+        [Expressions(
+            "Download at $ASSET_CONTENT_SLUG_URL",
+            null,
+            "Download at ${assetContentSlugUrl()}",
+            "Download at {{event.id | assetContentSlugUrl | default: 'null'}}"
+        )]
+        [InlineData("Liquid(Download at {{event | assetContentSlugUrl | default: 'null'}})")]
+        public async Task Should_return_null_when_asset_content_slug_url_not_found(string script)
         {
             var @event = new EnrichedContentEvent();
 
@@ -627,6 +700,29 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var result = await sut.FormatAsync(script, @event);
 
             Assert.Equal("[1,2,3]", result?.Replace(" ", string.Empty));
+        }
+
+        [Theory]
+        [Expressions(
+            "$CONTENT_DATA",
+            "${CONTENT_DATA}",
+            "${JSON.stringify(event.data)}",
+            null
+        )]
+        public async Task Should_return_json_string_when_data(string script)
+        {
+            var @event = new EnrichedContentEvent
+            {
+                Data =
+                    new NamedContentData()
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
+            };
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal("{\"city\":{\"iv\":{\"name\":\"Berlin\"}}}", result);
         }
 
         [Theory]

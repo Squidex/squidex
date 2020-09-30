@@ -53,8 +53,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     })
                     .SetFieldsInLists("asset1", "asset2");
 
-            A.CallTo(() => urlGenerator.AssetContent(appId, A<DomainId>._))
-                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<DomainId>(1)}");
+            A.CallTo(() => urlGenerator.AssetContent(appId, A<string>._))
+                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<string>(1)}");
 
             schemaProvider = x =>
             {

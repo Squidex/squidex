@@ -7,8 +7,8 @@
 
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AppLanguageDto, AppsState, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, StringFieldPropertiesDto, TranslationsService, Types, value$ } from '@app/shared';
-import { Observable } from 'rxjs';
-import { combineLatest } from 'rxjs/operators';
+import { combineLatest, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-content-field',
@@ -78,9 +78,10 @@ export class ContentFieldComponent implements OnChanges {
 
         if ((changes['formModel'] || changes['formModelCompare']) && this.formModelCompare) {
             this.isDifferent =
-                value$(this.formModel.form).pipe(
-                    combineLatest(value$(this.formModelCompare!.form),
-                        (lhs, rhs) => !Types.equals(lhs, rhs, true)));
+                combineLatest([
+                    value$(this.formModel.form),
+                    value$(this.formModelCompare!.form)
+                ]).pipe(map(([lhs, rhs]) => !Types.equals(lhs, rhs, true)));
         }
     }
 

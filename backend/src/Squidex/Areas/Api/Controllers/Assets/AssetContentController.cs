@@ -73,13 +73,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AllowAnonymous]
         public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, [FromQuery] AssetContentQueryDto queries, string? more = null)
         {
-            IAssetEntity? asset;
+            var asset = await assetRepository.FindAssetAsync(AppId, idOrSlug);
 
-            if (Guid.TryParse(idOrSlug, out var guid))
-            {
-                asset = await assetRepository.FindAssetAsync(AppId, guid);
-            }
-            else
+            if (asset == null)
             {
                 asset = await assetRepository.FindAssetBySlugAsync(AppId, idOrSlug);
             }

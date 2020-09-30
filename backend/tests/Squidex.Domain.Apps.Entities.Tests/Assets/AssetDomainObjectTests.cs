@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -25,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetDomainObjectTests : HandlerTestBase<AssetState>
     {
+        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly DomainId parentId = DomainId.NewGuid();
@@ -45,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._))
                 .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x)!));
 
-            sut = new AssetDomainObject(Store, tagService, assetQuery, A.Dummy<ISemanticLog>());
+            sut = new AssetDomainObject(Store, A.Dummy<ISemanticLog>(), tagService, assetQuery, contentRepository);
             sut.Setup(Id);
         }
 
@@ -243,6 +245,32 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetDeleted { DeletedSize = 2048 })
                 );
+        }
+
+        [Fact]
+        public async Task Delete_should_throw_exception_if_referenced_by_other_item()
+        {
+            var command = new DeleteAsset { CheckReferrers = true };
+
+            await ExecuteCreateAsync();
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id))
+                .Returns(true);
+
+            await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
+        }
+
+        [Fact]
+        public async Task Delete_should_not_throw_exception_if_referenced_by_other_item_but_forced()
+        {
+            var command = new DeleteAsset();
+
+            await ExecuteCreateAsync();
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id))
+                .Returns(true);
+
+            await PublishAsync(command);
         }
 
         private Task ExecuteCreateAsync()

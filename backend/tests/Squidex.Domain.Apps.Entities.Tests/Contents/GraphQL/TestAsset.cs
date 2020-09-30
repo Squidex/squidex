@@ -42,13 +42,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             metadata
             slug";
 
-        public static IEnrichedAssetEntity Create(DomainId id)
+        public static IEnrichedAssetEntity Create(NamedId<DomainId> appId, DomainId id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
             var asset = new AssetEntity
             {
                 Id = id,
+                AppId = appId,
                 Version = 1,
                 Created = now,
                 CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
@@ -86,8 +87,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 createdBy = asset.CreatedBy.ToString(),
                 lastModified = asset.LastModified,
                 lastModifiedBy = asset.LastModifiedBy.ToString(),
-                url = $"assets/{asset.Id}",
-                thumbnailUrl = $"assets/{asset.Id}?width=100",
+                url = $"assets/{asset.AppId.Name}/{asset.Id}",
+                thumbnailUrl = $"assets/{asset.AppId.Name}/{asset.Id}?width=100",
                 sourceUrl = $"assets/source/{asset.Id}",
                 mimeType = asset.MimeType,
                 fileName = asset.FileName,

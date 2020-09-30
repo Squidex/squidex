@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 { patternId2, new AppPattern("Numbers", "[0-9]*") }
             };
 
-            sut = new AppDomainObject(initialPatterns, Store, A.Dummy<ISemanticLog>(), appPlansProvider, appPlansBillingManager, userResolver);
+            sut = new AppDomainObject(Store, A.Dummy<ISemanticLog>(), initialPatterns, appPlansProvider, appPlansBillingManager, userResolver);
             sut.Setup(Id);
         }
 

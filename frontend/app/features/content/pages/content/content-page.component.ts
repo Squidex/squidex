@@ -9,9 +9,9 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, valueAll$, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, valueAll$, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
-import { debounceTime, filter, onErrorResumeNext, tap } from 'rxjs/operators';
+import { debounceTime, filter, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-content-page',
@@ -39,7 +39,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    constructor(apiUrl: ApiUrlConfig, authService: AuthService,
+    constructor(apiUrl: ApiUrlConfig, authService: AuthService, appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly autoSaveService: AutoSaveService,
         private readonly dialogs: DialogService,
@@ -51,7 +51,12 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     ) {
         super();
 
-        this.formContext = { user: authService.user, apiUrl: apiUrl.buildUrl('api') };
+        this.formContext = {
+            apiUrl: apiUrl.buildUrl('api'),
+            appId: appsState.snapshot.selectedApp!.id,
+            appName: appsState.snapshot.selectedApp!.name,
+            user: authService.user
+        };
     }
 
     public ngOnInit() {
@@ -187,10 +192,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         const content = this.content;
 
         if (content) {
-            this.contentsState.deleteMany([content]).pipe(onErrorResumeNext())
-                .subscribe(() => {
-                    this.back();
-                });
+            this.contentsState.deleteMany([content]);
         }
     }
 

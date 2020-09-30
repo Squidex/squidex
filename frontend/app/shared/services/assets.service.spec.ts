@@ -376,9 +376,9 @@ describe('AssetsService', () => {
             }
         };
 
-        assetsService.deleteAssetItem('my-app', resource, version).subscribe();
+        assetsService.deleteAssetItem('my-app', resource, true, version).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123?checkReferrers=true');
 
         expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);

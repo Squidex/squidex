@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<FIELDS>", TestAsset.AllFields);
 
-            var asset = TestAsset.Create(DomainId.NewGuid());
+            var asset = TestAsset.Create(appId, DomainId.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(0, asset));
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<FIELDS>", TestAsset.AllFields);
 
-            var asset = TestAsset.Create(DomainId.NewGuid());
+            var asset = TestAsset.Create(appId, DomainId.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null, A<Q>.That.HasOData("?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.CreateFrom(10, asset));
@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_return_single_asset_when_finding_asset()
         {
             var assetId = DomainId.NewGuid();
-            var asset = TestAsset.Create(assetId);
+            var asset = TestAsset.Create(appId, assetId);
 
             var query = @"
                 query {
@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var content = TestContent.Create(schemaId, DomainId.NewGuid(), DomainId.Empty, DomainId.Empty);
+            var content = TestContent.Create(appId, schemaId, DomainId.NewGuid(), DomainId.Empty, DomainId.Empty);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(0, content));
@@ -273,7 +273,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<FIELDS>", TestContent.AllFields);
 
-            var content = TestContent.Create(schemaId, DomainId.NewGuid(), DomainId.Empty, DomainId.Empty);
+            var content = TestContent.Create(appId, schemaId, DomainId.NewGuid(), DomainId.Empty, DomainId.Empty);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(0, content));
@@ -307,7 +307,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<FIELDS>", TestContent.AllFields);
 
-            var content = TestContent.Create(schemaId, DomainId.NewGuid(), DomainId.Empty, DomainId.Empty);
+            var content = TestContent.Create(appId, schemaId, DomainId.NewGuid(), DomainId.Empty, DomainId.Empty);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
                 .Returns(ResultList.CreateFrom(10, content));
@@ -364,7 +364,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_return_single_content_when_finding_content()
         {
             var contentId = DomainId.NewGuid();
-            var content = TestContent.Create(schemaId, contentId, DomainId.Empty, DomainId.Empty);
+            var content = TestContent.Create(appId, schemaId, contentId, DomainId.Empty, DomainId.Empty);
 
             var query = @"
                 query {
@@ -396,7 +396,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentRef = TestContent.CreateRef(schemaRefId1, contentRefId, "ref1-field", "ref1");
 
             var contentId = DomainId.NewGuid();
-            var content = TestContent.Create(schemaId, contentId, contentRefId, DomainId.Empty);
+            var content = TestContent.Create(appId, schemaId, contentId, contentRefId, DomainId.Empty);
 
             var query = @"
                 query {
@@ -466,7 +466,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentRef = TestContent.CreateRef(schemaRefId1, contentRefId, "ref1-field", "ref1");
 
             var contentId = DomainId.NewGuid();
-            var content = TestContent.Create(schemaId, contentId, contentRefId, DomainId.Empty);
+            var content = TestContent.Create(appId, schemaId, contentId, contentRefId, DomainId.Empty);
 
             var query = @"
                 query {
@@ -539,10 +539,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_also_fetch_referenced_assets_when_field_is_included_in_query()
         {
             var assetRefId = DomainId.NewGuid();
-            var assetRef = TestAsset.Create(assetRefId);
+            var assetRef = TestAsset.Create(appId, assetRefId);
 
             var contentId = DomainId.NewGuid();
-            var content = TestContent.Create(schemaId, contentId, DomainId.Empty, assetRefId);
+            var content = TestContent.Create(appId, schemaId, contentId, DomainId.Empty, assetRefId);
 
             var query = @"
                 query {
@@ -598,8 +598,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var assetId1 = DomainId.NewGuid();
             var assetId2 = DomainId.NewGuid();
-            var asset1 = TestAsset.Create(assetId1);
-            var asset2 = TestAsset.Create(assetId2);
+            var asset1 = TestAsset.Create(appId, assetId1);
+            var asset2 = TestAsset.Create(appId, assetId2);
 
             var query1 = @"
                 query {
@@ -653,7 +653,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_not_return_data_when_field_not_part_of_content()
         {
             var contentId = DomainId.NewGuid();
-            var content = TestContent.Create(schemaId, contentId, DomainId.Empty, DomainId.Empty, new NamedContentData());
+            var content = TestContent.Create(appId, schemaId, contentId, DomainId.Empty, DomainId.Empty, new NamedContentData());
 
             var query = @"
                 query {

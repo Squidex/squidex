@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var ctx = ContextWithPermission(permission.Id);
 
-            A.CallTo(() => urlGenerator.AssetsUI(appId))
+            A.CallTo(() => urlGenerator.AssetsUI(appId, A<string?>._))
                 .Returns("assets-url");
 
             var result = await sut.SearchAsync("assets", ctx);

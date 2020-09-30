@@ -43,7 +43,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private ContentCommand command;
         private ValidationContext validationContext;
 
-        public ContentOperationContext(IAppProvider appProvider, IEnumerable<IValidatorsFactory> factories, IScriptEngine scriptEngine, ISemanticLog log)
+        public ContentOperationContext(
+            IAppProvider appProvider,
+            IEnumerable<IValidatorsFactory> factories,
+            IScriptEngine scriptEngine,
+            ISemanticLog log)
         {
             this.appProvider = appProvider;
             this.factories = factories;

@@ -114,9 +114,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task ResetScheduledAsync(DomainId id)
+        public Task ResetScheduledAsync(DomainId documentId)
         {
-            return collectionAll.ResetScheduledAsync(id);
+            return collectionAll.ResetScheduledAsync(documentId);
         }
 
         public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
@@ -127,6 +127,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
         {
             return collectionAll.QueryIdsAsync(appId, schemaId, filterNode);
+        }
+
+        public Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId)
+        {
+            return collectionAll.HasReferrersAsync(appId, contentId);
         }
 
         public IEnumerable<IMongoCollection<MongoContentEntity>> GetInternalCollections()

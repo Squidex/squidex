@@ -32,10 +32,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
-        public AppDomainObject(
+        public AppDomainObject(IStore<DomainId> store, ISemanticLog log,
             InitialPatterns initialPatterns,
-            IStore<DomainId> store,
-            ISemanticLog log,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)

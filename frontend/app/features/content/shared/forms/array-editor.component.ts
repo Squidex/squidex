@@ -6,8 +6,8 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldArrayForm, FieldArrayItemForm, sorted } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { AppLanguageDto, ArrayFieldPropertiesDto, EditContentForm, FieldArrayForm, FieldArrayItemForm, sorted } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
@@ -16,7 +16,7 @@ import { ArrayItemComponent } from './array-item.component';
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArrayEditorComponent {
+export class ArrayEditorComponent implements OnChanges {
     @Input()
     public form: EditContentForm;
 
@@ -38,8 +38,26 @@ export class ArrayEditorComponent {
     @ViewChildren(ArrayItemComponent)
     public children: QueryList<ArrayItemComponent>;
 
+    public maxItems: number;
+
     public get field() {
         return this.formModel.field;
+    }
+
+    public get hasFields() {
+        return this.field.nested.length > 0;
+    }
+
+    public get canAdd() {
+        return this.formModel.items.length < this.maxItems;
+    }
+
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['formModel']) {
+            const properties = this.field.properties as ArrayFieldPropertiesDto;
+
+            this.maxItems = properties.maxItems || Number.MAX_VALUE;
+        }
     }
 
     public itemRemove(index: number) {

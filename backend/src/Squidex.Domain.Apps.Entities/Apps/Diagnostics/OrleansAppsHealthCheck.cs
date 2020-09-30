@@ -17,20 +17,25 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
 {
     public sealed class OrleansAppsHealthCheck : IHealthCheck
     {
-        private readonly IAppsByNameIndexGrain index;
+        private readonly IGrainFactory grainFactory;
 
         public OrleansAppsHealthCheck(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
 
-            index = grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id);
+            this.grainFactory = grainFactory;
         }
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            await index.CountAsync();
+            await GetGrain().CountAsync();
 
             return HealthCheckResult.Healthy("Orleans must establish communication.");
+        }
+
+        private IAppsByNameIndexGrain GetGrain()
+        {
+            return grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id);
         }
     }
 }

@@ -33,7 +33,7 @@ export function value$<T = any>(form: AbstractControl): Observable<T> {
 }
 
 export function valueAll$<T = any>(form: AbstractControl): Observable<T> {
-    return form.valueChanges.pipe(map(_ => getRawValue(form)), startWith(getRawValue(form)), distinctUntilChanged());
+    return form.valueChanges.pipe(map(() => getRawValue(form)), startWith(getRawValue(form)), distinctUntilChanged());
 }
 
 export function hasValue$(form: AbstractControl): Observable<boolean> {

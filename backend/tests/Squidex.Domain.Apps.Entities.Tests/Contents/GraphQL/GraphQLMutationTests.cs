@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public GraphQLMutationTests()
         {
-            content = TestContent.Create(schemaId, contentId, schemaRefId1.Id, schemaRefId2.Id, null);
+            content = TestContent.Create(appId, schemaId, contentId, schemaRefId1.Id, schemaRefId2.Id, null);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored))
                 .Returns(commandContext);

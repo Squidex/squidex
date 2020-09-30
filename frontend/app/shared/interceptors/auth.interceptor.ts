@@ -9,13 +9,13 @@ import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiUrlConfig, ErrorDto } from '@app/framework';
-import { empty, Observable, throwError } from 'rxjs';
+import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, switchMap, take } from 'rxjs/operators';
 import { AuthService, Profile } from './../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    private baseUrl: string;
+    private readonly baseUrl: string;
 
     constructor(apiUrlConfig: ApiUrlConfig,
         private readonly authService: AuthService,
@@ -52,7 +52,7 @@ export class AuthInterceptor implements HttpInterceptor {
                         catchError(() => {
                             this.authService.logoutRedirect();
 
-                            return empty();
+                            return EMPTY;
                         }),
                         switchMap(u => this.makeRequest(req, next, u)));
                 } else if (error.status === 401 || error.status === 403) {
@@ -63,7 +63,7 @@ export class AuthInterceptor implements HttpInterceptor {
                             this.router.navigate(['/forbidden'], { replaceUrl: true });
                         }
 
-                        return empty();
+                        return EMPTY;
                     } else {
                         return throwError(new ErrorDto(403, 'i18n:common.errorNoPermission'));
                     }

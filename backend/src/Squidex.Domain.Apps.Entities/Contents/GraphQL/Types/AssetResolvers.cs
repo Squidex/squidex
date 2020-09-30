@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     {
         public static readonly IFieldResolver Url = Resolve((asset, _, context) =>
         {
-            return context.UrlGenerator.AssetContent(asset.AppId, asset.Id);
+            return context.UrlGenerator.AssetContent(asset.AppId, asset.Id.ToString());
         });
 
         public static readonly IFieldResolver SourceUrl = Resolve((asset, _, context) =>
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IFieldResolver ThumbnailUrl = Resolve((asset, _, context) =>
         {
-            return context.UrlGenerator.AssetThumbnail(asset.AppId, asset.Id, asset.Type);
+            return context.UrlGenerator.AssetThumbnail(asset.AppId, asset.Id.ToString(), asset.Type);
         });
 
         public static readonly IFieldResolver FileHash = Resolve(x => x.FileHash);

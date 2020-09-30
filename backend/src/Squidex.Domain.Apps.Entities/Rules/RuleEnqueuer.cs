@@ -50,46 +50,46 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.localCache = localCache;
         }
 
-        public async Task Enqueue(Rule rule, DomainId ruleId, Envelope<IEvent> @event)
+        public async Task EnqueueAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
 
-            using (localCache.StartContext())
+            var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
+
+            foreach (var (job, ex) in jobs)
             {
-                var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
-
-                foreach (var (job, ex) in jobs)
+                if (ex != null)
                 {
-                    if (ex != null)
-                    {
-                        await ruleEventRepository.EnqueueAsync(job, null);
+                    await ruleEventRepository.EnqueueAsync(job, null);
 
-                        await ruleEventRepository.UpdateAsync(job, new RuleJobUpdate
-                        {
-                            JobResult = RuleJobResult.Failed,
-                            ExecutionResult = RuleResult.Failed,
-                            ExecutionDump = ex.ToString(),
-                            Finished = job.Created
-                        });
-                    }
-                    else
+                    await ruleEventRepository.UpdateAsync(job, new RuleJobUpdate
                     {
-                        await ruleEventRepository.EnqueueAsync(job, job.Created);
-                    }
+                        JobResult = RuleJobResult.Failed,
+                        ExecutionResult = RuleResult.Failed,
+                        ExecutionDump = ex.ToString(),
+                        Finished = job.Created
+                    });
+                }
+                else
+                {
+                    await ruleEventRepository.EnqueueAsync(job, job.Created);
                 }
             }
         }
 
         public async Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is AppEvent appEvent)
+            using (localCache.StartContext())
             {
-                var rules = await GetRulesAsync(appEvent.AppId.Id);
-
-                foreach (var ruleEntity in rules)
+                if (@event.Payload is AppEvent appEvent)
                 {
-                    await Enqueue(ruleEntity.RuleDef, ruleEntity.Id, @event);
+                    var rules = await GetRulesAsync(appEvent.AppId.Id);
+
+                    foreach (var ruleEntity in rules)
+                    {
+                        await EnqueueAsync(ruleEntity.RuleDef, ruleEntity.Id, @event);
+                    }
                 }
             }
         }

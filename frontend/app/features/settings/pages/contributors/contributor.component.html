@@ -14,7 +14,8 @@
         <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke"
             (sqxConfirmClick)="remove()"
             confirmTitle="i18n:contributors.deleteConfirmTitle"
-            confirmText="i18n:contributors.deleteConfirmText">
+            confirmText="i18n:contributors.deleteConfirmText"
+            confirmRememberKey="removeContributor">
             <i class="icon-bin2"></i>
         </button>
     </td>

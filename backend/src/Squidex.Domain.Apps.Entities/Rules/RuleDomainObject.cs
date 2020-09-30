@@ -26,14 +26,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IAppProvider appProvider;
         private readonly IRuleEnqueuer ruleEnqueuer;
 
-        public RuleDomainObject(IStore<DomainId> store, ISemanticLog log, IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
+        public RuleDomainObject(IStore<DomainId> store, ISemanticLog log,
+            IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
             : base(store, log)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(ruleEnqueuer, nameof(ruleEnqueuer));
 
             this.appProvider = appProvider;
-
             this.ruleEnqueuer = ruleEnqueuer;
         }
 
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var @event = SimpleMapper.Map(command, new RuleManuallyTriggered { RuleId = Snapshot.Id, AppId = Snapshot.AppId });
 
-            await ruleEnqueuer.Enqueue(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
+            await ruleEnqueuer.EnqueueAsync(Snapshot.RuleDef, Snapshot.UniqueId, Envelope.Create(@event));
 
             return null;
         }

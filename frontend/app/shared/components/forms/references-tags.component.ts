@@ -31,7 +31,7 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
-    private itemCount: number;
+    private readonly itemCount: number;
     private contentItems: ReadonlyArray<ContentDto> | null = null;
 
     @Input()

@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             }";
 
-        public static IEnrichedContentEntity Create(NamedId<DomainId> schemaId, DomainId id, DomainId refId, DomainId assetId, NamedContentData? data = null)
+        public static IEnrichedContentEntity Create(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId id, DomainId refId, DomainId assetId, NamedContentData? data = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -131,6 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var content = new ContentEntity
             {
                 Id = id,
+                AppId = appId,
                 Version = 1,
                 Created = now,
                 CreatedBy = new RefToken(RefTokenType.Subject, "user1"),

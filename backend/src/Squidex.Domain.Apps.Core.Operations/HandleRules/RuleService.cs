@@ -89,6 +89,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 var typed = @event.To<AppEvent>();
 
+                if (typed.Payload.FromRule)
+                {
+                    return result;
+                }
+
                 var actionType = rule.Action.GetType();
 
                 if (!ruleTriggerHandlers.TryGetValue(rule.Trigger.GetType(), out var triggerHandler))

@@ -71,7 +71,7 @@ export class PartitionConfig {
 }
 
 export class CompiledRule {
-    private function: Function;
+    private readonly function: Function;
 
     public get field() {
         return this.rule.field;

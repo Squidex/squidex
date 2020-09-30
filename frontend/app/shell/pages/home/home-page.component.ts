@@ -30,7 +30,7 @@ export class HomePageComponent {
             this.authService.loginPopup()
                 .subscribe(() => {
                     this.router.navigate(['/app']);
-                }, error => {
+                }, _ => {
                     this.showLoginError = true;
                 });
         }

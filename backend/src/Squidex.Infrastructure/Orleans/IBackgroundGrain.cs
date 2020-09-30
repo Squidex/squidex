@@ -7,13 +7,11 @@
 
 using System.Threading.Tasks;
 using Orleans;
-using Orleans.Concurrency;
 
 namespace Squidex.Infrastructure.Orleans
 {
     public interface IBackgroundGrain : IGrainWithStringKey
     {
-        [OneWay]
         Task ActivateAsync();
     }
 }

@@ -323,6 +323,8 @@ export class SchemaPropertiesDto {
     constructor(
         public readonly label?: string,
         public readonly hints?: string,
+        public readonly contentsSidebarUrl?: string,
+        public readonly contentSidebarUrl?: string,
         public readonly tags?: ReadonlyArray<string>
     ) {
     }
@@ -362,6 +364,8 @@ export interface SynchronizeSchemaDto {
 export interface UpdateSchemaDto {
     readonly label?: string;
     readonly hints?: string;
+    readonly contentsSidebarUrl?: string;
+    readonly contentSidebarUrl?: string;
     readonly tags?: ReadonlyArray<string>;
 }
 
@@ -698,7 +702,7 @@ function parseSchemas(response: any) {
             item.id,
             item.name,
             item.category,
-            new SchemaPropertiesDto(item.properties.label, item.properties.hints, item.properties.tags),
+            parseProperties(item.properties),
             item.isSingleton,
             item.isPublished,
             DateTime.parseISO(item.created), item.createdBy,
@@ -713,13 +717,11 @@ function parseSchemas(response: any) {
 function parseSchemaWithDetails(response: any) {
     const fields = response.fields.map((item: any) => parseField(item));
 
-    const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints, response.properties.tags);
-
     return new SchemaDetailsDto(response._links,
         response.id,
         response.name,
         response.category,
-        properties,
+        parseProperties(response.properties),
         response.isSingleton,
         response.isPublished,
         DateTime.parseISO(response.created), response.createdBy,
@@ -731,6 +733,15 @@ function parseSchemaWithDetails(response: any) {
         response.fieldRules,
         response.scripts || {},
         response.previewUrls || {});
+}
+
+function parseProperties(response: any) {
+    return new SchemaPropertiesDto(
+        response.label,
+        response.hints,
+        response.contentsSidebarUrl,
+        response.contentSidebarUrl,
+        response.tags);
 }
 
 export function parseField(item: any) {

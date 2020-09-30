@@ -52,11 +52,14 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         private async Task ExecuteCommandAsync(CommandContext context, CommentsCommand commentsCommand)
         {
-            var grain = grainFactory.GetGrain<ICommentsGrain>(commentsCommand.CommentsId.ToString());
-
-            var result = await grain.ExecuteAsync(commentsCommand.AsJ());
+            var result = await GetGrain(commentsCommand).ExecuteAsync(commentsCommand.AsJ());
 
             context.Complete(result.Value);
+        }
+
+        private ICommentsGrain GetGrain(CommentsCommand commentsCommand)
+        {
+            return grainFactory.GetGrain<ICommentsGrain>(commentsCommand.CommentsId.ToString());
         }
 
         private static bool IsMention(CreateComment createComment)

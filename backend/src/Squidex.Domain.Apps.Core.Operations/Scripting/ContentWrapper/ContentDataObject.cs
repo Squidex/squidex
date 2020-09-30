@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Jint;
@@ -115,6 +116,11 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             EnsurePropertiesInitialized();
 
             var propertyName = property.AsString();
+
+            if (propertyName.Equals("toJSON", StringComparison.OrdinalIgnoreCase))
+            {
+                return PropertyDescriptor.Undefined;
+            }
 
             return fieldProperties.GetOrAdd(propertyName, this, (k, c) => new ContentDataProperty(c, new ContentFieldObject(c, new ContentFieldData(), false)));
         }

@@ -46,14 +46,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             }
         }
 
-        private async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id)
-        {
-            using (Profiler.TraceMethod<RulesIndex>())
-            {
-                return await GetRuleCoreAsync(DomainId.Combine(appId, id));
-            }
-        }
-
         private async Task<List<DomainId>> GetRuleIdsAsync(DomainId appId)
         {
             using (Profiler.TraceMethod<RulesIndex>())
@@ -93,15 +85,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             {
                 await Index(rule.AppId.Id).RemoveAsync(rule.Id);
             }
-        }
-
-        private async Task<IRuleEntity> GetRuleInternalAsync(DomainId appId, DomainId id)
-        {
-            var key = DomainId.Combine(appId, id).ToString();
-
-            var rule = await grainFactory.GetGrain<IRuleGrain>(key).GetStateAsync();
-
-            return rule.Value;
         }
 
         private IRulesByAppIndexGrain Index(DomainId appId)

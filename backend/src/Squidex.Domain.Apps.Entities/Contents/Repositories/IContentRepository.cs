@@ -30,7 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
 
         Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, DomainId id, SearchScope scope);
 
-        Task ResetScheduledAsync(DomainId id);
+        Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId);
+
+        Task ResetScheduledAsync(DomainId documentId);
 
         Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback);
     }

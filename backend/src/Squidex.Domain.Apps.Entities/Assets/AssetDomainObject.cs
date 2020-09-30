@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Guards;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -20,23 +21,30 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Translations;
+using IAssetTagService = Squidex.Domain.Apps.Core.Tags.ITagService;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetDomainObject : LogSnapshotDomainObject<AssetState>
     {
-        private readonly ITagService tagService;
+        private readonly IContentRepository contentRepository;
+        private readonly IAssetTagService assetTags;
         private readonly IAssetQueryService assetQuery;
 
-        public AssetDomainObject(IStore<DomainId> store, ITagService tagService, IAssetQueryService assetQuery, ISemanticLog log)
+        public AssetDomainObject(IStore<DomainId> store, ISemanticLog log,
+            IAssetTagService assetTags,
+            IAssetQueryService assetQuery,
+            IContentRepository contentRepository)
             : base(store, log)
         {
-            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(assetTags, nameof(assetTags));
             Guard.NotNull(assetQuery, nameof(assetQuery));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
 
-            this.tagService = tagService;
-
+            this.assetTags = assetTags;
             this.assetQuery = assetQuery;
+            this.contentRepository = contentRepository;
         }
 
         protected override bool IsDeleted()
@@ -105,7 +113,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         GuardAsset.CanDelete(c);
 
-                        await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, null, Snapshot.Tags);
+                        if (c.CheckReferrers)
+                        {
+                            var hasReferrer = await contentRepository.HasReferrersAsync(Snapshot.AppId.Id, c.AssetId);
+
+                            if (hasReferrer)
+                            {
+                                throw new DomainException(T.Get("assets.referenced"));
+                            }
+                        }
+
+                        await assetTags.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, null, Snapshot.Tags);
 
                         Delete(c);
                     });
@@ -121,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return null;
             }
 
-            var normalized = await tagService.NormalizeTagsAsync(appId, TagGroups.Assets, tags, Snapshot.Tags);
+            var normalized = await assetTags.NormalizeTagsAsync(appId, TagGroups.Assets, tags, Snapshot.Tags);
 
             return new HashSet<string>(normalized.Values);
         }
@@ -130,10 +148,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var @event = SimpleMapper.Map(command, new AssetCreated
             {
+                MimeType = command.File.MimeType,
                 FileName = command.File.FileName,
                 FileSize = command.File.FileSize,
                 FileVersion = 0,
-                MimeType = command.File.MimeType,
                 Slug = command.File.FileName.ToAssetSlug()
             });
 
@@ -146,9 +164,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var @event = SimpleMapper.Map(command, new AssetUpdated
             {
+                MimeType = command.File.MimeType,
                 FileVersion = Snapshot.FileVersion + 1,
                 FileSize = command.File.FileSize,
-                MimeType = command.File.MimeType
             });
 
             RaiseEvent(@event);

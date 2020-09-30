@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { DialogService, Pager, Router2State, shareSubscribed, State } from '@app/framework';
-import { empty, Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { RuleEventDto, RulesService } from './../services/rules.service';
 import { AppsState } from './apps.state';
@@ -122,7 +122,7 @@ export class RuleEventsState extends State<Snapshot> {
 
     public filterByRule(ruleId?: string) {
         if (ruleId === this.snapshot.ruleId) {
-            return empty();
+            return EMPTY;
         }
 
         this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.reset(), ruleId }));
