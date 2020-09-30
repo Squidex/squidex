@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -67,6 +68,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         public bool Equals([AllowNull] NamedContentData other)
         {
             return base.Equals(other);
+        }
+
+        public override string ToString()
+        {
+            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value}"))}}}";
         }
     }
 }
