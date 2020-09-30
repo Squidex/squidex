@@ -22,7 +22,7 @@ export class ResourceLoaderService {
         let result = this.cache[key];
 
         if (!result) {
-            result = new Promise((resolve, reject) => {
+            result = new Promise(resolve => {
                 const style = this.renderer.createElement('link');
 
                 this.renderer.listen(style, 'load', () => resolve());

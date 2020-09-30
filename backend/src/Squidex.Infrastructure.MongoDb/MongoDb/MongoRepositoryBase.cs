@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.MongoDb
         protected static readonly ReplaceOptions UpsertReplace = new ReplaceOptions { IsUpsert = true };
         protected static readonly SortDefinitionBuilder<TEntity> Sort = Builders<TEntity>.Sort;
         protected static readonly UpdateDefinitionBuilder<TEntity> Update = Builders<TEntity>.Update;
-        protected static readonly FieldDefinitionBuilder<TEntity> Fields = FieldDefinitionBuilder<TEntity>.Instance;
+        protected static readonly FieldDefinitionBuilder<TEntity> FieldBuilder = FieldDefinitionBuilder<TEntity>.Instance;
         protected static readonly FilterDefinitionBuilder<TEntity> Filter = Builders<TEntity>.Filter;
         protected static readonly IndexKeysDefinitionBuilder<TEntity> Index = Builders<TEntity>.IndexKeys;
         protected static readonly ProjectionDefinitionBuilder<TEntity> Projection = Builders<TEntity>.Projection;

@@ -11,7 +11,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, valueAll$, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
-import { debounceTime, filter, onErrorResumeNext, tap } from 'rxjs/operators';
+import { debounceTime, filter, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-content-page',
@@ -192,10 +192,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         const content = this.content;
 
         if (content) {
-            this.contentsState.deleteMany([content]).pipe(onErrorResumeNext())
-                .subscribe(() => {
-                    this.back();
-                });
+            this.contentsState.deleteMany([content]);
         }
     }
 

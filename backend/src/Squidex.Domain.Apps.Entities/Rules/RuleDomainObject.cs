@@ -27,14 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IAppProvider appProvider;
         private readonly IRuleEnqueuer ruleEnqueuer;
 
-        public RuleDomainObject(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
+        public RuleDomainObject(IStore<Guid> store, ISemanticLog log,
+            IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
             : base(store, log)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(ruleEnqueuer, nameof(ruleEnqueuer));
 
             this.appProvider = appProvider;
-
             this.ruleEnqueuer = ruleEnqueuer;
         }
 

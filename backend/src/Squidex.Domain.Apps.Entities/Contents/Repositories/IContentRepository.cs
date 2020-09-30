@@ -28,6 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
 
         Task<IReadOnlyList<(Guid SchemaId, Guid Id)>> QueryIdsAsync(Guid appId, HashSet<Guid> ids, SearchScope scope);
 
+        Task<bool> HasReferrersAsync(Guid contentId);
+
         Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, SearchScope scope);
 
         Task ResetScheduledAsync(Guid contentId);

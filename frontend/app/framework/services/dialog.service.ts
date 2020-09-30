@@ -6,29 +6,56 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, Subject, throwError } from 'rxjs';
+import { Observable, ReplaySubject, Subject, throwError } from 'rxjs';
 import { ErrorDto } from './../utils/error';
 import { Types } from './../utils/types';
+import { LocalStoreService } from './local-store.service';
 
-export const DialogServiceFactory = () => {
-    return new DialogService();
+export const DialogServiceFactory = (localStore: LocalStoreService) => {
+    return new DialogService(localStore);
 };
 
 export class DialogRequest {
-    private readonly resultStream$ = new Subject<boolean>();
+    private readonly resultStream$ = new ReplaySubject<boolean>();
 
-    public get closed(): Observable<boolean> {
+    public get result(): Observable<boolean> {
         return this.resultStream$;
     }
 
-    constructor(
-        public readonly title: string,
-        public readonly text: string
-    ) {
+    public get isCompleted() {
+        return this.resultStream$.isStopped;
     }
 
-    public complete(value: boolean) {
-        this.resultStream$.next(value);
+    public get canRemember() {
+        return !!this.rememberKey;
+    }
+
+    public remember: boolean;
+
+    constructor(
+        public readonly title: string,
+        public readonly text: string,
+        private readonly rememberKey: string | undefined,
+        private readonly localStore: LocalStoreService
+    ) {
+        if (rememberKey) {
+            this.rememberKey = `dialogs.confirm.${rememberKey}`;
+
+            const isConfirmed = this.localStore.getInt(this.rememberKey);
+
+            if (isConfirmed > 0) {
+                this.resultStream$.next(isConfirmed === 1);
+                this.resultStream$.complete();
+            }
+        }
+    }
+
+    public complete(confirmed: boolean) {
+        if (this.rememberKey && this.remember) {
+            this.localStore.setInt(this.rememberKey, confirmed ? 1 : 2);
+        }
+
+        this.resultStream$.next(confirmed);
         this.resultStream$.complete();
     }
 }
@@ -77,6 +104,11 @@ export class DialogService {
         return this.notificationsStream$;
     }
 
+    constructor(
+        private readonly localStore: LocalStoreService
+    ) {
+    }
+
     public notifyError(error: string | ErrorDto) {
         if (Types.is(error, ErrorDto)) {
             this.notify(Notification.error(error));
@@ -99,11 +131,15 @@ export class DialogService {
         this.tooltipStream$.next(tooltip);
     }
 
-    public confirm(title: string, text: string): Observable<boolean> {
-        const request = new DialogRequest(title, text);
+    public confirm(title: string, text: string, rememberKey?: string): Observable<boolean> {
+        const request = new DialogRequest(title, text, rememberKey, this.localStore);
+
+        if (request.isCompleted) {
+            return request.result;
+        }
 
         this.requestStream$.next(request);
 
-        return request.closed;
+        return request.result;
     }
 }

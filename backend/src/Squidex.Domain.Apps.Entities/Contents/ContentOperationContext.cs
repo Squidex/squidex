@@ -16,9 +16,11 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 #pragma warning disable IDE0016 // Use 'throw' expression
@@ -43,7 +45,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private ContentCommand command;
         private ValidationContext validationContext;
 
-        public ContentOperationContext(IAppProvider appProvider, IEnumerable<IValidatorsFactory> factories, IScriptEngine scriptEngine, ISemanticLog log)
+        public ContentOperationContext(
+            IAppProvider appProvider,
+            IEnumerable<IValidatorsFactory> factories,
+            IScriptEngine scriptEngine,
+            ISemanticLog log)
         {
             this.appProvider = appProvider;
             this.factories = factories;
