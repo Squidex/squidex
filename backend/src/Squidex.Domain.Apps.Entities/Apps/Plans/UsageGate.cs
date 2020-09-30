@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IApiUsageTracker apiUsageTracker;
-        private readonly IUsageNotifierGrain usageLimitNotifier;
+        private readonly IGrainFactory grainFactory;
 
         public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IGrainFactory grainFactory)
         {
@@ -34,8 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             this.appPlansProvider = appPlansProvider;
             this.apiUsageTracker = apiUsageTracker;
-
-            usageLimitNotifier = grainFactory.GetGrain<IUsageNotifierGrain>(SingleGrain.Id);
+            this.grainFactory = grainFactory;
         }
 
         public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime today)
@@ -72,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                         Users = users
                     };
 
-                    usageLimitNotifier.NotifyAsync(notification).Forget();
+                    GetGrain().NotifyAsync(notification).Forget();
 
                     TrackNotified(appId);
                 }
@@ -81,6 +80,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             }
 
             return isBlocked;
+        }
+
+        private IUsageNotifierGrain GetGrain()
+        {
+            return grainFactory.GetGrain<IUsageNotifierGrain>(SingleGrain.Id);
         }
 
         private bool HasNotifiedBefore(Guid appId)
