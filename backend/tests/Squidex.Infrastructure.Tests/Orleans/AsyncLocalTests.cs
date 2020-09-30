@@ -47,8 +47,14 @@ namespace Squidex.Infrastructure.Orleans
             var result1 = await grain.GetValueAsync();
             var result2 = await grain.GetValueAsync();
 
+            await cluster.KillSiloAsync(cluster.Silos[0]);
+            await cluster.StartAdditionalSiloAsync();
+
+            var result3 = await grain.GetValueAsync();
+
             Assert.Equal(1, result1);
             Assert.Equal(1, result2);
+            Assert.Equal(1, result3);
         }
     }
 }

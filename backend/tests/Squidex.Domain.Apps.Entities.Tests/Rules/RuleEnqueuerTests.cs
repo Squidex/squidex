@@ -90,9 +90,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             A.CallTo(() => ruleEventRepository.EnqueueAsync(job, now, default))
                 .MustHaveHappened();
-
-            A.CallTo(() => localCache.StartContext())
-                .MustHaveHappened();
         }
 
         [Fact]
