@@ -20,7 +20,7 @@ export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
     ]
 })
 export class IndeterminateValueDirective implements ControlValueAccessor {
-    private callChange = (v: any) => { /* NOOP */ };
+    private callChange = (_: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
 
     constructor(

@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -27,8 +26,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
-        private static readonly Lazy<string> IdField = new Lazy<string>(GetIdField);
-
         public MongoAssetRepository(IMongoDatabase database)
             : base(database)
         {
@@ -105,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetEntities.Select(x => Guid.Parse(x[IdField.Value].AsString)).ToList();
+                return assetEntities.Select(x => Guid.Parse(x[Fields.AssetId].AsString)).ToList();
             }
         }
 
@@ -117,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetEntities.Select(x => Guid.Parse(x[IdField.Value].AsString)).ToList();
+                return assetEntities.Select(x => Guid.Parse(x[Fields.AssetId].AsString)).ToList();
             }
         }
 
@@ -175,11 +172,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.In(x => x.Id, ids),
                 Filter.Ne(x => x.IsDeleted, true));
-        }
-
-        private static string GetIdField()
-        {
-            return BsonClassMap.LookupClassMap(typeof(MongoAssetEntity)).GetMemberMap(nameof(MongoAssetEntity.Id)).ElementName;
         }
     }
 }

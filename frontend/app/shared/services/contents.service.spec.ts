@@ -389,9 +389,9 @@ describe('ContentsService', () => {
             }
         };
 
-        contentsService.deleteContent('my-app', resource, version).subscribe();
+        contentsService.deleteContent('my-app', resource, true, version).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1?checkReferrers=true');
 
         expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);

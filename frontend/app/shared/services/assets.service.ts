@@ -394,10 +394,10 @@ export class AssetsService {
             pretifyError('i18n:assets.moveFailed'));
     }
 
-    public deleteAssetItem(appName: string, asset: Resource, version: Version): Observable<Versioned<any>> {
+    public deleteAssetItem(appName: string, asset: Resource, checkReferrers: boolean, version: Version): Observable<Versioned<any>> {
         const link = asset._links['delete'];
 
-        const url = this.apiUrl.buildUrl(link.href);
+        const url = this.apiUrl.buildUrl(link.href) + `?checkReferrers=${checkReferrers}`;
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
             tap(() => {

@@ -12,7 +12,8 @@
                 <button type="button" class="btn btn-text-danger" [disabled]="!client.canRevoke"
                     (sqxConfirmClick)="revoke()"
                     confirmTitle="i18n:clients.deleteConfirmTitle"
-                    confirmText="i18n:clients.deleteConfirmText">
+                    confirmText="i18n:clients.deleteConfirmText"
+                    confirmRememberKey="revokeClient">
                     <i class="icon-bin2"></i>
                 </button>
             </div>

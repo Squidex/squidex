@@ -707,6 +707,29 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         [Theory]
         [Expressions(
+            "$CONTENT_DATA",
+            "${CONTENT_DATA}",
+            "${JSON.stringify(event.data)}",
+            null
+        )]
+        public async Task Should_return_json_string_when_data(string script)
+        {
+            var @event = new EnrichedContentEvent
+            {
+                Data =
+                    new NamedContentData()
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
+            };
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal("{\"city\":{\"iv\":{\"name\":\"Berlin\"}}}", result);
+        }
+
+        [Theory]
+        [Expressions(
             null,
             "From ${EVENT_ACTOR}",
             "From ${event.actor}",

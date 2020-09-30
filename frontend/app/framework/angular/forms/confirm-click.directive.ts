@@ -23,6 +23,9 @@ export class ConfirmClickDirective {
     public confirmText: string;
 
     @Input()
+    public confirmRememberKey: string;
+
+    @Input()
     public confirmRequired = true;
 
     @Output()
@@ -48,7 +51,7 @@ export class ConfirmClickDirective {
 
             this.beforeClick.emit();
 
-            this.dialogs.confirm(this.confirmTitle, this.confirmText).pipe(take(1))
+            this.dialogs.confirm(this.confirmTitle, this.confirmText, this.confirmRememberKey).pipe(take(1))
                 .subscribe(confirmed => {
                     if (confirmed) {
                         for (const observer of observers) {

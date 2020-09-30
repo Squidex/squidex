@@ -184,6 +184,9 @@
   <data name="assets.maxSizeReached" xml:space="preserve">
     <value>Hai raggiunto la dimensione massima consentito per le risorse.</value>
   </data>
+  <data name="assets.referenced" xml:space="preserve">
+    <value>Assets is referenced by a content and cannot be deleted.</value>
+  </data>
   <data name="backups.alreadyRunning" xml:space="preserve">
     <value>E' in esecuzione una altro processo di backup.</value>
   </data>
@@ -492,6 +495,9 @@
   </data>
   <data name="contents.listReferences" xml:space="preserve">
     <value>{count} Collegamenti(s)</value>
+  </data>
+  <data name="contents.referenced" xml:space="preserve">
+    <value>Content is referenced by another content and cannot be deleted.</value>
   </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>Il contenuto singleton non può essere aggiornato</value>

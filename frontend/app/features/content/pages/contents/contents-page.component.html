@@ -55,7 +55,8 @@
                         <button type="button" class="btn btn-danger" *ngIf="selectionCanDelete"
                             (sqxConfirmClick)="deleteSelected()"
                             confirmTitle="i18n:contents.deleteConfirmTitle"
-                            confirmText="i18n:contents.deleteManyConfirmText">
+                            confirmText="i18n:contents.deleteManyConfirmText"
+                            confirmRememberKey="deleteContents">
                             {{ 'common.delete' | sqxTranslate }}
                         </button>
                     </div>

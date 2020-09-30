@@ -27,7 +27,7 @@ export class UsersProviderService {
         if (!result) {
             const request =
                 this.usersService.getUser(id).pipe(
-                    catchError(error => {
+                    catchError(() => {
                         return of(new UserDto('Unknown', 'Unknown'));
                     }),
                     publishLast());

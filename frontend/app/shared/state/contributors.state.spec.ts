@@ -7,7 +7,7 @@
 
 import { ErrorDto } from '@app/framework';
 import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, Pager, versioned } from '@app/shared/internal';
-import { empty, of, throwError } from 'rxjs';
+import { EMPTY, of, throwError } from 'rxjs';
 import { catchError, onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { createContributors } from './../services/contributors.service.spec';
@@ -164,7 +164,7 @@ describe('ContributorsState', () => {
                 catchError(err => {
                     error = err;
 
-                    return empty();
+                    return EMPTY;
                 })
             ).subscribe();
 
@@ -183,7 +183,7 @@ describe('ContributorsState', () => {
                 catchError(err => {
                     error = err;
 
-                    return empty();
+                    return EMPTY;
                 })
             ).subscribe();
 

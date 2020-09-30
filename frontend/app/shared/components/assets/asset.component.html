@@ -33,14 +33,16 @@
                             <a class="file-delete ml-2" *ngIf="!removeMode && asset.canDelete"
                                 (sqxConfirmClick)="delete.emit()"
                                 confirmTitle="i18n:assets.deleteConfirmTitle"
-                                confirmText="i18n:assets.deleteConfirmText">
+                                confirmText="i18n:assets.deleteConfirmText"
+                                confirmRememberKey="deleteAsset">
                                 <i class="icon-delete"></i>
                             </a>
 
                             <a class="file-delete ml-2" *ngIf="removeMode"
                                 (sqxConfirmClick)="remove.emit()"
                                 confirmTitle="i18n:assets.removeConfirmTitle"
-                                confirmText="i18n:assets.removeConfirmText">
+                                confirmText="i18n:assets.removeConfirmText"
+                                confirmRememberKey="removeAsset">
                                 <i class="icon-close"></i>
                             </a>
                         </ng-container>
@@ -134,14 +136,16 @@
                         <button type="button" class="btn btn-text-danger" *ngIf="!removeMode && asset.canDelete"
                             (sqxConfirmClick)="delete.emit()"
                             confirmTitle="i18n:assets.deleteConfirmTitle"
-                            confirmText="i18n:assets.deleteConfirmText">
+                            confirmText="i18n:assets.deleteConfirmText"
+                            confirmRememberKey="deleteAsset">
                             <i class="icon-bin2"></i>
                         </button>
 
                         <button type="button" class="btn btn-text-secondary" *ngIf="removeMode"
                             (sqxConfirmClick)="remove.emit()"
                             confirmTitle="i18n:assets.removeConfirmTitle"
-                            confirmText="i18n:assets.removeConfirmText">
+                            confirmText="i18n:assets.removeConfirmText"
+                            confirmRememberKey="removeAsset">
                             <i class="icon-close"></i>
                         </button>
                     </td>

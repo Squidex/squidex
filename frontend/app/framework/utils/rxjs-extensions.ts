@@ -7,7 +7,7 @@
 
 // tslint:disable: only-arrow-functions
 
-import { empty, Observable } from 'rxjs';
+import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, onErrorResumeNext, publishReplay, refCount, switchMap } from 'rxjs/operators';
 import { DialogService } from './../services/dialog.service';
 import { Version, versioned, Versioned } from './version';
@@ -20,7 +20,7 @@ export function mapVersioned<T = any, R = any>(project: (value: T, version: Vers
     };
 }
 
-type Options = { silent?: boolean };
+type Options = { silent?: boolean, throw?: boolean };
 
 export function shareSubscribed<T>(dialogs: DialogService, options?: Options) {
     return shareMapSubscribed<T, T>(dialogs, x => x, options);
@@ -36,7 +36,11 @@ export function shareMapSubscribed<T, R = T>(dialogs: DialogService, project: (v
                     dialogs.notifyError(error);
                 }
 
-                return empty();
+                if (options?.throw) {
+                    return throwError(error);
+                }
+
+                return EMPTY;
             }))
             .subscribe();
 

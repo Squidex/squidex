@@ -316,10 +316,10 @@ export class ContentsService {
             pretifyError(`Failed to ${status} content. Please reload.`));
     }
 
-    public deleteContent(appName: string, resource: Resource, version: Version): Observable<Versioned<any>> {
+    public deleteContent(appName: string, resource: Resource, checkReferrers: boolean, version: Version): Observable<Versioned<any>> {
         const link = resource._links['delete'];
 
-        const url = this.apiUrl.buildUrl(link.href);
+        const url = this.apiUrl.buildUrl(link.href) + `?checkReferrers=${checkReferrers}`;
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
             tap(() => {

@@ -38,9 +38,9 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
+    private readonly itemCount: number;
     private languageField: LanguageDto;
     private selectedId: string | undefined;
-    private itemCount: number;
 
     @Input()
     public schemaId: string;

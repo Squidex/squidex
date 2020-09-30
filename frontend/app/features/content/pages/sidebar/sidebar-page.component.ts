@@ -18,9 +18,9 @@ import { combineLatest } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarPageComponent extends ResourceOwner implements AfterViewInit {
-    private isInitialized = false;
-    private context: any;
+    private readonly context: any;
     private content: any;
+    private isInitialized = false;
 
     @ViewChild('iframe', { static: false })
     public iframe: ElementRef<HTMLIFrameElement>;

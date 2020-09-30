@@ -19,7 +19,8 @@
                     <button type="button" class="btn btn-text-danger" [disabled]="!role.canDelete"
                         (sqxConfirmClick)="delete()"
                         confirmTitle="i18n:roles.deleteConfirmTitle"
-                        confirmText="i18n:roles.deleteConfirmText">
+                        confirmText="i18n:roles.deleteConfirmText"
+                        confirmRememberKey="deleteRole">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>
