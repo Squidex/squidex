@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             A.CallTo(() => ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event, true))
                 .Returns(new List<(RuleJob, Exception?)> { (job, null) });
 
-            await sut.Enqueue(rule.RuleDef, rule.Id, @event);
+            await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
             A.CallTo(() => ruleEventRepository.EnqueueAsync(job, now, default))
                 .MustHaveHappened();

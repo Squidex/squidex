@@ -59,10 +59,10 @@ namespace Squidex.Config.Orleans
                 options.HostSelf = false;
             });
 
+            builder.AddIncomingGrainCallFilter<LoggingFilter>();
             builder.AddIncomingGrainCallFilter<ExceptionWrapperFilter>();
             builder.AddIncomingGrainCallFilter<ActivationLimiterFilter>();
             builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
-            builder.AddIncomingGrainCallFilter<LoggingFilter>();
             builder.AddIncomingGrainCallFilter<StateFilter>();
 
             var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
