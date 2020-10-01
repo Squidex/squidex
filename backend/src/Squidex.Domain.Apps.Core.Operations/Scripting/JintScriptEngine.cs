@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Scripting
@@ -188,6 +189,10 @@ namespace Squidex.Domain.Apps.Core.Scripting
             catch (ParserException ex)
             {
                 throw new ValidationException($"Failed to execute script with javascript error: {ex.Message}", new ValidationError(ex.Message));
+            }
+            catch (DomainException)
+            {
+                throw;
             }
         }
     }

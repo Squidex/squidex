@@ -18,7 +18,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal
         private static readonly TimeSpan Expiration = TimeSpan.FromMinutes(10);
         private static readonly ParserOptions DefaultParserOptions = new ParserOptions
         {
-            AdaptRegexp = true, Tolerant = true, Loc = true
+            AdaptRegexp = true,
+            Tolerant = true,
+            Loc = true
         };
 
         private readonly IMemoryCache memoryCache;
@@ -30,20 +32,20 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal
             this.memoryCache = memoryCache;
         }
 
-        public Program Parse(string script)
+        public Script Parse(string script)
         {
             var key = Key(script);
 
-            if (!memoryCache.TryGetValue<Program>(key, out var program))
+            if (!memoryCache.TryGetValue<Script>(key, out var compiledScript))
             {
                 var parser = new JavaScriptParser(script, DefaultParserOptions);
 
-                program = parser.ParseProgram();
+                compiledScript = parser.ParseScript();
 
-                memoryCache.Set(key, program, Expiration);
+                memoryCache.Set(key, compiledScript, Expiration);
             }
 
-            return program;
+            return compiledScript;
         }
 
         private static string Key(string script)

@@ -8,6 +8,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Jint;
 using Jint.Native;
 using Jint.Native.Json;
 using Jint.Runtime;
@@ -51,16 +52,19 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             {
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
-                    var request = CreateRequest(url, headers);
-                    var response = await httpClient.SendAsync(request, context.CancellationToken);
+                    using (var request = CreateRequest(url, headers))
+                    {
+                        using (var response = await httpClient.SendAsync(request, context.CancellationToken))
+                        {
+                            response.EnsureSuccessStatusCode();
 
-                    response.EnsureSuccessStatusCode();
+                            var responseObject = await ParseResponse(context, response);
 
-                    var responseObject = await ParseResponse(context, response);
+                            context.Engine.ResetConstraints();
 
-                    context.Engine.ResetTimeoutTicks();
-
-                    callback(responseObject);
+                            callback(responseObject);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -86,9 +90,11 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
                 {
                     var value = TypeConverter.ToString(property.Value);
 
-                    if (!string.IsNullOrWhiteSpace(key))
+                    var keyString = key.AsString();
+
+                    if (!string.IsNullOrWhiteSpace(keyString))
                     {
-                        request.Headers.TryAddWithoutValidation(key, value ?? string.Empty);
+                        request.Headers.TryAddWithoutValidation(keyString, value ?? string.Empty);
                     }
                 }
             }
@@ -96,7 +102,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             return request;
         }
 
-        private async Task<JsValue> ParseResponse(ExecutionContext context, HttpResponseMessage response)
+        private static async Task<JsValue> ParseResponse(ExecutionContext context, HttpResponseMessage response)
         {
             var responseString = await response.Content.ReadAsStringAsync();
 
