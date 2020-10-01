@@ -15,6 +15,7 @@
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
     <PackageReference Include="Datadog.Trace" Version="1.17.0" />
     <PackageReference Include="Elasticsearch.Net" Version="7.7.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.4" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.6.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
