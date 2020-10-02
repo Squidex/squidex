@@ -34,6 +34,18 @@ export class AssetDto {
     public readonly canUpload: boolean;
     public readonly canMove: boolean;
 
+    public get fileNameWithoutExtension() {
+        let fileName = this.fileName;
+
+        const index = fileName.lastIndexOf('.');
+
+        if (index > 0) {
+            fileName = fileName.substr(0, index);
+        }
+
+        return fileName;
+    }
+
     public get isDuplicate() {
         return this._meta && this._meta['isDuplicate'] === 'true';
     }
