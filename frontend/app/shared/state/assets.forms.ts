@@ -125,7 +125,19 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
     }
 
     public transformLoad(value: Partial<AssetDto>) {
-        const result = { ...value, fileName: value.fileNameWithoutExtension };
+        const result = { ...value };
+
+        let fileName = value.fileName;
+
+        if (fileName) {
+            const index = fileName.lastIndexOf('.');
+
+            if (index > 0) {
+                fileName = fileName.substr(0, index);
+            }
+
+            result.fileName = fileName;
+        }
 
         if (Types.isObject(value.metadata)) {
             const length = Object.keys(value.metadata).length;

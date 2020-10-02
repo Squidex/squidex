@@ -35,15 +35,13 @@ export class AssetDto {
     public readonly canMove: boolean;
 
     public get fileNameWithoutExtension() {
-        let fileName = this.fileName;
-
-        const index = fileName.lastIndexOf('.');
+        const index = this.fileName.lastIndexOf('.');
 
         if (index > 0) {
-            fileName = fileName.substr(0, index);
+            return this.fileName.substr(0, index);
+        } else {
+            return this.fileName;
         }
-
-        return fileName;
     }
 
     public get isDuplicate() {

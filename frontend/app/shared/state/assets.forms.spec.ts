@@ -31,7 +31,7 @@ describe('AnnotateAssetForm', () => {
         form = new AnnotateAssetForm(new FormBuilder());
     });
 
-    it('shoulde remov extension when loading asset file name', () => {
+    it('shoulde remove extension when loading asset file name', () => {
         form.load(asset);
 
         const slug = form.form.get('fileName')!.value;
