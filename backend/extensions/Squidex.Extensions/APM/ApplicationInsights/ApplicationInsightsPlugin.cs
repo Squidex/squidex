@@ -8,6 +8,7 @@
 using System;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +43,7 @@ namespace Squidex.Extensions.APM.ApplicationInsights
             {
                 services.AddSingleton<IStartupFilter>(this);
                 services.AddApplicationInsightsTelemetry();
+                services.AddSingleton<ITelemetryInitializer, RoleNameTelemetryInitializer>();
             }
         }
     }
