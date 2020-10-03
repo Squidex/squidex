@@ -71,22 +71,22 @@
     <value>Het veld {0} moet hetzelfde zijn als {1}.</value>
   </data>
   <data name="annotations_EmailAddress" xml:space="preserve">
-    <value>The field {name|lower} is not a valid email address.</value>
+    <value>Het veld {name|lower} is geen geldig e-mailadres.</value>
   </data>
   <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
-    <value>The field {0} is not a valid email address.</value>
+    <value>Het veld {0} is geen geldig e-mailadres.</value>
   </data>
   <data name="annotations_Range" xml:space="preserve">
-    <value>The field {name|lower} must be between {min} and {max}.</value>
+    <value>Het veld {name|lower} moet tussen {min} en {max} zijn.</value>
   </data>
   <data name="dotnet_annotations_Range" xml:space="preserve">
-    <value>The field {0} must be between {1} and {2}.</value>
+    <value>Het veld {0} moet tussen {1} en {2} zijn.</value>
   </data>
   <data name="annotations_RegularExpression" xml:space="preserve">
-    <value>The field {name|lower} is not.</value>
+    <value>Het veld {name|lower} is niet.</value>
   </data>
   <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
-    <value>The field {0} is not.</value>
+    <value>Het veld {0} is niet.</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
     <value>Het veld {name|lower} is verplicht.</value>
@@ -95,16 +95,16 @@
     <value>Het veld {0} is verplicht.</value>
   </data>
   <data name="annotations_StringLength" xml:space="preserve">
-    <value>The field {name|lower} must be a string with a maximum length of {max}.</value>
+    <value>Het veld {name|lower} moet een string zijn met een maximale lengte van {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLength" xml:space="preserve">
-    <value>The field {0} must be a string with a maximum length of {1}.</value>
+    <value>Het veld {0} moet een string zijn met een maximale lengte van {1}.</value>
   </data>
   <data name="annotations_StringLengthMinimum" xml:space="preserve">
-    <value>The field {name|lower} must be a string with a minimum length of {min} and a maximum length of {max}.</value>
+    <value>Het veld {name|lower} moet een string zijn met een minimum lengte van {min} en een maximum lengte van {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
-    <value>The field {0} must be a string with a minimum length of {1} and a maximum length of {2}.</value>
+    <value>Het veld {0} moet een string zijn met een minimum lengte van {1} en een maximum lengte van {2}.</value>
   </data>
   <data name="apps.alreadyArchieved" xml:space="preserve">
     <value>App is al gearchiveerd.</value>
@@ -185,7 +185,7 @@
     <value>Je hebt jouw maximale assetgrootte bereikt.</value>
   </data>
   <data name="assets.referenced" xml:space="preserve">
-    <value>Assets is referenced by a content and cannot be deleted.</value>
+    <value>Er wordt naar dit bestand verwezen door een contentitem en kan niet worden verwijderd.</value>
   </data>
   <data name="backups.alreadyRunning" xml:space="preserve">
     <value>Er wordt al een ander back-upproces uitgevoerd.</value>
@@ -497,7 +497,7 @@
     <value>{count} referentie (s)</value>
   </data>
   <data name="contents.referenced" xml:space="preserve">
-    <value>Content is referenced by another content and cannot be deleted.</value>
+    <value>Er wordt naar de inhoud verwezen door een andere item en kan niet worden verwijderd.</value>
   </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>Singleton-inhoud kan niet worden bijgewerkt.</value>
@@ -533,7 +533,7 @@
     <value>Mag geen dubbele waarden bevatten.</value>
   </data>
   <data name="contents.validation.error" xml:space="preserve">
-    <value>Validation failed with internal error.</value>
+    <value>Validatie mislukt met interne fout.</value>
   </data>
   <data name="contents.validation.exactValue" xml:space="preserve">
     <value>Moet exact {waarde} zijn.</value>

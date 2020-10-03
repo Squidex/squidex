@@ -208,15 +208,17 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         let content = '';
 
         for (const asset of assets) {
+            const name = asset.fileNameWithoutExtension;
+
             switch (asset.type) {
                 case 'Image':
-                    content += `![${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
+                    content += `![${name}](${asset.fullUrl(this.apiUrl)} '${name}')`;
                     break;
                 case 'Video':
-                    content += `[${asset.fileName}](${asset.fullUrl(this.apiUrl)}')`;
+                    content += `[${name}](${asset.fullUrl(this.apiUrl)}')`;
                     break;
                 default:
-                    content += `[${asset.fileName}](${asset.fullUrl(this.apiUrl)}')`;
+                    content += `[${name}](${asset.fullUrl(this.apiUrl)}')`;
                     break;
             }
         }
@@ -265,7 +267,9 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    replaceText(`![${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`);
+                    const name = asset.fileNameWithoutExtension;
+
+                    replaceText(`![${name}](${asset.fullUrl(this.apiUrl)} '${name}')`);
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {

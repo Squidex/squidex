@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_return_empty_schema_if_schema_not_created()
+        public async Task Should_return_empty_schemas_if_schema_not_created()
         {
             var schema = SetupSchema(EtagVersion.NotFound);
 
@@ -154,16 +154,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_return_empty_schema_if_schema_deleted()
+        public async Task Should_return_schema_if_deleted()
         {
-            var schema = SetupSchema();
+            var schema = SetupSchema(0, true);
 
-            A.CallTo(() => index.GetIdAsync(schema.SchemaDef.Name))
-                .Returns(schema.Id);
+            A.CallTo(() => index.GetIdsAsync())
+                .Returns(new List<Guid> { schema.Id });
 
             var actual = await sut.GetSchemasAsync(appId.Id);
 
-            Assert.Empty(actual);
+            Assert.Same(actual[0], schema);
         }
 
         [Fact]
@@ -275,7 +275,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return new CreateSchema { SchemaId = schemaId.Id, Name = name, AppId = appId };
         }
 
-        private ISchemaEntity SetupSchema(long version = 0)
+        private ISchemaEntity SetupSchema(long version = 0, bool isDeleted = false)
         {
             var schemaEntity = A.Fake<ISchemaEntity>();
 
@@ -287,6 +287,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 .Returns(appId);
             A.CallTo(() => schemaEntity.Version)
                 .Returns(version);
+            A.CallTo(() => schemaEntity.IsDeleted)
+                .Returns(isDeleted);
 
             var schemaGrain = A.Fake<ISchemaGrain>();
 

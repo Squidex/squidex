@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         }
 
         [Fact]
-        public async Task Should_return_empty_rule_if_rule_not_created()
+        public async Task Should_return_empty_rules_if_rule_not_created()
         {
             var rule = SetupRule(-1);
 
@@ -60,16 +60,16 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         }
 
         [Fact]
-        public async Task Should_return_empty_rule_if_rule_deleted()
+        public async Task Should_return_rule_if_deleted()
         {
-            var rule = SetupRule(-1);
+            var rule = SetupRule(0, true);
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<DomainId> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
 
-            Assert.Empty(actual);
+            Assert.Same(actual[0], rule);
         }
 
         [Fact]
@@ -117,11 +117,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
                 .MustHaveHappened();
         }
 
-        private IRuleEntity SetupRule(long version)
+        private IRuleEntity SetupRule(long version, bool isDeleted = false)
         {
             var ruleId = DomainId.NewGuid();
 
-            var ruleEntity = new RuleEntity { Id = ruleId, AppId = appId, Version = version };
+            var ruleEntity = new RuleEntity { Id = ruleId, AppId = appId, Version = version, IsDeleted = isDeleted };
             var ruleGrain = A.Fake<IRuleGrain>();
 
             A.CallTo(() => ruleGrain.GetStateAsync())

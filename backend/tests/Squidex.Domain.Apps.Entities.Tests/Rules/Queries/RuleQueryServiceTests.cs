@@ -53,5 +53,24 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
             Assert.Same(enriched, result);
         }
+
+        [Fact]
+        public async Task Should_not_get_deleted_rules()
+        {
+            var original = new List<IRuleEntity>
+            {
+                new RuleEntity { IsDeleted = true }
+            };
+
+            A.CallTo(() => rulesIndex.GetRulesAsync(appId.Id))
+                .Returns(original);
+
+            var result = await sut.QueryAsync(requestContext);
+
+            Assert.Empty(result);
+
+            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnumerable<IRuleEntity>>._, requestContext))
+                .MustNotHaveHappened();
+        }
     }
 }

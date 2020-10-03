@@ -14,6 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 {
     public sealed class RuleQueryService : IRuleQueryService
     {
+        private static readonly List<IEnrichedRuleEntity> EmptyResults = new List<IEnrichedRuleEntity>();
         private readonly IRulesIndex rulesIndex;
         private readonly IRuleEnricher ruleEnricher;
 
@@ -30,9 +31,16 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
         {
             var rules = await rulesIndex.GetRulesAsync(context.App.Id);
 
-            var enriched = await ruleEnricher.EnrichAsync(rules, context);
+            rules.RemoveAll(x => x.IsDeleted);
 
-            return enriched;
+            if (rules.Count > 0)
+            {
+                var enriched = await ruleEnricher.EnrichAsync(rules, context);
+
+                return enriched;
+            }
+
+            return EmptyResults;
         }
     }
 }

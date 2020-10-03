@@ -31,7 +31,7 @@ describe('AnnotateAssetForm', () => {
         form = new AnnotateAssetForm(new FormBuilder());
     });
 
-    it('shoulde remov extension when loading asset file name', () => {
+    it('shoulde remove extension when loading asset file name', () => {
         form.load(asset);
 
         const slug = form.form.get('fileName')!.value;
@@ -41,6 +41,7 @@ describe('AnnotateAssetForm', () => {
 
     it('should create slug from file name', () => {
         form.load(asset);
+
         form.generateSlug({} as any);
 
         const slug = form.form.get('slug')!.value;
@@ -50,6 +51,7 @@ describe('AnnotateAssetForm', () => {
 
     it('should create slug from file name and append extension', () => {
         form.form.get('fileName')!.setValue('My New File');
+
         form.generateSlug(asset);
 
         const slug = form.form.get('slug')!.value;

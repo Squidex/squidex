@@ -221,15 +221,17 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         let content = '';
 
         for (const asset of assets) {
+            const name = asset.fileNameWithoutExtension;
+
             switch (asset.type) {
                 case 'Image':
-                    content += `<img src="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}" />`;
+                    content += `<img src="${asset.fullUrl(this.apiUrl)}" alt="${name}" />`;
                     break;
                 case 'Video':
                     content += `<video src="${asset.fullUrl(this.apiUrl)}" />`;
                     break;
                 default:
-                    content += `<a href="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}">${asset.fileName}</a>`;
+                    content += `<a href="${asset.fullUrl(this.apiUrl)}" alt="${name}">${name}</a>`;
                     break;
             }
         }
@@ -261,10 +263,12 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
+                    const name = asset.fileNameWithoutExtension;
+
                     if (asset.type === 'Video') {
                         replaceText(`<video src="${asset.fullUrl(this.apiUrl)}" />`);
                     } else {
-                        replaceText(`<img src="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}" />`);
+                        replaceText(`<img src="${asset.fullUrl(this.apiUrl)}" alt="${name}" />`);
                     }
                 }
             }, error => {
