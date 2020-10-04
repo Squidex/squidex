@@ -7,11 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 
 namespace Migrations.Migrations.MongoDb
@@ -27,70 +29,63 @@ namespace Migrations.Migrations.MongoDb
 
         public async Task UpdateAsync()
         {
-            var collection = database.GetCollection<BsonDocument>("Events");
-
-            const int SizeOfBatch = 200;
+            const int SizeOfBatch = 1000;
             const int SizeOfQueue = 20;
+
+            var collectionOld = database.GetCollection<BsonDocument>("Events");
+            var collectionNew = database.GetCollection<BsonDocument>("Events2");
 
             var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
                 BoundedCapacity = SizeOfQueue * SizeOfBatch
             });
 
+            var writeOptions = new BulkWriteOptions
+            {
+                IsOrdered = false
+            };
+
             var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
             {
                 var updates = new List<WriteModel<BsonDocument>>();
 
-                foreach (var commit in batch)
+                foreach (var document in batch)
                 {
-                    var eventStream = commit["EventStream"].AsString;
+                    var eventStream = document["EventStream"].AsString;
 
-                    string? appId = null;
-
-                    foreach (var @event in commit["Events"].AsBsonArray)
-                    {
-                        var metadata = @event["Metadata"].AsBsonDocument;
-
-                        if (metadata.TryGetValue("AppId", out var value))
-                        {
-                            appId = value.AsString;
-                        }
-                    }
-
-                    if (appId != null)
+                    if (TryGetAppId(document, out var appId))
                     {
                         var parts = eventStream.Split("-");
 
                         var domainType = parts[0];
                         var domainId = string.Join("-", parts.Skip(1));
 
-                        var newStreamName = $"{domainType}-{appId}--{domainId}";
+                        var newDomainId = DomainId.Combine(appId, domainId).ToString();
+                        var newStreamName = $"{domainType}-{newDomainId}";
 
-                        var update = Builders<BsonDocument>.Update.Set("EventStream", newStreamName);
+                        document["EventStream"] = newStreamName;
 
-                        var i = 0;
-
-                        foreach (var @event in commit["Events"].AsBsonArray)
+                        foreach (var @event in document["Events"].AsBsonArray)
                         {
-                            update = update.Set($"Events.{i}.Metadata.AggregateId", $"{appId}--{domainId}");
-                            update = update.Unset($"Events.{i}.Metadata.AppId");
+                            var metadata = @event["Metadata"].AsBsonDocument;
 
-                            i++;
+                            metadata["AggregateId"] = newDomainId;
+                            metadata.Remove("AppId");
                         }
 
-                        var filter = Builders<BsonDocument>.Filter.Eq("_id", commit["_id"].AsString);
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].AsString);
 
-                        updates.Add(new UpdateOneModel<BsonDocument>(filter, update));
+                        updates.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                        {
+                            IsUpsert = true
+                        });
                     }
                 }
 
-                if (updates.Count > 0)
-                {
-                    await collection.BulkWriteAsync(updates);
-                }
+                await collectionNew.BulkWriteAsync(updates, writeOptions);
             }, new ExecutionDataflowBlockOptions
             {
-                MaxDegreeOfParallelism = 4,
+                MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
                 MaxMessagesPerTask = 1,
                 BoundedCapacity = SizeOfQueue
             });
@@ -100,19 +95,29 @@ namespace Migrations.Migrations.MongoDb
                 PropagateCompletion = true
             });
 
-            await collection.Find(new BsonDocument()).ForEachAsync(async commit =>
-            {
-                var eventStream = commit["EventStream"].AsString;
-
-                if (!eventStream.Contains("--") && !eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
-                {
-                    await batchBlock.SendAsync(commit);
-                }
-            });
+            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync);
 
             batchBlock.Complete();
 
             await actionBlock.Completion;
+        }
+
+        private static bool TryGetAppId(BsonDocument document, [MaybeNullWhen(false)] out string appId)
+        {
+            foreach (var @event in document["Events"].AsBsonArray)
+            {
+                var metadata = @event["Metadata"].AsBsonDocument;
+
+                if (metadata.TryGetValue("AppId", out var value))
+                {
+                    appId = value.AsString;
+                    return true;
+                }
+            }
+
+            appId = null;
+
+            return false;
         }
     }
 }

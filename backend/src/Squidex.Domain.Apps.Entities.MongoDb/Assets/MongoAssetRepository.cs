@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         protected override string CollectionName()
         {
-            return "States_Assets";
+            return "States_Assets2";
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection, CancellationToken ct = default)

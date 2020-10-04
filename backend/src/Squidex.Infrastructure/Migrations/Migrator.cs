@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.Migrations
 
                     foreach (var migration in migrations)
                     {
-                        var name = migration.GetType().ToString();
+                        var name = migration.ToString()!;
 
                         log.LogInformation(w => w
                             .WriteProperty("action", "Migration")

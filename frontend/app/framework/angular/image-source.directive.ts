@@ -23,7 +23,8 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
     public imageSource: string;
 
     @Input()
-    public retryCount = 10;
+    public retryCount = 0;
+
     @Input()
     public layoutKey: string;
 
@@ -136,7 +137,7 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
     private retryLoadingImage() {
         this.loadRetries++;
 
-        if (this.loadRetries <= 3) {
+        if (this.loadRetries <= this.retryCount) {
             this.loadTimer =
                 setTimeout(() => {
                     this.loadQuery = MathHelper.guid();

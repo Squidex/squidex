@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         protected override string CollectionName()
         {
-            return "Events";
+            return "Events2";
         }
 
         protected override MongoCollectionSettings CollectionSettings()

@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
             A.CallTo(() => persistence.ReadAsync(A<long>._))
-                .MustHaveHappened();
+                .MustNotHaveHappened();
 
             Assert.True(result is EntityCreatedResult<DomainId>);
 
@@ -189,7 +189,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
             A.CallTo(() => persistence.ReadAsync(A<long>._))
-                .MustHaveHappened();
+                .MustNotHaveHappened();
 
             Assert.True(result is EntitySavedResult);
 
@@ -275,7 +275,18 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_throw_exception_when_already_created()
         {
-            SetupCreated(4);
+            SetupEmpty();
+
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
+                .Throws(new InconsistentStateException(4, EtagVersion.NotFound));
+
+            await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto()));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_already_created_after_creation()
+        {
+            await sut.ExecuteAsync(new CreateAuto());
 
             await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto()));
         }

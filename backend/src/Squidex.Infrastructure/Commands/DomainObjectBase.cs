@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Commands
@@ -146,15 +147,25 @@ namespace Squidex.Infrastructure.Commands
             Guard.NotNull(command, nameof(command));
             Guard.NotNull(handler, nameof(handler));
 
-            await EnsureLoadedAsync();
-
-            if (IsDeleted())
-            {
-                throw new DomainException("Object has already been deleted.");
-            }
-
             if (isUpdate)
             {
+                await EnsureLoadedAsync();
+
+                if (Version < 0)
+                {
+                    throw new DomainObjectNotFoundException(uniqueId.ToString());
+                }
+
+                if (Version != command.ExpectedVersion && command.ExpectedVersion > EtagVersion.Any)
+                {
+                    throw new DomainObjectVersionException(uniqueId.ToString(), Version, command.ExpectedVersion);
+                }
+
+                if (IsDeleted())
+                {
+                    throw new DomainException("Object has already been deleted.");
+                }
+
                 if (!CanAccept(command))
                 {
                     throw new DomainException("Invalid command.");
@@ -162,7 +173,9 @@ namespace Squidex.Infrastructure.Commands
             }
             else
             {
-                if (Version > EtagVersion.Empty)
+                command.ExpectedVersion = EtagVersion.Empty;
+
+                if (Version != command.ExpectedVersion)
                 {
                     throw new DomainObjectConflictException(uniqueId.ToString());
                 }
@@ -171,16 +184,6 @@ namespace Squidex.Infrastructure.Commands
                 {
                     throw new DomainException("Invalid command.");
                 }
-            }
-
-            if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
-            {
-                throw new DomainObjectVersionException(uniqueId.ToString(), Version, command.ExpectedVersion);
-            }
-
-            if (isUpdate && Version < 0)
-            {
-                throw new DomainObjectNotFoundException(uniqueId.ToString());
             }
 
             var previousSnapshot = Snapshot;
@@ -208,6 +211,12 @@ namespace Squidex.Infrastructure.Commands
                 isLoaded = true;
 
                 return result;
+            }
+            catch (InconsistentStateException) when (!isUpdate)
+            {
+                RestorePreviousSnapshot(previousSnapshot, previousVersion);
+
+                throw new DomainObjectConflictException(uniqueId.ToString());
             }
             catch
             {

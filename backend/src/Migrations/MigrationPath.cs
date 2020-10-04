@@ -48,7 +48,7 @@ namespace Migrations
                 yield return serviceProvider.GetRequiredService<ConvertEventStore>();
             }
 
-            // Version 22: Also add app id to aggregate id.
+            // Version 22: Integrate Domain Id.
             if (version < 22)
             {
                 yield return serviceProvider.GetRequiredService<AddAppIdToEventStream>();
@@ -80,7 +80,7 @@ namespace Migrations
                 }
 
                 // Version 14: Schema refactoring
-                // Version 22: Also add app id to aggregate id.
+                // Version 22: Introduce domain id.
                 if (version < 22)
                 {
                     yield return serviceProvider.GetRequiredService<ClearSchemas>();
@@ -88,8 +88,7 @@ namespace Migrations
                 }
 
                 // Version 18: Rebuild assets.
-                // Version 22: Introduce domain id.
-                if (version < 22)
+                if (version < 18)
                 {
                     yield return serviceProvider.GetService<RebuildAssetFolders>();
                     yield return serviceProvider.GetService<RebuildAssets>();
@@ -107,13 +106,26 @@ namespace Migrations
                     {
                         yield return serviceProvider.GetService<RenameAssetMetadata>();
                     }
+
+                    // Version 22: Introduce domain id.
+                    if (version < 22)
+                    {
+                        yield return serviceProvider.GetRequiredService<ConvertDocumentIds>().ForAssets();
+                    }
                 }
 
                 // Version 21: Introduce content drafts V2.
-                // Version 22: Introduce domain id.
-                if (version < 22)
+                if (version < 21)
                 {
                     yield return serviceProvider.GetRequiredService<RebuildContents>();
+                }
+                else
+                {
+                    // Version 22: Introduce domain id.
+                    if (version < 22)
+                    {
+                        yield return serviceProvider.GetRequiredService<ConvertDocumentIds>().ForContents();
+                    }
                 }
             }
 
