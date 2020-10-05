@@ -101,6 +101,14 @@ namespace Migrations.Migrations.MongoDb
                     var appId = document["_ai"].AsString;
 
                     var documentIdOld = document["_id"].AsString;
+
+                    if (documentIdOld.Contains("--", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
+
+                        documentIdOld = documentIdOld.Substring(index + 2);
+                    }
+
                     var documentIdNew = DomainId.Combine(appId, documentIdOld).ToString();
 
                     document["id"] = documentIdOld;
