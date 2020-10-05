@@ -141,16 +141,6 @@ namespace Squidex.Domain.Apps.Entities.Comments
             return new CommandContext(command, commandBus);
         }
 
-        private static bool IsForUser(ICommand command, string id)
-        {
-            return command is CreateComment createComment &&
-                createComment.CommentsId == id &&
-                createComment.Mentions == null &&
-                createComment.AppId == null &&
-                createComment.ExpectedVersion == EtagVersion.Any &&
-                createComment.IsMention;
-        }
-
         private void SetupUser(string id, string email)
         {
             var user = A.Fake<IUser>();

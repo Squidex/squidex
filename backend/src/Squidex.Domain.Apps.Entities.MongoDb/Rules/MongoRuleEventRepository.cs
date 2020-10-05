@@ -97,7 +97,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public async Task EnqueueAsync(RuleJob job, Instant? nextAttempt, CancellationToken ct = default)
         {
-            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Job = job, Created = job.Created, NextAttempt = nextAttempt });
+            var entity = new MongoRuleEventEntity { Job = job, Created = job.Created, NextAttempt = nextAttempt };
+
+            SimpleMapper.Map(job, entity);
+
+            entity.DocumentId = job.Id.ToString();
 
             await Collection.InsertOneIfNotExistsAsync(entity, ct);
         }
