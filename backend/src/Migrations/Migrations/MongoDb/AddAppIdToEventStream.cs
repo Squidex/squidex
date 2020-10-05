@@ -56,10 +56,18 @@ namespace Migrations.Migrations.MongoDb
 
                     if (TryGetAppId(document, out var appId))
                     {
-                        var parts = eventStream.Split("-");
+                        var indexOfType = eventStream.IndexOf('-');
+                        var indexOfId = indexOfType + 1;
 
-                        var domainType = parts[0];
-                        var domainId = string.Join("-", parts.Skip(1));
+                        var indexOfOldId = eventStream.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
+
+                        if (indexOfOldId > 0)
+                        {
+                            indexOfId = indexOfOldId + 2;
+                        }
+
+                        var domainType = eventStream.Substring(0, indexOfType);
+                        var domainId = eventStream.Substring(indexOfId);
 
                         var newDomainId = DomainId.Combine(appId, domainId).ToString();
                         var newStreamName = $"{domainType}-{newDomainId}";
