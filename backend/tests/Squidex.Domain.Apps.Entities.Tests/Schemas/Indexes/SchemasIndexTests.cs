@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             var schema = SetupSchema(0, true);
 
             A.CallTo(() => index.GetIdsAsync())
-                .Returns(new List<Guid> { schema.Id });
+                .Returns(new List<DomainId> { schema.Id });
 
             var actual = await sut.GetSchemasAsync(appId.Id);
 
