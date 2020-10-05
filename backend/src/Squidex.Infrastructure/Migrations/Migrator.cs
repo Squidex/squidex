@@ -90,11 +90,13 @@ namespace Squidex.Infrastructure.Migrations
                     }
 
                     version = newVersion;
+
+                    await migrationStatus.CompleteAsync(newVersion);
                 }
             }
             finally
             {
-                await migrationStatus.UnlockAsync(version);
+                await migrationStatus.UnlockAsync();
             }
         }
     }

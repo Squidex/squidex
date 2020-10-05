@@ -15,6 +15,8 @@ namespace Squidex.Infrastructure.Migrations
 
         Task<bool> TryLockAsync();
 
-        Task UnlockAsync(int newVersion);
+        Task CompleteAsync(int newVersion);
+
+        Task UnlockAsync();
     }
 }
