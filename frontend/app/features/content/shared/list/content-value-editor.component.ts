@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto } from '@app/shared';
+import { FieldDto, MathHelper } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-value-editor',
@@ -21,4 +21,6 @@ export class ContentValueEditorComponent {
 
     @Input()
     public form: FormGroup;
+
+    public uniqueId = MathHelper.guid();
 }
