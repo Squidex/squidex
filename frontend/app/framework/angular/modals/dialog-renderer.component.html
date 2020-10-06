@@ -9,19 +9,23 @@
         <ng-container content>
             <span [innerHTML]="request.text | sqxTranslate | sqxMarkdown"></span>
 
-            <div class="form-check mt-4" *ngIf="request.canRemember">
-                <input class="form-check-input" type="checkbox" id="remember" [(ngModel)]="request.remember">
+            <div class="custom-control custom-checkbox mt-4" *ngIf="request.canRemember">
+                <input class="custom-control-input" type="checkbox" id="remember" [(ngModel)]="request.remember">
 
-                <label class="form-check-label" for="remember">
+                <label class="custom-control-label" for="remember">
                     {{ 'common.remember' | sqxTranslate}}
                 </label>
             </div>
         </ng-container>
     
         <ng-container footer>
-            <button type="button" class="btn btn-secondary" (click)="cancel()">{{ 'common.no' | sqxTranslate }}</button>
+            <button type="button" class="btn btn-text-secondary2" (click)="cancel()">
+                {{ 'common.no' | sqxTranslate }}
+            </button>
 
-            <button type="button" class="btn btn-danger" (click)="confirm()" sqxFocusOnInit>{{ 'common.yes' | sqxTranslate }}</button>
+            <button type="button" class="btn btn-danger" (click)="confirm()" sqxFocusOnInit>
+                {{ 'common.yes' | sqxTranslate }}
+            </button>
         </ng-container>
     </sqx-modal-dialog>
 </ng-container>

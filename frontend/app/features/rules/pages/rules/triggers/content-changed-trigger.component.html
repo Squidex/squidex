@@ -38,7 +38,7 @@
     <div class="section" *ngIf="schemasToAdd.length > 0">
         <form class="form-inline" (ngSubmit)="addSchema()">
             <div class="form-group mr-1">
-                <select class="form-control schemas-control" [disabled]="triggerForm.disabled" [(ngModel)]="schemaToAdd" name="schema">
+                <select class="custom-select schemas-control" [disabled]="triggerForm.disabled" [(ngModel)]="schemaToAdd" name="schema">
                     <option *ngFor="let schema of schemasToAdd; trackBy: trackBySchema" [ngValue]="schema">{{schema.displayName}}</option>
                 </select>
             </div>
@@ -74,9 +74,9 @@
 </ng-container>
 
 <div class="form-group" [formGroup]="triggerForm">
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="handleAll" formControlName="handleAll" />
-        <label class="form-check-label" for="handleAll">
+    <div class="custom-control custom-checkbox">
+        <input class="custom-control-input" type="checkbox" id="handleAll" formControlName="handleAll">
+        <label class="custom-control-label" for="handleAll">
             Trigger on all content events
         </label>
     </div>

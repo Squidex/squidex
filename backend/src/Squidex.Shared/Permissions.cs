@@ -53,8 +53,7 @@ namespace Squidex.Shared
 
         public const string AppDelete = "squidex.apps.{app}.delete";
         public const string AppUpdate = "squidex.apps.{app}.update";
-        public const string AppUpdateImage = "squidex.apps.{app}.update";
-        public const string AppUpdateGeneral = "squidex.apps.{app}.general";
+        public const string AppUpdateImage = "squidex.apps.{app}.image";
 
         public const string AppHistory = "squidex.apps.{app}.history";
 
@@ -63,8 +62,6 @@ namespace Squidex.Shared
         public const string AppSearch = "squidex.apps.{app}.search";
 
         public const string AppTranslate = "squidex.apps.{app}.translate";
-
-        public const string AppUsage = "squidex.apps.{app}.usage";
 
         public const string AppComments = "squidex.apps.{app}.comments";
         public const string AppCommentsRead = "squidex.apps.{app}.comments.read";
@@ -147,6 +144,8 @@ namespace Squidex.Shared
         public const string AppContentsVersionCreate = "squidex.apps.{app}.contents.{name}.version.create";
         public const string AppContentsVersionDelete = "squidex.apps.{app}.contents.{name}.version.delete";
         public const string AppContentsDelete = "squidex.apps.{app}.contents.{name}.delete";
+
+        public const string AppUsage = "squidex.apps.{app}.usage";
 
         static Permissions()
         {

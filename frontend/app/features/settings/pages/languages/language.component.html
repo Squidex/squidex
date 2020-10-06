@@ -29,8 +29,13 @@
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
                 <div class="float-right">
-                    <button type="reset" class="btn btn-text-secondary2" (click)="toggleEditing()">{{ 'common.cancel' | sqxTranslate }}</button>
-                    <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">{{ 'common.save' | sqxTranslate }}</button>
+                    <button type="reset" class="btn btn-text-secondary2" (click)="toggleEditing()">
+                        {{ 'common.cancel' | sqxTranslate }}
+                    </button>
+                    
+                    <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">
+                        { 'common.save' | sqxTranslate }}
+                    </button>
                 </div>
             </div>
 
@@ -60,12 +65,14 @@
                         <form class="form fallback-form" (ngSubmit)="addFallbackLanguage()" *ngIf="otherLanguage && isEditable">
                             <div class="row no-gutters">
                                 <div class="col">
-                                    <select class="form-control fallback-select" [(ngModel)]="otherLanguage" name="otherLanguage">
+                                    <select class="custom-select fallback-select" [(ngModel)]="otherLanguage" name="otherLanguage">
                                         <option *ngFor="let otherLanguage of fallbackLanguagesNew; trackBy: trackByLanguage" [ngValue]="otherLanguage">{{otherLanguage.englishName}}</option>
                                     </select>
                                 </div>
                                 <div class="col-auto pl-1">
-                                    <button type="submit" class="btn btn-success">{{ 'languages.add' | sqxTranslate }}</button>
+                                    <button type="submit" class="btn btn-success">
+                                        {{ 'languages.add' | sqxTranslate }}
+                                    </button>
                                 </div>
                             </div>
                         </form>
@@ -74,9 +81,9 @@
 
                 <div class="form-group row" *ngIf="!language.isMaster">
                     <div class="col offset-3 col-9">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isMaster" formControlName="isMaster">
-                            <label class="form-check-label" for="{{language.iso2Code}}_isMaster">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" type="checkbox" id="{{language.iso2Code}}_isMaster" formControlName="isMaster">
+                            <label class="custom-control-label" for="{{language.iso2Code}}_isMaster">
                                 {{ 'languages.master' | sqxTranslate }}
                             </label>
                         </div>
@@ -89,9 +96,9 @@
 
                 <div class="form-group row" *ngIf="!language.isMaster">
                     <div class="col offset-3 col-9">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isOptional" formControlName="isOptional">
-                            <label class="form-check-label" for="{{language.iso2Code}}_isOptional">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" type="checkbox" id="{{language.iso2Code}}_isOptional" formControlName="isOptional">
+                            <label class="custom-control-label" for="{{language.iso2Code}}_isOptional">
                                 {{ 'languages.optional' | sqxTranslate }}
                             </label> 
                         </div>

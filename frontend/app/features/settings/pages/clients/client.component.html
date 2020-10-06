@@ -6,7 +6,9 @@
                 </sqx-editable-title>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-primary" (click)="connectDialog.show()">{{ 'clients.connect' | sqxTranslate }}</button>
+                <button type="button" class="btn btn-primary" (click)="connectDialog.show()">
+                    {{ 'clients.connect' | sqxTranslate }}
+                </button>
             </div>
             <div class="col-auto cell-actions no-padding">
                 <button type="button" class="btn btn-text-danger" [disabled]="!client.canRevoke"
@@ -52,7 +54,7 @@
                     {{ 'common.role' | sqxTranslate }}
                 </label>
                 <div class="col cell-input">
-                    <select class="form-control" [disabled]="!client.canUpdate" [ngModel]="client.role" (ngModelChange)="updateRole($event)">
+                    <select class="custom-select" [disabled]="!client.canUpdate" [ngModel]="client.role" (ngModelChange)="updateRole($event)">
                         <option *ngFor="let role of clientRoles; trackBy: trackByRole" [ngValue]="role.name">{{role.name}}</option>
                     </select>
                 </div>
@@ -60,10 +62,10 @@
             </div>
             <div class="form-group row">
                 <div class="col cell-input offset-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="{{client.id}}_allowAnonymous" [disabled]="!client.canUpdate" [ngModel]="client.allowAnonymous" (ngModelChange)="updateAllowAnonymous($event)">
+                    <div class="custom-control custom-checkbox">
+                        <input class="custom-control-input" type="checkbox" id="{{client.id}}_allowAnonymous" [disabled]="!client.canUpdate" [ngModel]="client.allowAnonymous" (ngModelChange)="updateAllowAnonymous($event)">
             
-                        <label class="form-check-label" for="{{client.id}}_allowAnonymous">
+                        <label class="custom-control-label" for="{{client.id}}_allowAnonymous">
                             {{ 'clients.allowAnonymous' | sqxTranslate }}
                         </label>
                     </div>
@@ -79,7 +81,7 @@
                     {{ 'clients.apiCallsLimit' | sqxTranslate }}
                 </label>
                 <div class="col cell-input">
-                    <input type="number" class="form-control" min="0" [disabled]="!client.canUpdate" [(ngModel)]="apiCallsLimit" />
+                    <input type="number" class="form-control" min="0" [disabled]="!client.canUpdate" [(ngModel)]="apiCallsLimit">
 
                     <sqx-form-hint>{{ 'clients.apiCallsLimitHint' | sqxTranslate }}</sqx-form-hint>
                 </div>

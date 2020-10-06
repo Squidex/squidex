@@ -13,12 +13,14 @@
                 </sqx-autocomplete>
             </div>
             <div class="col-3 pl-1">
-                <select class="form-control" formControlName="role">
+                <select class="custom-select" formControlName="role">
                     <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
                 </select>
             </div>
             <div class="col-auto pl-1">
-                <button type="submit" class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async">{{ 'contributors.add' | sqxTranslate }}</button>
+                <button type="submit" class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async">
+                    {{ 'contributors.add' | sqxTranslate }}
+                </button>
             </div>
         </div>
     </form>

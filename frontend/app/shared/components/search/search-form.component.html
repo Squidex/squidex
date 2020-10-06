@@ -75,18 +75,22 @@
                     <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxFocusOnInit>
                 </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" formControlName="user" id="user">
-                    <label class="form-check-label" for="user">
+                <div class="custom-control custom-checkbox">
+                    <input class="custom-control-input" type="checkbox" formControlName="user" id="user">
+                    <label class="custom-control-label" for="user">
                         {{ 'search.saveQueryMyself' | sqxTranslate }}
                     </label>
                 </div>
             </ng-container>
         
             <ng-container footer>
-                <button type="button" class="btn btn-secondary" (click)="saveQueryDialog.hide()">{{ 'common.cancel' | sqxTranslate }}</button>
+                <button type="button" class="btn btn-text-secondary2" (click)="saveQueryDialog.hide()">
+                    {{ 'common.cancel' | sqxTranslate }}
+                </button>
                
-                <button type="submit" class="btn btn-success">{{ 'common.create' | sqxTranslate }}</button>
+                <button type="submit" class="btn btn-success">
+                    {{ 'common.create' | sqxTranslate }}
+                </button>
             </ng-container>
         </sqx-modal-dialog>
     </form>

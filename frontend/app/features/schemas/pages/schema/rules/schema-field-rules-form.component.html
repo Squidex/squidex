@@ -12,7 +12,7 @@
                     <div class="col col-action pr-1">
                         <sqx-control-errors for="action"></sqx-control-errors>
 
-                        <select class="form-control" formControlName="action">
+                        <select class="custom-select" formControlName="action">
                             <option *ngFor="let fieldAction of fieldActions" [ngValue]="fieldAction">{{fieldAction}}</option>
                         </select>
                     </div>
@@ -20,7 +20,7 @@
                     <div class="col-3 pr-1">
                         <sqx-control-errors for="field"></sqx-control-errors>
 
-                        <select class="form-control" formControlName="field">
+                        <select class="custom-select" formControlName="field">
                             <option *ngFor="let field of fieldNames" [ngValue]="field">{{field}}</option>
                         </select>
                     </div>
@@ -72,7 +72,9 @@
             </div>
         </div>
         <div class="card-footer" *ngIf="isEditable">
-            <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">{{ 'common.save' | sqxTranslate }}</button>
+            <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">
+                {{ 'common.save' | sqxTranslate }}
+            </button>
         </div>
     </div>
 </form>

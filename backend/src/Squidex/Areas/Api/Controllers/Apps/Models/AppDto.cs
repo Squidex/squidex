@@ -168,7 +168,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 AddDeleteLink("delete", resources.Url<AppsController>(x => nameof(x.DeleteApp), values));
             }
 
-            if (resources.IsAllowed(P.AppUpdateGeneral, Name, additional: permissions))
+            if (resources.IsAllowed(P.AppUpdate, Name, additional: permissions))
             {
                 AddPutLink("update", resources.Url<AppsController>(x => nameof(x.UpdateApp), values));
             }

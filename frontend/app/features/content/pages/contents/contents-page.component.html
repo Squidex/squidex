@@ -82,7 +82,13 @@
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)">
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" type="checkbox" id="all_selected"
+                                            [ngModel]="selectedAll" 
+                                            (ngModelChange)="selectAll($event)">
+
+                                        <label class="custom-control-label" for="all_selected"></label>
+                                    </div>
                                 </th>
                                 <th class="cell-actions cell-actions-left">
                                     {{ 'common.actions' | sqxTranslate }}

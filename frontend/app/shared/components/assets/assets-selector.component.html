@@ -41,8 +41,12 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn btn-secondary" (click)="emitComplete()">{{ 'common.cancel' | sqxTranslate }}</button>
+        <button type="button" class="btn btn-text-secondary2" (click)="emitComplete()">
+            {{ 'common.cancel' | sqxTranslate }}
+        </button>
 
-        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="snapshot.selectionCount === 0">{{ 'assets.linkSelected' | sqxTranslate: { count: snapshot.selectionCount } }})</button>
+        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="snapshot.selectionCount === 0">
+            {{ 'assets.linkSelected' | sqxTranslate: { count: snapshot.selectionCount } }})
+        </button>
     </ng-container>
 </sqx-modal-dialog>

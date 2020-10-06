@@ -57,7 +57,9 @@
                         <input class="form-control" formControlName="name" placeholder="{{ 'backups.restoreNewAppName' | sqxTranslate }}">
                     </div>
                     <div class="col-auto pl-1">
-                        <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">{{ 'backups.restore' | sqxTranslate }}</button>
+                        <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">
+                            {{ 'backups.restore' | sqxTranslate }}
+                        </button>
                     </div>
                 </div>
             </form>

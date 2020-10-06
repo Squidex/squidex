@@ -9,7 +9,9 @@
                 </div>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary mr-1" [disabled]="!renameForm.valid || !renameForm.dirty">{{ 'common.save' | sqxTranslate }}</button>
+                <button type="submit" class="btn btn-primary mr-1" [disabled]="!renameForm.valid || !renameForm.dirty">
+                    {{ 'common.save' | sqxTranslate }}
+                </button>
         
                 <button type="button" class="btn btn-text-secondary btn-cancel mr-4" (click)="toggleRename()">
                     <i class="icon-close"></i>

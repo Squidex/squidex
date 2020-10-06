@@ -2,7 +2,7 @@
     <ng-container title>
         <div class="row">
             <div class="col-selector">
-                <select class="form-control form-control-dark" [ngModel]="schema?.id" (ngModelChange)="selectSchema($event)">
+                <select class="custom-select form-control-dark" [ngModel]="schema?.id" (ngModelChange)="selectSchema($event)">
                     <option *ngFor="let schema of schemas" [ngValue]="schema.id">
                         {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
                     </option>
@@ -44,7 +44,7 @@
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)">
+                                    <input type="checkbox" class="custom-control custom-checkbox" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)">
                                 </th>
                                 <th sqxContentListCell="meta.lastModifiedBy.avatar">
                                     <sqx-content-list-header field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
@@ -85,7 +85,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn btn-secondary" (click)="emitComplete()">
+        <button type="button" class="btn text-secondary" (click)="emitComplete()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 
