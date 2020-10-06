@@ -304,7 +304,7 @@ module.exports = function (env) {
             new plugins.HtmlWebpackPlugin({
                 filename: 'theme.html',
                 hash: true, 
-                chunks: [],
+                chunks: ['app'],
                 chunksSortMode: 'none', 
                 template: 'app/_theme.html'
             })

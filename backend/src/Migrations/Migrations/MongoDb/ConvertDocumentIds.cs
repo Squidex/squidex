@@ -82,6 +82,8 @@ namespace Migrations.Migrations.MongoDb
             var collectionOld = database.GetCollection<BsonDocument>(collectionNameOld);
             var collectionNew = database.GetCollection<BsonDocument>(collectionNameNew);
 
+            await collectionNew.DeleteManyAsync(new BsonDocument());
+
             var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
                 BoundedCapacity = SizeOfQueue * SizeOfBatch
