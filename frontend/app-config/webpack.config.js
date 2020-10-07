@@ -252,6 +252,7 @@ module.exports = function (env) {
          */
         config.entry = {
             'shims': './app/shims.ts',
+            'style': './app/style.js',
               'app': './app/app.ts'
         };
 
@@ -304,7 +305,7 @@ module.exports = function (env) {
             new plugins.HtmlWebpackPlugin({
                 filename: 'theme.html',
                 hash: true, 
-                chunks: ['app'],
+                chunks: ['style'],
                 chunksSortMode: 'none', 
                 template: 'app/_theme.html'
             })
