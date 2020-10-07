@@ -106,14 +106,23 @@
 
     <ng-container footer>
         <ng-container *ngIf="step === 2 || step === 4">
-            <button type="button" class="btn btn-secondary" (click)="emitComplete()">{{ 'common.cancel' | sqxTranslate }}</button>
+            <button type="button" class="btn btn-text-secondary2" (click)="emitComplete()">
+                {{ 'common.cancel' | sqxTranslate }}
+            </button>
         </ng-container>
 
         <ng-container *ngIf="isEditable">
-            <button *ngIf="step === 2 &&  isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">{{ 'common.continue' | sqxTranslate }}</button>
-            <button *ngIf="step === 2 && !isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">{{ 'common.save' | sqxTranslate }}</button>
+            <button *ngIf="step === 2 &&  isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">
+                {{ 'common.continue' | sqxTranslate }}
+            </button>
 
-            <button *ngIf="step === 4" type="submit" class="btn btn-primary" (click)="saveAction()">{{ 'common.save' | sqxTranslate }}</button>
+            <button *ngIf="step === 2 && !isWizard" type="submit" class="btn btn-primary" (click)="saveTrigger()">
+                {{ 'common.save' | sqxTranslate }}
+            </button>
+
+            <button *ngIf="step === 4" type="submit" class="btn btn-primary" (click)="saveAction()">
+                {{ 'common.save' | sqxTranslate }}
+            </button>
         </ng-container>
     </ng-container>
 </sqx-modal-dialog>

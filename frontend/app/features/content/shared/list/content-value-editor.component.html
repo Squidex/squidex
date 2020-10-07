@@ -3,13 +3,13 @@
         <ng-container *ngSwitchCase="'Number'">
             <ng-container [ngSwitch]="field.rawProperties.editor">
                 <ng-container *ngSwitchCase="'Input'">
-                    <input class="form-control" type="number" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
+                    <input class="form-control" type="number" [formControlName]="field.name" [placeholder]="field.displayPlaceholder">
                 </ng-container>
                 <ng-container *ngSwitchCase="'Stars'">
                     <sqx-stars [formControlName]="field.name" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Dropdown'">
-                    <select class="form-control" [formControlName]="field.name">
+                    <select class="custom-select" [formControlName]="field.name">
                         <option [ngValue]="null"></option>
                         <option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
                     </select>
@@ -19,13 +19,13 @@
         <ng-container *ngSwitchCase="'String'">
             <ng-container [ngSwitch]="field.rawProperties.editor">
                 <ng-container *ngSwitchCase="'Input'">
-                    <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
+                    <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder">
                 </ng-container>
                 <ng-container *ngSwitchCase="'Slug'">
-                    <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify" />
+                    <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify">
                 </ng-container>
                 <ng-container *ngSwitchCase="'Dropdown'">
-                    <select class="form-control" [formControlName]="field.name">
+                    <select class="custom-select" [formControlName]="field.name">
                         <option [ngValue]="null"></option>
                         <option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
                     </select>
@@ -38,8 +38,9 @@
                     <sqx-toggle [formControlName]="field.name" [threeStates]="!field.properties.isRequired"></sqx-toggle>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Checkbox'">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" [formControlName]="field.name" sqxIndeterminateValue />
+                    <div class="custom-control custom-checkbox">
+                        <input class="custom-control-input" type="checkbox" [formControlName]="field.name" id="{{uniqueId}}" sqxIndeterminateValue>
+                        <label class="custom-control-label" for="{{uniqueId}}"></label>
                     </div>
                 </ng-container>
             </ng-container>

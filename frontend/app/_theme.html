@@ -9,119 +9,129 @@
     <meta content="IE=edge" http-equiv="X-UA-Compatible" />
 
     <style>
-        body {
-            background: white !important;
+        .page-title h1 {
+            font-size: 40px;
         }
 
-        .bs-docs-section {
-            margin-top: 6em;
+        .bs-section-title {
+            font-size: 30px;
+            font-weight: lighter;
+            margin-bottom: 2rem;
         }
 
-        .bs-component .card {
-            margin-bottom: 1rem;
+        .bs-section {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
         }
 
-        .bs-component+.bs-component {
-            margin-top: 1rem;
+        .bs-section-white {
+            background: white;
         }
 
         .bs-component {
-            position: relative;
+            margin-bottom: 1rem;
         }
 
-        .bs-component .modal {
-            position: relative;
-            display: block;
+        .modal-tabs {
+            height: 4rem
         }
-        
-        .progress {
-            margin-bottom: 10px;
+
+        .panel {
+            min-height: 500px;
+        }
+
+        .card {
+            margin-bottom: 1rem;
+        }
+
+        .table-items-row-details::before {
+            right: 80px !important;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="bs-docs-section clearfix">
+    <div class="bs-section container">
+        <div class="row">
+            <div class="col-lg-12 page-title">
+                <h1>Squidex Theme</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="bs-section bs-section-white">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Navbars</h1>
-                    </div>
+                    <h1 class="bs-section-title">Navbars</h1>
+                </div>
+            </div>
 
-                    <div class="bs-component">
-                        <nav class="navbar navbar-toggleable-md navbar-dark bg-primary">
-                            <button type="button" class="navbar-toggler navbar-toggler-right">
-                                <span class="navbar-toggler-icon"></span>
-                            </button>
+            <div class="row bs-component">
+                <div class="col-lg-12">
+                    <nav class="navbar navbar-expand navbar-dark bg-primary">
+                        <a class="navbar-brand" href="#">Navbar</a>
+        
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item active">
+                                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Features</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Pricing</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">About</a>
+                            </li>
+                        </ul>
+        
+                        <form class="form-inline">
+                            <input class="form-control mr-sm-2" type="text" placeholder="Search">
+        
+                            <button type="button" class="btn btn-secondary my-2 my-sm-0">Search</button>
+                        </form>
+                    </nav>
+                </div>
+            </div>
 
-                            <a class="navbar-brand" href="#">Navbar</a>
+            <div class="row bs-component">
+                <div class="col-lg-12">
+                    <nav class="navbar navbar-expand navbar-light bg-light">
+                        <a class="navbar-brand" href="#">Navbar</a>
+        
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item active">
+                                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Features</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Pricing</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">About</a>
+                            </li>
+                        </ul>
+        
+                        <form class="form-inline">
+                            <input class="form-control mr-sm-2" type="text" placeholder="Search">
 
-                            <div class="collapse navbar-collapse">
-                                <ul class="navbar-nav mr-auto">
-                                    <li class="nav-item active">
-                                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">Features</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">Pricing</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">About</a>
-                                    </li>
-                                </ul>
-
-                                <form class="form-inline">
-                                    <input class="form-control mr-sm-2" type="text" placeholder="Search">
-                                    <button type="button" class="btn btn-secondary my-2 my-sm-0">Search</button>
-                                </form>
-                            </div>
-                        </nav>
-                    </div>
-
-                    <div class="bs-component">
-                        <nav class="navbar navbar-toggleable-md navbar-dark bg-inverse">
-                            <button type="button" class="navbar-toggler navbar-toggler-right">
-                                <span class="navbar-toggler-icon"></span>
-                            </button>
-
-                            <a class="navbar-brand" href="#">Navbar</a>
-
-                            <div class="collapse navbar-collapse">
-                                <ul class="navbar-nav mr-auto">
-                                    <li class="nav-item active">
-                                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">Features</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">Pricing</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">About</a>
-                                    </li>
-                                </ul>
-
-                                <form class="form-inline">
-                                    <input class="form-control mr-sm-2" type="text" placeholder="Search">
-                                    <button type="button" class="btn btn-secondary my-2 my-sm-0">Search</button>
-                                </form>
-                            </div>
-                        </nav>
-                    </div>
+                            <button type="button" class="btn btn-secondary my-2 my-sm-0">Search</button>
+                        </form>
+                    </nav>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
-            <div class="page-header">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <h1>Buttons</h1>
-                    </div>
+    <div class="bs-section bs-section-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="bs-section-title">Buttons</h1>
                 </div>
             </div>
 
@@ -134,6 +144,7 @@
                         <button type="button" class="btn btn-info">Info</button>
                         <button type="button" class="btn btn-warning">Warning</button>
                         <button type="button" class="btn btn-danger">Danger</button>
+
                         <a class="btn btn-link">Link</a>
                     </p>
 
@@ -144,6 +155,7 @@
                         <button type="button" class="btn btn-text-info">Info</button>
                         <button type="button" class="btn btn-text-warning">Warning</button>
                         <button type="button" class="btn btn-text-danger">Danger</button>
+                        <button type="button" class="btn btn-text-secondary2">Secondary2</button>
                     </p>
 
                     <p class="bs-component">
@@ -167,23 +179,17 @@
                     <div class="bs-component">
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-primary">Primary</button>
+
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-primary dropdown-toggle"></button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#">Dropdown link</a>
-                                    <a class="dropdown-item" href="#">Dropdown link</a>
-                                </div>
                             </div>
                         </div>
 
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-success">Success</button>
+
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-success dropdown-toggle"></button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#">Dropdown link</a>
-                                    <a class="dropdown-item" href="#">Dropdown link</a>
-                                </div>
                             </div>
                         </div>
 
@@ -191,21 +197,14 @@
                             <button type="button" class="btn btn-info">Info</button>
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-info dropdown-toggle"></button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#">Dropdown link</a>
-                                    <a class="dropdown-item" href="#">Dropdown link</a>
-                                </div>
                             </div>
                         </div>
 
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-danger">Danger</button>
+
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-danger dropdown-toggle"></button>
-                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop4">
-                                    <a class="dropdown-item" href="#">Dropdown link</a>
-                                    <a class="dropdown-item" href="#">Dropdown link</a>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -215,8 +214,8 @@
                         <button type="button" class="btn btn-primary">Default button</button>
                         <button type="button" class="btn btn-primary btn-sm">Small button</button>
                     </div>
-
                 </div>
+
                 <div class="col-lg-5">
                     <p class="bs-component">
                         <button type="button" class="btn btn-primary btn-lg btn-block">Block level button</button>
@@ -254,7 +253,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="bs-component" style="margin-bottom: 15px">
                         <div class="btn-group" data-toggle="buttons">
                             <button type="button" class="btn btn-toggle btn-success">
@@ -265,7 +264,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="bs-component" style="margin-bottom: 15px">
                         <div class="btn-group" data-toggle="buttons">
                             <button type="button" class="btn btn-toggle btn-info">
@@ -307,12 +306,9 @@
 
                     <div class="bs-component">
                         <div class="btn-group-vertical" data-toggle="buttons">
-                            <button type="button" class="btn btn-primary">Button</button>
-                            <button type="button" class="btn btn-primary">Button</button>
-                            <button type="button" class="btn btn-primary">Button</button>
-                            <button type="button" class="btn btn-primary">Button</button>
-                            <button type="button" class="btn btn-primary">Button</button>
-                            <button type="button" class="btn btn-primary">Button</button>
+                            <button type="button" class="btn btn-primary">Top</button>
+                            <button type="button" class="btn btn-primary">Middle</button>
+                            <button type="button" class="btn btn-primary">Buttom</button>
                         </div>
                     </div>
 
@@ -332,15 +328,15 @@
                                 <button type="button" class="btn btn-secondary">3</button>
                                 <button type="button" class="btn btn-secondary">4</button>
                             </div>
-                            
+
                             &nbsp;
-                            
+
                             <div class="btn-group" role="group" aria-label="Second group">
                                 <button type="button" class="btn btn-secondary">5</button>
                                 <button type="button" class="btn btn-secondary">6</button>
                                 <button type="button" class="btn btn-secondary">7</button>
                             </div>
-                            
+
                             &nbsp;
 
                             <div class="btn-group" role="group" aria-label="Third group">
@@ -348,17 +344,16 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
+    <div class="bs-section bs-section-white">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Typography</h1>
-                    </div>
+                    <h1 class="bs-section-title">Typography</h1>
                 </div>
             </div>
 
@@ -383,7 +378,7 @@
                         <p>Nullam quis risus eget <a href="#">urna mollis ornare</a> vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula.</p>
                         <p>The following is <strong>rendered as bold text</strong>.</p>
                         <p>The following is <em>rendered as italicized text</em>.</p>
-                        <p>An abbreviation of the word attribute is <abbr title="attribute">attr</abbr>.</p>
+                        <p>The following is an abbreviation <abbr title="attribute">attr</abbr>.</p>
                     </div>
 
                 </div>
@@ -401,7 +396,7 @@
 
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-lg-12">
                     <h2>Blockquotes</h2>
@@ -412,6 +407,7 @@
                     <div class="bs-component">
                         <blockquote class="blockquote">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                             <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
                         </blockquote>
                     </div>
@@ -420,20 +416,25 @@
                     <div class="bs-component">
                         <blockquote class="blockquote blockquote-reverse">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                             <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
                         </blockquote>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
+    <div class="bs-section bs-section-white">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Tables</h1>
-                    </div>
+                    <h1 class="bs-section-title">Tables</h1>
+                </div>
+            </div>
 
+            <div class="row">
+                <div class="col-lg-12">
                     <div class="bs-component">
                         <table class="table table-striped table-hover table-bordered">
                             <thead class="thead-inverse">
@@ -493,184 +494,301 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
+    <div class="bs-section">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Forms</h1>
-                    </div>
+                    <h1 class="bs-section-title">Tables2</h1>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-12">
                     <div class="bs-component">
-                        <form>
-                            <fieldset>
-                                <legend>Legend</legend>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">Email address</label>
-                                    <input type="email" class="form-control" aria-describedby="emailHelp" placeholder="Enter email">
-                                    <small class="text-muted form-text">We'll never share your email with anyone else.</small>
-                                </div>
-                                <div class="form-group">
-                                    <label for="underlinedInputHelp">Underlined</label>
-                                    <input type="text" class="form-control form-underlined" name="xyz" aria-describedby="underlinedInputHelp" placeholder="Enter text">
-                                    <small class="text-muted form-text">Input with just a line.</small>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputPassword1">Password</label>
-                                    <input type="password" class="form-control" placeholder="Password">
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleSelect1">Example select</label>
-                                    <select class="form-control">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleSelect2">Example multiple select</label>
-                                    <select multiple class="form-control">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleTextarea">Example textarea</label>
-                                    <textarea class="form-control" rows="3"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputFile">File input</label>
-                                    <input type="file" class="form-control-file" aria-describedby="fileHelp">
-                                    <sqx-form-hint>This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.</small>
-                                </div>
-                                <fieldset class="form-group">
-                                    <legend>Radio buttons</legend>
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input type="radio" class="form-check-input" name="optionsRadios" value="option1" checked>
-                                            Option one is this and that&mdash;be sure to include why it's great
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input type="radio" class="form-check-input" name="optionsRadios" value="option2">
-                                            Option two can be something else and selecting it will deselect option one
-                                        </label>
-                                    </div>
-                                    <div class="form-check disabled">
-                                        <label class="form-check-label">
-                                            <input type="radio" class="form-check-input" name="optionsRadios" value="option3" disabled>
-                                            Option three is disabled
-                                        </label>
-                                    </div>
-                                </fieldset>
-                                <div class="form-check">
-                                    <label class="form-check-label">
-                                        <input class="form-check-input" type="checkbox">
-                                        Check me out
-                                    </label>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </fieldset>
-                        </form>
+                        <table class="table table-items">
+                            <thead class="thead-inverse">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Column heading</th>
+                                    <th>Column heading</th>
+                                    <th>Column heading</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Column content</td>
+                                    <td>Column content</td>
+                                    <td>Column content</td>
+                                </tr>
+                                <tr class="spacer"></tr>
+
+                                <tr>
+                                    <td>2</td>
+                                    <td>Column content</td>
+                                    <td>Column content</td>
+                                    <td>Column content</td>
+                                </tr>
+                                <tr class="spacer"></tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-
-                <div class="col-lg-4 col-lg-offset-1">
-                    <form class="bs-component">
-                        <div class="form-group">
-                            <fieldset disabled>
-                                <label class="control-label" for="disabledInput">Disabled input</label>
-                                <input class="form-control" type="text" placeholder="Disabled input here..." disabled="">
-                            </fieldset>
-
-                            <fieldset disabled>
-                                <label class="control-label" for="disabledInput">Disabled underlined input</label>
-                                <input class="form-control form-underlined" type="text" placeholder="Disabled input here..." disabled="">
-                            </fieldset>
-                        </div>
-
-                        <div class="form-group">
-                            <fieldset>
-                                <label class="control-label" for="readOnlyInput">Readonly input</label>
-                                <input class="form-control" type="text" placeholder="Readonly input here…" readonly>
-                            </fieldset>
-
-                            <fieldset>
-                                <label class="control-label" for="readOnlyInput">Readonly underlined input</label>
-                                <input class="form-control form-underlined" type="text" placeholder="Readonly input here…" readonly>
-                            </fieldset>
-                        </div>
-
-                        <div class="form-group has-success">
-                            <label class="form-control-label" for="inputSuccess1">Input with success</label>
-                            <input type="text" class="form-control is-valid">
-                            <div class="valid-feedback">Success! You've done it.</div>
-                        </div>
-
-                        <div class="form-group has-warning">
-                            <label class="form-control-label" for="inputWarning1">Input with warning</label>
-                            <input type="text" class="form-control is-invalid">
-                            <div class="invalid-feedback">Shucks, try again.</div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-form-label col-form-label-lg" for="inputLarge">Large input</label>
-                            <input class="form-control form-control-lg" type="text">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-form-label" for="inputDefault">Default input</label>
-                            <input type="text" class="form-control">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-form-label col-form-label-sm" for="inputSmall">Small input</label>
-                            <input class="form-control form-control-sm" type="text">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">Input addons</label>
-                            
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">$</span>
-                                </div>
-                                
-                                <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
-                                
-                                <div class="input-group-append">
-                                    <span class="input-group-text">.00</span>
-                                </div>
-                              </div>
-                        </div>
-                    </form>
-
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
+    <div class="bs-section bs-section-white">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Navs</h1>
+                    <h1 class="bs-section-title">Forms</h1>
+                </div>
+            </div>
+
+            <form>
+                <fieldset>
+                    <legend>Legend</legend>
+
+                    <div class="form-alert form-alert-error">
+                        <p>Validation error.</p>
+
+                        <ul>
+                            <li>An user with the same email aready exists.</li>
+                        </ul>
                     </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="bs-component">
+                                <div class="form-group">
+                                    <label>Email address</label>
+
+                                    <input type="email" class="form-control" placeholder="Enter email" autocomplete="off">
+
+                                    <small class="text-muted form-text">We will never share your email with anyone else.</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Underlined</label>
+
+                                    <input type="text" class="form-control form-underlined" placeholder="Enter text" autocomplete="false">
+
+                                    <small class="text-muted form-text">Input with just an underlined.</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Password</label>
+
+                                    <input type="password" class="form-control" placeholder="Password" autocomplete="false">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Example custom select</label>
+
+                                    <select class="custom-select">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Example custom multiple select</label>
+
+                                    <select multiple class="custom-select">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Example textarea</label>
+
+                                    <textarea class="form-control" rows="3"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Custom File input</label>
+
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="customFile">
+
+                                        <label class="custom-file-label" for="customFile">Choose file</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>File input</label>
+
+                                    <input type="file" class="form-control-file">
+                                </div>
+
+                                <div class="form-group">
+                                    <h2>Custom Radio buttons</h2>
+
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
+                                        <label class="custom-control-label" for="customRadio1">Option 1</label>
+                                    </div>
+
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
+                                        <label class="custom-control-label" for="customRadio2">Option 2</label>
+                                    </div>
+                                    
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" id="customRadio3" name="customRadio" class="custom-control-input" disabled>
+                                        <label class="custom-control-label" for="customRadio3">Option 3 (disabled)</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <h2>Custom Checkboxes</h2>
+
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="customCheckbox1" name="customRadio" class="custom-control-input">
+                                        <label class="custom-control-label" for="customCheckbox1">Option 1</label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="customCheckbox2" name="customRadio" class="custom-control-input">
+                                        <label class="custom-control-label" for="customCheckbox2">Option 2</label>
+                                    </div>
+                                    
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="customCheckbox3" name="customRadio" class="custom-control-input" disabled>
+                                        <label class="custom-control-label" for="customCheckbox3">Option 3 (disabled)</label>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-lg-offset-1">
+                            <form class="bs-component">
+                                <div class="form-group">
+                                    <label>Disabled input</label>
+
+                                    <input class="form-control" type="text" placeholder="Disabled input here..." disabled>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Disabled underlined input</label>
+
+                                    <input class="form-control form-underlined" type="text" placeholder="Disabled input here..." disabled>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Readonly input</label>
+
+                                    <input class="form-control" type="text" placeholder="Disabled input here..." readonly>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Readonly underlined input</label>
+
+                                    <input class="form-control form-underlined" type="text" placeholder="Disabled input here..." readonly>
+                                </div>
+
+                                <div class="form-group has-success">
+                                    <label>Input with success</label>
+
+                                    <input type="text" class="form-control is-valid">
+
+                                    <div class="valid-feedback">Success! You've done it.</div>
+                                </div>
+
+                                <div class="form-group has-warning">
+                                    <label>Input with warning</label>
+
+                                    <input type="text" class="form-control is-invalid">
+
+                                    <div class="invalid-feedback">Shucks, try again.</div>
+                                </div>
+
+                                <div class="form-group has-warning">
+                                    <label>Input with error</label>
+
+                                    <div class="errors-container">
+                                        <div class="errors">You have entered an invalid value.</div>
+                                    </div>
+
+                                    <input type="text" class="form-control is-invalid">
+                                </div>
+
+                                <div class="form-group has-warning">
+                                    <label>Input with hint</label>
+
+                                    <input type="text" class="form-control">
+
+                                    <div class="alert alert-hint mt-2">
+                                        <i class="icon-info-outline"></i> The app name cannot be changed later.
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Large input</label>
+
+                                    <input class="form-control form-control-lg" type="text">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Default input</label>
+
+                                    <input type="text" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Small input</label>
+
+                                    <input class="form-control form-control-sm" type="text">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Input addons</label>
+
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+
+                                        <input type="text" class="form-control"
+                                            aria-label="Amount (to the nearest dollar)">
+
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    <div class="bs-section bs-section-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="bs-section-title">Forms</h1>
                 </div>
             </div>
 
             <div class="row" style="margin-bottom: 2rem">
                 <div class="col-lg-6">
                     <h2>Tabs</h2>
+
                     <div class="bs-component">
                         <ul class="nav nav-tabs">
                             <li class="nav-item">
@@ -683,7 +801,24 @@
                                 <a class="nav-link disabled" href="#">Disabled</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">Dropdown</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bs-component">
+                        <ul class="nav nav-tabs2">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#home">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#profile">Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link disabled" href="#">Disabled</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">Dropdown</a>
                             </li>
                         </ul>
                     </div>
@@ -691,22 +826,14 @@
 
                 <div class="col-lg-6">
                     <h2>Pills</h2>
+
                     <div class="bs-component">
                         <ul class="nav nav-pills">
                             <li class="nav-item">
                                 <a class="nav-link active" href="#">Active</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#">Action</a>
-                                    <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Something else here</a>
-
-                                    <div class="dropdown-divider"></div>
-
-                                    <a class="dropdown-item" href="#">Separated link</a>
-                                </div>
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">Dropdown</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Link</a>
@@ -716,23 +843,16 @@
                             </li>
                         </ul>
                     </div>
+
                     <br>
+
                     <div class="bs-component">
-                        <ul class="nav nav-pills nav-stacked">
+                        <ul class="nav flex-column">
                             <li class="nav-item">
                                 <a class="nav-link active" href="#">Active</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="#">Action</a>
-                                    <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Something else here</a>
-
-                                    <div class="dropdown-divider"></div>
-
-                                    <a class="dropdown-item" href="#">Separated link</a>
-                                </div>
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">Dropdown</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Link</a>
@@ -748,6 +868,7 @@
             <div class="row">
                 <div class="col-lg-6">
                     <h2>Breadcrumbs</h2>
+
                     <div class="bs-component">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item active">Home</li>
@@ -773,6 +894,7 @@
 
                 <div class="col-lg-6">
                     <h2>Pagination</h2>
+
                     <div class="bs-component">
                         <div>
                             <ul class="pagination">
@@ -851,28 +973,48 @@
                                 </li>
                             </ul>
                         </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2>Dropdown</h2>
 
+                    <div class="bs-component">
+                        <div class="dropdown-menu" style="position: static; display: block;">
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Something else here</a>
+
+                            <div class="dropdown-divider"></div>
+
+                            <a class="dropdown-item dropdown-item-delete" href="#">Separated link</a>
+                          </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
+    <div class="bs-section bs-section-white">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Indicators</h1>
-                    </div>
+                    <h1 class="bs-section-title">Indicators</h1>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-lg-12">
                     <h2>Alerts</h2>
+
                     <div class="bs-component">
                         <div class="alert alert-dismissible alert-warning mt-2">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
+
                             <h4>Warning!</h4>
+
                             <p>Best check yo self, you're not looking too good. Nulla vitae elit libero, a pharetra augue. Praesent commodo cursus magna, <a href="#" class="alert-link">vel scelerisque nisl consectetur et</a>.</p>
                         </div>
                     </div>
@@ -883,6 +1025,7 @@
                     <div class="bs-component">
                         <div class="alert alert-dismissible alert-danger mt-2">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
+
                             <strong>Oh snap!</strong> <a href="#" class="alert-link">Change a few things up</a> and try submitting again.
                         </div>
                     </div>
@@ -891,6 +1034,7 @@
                     <div class="bs-component">
                         <div class="alert alert-dismissible alert-success mt-2">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
+
                             <strong>Well done!</strong> You successfully read <a href="#" class="alert-link">this important alert message</a>.
                         </div>
                     </div>
@@ -899,13 +1043,16 @@
                     <div class="bs-component">
                         <div class="alert alert-dismissible alert-info mt-2">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
+
                             <i class="icon-info-outline"></i> <strong>Heads up!</strong> This <a href="#" class="alert-link">alert needs your attention</a>, but it's not super important.
                         </div>
                     </div>
                 </div>
             </div>
+
             <div>
                 <h2>Badges</h2>
+
                 <div class="bs-component" style="margin-bottom: 40px">
                     <span class="badge badge-primary">Primary</span>
                     <span class="badge badge-secondary">Secondary</span>
@@ -916,6 +1063,7 @@
                     <span class="badge badge-light">Light</span>
                     <span class="badge badge-dark">Dark</span>
                 </div>
+
                 <div class="bs-component">
                     <span class="badge badge-pill badge-primary">Primary</span>
                     <span class="badge badge-pill badge-secondary">Secondary</span>
@@ -928,103 +1076,99 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
+    <div class="bs-section bs-section-white">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Progress</h1>
-                    </div>
+                    <h1 class="bs-section-title">Progress</h1>
+                </div>
+            </div>
 
-                    <h3>Basic</h3>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Basic</h2>
+
                     <div class="bs-component">
                         <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 25%; height: 20px" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-
-                    <h3>Contextual alternatives</h3>
-                    <div class="bs-component">
-                        <div class="progress">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar" role="progressbar" style="width: 25%; height: 20px"></div>
                         </div>
                     </div>
 
-                    <h3>Multiple bars</h3>
+                    <h2>Contextual alternatives</h2>
+
                     <div class="bs-component">
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                            <div class="progress-bar bg-info" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 25%"></div>
+                        </div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%"></div>
+                        </div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 75%"></div>
+                        </div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 100%"></div>
                         </div>
                     </div>
 
-                    <h3>Striped</h3>
+                    <h2>Multiple bars</h2>
+
                     <div class="bs-component">
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 10%" 
-                                aria-valuenow="10"
-                                aria-valuemin="0"
-                                aria-valuemax="100"></div>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 25%" 
-                                aria-valuenow="25" 
-                                aria-valuemin="0"
-                                aria-valuemax="100"></div>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 50%" 
-                                aria-valuenow="50" 
-                                aria-valuemin="0"
-                                aria-valuemax="100"></div>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 75%" 
-                                aria-valuenow="75" 
-                                aria-valuemin="0"
-                                aria-valuemax="100"></div>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 100%" 
-                                aria-valuenow="100" 
-                                aria-valuemin="0"
-                                aria-valuemax="100"></div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar" role="progressbar" style="width: 15%"></div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 30%"></div>
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 20%"></div>
                         </div>
                     </div>
 
-                    <h3>Animated</h3>
+                    <h2>Striped</h2>
+
+                    <div class="bs-component">
+                        <div class="progress mb-1">
+                            <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 10%"></div>
+                        </div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 25%"></div>
+                        </div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 50%"></div>
+                        </div>
+                        <div class="progress mb-1">
+                            <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 75%"></div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <h2>Animated</h2>
+
                     <div class="bs-component">
                         <div class="progress">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" 
-                                aria-valuenow="75" 
-                                aria-valuemin="0"
-                                aria-valuemax="100" style="width: 75%">
-                            </div>
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
+    <div class="bs-section bs-section-white">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Containers</h1>
-                    </div>
+                    <h1 class="bs-section-title">Containers</h1>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
                     <div class="bs-component">
                         <div class="jumbotron">
                             <h1 class="display-3">Jumbotron</h1>
+
                             <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
                             <p><a class="btn btn-primary btn-lg" href="#">Learn more</a></p>
                         </div>
@@ -1063,25 +1207,32 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="col-lg-4">
                     <div class="bs-component">
                         <div class="list-group">
                             <a href="#" class="list-group-item list-group-item-action active">
                                 <h4 class="list-group-item-heading">List group item heading</h4>
+
                                 <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
                             </a>
                             <a href="#" class="list-group-item list-group-item-action">
                                 <h4 class="list-group-item-heading">List group item heading</h4>
+
                                 <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <div class="bs-section">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <h2>Cards</h2>
+                    <h1 class="bs-section-title">Cards</h1>
                 </div>
             </div>
 
@@ -1092,6 +1243,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1100,6 +1252,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1108,6 +1261,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1116,6 +1270,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1124,6 +1279,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1136,6 +1292,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1144,6 +1301,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1152,6 +1310,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1160,6 +1319,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1168,6 +1328,7 @@
                             <div class="card-body">
                                 <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
@@ -1179,19 +1340,21 @@
                     <div class="bs-component">
                         <div class="card">
                             <h3 class="card-header">Card header</h3>
+
                             <div class="card-body">
                                 <h5 class="card-title">Special title treatment</h5>
+
                                 <h6 class="card-subtitle text-muted">Support card subtitle</h6>
                             </div>
-                            
+
                             <img style="height: 200px; width: 100%; display: block" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22318%22%20height%3D%22180%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20318%20180%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_158bd1d28ef%20text%20%7B%20fill%3Argba(255%2C255%2C255%2C.75)%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A16pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_158bd1d28ef%22%3E%3Crect%20width%3D%22318%22%20height%3D%22180%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22129.359375%22%20y%3D%2297.35%22%3EImage%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" alt="Card image">
-                            
+
                             <div class="card-body">
-                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                <p href="#" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                                 <a href="#" class="card-link">Card link</a>
                                 <a href="#" class="card-link">Another link</a>
                             </div>
-                            
+
                             <div class="card-footer text-muted text-xs-center">
                                 2 days ago
                             </div>
@@ -1200,34 +1363,34 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
+    <div class="bs-section">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Dialogs</h1>
-                    </div>
+                    <h1 class="bs-section-title">Modals</h1>
                 </div>
             </div>
+
             <div class="row">
-                <div class="col-lg-6">
-                    <h2>Modals</h2>
+                <div class="col-lg-12">
                     <div class="bs-component">
-                        <div class="modal" style="position: relative; width: 100%; height: 500px">
-                            <div class="modal-backdrop show" style="position: absolute"></div> 
-                        
-                            <div class="modal-dialog modal-lg" style="position: absolute; top: 50px; left: 50px; right: 50px; bottom: 50px">
+                        <div class="modal" style="position: relative; width: 100%; height: 500px; display: block;">
+                            <div class="modal-backdrop show" style="position: absolute"></div>
+
+                            <div class="modal-dialog modal-lg" style="position: absolute; top: 50px; left: 50px; right: 50px; bottom: 50px; display: block;">
                                 <div class="modal-content">
                                     <div class="modal-header" *ngIf="showHeader">
                                         <h4 class="modal-title">
                                             Title
                                         </h4>
-                        
+
                                         <button type="button" class="close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
-                        
+
                                     <div class="modal-tabs clearfix">
                                         <ul class="nav nav-tabs2">
                                             <li class="nav-item">
@@ -1244,15 +1407,16 @@
                                             </li>
                                         </ul>
                                     </div>
-                        
+
                                     <div class="modal-body">
                                         Modal body text goes here.
                                     </div>
-                        
+
                                     <div class="modal-footer">
                                         <div class="clearfix">
                                             <button type="button" class="float-right btn btn-primary">Save changes</button>
-                                            <button type="button" class="float-left btn btn-secondary">Close</button>
+
+                                            <button type="button" class="float-left btn btn-text-secondary2">Close</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1262,18 +1426,147 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bs-docs-section">
+    <div class="bs-section">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="page-header">
-                        <h1>Modals</h1>
+                    <h1 class="bs-section-title">Lists</h1>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="bs-component">
+                        <div class="table-items-row table-items-row-expandable">
+                            <div class="table-items-row-summary">
+                                <div class="row no-gutters">
+                                    <div class="col">
+                                        My Item 1
+                                    </div>
+                                    <div class="col col-auto">
+                                        <button type="button" class="btn btn-secondary table-items-edit-button mr-1">
+                                            <i class="icon-settings"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-text-danger"">
+                                            <i class="icon-bin2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-items-row-details">
+                                <div class="table-items-row-details-tabs clearfix">
+                                    <ul class="nav nav-tabs2">
+                                        <li class="nav-item">
+                                            <a class="nav-link active">Tab1</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link">Tab2</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link">Tab3</a>
+                                        </li>
+                                    </ul>
+                                            
+                                    <div class="float-right">
+                                        <button type="reset" class="btn btn-text-secondary2">Cancel</button>
+                                        <button type="submit" class="btn btn-primary ml-1">Save</button>
+                                    </div>
+                                </div>
+                                <div class="table-items-row-details-tab">
+                                    Text
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-items-row table-items-row-expandable">
+                            <div class="table-items-row-summary">
+                                <div class="row no-gutters">
+                                    <div class="col">
+                                        My Item 2
+                                    </div>
+                                    <div class="col col-auto">
+                                        <button type="button" class="btn btn-secondary table-items-edit-button mr-1">
+                                            <i class="icon-settings"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-text-danger"">
+                                            <i class="icon-bin2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-items-row table-items-row-expandable">
+                            <div class="table-items-row-summary">
+                                <div class="row no-gutters">
+                                    <div class="col col-name">
+                                        My Item 3
+                                    </div>
+                                    <div class="col col-auto">
+                                        <button type="button" class="btn btn-secondary table-items-edit-button mr-1">
+                                            <i class="icon-settings"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-text-danger"">
+                                            <i class="icon-bin2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-items-row">
+                            <div class="row no-gutters">
+                                <div class="col col-name">
+                                    My Item 4
+                                </div>
+                                <div class="col col-auto">
+                                    <button type="button" class="btn btn-secondary table-items-edit-button mr-1">
+                                        <i class="icon-settings"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-text-danger"">
+                                        <i class="icon-bin2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                       
+                        <div class="table-items-footer">
+                            <form>
+                                <div class="row no-gutters">
+                                    <div class="col">
+                                        <input class="form-control" placeholder="Enter workflow name">
+                                    </div>
+                                    <div class="col-auto pl-1">
+                                        <button ype="submit" class="btn btn-success">Add Workflow</button>
+                                    </div>
+                                    <div class="col-auto pl-1">
+                                        <button type="reset" class="btn btn-text-secondary2">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="bs-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="bs-section-title">Panels</h1>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-lg-12">
                     <h2>Default</h2>
+
                     <div class="bs-component">
                         <div class="panel panel-light">
                             <div class="panel-header">
@@ -1281,30 +1574,24 @@
                                     <div class="float-right">
                                         <button type="button" class="btn btn-success">New</button>
                                     </div>
-                        
+
                                     <h3 class="panel-title">
                                         Title
                                     </h3>
                                 </div>
-                        
+
                                 <a class="panel-close">
                                     <i class="icon-close"></i>
                                 </a>
                             </div>
-                        
+
                             <div class="panel-main">
-                                <div class="panel-content">
+                                <div class="panel-content grid">
                                     <div class="panel-alert panel-alert-danger">
                                         Alert
                                     </div>
-
-                                    <ul>
-                                        <li>One</li>
-                                        <li>Two</li>
-                                        <li>Three</li>
-                                    </ul>
                                 </div>
-                        
+
                                 <div class="panel-sidebar">
                                     <a href="#" class="panel-link">
                                         <i class="icon-help2"></i>
@@ -1319,6 +1606,7 @@
             <div class="row">
                 <div class="col-lg-6">
                     <h2>Light</h2>
+
                     <div class="bs-component">
                         <div class="panel panel-light">
                             <div class="panel-header">
@@ -1326,48 +1614,29 @@
                                     <div class="float-right">
                                         <button type="button" class="btn btn-success">New</button>
                                     </div>
-                        
+
                                     <h3 class="panel-title">
                                         Title
                                     </h3>
                                 </div>
-                        
+
                                 <a class="panel-close">
                                     <i class="icon-close"></i>
                                 </a>
                             </div>
-                        
+
                             <div class="panel-main">
                                 <div class="panel-content panel-content-blank">
-                                    <ul class="nav nav-panel nav-dark-bordered flex-column">
-                                        <li class="nav-item">
-                                            <a class="nav-link">Link 1
-                                                <i class="icon-angle-right"></i>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link">Link 2
-                                                <i class="icon-angle-right"></i>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link active">Link 3
-                                                <i class="icon-angle-right"></i>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link">Link 4
-                                                <i class="icon-angle-right"></i>
-                                            </a>
-                                        </li>
-                                    </ul>
+                                    Text
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="col-lg-6">
                     <h2>Dark</h2>
+
                     <div class="bs-component">
                         <div class="panel panel-dark">
                             <div class="panel-header large">
@@ -1375,43 +1644,47 @@
                                     <div class="float-right">
                                         <button type="button" class="btn btn-success">New</button>
                                     </div>
-                        
+
                                     <h3 class="panel-title">
                                         Title
                                     </h3>
                                 </div>
-                        
+
                                 <a class="panel-close">
                                     <i class="icon-close"></i>
                                 </a>
-                                    
+
                                 <div class="panel-header-row">
                                     <div class="search-form">
                                         <input class="form-control form-control-dark" placeholder="Search here..." />
                                     </div>
                                 </div>
                             </div>
-                        
+
                             <div class="panel-main">
                                 <div class="panel-content">
                                     <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
                                         <li class="nav-item">
-                                            <a class="nav-link">Link 1
+                                            <a class="nav-link d-flex justify-content-between">
+                                                Link 1
                                                 <i class="icon-angle-right"></i>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link">Link 2
+                                            <a class="nav-link d-flex justify-content-between">
+                                                Link 2
                                                 <i class="icon-angle-right"></i>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link active">Link 3
+                                            <a class="nav-link d-flex justify-content-between">
+                                                Link 3
                                                 <i class="icon-angle-right"></i>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link">Link 4
+                                            <a class="nav-link d-flex justify-content-between">
+                                                Link 4
                                                 <i class="icon-angle-right"></i>
                                             </a>
                                         </li>
@@ -1425,5 +1698,4 @@
         </div>
     </div>
 </body>
-
 </html>

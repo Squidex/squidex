@@ -223,6 +223,11 @@ label {
         font-weight: normal;
     }
 
+    &.custom-control-label {
+        font-size: 100%;
+        font-weight: normal;
+    }
+
     .hint {
         color: $color-text-decent;
     }

@@ -50,10 +50,10 @@
         <div class="row transition-prevent-updates no-gutters">
             <div class="col col-arrow"></div>
             <div class="col col-step">
-                <div class="form-check float-right">
-                    <input class="form-check-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}" [disabled]="disabled" [ngModel]="step.noUpdate" (ngModelChange)="changeNoUpdate($event)">
+                <div class="custom-control custom-checkbox float-right">
+                    <input class="custom-control-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}" [disabled]="disabled" [ngModel]="step.noUpdate" (ngModelChange)="changeNoUpdate($event)">
 
-                    <label class="form-check-label" for="preventUpdates_{{step.name}}">
+                    <label class="custom-control-label" for="preventUpdates_{{step.name}}">
                         {{ 'workflows.preventUpdates' | sqxTranslate }}
                     </label>
                 </div>

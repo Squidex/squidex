@@ -32,8 +32,13 @@
         <form (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
                 <div class="float-right">
-                    <button type="reset" class="btn btn-text-secondary2" (click)="toggleEditing()">{{ 'common.cancel' | sqxTranslate }}</button>
-                    <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">{{ 'common.save' | sqxTranslate }}</button>
+                    <button type="reset" class="btn btn-text-secondary2" (click)="toggleEditing()">
+                        {{ 'common.cancel' | sqxTranslate }}
+                    </button>
+                    
+                    <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">
+                        {{ 'common.save' | sqxTranslate }}
+                    </button>
                 </div>
             </div>
 
@@ -45,20 +50,18 @@
                 </sqx-form-hint>
 
                 <ng-container *ngIf="!role.isDefaultRole; else defaultRole">
-                    <table class="table table-bordered table-fixed table-sm">
-                        <tr *ngFor="let control of editForm.controls; let i = index">
-                            <td class="col-name">
-                                <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
-    
-                                <sqx-autocomplete inputStyle="empty" [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
-                            </td>
-                            <td class="col-action" *ngIf="isEditable">
-                                <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
-                                    <i class="icon-bin2"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="row no-gutters mb-1" *ngFor="let control of editForm.controls; let i = index">
+                        <div class="col">
+                            <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
+
+                            <sqx-autocomplete [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
+                        </div>
+                        <div class="col-auto pl-1" *ngIf="isEditable">
+                            <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
+                                <i class="icon-bin2"></i>
+                            </button>
+                        </div>
+                    </div>
                 </ng-container>
 
                 <ng-template #defaultRole>
@@ -69,7 +72,7 @@
                     <table class="table table-bordered table-fixed table-sm">
                         <tr *ngFor="let control of editForm.controls; let i = index">
                             <td>
-                                <input class="form-control form-control-empty" [formControl]="control" />
+                                {{control.value}}
                             </td>
                         </tr>
                     </table>
@@ -96,13 +99,13 @@
                     </sqx-form-hint>
 
                     <div class="row rule-section">
-                        <div class="form-check col-6" *ngFor="let property of propertiesSimple; trackBy: trackByProperty">
-                            <input class="form-check-input" type="checkbox" id="{{role.name}}_{{property.key}}"
+                        <div class="custom-control custom-checkbox  col-6" *ngFor="let property of propertiesSimple; trackBy: trackByProperty">
+                            <input class="custom-control-input" type="checkbox" id="{{role.name}}_{{property.key}}"
                                 [disabled]="!isEditable"
                                 [ngModel]="getProperty(property.key)"
                                 (ngModelChange)="setProperty(property.key, $event)"
                                 [ngModelOptions]="standalone">
-                            <label class="form-check-label" for="{{role.name}}{{property.key}}">
+                            <label class="custom-control-label" for="{{role.name}}_{{property.key}}">
                                 {{ property.name | sqxTranslate }}
                             </label>
                         </div>
@@ -112,13 +115,13 @@
                         <h5>{{ 'common.schemas' | sqxTranslate }}</h5>
 
                         <div class="row rule-section">
-                            <div class="form-check col-6" *ngFor="let schema of schemas; trackBy: trackBySchema">
-                                <input class="form-check-input" type="checkbox" id="{{role.name}}_schema_{{schema.name}}"
+                            <div class="custom-control custom-checkbox col-6" *ngFor="let schema of schemas; trackBy: trackBySchema">
+                                <input class="custom-control-input" type="checkbox" id="{{role.name}}_schema_{{schema.name}}"
                                     [disabled]="!isEditable"
                                     [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
                                     (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
                                     [ngModelOptions]="standalone">
-                                <label class="form-check-label truncate" for="{{role.name}}_schema_{{schema.name}}">
+                                <label class="custom-control-label truncate" for="{{role.name}}_schema_{{schema.name}}">
                                     {{ 'roles.properties.hideContents' | sqxTranslate: { schema: schema.displayName } }}
                                 </label>
                             </div>

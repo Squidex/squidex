@@ -1,11 +1,13 @@
 <div #container (sqxResized)="updateContainerWidth($event.width)">
-    <div class="form-check" [class.form-check-block]="!snapshot.isSingleLine" [class.form-check-inline]="snapshot.isSingleLine" *ngFor="let value of valuesSorted">
-        <input type="checkbox" class="form-check-input" id="{{controlId}}{{value}}"
+    <div class="custom-control custom-checkbox" *ngFor="let value of valuesSorted"
+        [class.custom-control-block]="!snapshot.isSingleLine"
+        [class.custom-control-inline]="snapshot.isSingleLine">
+        <input class="custom-control-input" type="checkbox" id="{{controlId}}_{{value}}"
             (blur)="callTouched()"
             (change)="check($event.target.checked, value)" 
             [checked]="isChecked(value)"
             [disabled]="snapshot.isDisabled">
     
-        <label class="form-check-label" for="{{controlId}}{{value}}">{{value}}</label>
+        <label class="custom-control-label" for="{{controlId}}_{{value}}">{{value}}</label>
     </div>
 </div>

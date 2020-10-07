@@ -82,9 +82,13 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-secondary" (click)="cancel.emit()">{{ 'common.cancel' | sqxTranslate }}</button>
+            <button type="button" class="btn btn-text-secondary2" (click)="cancel.emit()">
+                {{ 'common.cancel' | sqxTranslate }}
+            </button>
 
-            <button type="submit" class="btn btn-success">{{ 'common.create' | sqxTranslate }}</button>
+            <button type="submit" class="btn btn-success">
+                {{ 'common.create' | sqxTranslate }}
+            </button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

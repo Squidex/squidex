@@ -29,9 +29,10 @@
                 <textarea class="form-control mb-1" name="{{comment.id}}" sqxFocusOnInit [(ngModel)]="editingText" [mention]="mentionUsers" [mentionConfig]="mentionConfig" (keydown)="updateWhenEnter($event)"></textarea>
     
                 <div>
-                    <button type="button" class="btn btn-sm btn-secondary mr-1" (click)="cancelEdit()">
+                    <button type="button" class="btn btn-sm btn-text-secondary2 mr-1" (click)="cancelEdit()">
                         {{ 'common.cancel' | sqxTranslate }}
                     </button>
+
                     <button type="submit" class="btn btn-sm btn-primary">
                         <i class="icon-enter"></i> {{ 'common.save' | sqxTranslate }}
                     </button>
