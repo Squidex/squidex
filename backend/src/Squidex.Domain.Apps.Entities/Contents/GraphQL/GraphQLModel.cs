@@ -83,15 +83,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var schema = new GraphQLSchema
             {
-                Query =
-                    new AppQueriesGraphType(
-                        model,
-                        pageSizeContents,
-                        pageSizeAssets,
-                        schemas
-                    ),
-                Mutation = new AppMutationsGraphType(model, schemas)
+                Query = new AppQueriesGraphType(
+                    model,
+                    pageSizeContents,
+                    pageSizeAssets,
+                    schemas)
             };
+
+            var schemasWithFields = schemas.Where(x => x.SchemaDef.Fields.Count > 0);
+
+            if (schemasWithFields.Any())
+            {
+                schema.Mutation = new AppMutationsGraphType(model, schemasWithFields);
+            }
 
             return schema;
         }

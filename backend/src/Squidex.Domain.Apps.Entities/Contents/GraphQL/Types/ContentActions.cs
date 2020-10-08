@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     Name = "id",
                     Description = "The id of the content (usually GUID).",
-                    DefaultValue = string.Empty,
+                    DefaultValue = null,
                     ResolvedType = AllTypes.NonNullDomainId
                 }
             };
@@ -108,21 +108,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     {
                         Name = "filter",
                         Description = "Optional OData filter.",
-                        DefaultValue = string.Empty,
+                        DefaultValue = null,
                         ResolvedType = AllTypes.String
                     },
                     new QueryArgument(AllTypes.None)
                     {
                         Name = "orderby",
                         Description = "Optional OData order definition.",
-                        DefaultValue = string.Empty,
+                        DefaultValue = null,
                         ResolvedType = AllTypes.String
                     },
                     new QueryArgument(AllTypes.None)
                     {
                         Name = "search",
                         Description = "Optional OData full text search.",
-                        DefaultValue = string.Empty,
+                        DefaultValue = null,
                         ResolvedType = AllTypes.String
                     }
                 };
@@ -200,8 +200,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     new QueryArgument(AllTypes.None)
                     {
                         Name = "id",
-                        Description = "The id of the content (GUID)",
-                        DefaultValue = string.Empty,
+                        Description = "The id of the content (usually GUID)",
+                        DefaultValue = null,
                         ResolvedType = AllTypes.NonNullString
                     },
                     new QueryArgument(AllTypes.None)
@@ -333,21 +333,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     Name = "id",
                     Description = "The id of the content (usually GUID)",
-                    DefaultValue = string.Empty,
+                    DefaultValue = null,
                     ResolvedType = AllTypes.NonNullString
                 },
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "status",
                     Description = "The new status",
-                    DefaultValue = string.Empty,
+                    DefaultValue = null,
                     ResolvedType = AllTypes.NonNullString
                 },
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "dueTime",
                     Description = "When to change the status",
-                    DefaultValue = EtagVersion.Any,
+                    DefaultValue = null,
                     ResolvedType = AllTypes.Date
                 },
                 new QueryArgument(AllTypes.None)
@@ -380,7 +380,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     Name = "id",
                     Description = "The id of the content (usually GUID)",
-                    DefaultValue = string.Empty,
+                    DefaultValue = null,
                     ResolvedType = AllTypes.NonNullGuid
                 },
                 new QueryArgument(AllTypes.None)
