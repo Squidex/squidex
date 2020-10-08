@@ -1,5 +1,33 @@
 # Changelog
 
+## 5.0.0 - 2020-10-08
+
+This feature adds custom IDs to the system. So far every ID like a content ID is globally unique. This means that you cannot create custom IDs and when a backup is restored you need to assign new ids, because the old IDs might be already in use.
+
+With this version on, every ID is prefixed with the app id, meaning they are only unique within an app. This allows new endpoints for upserting contents and defininig custom ids for assets.
+
+### WARNING: MIGRATION
+
+This version has to migrate a few mongo collections:
+
+* Events
+* States_AssetFolders
+* States_Assets
+* State_Contents_All
+* State_Contents_Published
+
+This process will start automatically and can take a while. To be backwards compatible when you experience a bug, new collections are created. The new collection names are
+
+* Events2
+* States_AssetFolders2
+* States_Assets2
+* States_Contents_All2
+* States_Contents_Published2
+
+(As you can see the collection names have been streamlined.)
+
+If everything works fine for you, you can delete the old collections.
+
 ## 4.7.0 - 2020-09-29
 
 ### Features
