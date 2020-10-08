@@ -24,7 +24,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="GraphQL" Version="3.0.0" />
+    <PackageReference Include="GraphQL" Version="3.0.0.2026" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.7" />
     <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.2.2">
       <PrivateAssets>all</PrivateAssets>

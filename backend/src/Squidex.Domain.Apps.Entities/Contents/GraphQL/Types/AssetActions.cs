@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     Name = "id",
                     Description = "The id of the asset (GUID).",
-                    DefaultValue = string.Empty,
+                    DefaultValue = null,
                     ResolvedType = AllTypes.NonNullGuid
                 }
             };
@@ -88,14 +88,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     {
                         Name = "filter",
                         Description = "Optional OData filter.",
-                        DefaultValue = string.Empty,
+                        DefaultValue = null,
                         ResolvedType = AllTypes.String
                     },
                     new QueryArgument(AllTypes.None)
                     {
                         Name = "orderby",
                         Description = "Optional OData order definition.",
-                        DefaultValue = string.Empty,
+                        DefaultValue = null,
                         ResolvedType = AllTypes.String
                     }
                 };
