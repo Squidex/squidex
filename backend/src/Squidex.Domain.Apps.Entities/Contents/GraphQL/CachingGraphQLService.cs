@@ -15,20 +15,21 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public sealed class CachingGraphQLService : CachingProviderBase, IGraphQLService
+    public sealed class CachingGraphQLService : IGraphQLService
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+        private readonly IMemoryCache cache;
         private readonly IServiceProvider resolver;
 
         public CachingGraphQLService(IMemoryCache cache, IServiceProvider resolver)
-            : base(cache)
         {
+            Guard.NotNull(cache, nameof(cache));
             Guard.NotNull(resolver, nameof(resolver));
 
+            this.cache = cache;
             this.resolver = resolver;
         }
 
@@ -83,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var cacheKey = CreateCacheKey(app.Id, app.Version.ToString());
 
-            return Cache.GetOrCreateAsync(cacheKey, async entry =>
+            return cache.GetOrCreateAsync(cacheKey, async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 

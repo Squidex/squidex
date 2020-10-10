@@ -13,7 +13,6 @@ using Jint.Native;
 using Jint.Native.Object;
 using Jint.Runtime;
 using Jint.Runtime.Descriptors;
-using Orleans;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 

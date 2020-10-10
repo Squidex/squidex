@@ -9,21 +9,22 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Infrastructure.UsageTracking
 {
-    public sealed class CachingUsageTracker : CachingProviderBase, IUsageTracker
+    public sealed class CachingUsageTracker : IUsageTracker
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
         private readonly IUsageTracker inner;
+        private readonly IMemoryCache cache;
 
         public CachingUsageTracker(IUsageTracker inner, IMemoryCache cache)
-            : base(cache)
         {
             Guard.NotNull(inner, nameof(inner));
+            Guard.NotNull(cache, nameof(cache));
 
             this.inner = inner;
+            this.cache = cache;
         }
 
         public Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
@@ -46,7 +47,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             var cacheKey = string.Join("$", "Usage", nameof(GetForMonthAsync), key, date, category);
 
-            return Cache.GetOrCreateAsync(cacheKey, entry =>
+            return cache.GetOrCreateAsync(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
@@ -60,7 +61,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             var cacheKey = string.Join("$", "Usage", nameof(GetAsync), key, fromDate, toDate, category);
 
-            return Cache.GetOrCreateAsync(cacheKey, entry =>
+            return cache.GetOrCreateAsync(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 

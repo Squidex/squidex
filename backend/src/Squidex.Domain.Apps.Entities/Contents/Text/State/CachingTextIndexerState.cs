@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Caching;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {

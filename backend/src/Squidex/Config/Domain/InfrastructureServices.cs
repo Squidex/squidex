@@ -15,6 +15,7 @@ using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Areas.Api.Controllers.UI;
+using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Domain.Apps.Core.Tags;
@@ -24,7 +25,6 @@ using Squidex.Domain.Apps.Entities.Contents.Counter;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
@@ -49,6 +49,9 @@ namespace Squidex.Config.Domain
             services.Configure<ReplicatedCacheOptions>(
                 config.GetSection("caching:replicated"));
 
+            services.AddReplicatedCache();
+            services.AddAsyncLocalCache();
+
             services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();
 
@@ -57,15 +60,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<GrainTagService>()
                 .As<ITagService>();
-
-            services.AddSingletonAs<AsyncLocalCache>()
-                .As<ILocalCache>();
-
-            services.AddSingletonAs<ReplicatedCache>()
-                .As<IReplicatedCache>();
-
-            services.AddSingletonAs<OrleansPubSub>()
-                .As<IPubSub>();
 
             services.AddSingletonAs<JintScriptEngine>()
                 .AsOptional<IScriptEngine>();
