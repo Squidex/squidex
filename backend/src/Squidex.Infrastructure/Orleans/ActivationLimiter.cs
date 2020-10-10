@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using Squidex.Infrastructure.Caching;
+using Squidex.Caching;
 
 namespace Squidex.Infrastructure.Orleans
 {

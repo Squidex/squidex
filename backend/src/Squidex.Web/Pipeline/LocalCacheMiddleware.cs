@@ -7,8 +7,8 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Squidex.Caching;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Web.Pipeline
 {

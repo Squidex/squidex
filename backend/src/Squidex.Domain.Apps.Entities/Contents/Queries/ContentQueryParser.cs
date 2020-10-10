@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
@@ -33,20 +32,21 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public class ContentQueryParser : CachingProviderBase
+    public class ContentQueryParser
     {
         private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
+        private readonly IMemoryCache cache;
         private readonly IJsonSerializer jsonSerializer;
         private readonly ContentOptions options;
 
         public ContentQueryParser(IMemoryCache cache, IJsonSerializer jsonSerializer, IOptions<ContentOptions> options)
-            : base(cache)
         {
             Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNull(cache, nameof(cache));
             Guard.NotNull(options, nameof(options));
 
             this.jsonSerializer = jsonSerializer;
-
+            this.cache = cache;
             this.options = options.Value;
         }
 
@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var cacheKey = BuildJsonCacheKey(context.App, schema, context.IsFrontendClient);
 
-            var result = Cache.GetOrCreate(cacheKey, entry =>
+            var result = cache.GetOrCreate(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var cacheKey = BuildEmdCacheKey(context.App, schema, context.IsFrontendClient);
 
-            var result = Cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
+            var result = cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
