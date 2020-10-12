@@ -6,6 +6,10 @@
     .modal-tabs {
         background: $color-dark-foreground;
     }
+
+    .form-control-dark {
+        border: 1px solid darken($color-modal-header-foreground, 20%);
+    }
 }
 
 .col-selector {

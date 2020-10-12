@@ -20,6 +20,7 @@
 <div class="row small-gutters" [class.hidden]="isCollapsed && !formCompare">
     <sqx-content-field *ngFor="let field of formSection.fields; trackBy: trackByField"
         (languageChange)="languageChange.emit($event)"
+        [compact]="compact"
         [form]="form"
         [formCompare]="formCompare"
         [formContext]="formContext"

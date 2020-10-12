@@ -20,6 +20,9 @@ export class ContentFieldComponent implements OnChanges {
     public languageChange = new EventEmitter<AppLanguageDto>();
 
     @Input()
+    public compact = false;
+
+    @Input()
     public form: EditContentForm;
 
     @Input()
@@ -49,7 +52,7 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     public get isHalfWidth() {
-        return this.formModel.field.properties.isHalfWidth && !this.formCompare;
+        return this.formModel.field.properties.isHalfWidth && !this.compact && !this.formCompare;
     }
 
     public showAllControls = false;

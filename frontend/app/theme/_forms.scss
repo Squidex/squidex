@@ -260,11 +260,14 @@ label {
     }
 }
 
+// sass-lint:disable quotes
+$select-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'><path fill='#ccc' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>") !default;;
+
 // Dark form control for the dark panel.
 .form-control-dark {
     & {
         @include placeholder-color($color-dark2-placeholder);
-        background: $color-dark2-control;
+        background-color: $color-dark2-control;
         border: 1px solid $color-dark2-control;
         color: darken($color-dark-foreground, 20%);
         transition: background-color .3s ease;
@@ -274,6 +277,10 @@ label {
         background: lighten($color-dark2-control, 2%);
         border-color: lighten($color-dark2-control, 2%);
         color: $color-dark2-focus-foreground;
+    }
+
+    &.custom-select {
+        background: $color-dark2-control escape-svg($select-indicator) no-repeat right .75rem center / 8px 10px;
     }
 }
 
