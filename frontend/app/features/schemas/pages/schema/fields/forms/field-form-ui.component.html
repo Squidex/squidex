@@ -1,5 +1,5 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
+    <div class="form-group row mb-2">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">{{ 'schemas.field.editorUrl' | sqxTranslate }}</label>
 
         <div class="col-6">
@@ -41,3 +41,16 @@
         <sqx-tags-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-tags-ui>
     </ng-container>
 </ng-container>
+
+<div [formGroup]="fieldForm">
+    <div class="form-group row mt-2">
+        <div class="col-9 offset-3">
+            <div class="custom-control custom-checkbox">
+                <input class="custom-control-input" type="checkbox" id="{{field.fieldId}}_fieldHalfWidth" formControlName="isHalfWidth">
+                <label class="custom-control-label" for="{{field.fieldId}}_fieldHalfWidth">
+                    {{ 'schemas.field.halfWidth' | sqxTranslate }}
+                </label>
+            </div>
+        </div>
+    </div>
+</div>

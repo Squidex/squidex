@@ -214,6 +214,7 @@ export class EditFieldForm extends Form<FormGroup, {}, FieldPropertiesDto> {
             ],
             editorUrl: null,
             isRequired: false,
+            isHalfWidth: false,
             tags: []
         }));
     }

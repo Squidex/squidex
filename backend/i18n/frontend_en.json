@@ -662,6 +662,7 @@
   "schemas.field.empty": "No field created yet.",
   "schemas.field.enable": "Enable in UI",
   "schemas.field.enabledMarker": "Enabled",
+  "schemas.field.halfWidth": "Half Width",
   "schemas.field.hiddenMarker": "Hidden",
   "schemas.field.hide": "Hide in API",
   "schemas.field.hintsHint": "Describe this schema for documentation and user interfaces.",
