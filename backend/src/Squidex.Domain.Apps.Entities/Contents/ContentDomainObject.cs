@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         if (!c.DoNotScript && c.Publish)
                         {
-                            await context.ExecuteScriptAsync(s => s.Change,
+                            c.Data = await context.ExecuteScriptAndTransformAsync(s => s.Change,
                                 new ScriptVars
                                 {
                                     Operation = "Published",
@@ -164,14 +164,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                                 if (!c.DoNotScript)
                                 {
-                                    await context.ExecuteScriptAsync(s => s.Change,
+                                    var data = Snapshot.Data.Clone();
+
+                                    var newData = await context.ExecuteScriptAndTransformAsync(s => s.Change,
                                         new ScriptVars
                                         {
                                             Operation = change.ToString(),
-                                            Data = Snapshot.Data,
+                                            Data = data,
                                             Status = c.Status,
                                             StatusOld = Snapshot.EditingStatus
                                         });
+
+                                    if (!newData.Equals(Snapshot.Data))
+                                    {
+                                        var command = SimpleMapper.Map(c, new UpdateContent { Data = newData });
+
+                                        Update(command, newData);
+                                    }
                                 }
 
                                 ChangeStatus(c, change);
