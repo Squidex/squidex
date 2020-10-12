@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Squidex.Infrastructure.Caching;
+using Squidex.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 

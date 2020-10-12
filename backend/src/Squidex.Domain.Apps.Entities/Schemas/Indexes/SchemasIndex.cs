@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Caching;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Translations;
@@ -33,7 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             Guard.NotNull(replicatedCache, nameof(replicatedCache));
 
             this.grainFactory = grainFactory;
-
             this.replicatedCache = replicatedCache;
         }
 
@@ -99,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (schema != null)
                 {
-                    CacheIt(schema, false);
+                    await CacheItAsync(schema, false);
                 }
 
                 return schema;
@@ -159,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                     if (schema != null)
                     {
-                        CacheIt(schema, true);
+                        await CacheItAsync(schema, true);
 
                         if (context.Command is DeleteSchema)
                         {
@@ -221,10 +220,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return $"SCHEMAS_ID_{appId}_{id}";
         }
 
-        private void CacheIt(ISchemaEntity schema, bool publish)
+        private Task CacheItAsync(ISchemaEntity schema, bool publish)
         {
-            replicatedCache.Add(GetCacheKey(schema.AppId.Id, schema.Id), schema, CacheDuration, publish);
-            replicatedCache.Add(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema, CacheDuration, publish);
+            return Task.WhenAll(
+                replicatedCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.Id), schema, CacheDuration, publish),
+                replicatedCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema, CacheDuration, publish));
         }
     }
 }

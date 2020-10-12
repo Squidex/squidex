@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Caching;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
@@ -36,7 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             Guard.NotNull(replicatedCache, nameof(replicatedCache));
 
             this.grainFactory = grainFactory;
-
             this.replicatedCache = replicatedCache;
         }
 
@@ -149,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 if (app != null)
                 {
-                    CacheIt(app, false);
+                    await CacheItAsync(app, false);
                 }
 
                 return app;
@@ -227,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                     if (app != null)
                     {
-                        CacheIt(app, true);
+                        await CacheItAsync(app, true);
 
                         switch (context.Command)
                         {
@@ -319,10 +318,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return $"APPS_NAME_{name}";
         }
 
-        private void CacheIt(IAppEntity app, bool publish)
+        private Task CacheItAsync(IAppEntity app, bool publish)
         {
-            replicatedCache.Add(GetCacheKey(app.Id), app, CacheDuration, publish);
-            replicatedCache.Add(GetCacheKey(app.Name), app, CacheDuration, publish);
+            return Task.WhenAll(
+                replicatedCache.AddAsync(GetCacheKey(app.Id), app, CacheDuration, publish),
+                replicatedCache.AddAsync(GetCacheKey(app.Name), app, CacheDuration, publish));
         }
     }
 }

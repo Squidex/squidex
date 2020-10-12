@@ -19,6 +19,9 @@ export class ContentSectionComponent implements OnChanges {
     public languageChange = new EventEmitter<AppLanguageDto>();
 
     @Input()
+    public compact = false;
+
+    @Input()
     public form: EditContentForm;
 
     @Input()

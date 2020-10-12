@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AppLanguageDto, AppsState, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, StringFieldPropertiesDto, TranslationsService, Types, value$ } from '@app/shared';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -18,6 +18,9 @@ import { map } from 'rxjs/operators';
 export class ContentFieldComponent implements OnChanges {
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
+
+    @Input()
+    public compact = false;
 
     @Input()
     public form: EditContentForm;
@@ -42,6 +45,15 @@ export class ContentFieldComponent implements OnChanges {
 
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
+
+    @HostBinding('class')
+    public get class() {
+        return this.isHalfWidth ? 'col-6 half-field' : 'col-12';
+    }
+
+    public get isHalfWidth() {
+        return this.formModel.field.properties.isHalfWidth && !this.compact && !this.formCompare;
+    }
 
     public showAllControls = false;
 

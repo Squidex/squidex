@@ -44,6 +44,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public bool IsRequired { get; set; }
 
         /// <summary>
+        /// Indicates if the field should be rendered with half width only.
+        /// </summary>
+        public bool IsHalfWidth { get; set; }
+
+        /// <summary>
         /// Optional url to the editor.
         /// </summary>
         public string? EditorUrl { get; set; }

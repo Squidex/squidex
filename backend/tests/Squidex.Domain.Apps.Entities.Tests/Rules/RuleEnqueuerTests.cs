@@ -12,13 +12,13 @@ using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using NodaTime;
+using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 

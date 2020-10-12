@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public bool IsRequired { get; set; }
 
+        public bool IsHalfWidth { get; set; }
+
         public string? Placeholder { get; set; }
 
         public string? EditorUrl { get; set; }

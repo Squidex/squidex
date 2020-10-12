@@ -9,12 +9,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans;
+using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Validation;
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 .Returns(index);
 
             var cache =
-                new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), new SimplePubSub(),
+                new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), new SimplePubSub(A.Fake<ILogger<SimplePubSub>>()),
                     Options.Create(new ReplicatedCacheOptions { Enable = true }));
 
             sut = new SchemasIndex(grainFactory, cache);

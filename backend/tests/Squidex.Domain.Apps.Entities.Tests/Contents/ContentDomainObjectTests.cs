@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Draft), "<create-script>", ScriptOptions()))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Published), "<change-script>", ScriptOptions()))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Published), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -375,7 +375,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Published, Change = StatusChange.Published })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Published, Status.Draft), "<change-script>", ScriptOptions()))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Published, Status.Draft), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -397,7 +397,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions()))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -420,7 +420,35 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions()))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions()))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task ChangeStatus_should_also_update_when_script_changes_data()
+        {
+            var command = new ChangeContentStatus { Status = Status.Draft };
+
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions()))
+                .Returns(otherData);
+
+            await ExecuteCreateAsync();
+            await ExecutePublishAsync();
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
+            Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUpdated { Data = otherData }),
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
+                );
+
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -444,7 +472,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Change, Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions()))
+            A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 
@@ -499,7 +527,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions()))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
         }
 

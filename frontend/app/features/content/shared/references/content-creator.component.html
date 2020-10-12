@@ -38,6 +38,7 @@
             <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
                 <sqx-content-section *ngFor="let section of contentForm.sections"
                     [(language)]="language"
+                    [compact]="true"
                     [form]="contentForm"
                     [formContext]="contentFormContext"
                     [formSection]="section"

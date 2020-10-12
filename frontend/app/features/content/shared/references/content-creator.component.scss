@@ -8,4 +8,8 @@
     .modal-content {
         background: $color-background;
     }
+
+    .form-control-dark {
+        border: 1px solid darken($color-modal-header-foreground, 20%);
+    }
 }

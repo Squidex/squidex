@@ -28,6 +28,8 @@ namespace Squidex.Config.Orleans
     {
         public static void ConfigureForSquidex(this ISiloBuilder builder, IConfiguration config)
         {
+            builder.AddOrleansPubSub();
+
             builder.ConfigureServices(siloServices =>
             {
                 siloServices.AddSingleton<IMongoClientFactory, DefaultMongoClientFactory>();

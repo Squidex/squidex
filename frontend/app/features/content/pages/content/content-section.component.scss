@@ -1,3 +1,16 @@
+:host ::ng-deep {
+    .small-gutters {
+        margin-left: .25rem;
+        margin-right: .25rem;
+
+        > .col-6,
+        > .col-12 {
+            padding-left: .25rem;
+            padding-right: .25rem;
+        }
+    }
+}
+
 .btn {
     & {
         width: 2rem;

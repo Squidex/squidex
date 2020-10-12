@@ -8,7 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Orleans;
-using Squidex.Infrastructure.Caching;
+using Squidex.Caching;
 
 namespace Squidex.Infrastructure.Orleans
 {

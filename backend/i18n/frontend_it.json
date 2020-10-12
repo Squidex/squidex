@@ -662,6 +662,7 @@
   "schemas.field.empty": "Nessun campo è stato ancora creato.",
   "schemas.field.enable": "Abilita nella UI",
   "schemas.field.enabledMarker": "Abilitato",
+  "schemas.field.halfWidth": "Half Width",
   "schemas.field.hiddenMarker": "Nasconsto",
   "schemas.field.hide": "Nascondi nelle API",
   "schemas.field.hintsHint": "Descrivi questo schema per la documentazione e le interfacce utente.",
