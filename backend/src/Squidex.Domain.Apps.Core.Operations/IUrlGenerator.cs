@@ -29,6 +29,10 @@ namespace Squidex.Domain.Apps.Core
 
         string AssetContent(NamedId<Guid> appId, string idOrSlug);
 
+        string AssetContentBase();
+
+        string AssetContentBase(string appName);
+
         string BackupsUI(NamedId<Guid> appId);
 
         string ClientsUI(NamedId<Guid> appId);
