@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ApiUrlConfig, AuthService, fadeAnimation, ModalModel, StatefulComponent, UIState } from '@app/shared';
+import { ApiUrlConfig, AuthService, fadeAnimation, ModalModel, StatefulComponent, UIOptions, UIState } from '@app/shared';
 
 interface State {
     // The display name of the user.
@@ -34,9 +34,24 @@ interface State {
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
     public modalMenu = new ModalModel();
 
+    public showSubmenu = false;
+
+    public language = this.uiOptions.get('more.culture');
+    public languages: ReadonlyArray<{ code: string, name: string }> = [{
+        code: 'en',
+        name: 'English'
+    }, {
+        code: 'nl',
+        name: 'Hollandske'
+    }, {
+        code: 'it',
+        name: 'Italiano'
+    }];
+
     constructor(changeDetector: ChangeDetectorRef, apiUrl: ApiUrlConfig,
         public readonly uiState: UIState,
-        private readonly authService: AuthService
+        public readonly uiOptions: UIOptions,
+        public readonly authService: AuthService
     ) {
         super(changeDetector, {
             profileDisplayName: '',
@@ -55,9 +70,23 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
                         const profileEmail = user.email;
                         const profileDisplayName = user.displayName;
 
-                        this.next(s => ({ ...s, profileId, profileEmail, profileDisplayName }));
+                        this.next(s => ({ ...s,
+                            profileId,
+                            profileEmail,
+                            profileDisplayName
+                        }));
                     }
                 }));
+    }
+
+    public changeLanguage(code: string) {
+        document.cookie = `.AspNetCore.Culture=c=${code}|uic=${code}`;
+
+        location.reload();
+    }
+
+    public toggle() {
+        this.showSubmenu = !this.showSubmenu;
     }
 
     public logout() {

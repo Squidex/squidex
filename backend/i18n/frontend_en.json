@@ -254,6 +254,7 @@
   "common.httpConflict": "Failed to make the update. Another user has made a change. Please reload.",
   "common.httpLimit": "You have exceeded the maximum limit of API calls.",
   "common.label": "Label",
+  "common.language": "Language",
   "common.languages": "Languages",
   "common.latitudeShort": "Lat",
   "common.loading": "Loading",
