@@ -29,7 +29,7 @@ namespace Squidex.Extensions.Actions.Webhook
         public Uri Url { get; set; }
 
         [LocalizedRequired]
-        [Display(Name = "Url", Description = "The type of the request.")]
+        [Display(Name = "Method", Description = "The type of the request.")]
         public WebhookMethod Method { get; set; }
 
         [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]

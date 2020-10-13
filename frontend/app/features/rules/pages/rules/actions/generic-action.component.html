@@ -21,8 +21,8 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'Dropdown'">
                     <select class="custom-select" [formControlName]="property.name">
-                        <option *ngIf="!property.isRequired"></option>
-                        <option *ngFor="let option of property.options">{{option}}</option>
+                        <option></option>
+                        <option *ngFor="let option of property.options" [ngValue]="option">{{option}}</option>
                     </select>
                 </ng-container>
                 <ng-container *ngSwitchDefault>
