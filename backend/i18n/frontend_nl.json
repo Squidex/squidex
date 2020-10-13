@@ -663,6 +663,7 @@
   "schemas.field.enable": "Inschakelen in gebruikersinterface",
   "schemas.field.enabledMarker": "Ingeschakeld",
   "schemas.field.halfWidth": "Half Width",
+  "schemas.field.halfWidthHint": "Shows the field with only the half width when on the edit or create page, when there is enough space.",
   "schemas.field.hiddenMarker": "Verborgen",
   "schemas.field.hide": "Verbergen in API",
   "schemas.field.hintsHint": "Beschrijf dit schema voor documentatie en gebruikersinterfaces.",
