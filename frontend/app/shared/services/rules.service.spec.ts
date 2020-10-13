@@ -64,7 +64,11 @@ describe('RulesService', () => {
                     display: 'Display2',
                     description: 'Description2',
                     isRequired: false,
-                    isFormattable: true
+                    isFormattable: true,
+                    options: [
+                        'Yes',
+                        'No'
+                    ]
                 }]
             },
             action1: {
@@ -82,7 +86,7 @@ describe('RulesService', () => {
 
         const action2 = new RuleElementDto('title2', 'display2', 'description2', '#222', '<svg path="2" />', null, 'link2', [
             new RuleElementPropertyDto('property1', 'Editor1', 'Display1', 'Description1', false, true),
-            new RuleElementPropertyDto('property2', 'Editor2', 'Display2', 'Description2', true, false)
+            new RuleElementPropertyDto('property2', 'Editor2', 'Display2', 'Description2', true, false, ['Yes', 'No'])
         ]);
 
         expect(actions!).toEqual({

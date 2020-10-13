@@ -13,11 +13,17 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'Checkbox'">
                     <div class="custom-control custom-checkbox">
-                        <input class="custom-control-input" type="checkbox" id="{{property.name}}" [formControlName]="property.name">
+                        <input class="custom-control-input" type="checkbox" id="{{property.name}}">
                         <label class="custom-control-label" for="{{property.name}}">
                             {{property.display}}
                         </label>
                     </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'Dropdown'">
+                    <select class="custom-select" [formControlName]="property.name">
+                        <option *ngIf="!property.isRequired"></option>
+                        <option *ngFor="let option of property.options">{{option}}</option>
+                    </select>
                 </ng-container>
                 <ng-container *ngSwitchDefault>
                     <input type="{{property.editor | lowercase}}" class="form-control" id="{{property.name}}" [formControlName]="property.name">

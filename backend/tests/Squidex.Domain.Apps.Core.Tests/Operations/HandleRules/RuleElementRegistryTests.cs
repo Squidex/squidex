@@ -41,6 +41,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             public string Custom { get; set; }
         }
 
+        public enum ActionEnum
+        {
+            Yes,
+            No
+        }
+
         [RuleAction(
             Title = "Action",
             IconImage = "<svg></svg>",
@@ -67,6 +73,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             [DataType(DataType.Password)]
             public string Password { get; set; }
+
+            [DataType(DataType.Text)]
+            public ActionEnum Enum { get; set; }
+
+            [DataType(DataType.Text)]
+            public ActionEnum? EnumOptional { get; set; }
 
             [DataType(DataType.Text)]
             public bool Boolean { get; set; }
@@ -139,6 +151,26 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Description = null,
                 Editor = RuleActionPropertyEditor.Password,
                 IsRequired = false
+            });
+
+            expected.Properties.Add(new RuleActionProperty
+            {
+                Name = "enum",
+                Display = "Enum",
+                Description = null,
+                Editor = RuleActionPropertyEditor.Dropdown,
+                IsRequired = true,
+                Options = new[] { "Yes", "No" }
+            });
+
+            expected.Properties.Add(new RuleActionProperty
+            {
+                Name = "enumOptional",
+                Display = "EnumOptional",
+                Description = null,
+                Editor = RuleActionPropertyEditor.Dropdown,
+                IsRequired = false,
+                Options = new[] { "Yes", "No" }
             });
 
             expected.Properties.Add(new RuleActionProperty

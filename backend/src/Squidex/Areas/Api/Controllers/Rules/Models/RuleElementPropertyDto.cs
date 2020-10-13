@@ -31,6 +31,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public string Display { get; set; }
 
         /// <summary>
+        /// The options, if the editor is a dropdown.
+        /// </summary>
+        public string[]? Options { get; set; }
+
+        /// <summary>
         /// The optional description.
         /// </summary>
         public string? Description { get; set; }

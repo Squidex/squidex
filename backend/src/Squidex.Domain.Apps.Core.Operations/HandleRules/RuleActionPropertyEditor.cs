@@ -10,6 +10,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     public enum RuleActionPropertyEditor
     {
         Checkbox,
+        Dropdown,
         Email,
         Number,
         Password,

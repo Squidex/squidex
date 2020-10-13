@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -29,15 +30,21 @@ namespace Squidex.Extensions.Actions.Webhook
 
         protected override async Task<(string Description, WebhookJob Data)> CreateJobAsync(EnrichedEvent @event, WebhookAction action)
         {
-            string requestBody;
+            var requestBody = string.Empty;
+            var requestSignature = string.Empty;
 
-            if (!string.IsNullOrEmpty(action.Payload))
+            if (action.Method != WebhookMethod.GET)
             {
-                requestBody = await FormatAsync(action.Payload, @event);
-            }
-            else
-            {
-                requestBody = ToEnvelopeJson(@event);
+                if (!string.IsNullOrEmpty(action.Payload))
+                {
+                    requestBody = await FormatAsync(action.Payload, @event);
+                }
+                else
+                {
+                    requestBody = ToEnvelopeJson(@event);
+                }
+
+                requestSignature = $"{requestBody}{action.SharedSecret}".Sha256Base64();
             }
 
             var requestUrl = await FormatAsync(action.Url, @event);
@@ -45,26 +52,89 @@ namespace Squidex.Extensions.Actions.Webhook
             var ruleDescription = $"Send event to webhook '{requestUrl}'";
             var ruleJob = new WebhookJob
             {
+                Method = action.Method,
                 RequestUrl = await FormatAsync(action.Url.ToString(), @event),
-                RequestSignature = $"{requestBody}{action.SharedSecret}".Sha256Base64(),
-                RequestBody = requestBody
+                RequestSignature = requestSignature,
+                RequestBody = requestBody,
+                RequestBodyType = action.PayloadType,
+                Headers = await ParseHeadersAsync(action.Headers, @event)
             };
 
             return (ruleDescription, ruleJob);
+        }
+
+        private async Task<Dictionary<string, string>> ParseHeadersAsync(string headers, EnrichedEvent @event)
+        {
+            if (string.IsNullOrWhiteSpace(headers))
+            {
+                return null;
+            }
+
+            var headersDictionary = new Dictionary<string, string>();
+
+            var lines = headers.Split('\n');
+
+            foreach (var line in lines)
+            {
+                var indexEqual = line.IndexOf('=');
+
+                if (indexEqual > 0 && indexEqual < line.Length - 1)
+                {
+                    var key = line.Substring(0, indexEqual);
+                    var val = line.Substring(indexEqual + 1);
+
+                    val = await FormatAsync(val, @event);
+
+                    headersDictionary[key] = val;
+                }
+            }
+
+            return headersDictionary;
         }
 
         protected override async Task<Result> ExecuteJobAsync(WebhookJob job, CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
-                using (var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
+                var method = HttpMethod.Post;
+
+                switch (job.Method)
                 {
-                    Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
-                })
+                    case WebhookMethod.PUT:
+                        method = HttpMethod.Put;
+                        break;
+                    case WebhookMethod.GET:
+                        method = HttpMethod.Get;
+                        break;
+                }
+
+                var request = new HttpRequestMessage(method, job.RequestUrl);
+
+                if (!string.IsNullOrEmpty(job.RequestBody) && job.Method != WebhookMethod.GET)
                 {
-                    request.Headers.Add("X-Signature", job.RequestSignature);
-                    request.Headers.Add("X-Application", "Squidex Webhook");
+                    var mediaType = job.RequestBodyType.Or("application/json");
+
+                    request.Content = new StringContent(job.RequestBody, Encoding.UTF8, mediaType);
+                }
+
+                using (request)
+                {
                     request.Headers.Add("User-Agent", "Squidex Webhook");
+
+                    if (job.Headers != null)
+                    {
+                        foreach (var (key, value) in job.Headers)
+                        {
+                            request.Headers.TryAddWithoutValidation(key, value);
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(job.RequestSignature))
+                    {
+                        request.Headers.Add("X-Signature", job.RequestSignature);
+                    }
+
+                    request.Headers.Add("X-Application", "Squidex Webhook");
 
                     return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
                 }
@@ -74,10 +144,16 @@ namespace Squidex.Extensions.Actions.Webhook
 
     public sealed class WebhookJob
     {
+        public WebhookMethod Method { get; set; }
+
         public string RequestUrl { get; set; }
 
         public string RequestSignature { get; set; }
 
         public string RequestBody { get; set; }
+
+        public string RequestBodyType { get; set; }
+
+        public Dictionary<string, string> Headers { get; set; }
     }
 }
