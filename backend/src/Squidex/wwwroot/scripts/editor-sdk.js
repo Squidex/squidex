@@ -124,6 +124,8 @@ function SquidexFormField() {
     var initCalled = false;
     var disabledHandler;
     var disabled = false;
+    var fullscreen = false;
+    var fullscreenHandler = false;
     var valueHandler;
     var value;
     var formValueHandler;
@@ -146,6 +148,12 @@ function SquidexFormField() {
     function raiseFormValueChanged() {
         if (formValueHandler && formValue) {
             formValueHandler(formValue);
+        }
+    }
+
+    function raiseFullscreen() {
+        if (fullscreenHandler) {
+            fullscreenHandler(fullscreen);
         }
     }
 
@@ -174,6 +182,10 @@ function SquidexFormField() {
                 formValue = event.data.formValue;
 
                 raiseFormValueChanged();
+            } else if (type === 'fullscreenChanged') {
+                fullscreen = event.data.fullscreen;
+
+                raiseFullscreen();
             } else if (type === 'init') {
                 context = event.data.context;
 
@@ -219,6 +231,8 @@ function SquidexFormField() {
 
         /*
          * Notifies the parent to navigate to the path.
+         *
+         * @params url: string: The url to navigate to.
          */
         navigate: function (url) {
             if (window.parent) {
@@ -226,8 +240,21 @@ function SquidexFormField() {
             }
         },
 
+        /*
+         * Notifies the parent to go to fullscreen mode.
+         *
+         * @params mode: boolean: The fullscreen mode.
+         */
+        toggleFullscreen: function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'fullscreen', mode: !fullscreen }, '*');
+            }
+        },
+
         /**
          * Notifies the control container that the value has been changed.
+         *
+         * @params newValue: any: The new field value.
          */
         valueChanged: function (newValue) {
             value = newValue;
@@ -271,6 +298,15 @@ function SquidexFormField() {
             formValueHandler = callback;
 
             raiseFormValueChanged();
+        },
+        
+        /**
+         * Register the fullscreen changed handler.
+         */
+        onFullscreen: function (callback) {
+            fullscreenHandler = callback;
+
+            raiseFullscreen();
         },
 
         /**

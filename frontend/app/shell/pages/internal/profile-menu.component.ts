@@ -22,6 +22,17 @@ interface State {
     profileUrl: string;
 }
 
+const ALL_LANGUAGES: ReadonlyArray<{ code: string, name: string }> = [{
+    code: 'en',
+    name: 'English'
+}, {
+    code: 'nl',
+    name: 'Nederlands'
+}, {
+    code: 'it',
+    name: 'Italiano'
+}];
+
 @Component({
     selector: 'sqx-profile-menu',
     styleUrls: ['./profile-menu.component.scss'],
@@ -37,16 +48,7 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     public showSubmenu = false;
 
     public language = this.uiOptions.get('more.culture');
-    public languages: ReadonlyArray<{ code: string, name: string }> = [{
-        code: 'en',
-        name: 'English'
-    }, {
-        code: 'nl',
-        name: 'Hollandske'
-    }, {
-        code: 'it',
-        name: 'Italiano'
-    }];
+    public languages = ALL_LANGUAGES;
 
     constructor(changeDetector: ChangeDetectorRef, apiUrl: ApiUrlConfig,
         public readonly uiState: UIState,
