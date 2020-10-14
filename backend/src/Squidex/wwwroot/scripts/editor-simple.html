@@ -13,6 +13,24 @@
             min-height: 250px;
         }
 
+        .fullscreen {
+            height: 100vh;
+        }
+
+        .fullscreen .ck-editor {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .fullscreen .ck-editor .ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline,
+        .fullscreen .ck-editor .ck.ck-editor__main {
+            height: 100%;
+        }
+
         #fullscreenButton {
             position: absolute;
             z-index: 10000;
@@ -28,8 +46,6 @@
     <textarea name="content" id="editor"></textarea>
 
     <script>
-        var fullscreen = false;
-
         var element = document.getElementById('editor');
 
         ClassicEditor
@@ -55,6 +71,14 @@
                     editor.set('isReadOnly', disabled);
                 });
 
+                field.onFullscreen(function (fullscreen) {
+                    if (fullscreen) {
+                        document.body.classList.add('fullscreen');
+                    } else {
+                        document.body.classList.remove('fullscreen');
+                    }
+                });
+
                 editor.model.document.on('change', function () {
                     var data = editor.getData();
 
@@ -71,9 +95,7 @@
 
                 document.getElementById('fullscreenButton')
                     .addEventListener('click', function () {
-                        fullscreen = !fullscreen;
-
-                        field.fullscreen(fullscreen);
+                        field.toggleFullscreen();
                     });
             });
     </script>

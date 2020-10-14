@@ -124,6 +124,8 @@ function SquidexFormField() {
     var initCalled = false;
     var disabledHandler;
     var disabled = false;
+    var fullscreen = false;
+    var fullscreenHandler = false;
     var valueHandler;
     var value;
     var formValueHandler;
@@ -146,6 +148,12 @@ function SquidexFormField() {
     function raiseFormValueChanged() {
         if (formValueHandler && formValue) {
             formValueHandler(formValue);
+        }
+    }
+
+    function raiseFullscreen() {
+        if (fullscreenHandler) {
+            fullscreenHandler(fullscreen);
         }
     }
 
@@ -174,6 +182,10 @@ function SquidexFormField() {
                 formValue = event.data.formValue;
 
                 raiseFormValueChanged();
+            } else if (type === 'fullscreenChanged') {
+                fullscreen = event.data.fullscreen;
+
+                raiseFullscreen();
             } else if (type === 'init') {
                 context = event.data.context;
 
@@ -233,9 +245,9 @@ function SquidexFormField() {
          *
          * @params mode: boolean: The fullscreen mode.
          */
-        fullscreen: function (mode) {
+        toggleFullscreen: function () {
             if (window.parent) {
-                window.parent.postMessage({ type: 'fullscreen', mode: mode }, '*');
+                window.parent.postMessage({ type: 'fullscreen', mode: !fullscreen }, '*');
             }
         },
 
@@ -286,6 +298,15 @@ function SquidexFormField() {
             formValueHandler = callback;
 
             raiseFormValueChanged();
+        },
+        
+        /**
+         * Register the fullscreen changed handler.
+         */
+        onFullscreen: function (callback) {
+            fullscreenHandler = callback;
+
+            raiseFullscreen();
         },
 
         /**

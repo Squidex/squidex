@@ -94,6 +94,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
                         this.isInitialized = true;
 
                         this.sendInit();
+                        this.sendFullscreen();
                         this.sendFormValue();
                         this.sendDisabled();
                         this.sendValue();
@@ -148,6 +149,10 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
         this.sendMessage('valueChanged', { value: this.value });
     }
 
+    private sendFullscreen() {
+        this.sendMessage('fullscreenChanged', { fullscreen: this.snapshot.isFullscreen });
+    }
+
     private sendDisabled() {
         this.sendMessage('disabled', { isDisabled: this.isDisabled });
     }
@@ -157,6 +162,8 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     private toggleFullscreen(isFullscreen: boolean) {
+        this.next(s => ({ ...s, isFullscreen }));
+
         let target = this.container.nativeElement;
 
         if (isFullscreen) {
@@ -165,7 +172,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
 
         this.renderer.appendChild(target, this.inner.nativeElement);
 
-        this.next(s => ({ ...s, isFullscreen }));
+        this.sendFullscreen();
     }
 
     private sendMessage(type: string, payload: any) {
