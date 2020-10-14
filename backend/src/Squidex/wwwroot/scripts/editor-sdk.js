@@ -219,6 +219,8 @@ function SquidexFormField() {
 
         /*
          * Notifies the parent to navigate to the path.
+         *
+         * @params url: string: The url to navigate to.
          */
         navigate: function (url) {
             if (window.parent) {
@@ -226,8 +228,21 @@ function SquidexFormField() {
             }
         },
 
+        /*
+         * Notifies the parent to go to fullscreen mode.
+         *
+         * @params mode: boolean: The fullscreen mode.
+         */
+        fullscreen: function (mode) {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'fullscreen', mode: mode }, '*');
+            }
+        },
+
         /**
          * Notifies the control container that the value has been changed.
+         *
+         * @params newValue: any: The new field value.
          */
         valueChanged: function (newValue) {
             value = newValue;

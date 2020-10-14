@@ -18,7 +18,7 @@ export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 
 interface State {
     // True, when the editor is shown as fullscreen.
-    isFullscreen: false;
+    isFullscreen: boolean;
 }
 
 @Component({
@@ -187,15 +187,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
             this.simplemde.codemirror.on('refresh', () => {
                 const isFullscreen = this.simplemde.isFullscreenActive();
 
-                let target = this.container.nativeElement;
-
-                if (isFullscreen) {
-                    target = document.body;
-                }
-
-                this.renderer.appendChild(target, this.inner.nativeElement);
-
-                this.next(s => ({ ...s, isFullscreen }));
+                this.toggleFullscreen(isFullscreen);
             });
 
             this.simplemde.codemirror.on('blur', () => {
@@ -276,5 +268,17 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                     replaceText('FAILED');
                 }
             });
+    }
+
+    private toggleFullscreen(isFullscreen: boolean) {
+        let target = this.container.nativeElement;
+
+        if (isFullscreen) {
+            target = document.body;
+        }
+
+        this.renderer.appendChild(target, this.inner.nativeElement);
+
+        this.next(s => ({ ...s, isFullscreen }));
     }
 }

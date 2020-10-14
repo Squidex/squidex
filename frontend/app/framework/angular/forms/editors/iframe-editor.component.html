@@ -1,1 +1,6 @@
-<iframe #iframe scrolling="no" width="100%"></iframe>
+<div #container>
+    <div #inner [class.fullscreen]="snapshot.isFullscreen">
+        <iframe #iframe scrolling="no" width="100%"></iframe>
+    </div>
+</div>
+

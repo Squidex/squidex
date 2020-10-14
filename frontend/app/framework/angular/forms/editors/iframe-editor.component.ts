@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Router } from '@angular/router';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
@@ -13,6 +13,11 @@ import { StatefulControlComponent, Types } from '@app/framework/internal';
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true
 };
+
+interface State {
+    // True, when the editor is shown as fullscreen.
+    isFullscreen: boolean;
+}
 
 @Component({
     selector: 'sqx-iframe-editor',
@@ -23,13 +28,19 @@ export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IFrameEditorComponent extends StatefulControlComponent<any, any> implements OnChanges, AfterViewInit {
+export class IFrameEditorComponent extends StatefulControlComponent<State, any> implements OnChanges, OnDestroy, AfterViewInit {
     private value: any;
     private isDisabled = false;
     private isInitialized = false;
 
     @ViewChild('iframe', { static: false })
     public iframe: ElementRef<HTMLIFrameElement>;
+
+    @ViewChild('container', { static: false })
+    public container: ElementRef<HTMLElement>;
+
+    @ViewChild('inner', { static: false })
+    public inner: ElementRef<HTMLElement>;
 
     @Input()
     public context: any = {};
@@ -40,11 +51,19 @@ export class IFrameEditorComponent extends StatefulControlComponent<any, any> im
     @Input()
     public url: string;
 
+    public fullscreen: boolean;
+
     constructor(changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,
         private readonly router: Router
     ) {
-        super(changeDetector, {});
+        super(changeDetector, {
+            isFullscreen: false
+        });
+    }
+
+    public ngOnDestroy() {
+        this.toggleFullscreen(false);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -81,11 +100,17 @@ export class IFrameEditorComponent extends StatefulControlComponent<any, any> im
                     } else if (type === 'resize') {
                         const { height } = event.data;
 
-                        this.iframe.nativeElement.height = height + 'px';
+                        this.renderer.setStyle(this.iframe.nativeElement, 'height', height + 'px');
                     } else if (type === 'navigate') {
                         const { url } = event.data;
 
                         this.router.navigateByUrl(url);
+                    } else if (type === 'fullscreen') {
+                        const { mode } = event.data;
+
+                        if (mode !== this.snapshot.isFullscreen) {
+                            this.toggleFullscreen(mode);
+                        }
                     } else if (type === 'valueChanged') {
                         const { value } = event.data;
 
@@ -97,6 +122,8 @@ export class IFrameEditorComponent extends StatefulControlComponent<any, any> im
                     } else if (type === 'touched') {
                         this.callTouched();
                     }
+
+                    this.detectChanges();
                 }
             }));
     }
@@ -127,6 +154,18 @@ export class IFrameEditorComponent extends StatefulControlComponent<any, any> im
 
     private sendFormValue() {
         this.sendMessage('formValueChanged', { formValue: this.formValue });
+    }
+
+    private toggleFullscreen(isFullscreen: boolean) {
+        let target = this.container.nativeElement;
+
+        if (isFullscreen) {
+            target = document.body;
+        }
+
+        this.renderer.appendChild(target, this.inner.nativeElement);
+
+        this.next(s => ({ ...s, isFullscreen }));
     }
 
     private sendMessage(type: string, payload: any) {

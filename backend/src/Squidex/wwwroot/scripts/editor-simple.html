@@ -12,13 +12,24 @@
         .ck-editor__editable {
             min-height: 250px;
         }
+
+        #fullscreenButton {
+            position: absolute;
+            z-index: 10000;
+            right: 10px;
+            top: 10px;
+        }
     </style>
 </head>
 
 <body>
+    <a href="#" id="fullscreenButton">Toggle fullscreen</a>
+
     <textarea name="content" id="editor"></textarea>
 
     <script>
+        var fullscreen = false;
+
         var element = document.getElementById('editor');
 
         ClassicEditor
@@ -57,6 +68,13 @@
                         field.touched();
                     }
                 });
+
+                document.getElementById('fullscreenButton')
+                    .addEventListener('click', function () {
+                        fullscreen = !fullscreen;
+
+                        field.fullscreen(fullscreen);
+                    });
             });
     </script>
 </body>
