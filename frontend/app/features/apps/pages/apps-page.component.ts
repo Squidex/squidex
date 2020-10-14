@@ -71,6 +71,10 @@ export class AppsPageComponent implements OnInit {
         this.addAppDialog.show();
     }
 
+    public leave(app: AppDto) {
+        this.appsState.leave(app);
+    }
+
     public trackByApp(_index: number, app: AppDto) {
         return app.id;
     }

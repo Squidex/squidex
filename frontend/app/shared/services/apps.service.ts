@@ -195,6 +195,18 @@ export class AppsService {
             pretifyError('i18n:apps.removeImageFailed'));
     }
 
+    public leaveApp(resource: Resource): Observable<any> {
+        const link = resource._links['leave'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
+            tap(() => {
+                this.analytics.trackEvent('App', 'Left');
+            }),
+            pretifyError('i18n:apps.leaveFailed'));
+    }
+
     public deleteApp(resource: Resource): Observable<any> {
         const link = resource._links['delete'];
 

@@ -163,6 +163,15 @@ describe('AppsState', () => {
         expect(appsState.snapshot.apps).toEqual([app1, updated]);
     });
 
+    it('should remove app from snapshot when left', () => {
+        appsService.setup(x => x.leaveApp(app2))
+            .returns(() => of({})).verifiable();
+
+        appsState.leave(app2).subscribe();
+
+        expect(appsState.snapshot.apps).toEqual([app1]);
+    });
+
     it('should remove app from snapshot when archived', () => {
         appsService.setup(x => x.deleteApp(app2))
             .returns(() => of({})).verifiable();
