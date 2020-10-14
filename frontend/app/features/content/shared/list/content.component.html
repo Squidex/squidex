@@ -22,38 +22,36 @@
     </td>
     
     <td class="cell-actions cell-actions-left" sqxStopClick>
-        <div class="dropdown dropdown-options inline-edit" *ngIf="content">
-            <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
-                <i class="icon-dots"></i>
-            </button>
-    
-            <ng-container *sqxModal="dropdown;closeAlways:true">
-                <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-left" @fade>
-                    <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
-                        {{ 'common.statusChangeTo' | sqxTranslate }} 
+        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
+            <i class="icon-dots"></i>
+        </button>
 
-                        <sqx-content-status small="true"
-                            layout="text"
-                            [status]="info.status"
-                            [statusColor]="info.color">
-                        </sqx-content-status>
-                    </a>
-                    <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="canClone">
-                        {{ 'common.clone' | sqxTranslate }}
-                    </a>
-                    
-                    <div class="dropdown-divider"></div>
-        
-                    <a class="dropdown-item dropdown-item-delete"
-                        (sqxConfirmClick)="delete.emit()"
-                        confirmTitle="i18n:contents.deleteConfirmTitle"
-                        confirmText="i18n:contents.deleteConfirmText"
-                        confirmRememberKey="deleteContent">
-                        {{ 'common.delete' | sqxTranslate }}
-                    </a>
-                </div>
-            </ng-container>
-        </div>
+        <ng-container *sqxModal="dropdown;closeAlways:true">
+            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-left" @fade>
+                <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
+                    {{ 'common.statusChangeTo' | sqxTranslate }} 
+
+                    <sqx-content-status small="true"
+                        layout="text"
+                        [status]="info.status"
+                        [statusColor]="info.color">
+                    </sqx-content-status>
+                </a>
+                <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="canClone">
+                    {{ 'common.clone' | sqxTranslate }}
+                </a>
+                
+                <div class="dropdown-divider"></div>
+    
+                <a class="dropdown-item dropdown-item-delete"
+                    (sqxConfirmClick)="delete.emit()"
+                    confirmTitle="i18n:contents.deleteConfirmTitle"
+                    confirmText="i18n:contents.deleteConfirmText"
+                    confirmRememberKey="deleteContent">
+                    {{ 'common.delete' | sqxTranslate }}
+                </a>
+            </div>
+        </ng-container>
     </td>
 
     <td *ngFor="let field of listFields" [sqxContentListCell]="field" [sqxStopClick]="shouldStop(field)">

@@ -100,22 +100,28 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static AppDto FromApp(IAppEntity app, string userId, bool isFrontend, IAppPlansProvider plans, Resources resources)
         {
-            var permissions = GetPermissions(app, userId, isFrontend);
+            var result = SimpleMapper.Map(app, new AppDto
+            {
+                PlanName = plans.GetPlanForApp(app).Plan.Name
+            });
 
-            var result = SimpleMapper.Map(app, new AppDto());
+            var permissions = PermissionSet.Empty;
 
-            result.Permissions = permissions.ToIds();
-
-            result.SetPlan(app, plans, resources, permissions);
-            result.SetImage(app, resources);
+            var isContributor = false;
 
             if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGet(app.Name, roleName, isFrontend, out var role))
             {
+                isContributor = true;
+
+                permissions = role.Permissions;
+
                 result.RoleProperties = role.Properties;
+                result.Permissions = permissions.ToIds();
             }
             else
             {
                 result.RoleProperties = JsonValue.Object();
+                result.Permissions = Array.Empty<string>();
             }
 
             if (resources.Includes(P.ForApp(P.AppContents, app.Name), permissions))
@@ -123,44 +129,29 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.CanAccessContent = true;
             }
 
-            return result.CreateLinks(resources, permissions);
-        }
-
-        private static PermissionSet GetPermissions(IAppEntity app, string userId, bool isFrontend)
-        {
-            var permissions = new List<Permission>();
-
-            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGet(app.Name, roleName, isFrontend, out var role))
-            {
-                permissions.AddRange(role.Permissions);
-            }
-
-            return new PermissionSet(permissions);
-        }
-
-        private void SetPlan(IAppEntity app, IAppPlansProvider plans, Resources resources, PermissionSet permissions)
-        {
             if (resources.IsAllowed(P.AppPlansChange, app.Name, additional: permissions))
             {
-                PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
+                result.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
             }
 
-            PlanName = plans.GetPlanForApp(app).Plan.Name;
+            return result.CreateLinks(app, resources, permissions, isContributor);
         }
 
-        private void SetImage(IAppEntity app, Resources resources)
-        {
-            if (app.Image != null)
-            {
-                AddGetLink("image", resources.Url<AppsController>(x => nameof(x.GetImage), new { app = app.Name }));
-            }
-        }
-
-        private AppDto CreateLinks(Resources resources, PermissionSet permissions)
+        private AppDto CreateLinks(IAppEntity app, Resources resources, PermissionSet permissions, bool isContributor)
         {
             var values = new { app = Name };
 
             AddGetLink("ping", resources.Url<PingController>(x => nameof(x.GetAppPing), values));
+
+            if (app.Image != null)
+            {
+                AddGetLink("image", resources.Url<AppsController>(x => nameof(x.GetImage), new { app = app.Name }));
+            }
+
+            if (isContributor)
+            {
+                AddDeleteLink("leave", resources.Url<AppContributorsController>(x => nameof(x.DeleteMyself), values));
+            }
 
             if (resources.IsAllowed(P.AppDelete, Name, additional: permissions))
             {
@@ -170,13 +161,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             if (resources.IsAllowed(P.AppUpdateGeneral, Name, additional: permissions))
             {
                 AddPutLink("update", resources.Url<AppsController>(x => nameof(x.UpdateApp), values));
-            }
-
-            if (resources.IsAllowed(P.AppUpdateImage, Name, additional: permissions))
-            {
-                AddPostLink("image/upload", resources.Url<AppsController>(x => nameof(x.UploadImage), values));
-
-                AddDeleteLink("image/delete", resources.Url<AppsController>(x => nameof(x.DeleteImage), values));
             }
 
             if (resources.IsAllowed(P.AppAssetsRead, Name, additional: permissions))
@@ -242,6 +226,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             if (resources.IsAllowed(P.AppAssetsCreate, Name, additional: permissions))
             {
                 AddPostLink("assets/create", resources.Url<SchemasController>(x => nameof(x.PostSchema), values));
+            }
+
+            if (resources.IsAllowed(P.AppUpdateImage, Name, additional: permissions))
+            {
+                AddPostLink("image/upload", resources.Url<AppsController>(x => nameof(x.UploadImage), values));
+                AddDeleteLink("image/delete", resources.Url<AppsController>(x => nameof(x.DeleteImage), values));
             }
 
             return this;

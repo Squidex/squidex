@@ -13,7 +13,10 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Invitation;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -87,6 +90,28 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
+        /// Remove yourself.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => User removed from app.
+        /// 404 => Contributor or app not found.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/contributors/me/")]
+        [ProducesResponseType(typeof(ContributorsDto), 200)]
+        [ApiPermission]
+        [ApiCosts(1)]
+        public async Task<IActionResult> DeleteMyself(string app)
+        {
+            var command = new RemoveContributor { ContributorId = UserId() };
+
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Remove contributor.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -121,6 +146,18 @@ namespace Squidex.Areas.Api.Controllers.Apps
             {
                 return await GetResponseAsync(context.Result<IAppEntity>(), false);
             }
+        }
+
+        private string UserId()
+        {
+            var subject = User.OpenIdSubject();
+
+            if (string.IsNullOrWhiteSpace(subject))
+            {
+                throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
+            }
+
+            return subject;
         }
 
         private Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)

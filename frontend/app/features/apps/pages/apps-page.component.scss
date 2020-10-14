@@ -15,80 +15,80 @@
     overflow-y: auto;
 }
 
-.card {
-    & {
-        @include hover-visible('.deeplinks', inline);
-        display: inline-block;
-        margin-bottom: 1rem;
-        margin-right: 1rem;
-        width: 20rem;
-    }
-
-    &-links {
-        margin-top: .5rem;
-    }
-
-    &-left {
-        padding-right: .75rem;
-    }
-
-    &-right {
-        overflow: hidden;
-    }
-
-    &-image {
-        text-align: center;
-    }
-
-    &-text {
-        color: $color-text-decent;
-        font-size: .9rem;
-        font-weight: normal;
-        margin-top: .5rem;
-    }
-
-    &-title {
-        @include truncate;
-        color: $color-title;
-        margin-bottom: 0;
-        margin-top: 0;
-    }
-
-    &-template {
-        .card-body {
-            min-height: 15.5rem;
-        }
-
-        .card-title {
-            margin-bottom: .75rem;
-            margin-top: 1rem;
-        }
-    }
-
-    &-href {
+:host ::ng-deep {
+    .card {
         & {
-            cursor: pointer;
+            @include hover-visible('.deeplinks', inline);
+            display: inline-block;
+            margin-bottom: 1rem;
+            margin-right: 1rem;
+            width: 20rem;
         }
 
-        &:hover {
-            @include box-shadow-outer(0, 3px, 16px, .2);
+        &-links {
+            margin-top: .5rem;
         }
 
-        &:focus {
-            outline: none;
+        &-left {
+            padding-right: .75rem;
         }
 
-        &:hover,
-        &:focus,
-        &:active {
-            text-decoration: none;
+        &-right {
+            overflow: hidden;
         }
-    }
-}
 
-.card-image {
-    img {
-        height: 6rem;
+        &-image {
+            text-align: center;
+
+            img {
+                height: 6rem;
+            }
+        }
+
+        &-text {
+            color: $color-text-decent;
+            font-size: .9rem;
+            font-weight: normal;
+            margin-top: .5rem;
+        }
+
+        &-title {
+            @include truncate;
+            color: $color-title;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+
+        &-template {
+            .card-body {
+                min-height: 15.5rem;
+            }
+
+            .card-title {
+                margin-bottom: .75rem;
+                margin-top: 1rem;
+            }
+        }
+
+        &-href {
+            & {
+                cursor: pointer;
+            }
+
+            &:hover {
+                @include box-shadow-outer(0, 3px, 16px, .2);
+            }
+
+            &:focus {
+                outline: none;
+            }
+
+            &:hover,
+            &:focus,
+            &:active {
+                text-decoration: none;
+            }
+        }
     }
 }
 
