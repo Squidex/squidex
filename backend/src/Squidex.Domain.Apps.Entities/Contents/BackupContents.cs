@@ -77,14 +77,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             switch (@event.Payload)
             {
-<<<<<<< HEAD
-                case ContentCreated contentCreated:
-                    contentIdsBySchemaId.GetOrAddNew(contentCreated.SchemaId.Id).Add(@event.Headers.AggregateId());
-=======
                 case AppCreated appCreated:
                     assetsUrlNew = GetUrls(appCreated.Name);
                     assetsUrlOld = await ReadUrlsAsync(context.Reader);
->>>>>>> release/4.x
                     break;
                 case SchemaDeleted schemaDeleted:
                     contentIdsBySchemaId.Remove(schemaDeleted.SchemaId.Id);
