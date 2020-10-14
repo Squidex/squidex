@@ -29,6 +29,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class AppDto : Resource
     {
+        private static readonly JsonObject EmptyObject = JsonValue.Object();
+
         /// <summary>
         /// The name of the app.
         /// </summary>
@@ -69,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The permission level of the user.
         /// </summary>
-        public IEnumerable<string> Permissions { get; set; }
+        public IEnumerable<string> Permissions { get; set; } = Array.Empty<string>();
 
         /// <summary>
         /// Indicates if the user can access the api.
@@ -96,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The properties from the role.
         /// </summary>
         [LocalizedRequired]
-        public JsonObject RoleProperties { get; set; }
+        public JsonObject RoleProperties { get; set; } = EmptyObject;
 
         public static AppDto FromApp(IAppEntity app, string userId, bool isFrontend, IAppPlansProvider plans, Resources resources)
         {
@@ -113,15 +115,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 isContributor = true;
 
-                permissions = role.Permissions;
-
                 result.RoleProperties = role.Properties;
                 result.Permissions = permissions.ToIds();
-            }
-            else
-            {
-                result.RoleProperties = JsonValue.Object();
-                result.Permissions = Array.Empty<string>();
+
+                permissions = role.Permissions;
             }
 
             if (resources.Includes(P.ForApp(P.AppContents, app.Name), permissions))
@@ -231,6 +228,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             if (resources.IsAllowed(P.AppUpdateImage, Name, additional: permissions))
             {
                 AddPostLink("image/upload", resources.Url<AppsController>(x => nameof(x.UploadImage), values));
+
                 AddDeleteLink("image/delete", resources.Url<AppsController>(x => nameof(x.DeleteImage), values));
             }
 
