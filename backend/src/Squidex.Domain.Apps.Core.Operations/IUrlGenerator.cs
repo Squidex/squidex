@@ -24,11 +24,13 @@ namespace Squidex.Domain.Apps.Core
 
         string AssetContent(NamedId<DomainId> appId, string idOrSlug);
 
+        string AssetContentBase();
+
+        string AssetContentBase(string appName);
+
         string BackupsUI(NamedId<DomainId> appId);
 
         string ClientsUI(NamedId<DomainId> appId);
-
-        string ContentsUI(NamedId<DomainId> appId);
 
         string ContentsUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId);
 

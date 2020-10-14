@@ -28,13 +28,33 @@ namespace Squidex.Extensions.Actions.Webhook
         [Formattable]
         public Uri Url { get; set; }
 
-        [Display(Name = "Shared Secret", Description = "The shared secret that is used to calculate the signature.")]
-        [DataType(DataType.Text)]
-        public string SharedSecret { get; set; }
+        [LocalizedRequired]
+        [Display(Name = "Method", Description = "The type of the request.")]
+        public WebhookMethod Method { get; set; }
 
         [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
         [DataType(DataType.MultilineText)]
         [Formattable]
         public string Payload { get; set; }
+
+        [Display(Name = "Payload Type", Description = "The mime type of the payload.")]
+        [DataType(DataType.Text)]
+        public string PayloadType { get; set; }
+
+        [Display(Name = "Headers (Optional)", Description = "The message headers in the format '[Key]=[Value]', one entry per line.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
+        public string Headers { get; set; }
+
+        [Display(Name = "Shared Secret", Description = "The shared secret that is used to calculate the payload signature.")]
+        [DataType(DataType.Text)]
+        public string SharedSecret { get; set; }
+    }
+
+    public enum WebhookMethod
+    {
+        POST,
+        PUT,
+        GET
     }
 }

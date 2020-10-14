@@ -46,6 +46,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             throw new NotSupportedException();
         }
 
+        public string AssetContentBase()
+        {
+            throw new NotSupportedException();
+        }
+
+        public string AssetContentBase(string appName)
+        {
+            throw new NotSupportedException();
+        }
+
         public string BackupsUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();

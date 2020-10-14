@@ -47,6 +47,16 @@ namespace Squidex.Web.Services
             return urlsOptions.BuildUrl($"app/{appId.Name}/settings", false);
         }
 
+        public string AssetContentBase()
+        {
+            return urlsOptions.BuildUrl("api/assets/");
+        }
+
+        public string AssetContentBase(string appName)
+        {
+            return urlsOptions.BuildUrl($"api/assets/{appName}/");
+        }
+
         public string AssetContent(NamedId<DomainId> appId, DomainId assetId)
         {
             return urlsOptions.BuildUrl($"api/assets/{appId.Name}/{assetId}");
@@ -54,7 +64,7 @@ namespace Squidex.Web.Services
 
         public string AssetContent(NamedId<DomainId> appId, string idOrSlug)
         {
-            return urlsOptions.BuildUrl($"assets/{appId.Name}/{idOrSlug}");
+            return urlsOptions.BuildUrl($"api/assets/{appId.Name}/{idOrSlug}");
         }
 
         public string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion)
@@ -65,6 +75,11 @@ namespace Squidex.Web.Services
         public string AssetsUI(NamedId<DomainId> appId, string? query = null)
         {
             return urlsOptions.BuildUrl($"app/{appId.Name}/assets", false) + query != null ? $"?query={query}" : string.Empty;
+        }
+
+        public string AssetsUI(NamedId<Named> appId, string? query = null)
+        {
+            return urlsOptions.BuildUrl($"app/{appId.Name}/assets?query={query}", false);
         }
 
         public string BackupsUI(NamedId<DomainId> appId)

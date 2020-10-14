@@ -12,11 +12,19 @@
         font-weight: normal;
         line-height: 1.4rem;
     }
-}
 
-@media (max-width: 1200px) {
-    .profile-name {
-        display: none;
+    &-menu {
+        &.open {
+            display: block;
+        }
+    }
+
+    &-submenu {
+        position: relative;
+
+        .dropdown-menu {
+            @include absolute(0, null, null, -10rem);
+        }
     }
 }
 

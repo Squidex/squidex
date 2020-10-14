@@ -97,7 +97,8 @@ export class RuleElementPropertyDto {
         public readonly display: string,
         public readonly description: string,
         public readonly isFormattable: boolean,
-        public readonly isRequired: boolean
+        public readonly isRequired: boolean,
+        public readonly options?: ReadonlyArray<string>
     ) {
     }
 }
@@ -228,7 +229,8 @@ export class RulesService {
                             property.display,
                             property.description,
                             property.isFormattable,
-                            property.isRequired
+                            property.isRequired,
+                            property.options
                         ));
 
                     actions[key] = new RuleElementDto(

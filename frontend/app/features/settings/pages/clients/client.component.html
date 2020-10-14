@@ -85,8 +85,8 @@
 
                     <sqx-form-hint>{{ 'clients.apiCallsLimitHint' | sqxTranslate }}</sqx-form-hint>
                 </div>
-                <div class="col-auto cell-input" *ngIf="client.canUpdate">
-                    <button class="btn btn-primary" (click)="updateApiCallsLimit()">
+                <div class="col-auto cell-input cell-button" *ngIf="client.canUpdate">
+                    <button class="btn btn-secondary" (click)="updateApiCallsLimit()">
                         {{ 'common.save' | sqxTranslate }}
                     </button>
                 </div>

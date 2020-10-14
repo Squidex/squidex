@@ -73,7 +73,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 if (property.CanRead && property.CanWrite)
                 {
-                    var actionProperty = new RuleActionProperty { Name = property.Name.ToCamelCase(), Display = property.Name };
+                    var actionProperty = new RuleActionProperty
+                    {
+                        Name = property.Name.ToCamelCase()
+                    };
 
                     var display = property.GetCustomAttribute<DisplayAttribute>();
 
@@ -81,17 +84,29 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     {
                         actionProperty.Display = display.Name;
                     }
+                    else
+                    {
+                        actionProperty.Display = property.Name;
+                    }
 
                     if (!string.IsNullOrWhiteSpace(display?.Description))
                     {
                         actionProperty.Description = display.Description;
                     }
 
-                    var type = property.PropertyType;
+                    var type = GetType(property);
 
-                    if ((GetDataAttribute<RequiredAttribute>(property) != null || (type.IsValueType && !IsNullable(type))) && type != typeof(bool) && type != typeof(bool?))
+                    if (!IsNullable(property.PropertyType))
                     {
-                        actionProperty.IsRequired = true;
+                        if (GetDataAttribute<RequiredAttribute>(property) != null)
+                        {
+                            actionProperty.IsRequired = true;
+                        }
+
+                        if (type.IsValueType && !IsBoolean(type) && !type.IsEnum)
+                        {
+                            actionProperty.IsRequired = true;
+                        }
                     }
 
                     if (property.GetCustomAttribute<FormattableAttribute>() != null)
@@ -99,35 +114,45 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         actionProperty.IsFormattable = true;
                     }
 
-                    var dataType = GetDataAttribute<DataTypeAttribute>(property)?.DataType;
+                    if (type.IsEnum)
+                    {
+                        var values = Enum.GetNames(type);
 
-                    if (type == typeof(bool) || type == typeof(bool?))
-                    {
-                        actionProperty.Editor = RuleActionPropertyEditor.Checkbox;
-                    }
-                    else if (type == typeof(int) || type == typeof(int?))
-                    {
-                        actionProperty.Editor = RuleActionPropertyEditor.Number;
-                    }
-                    else if (dataType == DataType.Url)
-                    {
-                        actionProperty.Editor = RuleActionPropertyEditor.Url;
-                    }
-                    else if (dataType == DataType.Password)
-                    {
-                        actionProperty.Editor = RuleActionPropertyEditor.Password;
-                    }
-                    else if (dataType == DataType.EmailAddress)
-                    {
-                        actionProperty.Editor = RuleActionPropertyEditor.Email;
-                    }
-                    else if (dataType == DataType.MultilineText)
-                    {
-                        actionProperty.Editor = RuleActionPropertyEditor.TextArea;
+                        actionProperty.Options = values;
+                        actionProperty.Editor = RuleActionPropertyEditor.Dropdown;
                     }
                     else
                     {
-                        actionProperty.Editor = RuleActionPropertyEditor.Text;
+                        var dataType = GetDataAttribute<DataTypeAttribute>(property)?.DataType;
+
+                        if (IsBoolean(type))
+                        {
+                            actionProperty.Editor = RuleActionPropertyEditor.Checkbox;
+                        }
+                        else if (IsNumericType(type))
+                        {
+                            actionProperty.Editor = RuleActionPropertyEditor.Number;
+                        }
+                        else if (dataType == DataType.Url)
+                        {
+                            actionProperty.Editor = RuleActionPropertyEditor.Url;
+                        }
+                        else if (dataType == DataType.Password)
+                        {
+                            actionProperty.Editor = RuleActionPropertyEditor.Password;
+                        }
+                        else if (dataType == DataType.EmailAddress)
+                        {
+                            actionProperty.Editor = RuleActionPropertyEditor.Email;
+                        }
+                        else if (dataType == DataType.MultilineText)
+                        {
+                            actionProperty.Editor = RuleActionPropertyEditor.TextArea;
+                        }
+                        else
+                        {
+                            actionProperty.Editor = RuleActionPropertyEditor.Text;
+                        }
                     }
 
                     definition.Properties.Add(actionProperty);
@@ -149,6 +174,50 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private static bool IsNullable(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
+
+        private static bool IsBoolean(Type type)
+        {
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.Boolean:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsNumericType(Type type)
+        {
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static Type GetType(PropertyInfo property)
+        {
+            var type = property.PropertyType;
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                type = type.GetGenericArguments()[0];
+            }
+
+            return type;
         }
 
         private static string GetActionName(Type type)

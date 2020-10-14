@@ -8,16 +8,14 @@
         <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
             <span class="user">
                 <img class="user-picture" [src]="snapshot.profileId | sqxUserIdPicture">
-                
-                <span class="profile-name">{{snapshot.profileDisplayName}}</span>
             </span>
         </span>
     </li>
 </ul>
 
-<ng-container *sqxModal="modalMenu;closeAlways:true;onRoot:false">
+<ng-container *sqxModal="modalMenu;onRoot:false">
     <div class="dropdown-menu" [sqxAnchoredTo]="button" [offset]="10" @fade>
-        <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
+        <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl" (click)="modalMenu.hide()">
             <div>{{ 'profile.userEmail' | sqxTranslate }}</div>
     
             <strong>{{snapshot.profileEmail}}</strong>
@@ -29,9 +27,21 @@
             {{ 'common.administration' | sqxTranslate }}
         </a>
 
-        <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
+        <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl" (click)="modalMenu.hide()">
             {{ 'profile.title' | sqxTranslate }}
         </a>
+
+        <div class="dropdown-submenu">
+            <a class="dropdown-item dropdown-toggle" (click)="toggle()">
+                {{ 'common.language' | sqxTranslate }}
+            </a>
+
+            <div class="dropdown-menu" [class.open]="showSubmenu">
+                <a class="dropdown-item" *ngFor="let availableLanguage of languages" [class.active]="availableLanguage.code === language" (click)="changeLanguage(availableLanguage.code)">
+                    {{ availableLanguage.name }}
+                </a>
+            </div>
+          </div>
 
         <div class="dropdown-divider"></div>
 
