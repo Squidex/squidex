@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Display = "Enum",
                 Description = null,
                 Editor = RuleActionPropertyEditor.Dropdown,
-                IsRequired = true,
+                IsRequired = false,
                 Options = new[] { "Yes", "No" }
             });
 
