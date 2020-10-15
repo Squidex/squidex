@@ -195,6 +195,25 @@ describe('AppsService', () => {
         expect(app!).toEqual(createApp(12));
     }));
 
+    it('should make delete request to leave app',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/apps/my-app/contributors/me' }
+            }
+        };
+
+        appsService.deleteApp(resource).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors/me');
+
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+    }));
+
     it('should make delete request to archive app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
 

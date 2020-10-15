@@ -41,54 +41,52 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <div class="dropdown dropdown-options">
-                        <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpen | async" #buttonOptions>
-                            <i class="icon-dots"></i>
-                        </button>
+                    <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpen | async" #buttonOptions>
+                        <i class="icon-dots"></i>
+                    </button>
 
-                        <ng-container *sqxModal="dropdown;closeAlways:true">
-                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
-                                <ng-container *ngIf="field.properties.isContentField">
-                                    <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
-                                        {{ 'schemas.field.enable' | sqxTranslate }}
-                                    </a>
-                                    <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
-                                        {{ 'schemas.field.disable' | sqxTranslate }}
-                                    </a>
-                                    <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
-                                        {{ 'schemas.field.hide' | sqxTranslate }}
-                                    </a>
-                                    <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
-                                        {{ 'schemas.field.show' | sqxTranslate }}
-                                    </a>
-                                </ng-container>                
-                                
-                                <ng-container *ngIf="field.canLock">
-                                    <div class="dropdown-divider"></div>
+                    <ng-container *sqxModal="dropdown;closeAlways:true">
+                        <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
+                            <ng-container *ngIf="field.properties.isContentField">
+                                <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
+                                    {{ 'schemas.field.enable' | sqxTranslate }}
+                                </a>
+                                <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
+                                    {{ 'schemas.field.disable' | sqxTranslate }}
+                                </a>
+                                <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
+                                    {{ 'schemas.field.hide' | sqxTranslate }}
+                                </a>
+                                <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
+                                    {{ 'schemas.field.show' | sqxTranslate }}
+                                </a>
+                            </ng-container>                
                             
-                                    <a class="dropdown-item"
-                                        (sqxConfirmClick)="lockField()"
-                                        confirmTitle="i18n:schemas.field.lockConfirmText"
-                                        confirmText="i18n:schemas.field.lockConfirmText"
-                                        confirmRememberKey="lockField">
-                                        {{ 'schemas.field.lock' | sqxTranslate }}
-                                    </a>
-                                </ng-container>
-    
-                                <ng-container>
-                                    <div class="dropdown-divider"></div>
-    
-                                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!field.canDelete"
-                                        (sqxConfirmClick)="deleteField()"
-                                        confirmTitle="i18n:schemas.field.deleteConfirmTitle"
-                                        confirmText="i18n:schemas.field.deleteConfirmText"
-                                        confirmRememberKey="deleteField">
-                                        {{ 'common.delete' | sqxTranslate }}
-                                    </a>
-                                </ng-container>
-                            </div>
-                        </ng-container>
-                    </div>
+                            <ng-container *ngIf="field.canLock">
+                                <div class="dropdown-divider"></div>
+                        
+                                <a class="dropdown-item"
+                                    (sqxConfirmClick)="lockField()"
+                                    confirmTitle="i18n:schemas.field.lockConfirmText"
+                                    confirmText="i18n:schemas.field.lockConfirmText"
+                                    confirmRememberKey="lockField">
+                                    {{ 'schemas.field.lock' | sqxTranslate }}
+                                </a>
+                            </ng-container>
+
+                            <ng-container>
+                                <div class="dropdown-divider"></div>
+
+                                <a class="dropdown-item dropdown-item-delete" [class.disabled]="!field.canDelete"
+                                    (sqxConfirmClick)="deleteField()"
+                                    confirmTitle="i18n:schemas.field.deleteConfirmTitle"
+                                    confirmText="i18n:schemas.field.deleteConfirmText"
+                                    confirmRememberKey="deleteField">
+                                    {{ 'common.delete' | sqxTranslate }}
+                                </a>
+                            </ng-container>
+                        </div>
+                    </ng-container>
                 </div>
             </div>
         </div>

@@ -131,22 +131,34 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public leave(app: AppDto): Observable<any> {
+        return this.appsService.leaveApp(app).pipe(
+            tap(() => {
+                this.removeApp(app);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public delete(app: AppDto): Observable<any> {
         return this.appsService.deleteApp(app).pipe(
             tap(() => {
-                this.next(s => {
-                    const apps = s.apps.filter(x => x.name !== app.name);
-
-                    const selectedApp =
-                        s.selectedApp &&
-                        s.selectedApp.id === app.id ?
-                        null :
-                        s.selectedApp;
-
-                    return { ...s, apps, selectedApp };
-                });
+                this.removeApp(app);
             }),
             shareSubscribed(this.dialogs));
+    }
+
+    private removeApp(app: AppDto) {
+        this.next(s => {
+            const apps = s.apps.filter(x => x.name !== app.name);
+
+            const selectedApp =
+                s.selectedApp &&
+                s.selectedApp.id === app.id ?
+                null :
+                s.selectedApp;
+
+            return { ...s, apps, selectedApp };
+        });
     }
 
     private replaceApp(updated: AppDto, app: AppDto) {
