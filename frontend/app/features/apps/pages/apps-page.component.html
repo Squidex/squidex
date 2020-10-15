@@ -1,8 +1,8 @@
 <sqx-title message="i18n:apps.listPageTitle"></sqx-title>
 
-<div class="panel-container page">  
+<div class="panel-container page" *ngIf="authState.userChanges | async; let user">  
     <div class="apps-section">
-        <h1 class="apps-title">{{ 'apps.welcomeTitle' | sqxTranslate: { user: authState.user?.displayName } }}</h1>
+        <h1 class="apps-title">{{ 'apps.welcomeTitle' | sqxTranslate: { user: user.displayName } }}</h1>
 
         <div class="subtext">
             {{ 'apps.welcomeSubtitle' | sqxTranslate }}
