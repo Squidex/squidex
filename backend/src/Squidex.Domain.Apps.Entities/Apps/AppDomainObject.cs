@@ -461,7 +461,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (Snapshot.IsArchived)
             {
-                throw new DomainException(T.Get("apps.alreadyArchieved"));
+                throw new DomainException(T.Get("apps.alreadyArchived"));
             }
         }
 

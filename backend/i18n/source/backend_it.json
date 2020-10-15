@@ -7,7 +7,7 @@
   "annotations_Required": "Il campo è {name|lower} obbligatorio.",
   "annotations_StringLength": "The field {name|lower} must be a string with a maximum length of {max}.",
   "annotations_StringLengthMinimum": "The field {name|lower} must be a string with a minimum length of {min} and a maximum length of {max}.",
-  "apps.alreadyArchieved": "La App è stata già archiviata.",
+  "apps.alreadyArchived": "La App è stata già archiviata.",
   "apps.clients.idAlreadyExists": "Un client con lo stesso id esiste già.",
   "apps.contributors.cannotChangeYourself": "Non puoi cambiare il tuo ruolo.",
   "apps.contributors.maxReached": "Hai raggiunto il numero massimo di contributori previsto per il tuo piano.",

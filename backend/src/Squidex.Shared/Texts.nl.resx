@@ -106,7 +106,7 @@
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
     <value>Het veld {0} moet een string zijn met een minimum lengte van {1} en een maximum lengte van {2}.</value>
   </data>
-  <data name="apps.alreadyArchieved" xml:space="preserve">
+  <data name="apps.alreadyArchived" xml:space="preserve">
     <value>App is al gearchiveerd.</value>
   </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">

@@ -7,7 +7,7 @@
   "annotations_Required": "Het veld {name|lower} is verplicht.",
   "annotations_StringLength": "Het veld {name|lower} moet een string zijn met een maximale lengte van {max}.",
   "annotations_StringLengthMinimum": "Het veld {name|lower} moet een string zijn met een minimum lengte van {min} en een maximum lengte van {max}.",
-  "apps.alreadyArchieved": "App is al gearchiveerd.",
+  "apps.alreadyArchived": "App is al gearchiveerd.",
   "apps.clients.idAlreadyExists": "Er bestaat al een client met dezelfde id.",
   "apps.contributors.cannotChangeYourself": "Je kunt jouw eigen rol niet wijzigen.",
   "apps.contributors.maxReached": "Je heeft het maximale aantal bijdragers voor jouw plan bereikt.",
