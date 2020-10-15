@@ -52,13 +52,11 @@ namespace Squidex.Areas.Frontend
                 return next();
             });
 
+            app.UseMiddleware<IndexMiddleware>();
+
             if (environment.IsDevelopment())
             {
                 app.UseMiddleware<WebpackMiddleware>();
-            }
-            else
-            {
-                app.UseMiddleware<IndexMiddleware>();
             }
 
             app.UseStaticFiles(new StaticFileOptions
