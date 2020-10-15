@@ -22,7 +22,9 @@
                     </div>
                 
                     <ng-container *ngIf="rolesState.roles | async; let roles">
-                        <sqx-client *ngFor="let client of clients; trackBy: trackByClient" [client]="client" [clientRoles]="roles">
+                        <sqx-client *ngFor="let client of clients; trackBy: trackByClient"
+                            [client]="client"
+                            [clientRoles]="roles">
                         </sqx-client>
                     </ng-container>
         

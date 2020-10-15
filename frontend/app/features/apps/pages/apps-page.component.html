@@ -15,33 +15,9 @@
                 <h3 class="empty-headline">{{ 'apps.empty' | sqxTranslate }}</h3>
             </div>
 
-            <div class="card card-href card-app" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">
-                <div class="card-body">
-                    <div class="row no-gutters">
-                        <div class="col-auto card-left">
-                            <sqx-avatar [image]="app.image" [identifier]="app.name"></sqx-avatar>
-                        </div>
-                        <div class="col card-right">
-                            <h3 class="card-title">{{app.displayName}}</h3>
-
-                            <div class="card-text card-links truncate">
-                                <a [routerLink]="['/app', app.name]" sqxStopClick>{{ 'common.edit' | sqxTranslate }}</a>
-
-                                <span class="deeplinks">
-                                    &nbsp;|
-                                    <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ 'common.content' | sqxTranslate }}</a> &middot;
-                                    <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ 'common.assets' | sqxTranslate }}</a> &middot;
-                                    <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ 'common.settings' | sqxTranslate }}</a>
-                                </span>
-                            </div>
-
-                            <div class="card-text" *ngIf="app.description">
-                                {{app.description}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <sqx-app *ngFor="let app of apps; trackBy: trackByApp"
+                [app]="app" (leave)="leave($event)">
+            </sqx-app>
         </div>
     </ng-container>
 

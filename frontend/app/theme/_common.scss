@@ -135,20 +135,6 @@ body {
     }
 }
 
-.dropdown-options {
-    & {
-        display: inline-block;
-    }
-
-    .dropdown-menu {
-        @include absolute(100%, 0, auto, auto);
-    }
-
-    .dropdown-item {
-        cursor: pointer;
-    }
-}
-
 .dropdown-item {
     cursor: pointer;
 }

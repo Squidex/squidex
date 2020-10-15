@@ -8,7 +8,7 @@
                 {{assetFolder.folderName | sqxTranslate}}
             </div>
             <div class="col-auto">
-                <div class="dropdown dropdown-options" *ngIf="canDelete || canUpdate">
+                <ng-container *ngIf="canDelete || canUpdate">
                     <button type="button" class="btn btn-sm btn-text-secondary ml-1" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
@@ -32,7 +32,7 @@
                             </a>
                         </div>
                     </ng-container>
-                </div>
+                </ng-container>
             </div>
         </div>            
     </div>

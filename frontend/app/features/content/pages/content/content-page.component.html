@@ -26,9 +26,9 @@
 
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
 
-                    <div class="dropdown dropdown-options ml-1" *ngIf="content?.canDelete">
+                    <ng-container *ngIf="content?.canDelete">
                         <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
-                            <i class="icon-more"></i>
+                            <i class="icon-dots"></i>
                         </button>
 
                         <ng-container *sqxModal="dropdown;closeAlways:true">
@@ -42,7 +42,7 @@
                                 </a>
                             </div>
                         </ng-container>
-                    </div>
+                    </ng-container>
                 </ng-container>
 
                 <ng-container *ngIf="content?.canUpdate">

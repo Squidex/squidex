@@ -4,8 +4,8 @@
     </button>
 </div>
 
-<div class="dropdown-options btn-group btn-group-{{size}}" *ngIf="isLargeMode">
-    <button type="button" class="btn btn-secondary dropdown-toggle" title="{{selectedLanguage.englishName}}" (click)="dropdown.toggle()" #button tabindex="-1">
+<ng-container *ngIf="isLargeMode">
+    <button type="button" class="btn btn-secondary btn-{{size}} dropdown-toggle" title="{{selectedLanguage.englishName}}" (click)="dropdown.toggle()" #button tabindex="-1">
         {{selectedLanguage.iso2Code}}
     </button>
 
@@ -16,4 +16,4 @@
             </div>
         </div>
     </ng-container>
-</div>
+</ng-container>
