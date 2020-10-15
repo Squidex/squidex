@@ -85,7 +85,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     contentIdsBySchemaId.Remove(schemaDeleted.SchemaId.Id);
                     break;
                 case ContentCreated contentCreated:
-                    contentIdsBySchemaId.GetOrAddNew(contentCreated.SchemaId.Id).Add(@event.Headers.AggregateId());
+                    contentIdsBySchemaId.GetOrAddNew(contentCreated.SchemaId.Id)
+                        .Add(@event.Headers.AggregateId());
 
                     if (assetsUrlNew != null && assetsUrlOld != null)
                     {
