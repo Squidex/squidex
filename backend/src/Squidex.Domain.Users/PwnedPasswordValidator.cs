@@ -29,6 +29,11 @@ namespace Squidex.Domain.Users
 
         public async Task<IdentityResult> ValidateAsync(UserManager<IdentityUser> manager, IdentityUser user, string password)
         {
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                return IdentityResult.Success;
+            }
+
             try
             {
                 var isBreached = await client.IsPasswordPwned(password);
