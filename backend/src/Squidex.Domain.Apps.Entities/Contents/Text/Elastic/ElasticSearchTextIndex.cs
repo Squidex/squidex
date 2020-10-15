@@ -69,10 +69,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
         {
             var data = new
             {
-                appId = upsert.AppId.Id,
+                appId = upsert.AppId.Id.ToString(),
                 appName = upsert.AppId.Name,
-                contentId = upsert.ContentId,
-                schemaId = upsert.SchemaId.Id,
+                contentId = upsert.ContentId.ToString(),
+                schemaId = upsert.SchemaId.Id.ToString(),
                 schemaName = upsert.SchemaId.Name,
                 serveAll = upsert.ServeAll,
                 servePublished = upsert.ServePublished,

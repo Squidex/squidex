@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var reader = A.Fake<IBackupReader>();
 
-            A.CallTo(() => reader.ReadJsonAttachmentAsync<Dictionary<string, string>>(A<string>._))
+            A.CallTo(() => reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._))
                 .Returns(storedUsers);
 
             return reader;

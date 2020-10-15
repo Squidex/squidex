@@ -136,11 +136,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     using (var writer = await backupArchiveLocation.OpenWriterAsync(stream))
                     {
+                        await writer.WriteVersionAsync();
+
                         var userMapping = new UserMapping(actor);
 
                         var context = new BackupContext(Key, userMapping, writer);
-
-                        var filter = $"^[^\\-]*-{Regex.Escape(Key)}";
 
                         await eventStore.QueryAsync(async storedEvent =>
                         {
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             job.HandledAssets = writer.WrittenAttachments;
 
                             lastTimestamp = await WritePeriodically(lastTimestamp);
-                        }, filter, null, ct);
+                        }, GetFilter(), null, ct);
 
                         foreach (var handler in handlers)
                         {
@@ -213,6 +213,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 currentJobToken = null;
                 currentJob = null;
             }
+        }
+
+        private string GetFilter()
+        {
+            return $"^[^\\-]*-{Regex.Escape(Key)}";
         }
 
         private async Task<Instant> WritePeriodically(Instant lastTimestamp)

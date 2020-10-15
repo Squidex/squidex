@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.ReadJsonAttachmentAsync<JsonObject>(A<string>._))
+            A.CallTo(() => context.Reader.ReadJsonAsync<JsonObject>(A<string>._))
                 .Returns(settings);
 
             await sut.RestoreAsync(context);

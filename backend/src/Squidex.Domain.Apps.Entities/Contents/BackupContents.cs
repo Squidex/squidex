@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             try
             {
-                return await reader.ReadJsonAttachmentAsync<Urls>(UrlsFile);
+                return await reader.ReadJsonAsync<Urls>(UrlsFile);
             }
             catch
             {

@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNull(reader, nameof(reader));
             Guard.NotNull(userResolver, nameof(userResolver));
 
-            var json = await reader.ReadJsonAttachmentAsync<Dictionary<string, string>>(UsersFile);
+            var json = await reader.ReadJsonAsync<Dictionary<string, string>>(UsersFile);
 
             foreach (var (userId, email) in json)
             {

@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => urlGenerator.AssetContentBase(appId.Name))
                 .Returns(newAssetsUrlApp);
 
-            A.CallTo(() => reader.ReadJsonAttachmentAsync<BackupContents.Urls>(A<string>._))
+            A.CallTo(() => reader.ReadJsonAsync<BackupContents.Urls>(A<string>._))
                 .Returns(new BackupContents.Urls
                 {
                     Assets = oldAssetsUrl,

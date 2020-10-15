@@ -161,6 +161,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     using (var reader = await DownloadAsync())
                     {
+                        await reader.CheckCompatibilityAsync();
+
                         using (Profiler.Trace("ReadEvents"))
                         {
                             await ReadEventsAsync(reader, handlers);

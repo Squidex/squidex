@@ -54,27 +54,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public Task<T> ReadJsonAttachmentAsync<T>(string name)
+        public Task<T> ReadJsonAsync<T>(string name)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
-            var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
+            var entry = GetEntry(name);
 
-            if (attachmentEntry == null)
+            using (var stream = entry.Open())
             {
-                throw new FileNotFoundException("Cannot find attachment.", name);
+                return Task.FromResult(serializer.Deserialize<T>(stream, null));
             }
-
-            T result;
-
-            using (var stream = attachmentEntry.Open())
-            {
-                result = serializer.Deserialize<T>(stream, null);
-            }
-
-            readAttachments++;
-
-            return Task.FromResult(result);
         }
 
         public async Task ReadBlobAsync(string name, Func<Stream, Task> handler)
@@ -82,6 +71,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNull(handler, nameof(handler));
 
+            var entry = GetEntry(name);
+
+            using (var stream = entry.Open())
+            {
+                await handler(stream);
+            }
+        }
+
+        private ZipArchiveEntry GetEntry(string name)
+        {
             var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
 
             if (attachmentEntry == null)
@@ -89,12 +88,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 throw new FileNotFoundException("Cannot find attachment.", name);
             }
 
-            using (var stream = attachmentEntry.Open())
-            {
-                await handler(stream);
-            }
-
             readAttachments++;
+
+            return attachmentEntry;
         }
 
         public async Task ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter, Func<(string Stream, Envelope<IEvent> Event), Task> handler)

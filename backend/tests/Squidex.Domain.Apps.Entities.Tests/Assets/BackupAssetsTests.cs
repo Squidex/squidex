@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.ReadJsonAttachmentAsync<TagsExport>(A<string>._))
+            A.CallTo(() => context.Reader.ReadJsonAsync<TagsExport>(A<string>._))
                 .Returns(tags);
 
             await sut.RestoreAsync(context);

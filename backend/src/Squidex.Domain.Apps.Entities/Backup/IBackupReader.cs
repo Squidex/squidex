@@ -23,6 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         Task ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter, Func<(string Stream, Envelope<IEvent> Event), Task> handler);
 
-        Task<T> ReadJsonAttachmentAsync<T>(string name);
+        Task<T> ReadJsonAsync<T>(string name);
     }
 }

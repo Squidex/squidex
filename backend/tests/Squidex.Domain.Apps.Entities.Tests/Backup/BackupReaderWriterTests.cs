@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -31,13 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         [TypeName(nameof(MyEvent))]
         public sealed class MyEvent : IEvent
         {
-            public DomainId DomainIdRaw { get; set; }
-
-            public DomainId DomainIdEmpty { get; set; }
-
-            public NamedId<DomainId> DomainIdNamed { get; set; }
-
-            public Dictionary<DomainId, string> Values { get; set; }
+            public Guid Id { get; set; } = Guid.NewGuid();
         }
 
         public BackupReaderWriterTests()
@@ -47,14 +40,72 @@ namespace Squidex.Domain.Apps.Entities.Backup
             formatter = new DefaultEventDataFormatter(typeNameRegistry, serializer);
         }
 
+        [Fact]
+        public async Task Should_read_and_write_json_async()
+        {
+            var file = "File.json";
+
+            var value = Guid.NewGuid();
+
+            await TestReaderWriterAsync(BackupVersion.V1, async writer =>
+            {
+                await WriteJsonGuidAsync(writer, file, value);
+            }, async reader =>
+            {
+                var read = await ReadJsonGuidAsync(reader, file);
+
+                Assert.Equal(value, read);
+            });
+        }
+
+        [Fact]
+        public async Task Should_read_and_write_blob_async()
+        {
+            var file = "File.json";
+
+            var value = Guid.NewGuid();
+
+            await TestReaderWriterAsync(BackupVersion.V1, async writer =>
+            {
+                await WriteGuidAsync(writer, file, value);
+            }, async reader =>
+            {
+                var read = await ReadGuidAsync(reader, file);
+
+                Assert.Equal(value, read);
+            });
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_json_not_found()
+        {
+            await TestReaderWriterAsync(BackupVersion.V1, writer =>
+            {
+                return Task.CompletedTask;
+            }, async reader =>
+            {
+                await Assert.ThrowsAsync<FileNotFoundException>(() => reader.ReadJsonAsync<int>("404"));
+            });
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_blob_not_found()
+        {
+            await TestReaderWriterAsync(BackupVersion.V1, writer =>
+            {
+                return Task.CompletedTask;
+            }, async reader =>
+            {
+                await Assert.ThrowsAsync<FileNotFoundException>(() => reader.ReadBlobAsync("404", s => Task.CompletedTask));
+            });
+        }
+
         [Theory]
         [InlineData(BackupVersion.V1)]
         [InlineData(BackupVersion.V2)]
         public async Task Should_write_and_read_events_to_backup(BackupVersion version)
         {
-            var stream = new MemoryStream();
-
-            var random = new Random();
+            var randomGenerator = new Random();
             var randomDomainIds = new List<DomainId>();
 
             for (var i = 0; i < 100; i++)
@@ -64,85 +115,64 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             DomainId RandomDomainId()
             {
-                return randomDomainIds[random.Next(randomDomainIds.Count)];
+                return randomDomainIds[randomGenerator.Next(randomDomainIds.Count)];
             }
 
-            var sourceEvents = new List<(string Stream, Envelope<IEvent> Event)>();
+            var sourceEvents = new List<(string Stream, Envelope<MyEvent> Event)>();
 
             for (var i = 0; i < 200; i++)
             {
-                var @event = new MyEvent
-                {
-                    DomainIdNamed = NamedId.Of(RandomDomainId(), $"name{i}"),
-                    DomainIdRaw = RandomDomainId(),
-                    Values = new Dictionary<DomainId, string>
-                    {
-                        [RandomDomainId()] = "Key"
-                    }
-                };
+                var @event = new MyEvent();
 
-                var envelope = Envelope.Create<IEvent>(@event);
+                var envelope = Envelope.Create(@event);
 
-                envelope.Headers.Add(RandomDomainId().ToString(), i);
-                envelope.Headers.Add("Id", RandomDomainId().ToString());
+                envelope.Headers.Add("Id", @event.Id.ToString());
                 envelope.Headers.Add("Index", i);
 
                 sourceEvents.Add(($"My-{RandomDomainId()}", envelope));
             }
 
-            using (var writer = new BackupWriter(serializer, stream, true, version))
+            await TestReaderWriterAsync(version, async writer =>
             {
-                foreach (var (_, envelope) in sourceEvents)
+                foreach (var (stream, envelope) in sourceEvents)
                 {
                     var eventData = formatter.ToEventData(envelope, Guid.NewGuid(), true);
-                    var eventStored = new StoredEvent("S", "1", 2, eventData);
+                    var eventStored = new StoredEvent(stream, "1", 2, eventData);
 
                     var index = int.Parse(envelope.Headers["Index"].ToString());
 
                     if (index % 17 == 0)
                     {
-                        await writer.WriteBlobAsync(index.ToString(), innerStream =>
-                        {
-                            innerStream.WriteByte((byte)index);
-
-                            return Task.CompletedTask;
-                        });
+                        await WriteGuidAsync(writer, index.ToString(), envelope.Payload.Id);
                     }
                     else if (index % 37 == 0)
                     {
-                        await writer.WriteJsonAsync(index.ToString(), $"JSON_{index}");
+                        await WriteJsonGuidAsync(writer, index.ToString(), envelope.Payload.Id);
                     }
 
                     writer.WriteEvent(eventStored);
                 }
-            }
-
-            stream.Position = 0;
-
-            var targetEvents = new List<(string Stream, Envelope<IEvent> Event)>();
-
-            using (var reader = new BackupReader(serializer, stream))
+            }, async reader =>
             {
+                var targetEvents = new List<(string Stream, Envelope<IEvent> Event)>();
+
                 await reader.ReadEventsAsync(streamNameResolver, formatter, async @event =>
                 {
                     var index = int.Parse(@event.Event.Headers["Index"].ToString());
 
+                    var id = Guid.Parse(@event.Event.Headers["Id"].ToString());
+
                     if (index % 17 == 0)
                     {
-                        await reader.ReadBlobAsync(index.ToString(), innerStream =>
-                        {
-                            var byteRead = innerStream.ReadByte();
+                        var guid = await ReadGuidAsync(reader, index.ToString());
 
-                            Assert.Equal((byte)index, byteRead);
-
-                            return Task.CompletedTask;
-                        });
+                        Assert.Equal(id, guid);
                     }
                     else if (index % 37 == 0)
                     {
-                        var json = await reader.ReadJsonAttachmentAsync<string>(index.ToString());
+                        var guid = await ReadJsonGuidAsync(reader, index.ToString());
 
-                        Assert.Equal($"JSON_{index}", json);
+                        Assert.Equal(id, guid);
                     }
 
                     targetEvents.Add(@event);
@@ -150,15 +180,66 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 for (var i = 0; i < targetEvents.Count; i++)
                 {
-                    var target = targetEvents[i].Event.To<MyEvent>();
+                    var targetEvent = targetEvents[i].Event.To<MyEvent>();
+                    var targetStream = targetEvents[i].Stream;
 
-                    var source = sourceEvents[i].Event.To<MyEvent>();
+                    var sourceEvent = sourceEvents[i].Event.To<MyEvent>();
+                    var sourceStream = sourceEvents[i].Stream;
 
-                    Assert.Equal(source.Payload.Values.First().Key, target.Payload.Values.First().Key);
-                    Assert.Equal(source.Payload.DomainIdRaw, target.Payload.DomainIdRaw);
-                    Assert.Equal(source.Payload.DomainIdNamed.Id, target.Payload.DomainIdNamed.Id);
+                    Assert.Equal(sourceEvent.Payload.Id, targetEvent.Payload.Id);
+                    Assert.Equal(sourceStream, targetStream);
+                }
+            });
+        }
 
-                    Assert.Equal(DomainId.Empty, target.Payload.DomainIdEmpty);
+        private static Task<Guid> ReadJsonGuidAsync(IBackupReader reader, string file)
+        {
+            return reader.ReadJsonAsync<Guid>(file);
+        }
+
+        private static Task WriteJsonGuidAsync(IBackupWriter writer, string file, Guid value)
+        {
+            return writer.WriteJsonAsync(file, value);
+        }
+
+        private static Task WriteGuidAsync(IBackupWriter writer, string file, Guid value)
+        {
+            return writer.WriteBlobAsync(file, async stream =>
+            {
+                await stream.WriteAsync(value.ToByteArray());
+            });
+        }
+
+        private static async Task<Guid> ReadGuidAsync(IBackupReader reader, string file)
+        {
+            var read = Guid.Empty;
+
+            await reader.ReadBlobAsync(file, async stream =>
+            {
+                var buffer = new byte[16];
+
+                await stream.ReadAsync(buffer);
+
+                read = new Guid(buffer);
+            });
+
+            return read;
+        }
+
+        private async Task TestReaderWriterAsync(BackupVersion version, Func<IBackupWriter, Task> write, Func<IBackupReader, Task> read)
+        {
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new BackupWriter(serializer, stream, true, version))
+                {
+                    await write(writer);
+                }
+
+                stream.Position = 0;
+
+                using (var reader = new BackupReader(serializer, stream))
+                {
+                    await read(reader);
                 }
             }
         }
