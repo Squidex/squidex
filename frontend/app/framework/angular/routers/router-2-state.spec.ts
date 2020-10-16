@@ -23,17 +23,17 @@ describe('Router2State', () => {
 
             synchronizer.writeValue(value, params);
 
-            expect(params['key']).toEqual('my-string');
+            expect(params).toEqual({ key: 'my-string' });
         });
 
-        it('should not write value to route when not a string', () => {
+        it('Should write undefined when not a string', () => {
             const params: Params = {};
 
             const value = 123;
 
             synchronizer.writeValue(value, params);
 
-            expect(params).toEqual({});
+            expect(params).toEqual({ key: undefined });
         });
 
         it('should get string from route', () => {
@@ -60,27 +60,27 @@ describe('Router2State', () => {
 
             synchronizer.writeValue(value, params);
 
-            expect(params['key']).toEqual('flag1,flag2');
+            expect(params).toEqual({ key: 'flag1,flag2' });
         });
 
-        it('should write empty object to route', () => {
+        it('Should write undefined when empty', () => {
             const params: Params = {};
 
             const value = {};
 
             synchronizer.writeValue(value, params);
 
-            expect(params['key']).toEqual('');
+            expect(params).toEqual({ key: undefined });
         });
 
-        it('should not write value to route when not an object', () => {
+        it('Should write undefined when not an object', () => {
             const params: Params = {};
 
             const value = 123;
 
             synchronizer.writeValue(value, params);
 
-            expect(params).toEqual({});
+            expect(params).toEqual({ key: undefined });
         });
 
         it('should get object from route', () => {
@@ -117,45 +117,44 @@ describe('Router2State', () => {
 
             synchronizer.writeValue(value, params);
 
-            expect(params['page']).toEqual('10');
-            expect(params['take']).toEqual('20');
+            expect(params).toEqual({ take: '20', page: '10' });
 
             localStore.verify(x => x.setInt('contents.pageSize', 20), Times.once());
         });
 
-        it('should not write page if zero', () => {
+        it('Should write undefined when page number is zero', () => {
             const params: Params = {};
 
             const value = new Pager(0, 0, 20, true);
 
             synchronizer.writeValue(value, params);
 
-            expect(params['page']).toBeUndefined();
-            expect(params['take']).toEqual('20');
+            expect(params).toEqual({ take: '20', page: undefined });
 
             localStore.verify(x => x.setInt('contents.pageSize', 20), Times.once());
         });
 
-        it('should not write value to route when not pager', () => {
+        it('should write undefined when value not a pager', () => {
             const params: Params = {};
 
             const value = 123;
 
             synchronizer.writeValue(value, params);
 
-            expect(params).toEqual({});
+            expect(params).toEqual({ take: undefined, page: undefined });
 
             localStore.verify(x => x.setInt('contents.pageSize', 20), Times.never());
         });
 
-        it('should not write value to route when null', () => {
+        it('should write undefined when value is null', () => {
             const params: Params = {};
 
             const value = null;
 
             synchronizer.writeValue(value, params);
 
-            expect(params).toEqual({});
+            expect(params).toEqual({ take: undefined, page: undefined });
+
             localStore.verify(x => x.setInt('contents.pageSize', 20), Times.never());
         });
 
