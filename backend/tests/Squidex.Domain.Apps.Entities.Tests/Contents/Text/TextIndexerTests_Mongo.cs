@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     [Trait("Category", "Dependencies")]
     public class TextIndexerTests_Mongo : TextIndexerTestsBase
     {
-        private sealed class TheFactory : IIndexerFactory
+        private sealed class MongoFactory : IIndexerFactory
         {
             private readonly MongoClient mongoClient = new MongoClient("mongodb://localhost");
 
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public override IIndexerFactory Factory { get; } = new TheFactory();
+        public override IIndexerFactory Factory { get; } = new MongoFactory();
 
         public TextIndexerTests_Mongo()
         {

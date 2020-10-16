@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     [Trait("Category", "Dependencies")]
     public class TextIndexerTests_Elastic : TextIndexerTestsBase
     {
-        private sealed class TheFactory : IIndexerFactory
+        private sealed class ElasticFactory : IIndexerFactory
         {
             public Task CleanupAsync()
             {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public override IIndexerFactory Factory { get; } = new TheFactory();
+        public override IIndexerFactory Factory { get; } = new ElasticFactory();
 
         public TextIndexerTests_Elastic()
         {
