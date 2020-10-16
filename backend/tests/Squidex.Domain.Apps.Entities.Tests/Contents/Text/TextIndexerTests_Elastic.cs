@@ -10,6 +10,8 @@ using Squidex.Domain.Apps.Entities.Contents.Text.Elastic;
 using Squidex.Infrastructure;
 using Xunit;
 
+#pragma warning disable SA1115 // Parameter should follow comma
+
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     [Trait("Category", "Dependencies")]
@@ -22,11 +24,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 return Task.CompletedTask;
             }
 
-            public Task<ITextIndex> CreateAsync(DomainId schemaId)
+            public async Task<ITextIndex> CreateAsync(DomainId schemaId)
             {
                 var index = new ElasticSearchTextIndex("http://localhost:9200", "squidex", true);
 
-                return Task.FromResult<ITextIndex>(index);
+                await index.InitializeAsync();
+
+                return index;
             }
         }
 
@@ -35,7 +39,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public TextIndexerTests_Elastic()
         {
             SupportsSearchSyntax = false;
-            SupportsMultiLanguage = false;
+        }
+
+        [Fact]
+        public async Task Should_index_localized_content_without_stop_words_and_retrieve()
+        {
+            await TestCombinations(
+                Create(ids1[0], "de", "and und"),
+                Create(ids2[0], "en", "and und"),
+
+                Search(expected: ids1, text: "and"),
+                Search(expected: ids2, text: "und")
+            );
+        }
+
+        [Fact]
+        public async Task Should_index_cjk_content_and_retrieve()
+        {
+            await TestCombinations(
+                Create(ids1[0], "zh", "可以将正向最大匹配方法和"),
+
+                Search(expected: ids1, text: "大"),
+                Search(expected: ids1, text: "匹")
+            );
         }
     }
 }

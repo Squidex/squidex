@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
@@ -18,6 +19,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
+#pragma warning disable SA1401 // Fields should be private
 #pragma warning disable SA1114 // Parameter list should follow declaration
 #pragma warning disable SA1115 // Parameter should follow comma
 #pragma warning disable RECS0021 // Warns about calls to virtual member functions occuring in the constructor
@@ -26,13 +28,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public abstract class TextIndexerTestsBase
     {
-        private readonly List<DomainId> ids1 = new List<DomainId> { DomainId.NewGuid() };
-        private readonly List<DomainId> ids2 = new List<DomainId> { DomainId.NewGuid() };
+        protected readonly List<DomainId> ids1 = new List<DomainId> { DomainId.NewGuid() };
+        protected readonly List<DomainId> ids2 = new List<DomainId> { DomainId.NewGuid() };
+
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly IAppEntity app;
 
-        private delegate Task IndexOperation(TextIndexingProcess process);
+        protected delegate Task IndexOperation(TextIndexingProcess process);
 
         public abstract IIndexerFactory Factory { get; }
 
@@ -40,14 +43,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public virtual bool SupportsSearchSyntax { get; set; } = true;
 
-        public virtual bool SupportsMultiLanguage { get; set; } = true;
-
         public virtual InMemoryTextIndexerState State { get; } = new InMemoryTextIndexerState();
 
         protected TextIndexerTestsBase()
         {
             app =
-                Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"),
+                Mocks.App(appId,
                     Language.DE,
                     Language.EN);
         }
@@ -89,41 +90,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 Search(expected: ids1, text: "en:city"),
                 Search(expected: ids2, text: "de:Stadt")
             );
-        }
-
-        [Fact]
-        public async Task Should_index_localized_content_and_retrieve()
-        {
-            if (SupportsMultiLanguage)
-            {
-                await TestCombinations(
-                    Create(ids1[0], "de", "Stadt und Land and Fluss"),
-
-                    Create(ids2[0], "en", "City and Country und River"),
-
-                    Search(expected: ids1, text: "Stadt"),
-                    Search(expected: ids2, text: "City"),
-
-                    Search(expected: ids1, text: "and"),
-                    Search(expected: ids2, text: "und")
-                );
-            }
-            else
-            {
-                var both = ids2.Union(ids1).ToList();
-
-                await TestCombinations(
-                    Create(ids1[0], "de", "Stadt und Land and Fluss"),
-
-                    Create(ids2[0], "en", "City and Country und River"),
-
-                    Search(expected: ids1, text: "Stadt"),
-                    Search(expected: ids2, text: "City"),
-
-                    Search(expected: null, text: "and"),
-                    Search(expected: both, text: "und")
-                );
-            }
         }
 
         [Fact]
@@ -316,10 +282,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 Search(expected: null, text: "V2", target: SearchScope.Published),
 
                 // Make an update, this updates the current version only.
-                Update(ids1[0], "iv", "Night"),
+                Update(ids1[0], "iv", "V3"),
 
-                Search(expected: ids1, text: "Night", target: SearchScope.All),
-                Search(expected: ids1, text: "Night", target: SearchScope.Published)
+                Search(expected: ids1, text: "V3", target: SearchScope.All),
+                Search(expected: ids1, text: "V3", target: SearchScope.Published)
             );
         }
 
@@ -327,20 +293,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_delete_documents_from_index()
         {
             await TestCombinations(
-                Create(ids1[0], "iv", "Hello"),
-                Create(ids2[0], "iv", "World"),
+                Create(ids1[0], "iv", "V1_1"),
+                Create(ids2[0], "iv", "V2_1"),
 
-                Search(expected: ids1, text: "Hello"),
-                Search(expected: ids2, text: "World"),
+                Search(expected: ids1, text: "V1_1"),
+                Search(expected: ids2, text: "V2_1"),
 
                 Delete(ids1[0]),
 
-                Search(expected: null, text: "Hello"),
-                Search(expected: ids2, text: "World")
+                Search(expected: null, text: "V1_1"),
+                Search(expected: ids2, text: "V2_1")
             );
         }
 
-        private IndexOperation Create(DomainId id, string language, string text)
+        protected IndexOperation Create(DomainId id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -351,7 +317,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Op(id, new ContentCreated { Data = data });
         }
 
-        private IndexOperation Update(DomainId id, string language, string text)
+        protected IndexOperation Update(DomainId id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -362,7 +328,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Op(id, new ContentUpdated { Data = data });
         }
 
-        private IndexOperation CreateDraftWithData(DomainId id, string language, string text)
+        protected IndexOperation CreateDraftWithData(DomainId id, string language, string text)
         {
             var data =
                 new NamedContentData()
@@ -373,27 +339,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Op(id, new ContentDraftCreated { MigratedData = data });
         }
 
-        private IndexOperation CreateDraft(DomainId id)
+        protected IndexOperation CreateDraft(DomainId id)
         {
             return Op(id, new ContentDraftCreated());
         }
 
-        private IndexOperation Publish(DomainId id)
+        protected IndexOperation Publish(DomainId id)
         {
             return Op(id, new ContentStatusChanged { Status = Status.Published });
         }
 
-        private IndexOperation Unpublish( DomainId id)
+        protected IndexOperation Unpublish( DomainId id)
         {
             return Op(id, new ContentStatusChanged { Status = Status.Draft });
         }
 
-        private IndexOperation DeleteDraft(DomainId id)
+        protected IndexOperation DeleteDraft(DomainId id)
         {
             return Op(id, new ContentDraftDeleted());
         }
 
-        private IndexOperation Delete(DomainId id)
+        protected IndexOperation Delete(DomainId id)
         {
             return Op(id, new ContentDeleted());
         }
@@ -407,7 +373,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return p => p.On(Enumerable.Repeat(Envelope.Create<IEvent>(contentEvent), 1));
         }
 
-        private IndexOperation Search(List<DomainId>? expected, string text, SearchScope target = SearchScope.All)
+        protected IndexOperation Search(List<DomainId>? expected, string text, SearchScope target = SearchScope.All)
         {
             return async p =>
             {
@@ -417,7 +383,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 if (expected != null)
                 {
-                    Assert.Equal(expected, result);
+                    result.Should().BeEquivalentTo(expected.ToHashSet());
                 }
                 else
                 {
@@ -426,7 +392,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             };
         }
 
-        private async Task TestCombinations(params IndexOperation[] actions)
+        protected async Task TestCombinations(params IndexOperation[] actions)
         {
             if (SupportsCleanup)
             {
@@ -441,7 +407,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task TestCombinations(int firstSteps, params IndexOperation[] actions)
+        protected async Task TestCombinations(int firstSteps, params IndexOperation[] actions)
         {
             await ExecuteAsync(async sut =>
             {

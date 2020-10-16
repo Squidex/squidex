@@ -355,7 +355,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             var ids =
                 events
                     .Select(x => x.Payload).OfType<ContentEvent>()
-                    .Select(x => x.ContentId)
+                    .Select(x => DomainId.Combine(x.AppId.Id, x.ContentId))
                     .ToHashSet();
 
             return textIndexerState.GetAsync(ids);

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using Microsoft.Extensions.ObjectPool;
 using Squidex.Domain.Apps.Core.Contents;
@@ -93,8 +94,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     sb.Append(" ");
                 }
 
-                sb.Append(text);
+                foreach (var c in text)
+                {
+                    if (IsCJKLetter(c))
+                    {
+                        sb.Append(c);
+                        sb.Append(" ");
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
             }
+        }
+
+        private static bool IsCJKLetter(char c)
+        {
+            return char.IsLetter(c) && char.GetUnicodeCategory(c) == UnicodeCategory.OtherLetter && !IsKatakana(c);
+        }
+
+        private static bool IsKatakana(char c)
+        {
+            return c >= '\u30A0' && c <= '\u30FF';
         }
     }
 }

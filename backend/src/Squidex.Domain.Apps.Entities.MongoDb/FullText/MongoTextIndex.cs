@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                         Filter.Eq(x => x.AppId, app.Id),
                         Filter.In(x => x.SchemaId, filter.SchemaIds),
                         Filter_ByScope(scope),
-                        Filter.Text(queryText)))
+                        Filter.Text(queryText, "none")))
                     .Only(x => x.ContentId).Limit(limit)
                     .ToListAsync();
 
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                         Filter.Eq(x => x.AppId, app.Id),
                         Filter.Exists(x => x.SchemaId),
                         Filter_ByScope(scope),
-                        Filter.Text(queryText)))
+                        Filter.Text(queryText, "none")))
                     .Only(x => x.ContentId).Limit(limit)
                     .ToListAsync();
 

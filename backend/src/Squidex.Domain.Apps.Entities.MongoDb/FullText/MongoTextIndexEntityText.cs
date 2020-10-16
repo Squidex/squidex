@@ -17,6 +17,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         [BsonIgnoreIfNull]
         [BsonElement("language")]
-        public string Language { get; set; }
+        public string Language { get; set; } = "none";
     }
 }
