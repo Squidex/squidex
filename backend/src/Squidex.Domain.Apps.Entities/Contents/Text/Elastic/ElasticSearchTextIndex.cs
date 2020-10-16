@@ -50,19 +50,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
         public async Task ExecuteAsync(params IndexCommand[] commands)
         {
+            var args = new List<object>();
+
             foreach (var command in commands)
             {
                 switch (command)
                 {
                     case UpsertIndexEntry upsert:
-                        await UpsertAsync(upsert);
+                        Upsert(upsert, args);
                         break;
                     case UpdateIndexEntry update:
-                        await UpdateAsync(update);
+                        Update(update, args);
                         break;
                     case DeleteIndexEntry delete:
-                        await DeleteAsync(delete);
+                        Delete(delete, args);
                         break;
+                }
+            }
+
+            if (args.Count > 0)
+            {
+                var result = await client.BulkAsync<StringResponse>(PostData.MultiJson(args));
+
+                if (!result.Success)
+                {
+                    throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
                 }
             }
 
@@ -72,9 +84,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             }
         }
 
-        private async Task UpsertAsync(UpsertIndexEntry upsert)
+        private void Upsert(UpsertIndexEntry upsert, List<object> args)
         {
-            var data = new
+            args.Add(new
+            {
+                index = new
+                {
+                    _id = upsert.DocId,
+                    _index = indexName,
+                }
+            });
+
+            args.Add(new
             {
                 appId = upsert.AppId.Id.ToString(),
                 appName = upsert.AppId.Name,
@@ -84,38 +105,37 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 serveAll = upsert.ServeAll,
                 servePublished = upsert.ServePublished,
                 texts = upsert.Texts
-            };
-
-            var result = await client.IndexAsync<StringResponse>(indexName, upsert.DocId, CreatePost(data));
-
-            if (!result.Success)
-            {
-                throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
-            }
+            });
         }
 
-        private async Task UpdateAsync(UpdateIndexEntry update)
+        private void Update(UpdateIndexEntry update, List<object> args)
         {
-            var data = new
+            args.Add(new
             {
-                doc = new
+                index = new
                 {
-                    serveAll = update.ServeAll,
-                    servePublished = update.ServePublished
+                    _id = update.DocId,
+                    _index = indexName,
                 }
-            };
+            });
 
-            var result = await client.UpdateAsync<StringResponse>(indexName, update.DocId, CreatePost(data));
-
-            if (!result.Success)
+            args.Add(new
             {
-                throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
-            }
+                serveAll = update.ServeAll,
+                servePublished = update.ServePublished
+            });
         }
 
-        private Task DeleteAsync(DeleteIndexEntry delete)
+        private void Delete(DeleteIndexEntry delete, List<object> args)
         {
-            return client.DeleteAsync<StringResponse>(indexName, delete.DocId);
+            args.Add(new
+            {
+                index = new
+                {
+                    _id = delete.DocId,
+                    _index = indexName,
+                }
+            });
         }
 
         public async Task<List<DomainId>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
