@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextIndexerTests_Elastic()
         {
-            SupportsSearchSyntax = false;
+            SupportssQuerySyntax = true;
         }
 
         [Fact]
@@ -57,10 +57,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_index_cjk_content_and_retrieve()
         {
             await TestCombinations(
-                Create(ids1[0], "zh", "可以将正向最大匹配方法和"),
+                Create(ids1[0], "zh", "東京大学"),
 
-                Search(expected: ids1, text: "大"),
-                Search(expected: ids1, text: "匹")
+                Search(expected: ids1, text: "東京")
             );
         }
     }

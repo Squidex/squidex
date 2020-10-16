@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextIndexerTests_Mongo()
         {
-            SupportsSearchSyntax = false;
+            SupportssQuerySyntax = false;
         }
 
         [Fact]

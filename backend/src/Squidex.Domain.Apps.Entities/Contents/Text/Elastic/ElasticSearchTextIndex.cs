@@ -38,206 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             this.waitForTesting = waitForTesting;
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default)
+        public Task InitializeAsync(CancellationToken ct = default)
         {
-            var query = new
-            {
-                properties = new Dictionary<string, object>
-                {
-                    ["texts.ar"] = new
-                    {
-                        type = "text",
-                        analyzer = "arabic"
-                    },
-                    ["texts.hy"] = new
-                    {
-                        type = "text",
-                        analyzer = "armenian"
-                    },
-                    ["texts.eu"] = new
-                    {
-                        type = "text",
-                        analyzer = "basque"
-                    },
-                    ["texts.bn"] = new
-                    {
-                        type = "text",
-                        analyzer = "bengali"
-                    },
-                    ["texts.br"] = new
-                    {
-                        type = "text",
-                        analyzer = "brazilian"
-                    },
-                    ["texts.bg"] = new
-                    {
-                        type = "text",
-                        analyzer = "bulgarian"
-                    },
-                    ["texts.ca"] = new
-                    {
-                        type = "text",
-                        analyzer = "catalan"
-                    },
-                    ["texts.zh"] = new
-                    {
-                        type = "text",
-                        analyzer = "cjk"
-                    },
-                    ["texts.ja"] = new
-                    {
-                        type = "text",
-                        analyzer = "cjk"
-                    },
-                    ["texts.ko"] = new
-                    {
-                        type = "text",
-                        analyzer = "cjk"
-                    },
-                    ["texts.cs"] = new
-                    {
-                        type = "text",
-                        analyzer = "czech"
-                    },
-                    ["texts.da"] = new
-                    {
-                        type = "text",
-                        analyzer = "danish"
-                    },
-                    ["texts.nl"] = new
-                    {
-                        type = "text",
-                        analyzer = "dutch"
-                    },
-                    ["texts.en"] = new
-                    {
-                        type = "text",
-                        analyzer = "english"
-                    },
-                    ["texts.fi"] = new
-                    {
-                        type = "text",
-                        analyzer = "finnish"
-                    },
-                    ["texts.fr"] = new
-                    {
-                        type = "text",
-                        analyzer = "french"
-                    },
-                    ["texts.gl"] = new
-                    {
-                        type = "text",
-                        analyzer = "galician"
-                    },
-                    ["texts.de"] = new
-                    {
-                        type = "text",
-                        analyzer = "german"
-                    },
-                    ["texts.el"] = new
-                    {
-                        type = "text",
-                        analyzer = "greek"
-                    },
-                    ["texts.hi"] = new
-                    {
-                        type = "text",
-                        analyzer = "hindi"
-                    },
-                    ["texts.hu"] = new
-                    {
-                        type = "text",
-                        analyzer = "hungarian"
-                    },
-                    ["texts.id"] = new
-                    {
-                        type = "text",
-                        analyzer = "indonesian"
-                    },
-                    ["texts.ga"] = new
-                    {
-                        type = "text",
-                        analyzer = "irish"
-                    },
-                    ["texts.it"] = new
-                    {
-                        type = "text",
-                        analyzer = "italian"
-                    },
-                    ["texts.lv"] = new
-                    {
-                        type = "text",
-                        analyzer = "latvian"
-                    },
-                    ["texts.lt"] = new
-                    {
-                        type = "text",
-                        analyzer = "lithuanian"
-                    },
-                    ["texts.nb"] = new
-                    {
-                        type = "text",
-                        analyzer = "norwegian"
-                    },
-                    ["texts.nn"] = new
-                    {
-                        type = "text",
-                        analyzer = "norwegian"
-                    },
-                    ["texts.no"] = new
-                    {
-                        type = "text",
-                        analyzer = "norwegian"
-                    },
-                    ["texts.pt"] = new
-                    {
-                        type = "text",
-                        analyzer = "portuguese"
-                    },
-                    ["texts.ro"] = new
-                    {
-                        type = "text",
-                        analyzer = "romanian"
-                    },
-                    ["texts.ru"] = new
-                    {
-                        type = "text",
-                        analyzer = "russian"
-                    },
-                    ["texts.ku"] = new
-                    {
-                        type = "text",
-                        analyzer = "sorani"
-                    },
-                    ["texts.es"] = new
-                    {
-                        type = "text",
-                        analyzer = "spanish"
-                    },
-                    ["texts.sv"] = new
-                    {
-                        type = "text",
-                        analyzer = "swedish"
-                    },
-                    ["texts.tr"] = new
-                    {
-                        type = "text",
-                        analyzer = "turkish"
-                    },
-                    ["texts.th"] = new
-                    {
-                        type = "text",
-                        analyzer = "thai"
-                    }
-                }
-            };
-
-            var result = await client.Indices.PutMappingAsync<StringResponse>(indexName, CreatePost(query));
-
-            if (!result.Success)
-            {
-                throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
-            }
+            return ElasticSearchMapping.ApplyAsync(client, indexName, ct);
         }
 
         public Task ClearAsync()
@@ -315,11 +118,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             return client.DeleteAsync<StringResponse>(indexName, delete.DocId);
         }
 
-        private static PostData CreatePost<T>(T data)
-        {
-            return new SerializableData<T>(data);
-        }
-
         public async Task<List<DomainId>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
         {
             if (string.IsNullOrWhiteSpace(queryText))
@@ -327,11 +125,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 return new List<DomainId>();
             }
 
-            var isFuzzy = queryText.StartsWith("~", StringComparison.OrdinalIgnoreCase);
+            var isFuzzy = queryText.EndsWith("~", StringComparison.OrdinalIgnoreCase);
 
             if (isFuzzy)
             {
-                queryText = queryText.Substring(1);
+                queryText = queryText[..^1];
+            }
+
+            var field = "texts.*";
+
+            if (queryText.Length >= 4 && queryText.IndexOf(":", StringComparison.OrdinalIgnoreCase) == 2)
+            {
+                var candidateLanguage = queryText.Substring(0, 2);
+
+                if (Language.IsValidLanguage(candidateLanguage))
+                {
+                    field = $"texts.{candidateLanguage}";
+
+                    queryText = queryText.Substring(3);
+                }
             }
 
             var serveField = GetServeField(scope);
@@ -365,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                                     fuzziness = isFuzzy ? (object)"AUTO" : 0,
                                     fields = new[]
                                     {
-                                        "texts.*"
+                                        field
                                     },
                                     query = queryText
                                 }
@@ -426,6 +238,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             return scope == SearchScope.Published ?
                 "servePublished" :
                 "serveAll";
+        }
+
+        private static PostData CreatePost<T>(T data)
+        {
+            return new SerializableData<T>(data);
         }
     }
 }

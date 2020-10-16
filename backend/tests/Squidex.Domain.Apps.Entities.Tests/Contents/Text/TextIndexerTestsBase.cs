@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public virtual bool SupportsCleanup { get; set; } = false;
 
-        public virtual bool SupportsSearchSyntax { get; set; } = true;
+        public virtual bool SupportssQuerySyntax { get; set; } = true;
 
         public virtual InMemoryTextIndexerState State { get; } = new InMemoryTextIndexerState();
 
@@ -54,20 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [SkippableFact]
-        public async Task Should_throw_exception_for_invalid_query()
-        {
-            Skip.IfNot(SupportsSearchSyntax);
-
-            await Assert.ThrowsAsync<ValidationException>(async () =>
-            {
-                await TestCombinations(Search(expected: null, text: "~hello"));
-            });
-        }
-
-        [SkippableFact]
         public async Task Should_index_invariant_content_and_retrieve_with_fuzzy()
         {
-            Skip.IfNot(SupportsSearchSyntax);
+            Skip.IfNot(SupportssQuerySyntax);
 
             await TestCombinations(
                 Create(ids1[0], "iv", "Hello"),
@@ -81,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [SkippableFact]
         public async Task Should_search_by_field()
         {
-            Skip.IfNot(SupportsSearchSyntax);
+            Skip.IfNot(SupportssQuerySyntax);
 
             await TestCombinations(
                 Create(ids1[0], "en", "City"),
