@@ -78,13 +78,13 @@ namespace Squidex.Infrastructure.Translations
                     {
                         if (variable.EndsWith("|lower"))
                         {
-                            variable = variable[0..^6];
+                            variable = variable[..^6];
                             shouldLower = true;
                         }
 
                         if (variable.EndsWith("|upper"))
                         {
-                            variable = variable[0..^6];
+                            variable = variable[..^6];
                             shouldUpper = true;
                         }
                     }
@@ -109,11 +109,6 @@ namespace Squidex.Infrastructure.Translations
                         {
                             variableValue = variableName;
                         }
-                    }
-
-                    if (variableValue == null)
-                    {
-                        variableValue = variableName;
                     }
 
                     variableValue ??= variableName;

@@ -35,8 +35,6 @@ namespace Squidex.Infrastructure.Migrations
 
         public async Task MigrateAsync(CancellationToken ct = default)
         {
-            var version = 0;
-
             try
             {
                 while (!await migrationStatus.TryLockAsync())
@@ -48,7 +46,7 @@ namespace Squidex.Infrastructure.Migrations
                     await Task.Delay(LockWaitMs, ct);
                 }
 
-                version = await migrationStatus.GetVersionAsync();
+                var version = await migrationStatus.GetVersionAsync();
 
                 while (!ct.IsCancellationRequested)
                 {

@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<Urls?> ReadUrlsAsync(IBackupReader reader)
+        private static async Task<Urls?> ReadUrlsAsync(IBackupReader reader)
         {
             try
             {

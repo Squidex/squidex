@@ -14,7 +14,7 @@ using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
+namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 {
     public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
     {

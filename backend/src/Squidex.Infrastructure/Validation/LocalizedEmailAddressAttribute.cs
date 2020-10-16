@@ -12,7 +12,7 @@ using Squidex.Text;
 
 namespace Squidex.Infrastructure.Validation
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class LocalizedEmailAddressAttribute : ValidationAttribute
     {
         public override bool IsValid(object value)

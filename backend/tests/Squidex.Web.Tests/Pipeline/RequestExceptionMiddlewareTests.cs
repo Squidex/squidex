@@ -29,12 +29,12 @@ namespace Squidex.Web.Pipeline
 
         public RequestExceptionMiddlewareTests()
         {
-            next = new RequestDelegate(context =>
+            next = context =>
             {
                 isNextCalled = true;
 
                 return Task.CompletedTask;
-            });
+            };
 
             httpContext.Features.Set(responseFeature);
 

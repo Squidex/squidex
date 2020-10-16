@@ -8,7 +8,7 @@
 using System.Threading.Tasks;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Notifications
+namespace Squidex.Domain.Apps.Entities.Notifications
 {
     public interface INotificationSender
     {

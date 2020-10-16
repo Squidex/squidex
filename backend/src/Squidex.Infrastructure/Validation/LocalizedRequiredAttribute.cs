@@ -12,7 +12,7 @@ using Squidex.Text;
 
 namespace Squidex.Infrastructure.Validation
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class LocalizedRequiredAttribute : RequiredAttribute
     {
         public override string FormatErrorMessage(string name)

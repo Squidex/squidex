@@ -321,12 +321,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public TextIndexingProcess(ITextIndex textIndexer, ITextIndexerState textIndexerState)
+        public TextIndexingProcess(ITextIndex textIndex, ITextIndexerState textIndexerState)
         {
-            Guard.NotNull(textIndexer, nameof(textIndexer));
+            Guard.NotNull(textIndex, nameof(textIndex));
             Guard.NotNull(textIndexerState, nameof(textIndexerState));
 
-            this.textIndex = textIndexer;
+            this.textIndex = textIndex;
             this.textIndexerState = textIndexerState;
         }
 
@@ -336,7 +336,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await textIndexerState.ClearAsync();
         }
 
-        public async Task On(IEnumerable<Envelope<IEvent>> @events)
+        public async Task On(IEnumerable<Envelope<IEvent>> events)
         {
             var states = await QueryStatesAsync(events);
 

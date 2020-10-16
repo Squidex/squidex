@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         private static readonly Dictionary<string, string> PropertyMap =
             typeof(MongoContentEntity).GetProperties()
                 .ToDictionary(
-                    x => ToElementName(x),
-                    x => ToName(x),
+                    ToElementName,
+                    ToName,
                     StringComparer.OrdinalIgnoreCase);
 
         private static string ToName(PropertyInfo x)

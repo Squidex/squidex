@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.History
             return repository.ClearAsync();
         }
 
-        public async Task On(IEnumerable<Envelope<IEvent>> @events)
+        public async Task On(IEnumerable<Envelope<IEvent>> events)
         {
             var targets = new List<(Envelope<AppEvent> Event, HistoryEvent? HistoryEvent)>();
 

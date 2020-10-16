@@ -162,7 +162,7 @@ namespace Squidex.Web.Pipeline
             var tempFileName = Path.GetTempFileName();
             try
             {
-                File.WriteAllText(tempFileName, "Hello World");
+                await File.WriteAllTextAsync(tempFileName, "Hello World");
 
                 await sut.InvokeAsync(httpContext, async x =>
                 {

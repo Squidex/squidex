@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Notifications
+namespace Squidex.Domain.Apps.Entities.Notifications
 {
     public sealed class NotificationEmailSender : INotificationSender
     {

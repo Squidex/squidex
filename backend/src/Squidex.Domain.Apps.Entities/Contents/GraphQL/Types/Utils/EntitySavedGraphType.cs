@@ -9,7 +9,7 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
     public sealed class EntitySavedGraphType : ObjectGraphType<EntitySavedResult>
     {

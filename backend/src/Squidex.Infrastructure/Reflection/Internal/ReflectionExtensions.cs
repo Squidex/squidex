@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Squidex.Infrastructure.Reflection
+namespace Squidex.Infrastructure.Reflection.Internal
 {
     public static class ReflectionExtensions
     {

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
@@ -80,7 +80,7 @@
 
             search.addWidgets([
                 instantsearch.widgets.searchBox({
-                    container: '#searchbox',
+                    container: '#searchbox'
                 }),
 
                 instantsearch.widgets.hits({
@@ -92,11 +92,11 @@
                                     <div class="hit-name">
                                         ${instantsearch.highlight({
                                             attribute: 'firstname',
-                                            hit,
+                                            hit
                                         })}
                                         ${instantsearch.highlight({
                                             attribute: 'lastname',
-                                            hit,
+                                            hit
                                         })}
 
                                         <div>
@@ -106,7 +106,7 @@
                                 </div>
                             `;
                         }
-                    },
+                    }
                 })
             ]);
 

@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return Task.CompletedTask;
         }
 
-        async Task On(IEnumerable<Envelope<IEvent>> @events)
+        async Task On(IEnumerable<Envelope<IEvent>> events)
         {
             foreach (var @event in events)
             {

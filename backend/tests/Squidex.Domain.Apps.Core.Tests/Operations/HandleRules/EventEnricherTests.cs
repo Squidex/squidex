@@ -124,13 +124,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier))
                 .Returns(user);
 
-            var @event1 =
+            var event1 =
                 Envelope.Create<AppEvent>(new ContentCreated
                 {
                     Actor = actor
                 });
 
-            var @event2 =
+            var event2 =
                 Envelope.Create<AppEvent>(new ContentCreated
                 {
                     Actor = actor
@@ -139,8 +139,8 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var enrichedEvent1 = new EnrichedContentEvent();
             var enrichedEvent2 = new EnrichedContentEvent();
 
-            await sut.EnrichAsync(enrichedEvent1, @event1);
-            await sut.EnrichAsync(enrichedEvent2, @event2);
+            await sut.EnrichAsync(enrichedEvent1, event1);
+            await sut.EnrichAsync(enrichedEvent2, event2);
 
             Assert.Equal(user, enrichedEvent1.User);
             Assert.Equal(user, enrichedEvent2.User);

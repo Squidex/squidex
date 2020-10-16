@@ -263,7 +263,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Name = "data",
                         Description = "The data for the content.",
                         DefaultValue = null,
-                        ResolvedType = new NonNullGraphType(inputType),
+                        ResolvedType = new NonNullGraphType(inputType)
                     },
                     new QueryArgument(AllTypes.None)
                     {
@@ -305,7 +305,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Name = "data",
                         Description = "The data for the content.",
                         DefaultValue = null,
-                        ResolvedType = new NonNullGraphType(inputType),
+                        ResolvedType = new NonNullGraphType(inputType)
                     },
                     new QueryArgument(AllTypes.None)
                     {

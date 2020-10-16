@@ -33,6 +33,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         [BsonRequired]
         [BsonElement]
+        public Instant Created { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public Instant LastModified { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         [BsonRepresentation(BsonType.String)]
         public RuleResult Result { get; set; }
 

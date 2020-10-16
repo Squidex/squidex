@@ -73,14 +73,11 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
         public override void RemoveOwnProperty(JsValue property)
         {
-            if (fieldsToDelete == null)
-            {
-                fieldsToDelete = new HashSet<string>();
-            }
-
             var propertyName = property.AsString();
 
+            fieldsToDelete ??= new HashSet<string>();
             fieldsToDelete.Add(propertyName);
+
             fieldProperties?.Remove(propertyName);
 
             MarkChanged();

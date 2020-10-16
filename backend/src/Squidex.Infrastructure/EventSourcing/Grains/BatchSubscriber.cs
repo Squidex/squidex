@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             {
                 var sender = eventSubscription.Sender;
 
-                foreach (var jobsBySender in jobs.GroupBy<Job, object>(x => x.Sender))
+                foreach (var jobsBySender in jobs.GroupBy(x => x.Sender))
                 {
                     if (sender != null && ReferenceEquals(jobsBySender.Key, sender))
                     {

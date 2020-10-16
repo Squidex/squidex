@@ -7,7 +7,7 @@
 
 using System.Threading.Tasks;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Apps.Notifications;
+using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;

@@ -43,7 +43,7 @@ namespace Squidex.Extensions.Actions.CreateContent
         {
             var ruleJob = new Command
             {
-                AppId = @event.AppId,
+                AppId = @event.AppId
             };
 
             var schema = await appProvider.GetSchemaAsync(@event.AppId.Id, action.Schema, true);

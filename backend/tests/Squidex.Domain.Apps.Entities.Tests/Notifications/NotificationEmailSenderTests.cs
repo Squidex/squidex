@@ -18,7 +18,7 @@ using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Notifications
+namespace Squidex.Domain.Apps.Entities.Notifications
 {
     public class NotificationEmailSenderTests
     {

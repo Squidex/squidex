@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 MimeType = command.File.MimeType,
                 FileVersion = Snapshot.FileVersion + 1,
-                FileSize = command.File.FileSize,
+                FileSize = command.File.FileSize
             });
 
             RaiseEvent(@event);

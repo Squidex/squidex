@@ -9,7 +9,7 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Apps.Notifications;
+using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation.Notifications
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
     public class InvitationEventConsumerTests
     {
