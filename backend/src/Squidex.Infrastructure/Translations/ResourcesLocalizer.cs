@@ -28,15 +28,26 @@ namespace Squidex.Infrastructure.Translations
 
             this.resourceManager = resourceManager;
 #if DEBUG
-            if (File.Exists(MissingFileName))
-            {
-                var missing = File.ReadAllLines(MissingFileName);
+            missingTranslations = new HashSet<string>();
 
-                missingTranslations = new HashSet<string>(missing);
-            }
-            else
+            for (var i = 0; i < 3; i++)
             {
-                missingTranslations = new HashSet<string>();
+                lock (LockObject)
+                {
+                    try
+                    {
+                        if (File.Exists(MissingFileName))
+                        {
+                            var missing = File.ReadAllLines(MissingFileName);
+
+                            missingTranslations = new HashSet<string>(missing);
+                        }
+                    }
+                    catch (IOException)
+                    {
+                        continue;
+                    }
+                }
             }
 #endif
         }
@@ -171,11 +182,21 @@ namespace Squidex.Infrastructure.Translations
             if (translation == null)
             {
 #if DEBUG
-                lock (LockObject)
+                for (var i = 0; i < 3; i++)
                 {
-                    if (!missingTranslations.Add(key))
+                    lock (LockObject)
                     {
-                        File.AppendAllLines(MissingFileName, new[] { key });
+                        try
+                        {
+                            if (!missingTranslations.Add(key))
+                            {
+                                File.AppendAllLines(MissingFileName, new[] { key });
+                            }
+                        }
+                        catch (IOException)
+                        {
+                            continue;
+                        }
                     }
                 }
 #endif
