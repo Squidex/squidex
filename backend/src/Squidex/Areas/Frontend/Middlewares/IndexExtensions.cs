@@ -9,6 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -33,20 +34,23 @@ namespace Squidex.Areas.Frontend.Middlewares
             return context.Request.Path.Value.EndsWith(".html", StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool IsHtml(this HttpContext context)
+        public static bool IsNotModified(this HttpResponse response)
         {
-            return context.Response.ContentType?.ToLower().Contains("text/html") == true;
+            return response.StatusCode == (int)HttpStatusCode.NotModified;
         }
 
-        public static string AdjustHtml(this string html, HttpContext httpContext)
+        public static string AdjustBase(this string html, HttpContext httpContext)
         {
-            var result = html;
-
             if (httpContext.Request.PathBase.HasValue)
             {
-                result = result.Replace("<base href=\"/\">", $"<base href=\"{httpContext.Request.PathBase}/\">");
+                html = html.Replace("<base href=\"/\">", $"<base href=\"{httpContext.Request.PathBase}/\">");
             }
 
+            return html;
+        }
+
+        public static string AddOptions(this string html, HttpContext httpContext)
+        {
             var uiOptions = httpContext.RequestServices.GetService<IOptions<MyUIOptions>>()?.Value;
 
             if (uiOptions != null)
@@ -72,10 +76,10 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 var texts = GetText(CultureInfo.CurrentUICulture.Name);
 
-                result = result.Replace("<body>", $"<body>\n<script>\nvar options = {jsonOptions};\nvar texts = {texts};</script>");
+                html = html.Replace("<body>", $"<body>\n<script>\nvar options = {jsonOptions};\nvar texts = {texts};</script>");
             }
 
-            return result;
+            return html;
         }
 
         private static string GetText(string culture)

@@ -23,7 +23,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.IsHtmlPath() && context.Response.StatusCode != 304)
+            if (context.IsHtmlPath() && !context.Response.IsNotModified())
             {
                 var responseBuffer = new MemoryStream();
                 var responseBody = context.Response.Body;
@@ -32,13 +32,18 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 await next(context);
 
-                if (context.Response.StatusCode != 304)
+                if (!context.Response.IsNotModified())
                 {
                     context.Response.Body = responseBody;
 
                     var html = Encoding.UTF8.GetString(responseBuffer.ToArray());
 
-                    html = html.AdjustHtml(context);
+                    html = html.AdjustBase(context);
+
+                    if (context.IsIndex())
+                    {
+                        html = html.AddOptions(context);
+                    }
 
                     context.Response.ContentLength = Encoding.UTF8.GetByteCount(html);
                     context.Response.Body = responseBody;

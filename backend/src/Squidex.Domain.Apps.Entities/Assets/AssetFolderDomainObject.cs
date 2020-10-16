@@ -54,8 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
-            VerifyNotDeleted();
-
             switch (command)
             {
                 case CreateAssetFolder createAssetFolder:
@@ -122,14 +120,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             @event.AppId ??= Snapshot.AppId;
 
             RaiseEvent(Envelope.Create(@event));
-        }
-
-        private void VerifyNotDeleted()
-        {
-            if (Snapshot.IsDeleted)
-            {
-                throw new DomainException(T.Get("assets.assetFolderAlreadyDeleted"));
-            }
         }
     }
 }

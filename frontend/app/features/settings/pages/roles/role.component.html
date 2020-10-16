@@ -81,7 +81,7 @@
                 <form class="form-group row no-gutters" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
                     <div class="col">
                         <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput
-                            placeholder="{{ 'i18n:roles.permissionsPlaceholder' | sqxTranslate }}">
+                            placeholder="{{ 'roles.permissionsPlaceholder' | sqxTranslate }}">
                         </sqx-autocomplete>
                     </div>
                     <div class="col-auto pl-1">

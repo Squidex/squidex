@@ -106,9 +106,6 @@
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
     <value>The field {0} must be a string with a minimum length of {1} and a maximum length of {2}.</value>
   </data>
-  <data name="apps.alreadyArchieved" xml:space="preserve">
-    <value>App has already been archived.</value>
-  </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
     <value>A client with the same id already exists.</value>
   </data>
@@ -168,12 +165,6 @@
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>Cannot remove a role when a contributor is assigned.</value>
-  </data>
-  <data name="assets.assetAlreadyDeleted" xml:space="preserve">
-    <value>Asset has already been deleted</value>
-  </data>
-  <data name="assets.assetFolderAlreadyDeleted" xml:space="preserve">
-    <value>Asset folder has already been deleted</value>
   </data>
   <data name="assets.folderNotFound" xml:space="preserve">
     <value>Asset folder does not exist.</value>
@@ -462,9 +453,6 @@
   </data>
   <data name="contents.draftToDeleteNotFound" xml:space="preserve">
     <value>There is nothing to delete.</value>
-  </data>
-  <data name="contents.invalidArrayOfIds" xml:space="preserve">
-    <value>Invalid json type, expected array of guid strings.</value>
   </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
     <value>Invalid json type, expected array of objects.</value>
@@ -832,14 +820,8 @@
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Your email address is set to private in Github. Please set it to public to use Github login.</value>
   </data>
-  <data name="rules.alreadyDeleted" xml:space="preserve">
-    <value>Rule has already been deleted.</value>
-  </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
     <value>Another rule is already running.</value>
-  </data>
-  <data name="schemas.alreadyDeleted" xml:space="preserve">
-    <value>Schema has already been deleted.</value>
   </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Calculated default value and default value cannot be used together.</value>

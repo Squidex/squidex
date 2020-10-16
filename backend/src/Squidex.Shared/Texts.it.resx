@@ -106,9 +106,6 @@
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
     <value>The field {0} must be a string with a minimum length of {1} and a maximum length of {2}.</value>
   </data>
-  <data name="apps.alreadyArchieved" xml:space="preserve">
-    <value>La App è stata già archiviata.</value>
-  </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
     <value>Un client con lo stesso id esiste già.</value>
   </data>
@@ -168,12 +165,6 @@
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>Non è possibile rimuovere un ruolo quando questo è assegnato ad un collaboratore.</value>
-  </data>
-  <data name="assets.assetAlreadyDeleted" xml:space="preserve">
-    <value>La risorsa è stata già eliminata</value>
-  </data>
-  <data name="assets.assetFolderAlreadyDeleted" xml:space="preserve">
-    <value>La cartella delle risorse è stata già eliminata</value>
   </data>
   <data name="assets.folderNotFound" xml:space="preserve">
     <value>La cartella delle risorse non esiste.</value>
@@ -462,9 +453,6 @@
   </data>
   <data name="contents.draftToDeleteNotFound" xml:space="preserve">
     <value>Non c'è niente da eliminare.</value>
-  </data>
-  <data name="contents.invalidArrayOfIds" xml:space="preserve">
-    <value>Errore nel json, atteso un array di string guid.</value>
   </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
     <value>Errore nel json, attesp un array di objects.</value>
@@ -832,14 +820,8 @@
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Il tuo indirizzo email è impostato su privato in Github. Impostalo come pubblico per poter utilizzare il login Github.</value>
   </data>
-  <data name="rules.alreadyDeleted" xml:space="preserve">
-    <value>La regola è stata già cancellata.</value>
-  </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
     <value>E' in esecuzione un'altra regola.</value>
-  </data>
-  <data name="schemas.alreadyDeleted" xml:space="preserve">
-    <value>Lo schema è stato già cancellato.</value>
   </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Il valore predefinito calcolato e il valore predefinito non possono essere utilizzati insieme.</value>

@@ -128,6 +128,8 @@ export class QueryFullTextSynchronizer implements RouteSynchronizer {
     }
 
     public writeValue(state: any, params: Params) {
+        params['query'] = undefined;
+
         if (Types.isObject(state) && Types.isString(state.fullText) && state.fullText.length > 0) {
             params['query'] = state.fullText;
         }
@@ -144,6 +146,8 @@ export class QuerySynchronizer implements RouteSynchronizer {
     }
 
     public writeValue(state: any, params: Params) {
+        params['query'] = undefined;
+
         if (Types.isObject(state)) {
             params['query'] = serializeQuery(state);
         }

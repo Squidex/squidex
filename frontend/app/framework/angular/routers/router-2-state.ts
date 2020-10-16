@@ -54,6 +54,9 @@ export class PagerSynchronizer implements RouteSynchronizer {
     }
 
     public writeValue(state: any, params: Params) {
+        params['page'] = undefined;
+        params['take'] = undefined;
+
         if (Types.is(state, Pager)) {
             if (state.page > 0) {
                 params['page'] = state.page.toString();
@@ -81,6 +84,8 @@ export class StringSynchronizer implements RouteSynchronizer {
     }
 
     public writeValue(state: any, params: Params) {
+        params[this.name] = undefined;
+
         if (Types.isString(state)) {
             params[this.name] = state;
         }
@@ -110,10 +115,14 @@ export class StringKeysSynchronizer implements RouteSynchronizer {
     }
 
     public writeValue(state: any, params: Params) {
+        params[this.name] = undefined;
+
         if (Types.isObject(state)) {
             const value = Object.keys(state).join(',');
 
-            params[this.name] = value;
+            if (value.length > 0) {
+                params[this.name] = value;
+            }
         }
     }
 }

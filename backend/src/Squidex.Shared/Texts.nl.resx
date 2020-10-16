@@ -106,9 +106,6 @@
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
     <value>Het veld {0} moet een string zijn met een minimum lengte van {1} en een maximum lengte van {2}.</value>
   </data>
-  <data name="apps.alreadyArchieved" xml:space="preserve">
-    <value>App is al gearchiveerd.</value>
-  </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
     <value>Er bestaat al een client met dezelfde id.</value>
   </data>
@@ -168,12 +165,6 @@
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>Kan een rol niet verwijderen wanneer een bijdrager is toegewezen.</value>
-  </data>
-  <data name="assets.assetAlreadyDeleted" xml:space="preserve">
-    <value>Asset is al verwijderd</value>
-  </data>
-  <data name="assets.assetFolderAlreadyDeleted" xml:space="preserve">
-    <value>Assetmap is al verwijderd</value>
   </data>
   <data name="assets.folderNotFound" xml:space="preserve">
     <value>Assetmap bestaat niet.</value>
@@ -462,9 +453,6 @@
   </data>
   <data name="contents.draftToDeleteNotFound" xml:space="preserve">
     <value>Er is niets te verwijderen.</value>
-  </data>
-  <data name="contents.invalidArrayOfIds" xml:space="preserve">
-    <value>Ongeldig json-type, verwachte array van guid-strings.</value>
   </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
     <value>Ongeldig json-type, verwachte reeks objecten.</value>
@@ -832,14 +820,8 @@
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Jouw e-mailadres is ingesteld op privé in Github. Stel het in op openbaar om Github-login te gebruiken.</value>
   </data>
-  <data name="rules.alreadyDeleted" xml:space="preserve">
-    <value>Regel is al verwijderd.</value>
-  </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
     <value>Er wordt al een andere regel uitgevoerd.</value>
-  </data>
-  <data name="schemas.alreadyDeleted" xml:space="preserve">
-    <value>Schema is al verwijderd.</value>
   </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Berekende standaardwaarde en standaardwaarde kunnen niet samen worden gebruikt.</value>
