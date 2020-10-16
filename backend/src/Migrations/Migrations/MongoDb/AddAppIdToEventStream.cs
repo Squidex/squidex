@@ -67,7 +67,7 @@ namespace Migrations.Migrations.MongoDb
                         var domainType = eventStream.Substring(0, indexOfType);
                         var domainId = eventStream.Substring(indexOfId);
 
-                        var newDomainId = DomainId.Combine(appId, domainId).ToString();
+                        var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();
                         var newStreamName = $"{domainType}-{newDomainId}";
 
                         document["EventStream"] = newStreamName;

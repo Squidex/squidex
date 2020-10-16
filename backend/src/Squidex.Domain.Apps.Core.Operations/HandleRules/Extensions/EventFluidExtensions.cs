@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
                     {
                         if (context.GetValue("event")?.ToObjectValue() is EnrichedContentEvent contentEvent)
                         {
-                            var result = urlGenerator.ContentUI(contentEvent.AppId, contentEvent.SchemaId, id.ToString());
+                            var result = urlGenerator.ContentUI(contentEvent.AppId, contentEvent.SchemaId, id);
 
                             return new StringValue(result);
                         }

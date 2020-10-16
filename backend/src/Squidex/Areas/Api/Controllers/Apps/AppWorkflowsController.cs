@@ -12,6 +12,7 @@ using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -97,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(WorkflowsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppWorkflowsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutWorkflow(string app, string id, [FromBody] UpdateWorkflowDto request)
+        public async Task<IActionResult> PutWorkflow(string app, DomainId id, [FromBody] UpdateWorkflowDto request)
         {
             var command = request.ToCommand(id);
 
@@ -120,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(WorkflowsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppWorkflowsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteWorkflow(string app, string id)
+        public async Task<IActionResult> DeleteWorkflow(string app, DomainId id)
         {
             var command = new DeleteWorkflow { WorkflowId = id };
 

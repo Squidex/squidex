@@ -159,7 +159,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppRulesUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutRule(string app, string id, [FromBody] UpdateRuleDto request)
+        public async Task<IActionResult> PutRule(string app, DomainId id, [FromBody] UpdateRuleDto request)
         {
             var command = request.ToCommand(id);
 
@@ -182,7 +182,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
-        public async Task<IActionResult> EnableRule(string app, string id)
+        public async Task<IActionResult> EnableRule(string app, DomainId id)
         {
             var command = new EnableRule { RuleId = id };
 
@@ -205,7 +205,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DisableRule(string app, string id)
+        public async Task<IActionResult> DisableRule(string app, DomainId id)
         {
             var command = new DisableRule { RuleId = id };
 
@@ -227,7 +227,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("apps/{app}/rules/{id}/trigger/")]
         [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(1)]
-        public async Task<IActionResult> TriggerRule(string app, string id)
+        public async Task<IActionResult> TriggerRule(string app, DomainId id)
         {
             var command = new TriggerRule { RuleId = id };
 
@@ -249,7 +249,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(204)]
         [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutRuleRun(string app, string id)
+        public async Task<IActionResult> PutRuleRun(string app, DomainId id)
         {
             await ruleRunnerService.RunAsync(App.Id, id);
 
@@ -269,7 +269,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("apps/{app}/rules/{id}/")]
         [ApiPermissionOrAnonymous(Permissions.AppRulesDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteRule(string app, string id)
+        public async Task<IActionResult> DeleteRule(string app, DomainId id)
         {
             await CommandBus.PublishAsync(new DeleteRule { RuleId = id });
 
@@ -292,9 +292,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(typeof(RuleEventsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppRulesRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetEvents(string app, [FromQuery] string? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public async Task<IActionResult> GetEvents(string app, [FromQuery] DomainId? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, DomainId.CreateNullable(ruleId), skip, take);
+            var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take);
 
             var response = RuleEventsDto.FromRuleEvents(ruleEvents, Resources);
 
@@ -314,7 +314,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("apps/{app}/rules/events/{id}/")]
         [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PutEvent(string app, string id)
+        public async Task<IActionResult> PutEvent(string app, DomainId id)
         {
             var ruleEvent = await ruleEventsRepository.FindAsync(id);
 
@@ -341,7 +341,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("apps/{app}/rules/events/{id}/")]
         [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(0)]
-        public async Task<IActionResult> DeleteEvent(string app, string id)
+        public async Task<IActionResult> DeleteEvent(string app, DomainId id)
         {
             var ruleEvent = await ruleEventsRepository.FindAsync(id);
 

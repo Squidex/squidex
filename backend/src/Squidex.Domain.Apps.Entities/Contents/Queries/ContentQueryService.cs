@@ -161,7 +161,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (Guid.TryParse(schemaIdOrName, out var guid))
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, guid, false, canCache);
+                var schemaId = DomainId.Create(guid);
+
+                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaId, false, canCache);
             }
 
             if (schema == null)

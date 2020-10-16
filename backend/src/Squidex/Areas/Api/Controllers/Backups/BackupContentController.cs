@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
 
@@ -47,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ProducesResponseType(typeof(FileResult), 200)]
         [ApiCosts(0)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetBackupContent(string app, string id)
+        public async Task<IActionResult> GetBackupContent(string app, DomainId id)
         {
             var backup = await backupservice.GetBackupAsync(AppId, id);
 

@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 currentReminder = await RegisterOrUpdateReminder("KeepAlive", TimeSpan.Zero, TimeSpan.FromMinutes(2));
 
-                var rules = await appProvider.GetRulesAsync(Key);
+                var rules = await appProvider.GetRulesAsync(DomainId.Create(Key));
 
                 var rule = rules.Find(x => x.Id == job.RuleId);
 

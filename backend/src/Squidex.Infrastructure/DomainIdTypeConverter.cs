@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            return sourceType == typeof(string) && sourceType == typeof(Guid);
+            return sourceType == typeof(string) || sourceType == typeof(Guid);
         }
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)

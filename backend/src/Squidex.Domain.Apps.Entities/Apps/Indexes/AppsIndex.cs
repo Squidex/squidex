@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                         {
                             await index.AddAsync(token);
 
-                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId.ToString());
+                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId);
                         }
                         else
                         {
@@ -253,7 +253,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             if (name.IsSlug())
             {
-                var token = await index.ReserveAsync(command.AppId.ToString(), name);
+                var token = await index.ReserveAsync(command.AppId, name);
 
                 if (token == null)
                 {

@@ -73,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AllowAnonymous]
         public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, [FromQuery] AssetContentQueryDto queries, string? more = null)
         {
-            var asset = await assetRepository.FindAssetAsync(AppId, idOrSlug);
+            var asset = await assetRepository.FindAssetAsync(AppId, DomainId.Create(idOrSlug));
 
             if (asset == null)
             {
@@ -99,7 +99,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(0.5)]
         [AllowAnonymous]
         [Obsolete]
-        public async Task<IActionResult> GetAssetContent(string id, [FromQuery] AssetContentQueryDto queries)
+        public async Task<IActionResult> GetAssetContent(DomainId id, [FromQuery] AssetContentQueryDto queries)
         {
             var asset = await assetRepository.FindAssetAsync(id);
 

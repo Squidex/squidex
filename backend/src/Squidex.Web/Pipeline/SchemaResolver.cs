@@ -60,7 +60,9 @@ namespace Squidex.Web.Pipeline
 
             if (Guid.TryParse(schemaIdOrName, out var guid))
             {
-                return appProvider.GetSchemaAsync(appId, guid, false, canCache);
+                var schemaId = DomainId.Create(guid);
+
+                return appProvider.GetSchemaAsync(appId, schemaId, false, canCache);
             }
             else
             {

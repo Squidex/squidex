@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Tasks;
@@ -88,7 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ProducesResponseType(typeof(List<BackupJobDto>), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppBackupsDelete)]
         [ApiCosts(0)]
-        public async Task<IActionResult> DeleteBackup(string app, string id)
+        public async Task<IActionResult> DeleteBackup(string app, DomainId id)
         {
             await backupService.DeleteBackupAsync(AppId, id);
 

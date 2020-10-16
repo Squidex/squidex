@@ -111,7 +111,7 @@ namespace Migrations.Migrations.MongoDb
                         documentIdOld = documentIdOld.Substring(index + 2);
                     }
 
-                    var documentIdNew = DomainId.Combine(appId, documentIdOld).ToString();
+                    var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();
 
                     document["id"] = documentIdOld;
                     document["_id"] = documentIdNew;

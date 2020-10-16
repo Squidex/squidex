@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static DomainId AggregateId(this EnvelopeHeaders headers)
         {
-            return headers.GetString(CommonHeaders.AggregateId);
+            return DomainId.Create(headers.GetString(CommonHeaders.AggregateId));
         }
 
         public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, DomainId value) where T : class, IEvent

@@ -324,7 +324,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (@event.Payload is AppCreated appCreated)
             {
-                var previousAppId = appCreated.AppId.Id.ToString();
+                var previousAppId = appCreated.AppId.Id;
 
                 if (!string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
                 {
@@ -363,7 +363,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     restoreContext.PreviousAppId.ToString(),
                     restoreContext.AppId.ToString());
 
-                @event.SetAggregateId(id);
+                var domainId = DomainId.Create(id);
+
+                @event.SetAggregateId(domainId);
             }
 
             foreach (var handler in handlers)

@@ -8,6 +8,7 @@
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -25,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public Instant? DueTime { get; set; }
 
-        public ChangeContentStatus ToCommand(string id)
+        public ChangeContentStatus ToCommand(DomainId id)
         {
             return new ChangeContentStatus { ContentId = id, Status = Status, DueTime = DueTime };
         }

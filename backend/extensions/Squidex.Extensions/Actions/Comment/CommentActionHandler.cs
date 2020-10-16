@@ -48,7 +48,7 @@ namespace Squidex.Extensions.Actions.Comment
                     ruleJob.Actor = contentEvent.Actor;
                 }
 
-                ruleJob.CommentsId = contentEvent.Id.ToString();
+                ruleJob.CommentsId = contentEvent.Id;
 
                 return (Description, ruleJob);
             }

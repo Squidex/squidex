@@ -11,6 +11,7 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
@@ -49,11 +50,13 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] string parentId)
+        public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] DomainId parentId)
         {
-            var (folders, path) = await AsyncHelper.WhenAll(
-                assetQuery.QueryAssetFoldersAsync(Context, parentId),
-                assetQuery.FindAssetFolderAsync(Context.App.Id, parentId));
+            var (folders, path) =
+                await AsyncHelper.WhenAll(
+                    assetQuery.QueryAssetFoldersAsync(Context, parentId),
+                    assetQuery.FindAssetFolderAsync(Context.App.Id, parentId)
+                );
 
             var response = Deferred.Response(() =>
             {
@@ -106,7 +109,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetFolder(string app, string id, [FromBody] RenameAssetFolderDto request)
+        public async Task<IActionResult> PutAssetFolder(string app, DomainId id, [FromBody] RenameAssetFolderDto request)
         {
             var command = request.ToCommand(id);
 
@@ -131,7 +134,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetFolderParent(string app, string id, [FromBody] MoveAssetItemDto request)
+        public async Task<IActionResult> PutAssetFolderParent(string app, DomainId id, [FromBody] MoveAssetItemDto request)
         {
             var command = request.ToFolderCommand(id);
 
@@ -153,7 +156,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteAssetFolder(string app, string id)
+        public async Task<IActionResult> DeleteAssetFolder(string app, DomainId id)
         {
             await CommandBus.PublishAsync(new DeleteAssetFolder { AssetFolderId = id });
 

@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -275,7 +276,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContent(string app, string name, string id)
+        public async Task<IActionResult> GetContent(string app, string name, DomainId id)
         {
             var content = await contentQuery.FindContentAsync(Context, name, id);
 
@@ -303,7 +304,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/{name}/{id}/{version}/")]
         [ApiPermissionOrAnonymous(Permissions.AppContentsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContentVersion(string app, string name, string id, int version)
+        public async Task<IActionResult> GetContentVersion(string app, string name, DomainId id, int version)
         {
             var content = await contentQuery.FindContentAsync(Context, name, id, version);
 
@@ -333,13 +334,13 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 201)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false, [FromQuery] string? id = null)
+        public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false, [FromQuery] DomainId? id = null)
         {
             var command = new CreateContent { Data = request.ToCleaned(), Publish = publish };
 
-            if (!string.IsNullOrWhiteSpace(id))
+            if (id != null && id.Value != default && !string.IsNullOrWhiteSpace(id.Value.ToString()))
             {
-                command.ContentId = id;
+                command.ContentId = id.Value;
             }
 
             var response = await InvokeCommandAsync(command);
@@ -430,7 +431,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, string id, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
+        public async Task<IActionResult> PostContent(string app, string name, DomainId id, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
             var command = new UpsertContent { ContentId = id, Data = request.ToCleaned(), Publish = publish };
 
@@ -459,7 +460,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(string app, string name, string id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PutContent(string app, string name, DomainId id, [FromBody] NamedContentData request)
         {
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
 
@@ -488,7 +489,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PatchContent(string app, string name, string id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PatchContent(string app, string name, DomainId id, [FromBody] NamedContentData request)
         {
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
 
@@ -517,7 +518,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContentStatus(string app, string name, string id, ChangeStatusDto request)
+        public async Task<IActionResult> PutContentStatus(string app, string name, DomainId id, ChangeStatusDto request)
         {
             var command = request.ToCommand(id);
 
@@ -544,7 +545,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsVersionCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> CreateDraft(string app, string name, string id)
+        public async Task<IActionResult> CreateDraft(string app, string name, DomainId id)
         {
             var command = new CreateContentDraft { ContentId = id };
 
@@ -571,7 +572,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteVersion(string app, string name, string id)
+        public async Task<IActionResult> DeleteVersion(string app, string name, DomainId id)
         {
             var command = new DeleteContentDraft { ContentId = id };
 
@@ -598,7 +599,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/{name}/{id}/")]
         [ApiPermissionOrAnonymous(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteContent(string app, string name, string id, [FromQuery] bool checkReferrers = false)
+        public async Task<IActionResult> DeleteContent(string app, string name, DomainId id, [FromQuery] bool checkReferrers = false)
         {
             var command = new DeleteContent { ContentId = id, CheckReferrers = checkReferrers };
 

@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
         [Route("users/{userId}/notifications")]
         [ProducesResponseType(typeof(CommentsDto), 200)]
         [ApiPermission]
-        public async Task<IActionResult> GetNotifications(string userId, [FromQuery] long version = EtagVersion.Any)
+        public async Task<IActionResult> GetNotifications(DomainId userId, [FromQuery] long version = EtagVersion.Any)
         {
             CheckPermissions(userId);
 
@@ -77,23 +77,25 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
         [HttpDelete]
         [Route("users/{userId}/notifications/{commentId}")]
         [ApiPermission]
-        public async Task<IActionResult> DeleteComment(string userId, string commentId)
+        public async Task<IActionResult> DeleteComment(DomainId userId, DomainId commentId)
         {
             CheckPermissions(userId);
 
-            await CommandBus.PublishAsync(new DeleteComment
+            var commmand = new DeleteComment
             {
                 AppId = NoApp,
                 CommentsId = userId,
                 CommentId = commentId
-            });
+            };
+
+            await CommandBus.PublishAsync(commmand);
 
             return NoContent();
         }
 
-        private void CheckPermissions(string userId)
+        private void CheckPermissions(DomainId userId)
         {
-            if (!string.Equals(userId, User.OpenIdSubject()))
+            if (!string.Equals(userId.ToString(), User.OpenIdSubject()))
             {
                 throw new DomainForbiddenException(T.Get("comments.noPermissions"));
             }

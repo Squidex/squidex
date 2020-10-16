@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRequired]
         public Status Initial { get; set; }
 
-        public UpdateWorkflow ToCommand(string id)
+        public UpdateWorkflow ToCommand(DomainId id)
         {
             var workflow = new Workflow(
                 Initial,

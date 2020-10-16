@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ProducesResponseType(typeof(CommentsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppCommentsRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetComments(string app, string commentsId, [FromQuery] long version = EtagVersion.Any)
+        public async Task<IActionResult> GetComments(string app, DomainId commentsId, [FromQuery] long version = EtagVersion.Any)
         {
             var result = await commentsLoader.GetCommentsAsync(commentsId, version);
 
@@ -80,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ProducesResponseType(typeof(CommentDto), 201)]
         [ApiPermissionOrAnonymous(Permissions.AppCommentsCreate)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PostComment(string app, string commentsId, [FromBody] UpsertCommentDto request)
+        public async Task<IActionResult> PostComment(string app, DomainId commentsId, [FromBody] UpsertCommentDto request)
         {
             var command = request.ToCreateCommand(commentsId);
 
@@ -107,9 +107,11 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
         [ApiPermissionOrAnonymous(Permissions.AppCommentsUpdate)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PutComment(string app, string commentsId, string commentId, [FromBody] UpsertCommentDto request)
+        public async Task<IActionResult> PutComment(string app, DomainId commentsId, DomainId commentId, [FromBody] UpsertCommentDto request)
         {
-            await CommandBus.PublishAsync(request.ToUpdateComment(commentsId, commentId));
+            var command = request.ToUpdateComment(commentsId, commentId);
+
+            await CommandBus.PublishAsync(command);
 
             return NoContent();
         }
@@ -128,13 +130,11 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
         [ApiPermissionOrAnonymous(Permissions.AppCommentsDelete)]
         [ApiCosts(0)]
-        public async Task<IActionResult> DeleteComment(string app, string commentsId, string commentId)
+        public async Task<IActionResult> DeleteComment(string app, DomainId commentsId, DomainId commentId)
         {
-            await CommandBus.PublishAsync(new DeleteComment
-            {
-                CommentsId = commentsId,
-                CommentId = commentId
-            });
+            var command = new DeleteComment { CommentsId = commentsId, CommentId = commentId };
+
+            await CommandBus.PublishAsync(command);
 
             return NoContent();
         }

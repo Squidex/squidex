@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -19,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [LocalizedRequired]
         public string FolderName { get; set; }
 
-        public RenameAssetFolder ToCommand(string id)
+        public RenameAssetFolder ToCommand(DomainId id)
         {
             return SimpleMapper.Map(this, new RenameAssetFolder { AssetFolderId = id });
         }

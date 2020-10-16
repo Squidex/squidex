@@ -77,7 +77,7 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schemaId));
 
-            var command = new CreateSchema { SchemaId = Guid.NewGuid() };
+            var command = new CreateSchema { SchemaId = DomainId.NewGuid() };
             var context = Ctx(command);
 
             await sut.HandleAsync(context);

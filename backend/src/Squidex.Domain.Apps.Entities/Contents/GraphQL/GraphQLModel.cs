@@ -34,6 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public bool CanGenerateAssetSourceUrl { get; }
 
+        static GraphQLModel()
+        {
+            ValueConverter.Register<string, DomainId>(DomainId.Create);
+        }
+
         public GraphQLModel(IAppEntity app,
             IEnumerable<ISchemaEntity> schemas,
             int pageSizeContents,

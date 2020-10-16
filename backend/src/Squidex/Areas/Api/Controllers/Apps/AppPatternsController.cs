@@ -11,6 +11,7 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -96,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(PatternsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutPattern(string app, string id, [FromBody] UpdatePatternDto request)
+        public async Task<IActionResult> PutPattern(string app, DomainId id, [FromBody] UpdatePatternDto request)
         {
             var command = request.ToUpdateCommand(id);
 
@@ -122,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(PatternsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppPatternsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeletePattern(string app, string id)
+        public async Task<IActionResult> DeletePattern(string app, DomainId id)
         {
             var command = new DeletePattern { PatternId = id };
 

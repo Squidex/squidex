@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
-                var documentId = DomainId.Combine(appId, id).ToString();
+                var documentId = DomainId.Combine(appId, id);
 
                 var assetFolderEntity =
                     await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)

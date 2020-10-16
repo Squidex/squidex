@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
@@ -96,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] string? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            var assets = await assetQuery.QueryAsync(Context, parentId!, CreateQuery(ids, q));
+            var assets = await assetQuery.QueryAsync(Context, DomainId.CreateNullable(parentId), CreateQuery(ids, q));
 
             var response = Deferred.Response(() =>
             {
@@ -149,7 +150,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAsset(string app, string id)
+        public async Task<IActionResult> GetAsset(string app, DomainId id)
         {
             var asset = await assetQuery.FindAssetAsync(Context, id);
 
@@ -188,15 +189,15 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, [FromQuery] string parentId, IFormFile file, [FromQuery] string? id = null, [FromQuery] bool duplicate = false)
+        public async Task<IActionResult> PostAsset(string app, [FromQuery] DomainId parentId, IFormFile file, [FromQuery] DomainId? id = null, [FromQuery] bool duplicate = false)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
             var command = new CreateAsset { File = assetFile, ParentId = parentId, Duplicate = duplicate };
 
-            if (!string.IsNullOrWhiteSpace(id))
+            if (id != null && id.Value != default && !string.IsNullOrWhiteSpace(id.Value.ToString()))
             {
-                command.AssetId = id;
+                command.AssetId = id.Value;
             }
 
             var response = await InvokeCommandAsync(command);
@@ -223,7 +224,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpload)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetContent(string app, string id, IFormFile file)
+        public async Task<IActionResult> PutAssetContent(string app, DomainId id, IFormFile file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
@@ -251,7 +252,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAsset(string app, string id, [FromBody] AnnotateAssetDto request)
+        public async Task<IActionResult> PutAsset(string app, DomainId id, [FromBody] AnnotateAssetDto request)
         {
             var command = request.ToCommand(id);
 
@@ -276,7 +277,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetParent(string app, string id, [FromBody] MoveAssetItemDto request)
+        public async Task<IActionResult> PutAssetParent(string app, DomainId id, [FromBody] MoveAssetItemDto request)
         {
             var command = request.ToCommand(id);
 
@@ -299,7 +300,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/{id}/")]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteAsset(string app, string id, [FromQuery] bool checkReferrers = false)
+        public async Task<IActionResult> DeleteAsset(string app, DomainId id, [FromQuery] bool checkReferrers = false)
         {
             await CommandBus.PublishAsync(new DeleteAsset { AssetId = id, CheckReferrers = checkReferrers });
 

@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private Task DeletePublishedContentAsync(DomainId appId, DomainId id)
         {
-            var documentId = DomainId.Combine(appId, id).ToString();
+            var documentId = DomainId.Combine(appId, id);
 
             return collectionPublished.RemoveAsync(documentId);
         }

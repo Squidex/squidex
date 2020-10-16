@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities
 
                     foreach (var id in ids.Split(','))
                     {
-                        idsList.Add(id);
+                        idsList.Add(DomainId.Create(id));
                     }
 
                     c.Ids = idsList;

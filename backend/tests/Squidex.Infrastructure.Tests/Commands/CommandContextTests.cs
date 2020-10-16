@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Commands
             Assert.Null(sut.PlainResult);
             Assert.Null(sut.Result<string>());
 
-            Assert.NotEqual(Guid.Empty, sut.ContextId);
+            Assert.NotEqual(DomainId.Empty, sut.ContextId);
 
             Assert.False(sut.IsCompleted);
         }

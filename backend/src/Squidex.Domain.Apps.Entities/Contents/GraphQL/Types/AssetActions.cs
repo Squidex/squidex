@@ -10,6 +10,7 @@ using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -56,9 +57,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             public static readonly IFieldResolver Resolver = new FuncFieldResolver<object?>(c =>
             {
-                var id = c.GetArgument<Guid>("id");
+                var assetId = c.GetArgument<DomainId>("id");
 
-                return ((GraphQLExecutionContext)c.UserContext).FindAssetAsync(id);
+                return ((GraphQLExecutionContext)c.UserContext).FindAssetAsync(assetId);
             });
         }
 

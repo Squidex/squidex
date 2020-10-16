@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         {
             command.Actor = actor;
             command.AppId = appId;
-            command.CommentsId = commentsId.ToString();
+            command.CommentsId = commentsId;
             command.CommentId = commentId;
 
             return command;

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -35,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return SimpleMapper.Map(this, new AddPattern());
         }
 
-        public UpdatePattern ToUpdateCommand(string id)
+        public UpdatePattern ToUpdateCommand(DomainId id)
         {
             return SimpleMapper.Map(this, new UpdatePattern { PatternId = id });
         }

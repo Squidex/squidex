@@ -57,7 +57,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                     var id = (await arguments[1].Expression.EvaluateAsync(context)).ToStringValue();
 
-                    var references = await contentQueryService.QueryAsync(appContext, new List<DomainId> { id });
+                    var domainId = DomainId.Create(id);
+                    var domainIds = new List<DomainId> { domainId };
+
+                    var references = await contentQueryService.QueryAsync(appContext, domainIds);
                     var reference = references.FirstOrDefault();
 
                     if (reference != null)

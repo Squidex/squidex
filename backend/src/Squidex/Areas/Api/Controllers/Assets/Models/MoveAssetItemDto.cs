@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             return new MoveAsset { AssetId = id, ParentId = ParentId };
         }
 
-        public MoveAssetFolder ToFolderCommand(string id)
+        public MoveAssetFolder ToFolderCommand(DomainId id)
         {
             return new MoveAssetFolder { AssetFolderId = id, ParentId = ParentId };
         }

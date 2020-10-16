@@ -16,8 +16,13 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
-    public sealed class MongoRuleEventEntity : MongoEntity, IRuleEventEntity
+    [BsonIgnoreExtraElements]
+    public sealed class MongoRuleEventEntity : IRuleEventEntity
     {
+        [BsonId]
+        [BsonElement]
+        public DomainId DocumentId { get; set; }
+
         [BsonRequired]
         [BsonElement]
         public DomainId AppId { get; set; }

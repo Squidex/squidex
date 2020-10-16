@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Infrastructure;
 
 namespace Migrations.OldTriggers
 {
@@ -71,7 +72,9 @@ namespace Migrations.OldTriggers
                 condition = string.Join(" || ", conditions);
             }
 
-            return new ContentChangedTriggerSchemaV2 { SchemaId = SchemaId, Condition = condition };
+            var schemaId = DomainId.Create(SchemaId);
+
+            return new ContentChangedTriggerSchemaV2 { SchemaId = schemaId, Condition = condition };
         }
     }
 }

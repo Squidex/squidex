@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
             SimpleMapper.Map(job, entity);
 
-            entity.DocumentId = job.Id.ToString();
+            entity.DocumentId = job.Id;
 
             await Collection.InsertOneIfNotExistsAsync(entity, ct);
         }

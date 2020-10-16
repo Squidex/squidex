@@ -7,6 +7,7 @@
 
 using System;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -25,12 +26,12 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         /// </summary>
         public Uri? Url { get; set; }
 
-        public CreateComment ToCreateCommand(string commentsId)
+        public CreateComment ToCreateCommand(DomainId commentsId)
         {
             return SimpleMapper.Map(this, new CreateComment { CommentsId = commentsId });
         }
 
-        public UpdateComment ToUpdateComment(string commentsId, string commentId)
+        public UpdateComment ToUpdateComment(DomainId commentsId, DomainId commentId)
         {
             return SimpleMapper.Map(this, new UpdateComment { CommentsId = commentsId, CommentId = commentId });
         }

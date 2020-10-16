@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             if (!NamedId<DomainId>.TryParse(value, Parser, out var result))
             {
-                throw new JsonException("Named id must have at least 2 parts divided by commata.");
+                throw new JsonException("Named id must have at least 2 parts divided by comma.");
             }
 
             return result;
@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         private static bool ParseString(ReadOnlySpan<char> value, out DomainId result)
         {
-            result = new string(value);
+            result = DomainId.Create(new string(value));
 
             return true;
         }

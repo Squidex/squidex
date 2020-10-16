@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected override Task OnActivateAsync(string key)
         {
-            domainObject.Setup(key);
+            domainObject.Setup(DomainId.Create(key));
 
             return base.OnActivateAsync(key);
         }

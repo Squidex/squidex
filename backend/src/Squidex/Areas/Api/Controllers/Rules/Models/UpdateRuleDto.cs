@@ -8,6 +8,7 @@
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
@@ -29,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [JsonConverter(typeof(RuleActionConverter))]
         public RuleAction Action { get; set; }
 
-        public UpdateRule ToCommand(string id)
+        public UpdateRule ToCommand(DomainId id)
         {
             var command = new UpdateRule { RuleId = id, Action = Action, Name = Name };
 

@@ -15,6 +15,7 @@ using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared;
@@ -170,7 +171,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult GetLogFile(string token)
         {
-            var appId = dataProtector.Unprotect(token);
+            var appId = DomainId.Create(dataProtector.Unprotect(token));
 
             var today = DateTime.UtcNow.Date;
 

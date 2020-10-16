@@ -79,16 +79,6 @@ namespace Squidex.Infrastructure
             return string.Compare(id, other.id, StringComparison.Ordinal);
         }
 
-        public static implicit operator DomainId(string value)
-        {
-            return Create(value);
-        }
-
-        public static implicit operator DomainId(Guid value)
-        {
-            return Create(value);
-        }
-
         public static bool operator ==(DomainId lhs, DomainId rhs)
         {
             return lhs.Equals(rhs);

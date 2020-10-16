@@ -76,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             public static readonly IFieldResolver Resolver = new FuncFieldResolver<object?>(c =>
             {
-                var id = c.GetArgument<Guid>("id");
+                var contentId = c.GetArgument<DomainId>("id");
 
-                return ((GraphQLExecutionContext)c.UserContext).FindContentAsync(id);
+                return ((GraphQLExecutionContext)c.UserContext).FindContentAsync(contentId);
             });
         }
 
@@ -183,7 +183,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                     if (!string.IsNullOrWhiteSpace(contentId))
                     {
-                        command.ContentId = contentId;
+                        var id = DomainId.Create(contentId);
+
+                        command.ContentId = id;
                     }
 
                     return command;
@@ -236,7 +238,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     var contentData = GetContentData(c);
                     var contentId = c.GetArgument<string>("id");
 
-                    return new UpsertContent { ContentId = contentId, Data = contentData, Publish = contentPublish };
+                    var id = DomainId.Create(contentId);
+
+                    return new UpsertContent { ContentId = id, Data = contentData, Publish = contentPublish };
                 });
             }
         }
@@ -275,7 +279,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
                 {
-                    var contentId = c.GetArgument<Guid>("id");
+                    var contentId = c.GetArgument<DomainId>("id");
                     var contentData = GetContentData(c);
 
                     return new UpdateContent { ContentId = contentId, Data = contentData };
@@ -317,7 +321,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
                 {
-                    var contentId = c.GetArgument<Guid>("id");
+                    var contentId = c.GetArgument<DomainId>("id");
                     var contentData = GetContentData(c);
 
                     return new PatchContent { ContentId = contentId, Data = contentData };
@@ -363,7 +367,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
                 {
-                    var contentId = c.GetArgument<Guid>("id");
+                    var contentId = c.GetArgument<DomainId>("id");
                     var contentStatus = new Status(c.GetArgument<string>("status"));
                     var contentDueTime = c.GetArgument<Instant?>("dueTime");
 
@@ -381,7 +385,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Name = "id",
                     Description = "The id of the content (usually GUID)",
                     DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullGuid
+                    ResolvedType = AllTypes.NonNullString
                 },
                 new QueryArgument(AllTypes.None)
                 {
@@ -396,7 +400,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 return ResolveAsync<EntitySavedResult>(appId, schemaId, c =>
                 {
-                    var contentId = c.GetArgument<Guid>("id");
+                    var contentId = c.GetArgument<DomainId>("id");
 
                     return new DeleteContent { ContentId = contentId };
                 });

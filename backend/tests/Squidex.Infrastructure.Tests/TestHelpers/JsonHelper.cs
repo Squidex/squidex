@@ -34,9 +34,10 @@ namespace Squidex.Infrastructure.TestHelpers
 
                 ContractResolver = new ConverterContractResolver(
                     new ClaimsPrincipalConverter(),
-                    new InstantConverter(),
+                    new DomainIdConverter(),
                     new EnvelopeHeadersConverter(),
                     new FilterConverter(),
+                    new InstantConverter(),
                     new JsonValueConverter(),
                     new LanguageConverter(),
                     new NamedGuidIdConverter(),

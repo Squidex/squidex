@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var documentId = DomainId.Combine(schema.AppId, id).ToString();
+            var documentId = DomainId.Combine(schema.AppId, id);
 
             var find = Collection.Find(x => x.DocumentId == documentId);
 

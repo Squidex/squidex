@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 {
                     if (id is JsonString s)
                     {
-                        result.Add(s.Value);
+                        result.Add(DomainId.Create(s.Value));
 
                         added++;
 

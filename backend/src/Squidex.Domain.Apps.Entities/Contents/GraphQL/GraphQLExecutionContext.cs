@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     foreach (var id in array)
                     {
-                        result.Add(id.ToString());
+                        result.Add(DomainId.Create(id.ToString()));
                     }
                 }
 

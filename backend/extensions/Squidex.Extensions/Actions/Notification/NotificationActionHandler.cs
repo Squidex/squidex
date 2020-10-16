@@ -55,7 +55,9 @@ namespace Squidex.Extensions.Actions.Notification
                     throw new InvalidOperationException($"Cannot find user by '{action.User}'");
                 }
 
-                var ruleJob = new CreateComment { Actor = actor, CommentsId = user.Id, Text = text };
+                var commentsId = DomainId.Create(user.Id);
+
+                var ruleJob = new CreateComment { Actor = actor, CommentsId = commentsId, Text = text };
 
                 if (!string.IsNullOrWhiteSpace(action.Url))
                 {

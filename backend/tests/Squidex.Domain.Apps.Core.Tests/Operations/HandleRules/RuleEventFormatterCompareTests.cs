@@ -38,8 +38,8 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
-        private readonly DomainId contentId = Guid.NewGuid();
-        private readonly DomainId assetId = Guid.NewGuid();
+        private readonly DomainId contentId = DomainId.NewGuid();
+        private readonly DomainId assetId = DomainId.NewGuid();
         private readonly RuleEventFormatter sut;
 
         private class FakeContentResolver : IRuleEventFormatter

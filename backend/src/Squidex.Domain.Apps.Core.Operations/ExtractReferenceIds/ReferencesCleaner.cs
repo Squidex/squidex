@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private bool IsValidReference(IJsonValue item)
         {
-            return item is JsonString s && validIds.Contains(s.Value);
+            return item is JsonString s && validIds.Contains(DomainId.Create(s.Value));
         }
     }
 }

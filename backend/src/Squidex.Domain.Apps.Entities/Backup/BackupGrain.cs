@@ -132,6 +132,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             try
             {
+                var appId = DomainId.Create(Key);
+
                 using (var stream = backupArchiveLocation.OpenStream(job.Id))
                 {
                     using (var writer = await backupArchiveLocation.OpenWriterAsync(stream))
@@ -140,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         var userMapping = new UserMapping(actor);
 
-                        var context = new BackupContext(Key, userMapping, writer);
+                        var context = new BackupContext(appId, userMapping, writer);
 
                         await eventStore.QueryAsync(async storedEvent =>
                         {
