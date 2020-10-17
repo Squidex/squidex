@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
         {
             args.Add(new
             {
-                index = new
+                update = new
                 {
                     _id = update.DocId,
                     _index = indexName,
@@ -121,8 +121,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
             args.Add(new
             {
-                serveAll = update.ServeAll,
-                servePublished = update.ServePublished
+                doc = new
+                {
+                    serveAll = update.ServeAll,
+                    servePublished = update.ServePublished
+                }
             });
         }
 
@@ -130,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
         {
             args.Add(new
             {
-                index = new
+                delete = new
                 {
                     _id = delete.DocId,
                     _index = indexName,
