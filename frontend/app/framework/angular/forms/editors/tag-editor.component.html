@@ -53,8 +53,8 @@
                                 (ngModelChange)="toggleValue($event, item)"
                             />
 
-                            <label class="custom-control-label truncate" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-left">
-                                {{item.name}}
+                            <label class="custom-control-label" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-left">
+                                <span class="truncate">{{item.name}}</span>
                             </label>
                         </div>
                     </div>
