@@ -18,7 +18,7 @@ namespace Squidex.Domain.Users
     {
         private readonly ISnapshotStore<State, Guid> store;
 
-        [CollectionName("Identity_certificateAccount")]
+        [CollectionName("Identity_CertificateAccount")]
         public sealed class State
         {
             public AccountModel Account { get; set; }
