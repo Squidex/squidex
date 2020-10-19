@@ -69,6 +69,7 @@ COPY --from=backend /build/ .
 COPY --from=frontend /build/ wwwroot/build/
 
 EXPOSE 80
+EXPOSE 443
 EXPOSE 11111
 
 ENTRYPOINT ["dotnet", "Squidex.dll"]
