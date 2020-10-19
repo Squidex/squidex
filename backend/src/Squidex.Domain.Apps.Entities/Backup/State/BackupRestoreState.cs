@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
-    public class RestoreState2
+    public class BackupRestoreState
     {
         public RestoreJob Job { get; set; }
     }

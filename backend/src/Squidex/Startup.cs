@@ -41,6 +41,7 @@ namespace Squidex
             services.AddNonBreakingSameSiteCookies();
 
             services.AddSquidexMvcWithPlugins(config);
+            services.AddSquidexLetsEncrypt(config);
 
             services.AddSquidexApps();
             services.AddSquidexAssetInfrastructure(config);

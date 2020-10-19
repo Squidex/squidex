@@ -193,27 +193,37 @@ namespace Squidex.Domain.Users.MongoDb
 
         public async Task<IdentityUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
-            return await Collection.Find(x => x.NormalizedEmail == normalizedEmail).FirstOrDefaultAsync(cancellationToken);
+            var result = await Collection.Find(x => x.NormalizedEmail == normalizedEmail).FirstOrDefaultAsync(cancellationToken);
+
+            return result;
         }
 
         public async Task<IdentityUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            return await Collection.Find(x => x.NormalizedEmail == normalizedUserName).FirstOrDefaultAsync(cancellationToken);
+            var result = await Collection.Find(x => x.NormalizedEmail == normalizedUserName).FirstOrDefaultAsync(cancellationToken);
+
+            return result;
         }
 
         public async Task<IdentityUser> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            return await Collection.Find(x => x.Logins.Any(y => y.LoginProvider == loginProvider && y.ProviderKey == providerKey)).FirstOrDefaultAsync(cancellationToken);
+            var result = await Collection.Find(x => x.Logins.Any(y => y.LoginProvider == loginProvider && y.ProviderKey == providerKey)).FirstOrDefaultAsync(cancellationToken);
+
+            return result;
         }
 
         public async Task<IList<IdentityUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken)
         {
-            return (await Collection.Find(x => x.Claims.Any(y => y.Type == claim.Type && y.Value == claim.Value)).ToListAsync(cancellationToken)).OfType<IdentityUser>().ToList();
+            var result = await Collection.Find(x => x.Claims.Any(y => y.Type == claim.Type && y.Value == claim.Value)).ToListAsync(cancellationToken);
+
+            return result.OfType<IdentityUser>().ToList();
         }
 
         public async Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
         {
-            return (await Collection.Find(x => x.Roles.Contains(roleName)).ToListAsync(cancellationToken)).OfType<IdentityUser>().ToList();
+            var result = await Collection.Find(x => x.Roles.Contains(roleName)).ToListAsync(cancellationToken);
+
+            return result.OfType<IdentityUser>().ToList();
         }
 
         public async Task<IdentityResult> CreateAsync(IdentityUser user, CancellationToken cancellationToken)
@@ -241,112 +251,156 @@ namespace Squidex.Domain.Users.MongoDb
 
         public Task<string> GetUserIdAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).Id);
+            var result = user.Id;
+
+            return Task.FromResult(result);
         }
 
         public Task<string> GetUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).UserName);
+            var result = user.UserName;
+
+            return Task.FromResult(result);
         }
 
         public Task<string> GetNormalizedUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).NormalizedUserName);
+            var result = user.NormalizedUserName;
+
+            return Task.FromResult(result);
         }
 
         public Task<string> GetPasswordHashAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).PasswordHash);
+            var result = user.PasswordHash;
+
+            return Task.FromResult(result);
         }
 
         public Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult<IList<string>>(((MongoUser)user).Roles.ToList());
+            var result = ((MongoUser)user).Roles.ToList();
+
+            return Task.FromResult<IList<string>>(result);
         }
 
         public Task<bool> IsInRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).Roles.Contains(roleName));
+            var result = ((MongoUser)user).Roles.Contains(roleName);
+
+            return Task.FromResult(result);
         }
 
         public Task<IList<UserLoginInfo>> GetLoginsAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult<IList<UserLoginInfo>>(((MongoUser)user).Logins.Select(x => new UserLoginInfo(x.LoginProvider, x.ProviderKey, x.ProviderDisplayName)).ToList());
+            var result = ((MongoUser)user).Logins.Select(x => new UserLoginInfo(x.LoginProvider, x.ProviderKey, x.ProviderDisplayName)).ToList();
+
+            return Task.FromResult<IList<UserLoginInfo>>(result);
         }
 
         public Task<string> GetSecurityStampAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).SecurityStamp);
+            var result = user.SecurityStamp;
+
+            return Task.FromResult(result);
         }
 
         public Task<string> GetEmailAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).Email);
+            var result = user.Email;
+
+            return Task.FromResult(result);
         }
 
         public Task<bool> GetEmailConfirmedAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).EmailConfirmed);
+            var result = user.EmailConfirmed;
+
+            return Task.FromResult(result);
         }
 
         public Task<string> GetNormalizedEmailAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).NormalizedEmail);
+            var result = user.NormalizedEmail;
+
+            return Task.FromResult(result);
         }
 
         public Task<IList<Claim>> GetClaimsAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult<IList<Claim>>(((MongoUser)user).Claims);
+            var result = ((MongoUser)user).Claims;
+
+            return Task.FromResult<IList<Claim>>(result);
         }
 
         public Task<string> GetPhoneNumberAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).PhoneNumber);
+            var result = user.PhoneNumber;
+
+            return Task.FromResult(result);
         }
 
         public Task<bool> GetPhoneNumberConfirmedAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).PhoneNumberConfirmed);
+            var result = user.PhoneNumberConfirmed;
+
+            return Task.FromResult(result);
         }
 
         public Task<bool> GetTwoFactorEnabledAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).TwoFactorEnabled);
+            var result = user.TwoFactorEnabled;
+
+            return Task.FromResult(result);
         }
 
         public Task<DateTimeOffset?> GetLockoutEndDateAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).LockoutEnd);
+            var result = user.LockoutEnd;
+
+            return Task.FromResult(result);
         }
 
         public Task<int> GetAccessFailedCountAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).AccessFailedCount);
+            var result = user.AccessFailedCount;
+
+            return Task.FromResult(result);
         }
 
         public Task<bool> GetLockoutEnabledAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).LockoutEnabled);
+            var result = user.LockoutEnabled;
+
+            return Task.FromResult(result);
         }
 
         public Task<string> GetTokenAsync(IdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).GetToken(loginProvider, name)!);
+            var result = ((MongoUser)user).GetToken(loginProvider, name)!;
+
+            return Task.FromResult(result);
         }
 
         public Task<string> GetAuthenticatorKeyAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).GetToken(InternalLoginProvider, AuthenticatorKeyTokenName)!);
+            var result = ((MongoUser)user).GetToken(InternalLoginProvider, AuthenticatorKeyTokenName)!;
+
+            return Task.FromResult(result);
         }
 
         public Task<bool> HasPasswordAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(!string.IsNullOrWhiteSpace(((MongoUser)user).PasswordHash));
+            var result = !string.IsNullOrWhiteSpace(user.PasswordHash);
+
+            return Task.FromResult(result);
         }
 
         public Task<int> CountCodesAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).GetToken(InternalLoginProvider, RecoveryCodeTokenName)?.Split(';').Length ?? 0);
+            var result = ((MongoUser)user).GetToken(InternalLoginProvider, RecoveryCodeTokenName)?.Split(';').Length ?? 0;
+
+            return Task.FromResult(result);
         }
 
         public Task SetUserNameAsync(IdentityUser user, string userName, CancellationToken cancellationToken)

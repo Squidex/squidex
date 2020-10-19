@@ -13,30 +13,32 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Driver;
-using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Users.MongoDb
+namespace Squidex.Domain.Users
 {
-    public sealed class MongoKeyStore : MongoRepositoryBase<MongoKey>, ISigningCredentialStore, IValidationKeysStore
+    public sealed class DefaultKeyStore : ISigningCredentialStore, IValidationKeysStore
     {
+        private readonly ISnapshotStore<State, Guid> store;
         private SigningCredentials? cachedKey;
         private SecurityKeyInfo[]? cachedKeyInfo;
 
-        public MongoKeyStore(IMongoDatabase database, bool setup = false)
-            : base(database, setup)
+        [CollectionName("Identity_Keys")]
+        public sealed class State
         {
+            public string Key { get; set; }
+
+            public RSAParameters Parameters { get; set; }
         }
 
-        protected override string CollectionName()
+        public DefaultKeyStore(ISnapshotStore<State, Guid> store)
         {
-            return "Key";
+            this.store = store;
         }
 
         public async Task<SigningCredentials> GetSigningCredentialsAsync()
         {
             var (_, key) = await GetOrCreateKeyAsync();
-            // SignatureProvider signatureProvider = key.CryptoProviderFactory.CreateForVerifying(key, key.Al);
 
             return key;
         }
@@ -55,57 +57,50 @@ namespace Squidex.Domain.Users.MongoDb
                 return (cachedKeyInfo, cachedKey);
             }
 
-            var key = await Collection.Find(x => x.Id == "Default").FirstOrDefaultAsync();
+            var (state, _) = await store.ReadAsync(default);
 
             RsaSecurityKey securityKey;
 
-            if (key == null)
+            if (state == null)
             {
                 securityKey = new RsaSecurityKey(RSA.Create(2048))
                 {
                     KeyId = CryptoRandom.CreateUniqueId(16)
                 };
 
-                key = new MongoKey { Id = "Default", Key = securityKey.KeyId };
+                state = new State { Key = securityKey.KeyId };
 
                 if (securityKey.Rsa != null)
                 {
                     var parameters = securityKey.Rsa.ExportParameters(includePrivateParameters: true);
 
-                    key.Parameters = MongoKeyParameters.Create(parameters);
+                    state.Parameters = parameters;
                 }
                 else
                 {
-                    key.Parameters = MongoKeyParameters.Create(securityKey.Parameters);
+                    state.Parameters = securityKey.Parameters;
                 }
 
                 try
                 {
-                    await Collection.InsertOneAsync(key);
+                    await store.WriteAsync(default, state, 0, 0);
 
                     return CreateCredentialsPair(securityKey);
                 }
-                catch (MongoWriteException ex)
+                catch (InconsistentStateException)
                 {
-                    if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
-                    {
-                        key = await Collection.Find(x => x.Id == "Default").FirstOrDefaultAsync();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    (state, _) = await store.ReadAsync(default);
                 }
             }
 
-            if (key == null)
+            if (state == null)
             {
                 throw new InvalidOperationException("Cannot read key.");
             }
 
-            securityKey = new RsaSecurityKey(key.Parameters.ToParameters())
+            securityKey = new RsaSecurityKey(state.Parameters)
             {
-                KeyId = key.Key
+                KeyId = state.Key
             };
 
             return CreateCredentialsPair(securityKey);

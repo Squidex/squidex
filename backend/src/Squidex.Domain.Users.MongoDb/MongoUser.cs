@@ -9,23 +9,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Users.MongoDb
 {
     public sealed class MongoUser : IdentityUser
     {
+        [BsonRequired]
+        [BsonElement]
         public List<Claim> Claims { get; set; } = new List<Claim>();
 
+        [BsonRequired]
+        [BsonElement]
         public List<UserTokenInfo> Tokens { get; set; } = new List<UserTokenInfo>();
 
+        [BsonRequired]
+        [BsonElement]
         public List<UserLoginInfo> Logins { get; set; } = new List<UserLoginInfo>();
 
+        [BsonRequired]
+        [BsonElement]
         public HashSet<string> Roles { get; set; } = new HashSet<string>();
 
         internal void AddLogin(UserLoginInfo login)
         {
-            Logins.Add(new UserLoginInfo(login.LoginProvider, login.ProviderKey, login.ProviderDisplayName));
+            Logins.Add(login);
         }
 
         internal void AddRole(string role)
@@ -38,9 +47,9 @@ namespace Squidex.Domain.Users.MongoDb
             Roles.Remove(role);
         }
 
-        internal void RemoveLogin(string loginProvider, string providerKey)
+        internal void RemoveLogin(string provider, string providerKey)
         {
-            Logins.RemoveAll(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
+            Logins.RemoveAll(x => x.LoginProvider == provider && x.ProviderKey == providerKey);
         }
 
         internal void AddClaim(Claim claim)
@@ -55,7 +64,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         internal void RemoveClaim(Claim claim)
         {
-            Claims.RemoveAll(c => c.Type == claim.Type && c.Value == claim.Value);
+            Claims.RemoveAll(x => x.Type == claim.Type && x.Value == claim.Value);
         }
 
         internal void RemoveClaims(IEnumerable<Claim> claims)
@@ -63,19 +72,19 @@ namespace Squidex.Domain.Users.MongoDb
             claims.Foreach((x, _) => RemoveClaim(x));
         }
 
-        internal string? GetToken(string loginProvider, string name)
+        internal string? GetToken(string provider, string name)
         {
-            return Tokens.FirstOrDefault(t => t.LoginProvider == loginProvider && t.Name == name)?.Value;
+            return Tokens.FirstOrDefault(x => x.LoginProvider == provider && x.Name == name)?.Value;
         }
 
-        internal void AddToken(string loginProvider, string name, string value)
+        internal void AddToken(string provider, string name, string value)
         {
-            Tokens.Add(new UserTokenInfo { LoginProvider = loginProvider, Name = name, Value = value });
+            Tokens.Add(new UserTokenInfo { LoginProvider = provider, Name = name, Value = value });
         }
 
-        internal void RemoveToken(string loginProvider, string name)
+        internal void RemoveToken(string provider, string name)
         {
-            Tokens.RemoveAll(t => t.LoginProvider == loginProvider && t.Name == name);
+            Tokens.RemoveAll(x => x.LoginProvider == provider && x.Name == name);
         }
 
         internal void ReplaceClaim(Claim existingClaim, Claim newClaim)
