@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Validation;
 using Xunit;
 
 #pragma warning disable SA1401 // Fields should be private
@@ -297,35 +296,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         protected IndexOperation Create(DomainId id, string language, string text)
         {
-            var data =
-                new NamedContentData()
-                    .AddField("text",
-                        new ContentFieldData()
-                            .AddValue(language, text));
+            var data = Data(language, text);
 
             return Op(id, new ContentCreated { Data = data });
         }
 
         protected IndexOperation Update(DomainId id, string language, string text)
         {
-            var data =
-                new NamedContentData()
-                    .AddField("text",
-                        new ContentFieldData()
-                            .AddValue(language, text));
+            var data = Data(language, text);
 
             return Op(id, new ContentUpdated { Data = data });
         }
 
         protected IndexOperation CreateDraftWithData(DomainId id, string language, string text)
         {
-            var data =
-                new NamedContentData()
+            var data = Data(language, text);
+
+            return Op(id, new ContentDraftCreated { MigratedData = data });
+        }
+
+        private static NamedContentData Data(string language, string text)
+        {
+            return new NamedContentData()
                     .AddField("text",
                         new ContentFieldData()
                             .AddValue(language, text));
-
-            return Op(id, new ContentDraftCreated { MigratedData = data });
         }
 
         protected IndexOperation CreateDraft(DomainId id)
@@ -338,7 +333,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Op(id, new ContentStatusChanged { Status = Status.Published });
         }
 
-        protected IndexOperation Unpublish( DomainId id)
+        protected IndexOperation Unpublish(DomainId id)
         {
             return Op(id, new ContentStatusChanged { Status = Status.Draft });
         }
@@ -376,7 +371,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
                 else
                 {
-                    Assert.Empty(result);
+                    result.Should().BeEmpty();
                 }
             };
         }
