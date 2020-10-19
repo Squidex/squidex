@@ -99,7 +99,7 @@
                     </sqx-form-hint>
 
                     <div class="row rule-section">
-                        <div class="custom-control custom-checkbox  col-6" *ngFor="let property of propertiesSimple; trackBy: trackByProperty">
+                        <div class="custom-control custom-checkbox col-6" *ngFor="let property of propertiesSimple; trackBy: trackByProperty">
                             <input class="custom-control-input" type="checkbox" id="{{role.name}}_{{property.key}}"
                                 [disabled]="!isEditable"
                                 [ngModel]="getProperty(property.key)"
@@ -121,8 +121,10 @@
                                     [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
                                     (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
                                     [ngModelOptions]="standalone">
-                                <label class="custom-control-label truncate" for="{{role.name}}_schema_{{schema.name}}">
-                                    {{ 'roles.properties.hideContents' | sqxTranslate: { schema: schema.displayName } }}
+                                <label class="custom-control-label" for="{{role.name}}_schema_{{schema.name}}">
+                                    <span class="truncate">
+                                        {{ 'roles.properties.hideContents' | sqxTranslate: { schema: schema.displayName } }}
+                                    </span>
                                 </label>
                             </div>
                         </div>

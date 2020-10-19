@@ -68,6 +68,8 @@ WORKDIR /app
 COPY --from=backend /build/ .
 COPY --from=frontend /build/ wwwroot/build/
 
+ENV ASPNETCORE_URLS=https://+;http://+
+
 EXPOSE 80
 EXPOSE 443
 EXPOSE 11111
