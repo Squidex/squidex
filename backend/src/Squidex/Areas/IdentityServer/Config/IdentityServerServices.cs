@@ -27,7 +27,7 @@ namespace Squidex.Areas.IdentityServer.Config
     {
         public static void AddSquidexIdentityServer(this IServiceCollection services)
         {
-            services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(s =>
+            services.AddSingletonAs<IConfigureOptions<KeyManagementOptions>>(s =>
             {
                 return new ConfigureOptions<KeyManagementOptions>(options =>
                 {
@@ -40,20 +40,26 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddDefaultTokenProviders();
 
-            services.AddSingleton<IPasswordValidator<IdentityUser>,
-                PwnedPasswordValidator>();
+            services.AddSingletonAs<DefaultXmlRepository>()
+                .As<IXmlRepository>();
 
-            services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>,
-                UserClaimsPrincipalFactoryWithEmail>();
+            services.AddSingletonAs<DefaultKeyStore>()
+                .As<ISigningCredentialStore>().As<IValidationKeysStore>();
 
-            services.AddSingleton<IClaimsTransformation,
-                ApiPermissionUnifier>();
+            services.AddSingletonAs<PwnedPasswordValidator>()
+                .As<IPasswordValidator<IdentityUser>>();
 
-            services.AddSingleton<IClientStore,
-                LazyClientStore>();
+            services.AddScopedAs<UserClaimsPrincipalFactoryWithEmail>()
+                .As<IUserClaimsPrincipalFactory<IdentityUser>>();
 
-            services.AddSingleton<IResourceStore,
-                InMemoryResourcesStore>();
+            services.AddSingletonAs<ApiPermissionUnifier>()
+                .As<IClaimsTransformation>();
+
+            services.AddSingletonAs<LazyClientStore>()
+                .As<IClientStore>();
+
+            services.AddSingletonAs<InMemoryResourcesStore>()
+                .As<IResourceStore>();
 
             services.AddIdentityServer(options =>
                 {

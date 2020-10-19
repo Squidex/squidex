@@ -14,7 +14,8 @@ namespace Squidex.Infrastructure.Log.Adapter
     {
         public static ILoggingBuilder AddSemanticLog(this ILoggingBuilder builder)
         {
-            builder.Services.AddSingleton<ILoggerProvider, SemanticLogLoggerProvider>();
+            builder.Services.AddSingletonAs<SemanticLogLoggerProvider>()
+                .As<ILoggerProvider>();
 
             return builder;
         }

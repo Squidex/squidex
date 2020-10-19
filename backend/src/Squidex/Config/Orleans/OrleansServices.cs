@@ -32,10 +32,14 @@ namespace Squidex.Config.Orleans
 
             builder.ConfigureServices(siloServices =>
             {
-                siloServices.AddSingleton<IMongoClientFactory, DefaultMongoClientFactory>();
+                siloServices.AddSingletonAs<DefaultMongoClientFactory>()
+                    .As<IMongoClientFactory>();
 
-                siloServices.AddSingleton<IActivationLimiter, ActivationLimiter>();
-                siloServices.AddScoped<IActivationLimit, ActivationLimit>();
+                siloServices.AddSingletonAs<ActivationLimiter>()
+                    .As<IActivationLimiter>();
+
+                siloServices.AddScopedAs<ActivationLimit>()
+                    .As<IActivationLimit>();
 
                 siloServices.AddScoped(typeof(IGrainState<>), typeof(Infrastructure.Orleans.GrainState<>));
             });

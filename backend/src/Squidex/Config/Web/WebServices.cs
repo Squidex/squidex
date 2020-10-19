@@ -5,6 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using LettuceEncrypt;
+using LettuceEncrypt.Accounts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -14,6 +17,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Users;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Translations;
 using Squidex.Pipeline.Plugins;
@@ -103,6 +107,35 @@ namespace Squidex.Config.Web
             .AddRazorRuntimeCompilation()
             .AddSquidexPlugins(config)
             .AddSquidexSerializers();
+        }
+
+        public static void AddSquidexLetsEncrypt(this IServiceCollection services, IConfiguration config)
+        {
+            var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
+
+            if (!urlsOptions.EnableLetsEncrypt)
+            {
+                return;
+            }
+
+            services.AddLettuceEncrypt(options =>
+            {
+                options.AcceptTermsOfService = true;
+
+                options.DomainNames = new[]
+                {
+                    new Uri(urlsOptions.BaseUrl).Host
+                };
+
+                options.EmailAddress = urlsOptions.Email;
+            });
+
+            services.AddSingletonAs<DefaultCertificateStore>()
+                .As<ICertificateRepository>()
+                .As<ICertificateSource>();
+
+            services.AddSingletonAs<DefaultCertificateAccountStore>()
+                .As<IAccountStore>();
         }
     }
 }

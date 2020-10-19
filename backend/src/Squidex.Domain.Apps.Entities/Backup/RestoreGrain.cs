@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IServiceProvider serviceProvider;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IUserResolver userResolver;
-        private readonly IGrainState<RestoreState2> state;
+        private readonly IGrainState<BackupRestoreState> state;
         private RestoreContext restoreContext;
 
         private RestoreJob CurrentJob
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             ICommandBus commandBus,
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,
-            IGrainState<RestoreState2> state,
+            IGrainState<BackupRestoreState> state,
             IServiceProvider serviceProvider,
             IStreamNameResolver streamNameResolver,
             IUserResolver userResolver,

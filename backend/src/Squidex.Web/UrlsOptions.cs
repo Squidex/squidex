@@ -20,7 +20,11 @@ namespace Squidex.Web
 
         public bool EnableXForwardedHost { get; set; }
 
+        public bool EnableLetsEncrypt { get; set; }
+
         public bool EnforceHTTPS { get; set; }
+
+        public string Email { get; set; } = "admin@squidex.io";
 
         public string BaseUrl
         {

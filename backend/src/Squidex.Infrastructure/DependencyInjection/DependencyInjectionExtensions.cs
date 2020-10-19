@@ -92,5 +92,19 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return new InterfaceRegistrator<T>((t, f) => services.AddSingleton(t, f), services.TryAddSingleton);
         }
+
+        public static InterfaceRegistrator<T> AddScopedAs<T>(this IServiceCollection services, Func<IServiceProvider, T> factory) where T : class
+        {
+            services.AddScoped(typeof(T), factory);
+
+            return new InterfaceRegistrator<T>((t, f) => services.AddScoped(t, f), services.TryAddScoped);
+        }
+
+        public static InterfaceRegistrator<T> AddScopedAs<T>(this IServiceCollection services) where T : class
+        {
+            services.AddScoped<T, T>();
+
+            return new InterfaceRegistrator<T>((t, f) => services.AddScoped(t, f), services.TryAddScoped);
+        }
     }
 }
