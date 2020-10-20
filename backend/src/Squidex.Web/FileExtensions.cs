@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Translations;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Web
 {
