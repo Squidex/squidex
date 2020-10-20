@@ -1,5 +1,33 @@
 # Changelog
 
+## 5.1.0 - 2020-10-20
+
+### Breaking Changes
+
+This version introduces a few small breaking changes. The support for https redirects and `X-FORWARDED-*` headers has been removed. Squidex does not provide a solution for https and it is the responsibility of the reverse proxy like nginx, caddy, IIS or Cloudflare to terminate https requests. Therefore it does not make sense to care about https redirects anyway. The support for `X-FORWARDED-*` headers has been removed because it was possible to solve it with the mandatory `urls:baseUrls` setting in an easier way.
+
+### Features
+
+* **Backup**: Check version compatibility.
+* **Backup**: Adjust asset urls in strings to new app.
+* **Full Text**: Batching operations for Elastic Search
+* **Full Text**: Search in field with Elastic Search
+* **Full Text**: Search lazy with Elastic Search
+* **UI**: Leave an app.
+* **UI**: Fullscreen mode for custom field editors.
+* **UI**: Language toggle to switch UI language.
+* **UI**: Half width fields for field editors.
+* **UI**: Make the schema selector dropdown more visible.
+* **UI**: Markdown support for field labels.
+* **Server**: Remove support for https redirects and X-FORWARDED headers.
+
+### Bugfixes
+
+* **UI**: Fixed the route synchronizer.
+* **UI**: Fix a few spelling errors.
+* **UI**: Fixes checkboxes for custom roles.
+* **Assets**: Fix asset urls in GraphQL.
+
 ## 5.0.0 - 2020-10-08
 
 This feature adds custom IDs to the system. So far every ID like a content ID is globally unique. This means that you cannot create custom IDs and when a backup is restored you need to assign new ids, because the old IDs might be already in use.
