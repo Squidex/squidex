@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -131,39 +130,7 @@ namespace Squidex.Config.Web
 
         public static void UseSquidexForwardingRules(this IApplicationBuilder app, IConfiguration config)
         {
-            app.UseForwardedHeaders(GetForwardingOptions(config));
-
-            app.UseMiddleware<EnforceHttpsMiddleware>();
-
             app.UseMiddleware<CleanupHostMiddleware>();
-        }
-
-        private static ForwardedHeadersOptions GetForwardingOptions(IConfiguration config)
-        {
-            var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
-
-            if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl) && urlsOptions.EnableXForwardedHost)
-            {
-                return new ForwardedHeadersOptions
-                {
-                    AllowedHosts = new List<string>
-                    {
-                        new Uri(urlsOptions.BaseUrl).Host
-                    },
-                    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
-                    ForwardLimit = null,
-                    RequireHeaderSymmetry = false
-                };
-            }
-            else
-            {
-                return new ForwardedHeadersOptions
-                {
-                    ForwardedHeaders = ForwardedHeaders.XForwardedProto,
-                    ForwardLimit = null,
-                    RequireHeaderSymmetry = false
-                };
-            }
         }
     }
 }

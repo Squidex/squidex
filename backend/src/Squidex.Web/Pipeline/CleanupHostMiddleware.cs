@@ -16,6 +16,7 @@ namespace Squidex.Web.Pipeline
     {
         private readonly RequestDelegate next;
         private readonly HostString host;
+        private readonly string schema;
 
         public CleanupHostMiddleware(RequestDelegate next, IOptions<UrlsOptions> options)
         {
@@ -31,11 +32,14 @@ namespace Squidex.Web.Pipeline
             {
                 host = new HostString(uri.Host, uri.Port);
             }
+
+            schema = uri.Scheme.ToLowerInvariant();
         }
 
         public Task InvokeAsync(HttpContext context)
         {
             context.Request.Host = host;
+            context.Request.Scheme = schema;
 
             return next(context);
         }

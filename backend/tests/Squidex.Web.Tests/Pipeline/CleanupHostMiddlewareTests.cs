@@ -53,6 +53,7 @@ namespace Squidex.Web.Pipeline
             await sut.InvokeAsync(httpContext);
 
             Assert.Equal(expectedHost, httpContext.Request.Host.Value);
+            Assert.Equal(uri.Scheme, httpContext.Request.Scheme);
             Assert.True(isNextCalled);
         }
     }
