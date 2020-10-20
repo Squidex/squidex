@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using BadHttpRequestExceptionIIS = Microsoft.AspNetCore.Server.IIS.BadHttpRequestException;
+using BadHttpRequestExceptionKestrel = Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException;
 
 namespace Squidex.Web
 {
@@ -105,6 +107,12 @@ namespace Squidex.Web
 
                 case DecoderFallbackException _:
                     return (CreateError(400, exception.Message), true);
+
+                case BadHttpRequestExceptionIIS ex:
+                    return (CreateError(ex.StatusCode, ex.Message), true);
+
+                case BadHttpRequestExceptionKestrel ex:
+                    return (CreateError(ex.StatusCode, ex.Message), true);
 
                 default:
                     return (CreateError(500), false);

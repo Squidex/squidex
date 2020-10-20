@@ -178,7 +178,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <returns>
         /// 201 => Asset created.
         /// 404 => App not found.
-        /// 400 => Asset exceeds the maximum size.
+        /// 413 => Asset exceeds the maximum upload size.
+        /// 400 => Asset request not valid.
         /// </returns>
         /// <remarks>
         /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and is required correctly.
@@ -214,7 +215,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <returns>
         /// 200 => Asset updated.
         /// 404 => Asset or app not found.
-        /// 400 => Asset exceeds the maximum size.
+        /// 413 => Asset exceeds the maximum upload size.
+        /// 400 => Asset request not valid.
         /// </returns>
         /// <remarks>
         /// Use multipart request to upload an asset.

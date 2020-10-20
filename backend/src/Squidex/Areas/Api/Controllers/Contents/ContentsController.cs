@@ -508,7 +508,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <returns>
         /// 200 => Content status changed.
         /// 404 => Content, schema or app not found.
-        /// 400 => Request is not valid.
+        /// 400 => Content request is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
