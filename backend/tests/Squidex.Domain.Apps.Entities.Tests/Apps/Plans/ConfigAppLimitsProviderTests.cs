@@ -33,7 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             MaxApiCalls = 50000,
             MaxAssetSize = 1024 * 1024 * 10,
             MaxContributors = 2,
-            BlockingApiCalls = 50000
+            BlockingApiCalls = 50000,
+            IsFree = true
         };
 
         private static readonly ConfigAppLimitsPlan BasicPlan = new ConfigAppLimitsPlan
@@ -45,7 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             MaxContributors = 5,
             YearlyCosts = "100€",
             YearlyId = "basic_yearly",
-            BlockingApiCalls = 150000
+            BlockingApiCalls = 150000,
+            IsFree = false
         };
 
         private static readonly ConfigAppLimitsPlan[] Plans = { BasicPlan, FreePlan };

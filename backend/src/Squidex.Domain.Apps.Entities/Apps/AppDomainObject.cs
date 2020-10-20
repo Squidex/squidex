@@ -318,9 +318,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        private IAppLimitsPlan? GetPlan()
+        private IAppLimitsPlan GetPlan()
         {
-            return appPlansProvider.GetPlan(Snapshot.Plan?.PlanId);
+            return appPlansProvider.GetPlanForApp(Snapshot).Plan;
         }
 
         public void Create(CreateApp command)

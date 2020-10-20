@@ -33,6 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public int MaxContributors { get; set; }
 
+        public bool IsFree { get; set; }
+
         public ConfigAppLimitsPlan Clone()
         {
             return (ConfigAppLimitsPlan)MemberwiseClone();

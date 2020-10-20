@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         private readonly Dictionary<string, ConfigAppLimitsPlan> plansById = new Dictionary<string, ConfigAppLimitsPlan>(StringComparer.OrdinalIgnoreCase);
         private readonly List<ConfigAppLimitsPlan> plansList = new List<ConfigAppLimitsPlan>();
+        private readonly ConfigAppLimitsPlan freePlan;
 
         public ConfigAppPlansProvider(IEnumerable<ConfigAppLimitsPlan> config)
         {
@@ -41,6 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                     plansById[plan.YearlyId] = plan;
                 }
             }
+
+            freePlan = plansList.FirstOrDefault(x => x.IsFree) ?? Infinite;
         }
 
         public IEnumerable<IAppLimitsPlan> GetAvailablePlans()
@@ -60,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public IAppLimitsPlan GetFreePlan()
         {
-            return GetPlanCore(plansList.FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Costs))?.Id);
+            return freePlan;
         }
 
         public IAppLimitsPlan? GetPlanUpgradeForApp(IAppEntity app)
@@ -103,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         private ConfigAppLimitsPlan GetPlanCore(string? planId)
         {
-            return plansById.GetOrDefault(planId ?? string.Empty) ?? plansById.Values.FirstOrDefault() ?? Infinite;
+            return plansById.GetOrDefault(planId ?? string.Empty) ?? freePlan;
         }
     }
 }
