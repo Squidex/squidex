@@ -6,6 +6,16 @@
 
 This version introduces a few small breaking changes. The support for https redirects and `X-FORWARDED-*` headers has been removed. Squidex does not provide a solution for https and it is the responsibility of the reverse proxy like nginx, caddy, IIS or Cloudflare to terminate https requests. Therefore it does not make sense to care about https redirects anyway. The support for `X-FORWARDED-*` headers has been removed because it was possible to solve it with the mandatory `urls:baseUrls` setting in an easier way.
 
+This version also comes with new docker image versioning, each version is now tagged with the concrete version and the major version only, e.g.
+
+* squidex/squidex:5
+* squidex/squidex:5.1
+
+Furthermore the docker-compose files are updated with a simpler approach to use [caddy](https://caddyserver.com/) as a reverse proxy for https termination:
+
+https://github.com/Squidex/squidex-docker/blob/master/standalone/docker-compose.yml
+
+
 ### Features
 
 * **Backup**: Check version compatibility.
