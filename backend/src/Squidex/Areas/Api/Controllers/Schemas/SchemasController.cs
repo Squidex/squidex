@@ -262,7 +262,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The schema rules object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
-        /// 400 => Schema rules are not valid.
+        /// 400 => Schema request not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -285,7 +285,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema to publish.</param>
         /// <returns>
-        /// 200 => Schema has been published.
+        /// 200 => Schema published.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -308,7 +308,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema to unpublish.</param>
         /// <returns>
-        /// 200 => Schema has been unpublished.
+        /// 200 => Schema unpublished.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]

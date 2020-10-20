@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
         /// 201 => Schema field created.
-        /// 400 => Schema field request not valid.
+        /// 400 => Schema request not valid.
         /// 404 => Schema or app not found.
         /// 409 => Schema field name already in use.
         /// </returns>
@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
         /// 201 => Schema field created.
-        /// 400 => Schema field request not valid.
+        /// 400 => Schema request not valid.
         /// 409 => Schema field name already in use.
         /// 404 => Schema, field or app not found.
         /// </returns>
@@ -88,7 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The request that contains the field names.</param>
         /// <returns>
         /// 200 => Schema UI fields defined.
-        /// 400 => Schema field request not valid.
+        /// 400 => Schema request not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -113,7 +113,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The request that contains the field ids.</param>
         /// <returns>
         /// 200 => Schema fields reordered.
-        /// 400 => Schema field request not valid.
+        /// 400 => Schema request not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
