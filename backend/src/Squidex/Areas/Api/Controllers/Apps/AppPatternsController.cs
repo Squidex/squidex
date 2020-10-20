@@ -63,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Pattern to be added to the app.</param>
         /// <returns>
-        /// 201 => Pattern generated.
+        /// 201 => Pattern created.
         /// 400 => Pattern request not valid.
         /// 404 => App not found.
         /// </returns>
@@ -112,7 +112,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the pattern to be deleted.</param>
         /// <returns>
-        /// 200 => Pattern removed.
+        /// 200 => Pattern deleted.
         /// 404 => Pattern or app not found.
         /// </returns>
         /// <remarks>

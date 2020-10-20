@@ -177,9 +177,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="duplicate">True to duplicate the asset, event if the file has been uploaded.</param>
         /// <returns>
         /// 201 => Asset created.
-        /// 404 => App not found.
-        /// 413 => Asset exceeds the maximum upload size.
         /// 400 => Asset request not valid.
+        /// 413 => Asset exceeds the maximum upload size.
+        /// 404 => App not found.
         /// </returns>
         /// <remarks>
         /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and is required correctly.
@@ -214,9 +214,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="file">The file to upload.</param>
         /// <returns>
         /// 200 => Asset updated.
-        /// 404 => Asset or app not found.
-        /// 413 => Asset exceeds the maximum upload size.
         /// 400 => Asset request not valid.
+        /// 413 => Asset exceeds the maximum upload size.
+        /// 404 => Asset or app not found.
         /// </returns>
         /// <remarks>
         /// Use multipart request to upload an asset.
@@ -245,7 +245,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
         /// 200 => Asset updated.
-        /// 400 => Asset name not valid.
+        /// 400 => Asset request not valid.
         /// 404 => Asset or app not found.
         /// </returns>
         [HttpPut]
@@ -271,6 +271,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
         /// 200 => Asset moved.
+        /// 400 => Asset request not valid.
         /// 404 => Asset or app not found.
         /// </returns>
         [HttpPut]

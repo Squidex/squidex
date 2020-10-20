@@ -112,7 +112,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The schema object that needs to be added to the app.</param>
         /// <returns>
         /// 201 => Schema created.
-        /// 400 => Schema name or properties are not valid.
+        /// 400 => Schema request not valid.
         /// 409 => Schema name already in use.
         /// </returns>
         [HttpPost]
@@ -137,7 +137,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
-        /// 400 => Schema properties are not valid.
+        /// 400 => Schema request not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -162,7 +162,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
-        /// 400 => Schema properties are not valid.
+        /// 400 => Schema request not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -187,6 +187,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
+        /// 400 => Schema request not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -211,7 +212,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The preview urls for the schema.</param>
         /// <returns>
         /// 200 => Schema updated.
-        /// 400 => Schema urls are not valid.
+        /// 400 => Schema request not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -236,7 +237,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The schema scripts object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
-        /// 400 => Schema scripts are not valid.
+        /// 400 => Schema request not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]

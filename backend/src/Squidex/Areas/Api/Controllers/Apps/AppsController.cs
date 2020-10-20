@@ -151,6 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">The values to update.</param>
         /// <returns>
         /// 200 => App updated.
+        /// 400 => App request not valid.
         /// 404 => App not found.
         /// </returns>
         [HttpPut]
@@ -172,6 +173,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="file">The file to upload.</param>
         /// <returns>
         /// 200 => App image uploaded.
+        /// 400 => App request not valid.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]

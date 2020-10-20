@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
-        /// 200 => Language configuration returned.
+        /// 200 => Languages returned.
         /// 404 => App not found.
         /// </returns>
         [HttpGet]

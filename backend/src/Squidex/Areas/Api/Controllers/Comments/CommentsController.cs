@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// When passing in a version you can retrieve all updates since then.
         /// </remarks>
         /// <returns>
-        /// 200 => All comments returned.
+        /// 200 => Comments returned.
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
@@ -72,7 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// <param name="request">The comment object that needs to created.</param>
         /// <returns>
         /// 201 => Comment created.
-        /// 400 => Comment is not valid.
+        /// 400 => Comment request not valid.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
@@ -100,7 +100,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// <param name="request">The comment object that needs to updated.</param>
         /// <returns>
         /// 204 => Comment updated.
-        /// 400 => Comment text not valid.
+        /// 400 => Comment request not valid.
         /// 404 => Comment or app not found.
         /// </returns>
         [HttpPut]

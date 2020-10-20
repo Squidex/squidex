@@ -33,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
-        /// 200 => Client keys returned.
+        /// 200 => Clients returned.
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Client object that needs to be added to the app.</param>
         /// <returns>
-        /// 201 => Client generated.
+        /// 201 => Client created.
         /// 400 => Client request not valid.
         /// 404 => App not found.
         /// </returns>
@@ -118,7 +118,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the client that must be deleted.</param>
         /// <returns>
-        /// 200 => Client revoked.
+        /// 200 => Client deleted.
         /// 404 => Client or app not found.
         /// </returns>
         /// <remarks>

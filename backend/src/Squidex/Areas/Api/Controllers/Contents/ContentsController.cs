@@ -45,8 +45,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="queries">The graphql query.</param>
         /// <returns>
-        /// 200 => Contents retrieved or mutated.
-        /// 404 => Schema or app not found.
+        /// 200 => Contents returned or mutated.
+        /// 404 => App not found.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -77,8 +77,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="query">The graphql query.</param>
         /// <returns>
-        /// 200 => Contents retrieved or mutated.
-        /// 404 => Schema or app not found.
+        /// 200 => Contents returned or mutated.
+        /// 404 => App not found.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -109,8 +109,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="batch">The graphql queries.</param>
         /// <returns>
-        /// 200 => Contents retrieved or mutated.
-        /// 404 => Schema or app not found.
+        /// 200 => Contents returned or mutated.
+        /// 404 => App not found.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -141,7 +141,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
         /// <returns>
-        /// 200 => Contents retrieved.
+        /// 200 => Contents returned.
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
@@ -170,7 +170,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="query">The required query object.</param>
         /// <returns>
-        /// 200 => Contents retrieved.
+        /// 200 => Contents returned.
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
@@ -201,7 +201,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="ids">The optional ids of the content to fetch.</param>
         /// <param name="q">The optional json query.</param>
         /// <returns>
-        /// 200 => Contents retrieved.
+        /// 200 => Contents retunred.
         /// 404 => Schema or app not found.
         /// </returns>
         /// <remarks>
@@ -233,7 +233,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="query">The required query object.</param>
         /// <returns>
-        /// 200 => Contents retrieved.
+        /// 200 => Contents returned.
         /// 404 => Schema or app not found.
         /// </returns>
         /// <remarks>
@@ -265,7 +265,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content to fetch.</param>
         /// <returns>
-        /// 200 => Content found.
+        /// 200 => Content returned.
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>
@@ -293,9 +293,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="id">The id of the content to fetch.</param>
         /// <param name="version">The version fo the content to fetch.</param>
         /// <returns>
-        /// 200 => Content found.
+        /// 200 => Content version returned.
         /// 404 => Content, schema or app not found.
-        /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -323,8 +322,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="id">The optional custom content id.</param>
         /// <returns>
         /// 201 => Content created.
+        /// 400 => Content request not valid.
         /// 404 => Content, schema or app not found.
-        /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -356,8 +355,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="request">The import request.</param>
         /// <returns>
         /// 201 => Contents created.
+        /// 400 => Content request not valid.
         /// 404 => Content references, schema or app not found.
-        /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -387,8 +386,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="request">The bulk update request.</param>
         /// <returns>
         /// 201 => Contents created.
+        /// 400 => Content request not valid.
         /// 404 => Content references, schema or app not found.
-        /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -420,8 +419,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="request">The full data for the content item.</param>
         /// <returns>
         /// 200 => Content updated.
+        /// 400 => Content request not valid.
         /// 404 => Content references, schema or app not found.
-        /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -449,8 +448,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="request">The full data for the content item.</param>
         /// <returns>
         /// 200 => Content updated.
+        /// 400 => Content request not valid.
         /// 404 => Content references, schema or app not found.
-        /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -478,8 +477,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="request">The patch for the content item.</param>
         /// <returns>
         /// 200 => Content patched.
+        /// 400 => Content request not valid.
         /// 404 => Content, schema or app not found.
-        /// 400 => Content patch is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -507,8 +506,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="request">The status request.</param>
         /// <returns>
         /// 200 => Content status changed.
+        /// 400 => Content request not valid.
         /// 404 => Content, schema or app not found.
-        /// 400 => Content request is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -590,6 +589,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="checkReferrers">True to check referrers of this content.</param>
         /// <returns>
         /// 204 => Content deleted.
+        /// 400 => Content cannot be deleted.
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>

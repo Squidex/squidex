@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
-        /// 200 => App workflows returned.
+        /// 200 => Workflows returned.
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
@@ -64,8 +64,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">The new workflow.</param>
         /// <returns>
-        /// 200 => Workflow updated.
-        /// 400 => Workflow request is not valid.
+        /// 200 => Workflow created.
+        /// 400 => Workflow request not valid.
         /// 404 => Workflow or app not found.
         /// </returns>
         [HttpPost]
@@ -90,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="id">The id of the workflow to update.</param>
         /// <returns>
         /// 200 => Workflow updated.
-        /// 400 => Workflow request is not valid.
+        /// 400 => Workflow request not valid.
         /// 404 => Workflow or app not found.
         /// </returns>
         [HttpPut]

@@ -61,6 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// <param name="app">The name of the app.</param>
         /// <returns>
         /// 204 => Backup started.
+        /// 400 => Backup contingent reached.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
@@ -81,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the backup to delete.</param>
         /// <returns>
-        /// 204 => Backup started.
+        /// 204 => Backup deleted.
         /// 404 => Backup or app not found.
         /// </returns>
         [HttpDelete]

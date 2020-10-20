@@ -107,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// <param name="request">The rule object that needs to be added to the app.</param>
         /// <returns>
         /// 201 => Rule created.
-        /// 400 => Rule is not valid.
+        /// 400 => Rule request not valid.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
@@ -151,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// <param name="request">The rule object that needs to be added to the app.</param>
         /// <returns>
         /// 200 => Rule updated.
-        /// 400 => Rule is not valid.
+        /// 400 => Rule request not valid.
         /// 404 => Rule or app not found.
         /// </returns>
         [HttpPut]

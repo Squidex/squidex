@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
-        /// 200 => App contributors returned.
+        /// 200 => Contributors returned.
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
@@ -71,8 +71,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>
-        /// 201 => User assigned to app.
-        /// 400 => User is not found.
+        /// 201 => Contributor assigned to app.
+        /// 400 => Contributor request not valid.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
@@ -94,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
-        /// 200 => User removed from app.
+        /// 200 => Contributor removed.
         /// 404 => Contributor or app not found.
         /// </returns>
         [HttpDelete]
@@ -117,7 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the contributor.</param>
         /// <returns>
-        /// 200 => User removed from app.
+        /// 200 => Contributor removed.
         /// 404 => Contributor or app not found.
         /// </returns>
         [HttpDelete]

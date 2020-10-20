@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
-        /// 200 => App roles returned.
+        /// 200 => Roles returned.
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
@@ -88,8 +88,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Role object that needs to be added to the app.</param>
         /// <returns>
-        /// 201 => User assigned to app.
-        /// 400 => Role name already in use.
+        /// 201 => Role created.
+        /// 400 => Role request not valid.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
@@ -138,7 +138,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="roleName">The name of the role.</param>
         /// <returns>
         /// 200 => Role deleted.
-        /// 400 => Role is in use by contributor or client or default role.
+        /// 400 => Role is in use by contributor or client or a default role.
         /// 404 => Role or app not found.
         /// </returns>
         [HttpDelete]
