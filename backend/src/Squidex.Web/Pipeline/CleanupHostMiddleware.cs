@@ -8,50 +8,38 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 
 namespace Squidex.Web.Pipeline
 {
     public class CleanupHostMiddleware
     {
         private readonly RequestDelegate next;
-        private readonly HostString host;
-        private readonly string schema;
 
-        public CleanupHostMiddleware(RequestDelegate next, IOptions<UrlsOptions> options)
+        public CleanupHostMiddleware(RequestDelegate next)
         {
             this.next = next;
-
-            var uri = new Uri(options.Value.BaseUrl);
-
-            if (HasHttpPort(uri) || HasHttpsPort(uri))
-            {
-                host = new HostString(uri.Host);
-            }
-            else
-            {
-                host = new HostString(uri.Host, uri.Port);
-            }
-
-            schema = uri.Scheme.ToLowerInvariant();
         }
 
         public Task InvokeAsync(HttpContext context)
         {
-            context.Request.Host = host;
-            context.Request.Scheme = schema;
+            var request = context.Request;
+
+            if (request.Host.HasValue && (HasHttpsPort(request) || HasHttpPort(request)))
+            {
+                request.Host = new HostString(request.Host.Host);
+            }
 
             return next(context);
         }
 
-        private static bool HasHttpPort(Uri uri)
+        private static bool HasHttpPort(HttpRequest request)
         {
-            return uri.Scheme == "http" && uri.Port == 80;
+            return request.Scheme == "http" && request.Host.Port == 80;
         }
 
-        private static bool HasHttpsPort(Uri uri)
+        private static bool HasHttpsPort(HttpRequest request)
         {
-            return uri.Scheme == "https" && uri.Port == 443;
+            return request.Scheme == "https" && request.Host.Port == 443;
         }
     }
 }

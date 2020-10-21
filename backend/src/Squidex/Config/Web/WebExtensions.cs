@@ -8,13 +8,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure.Json;
 using Squidex.Pipeline.Robots;
@@ -130,7 +133,49 @@ namespace Squidex.Config.Web
 
         public static void UseSquidexForwardingRules(this IApplicationBuilder app, IConfiguration config)
         {
+            var urlsOptions = app.ApplicationServices.GetRequiredService<IOptions<UrlsOptions>>().Value;
+
+            if (urlsOptions.EnableForwardHeaders)
+            {
+                var options = new ForwardedHeadersOptions
+                {
+                    AllowedHosts = new List<string>
+                    {
+                        new Uri(urlsOptions.BaseUrl).Host
+                    },
+                    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
+                    ForwardLimit = null,
+                    RequireHeaderSymmetry = false
+                };
+
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+
+                if (urlsOptions.KnownProxies != null)
+                {
+                    foreach (var proxy in urlsOptions.KnownProxies)
+                    {
+                        if (IPAddress.TryParse(proxy, out var address))
+                        {
+                            options.KnownProxies.Add(address);
+                        }
+                    }
+                }
+
+                app.UseForwardedHeaders(options);
+            }
+
             app.UseMiddleware<CleanupHostMiddleware>();
+
+            if (urlsOptions.EnforceHost)
+            {
+                app.UseHostFiltering();
+            }
+
+            if (urlsOptions.EnforceHTTPS)
+            {
+                app.UseHttpsRedirection();
+            }
         }
     }
 }
