@@ -116,6 +116,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 };
 
                 await ruleEventRepository.UpdateAsync(@event.Job, update);
+
+                if (response.Status == RuleResult.Failed)
+                {
+                    log.LogWarning(response.Exception!, w => w
+                        .WriteProperty("action", "SendRuleEvent")
+                        .WriteProperty("status", "Failed")
+                        .WriteProperty("ruleId", @event.Job.RuleId.ToString())
+                        .WriteProperty("ruleDescription", @event.Job.Description)
+                        .WriteProperty("dump", response.Dump));
+                }
             }
             catch (Exception ex)
             {

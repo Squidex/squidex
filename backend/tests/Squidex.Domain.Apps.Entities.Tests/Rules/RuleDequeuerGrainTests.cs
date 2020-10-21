@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleDequeuerTests
+    public class RuleDequeuerGrainTests
     {
         private readonly IClock clock = A.Fake<IClock>();
         private readonly ISemanticLog log = A.Dummy<ISemanticLog>();
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly RuleDequeuerGrain sut;
 
-        public RuleDequeuerTests()
+        public RuleDequeuerGrainTests()
         {
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
@@ -125,6 +125,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
 
             await sut.HandleAsync(@event);
+
+            if (result == RuleResult.Failed)
+            {
+                A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<Exception?>._, A<LogFormatter>._))
+                    .MustHaveHappened();
+            }
+            else
+            {
+                A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<Exception?>._, A<LogFormatter>._))
+                    .MustNotHaveHappened();
+            }
 
             A.CallTo(() => ruleEventRepository.UpdateAsync(@event.Job,
                     A<RuleJobUpdate>.That.Matches(x =>
