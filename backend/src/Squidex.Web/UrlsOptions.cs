@@ -16,15 +16,15 @@ namespace Squidex.Web
     {
         private readonly HashSet<HostString> allTrustedHosts = new HashSet<HostString>();
         private string baseUrl;
-        private string[] trustedHosts;
+        private string[]? trustedHosts;
 
-        public string[] KnownProxies { get; set; }
+        public string[]? KnownProxies { get; set; }
 
         public bool EnableForwardHeaders { get; set; } = true;
 
         public bool EnforceHTTPS { get; set; } = false;
 
-        public bool EnforceHost { get; set; } = true;
+        public bool EnforceHost { get; set; } = false;
 
         public int? HttpsPort { get; set; } = 443;
 
@@ -45,7 +45,7 @@ namespace Squidex.Web
             }
         }
 
-        public string[] TrustedHosts
+        public string[]? TrustedHosts
         {
             get
             {
