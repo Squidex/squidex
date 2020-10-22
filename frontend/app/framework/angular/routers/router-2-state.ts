@@ -8,7 +8,7 @@
 // tslint:disable: readonly-array
 
 import { Injectable, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Params, Router } from '@angular/router';
 import { LocalStoreService, Pager, Types } from '@app/framework/internal';
 import { State } from '@app/framework/state';
 import { Subscription } from 'rxjs';
@@ -177,6 +177,9 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
     private lastSyncedParams: Params | undefined;
     private subscriptionChanges: Subscription;
     private subscriptionQueryParams: Subscription;
+    private subscriptionEvents: Subscription;
+    private isNavigating = false;
+    private pendingParams?: Params;
 
     constructor(
         private readonly state: State<T>,
@@ -194,6 +197,23 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
         this.subscriptionChanges =
             this.state.changes
                 .subscribe(s => this.syncToRoute(s));
+
+        this.subscriptionEvents =
+            this.router.events
+                .subscribe(event => {
+                    if (Types.is(event, NavigationStart)) {
+                        this.isNavigating = true;
+                    } else if (
+                        Types.is(event, NavigationEnd) ||
+                        Types.is(event, NavigationCancel) ||
+                        Types.is(event, NavigationError)) {
+                        this.isNavigating = false;
+
+                        if (this.pendingParams) {
+                            this.syncFromParams(this.pendingParams);
+                        }
+                    }
+                });
     }
 
     public destroy() {
@@ -201,6 +221,7 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
 
         this.subscriptionQueryParams?.unsubscribe();
         this.subscriptionChanges?.unsubscribe();
+        this.subscriptionEvents?.unsubscribe();
     }
 
     private syncToRoute(state: T) {
@@ -224,27 +245,38 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
             return;
         }
 
-        const queryParams: Params = {};
+        const query: Params = {};
 
         for (const key in this.syncs) {
             if (this.syncs.hasOwnProperty(key)) {
                 const { synchronizer, value } = this.syncs[key];
 
-                synchronizer.writeValue(value, queryParams);
+                synchronizer.writeValue(value, query);
             }
         }
 
-        this.lastSyncedParams = queryParams;
+        if (this.isNavigating) {
+            this.pendingParams = query;
+        } else {
+            this.syncFromParams(query);
+        }
+    }
+
+    private syncFromParams(query: Params) {
+        this.pendingParams = undefined;
 
         this.router.navigate([], {
-            relativeTo: this.route,
-            queryParams,
+            queryParams: query,
             queryParamsHandling: 'merge',
             replaceUrl: true
         });
+
+        this.lastSyncedParams = cleanupParams(query);
     }
 
     private syncFromRoute(query: Params) {
+        query = cleanupParams(query);
+
         if (Types.equals(this.lastSyncedParams, query)) {
             return;
         }
@@ -305,4 +337,18 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
 
         return this;
     }
+}
+
+function cleanupParams(query: Params) {
+    for (const key in query) {
+        if (query.hasOwnProperty(key)) {
+            const value = query[key];
+
+            if (Types.isNull(value) || Types.isUndefined(value)) {
+                delete query[key];
+            }
+        }
+    }
+
+    return query;
 }

@@ -135,7 +135,7 @@ export class AssetsState extends State<Snapshot> {
             .withPager('assetsPager', 'assets', 20)
             .withString('parentId', 'parent')
             .withStrings('tagsSelected', 'tags')
-            .withSynchronizer('assetsQuery', new QueryFullTextSynchronizer())
+            .withSynchronizer('assetsQuery', QueryFullTextSynchronizer.INSTANCE)
             .whenSynced(() => this.loadInternal(false))
             .build();
     }

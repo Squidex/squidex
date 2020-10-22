@@ -119,6 +119,8 @@ const DEFAULT_QUERY = {
 };
 
 export class QueryFullTextSynchronizer implements RouteSynchronizer {
+    public static readonly INSTANCE = new QueryFullTextSynchronizer();
+
     public getValue(params: Params) {
         const query = params['query'];
 
@@ -137,6 +139,8 @@ export class QueryFullTextSynchronizer implements RouteSynchronizer {
 }
 
 export class QuerySynchronizer implements RouteSynchronizer {
+    public static readonly INSTANCE = new QuerySynchronizer();
+
     public getValue(params: Params) {
         const query = params['query'];
 

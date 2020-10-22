@@ -55,7 +55,7 @@ export class AnalyticsService {
             this.gtag('config', this.analyticsId, { anonymize_ip: true });
 
             this.router.events.pipe(
-                filter(e => Types.is(e, NavigationEnd)))
+                filter(event => Types.is(event, NavigationEnd)))
                 .subscribe(() => {
                     this.gtag('config', this.analyticsId, { page_path: window.location.pathname, anonymize_ip: true });
                 });

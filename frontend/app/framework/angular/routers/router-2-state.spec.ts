@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NavigationExtras, Params, Router } from '@angular/router';
+import { NavigationEnd, NavigationExtras, NavigationStart, Params, Router } from '@angular/router';
 import { LocalStoreService, MathHelper, Pager } from '@app/framework/internal';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { State } from './../../state';
 import { PagerSynchronizer, Router2State, StringKeysSynchronizer, StringSynchronizer } from './router-2-state';
@@ -208,7 +208,8 @@ describe('Router2State', () => {
     describe('Implementation', () => {
         let localStore: IMock<LocalStoreService>;
         let routerQueryParams: BehaviorSubject<Params>;
-        let routeActivated: any;
+        let routerEvents: Subject<any>;
+        let route: any;
         let router: IMock<Router>;
         let router2State: Router2State;
         let state: State<any>;
@@ -217,14 +218,16 @@ describe('Router2State', () => {
         beforeEach(() => {
             localStore = Mock.ofType<LocalStoreService>();
 
+            routerEvents = new Subject<any>();
             router = Mock.ofType<Router>();
+            router.setup(x => x.events).returns(() => routerEvents);
 
             state = new State<any>({});
 
             routerQueryParams = new BehaviorSubject<Params>({});
-            routeActivated = { queryParams: routerQueryParams, id: MathHelper.guid() };
-            router2State = new Router2State(routeActivated, router.object, localStore.object);
+            route = { queryParams: routerQueryParams, id: MathHelper.guid() };
 
+            router2State = new Router2State(route, router.object, localStore.object);
             router2State.mapTo(state)
                 .keep('keep')
                 .withString('state1', 'key1')
@@ -242,8 +245,9 @@ describe('Router2State', () => {
         it('should unsubscribe from route and state', () => {
             router2State.ngOnDestroy();
 
-            expect(state.changes['observers'].length).toBe(0);
-            expect(routeActivated.queryParams.observers.length).toBe(0);
+            expect(state.changes['observers'].length).toEqual(0);
+            expect(route.queryParams.observers.length).toEqual(0);
+            expect(routerEvents.observers.length).toEqual(0);
         });
 
         it('Should sync from route', () => {
@@ -274,6 +278,22 @@ describe('Router2State', () => {
             routerQueryParams.next({
                 key1: 'hello',
                 key2: 'squidex'
+            });
+
+            expect(invoked).toEqual(1);
+        });
+
+        it('Should not sync again when no value has changed', () => {
+            routerQueryParams.next({
+                key1: 'hello',
+                key2: 'squidex'
+            });
+
+            routerQueryParams.next({
+                key1: 'hello',
+                key2: 'squidex',
+                key3: undefined,
+                key4: null
             });
 
             expect(invoked).toEqual(1);
@@ -327,7 +347,41 @@ describe('Router2State', () => {
                 state2: 'squidex'
             });
 
-            expect(routeExtras!.relativeTo).toBeDefined();
+            expect(routeExtras!.replaceUrl).toBeTrue();
+            expect(routeExtras!.queryParamsHandling).toBe('merge');
+            expect(routeExtras!.queryParams).toEqual({ key1: 'hello', key2: 'squidex' });
+        });
+
+        it('Should not sync when navigating', () => {
+            routerEvents.next(new NavigationStart(0, ''));
+
+            state.next({
+                state1: 'hello',
+                state2: 'squidex'
+            });
+
+            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.never());
+
+            expect().nothing();
+        });
+
+        it('Should sync from state delayed when navigating', () => {
+            let routeExtras: NavigationExtras;
+
+            router.setup(x => x.navigate([], It.isAny()))
+                .callback((_, extras) => { routeExtras = extras; });
+
+            routerEvents.next(new NavigationStart(0, ''));
+
+            state.next({
+                state1: 'hello',
+                state2: 'squidex'
+            });
+
+            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.never());
+
+            routerEvents.next(new NavigationEnd(0, '', ''));
+
             expect(routeExtras!.replaceUrl).toBeTrue();
             expect(routeExtras!.queryParamsHandling).toBe('merge');
             expect(routeExtras!.queryParams).toEqual({ key1: 'hello', key2: 'squidex' });

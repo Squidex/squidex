@@ -128,7 +128,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         synchronizer.mapTo(this)
             .keep('selectedContent')
             .withPager('contentsPager', 'contents', 10)
-            .withSynchronizer('contentsQuery', new QuerySynchronizer())
+            .withSynchronizer('contentsQuery', QuerySynchronizer.INSTANCE)
             .whenSynced(() => this.loadInternal(false))
             .build();
     }

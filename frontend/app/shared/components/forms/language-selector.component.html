@@ -9,7 +9,7 @@
         {{selectedLanguage.iso2Code}}
     </button>
 
-    <ng-container *sqxModal="dropdown">
+    <ng-container *sqxModal="dropdown;closeAlways:true">
         <div class="dropdown-menu" [sqxAnchoredTo]="button" @fade>
             <div class="dropdown-item" *ngFor="let language of languages; trackBy: trackByLanguage" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
                 <strong class="iso-code iso-code-dropdown">{{language.iso2Code}}</strong> ({{language.englishName}})
