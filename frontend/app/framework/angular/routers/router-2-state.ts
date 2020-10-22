@@ -344,7 +344,7 @@ function cleanupParams(query: Params) {
         if (query.hasOwnProperty(key)) {
             const value = query[key];
 
-            if (Types.isNull(value) || Types.isUndefined(value)) {
+            if (Types.isNull(value) || Types.isUndefined(key)) {
                 delete query[key];
             }
         }
