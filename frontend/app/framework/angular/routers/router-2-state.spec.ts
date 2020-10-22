@@ -307,11 +307,26 @@ describe('Router2State', () => {
 
             routerQueryParams.next({
                 key1: 'hello',
-                key2: 'squidex',
+                key2: 'cms',
                 key3: '!'
             });
 
             expect(invoked).toEqual(2);
+        });
+
+        it('Should not sync again when no state as changed', () => {
+            routerQueryParams.next({
+                key1: 'hello',
+                key2: 'squidex'
+            });
+
+            routerQueryParams.next({
+                key1: 'hello',
+                key2: 'squidex',
+                key3: '!'
+            });
+
+            expect(invoked).toEqual(1);
         });
 
         it('Should reset other values when synced from route', () => {

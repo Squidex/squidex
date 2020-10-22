@@ -299,10 +299,10 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
             update[key] = this.state.snapshot[key];
         }
 
-        this.state.resetState(update);
-
-        for (const action of this.syncDone) {
-            action();
+        if (this.state.resetState(update)) {
+            for (const action of this.syncDone) {
+                action();
+            }
         }
     }
 
@@ -344,7 +344,7 @@ function cleanupParams(query: Params) {
         if (query.hasOwnProperty(key)) {
             const value = query[key];
 
-            if (Types.isNull(value) || Types.isUndefined(key)) {
+            if (Types.isNull(value) || Types.isUndefined(value)) {
                 delete query[key];
             }
         }

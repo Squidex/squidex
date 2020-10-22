@@ -164,7 +164,6 @@ export class ResultSet<T> {
 
 export class State<T extends {}> {
     private readonly state: BehaviorSubject<Readonly<T>>;
-    private readonly initialState: Readonly<T>;
 
     public get changes(): Observable<Readonly<T>> {
         return this.state;
@@ -185,39 +184,54 @@ export class State<T extends {}> {
     }
 
     public projectFrom2<M, N, O>(lhs: Observable<M>, rhs: Observable<N>, project: (l: M, r: N) => O, compare?: (x: O, y: O) => boolean) {
-        return combineLatest(lhs, rhs, (x, y) => project(x, y)).pipe(
-            distinctUntilChanged(compare), shareReplay(1));
+        return combineLatest([lhs, rhs]).pipe(
+            map(([x, y]) => project(x, y)), distinctUntilChanged(compare), shareReplay(1));
     }
 
-    constructor(state: Readonly<T>) {
-        this.initialState = state;
-
-        this.state = new BehaviorSubject(state);
+    constructor(
+        private readonly initialState: Readonly<T>
+    ) {
+        this.state = new BehaviorSubject(initialState);
     }
 
     public resetState(update?: ((v: T) => Readonly<T>) | Partial<T>) {
-        let newState = this.initialState;
-
-        if (update) {
-            if (Types.isFunction(update)) {
-                newState = update(this.initialState);
-            } else {
-                newState = { ...this.initialState, ...update };
-            }
-        }
-
-        this.state.next(newState);
+        return this.updateState(this.initialState, update);
     }
 
     public next(update: ((v: T) => Readonly<T>) | Partial<T>) {
-        let newState: T;
+        return this.updateState(this.state.value, update);
+    }
 
-        if (Types.isFunction(update)) {
-            newState = update(this.state.value);
-        } else {
-            newState = { ...this.state.value, ...update };
+    private updateState(state: T, update?: ((v: T) => Readonly<T>) | Partial<T>) {
+        let newState = state;
+
+        if (update) {
+            if (Types.isFunction(update)) {
+                newState = update(state);
+            } else {
+                newState = { ...state, ...update };
+            }
         }
 
-        this.state.next(newState);
+        let isChanged = false;
+
+        const newKeys = Object.keys(newState);
+
+        if (newKeys.length !== Object.keys(this.snapshot).length) {
+            isChanged = true;
+        } else {
+            for (const key of newKeys) {
+                if (newState[key] !== this.snapshot[key]) {
+                    isChanged = true;
+                    break;
+                }
+            }
+        }
+
+        if (isChanged) {
+            this.state.next(newState);
+        }
+
+        return isChanged;
     }
 }
