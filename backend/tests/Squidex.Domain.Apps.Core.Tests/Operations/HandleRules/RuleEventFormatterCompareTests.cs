@@ -500,6 +500,29 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         [Theory]
         [Expressions(
+            "$CONTENT_DATA.country.zh-TW",
+            "${CONTENT_DATA.country.zh-TW}",
+            "${event.data.country['zh-TW']}",
+            "{{event.data.country.zh-TW}}"
+        )]
+        public async Task Should_return_country_based_culture(string script)
+        {
+            var @event = new EnrichedContentEvent
+            {
+                Data =
+                    new NamedContentData()
+                        .AddField("country",
+                            new ContentFieldData()
+                                .AddValue("zh-TW", "Berlin"))
+            };
+
+            var result = await sut.FormatAsync(script, @event);
+
+            Assert.Equal("Berlin", result);
+        }
+
+        [Theory]
+        [Expressions(
             "$CONTENT_DATA.country.iv",
             "${CONTENT_DATA.country.iv}",
             "${event.data.country.iv}",
