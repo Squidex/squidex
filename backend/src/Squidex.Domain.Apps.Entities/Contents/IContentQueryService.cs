@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, IReadOnlyList<Guid> ids);
 
-        Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query);
+        Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query, Guid? referenced = null);
 
         Task<IEnrichedContentEntity> FindContentAsync(Context context, string schemaIdOrName, Guid id, long version = EtagVersion.Any);
 

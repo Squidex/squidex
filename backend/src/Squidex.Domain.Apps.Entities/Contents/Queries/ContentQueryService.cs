@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query)
+        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query, Guid? referenced = null)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -209,11 +209,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return context.Permissions.Allows(permission);
         }
 
-        private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, ISchemaEntity schema, Q query)
+        private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, ISchemaEntity schema, Q query, Guid? referenced = null)
         {
             var parsedQuery = await queryParser.ParseQueryAsync(context, schema, query);
 
-            return await QueryCoreAsync(context, schema, parsedQuery);
+            return await QueryCoreAsync(context, schema, parsedQuery, referenced);
         }
 
         private async Task<IResultList<IContentEntity>> QueryByIdsAsync(Context context, ISchemaEntity schema, Q query)
@@ -228,9 +228,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contentRepository.QueryAsync(context.App, new HashSet<Guid>(ids), context.Scope());
         }
 
-        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query)
+        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query, Guid? referenced)
         {
-            return contentRepository.QueryAsync(context.App, schema, query, context.Scope());
+            return contentRepository.QueryAsync(context.App, schema, query, referenced, context.Scope());
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, HashSet<Guid> ids)

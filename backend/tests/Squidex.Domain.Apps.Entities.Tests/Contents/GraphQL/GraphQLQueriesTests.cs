@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var content = TestContent.Create(schemaId, Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5"), null))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -276,7 +276,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var content = TestContent.Create(schemaId, Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5"), null))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var content = TestContent.Create(schemaId, Guid.NewGuid(), Guid.Empty, Guid.Empty);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5")))
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5"), null))
                 .Returns(ResultList.CreateFrom(10, content));
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
@@ -448,6 +448,133 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                             {
                                                 iv = "ref1"
                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_also_fetch_referencing_contents_when_field_is_included_in_query()
+        {
+            var contentRefId = Guid.NewGuid();
+            var contentRef = TestContent.CreateRef(schemaRefId1, contentRefId, "ref1-field", "ref1");
+
+            var contentId = Guid.NewGuid();
+            var content = TestContent.Create(schemaId, contentId, contentRefId, Guid.Empty);
+
+            var query = @"
+                query {
+                  findMyRefSchema1Content(id: ""<ID>"") {
+                    id
+                    referencingMySchemaContents(top: 30, skip: 5) {
+                      id
+                      data {
+                        myString {
+                          de
+                        }
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentRefId.ToString());
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>._))
+                .Returns(ResultList.CreateFrom(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5"), contentRefId))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMyRefSchema1Content = new
+                    {
+                        id = contentRefId,
+                        referencingMySchemaContents = new[]
+                        {
+                            new
+                            {
+                                id = contentId,
+                                data = new
+                                {
+                                    myString = new
+                                    {
+                                        de = "value"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_also_fetch_referencing_contents_with_total_when_field_is_included_in_query()
+        {
+            var contentRefId = Guid.NewGuid();
+            var contentRef = TestContent.CreateRef(schemaRefId1, contentRefId, "ref1-field", "ref1");
+
+            var contentId = Guid.NewGuid();
+            var content = TestContent.Create(schemaId, contentId, contentRefId, Guid.Empty);
+
+            var query = @"
+                query {
+                  findMyRefSchema1Content(id: ""<ID>"") {
+                    id
+                    referencingMySchemaContentsWithTotal(top: 30, skip: 5) {
+                      total
+                      items {
+                        id
+                        data {
+                          myString {
+                            de
+                          }
+                        }
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentRefId.ToString());
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<IReadOnlyList<Guid>>._))
+                .Returns(ResultList.CreateFrom(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(), A<Q>.That.HasOData("?$top=30&$skip=5"), contentRefId))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMyRefSchema1Content = new
+                    {
+                        id = contentRefId,
+                        referencingMySchemaContentsWithTotal = new
+                        {
+                            total = 1,
+                            items = new[]
+                            {
+                                new
+                                {
+                                    id = contentId,
+                                    data = new
+                                    {
+                                        myString = new
+                                        {
+                                            de = "value"
                                         }
                                     }
                                 }

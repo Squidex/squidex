@@ -134,5 +134,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             return ids.Select(cachedContents.GetOrDefault).NotNull().ToList();
         }
+
+        public Task<IResultList<IEnrichedContentEntity>> QueryReferencingContentsAsync(string schemaIdOrName, string query, Guid reference)
+        {
+            return contentQuery.QueryAsync(context, schemaIdOrName, Q.Empty.WithODataQuery(query), reference);
+        }
     }
 }

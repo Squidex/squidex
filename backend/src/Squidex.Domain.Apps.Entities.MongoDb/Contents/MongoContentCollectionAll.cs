@@ -64,11 +64,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await queryScheduledItems.PrepareAsync(collection, ct);
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, Guid? referenced)
         {
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
             {
-                return await queryContentsByQuery.DoAsync(app, schema, query, SearchScope.All);
+                return await queryContentsByQuery.DoAsync(app, schema, query, referenced, SearchScope.All);
             }
         }
 
