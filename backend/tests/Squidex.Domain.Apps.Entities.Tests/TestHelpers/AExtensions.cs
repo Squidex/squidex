@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata)
         {
-            return that.HasOData(odata);
+            return that.HasOData(odata, null);
         }
 
         public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata, Guid? reference = null)
