@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 {
     public sealed class ImageSharpAssetThumbnailGenerator : IAssetThumbnailGenerator
     {
-        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(Math.Max(Environment.ProcessorCount / 4, 1));
+        private readonly SemaphoreSlim maxTasks = new SemaphoreSlim(Math.Max(Environment.ProcessorCount / 4, 1));
 
         public async Task CreateThumbnailAsync(Stream source, Stream destination, ResizeOptions options)
         {
@@ -42,8 +42,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             var w = options.Width ?? 0;
             var h = options.Height ?? 0;
 
-            await semaphoreSlim.WaitAsync();
-
+            await maxTasks.WaitAsync();
             try
             {
                 using (var image = Image.Load(source, out var format))
@@ -89,7 +88,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             }
             finally
             {
-                semaphoreSlim.Release();
+                maxTasks.Release();
             }
         }
 
@@ -156,8 +155,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             Guard.NotNull(source, nameof(source));
             Guard.NotNull(destination, nameof(destination));
 
-            await semaphoreSlim.WaitAsync();
-
+            await maxTasks.WaitAsync();
             try
             {
                 using (var image = Image.Load(source, out var format))
@@ -178,7 +176,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
             }
             finally
             {
-                semaphoreSlim.Release();
+                maxTasks.Release();
             }
         }
 

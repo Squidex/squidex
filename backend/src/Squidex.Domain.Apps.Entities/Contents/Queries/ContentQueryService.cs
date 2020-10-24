@@ -55,6 +55,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
+            if (id == default)
+            {
+                throw new DomainObjectNotFoundException(id.ToString());
+            }
+
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
             CheckPermission(context, schema);
@@ -85,6 +90,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
+            if (query == null)
+            {
+                return EmptyContents;
+            }
+
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
             CheckPermission(context, schema);
@@ -110,13 +120,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
+            if (ids == null || ids.Count == 0)
+            {
+                return EmptyContents;
+            }
+
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                if (ids == null || ids.Count == 0)
-                {
-                    return EmptyContents;
-                }
-
                 var contents = await QueryCoreAsync(context, ids);
 
                 var filtered =
@@ -215,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var parsedQuery = await queryParser.ParseQueryAsync(context, schema, query);
 
-            return await QueryCoreAsync(context, schema, parsedQuery);
+            return await QueryCoreAsync(context, schema, parsedQuery, query.Reference);
         }
 
         private async Task<IResultList<IContentEntity>> QueryByIdsAsync(Context context, ISchemaEntity schema, Q query)
@@ -230,9 +240,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contentRepository.QueryAsync(context.App, new HashSet<DomainId>(ids), context.Scope());
         }
 
-        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query)
+        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query, DomainId? referenced)
         {
-            return contentRepository.QueryAsync(context.App, schema, query, context.Scope());
+            return contentRepository.QueryAsync(context.App, schema, query, referenced, context.Scope());
         }
 
         private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, HashSet<DomainId> ids)

@@ -49,6 +49,9 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     public formValue: any;
 
     @Input()
+    public language: string;
+
+    @Input()
     public url: string;
 
     public fullscreen: boolean;
@@ -72,8 +75,12 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
                 this.setupUrl();
             }
 
-            if (changes['formValue'] && this.formValue) {
+            if (changes['formValue']) {
                 this.sendFormValue();
+            }
+
+            if (changes['language']) {
+                this.sendLanguage();
             }
         }
     }
@@ -96,6 +103,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
                         this.sendInit();
                         this.sendFullscreen();
                         this.sendFormValue();
+                        this.sendLanguage();
                         this.sendDisabled();
                         this.sendValue();
                     } else if (type === 'resize') {
@@ -158,7 +166,15 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     private sendFormValue() {
-        this.sendMessage('formValueChanged', { formValue: this.formValue });
+        if (this.formValue) {
+            this.sendMessage('formValueChanged', { formValue: this.formValue });
+        }
+    }
+
+    private sendLanguage() {
+        if (this.language) {
+            this.sendMessage('languageChanged', { language: this.language });
+        }
     }
 
     private toggleFullscreen(isFullscreen: boolean) {

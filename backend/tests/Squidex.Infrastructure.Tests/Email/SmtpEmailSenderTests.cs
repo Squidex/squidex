@@ -11,6 +11,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Email
 {
+    [Trait("Category", "Dependencies")]
     public class SmtpEmailSenderTests
     {
         [Fact]

@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FakeItEasy;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
@@ -19,9 +20,14 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return that.Matches(x => x.Query!.ToString() == query);
         }
 
-        public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string query)
+        public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata)
         {
-            return that.Matches(x => x.ODataQuery == query);
+            return that.HasOData(odata, null);
+        }
+
+        public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata, DomainId? reference = null)
+        {
+            return that.Matches(x => x.ODataQuery == odata && x.Reference == reference);
         }
 
         public static ClrQuery Is(this INegatableArgumentConstraintManager<ClrQuery> that, string query)

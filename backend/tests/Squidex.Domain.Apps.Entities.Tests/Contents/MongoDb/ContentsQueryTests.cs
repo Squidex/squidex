@@ -59,11 +59,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         }
 
         [Fact]
-        public async Task Should_query_contents_by_filter()
+        public async Task Should_query_contents_ids_by_filter()
         {
             var filter = F.Eq("data.value.iv", 12);
 
             var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter);
+
+            Assert.NotEmpty(contents);
+        }
+
+        [Fact]
+        public async Task Should_query_contents_by_filter()
+        {
+            var query = new ClrQuery
+            {
+                Sort = new List<SortNode>
+                {
+                    new SortNode("lastModified", SortOrder.Descending)
+                },
+                Filter = F.Eq("data.value.iv", 12)
+            };
+
+            var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), query, null, SearchScope.Published);
 
             Assert.NotEmpty(contents);
         }
@@ -77,11 +94,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         }
 
         [Fact]
-        public async Task Should_query_contents_by_default()
+        public async Task Should_query_contents_with_default_query()
         {
             var query = new ClrQuery();
 
             var contents = await QueryAsync(query);
+
+            Assert.NotEmpty(contents);
+        }
+
+        [Fact]
+        public async Task Should_query_contents_with_default_query_and_id()
+        {
+            var query = new ClrQuery();
+
+            var contents = await QueryAsync(query, id: DomainId.NewGuid());
 
             Assert.NotEmpty(contents);
         }
@@ -128,7 +155,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             Assert.NotEmpty(contents);
         }
 
-        private async Task<IResultList<IContentEntity>> QueryAsync(ClrQuery clrQuery, int take = 1000, int skip = 100)
+        [Fact]
+        public async Task Should_query_contents_with_query_filter_and_id()
+        {
+            var query = new ClrQuery
+            {
+                Filter = F.Eq("data.value.iv", 12)
+            };
+
+            var contents = await QueryAsync(query, 1000, 0, id: DomainId.NewGuid());
+
+            Assert.Empty(contents);
+        }
+
+        private async Task<IResultList<IContentEntity>> QueryAsync(ClrQuery clrQuery, int take = 1000, int skip = 100, DomainId? id = null)
         {
             if (clrQuery.Take == long.MaxValue)
             {
@@ -148,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 };
             }
 
-            var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), clrQuery, SearchScope.All);
+            var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), clrQuery, id, SearchScope.All);
 
             return contents;
         }

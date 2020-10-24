@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Entities
 
         public IReadOnlyList<DomainId> Ids { get; private set; }
 
+        public DomainId? Reference { get; private set; }
+
         public string? ODataQuery { get; private set; }
 
         public string? JsonQuery { get; private set; }
@@ -50,6 +52,11 @@ namespace Squidex.Domain.Apps.Entities
         public Q WithIds(params DomainId[] ids)
         {
             return Clone(c => c.Ids = ids.ToList());
+        }
+
+        public Q WithReference(DomainId? reference)
+        {
+            return Clone(c => c.Reference = reference);
         }
 
         public Q WithIds(IEnumerable<DomainId> ids)

@@ -12,7 +12,8 @@
             <sqx-iframe-editor [url]="field.properties.editorUrl"
                 [context]="formContext"
                 [formControl]="editorControl"
-                [formValue]="form?.value | async">
+                [formValue]="form?.value | async"
+                [language]="language?.iso2Code">
             </sqx-iframe-editor>
 		</ng-container>
 

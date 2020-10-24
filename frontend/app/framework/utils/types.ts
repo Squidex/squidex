@@ -162,15 +162,15 @@ export module Types {
 
             return true;
         } else if (Types.isObject(lhs) && Types.isObject(rhs)) {
-            if (Object.keys(lhs).length !== Object.keys(rhs).length) {
+            const lhsKeys = Object.keys(lhs);
+
+            if (lhsKeys.length !== Object.keys(rhs).length) {
                 return false;
             }
 
-            for (const key in lhs) {
-                if (lhs.hasOwnProperty(key)) {
-                    if (!equals(lhs[key], rhs[key], lazyString)) {
-                        return false;
-                    }
+            for (const key of lhsKeys) {
+                if (!equals(lhs[key], rhs[key], lazyString)) {
+                    return false;
                 }
             }
 

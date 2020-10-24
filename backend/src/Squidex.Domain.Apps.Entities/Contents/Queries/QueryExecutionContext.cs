@@ -8,6 +8,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
@@ -16,6 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class QueryExecutionContext : Dictionary<string, object>
     {
+        private readonly SemaphoreSlim maxRequests = new SemaphoreSlim(10);
         private readonly ConcurrentDictionary<DomainId, IEnrichedContentEntity?> cachedContents = new ConcurrentDictionary<DomainId, IEnrichedContentEntity?>();
         private readonly ConcurrentDictionary<DomainId, IEnrichedAssetEntity?> cachedAssets = new ConcurrentDictionary<DomainId, IEnrichedAssetEntity?>();
         private readonly IContentQueryService contentQuery;
@@ -44,7 +46,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (asset == null)
             {
-                asset = await assetQuery.FindAssetAsync(context, id);
+                await maxRequests.WaitAsync();
+                try
+                {
+                    asset = await assetQuery.FindAssetAsync(context, id);
+                }
+                finally
+                {
+                    maxRequests.Release();
+                }
 
                 if (asset != null)
                 {
@@ -61,7 +71,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (content == null)
             {
-                content = await contentQuery.FindContentAsync(context, schemaId.ToString(), id);
+                await maxRequests.WaitAsync();
+                try
+                {
+                    content = await contentQuery.FindContentAsync(context, schemaId.ToString(), id);
+                }
+                finally
+                {
+                    maxRequests.Release();
+                }
 
                 if (content != null)
                 {
@@ -72,9 +90,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return content;
         }
 
-        public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(string query)
+        public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(string odata)
         {
-            var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithODataQuery(query));
+            var q = Q.Empty.WithODataQuery(odata);
+
+            IResultList<IEnrichedAssetEntity> assets;
+
+            await maxRequests.WaitAsync();
+            try
+            {
+                assets = await assetQuery.QueryAsync(context, null, q);
+            }
+            finally
+            {
+                maxRequests.Release();
+            }
 
             foreach (var asset in assets)
             {
@@ -84,16 +114,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return assets;
         }
 
-        public virtual async Task<IResultList<IEnrichedContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
+        public virtual async Task<IResultList<IEnrichedContentEntity>> QueryContentsAsync(string schemaIdOrName, string odata)
         {
-            var result = await contentQuery.QueryAsync(context, schemaIdOrName, Q.Empty.WithODataQuery(query));
+            var q = Q.Empty.WithODataQuery(odata);
 
-            foreach (var content in result)
+            IResultList<IEnrichedContentEntity> contents;
+
+            await maxRequests.WaitAsync();
+            try
+            {
+                contents = await contentQuery.QueryAsync(context, schemaIdOrName, q);
+            }
+            finally
+            {
+                maxRequests.Release();
+            }
+
+            foreach (var content in contents)
             {
                 cachedContents[content.Id] = content;
             }
 
-            return result;
+            return contents;
         }
 
         public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(ICollection<DomainId> ids)
@@ -104,7 +146,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (notLoadedAssets.Count > 0)
             {
-                var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithIds(notLoadedAssets));
+                IResultList<IEnrichedAssetEntity> assets;
+
+                await maxRequests.WaitAsync();
+                try
+                {
+                    assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithIds(notLoadedAssets));
+                }
+                finally
+                {
+                    maxRequests.Release();
+                }
 
                 foreach (var asset in assets)
                 {
@@ -123,15 +175,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (notLoadedContents.Count > 0)
             {
-                var result = await contentQuery.QueryAsync(context, notLoadedContents);
+                IResultList<IEnrichedContentEntity> contents;
 
-                foreach (var content in result)
+                await maxRequests.WaitAsync();
+                try
+                {
+                    contents = await contentQuery.QueryAsync(context, notLoadedContents);
+                }
+                finally
+                {
+                    maxRequests.Release();
+                }
+
+                foreach (var content in contents)
                 {
                     cachedContents[content.Id] = content;
                 }
             }
 
             return ids.Select(cachedContents.GetOrDefault).NotNull().ToList();
+        }
+
+        public async Task<IResultList<IEnrichedContentEntity>> QueryReferencingContentsAsync(string schemaIdOrName, string odata, DomainId reference)
+        {
+            var q = Q.Empty.WithODataQuery(odata).WithReference(reference);
+
+            await maxRequests.WaitAsync();
+            try
+            {
+                return await contentQuery.QueryAsync(context, schemaIdOrName, q);
+            }
+            finally
+            {
+                maxRequests.Release();
+            }
         }
     }
 }

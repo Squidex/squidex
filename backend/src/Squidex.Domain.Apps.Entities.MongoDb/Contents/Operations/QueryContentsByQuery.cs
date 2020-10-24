@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             await Collection.Indexes.CreateOneAsync(indexBySchema, cancellationToken: ct);
         }
 
-        public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, SearchScope scope)
+        public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, DomainId? referenced, SearchScope scope)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     }
                 }
 
-                var filter = CreateFilter(schema.AppId.Id, schema.Id, fullTextIds, query);
+                var filter = CreateFilter(schema.AppId.Id, schema.Id, fullTextIds, query, referenced);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems = FindContentsAsync(query, filter);
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return query.Sort?.All(x => x.Path.ToString() == "mt" && x.Order == SortOrder.Descending) == true;
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, DomainId schemaId, ICollection<DomainId>? ids, ClrQuery? query)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, DomainId schemaId, ICollection<DomainId>? ids, ClrQuery? query, DomainId? referenced)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -175,6 +175,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             if (query?.Filter != null)
             {
                 filters.Add(query.Filter.BuildFilter<MongoContentEntity>());
+            }
+
+            if (referenced != null)
+            {
+                filters.Add(Filter.AnyEq(x => x.ReferencedIds, referenced.Value));
             }
 
             return Filter.And(filters);

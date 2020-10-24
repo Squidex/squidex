@@ -86,7 +86,7 @@ function SquidexPlugin() {
         },
 
         /**
-         * Register the init handler.
+         * Register an function that is called when the sidebar is initialized.
          */
         onInit: function (callback) {
             initHandler = callback;
@@ -95,7 +95,9 @@ function SquidexPlugin() {
         },
 
         /**
-         * Register the content changed handler.
+         * Register an function that is called whenever the value of the content has changed.
+         * 
+         * The callback has one argument with the value of the content (any).
          */
         onContentChanged: function (callback) {
             contentHandler = callback;
@@ -128,6 +130,8 @@ function SquidexFormField() {
     var fullscreenHandler = false;
     var valueHandler;
     var value;
+    var languageHandler;
+    var language;
     var formValueHandler;
     var formValue;
     var context;
@@ -148,6 +152,12 @@ function SquidexFormField() {
     function raiseFormValueChanged() {
         if (formValueHandler && formValue) {
             formValueHandler(formValue);
+        }
+    }
+
+    function raiseLanguageChanged() {
+        if (languageHandler && language) {
+            languageHandler(language);
         }
     }
 
@@ -186,6 +196,10 @@ function SquidexFormField() {
                 fullscreen = event.data.fullscreen;
 
                 raiseFullscreen();
+            } else if (type === 'languageChanged') {
+                language = event.data.language;
+
+                raiseLanguageChanged();                 
             } else if (type === 'init') {
                 context = event.data.context;
 
@@ -218,6 +232,27 @@ function SquidexFormField() {
          */
         getFormValue: function () {
             return formValue;
+        },
+
+        /*
+         * Get the current field language.
+         */
+        getLanguage: function () {
+            return language;
+        },
+
+        /*
+         * Get the disabled state.
+         */
+        isDisabled: function () {
+            return disabled;
+        },
+
+        /*
+         * Get the fullscreen state.
+         */
+        isFullscreen: function () {
+            return fullscreen;
         },
 
         /**
@@ -265,7 +300,7 @@ function SquidexFormField() {
         },
 
         /**
-         * Register the init handler.
+         * Register an function that is called when the field is initialized.
          */
         onInit: function (callback) {
             initHandler = callback;
@@ -274,7 +309,9 @@ function SquidexFormField() {
         },
 
         /**
-         * Register the disabled handler.
+         * Register an function that is called whenever the field is disabled or enabled.
+         * 
+         * The callback has one argument with disabled state (disabled = true, enabled = false).
          */
         onDisabled: function (callback) {
             disabledHandler = callback;
@@ -283,25 +320,42 @@ function SquidexFormField() {
         },
 
         /**
-         * Register the value changed handler.
+         * Register an function that is called whenever the field language is changed.
+         * 
+         * The callback has one argument with the language of the field (string).
+         */
+        onLanguageChanged: function (callback) {
+            languageHandler = callback;
+
+            raiseLanguageChanged();
+        },
+
+        /**
+         * Register an function that is called whenever the value of the field has changed.
+         * 
+         * The callback has one argument with the value of the field (any).
          */
         onValueChanged: function (callback) {
             valueHandler = callback;
 
             raiseValueChanged();
         },
-        
+
         /**
-         * Register the form value changed handler.
+         * Register an function that is called whenever the value of the content has changed.
+         * 
+         * The callback has one argument with the value of the content (any).
          */
         onFormValueChanged: function (callback) {
             formValueHandler = callback;
 
             raiseFormValueChanged();
         },
-        
+
         /**
-         * Register the fullscreen changed handler.
+         * Register an function that is called whenever the fullscreen mode has changed.
+         * 
+         * The callback has one argument with fullscreen state (fullscreen on = true, fullscreen off = false).
          */
         onFullscreen: function (callback) {
             fullscreenHandler = callback;

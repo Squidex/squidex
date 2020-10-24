@@ -115,24 +115,16 @@ div {
     padding-left: .25rem;
 }
 
-.gray {
-    .item {
-        background: $color-border;
-        color: $color-text;
-        cursor: default;
-    }
-}
-
 .icon-close {
     font-size: .6rem;
 }
 
 .item {
     & {
-        background: $color-theme-blue;
+        background: $color-input;
         border: 0;
-        border-radius: 2px;
-        color: $color-dark-foreground;
+        border-radius: 3px;
+        color: $color-text;
         cursor: default;
         display: inline-block;
         height: $inner-height;

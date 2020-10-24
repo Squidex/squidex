@@ -85,12 +85,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private void AddContentQueries(DomainId schemaId, string schemaType, string schemaName, IGraphType contentType, int pageSize)
         {
-            var resolver = ContentActions.Query.Resolver(schemaId);
+            var resolver = ContentActions.QueryOrReferencing.Query(schemaId);
 
             AddField(new FieldType
             {
                 Name = $"query{schemaType}Contents",
-                Arguments = ContentActions.Query.Arguments(pageSize),
+                Arguments = ContentActions.QueryOrReferencing.Arguments(pageSize),
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
                 Resolver = resolver,
                 Description = $"Query {schemaName} content items."
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"query{schemaType}ContentsWithTotal",
-                Arguments = ContentActions.Query.Arguments(pageSize),
+                Arguments = ContentActions.QueryOrReferencing.Arguments(pageSize),
                 ResolvedType = new ContentsResultGraphType(schemaType, schemaName, contentType),
                 Resolver = resolver,
                 Description = $"Query {schemaName} content items with total count."
