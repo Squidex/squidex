@@ -5,24 +5,25 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
     {
-        private readonly ISchemaEntity schema;
-        private readonly string schemaType;
-        private readonly string schemaName;
+        private readonly Guid schemaId;
 
         public ContentGraphType(ISchemaEntity schema)
         {
-            this.schema = schema;
+            this.schemaId = schema.Id;
 
-            schemaType = schema.TypeName();
-            schemaName = schema.DisplayName();
+            var schemaType = schema.TypeName();
+            var schemaName = schema.DisplayName();
 
             Name = $"{schemaType}";
 
@@ -99,11 +100,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private bool CheckType(object value)
         {
-           return value is IContentEntity content && content.SchemaId?.Id == schema.Id;
+           return value is IContentEntity content && content.SchemaId?.Id == schemaId;
         }
 
-        public void Initialize(IGraphModel model)
+        public void Initialize(IGraphModel model, ISchemaEntity schema, IEnumerable<ISchemaEntity> all, int pageSize)
         {
+            var schemaType = schema.TypeName();
+            var schemaName = schema.DisplayName();
+
             AddField(new FieldType
             {
                 Name = "url",
@@ -137,6 +141,63 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Description = $"The flat data of the {schemaName} content."
                 });
             }
+
+            foreach (var other in all.Where(x => References(x, schema)))
+            {
+                var referencingId = other.Id;
+                var referencingType = other.TypeName();
+                var referencingName = other.DisplayName();
+
+                var contentType = model.GetContentType(referencingId);
+
+                AddReferencingQueries(referencingId, referencingType, referencingName, contentType, pageSize);
+            }
+        }
+
+        private void AddReferencingQueries(Guid referencingId, string referencingType, string referencingName, IGraphType contentType, int pageSize)
+        {
+            var resolver = ContentActions.QueryOrReferencing.Referencing(referencingId);
+
+            AddField(new FieldType
+            {
+                Name = $"referencing{referencingType}Contents",
+                Arguments = ContentActions.QueryOrReferencing.Arguments(pageSize),
+                ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
+                Resolver = resolver,
+                Description = $"Query {referencingName} content items."
+            });
+
+            AddField(new FieldType
+            {
+                Name = $"referencing{referencingType}ContentsWithTotal",
+                Arguments = ContentActions.QueryOrReferencing.Arguments(pageSize),
+                ResolvedType = new ContentsResultGraphType(referencingType, referencingName, contentType),
+                Resolver = resolver,
+                Description = $"Query {referencingName} content items with total count."
+            });
+        }
+
+        private static bool References(ISchemaEntity other, ISchemaEntity schema)
+        {
+            var id = schema.Id;
+
+            return other.SchemaDef.Fields.Any(x => References(x, id));
+        }
+
+        private static bool References(IField field, Guid id)
+        {
+            switch (field)
+            {
+                case IField<ReferencesFieldProperties> reference:
+                    return
+                        reference.Properties.SchemaIds == null ||
+                        reference.Properties.SchemaIds.Count == 0 ||
+                        reference.Properties.SchemaIds.Contains(id);
+                case IArrayField arrayField:
+                    return arrayField.Fields.Any(x => References(x, id));
+            }
+
+            return false;
         }
     }
 }
