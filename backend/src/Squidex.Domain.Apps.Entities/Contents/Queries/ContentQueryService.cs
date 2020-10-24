@@ -55,6 +55,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
+            if (id == default)
+            {
+                throw new DomainObjectNotFoundException(id.ToString());
+            }
+
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
             CheckPermission(context, schema);
@@ -81,9 +86,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query, Guid? referenced = null)
+        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query)
         {
             Guard.NotNull(context, nameof(context));
+
+            if (query == null)
+            {
+                return EmptyContents;
+            }
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
@@ -110,13 +120,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
+            if (ids == null || ids.Count == 0)
+            {
+                return EmptyContents;
+            }
+
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                if (ids == null || ids.Count == 0)
-                {
-                    return EmptyContents;
-                }
-
                 var contents = await QueryCoreAsync(context, ids);
 
                 var filtered =
@@ -209,11 +219,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return context.Permissions.Allows(permission);
         }
 
-        private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, ISchemaEntity schema, Q query, Guid? referenced = null)
+        private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, ISchemaEntity schema, Q query)
         {
             var parsedQuery = await queryParser.ParseQueryAsync(context, schema, query);
 
-            return await QueryCoreAsync(context, schema, parsedQuery, referenced);
+            return await QueryCoreAsync(context, schema, parsedQuery, query.Reference);
         }
 
         private async Task<IResultList<IContentEntity>> QueryByIdsAsync(Context context, ISchemaEntity schema, Q query)
