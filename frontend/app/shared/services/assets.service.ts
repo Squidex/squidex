@@ -282,7 +282,11 @@ export class AssetsService {
     }
 
     public postAssetFile(appName: string, file: Blob, parentId?: string): Observable<number | AssetDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?parentId=${parentId}`);
+        let url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
+
+        if (parentId) {
+            url += `?parentId=${parentId}`;
+        }
 
         return HTTP.upload(this.http, 'POST', url, file).pipe(
             filter(event =>

@@ -242,6 +242,25 @@ describe('AssetsService', () => {
         expect(asset!).toEqual(createAsset(12));
     }));
 
+    it('should make post without parent id to create asset',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        let asset: AssetDto;
+
+        assetsService.postAssetFile('my-app', null!).subscribe(result => {
+            asset = <AssetDto>result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush(assetResponse(12));
+
+        expect(asset!).toEqual(createAsset(12));
+    }));
+
     it('should return proper error when upload failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
