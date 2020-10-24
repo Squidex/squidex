@@ -32,24 +32,19 @@ namespace Squidex.Domain.Users.MongoDb
         [BsonElement]
         public HashSet<string> Roles { get; set; } = new HashSet<string>();
 
+        internal string? GetToken(string provider, string name)
+        {
+            return Tokens.Find(x => x.LoginProvider == provider && x.Name == name)?.Value;
+        }
+
         internal void AddLogin(UserLoginInfo login)
         {
-            Logins.Add(login);
+            Logins.Add(new UserLoginInfo(login.LoginProvider, login.ProviderKey, login.ProviderDisplayName));
         }
 
         internal void AddRole(string role)
         {
             Roles.Add(role);
-        }
-
-        internal void RemoveRole(string role)
-        {
-            Roles.Remove(role);
-        }
-
-        internal void RemoveLogin(string provider, string providerKey)
-        {
-            Logins.RemoveAll(x => x.LoginProvider == provider && x.ProviderKey == providerKey);
         }
 
         internal void AddClaim(Claim claim)
@@ -62,6 +57,21 @@ namespace Squidex.Domain.Users.MongoDb
             claims.Foreach((x, _) => AddClaim(x));
         }
 
+        internal void AddToken(string provider, string name, string value)
+        {
+            Tokens.Add(new UserTokenInfo { LoginProvider = provider, Name = name, Value = value });
+        }
+
+        internal void RemoveLogin(string provider, string providerKey)
+        {
+            Logins.RemoveAll(x => x.LoginProvider == provider && x.ProviderKey == providerKey);
+        }
+
+        internal void RemoveRole(string role)
+        {
+            Roles.Remove(role);
+        }
+
         internal void RemoveClaim(Claim claim)
         {
             Claims.RemoveAll(x => x.Type == claim.Type && x.Value == claim.Value);
@@ -70,16 +80,6 @@ namespace Squidex.Domain.Users.MongoDb
         internal void RemoveClaims(IEnumerable<Claim> claims)
         {
             claims.Foreach((x, _) => RemoveClaim(x));
-        }
-
-        internal string? GetToken(string provider, string name)
-        {
-            return Tokens.FirstOrDefault(x => x.LoginProvider == provider && x.Name == name)?.Value;
-        }
-
-        internal void AddToken(string provider, string name, string value)
-        {
-            Tokens.Add(new UserTokenInfo { LoginProvider = provider, Name = name, Value = value });
         }
 
         internal void RemoveToken(string provider, string name)
@@ -94,11 +94,11 @@ namespace Squidex.Domain.Users.MongoDb
             AddClaim(newClaim);
         }
 
-        internal void SetToken(string loginProider, string name, string value)
+        internal void ReplaceToken(string provider, string name, string value)
         {
-            RemoveToken(loginProider, name);
+            RemoveToken(provider, name);
 
-            AddToken(loginProider, name, value);
+            AddToken(provider, name, value);
         }
     }
 

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
 
             if (parentId.HasValue)
             {
-                if (parentId == DomainId.Empty)
+                if (parentId.Value == DomainId.Empty)
                 {
                     filters.Add(
                         Filter.Or(

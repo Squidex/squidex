@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,25 +31,10 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_get_app()
         {
-            var w = Stopwatch.StartNew();
-
+            // STEP 1: Get app.
             var app = await _.Apps.GetAppAsync(_.AppName);
 
             Assert.Equal(_.AppName, app.Name);
-
-            w.Stop();
-
-            Debug.WriteLine("ELAPSED: {0}", w.Elapsed);
-
-            var w2 = Stopwatch.StartNew();
-
-            app = await _.Apps.GetAppAsync(_.AppName);
-
-            Assert.Equal(_.AppName, app.Name);
-
-            w2.Stop();
-
-            Debug.WriteLine("ELAPSED: {0}", w2.Elapsed);
         }
 
         [Fact]

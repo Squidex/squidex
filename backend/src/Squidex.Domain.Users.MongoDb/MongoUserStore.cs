@@ -552,7 +552,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public Task SetTokenAsync(IdentityUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
         {
-            ((MongoUser)user).SetToken(loginProvider, name, value);
+            ((MongoUser)user).ReplaceToken(loginProvider, name, value);
 
             return Task.CompletedTask;
         }
@@ -566,14 +566,14 @@ namespace Squidex.Domain.Users.MongoDb
 
         public Task SetAuthenticatorKeyAsync(IdentityUser user, string key, CancellationToken cancellationToken)
         {
-            ((MongoUser)user).SetToken(InternalLoginProvider, AuthenticatorKeyTokenName, key);
+            ((MongoUser)user).ReplaceToken(InternalLoginProvider, AuthenticatorKeyTokenName, key);
 
             return Task.CompletedTask;
         }
 
         public Task ReplaceCodesAsync(IdentityUser user, IEnumerable<string> recoveryCodes, CancellationToken cancellationToken)
         {
-            ((MongoUser)user).SetToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(";", recoveryCodes));
+            ((MongoUser)user).ReplaceToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(";", recoveryCodes));
 
             return Task.CompletedTask;
         }
@@ -587,7 +587,7 @@ namespace Squidex.Domain.Users.MongoDb
             {
                 var updatedCodes = new List<string>(splitCodes.Where(s => s != code));
 
-                ((MongoUser)user).SetToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(";", updatedCodes));
+                ((MongoUser)user).ReplaceToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(";", updatedCodes));
 
                 return Task.FromResult(true);
             }

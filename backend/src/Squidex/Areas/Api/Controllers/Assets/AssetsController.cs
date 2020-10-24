@@ -95,9 +95,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] DomainId? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            var assets = await assetQuery.QueryAsync(Context, DomainId.CreateNullable(parentId), CreateQuery(ids, q));
+            var assets = await assetQuery.QueryAsync(Context, parentId, CreateQuery(ids, q));
 
             var response = Deferred.Response(() =>
             {

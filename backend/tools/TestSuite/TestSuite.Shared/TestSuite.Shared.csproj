@@ -11,7 +11,7 @@
     </PackageReference>
     <PackageReference Include="Lazy.Fody" Version="1.8.0" PrivateAssets="all" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="6.0.0-beta1" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="6.4.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
