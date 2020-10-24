@@ -22,7 +22,7 @@
         var field = new SquidexFormField();
 
         function logState(message) {
-            console.log(`${message}. Value: <${JSON.stringify(field.getValue(), 2)}>, Form Value: <${JSON.stringify(field.getFormValue())}>`);
+            console.log(`${message}.\n\Language: ${field.getLanguage()}\n\nValue\n<${JSON.stringify(field.getValue(), 2)}>\n\nForm Value\n<${JSON.stringify(field.getFormValue())}>\n\nDisabled: ${field.isDisabled()}`);
         }
 
         logState('Setup');
@@ -41,12 +41,18 @@
             logState('Init');
         });
 
-        // Handle the value change event and set the text to the editor.
-        field.onValueChanged(function (value) {
-            logState(`Value changed: <${JSON.stringify(value, 2)}>`);
+        field.onValueChanged(function () {
+            logState('Value changed');
         });
 
-        // Disable the editor when it should be disabled.
+        field.onFormValueChanged(function () {
+            logState('Form value changed');
+        });
+
+        field.onLanguageChanged(function () {
+            logState('Field language changed');
+        });
+
         field.onDisabled(function (disabled) {
             logState(`Disabled: <${JSON.stringify(disabled, 2)}>`);
         });
