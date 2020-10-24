@@ -183,16 +183,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [InlineData(0, 0, SearchScope.Published)]
         public async Task QueryAsync_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
+            var reference = Guid.NewGuid();
+
             var ctx =
                 CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
                     .WithUnpublished(unpublished == 1);
 
             var content = CreateContent(contentId);
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<ClrQuery>._, scope))
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<ClrQuery>._, reference, scope))
                 .Returns(ResultList.CreateFrom(5, content));
 
-            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
+            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty.WithReference(reference));
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(contentId, result[0].Id);

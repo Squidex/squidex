@@ -54,15 +54,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collectionPublished.InitializeAsync(ct);
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, SearchScope scope)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, Guid? referenced, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schema, query);
+                return collectionAll.QueryAsync(app, schema, query, referenced);
             }
             else
             {
-                return collectionPublished.QueryAsync(app, schema, query);
+                return collectionPublished.QueryAsync(app, schema, query, referenced);
             }
         }
 

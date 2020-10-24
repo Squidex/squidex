@@ -73,9 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return content;
         }
 
-        public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(string query)
+        public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(string odata)
         {
-            var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithODataQuery(query));
+            var q = Q.Empty.WithODataQuery(odata);
+
+            var assets = await assetQuery.QueryAsync(context, null, q);
 
             foreach (var asset in assets)
             {
@@ -85,9 +87,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return assets;
         }
 
-        public virtual async Task<IResultList<IEnrichedContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
+        public virtual async Task<IResultList<IEnrichedContentEntity>> QueryContentsAsync(string schemaIdOrName, string odata)
         {
-            var result = await contentQuery.QueryAsync(context, schemaIdOrName, Q.Empty.WithODataQuery(query));
+            var q = Q.Empty.WithODataQuery(odata);
+
+            var result = await contentQuery.QueryAsync(context, schemaIdOrName, q);
 
             foreach (var content in result)
             {
@@ -133,6 +137,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
 
             return ids.Select(cachedContents.GetOrDefault).NotNull().ToList();
+        }
+
+        public Task<IResultList<IEnrichedContentEntity>> QueryReferencingContentsAsync(string schemaIdOrName, string odata, Guid reference)
+        {
+            var q = Q.Empty.WithODataQuery(odata).WithReference(reference);
+
+            return contentQuery.QueryAsync(context, schemaIdOrName, q);
         }
     }
 }

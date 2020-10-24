@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        public static class Query
+        public static class QueryOrReferencing
         {
             private static QueryArguments? arguments;
 
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 };
             }
 
-            public static IFieldResolver Resolver(Guid schemaId)
+            public static IFieldResolver Query(Guid schemaId)
             {
                 var schemaIdValue = schemaId.ToString();
 
@@ -137,6 +137,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     var query = c.BuildODataQuery();
 
                     return ((GraphQLExecutionContext)c.UserContext).QueryContentsAsync(schemaIdValue, query);
+                });
+            }
+
+            public static IFieldResolver Referencing(Guid schemaId)
+            {
+                var schemaIdValue = schemaId.ToString();
+
+                return new FuncFieldResolver<IContentEntity, object?>(c =>
+                {
+                    var query = c.BuildODataQuery();
+
+                    var contentId = c.Source.Id;
+
+                    return ((GraphQLExecutionContext)c.UserContext).QueryReferencingContentsAsync(schemaIdValue, query, c.Source.Id);
                 });
             }
         }

@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             graphQLSchema.RegisterValueConverter(JsonConverter.Instance);
             graphQLSchema.RegisterValueConverter(InstantConverter.Instance);
 
-            InitializeContentTypes();
+            InitializeContentTypes(allSchemas, pageSizeContents);
         }
 
         private void BuildSchemas(List<ISchemaEntity> allSchemas)
@@ -67,11 +67,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
         }
 
-        private void InitializeContentTypes()
+        private void InitializeContentTypes(List<ISchemaEntity> allSchemas, int pageSize)
         {
+            var i = 0;
+
             foreach (var contentType in contentTypes.Values)
             {
-                contentType.Initialize(this);
+                var schema = allSchemas[i];
+
+                contentType.Initialize(this, schema, allSchemas, pageSize);
+
+                i++;
             }
 
             foreach (var contentType in contentTypes.Values)
