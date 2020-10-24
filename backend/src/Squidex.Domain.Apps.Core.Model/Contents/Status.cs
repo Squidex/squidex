@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public int CompareTo([AllowNull] Status other)
         {
-            return string.Compare(name, other.name, StringComparison.Ordinal);
+            return string.Compare(Name, other.Name, StringComparison.Ordinal);
         }
 
         public static bool operator ==(Status lhs, Status rhs)

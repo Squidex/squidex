@@ -61,12 +61,12 @@ namespace Squidex.Infrastructure
 
         public bool Equals(DomainId other)
         {
-            return string.Equals(id, other.id);
+            return string.Equals(ToString(), other.ToString());
         }
 
         public override int GetHashCode()
         {
-            return id?.GetHashCode() ?? 0;
+            return ToString().GetHashCode();
         }
 
         public override string ToString()
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure
 
         public int CompareTo([AllowNull] DomainId other)
         {
-            return string.Compare(id, other.id, StringComparison.Ordinal);
+            return string.Compare(ToString(), other.ToString(), StringComparison.Ordinal);
         }
 
         public static bool operator ==(DomainId lhs, DomainId rhs)
