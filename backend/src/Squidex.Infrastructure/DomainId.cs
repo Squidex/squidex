@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure
                 return null;
             }
 
-            return new DomainId(value);
+            return Create(value);
         }
 
         public static DomainId Create(string value)

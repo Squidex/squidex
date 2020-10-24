@@ -92,6 +92,30 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
+        public void Should_compare_with_nullable()
+        {
+            DomainId? value = DomainId.Empty;
+
+            Assert.True(value == DomainId.Empty);
+        }
+
+        [Fact]
+        public void Should_compare_with_nullable2()
+        {
+            DomainId? value = DomainId.Create(Guid.Empty.ToString());
+
+            Assert.True(value == DomainId.Empty);
+        }
+
+        [Fact]
+        public void Should_compare_with_non_shared_nullable()
+        {
+            DomainId? value = DomainId.Create("0");
+
+            Assert.True(value == DomainId.Create("0"));
+        }
+
+        [Fact]
         public void Should_make_correct_equal_comparisons()
         {
             var domainId_1_a = DomainId.Create("1");
