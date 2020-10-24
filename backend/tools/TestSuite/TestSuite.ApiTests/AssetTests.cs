@@ -230,6 +230,47 @@ namespace TestSuite.ApiTests
             Assert.Contains(assets_2.Items, x => x.Id == asset_1.Id);
         }
 
+        [Fact]
+        public async Task Should_query_asset_by_root_folder()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Query asset by root folder.
+            var assets_1 = await _.Assets.GetAssetsAsync(_.AppName, new AssetQuery
+            {
+                ParentId = Guid.Empty.ToString()
+            });
+
+            Assert.Contains(assets_1.Items, x => x.Id == asset_1.Id);
+        }
+
+        [Fact]
+        public async Task Should_query_asset_by_subfolder()
+        {
+            // STEP 1: Create asset folder
+            var folderRequest = new CreateAssetFolderDto
+            {
+                FolderName = "sub"
+            };
+
+            var folder = await _.Assets.PostAssetFolderAsync(_.AppName, folderRequest);
+
+
+            // STEP 1: Create asset in folder
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png", parentId: folder.Id);
+
+
+            // STEP 2: Query asset by root folder.
+            var assets_1 = await _.Assets.GetAssetsAsync(_.AppName, new AssetQuery
+            {
+                ParentId = folder.Id
+            });
+
+            Assert.Single(assets_1.Items, x => x.Id == asset_1.Id);
+        }
+
         [Fact, Trait("Category", "NotAutomated")]
         public async Task Should_delete_recursively()
         {
