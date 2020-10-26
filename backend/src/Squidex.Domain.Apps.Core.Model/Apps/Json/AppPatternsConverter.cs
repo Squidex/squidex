@@ -17,11 +17,11 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
     {
         protected override void WriteValue(JsonWriter writer, AppPatterns value, JsonSerializer serializer)
         {
-            var json = new Dictionary<Guid, JsonAppPattern>(value.Count);
+            var json = new Dictionary<Guid, AppPattern>(value.Count);
 
-            foreach (var (key, appPattern) in value)
+            foreach (var (key, pattern) in value)
             {
-                json.Add(key, new JsonAppPattern(appPattern));
+                json.Add(key, pattern);
             }
 
             serializer.Serialize(writer, json);
@@ -29,9 +29,9 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
         protected override AppPatterns ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<Dictionary<Guid, JsonAppPattern>>(reader)!;
+            var json = serializer.Deserialize<Dictionary<Guid, AppPattern>>(reader)!;
 
-            return new AppPatterns(json.ToDictionary(x => x.Key, x => x.Value.ToPattern()));
+            return new AppPatterns(json);
         }
     }
 }
