@@ -84,9 +84,9 @@
 
 .transition-prevent-updates {
     & {
-        line-height: 2.5rem;
         margin-bottom: 1rem;
         margin-top: .25rem;
+        min-height: 2.5rem;
     }
 
     &-to {

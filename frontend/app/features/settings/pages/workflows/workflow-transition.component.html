@@ -11,13 +11,25 @@
         <span class="text-decent">{{ 'workflows.syntax.when' | sqxTranslate }}</span>
     </div>
     <div class="col">
-        <input class="form-control" [class.dashed]="!transition.expression" spellcheck="false" [disabled]="disabled" [ngModelOptions]="onBlur" [ngModel]="transition.expression" (ngModelChange)="changeExpression($event)" placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"> 
+        <input class="form-control" [class.dashed]="!transition.expression" spellcheck="false"
+            [disabled]="disabled" 
+            [ngModelOptions]="onBlur" 
+            [ngModel]="transition.expression" 
+            (ngModelChange)="changeExpression($event)" 
+            placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"> 
     </div>
     <div class="col-auto col-label">
         <span class="text-decent">{{ 'workflows.syntax.for' | sqxTranslate }}</span>
     </div>
     <div class="col col-roles">
-        <sqx-tag-editor [allowDuplicates]="false" [dashed]="true" [disabled]="disabled" (ngModelChange)="changeRole($event)" [ngModel]="transition.roles" [ngModelOptions]="onBlur" [singleLine]="true" [suggestions]="roles" placeholder="{{ 'common.role' | sqxTranslate }}">
+        <sqx-tag-editor [allowDuplicates]="false" 
+            [dashed]="true" 
+            [disabled]="disabled" 
+            [ngModelOptions]="onBlur"
+            [ngModel]="transition.roles" 
+            (ngModelChange)="changeRole($event)" 
+            [singleLine]="true" 
+            [suggestions]="roles" placeholder="{{ 'common.role' | sqxTranslate }}">
         </sqx-tag-editor>
     </div>
 
