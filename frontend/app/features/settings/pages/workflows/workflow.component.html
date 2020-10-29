@@ -59,7 +59,10 @@
                     <label class="col-form-label" for="{{workflow.id}}_name">{{ 'common.name' | sqxTranslate }}</label>
             
                     <div class="col">
-                        <input class="form-control" id="{{workflow.id}}_name" [ngModelOptions]="onBlur" [ngModel]="workflow.name" (ngModelChange)="rename($event)">
+                        <input class="form-control" id="{{workflow.id}}_name" 
+                            [ngModelOptions]="onBlur" 
+                            [ngModel]="workflow.name"
+                            (ngModelChange)="rename($event)">
             
                         <sqx-form-hint>
                             {{ 'workflows.workflowNameHint' | sqxTranslate }}

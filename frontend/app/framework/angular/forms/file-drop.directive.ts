@@ -6,6 +6,7 @@
  */
 
 // tslint:disable: prefer-for-of
+// tslint:disable: readonly-array
 
 import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 import { Types } from '@app/framework/internal';
@@ -45,18 +46,16 @@ export class FileDropDirective {
     }
 
     @HostListener('paste', ['$event'])
-    public onPaste(event: ClipboardEvent) {
-        if (this.noPaste) {
-            return;
+    public async onPaste(event: ClipboardEvent) {
+        if (!this.noPaste) {
+            this.stopEvent(event);
+
+            const files = await this.getAllowedFiles(event.clipboardData);
+
+            if (files && !this.disabled) {
+                this.drop.emit(files);
+            }
         }
-
-        const files = this.getAllowedFiles(event.clipboardData);
-
-        if (files && !this.disabled) {
-            this.drop.emit(files);
-        }
-
-        this.stopEvent(event);
     }
 
     @HostListener('dragend', ['$event'])
@@ -88,22 +87,26 @@ export class FileDropDirective {
     }
 
     @HostListener('drop', ['$event'])
-    public onDrop(event: DragDropEvent) {
+    public async onDrop(event: DragDropEvent) {
         if (hasFiles(event.dataTransfer)) {
-            const files = this.getAllowedFiles(event.dataTransfer);
+            this.stopDrag(event);
+
+            const files = await this.getAllowedFiles(event.dataTransfer);
 
             if (files && !this.disabled) {
                 this.drop.emit(files);
             }
-
-            this.dragEnd(0);
-            this.stopEvent(event);
         }
     }
 
     private stopEvent(event: Event) {
         event.preventDefault();
         event.stopPropagation();
+    }
+
+    private stopDrag(event: DragDropEvent) {
+        this.dragEnd(0);
+        this.stopEvent(event);
     }
 
     private dragStart() {
@@ -122,30 +125,20 @@ export class FileDropDirective {
         }
     }
 
-    private getAllowedFiles(dataTransfer: DataTransfer | null) {
+    private async getAllowedFiles(dataTransfer: DataTransfer | null) {
         if (!dataTransfer || !hasFiles(dataTransfer)) {
             return null;
         }
 
-        const files: File[] = [];
+        let files: File[] = [];
 
-        for (let i = 0; i < dataTransfer.files.length; i++) {
-            const file = dataTransfer.files.item(i);
+        for (let i = 0; i < dataTransfer.items.length; i++) {
+            const item = dataTransfer.items[i];
 
-            if (file && this.isAllowedFile(file)) {
-                files.push(file);
-            }
+            await transferFileTree(item, files);
         }
 
-        if (files.length === 0) {
-            for (let i = 0; i < dataTransfer.items.length; i++) {
-                const file = dataTransfer.items[i].getAsFile();
-
-                if (file && this.isAllowedFile(file)) {
-                    files.push(file);
-                }
-            }
-        }
+        files = files.filter(f => this.isAllowedFile(f));
 
         return files.length > 0 ? files : null;
     }
@@ -201,6 +194,62 @@ function hasFiles(dataTransfer: DataTransfer): boolean {
     } else {
         return false;
     }
+}
+
+async function transferWebkitTree(item: any, files: File[]) {
+    if (item.isFile) {
+        const file = await getFilePromise(item);
+
+        files.push(file);
+    } else if (item.isDirectory) {
+        const entries = await getFilesPromise(item);
+
+        for (const entry of entries) {
+            await transferWebkitTree(entry, files);
+        }
+    }
+}
+
+async function transferFileTree(item: DataTransferItem, files: File[]) {
+    if (Types.isFunction(item['webkitGetAsEntry'])) {
+        const webkitEntry = item.webkitGetAsEntry();
+
+        if (webkitEntry) {
+            await transferWebkitTree(webkitEntry, files);
+
+            return;
+        }
+    }
+
+    if (Types.isFunction(item['getAsFile'])) {
+        const fileItem = item.getAsFile();
+
+        if (fileItem) {
+            files.push(fileItem);
+        }
+    }
+}
+
+function getFilesPromise(item: any): Promise<ReadonlyArray<any>> {
+    return new Promise((resolve, reject) => {
+        try {
+            const reader = item.createReader();
+
+            reader.readEntries(resolve);
+        } catch (ex) {
+            reject(ex);
+        }
+    });
+}
+
+function getFilePromise(item: any): Promise<File> {
+    return new Promise((resolve, reject) => {
+        try {
+            item.file(resolve);
+        } catch (ex) {
+            reject(ex);
+        }
+    });
 }
 
 interface DragDropEvent extends MouseEvent {

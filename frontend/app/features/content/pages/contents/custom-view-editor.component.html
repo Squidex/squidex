@@ -15,9 +15,9 @@
             <i class="icon-drag2 drag-handle"></i> 
             
             <div class="custom-control custom-checkbox">
-                <input class="custom-control-input" type="checkbox" checked (click)="removeField(field)" id="field_{{field}}">
+                <input class="custom-control-input" type="checkbox" checked (click)="removeField(field)" id="field_{{field}}" [disabled]="!field">
                 <label class="custom-control-label" for="field_{{field}}">
-                    {{field}}
+                    {{field || '--'}}
                 </label>
             </div>
         </div>

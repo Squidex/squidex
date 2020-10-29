@@ -34,7 +34,8 @@
                         {{ 'workflows.empty' | sqxTranslate }}
                     </div>
 
-                    <sqx-workflow *ngFor="let workflow of workflows; trackBy: trackByWorkflow" [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource">
+                    <sqx-workflow *ngFor="let workflow of workflows; trackBy: trackByWorkflow" 
+                        [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource">
                     </sqx-workflow>
 
                     <sqx-workflow-add-form *ngIf="workflowsState.canCreate | async"></sqx-workflow-add-form>
