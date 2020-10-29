@@ -47,15 +47,17 @@ namespace Squidex.Domain.Apps.Entities.Backup.Model
             return new CompatibleStoredEvent { NewEvent = NewEvent.V2(stored) };
         }
 
-        public (string Stream, EventData Data) ToEvent()
+        public StoredEvent ToStoredEvent()
         {
             if (NewEvent != null)
             {
-                return NewEvent.ToEvent();
+                return NewEvent.ToStoredEvent();
             }
             else
             {
-                return (StreamName, Data.ToData());
+                var data = Data.ToData();
+
+                return new StoredEvent(StreamName, EventPosition, EventStreamNumber, data);
             }
         }
     }
@@ -109,9 +111,11 @@ namespace Squidex.Domain.Apps.Entities.Backup.Model
             };
         }
 
-        public (string Stream, EventData Data) ToEvent()
+        public StoredEvent ToStoredEvent()
         {
-            return (StreamName, new EventData(EventType, EventHeaders, EventPayload));
+            var data = new EventData(EventType, EventHeaders, EventPayload);
+
+            return new StoredEvent(StreamName, "0", -1, data);
         }
     }
 }

@@ -45,6 +45,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();
 
+            services.AddSingletonAs<RepairFiles>()
+                .As<IEventConsumer>();
+
             services.AddTransientAs<AssetHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 

@@ -12,7 +12,6 @@ using FakeItEasy;
 using FluentAssertions;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -96,7 +95,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventSubscription.Sender)
                 .Returns(eventSubscription);
 
-            A.CallTo(() => formatter.Parse(eventData))
+            A.CallTo(() => formatter.ParseIfKnown(A<StoredEvent>.That.Matches(x => x.Data == eventData)))
                 .Returns(envelope);
 
             sut = new MyEventConsumerGrain(
@@ -318,8 +317,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_ignore_old_events()
         {
-            A.CallTo(() => formatter.Parse(eventData))
-                .Throws(new TypeNameNotFoundException());
+            A.CallTo(() => formatter.ParseIfKnown(A<StoredEvent>.That.Matches(x => x.Data == eventData)))
+                .Returns(null);
 
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
@@ -466,7 +465,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => formatter.Parse(eventData))
+            A.CallTo(() => formatter.ParseIfKnown(A<StoredEvent>.That.Matches(x => x.Data == eventData)))
                 .Throws(ex);
 
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);

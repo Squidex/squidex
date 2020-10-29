@@ -110,10 +110,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 using (var stream = eventEntry.Open())
                 {
-                    var (streamName, data) = serializer.Deserialize<CompatibleStoredEvent>(stream).ToEvent();
+                    var storedEvent = serializer.Deserialize<CompatibleStoredEvent>(stream).ToStoredEvent();
 
-                    var eventStream = streamName;
-                    var eventEnvelope = formatter.Parse(data);
+                    var eventStream = storedEvent.StreamName;
+                    var eventEnvelope = formatter.Parse(storedEvent);
 
                     await handler((eventStream, eventEnvelope));
                 }

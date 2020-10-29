@@ -28,8 +28,24 @@ namespace Squidex.Infrastructure.EventSourcing
             this.serializer = serializer;
         }
 
-        public Envelope<IEvent> Parse(EventData eventData)
+        public Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent)
         {
+            try
+            {
+                return Parse(storedEvent);
+            }
+            catch (TypeNameNotFoundException)
+            {
+                return null;
+            }
+        }
+
+        public Envelope<IEvent> Parse(StoredEvent storedEvent)
+        {
+            Guard.NotNull(storedEvent, nameof(storedEvent));
+
+            var eventData = storedEvent.Data;
+
             var payloadType = typeNameRegistry.GetType(eventData.Type);
             var payloadObj = serializer.Deserialize<IEvent>(eventData.Payload, payloadType);
 
@@ -44,6 +60,9 @@ namespace Squidex.Infrastructure.EventSourcing
             }
 
             var envelope = new Envelope<IEvent>(payloadObj, eventData.Headers);
+
+            envelope.SetEventPosition(storedEvent.EventPosition);
+            envelope.SetEventStreamNumber(storedEvent.EventStreamNumber);
 
             return envelope;
         }

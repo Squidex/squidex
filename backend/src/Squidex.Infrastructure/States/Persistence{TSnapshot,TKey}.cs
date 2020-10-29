@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Reflection;
 
 #pragma warning disable RECS0012 // 'if' statement can be re-written as 'switch' statement
 
@@ -118,7 +117,7 @@ namespace Squidex.Infrastructure.States
                         throw new InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
                     }
 
-                    var parsedEvent = ParseKnownEvent(@event);
+                    var parsedEvent = eventDataFormatter.ParseIfKnown(@event);
 
                     if (applyEvent != null && parsedEvent != null)
                     {
@@ -208,18 +207,6 @@ namespace Squidex.Infrastructure.States
         private bool UseEventSourcing()
         {
             return persistenceMode == PersistenceMode.EventSourcing || persistenceMode == PersistenceMode.SnapshotsAndEventSourcing;
-        }
-
-        private Envelope<IEvent>? ParseKnownEvent(StoredEvent storedEvent)
-        {
-            try
-            {
-                return eventDataFormatter.Parse(storedEvent.Data);
-            }
-            catch (TypeNameNotFoundException)
-            {
-                return null;
-            }
         }
 
         private void UpdateVersion()
