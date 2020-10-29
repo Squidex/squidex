@@ -9,24 +9,23 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
     public sealed class AlwaysCreateClientCommandMiddleware : ICommandMiddleware
     {
-        public Task HandleAsync(CommandContext context, NextDelegate next)
+        public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
+            await next(context);
+
             if (context.IsCompleted && context.Command is CreateApp createApp)
             {
                 var appId = NamedId.Of(createApp.AppId, createApp.Name);
 
                 var command = new AttachClient { Id = "default", AppId = appId };
 
-                context.CommandBus.PublishAsync(command).Forget();
+                await context.CommandBus.PublishAsync(command);
             }
-
-            return next(context);
         }
     }
 }
