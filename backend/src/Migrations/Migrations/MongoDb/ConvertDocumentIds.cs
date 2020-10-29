@@ -60,7 +60,7 @@ namespace Migrations.Migrations.MongoDb
             {
                 case Scope.Assets:
                     await RebuildAsync(database, "States_Assets");
-                    await RebuildAsync(database, "States_AssetFolders");
+                    await RebuildAsync(database, "States_AssetFolders", null, ConvertParentId);
                     break;
                 case Scope.Contents:
                     await RebuildAsync(databaseContent, "State_Contents_All", "States_Contents_All2");
@@ -69,7 +69,7 @@ namespace Migrations.Migrations.MongoDb
             }
         }
 
-        private static async Task RebuildAsync(IMongoDatabase database, string collectionNameOld, string? collectionNameNew = null)
+        private static async Task RebuildAsync(IMongoDatabase database, string collectionNameOld, string? collectionNameNew = null, Action<BsonDocument>? extraAction = null)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 10;
@@ -116,6 +116,11 @@ namespace Migrations.Migrations.MongoDb
                     document["id"] = documentIdOld;
                     document["_id"] = documentIdNew;
 
+                    if (extraAction != null)
+                    {
+                        extraAction(document);
+                    }
+
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", documentIdNew);
 
                     updates.Add(new ReplaceOneModel<BsonDocument>(filter, document)
@@ -142,6 +147,11 @@ namespace Migrations.Migrations.MongoDb
             batchBlock.Complete();
 
             await actionBlock.Completion;
+        }
+
+        private static void ConvertParentId(BsonDocument document)
+        {
+            document["pi"] = document["pi"].AsGuid.ToString();
         }
     }
 }
