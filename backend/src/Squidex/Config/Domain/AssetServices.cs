@@ -46,7 +46,7 @@ namespace Squidex.Config.Domain
                 .AsSelf();
 
             services.AddSingletonAs<RepairFiles>()
-                .As<IEventConsumer>();
+                .AsSelf();
 
             services.AddTransientAs<AssetHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();

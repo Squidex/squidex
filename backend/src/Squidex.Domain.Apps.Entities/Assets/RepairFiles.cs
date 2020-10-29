@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.IO;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -14,51 +16,59 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class RepairFiles : IEventConsumer
+    public sealed class RepairFiles
     {
+        private static readonly MemoryStream DummyStream = new MemoryStream(Encoding.UTF8.GetBytes("dummy"));
         private readonly IAssetFileStore assetFileStore;
+        private readonly IEventStore eventStore;
+        private readonly IEventDataFormatter eventDataFormatter;
 
-        public string Name
-        {
-            get { return GetType().Name; }
-        }
-
-        public string EventsFilter
-        {
-            get { return "^asset\\-"; }
-        }
-
-        public RepairFiles(IAssetFileStore assetFileStore)
+        public RepairFiles(
+            IAssetFileStore assetFileStore,
+            IEventStore eventStore,
+            IEventDataFormatter eventDataFormatter)
         {
             Guard.NotNull(assetFileStore, nameof(assetFileStore));
+            Guard.NotNull(eventStore, nameof(eventStore));
+            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
 
             this.assetFileStore = assetFileStore;
+            this.eventStore = eventStore;
+            this.eventDataFormatter = eventDataFormatter;
         }
 
-        public async Task On(Envelope<IEvent> @event)
+        public async Task RepairAsync(CancellationToken ct = default)
         {
-            switch (@event.Payload)
+            await eventStore.QueryAsync(async storedEvent =>
             {
-                case AssetCreated assetCreated:
-                    await TryRepairAsync(assetCreated.AppId, assetCreated.AssetId, assetCreated.FileVersion);
-                    break;
-                case AssetUpdated assetUpdated:
-                    await TryRepairAsync(assetUpdated.AppId, assetUpdated.AssetId, assetUpdated.FileVersion);
-                    break;
-            }
+                var @event = eventDataFormatter.ParseIfKnown(storedEvent);
+
+                if (@event != null)
+                {
+                    switch (@event.Payload)
+                    {
+                        case AssetCreated assetCreated:
+                            await TryRepairAsync(assetCreated.AppId, assetCreated.AssetId, assetCreated.FileVersion, ct);
+                            break;
+                        case AssetUpdated assetUpdated:
+                            await TryRepairAsync(assetUpdated.AppId, assetUpdated.AssetId, assetUpdated.FileVersion, ct);
+                            break;
+                    }
+                }
+            }, "^asset\\-", ct: ct);
         }
 
-        private async Task TryRepairAsync(NamedId<DomainId> appId, DomainId id, long fileVersion)
+        private async Task TryRepairAsync(NamedId<DomainId> appId, DomainId id, long fileVersion, CancellationToken ct)
         {
             try
             {
-                await assetFileStore.GetFileSizeAsync(appId.Id, id, fileVersion);
+                await assetFileStore.GetFileSizeAsync(appId.Id, id, fileVersion, ct);
             }
             catch (AssetNotFoundException)
             {
-                var stream = new MemoryStream(new byte[] { 1, 2, 3, 4 });
+                DummyStream.Position = 0;
 
-                await assetFileStore.UploadAsync(appId.Id, id, fileVersion, stream);
+                await assetFileStore.UploadAsync(appId.Id, id, fileVersion, DummyStream, ct);
             }
         }
     }
