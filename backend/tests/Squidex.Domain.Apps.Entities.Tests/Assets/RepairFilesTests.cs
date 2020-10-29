@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             IEventConsumer consumer = sut;
 
-            Assert.Equal(nameof(RecursiveDeleter), consumer.Name);
+            Assert.Equal(nameof(RepairFiles), consumer.Name);
         }
 
         [Fact]
