@@ -41,6 +41,30 @@ namespace Squidex.Domain.Apps.Entities.Backup
         }
 
         [Fact]
+        public async Task Should_not_write_blob_if_handler_failed()
+        {
+            var file = "File.json";
+
+            await TestReaderWriterAsync(BackupVersion.V1, async writer =>
+            {
+                try
+                {
+                    await writer.WriteBlobAsync(file, _ =>
+                    {
+                        throw new InvalidOperationException();
+                    });
+                }
+                catch
+                {
+                    return;
+                }
+            }, async reader =>
+            {
+                await Assert.ThrowsAsync<FileNotFoundException>(() => ReadGuidAsync(reader, file));
+            });
+        }
+
+        [Fact]
         public async Task Should_read_and_write_json_async()
         {
             var file = "File.json";

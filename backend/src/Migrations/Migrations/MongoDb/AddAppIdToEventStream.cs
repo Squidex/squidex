@@ -67,16 +67,25 @@ namespace Migrations.Migrations.MongoDb
                         var domainType = eventStream.Substring(0, indexOfType);
                         var domainId = eventStream.Substring(indexOfId);
 
-                        var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();
-                        var newStreamName = $"{domainType}-{newDomainId}";
+                        if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();
+                            var newStreamName = $"{domainType}-{newDomainId}";
 
-                        document["EventStream"] = newStreamName;
+                            document["EventStream"] = newStreamName;
+
+                            foreach (var @event in document["Events"].AsBsonArray)
+                            {
+                                var metadata = @event["Metadata"].AsBsonDocument;
+
+                                metadata["AggregateId"] = newDomainId;
+                            }
+                        }
 
                         foreach (var @event in document["Events"].AsBsonArray)
                         {
                             var metadata = @event["Metadata"].AsBsonDocument;
 
-                            metadata["AggregateId"] = newDomainId;
                             metadata.Remove("AppId");
                         }
                     }

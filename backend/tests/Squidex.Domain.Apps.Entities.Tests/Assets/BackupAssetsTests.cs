@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
@@ -81,7 +82,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var @event = new AssetCreated { AssetId = DomainId.NewGuid() };
 
-            await TestBackupEventAsync(@event, 0);
+            await TestBackupAsync(@event, 0);
+        }
+
+        [Fact]
+        public async Task Should_backup_created_asset_with_missing_file()
+        {
+            var @event = new AssetCreated { AssetId = DomainId.NewGuid() };
+
+            await TestBackupFailedAsync(@event, 0);
         }
 
         [Fact]
@@ -89,10 +98,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var @event = new AssetUpdated { AssetId = DomainId.NewGuid(), FileVersion = 3 };
 
-            await TestBackupEventAsync(@event, @event.FileVersion);
+            await TestBackupAsync(@event, @event.FileVersion);
         }
 
-        private async Task TestBackupEventAsync(AssetEvent @event, long version)
+        [Fact]
+        public async Task Should_backup_updated_asset_with_missing_file()
+        {
+            var @event = new AssetUpdated { AssetId = DomainId.NewGuid(), FileVersion = 3 };
+
+            await TestBackupFailedAsync(@event, @event.FileVersion);
+        }
+
+        private async Task TestBackupAsync(AssetEvent @event, long version)
         {
             var assetStream = new MemoryStream();
             var assetId = @event.AssetId;
@@ -108,6 +125,22 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .MustHaveHappened();
         }
 
+        private async Task TestBackupFailedAsync(AssetEvent @event, long version)
+        {
+            var assetStream = new MemoryStream();
+            var assetId = @event.AssetId;
+
+            var context = CreateBackupContext();
+
+            A.CallTo(() => context.Writer.WriteBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>._))
+                .Invokes((string _, Func<Stream, Task> handler) => handler(assetStream));
+
+            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, version, assetStream, default, default))
+                .Throws(new AssetNotFoundException(assetId.ToString()));
+
+            await sut.BackupEventAsync(AppEvent(@event), context);
+        }
+
         [Fact]
         public async Task Should_restore_created_asset()
         {
@@ -117,11 +150,27 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Should_restore_created_asset_with_missing_file()
+        {
+            var @event = new AssetCreated { AssetId = DomainId.NewGuid() };
+
+            await TestRestoreFailedAsync(@event, 0);
+        }
+
+        [Fact]
         public async Task Should_restore_updated_asset()
         {
             var @event = new AssetUpdated { AppId = appId, AssetId = DomainId.NewGuid(), FileVersion = 3 };
 
             await TestRestoreAsync(@event, @event.FileVersion);
+        }
+
+        [Fact]
+        public async Task Should_restore_updated_asset_with_missing_file()
+        {
+            var @event = new AssetUpdated { AppId = appId, AssetId = DomainId.NewGuid(), FileVersion = 3 };
+
+            await TestRestoreFailedAsync(@event, @event.FileVersion);
         }
 
         private async Task TestRestoreAsync(AssetEvent @event, long version)
@@ -138,6 +187,22 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, assetStream, default))
                 .MustHaveHappened();
+        }
+
+        private async Task TestRestoreFailedAsync(AssetEvent @event, long version)
+        {
+            var assetStream = new MemoryStream();
+            var assetId = @event.AssetId;
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => context.Reader.ReadBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>._))
+                .Throws(new FileNotFoundException());
+
+            await sut.RestoreEventAsync(AppEvent(@event), context);
+
+            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, assetStream, default))
+                .MustNotHaveHappened();
         }
 
         [Fact]

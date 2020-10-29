@@ -6,12 +6,14 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -122,20 +124,34 @@ namespace Squidex.Domain.Apps.Entities.Assets
             await context.Writer.WriteJsonAsync(TagsFile, tags);
         }
 
-        private Task WriteAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupWriter writer)
+        private async Task WriteAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupWriter writer)
         {
-            return writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
+            try
             {
-                return assetFileStore.DownloadAsync(appId, assetId, fileVersion, stream);
-            });
+                await writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
+                {
+                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, stream);
+                });
+            }
+            catch (AssetNotFoundException)
+            {
+                return;
+            }
         }
 
-        private Task ReadAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupReader reader)
+        private async Task ReadAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupReader reader)
         {
-            return reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
+            try
             {
-                return assetFileStore.UploadAsync(appId, assetId, fileVersion, stream);
-            });
+                await reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
+                {
+                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, stream);
+                });
+            }
+            catch (FileNotFoundException)
+            {
+                return;
+            }
         }
 
         private static string GetName(DomainId assetId, long fileVersion)

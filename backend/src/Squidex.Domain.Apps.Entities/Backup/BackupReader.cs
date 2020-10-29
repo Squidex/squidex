@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
 
-            if (attachmentEntry == null)
+            if (attachmentEntry == null || attachmentEntry.Length == 0)
             {
                 throw new FileNotFoundException("Cannot find attachment.", name);
             }
