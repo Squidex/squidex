@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             foreach (var @event in storedEvents)
             {
-                var parsedEvent = eventDataFormatter.Parse(@event.Data);
+                var parsedEvent = eventDataFormatter.Parse(@event);
 
                 version = @event.EventStreamNumber;
 

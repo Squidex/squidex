@@ -54,8 +54,9 @@ namespace Squidex.Infrastructure.EventSourcing
             inputEvent.SetTimestamp(SystemClock.Instance.GetCurrentInstant());
 
             var eventData = sut.ToEventData(inputEvent, commitId);
+            var eventStored = new StoredEvent("stream", "0", -1, eventData);
 
-            var outputEvent = sut.Parse(eventData).To<MyEvent>();
+            var outputEvent = sut.Parse(eventStored).To<MyEvent>();
 
             AssertHeaders(inputEvent.Headers, outputEvent.Headers);
             AssertPayload(inputEvent, outputEvent);
@@ -67,8 +68,9 @@ namespace Squidex.Infrastructure.EventSourcing
             var inputEvent = new Envelope<MyOldEvent>(new MyOldEvent { MyProperty = "My-Property" });
 
             var eventData = sut.ToEventData(inputEvent, Guid.NewGuid());
+            var eventStored = new StoredEvent("stream", "0", -1, eventData);
 
-            var outputEvent = sut.Parse(eventData).To<MyEvent>();
+            var outputEvent = sut.Parse(eventStored).To<MyEvent>();
 
             Assert.Equal(inputEvent.Payload.MyProperty, outputEvent.Payload.MyProperty);
         }
@@ -79,8 +81,9 @@ namespace Squidex.Infrastructure.EventSourcing
             var inputEvent = new Envelope<MyOldEvent>(new MyOldEvent { MyProperty = "My-Property" });
 
             var eventData = sut.ToEventData(inputEvent, Guid.NewGuid(), false);
+            var eventStored = new StoredEvent("stream", "0", -1, eventData);
 
-            var outputEvent = sut.Parse(eventData).To<MyEvent>();
+            var outputEvent = sut.Parse(eventStored).To<MyEvent>();
 
             Assert.Equal(inputEvent.Payload.MyProperty, outputEvent.Payload.MyProperty);
         }

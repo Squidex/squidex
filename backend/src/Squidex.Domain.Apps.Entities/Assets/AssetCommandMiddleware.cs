@@ -42,8 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetFileStore = assetFileStore;
             this.assetEnricher = assetEnricher;
             this.assetQuery = assetQuery;
-            this.contextProvider = contextProvider;
             this.assetMetadataSources = assetMetadataSources;
+            this.contextProvider = contextProvider;
         }
 
         public override async Task HandleAsync(CommandContext context, NextDelegate next)

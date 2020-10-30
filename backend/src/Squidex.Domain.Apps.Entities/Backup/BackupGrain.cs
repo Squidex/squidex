@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         await eventStore.QueryAsync(async storedEvent =>
                         {
-                            var @event = eventDataFormatter.Parse(storedEvent.Data);
+                            var @event = eventDataFormatter.Parse(storedEvent);
 
                             if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
                             {

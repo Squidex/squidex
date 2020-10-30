@@ -175,6 +175,7 @@ namespace Squidex.Infrastructure
         }
 
         [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NotNull(object? target, string parameterName)
         {
             if (target == null)
