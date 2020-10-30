@@ -1,5 +1,44 @@
 # Changelog
 
+## 5.3.0 - 2020-10-30
+
+### Breaking changes
+
+This changes reverts the changes from `5.1.0` and uses a normal handling of forwarded headers again.
+
+Futhermore it fixes some issues with the migration from 4.X versions. You have to run the migrations agains as explained here: https://docs.squidex.io/01-getting-started/installation/troubleshooting-and-support#my-migration-is-broken
+
+### Features
+
+* **Assets**: Upload assets by dropping a folder to the drop area.
+* **Assets**: Introduce a new option to fix broken asset files.
+* **Backups**: Ignore missing asset files during backup and restore.
+* **GraphQL**: Limit the number of parallel requests in GraphQL to keep the load on MongoDB low.
+* **GraphQL**: Resolve reverse references in GraphQL.
+* **Rules**: Log exceptions in rule handlers (actions).
+* **UI**: Provide access to the current language in field editors.
+
+### Bugfixes
+
+* **Assets**: Fix parent id for folders. See above.
+* **UI**: Several layout fixes in the UI.
+* **UI**: Several UI language fixes.
+
+## 4.7.6 - 2020-10-30
+
+### Features
+
+* **Assets**: Upload assets by dropping a folder to the drop area.
+* **GraphQL**: Limit the number of parallel requests in GraphQL to keep the load on MongoDB low.
+* **GraphQL**: Resolve reverse references in GraphQL.
+* **Rules**: Log exceptions in rule handlers (actions).
+* **UI**: Provide access to the current language in field editors.
+
+### Bugfixes
+
+* **UI**: Several layout fixes in the UI.
+* **UI**: Several UI language fixes.
+
 ## 5.1.0 - 2020-10-20
 
 ### Breaking Changes
