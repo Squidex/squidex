@@ -57,7 +57,7 @@
     <ng-container content>
         <sqx-list-view [isLoading]="assetsState.isLoading | async">
             <ng-container header>
-                <sqx-asset-path [path]="assetsState.path | async" (navigate)="assetsState.navigate($event)"></sqx-asset-path>
+                <sqx-asset-path [path]="assetsState.path | async" (navigate)="assetsState.navigate($event.id)"></sqx-asset-path>
             </ng-container>
 
             <div content>

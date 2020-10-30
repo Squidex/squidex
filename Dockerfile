@@ -8,7 +8,7 @@ ARG SQUIDEX__VERSION=4.0.0
 WORKDIR /src
 
 # Copy nuget project files.
-COPY backend/*.sln backend/NuGet.Config  ./
+COPY backend/*.sln ./
 
 # Copy the main source project files
 COPY backend/src/*/*.csproj ./
