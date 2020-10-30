@@ -16,7 +16,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
@@ -156,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                 {
                     try
                     {
-                        var @event = ParseKnownEvent(storedEvent);
+                        var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
                         if (@event != null)
                         {
@@ -212,23 +211,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     currentJobToken?.Dispose();
                     currentJobToken = null;
                 }
-            }
-        }
-
-        private Envelope<IEvent>? ParseKnownEvent(StoredEvent storedEvent)
-        {
-            try
-            {
-                var @event = eventDataFormatter.Parse(storedEvent.Data);
-
-                @event.SetEventPosition(storedEvent.EventPosition);
-                @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
-
-                return @event;
-            }
-            catch (TypeNameNotFoundException)
-            {
-                return null;
             }
         }
 

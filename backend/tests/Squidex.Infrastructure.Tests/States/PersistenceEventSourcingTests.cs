@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -66,8 +65,8 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => eventStore.QueryAsync(key, 0))
                 .Returns(new List<StoredEvent> { storedEvent });
 
-            A.CallTo(() => eventDataFormatter.Parse(storedEvent.Data))
-                .Throws(new TypeNameNotFoundException());
+            A.CallTo(() => eventDataFormatter.ParseIfKnown(storedEvent))
+                .Returns(null);
 
             var persistedEvents = new List<IEvent>();
             var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
@@ -274,7 +273,10 @@ namespace Squidex.Infrastructure.States
 
                 eventsStored.Add(eventStored);
 
-                A.CallTo(() => eventDataFormatter.Parse(eventData))
+                A.CallTo(() => eventDataFormatter.Parse(eventStored))
+                    .Returns(new Envelope<IEvent>(@event));
+
+                A.CallTo(() => eventDataFormatter.ParseIfKnown(eventStored))
                     .Returns(new Envelope<IEvent>(@event));
 
                 i++;

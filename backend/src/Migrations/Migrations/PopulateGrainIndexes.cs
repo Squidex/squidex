@@ -77,34 +77,37 @@ namespace Migrations.Migrations
 
             await eventStore.QueryAsync(storedEvent =>
             {
-                var @event = eventDataFormatter.Parse(storedEvent.Data);
+                var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
-                switch (@event.Payload)
+                if (@event != null)
                 {
-                    case AppCreated created:
-                        {
-                            RemoveApp(created.AppId, false);
-
-                            appsByName[created.Name] = created.AppId.Id;
-                            break;
-                        }
-
-                    case AppContributorAssigned contributorAssigned:
-                        {
-                            if (HasApp(contributorAssigned.AppId, true, out _))
+                    switch (@event.Payload)
+                    {
+                        case AppCreated created:
                             {
-                                Index(contributorAssigned.ContributorId).Add(contributorAssigned.AppId.Id);
+                                RemoveApp(created.AppId, false);
+
+                                appsByName[created.Name] = created.AppId.Id;
+                                break;
                             }
 
-                            break;
-                        }
+                        case AppContributorAssigned contributorAssigned:
+                            {
+                                if (HasApp(contributorAssigned.AppId, true, out _))
+                                {
+                                    Index(contributorAssigned.ContributorId).Add(contributorAssigned.AppId.Id);
+                                }
 
-                    case AppContributorRemoved contributorRemoved:
-                        Index(contributorRemoved.ContributorId).Remove(contributorRemoved.AppId.Id);
-                        break;
-                    case AppArchived archived:
-                        RemoveApp(archived.AppId, true);
-                        break;
+                                break;
+                            }
+
+                        case AppContributorRemoved contributorRemoved:
+                            Index(contributorRemoved.ContributorId).Remove(contributorRemoved.AppId.Id);
+                            break;
+                        case AppArchived archived:
+                            RemoveApp(archived.AppId, true);
+                            break;
+                    }
                 }
 
                 return Task.CompletedTask;
@@ -129,16 +132,19 @@ namespace Migrations.Migrations
 
             await eventStore.QueryAsync(storedEvent =>
             {
-                var @event = eventDataFormatter.Parse(storedEvent.Data);
+                var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
-                switch (@event.Payload)
+                if (@event != null)
                 {
-                    case RuleCreated created:
-                        Index(created).Add(created.RuleId);
-                        break;
-                    case RuleDeleted deleted:
-                        Index(deleted).Remove(deleted.RuleId);
-                        break;
+                    switch (@event.Payload)
+                    {
+                        case RuleCreated created:
+                            Index(created).Add(created.RuleId);
+                            break;
+                        case RuleDeleted deleted:
+                            Index(deleted).Remove(deleted.RuleId);
+                            break;
+                    }
                 }
 
                 return Task.CompletedTask;
@@ -161,16 +167,19 @@ namespace Migrations.Migrations
 
             await eventStore.QueryAsync(storedEvent =>
             {
-                var @event = eventDataFormatter.Parse(storedEvent.Data);
+                var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
-                switch (@event.Payload)
+                if (@event != null)
                 {
-                    case SchemaCreated created:
-                        Index(created)[created.SchemaId.Name] = created.SchemaId.Id;
-                        break;
-                    case SchemaDeleted deleted:
-                        Index(deleted).Remove(deleted.SchemaId.Name);
-                        break;
+                    switch (@event.Payload)
+                    {
+                        case SchemaCreated created:
+                            Index(created)[created.SchemaId.Name] = created.SchemaId.Id;
+                            break;
+                        case SchemaDeleted deleted:
+                            Index(deleted).Remove(deleted.SchemaId.Name);
+                            break;
+                    }
                 }
 
                 return Task.CompletedTask;

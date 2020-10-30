@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
@@ -63,7 +62,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 {
                     try
                     {
-                        job.Event = ParseKnownEvent(job.StoredEvent!);
+                        job.Event = eventDataFormatter.ParseIfKnown(job.StoredEvent!);
                     }
                     catch (Exception ex)
                     {
@@ -154,23 +153,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         public void Unsubscribe()
         {
             eventSubscription.Unsubscribe();
-        }
-
-        private Envelope<IEvent>? ParseKnownEvent(StoredEvent storedEvent)
-        {
-            try
-            {
-                var @event = eventDataFormatter.Parse(storedEvent.Data);
-
-                @event.SetEventPosition(storedEvent.EventPosition);
-                @event.SetEventStreamNumber(storedEvent.EventStreamNumber);
-
-                return @event;
-            }
-            catch (TypeNameNotFoundException)
-            {
-                return null;
-            }
         }
 
         public Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
