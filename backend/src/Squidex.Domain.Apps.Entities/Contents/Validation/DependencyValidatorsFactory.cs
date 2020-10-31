@@ -29,8 +29,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
             this.contentRepository = contentRepository;
         }
 
-        public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, FieldValidatorFactory createFieldValidator)
+        public IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, FieldValidatorFactory createFieldValidator)
         {
+            if (context.Mode == ValidationMode.Optimized)
+            {
+                yield break;
+            }
+
             if (field is IField<AssetsFieldProperties> assetsField)
             {
                 var checkAssets = new CheckAssets(async ids =>

@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     return @event;
                 }
 
-                if (!source.Properties.DeepEquals(target.Properties))
+                if (!source.Properties.Equals(target.Properties))
                 {
                     yield return E(new SchemaUpdated { Properties = target.Properties });
                 }

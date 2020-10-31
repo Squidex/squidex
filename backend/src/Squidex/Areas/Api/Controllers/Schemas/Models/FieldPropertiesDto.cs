@@ -44,6 +44,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public bool IsRequired { get; set; }
 
         /// <summary>
+        /// Indicates if the field is required when publishing.
+        /// </summary>
+        public bool IsRequiredOnPublish { get; set; }
+
+        /// <summary>
         /// Indicates if the field should be rendered with half width only.
         /// </summary>
         public bool IsHalfWidth { get; set; }

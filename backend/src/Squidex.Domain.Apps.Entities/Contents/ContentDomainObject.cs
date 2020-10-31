@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Guards;
-using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Domain.Apps.Entities.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
@@ -22,28 +22,19 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class ContentDomainObject : LogSnapshotDomainObject<ContentState>
     {
-        private readonly IContentWorkflow contentWorkflow;
-        private readonly IContentRepository contentRepository;
         private readonly ContentOperationContext context;
 
         public ContentDomainObject(IStore<DomainId> store, ISemanticLog log,
-            IContentWorkflow contentWorkflow,
-            IContentRepository contentRepository,
             ContentOperationContext context)
             : base(store, log)
         {
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
             Guard.NotNull(context, nameof(context));
 
-            this.contentWorkflow = contentWorkflow;
-            this.contentRepository = contentRepository;
             this.context = context;
         }
 
@@ -67,8 +58,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public override Task<object?> ExecuteAsync(IAggregateCommand command)
         {
-            VerifyNotDeleted();
-
             switch (command)
             {
                 case UpsertContent uspertContent:
@@ -92,13 +81,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         await LoadContext(c.AppId, c.SchemaId, c, c.OptimizeValidation);
 
-                        await GuardContent.CanCreate(context.Schema, contentWorkflow, c);
+                        await GuardContent.CanCreate(context.Schema, context.Workflow, c);
 
-                        var status = await contentWorkflow.GetInitialStatusAsync(context.Schema);
+                        var status = await context.GetInitialStatusAsync();
 
                         if (!c.DoNotValidate)
                         {
-                            await context.ValidateInputAsync(c.Data);
+                            await context.ValidateInputAsync(c.Data, createContent.Publish);
                         }
 
                         if (!c.DoNotScript)
@@ -144,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         GuardContent.CanCreateDraft(c, Snapshot);
 
-                        var status = await contentWorkflow.GetInitialStatusAsync(context.Schema);
+                        var status = await context.GetInitialStatusAsync();
 
                         CreateDraft(c, status);
 
@@ -166,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case UpdateContent updateContent:
                     return UpdateReturnAsync(updateContent, async c =>
                     {
-                        await GuardContent.CanUpdate(Snapshot, contentWorkflow, c);
+                        await GuardContent.CanUpdate(Snapshot, context.Workflow, c);
 
                         return await UpdateAsync(c, x => c.Data, false);
                     });
@@ -174,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case PatchContent patchContent:
                     return UpdateReturnAsync(patchContent, async c =>
                     {
-                        await GuardContent.CanPatch(Snapshot, contentWorkflow, c);
+                        await GuardContent.CanPatch(Snapshot, context.Workflow, c);
 
                         return await UpdateAsync(c, c.Data.MergeInto, true);
                     });
@@ -186,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
 
-                            await GuardContent.CanChangeStatus(context.Schema, Snapshot, contentWorkflow, c);
+                            await GuardContent.CanChangeStatus(context.Schema, Snapshot, context.Workflow, c);
 
                             if (c.DueTime.HasValue)
                             {
@@ -196,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             {
                                 var change = GetChange(c);
 
-                                if (!c.DoNotScript)
+                                if (!c.DoNotScript && context.HasScript(c => c.Change))
                                 {
                                     var data = Snapshot.Data.Clone();
 
@@ -215,6 +204,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                                         Update(command, newData);
                                     }
+                                }
+
+                                if (!c.DoNotValidate && change == StatusChange.Published)
+                                {
+                                    await context.ValidateOnPublishAsync(Snapshot.Data);
                                 }
 
                                 ChangeStatus(c, change);
@@ -240,7 +234,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
 
-                        GuardContent.CanDelete(context.Schema, c);
+                        await GuardContent.CanDelete(context.Schema, Snapshot, context.Repository, c);
 
                         if (!c.DoNotScript)
                         {
@@ -252,16 +246,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     Status = Snapshot.EditingStatus,
                                     StatusOld = default
                                 });
-                        }
-
-                        if (c.CheckReferrers)
-                        {
-                            var hasReferrer = await contentRepository.HasReferrersAsync(Snapshot.AppId.Id, c.AggregateId);
-
-                            if (hasReferrer)
-                            {
-                                throw new DomainException(T.Get("contents.referenced"));
-                            }
                         }
 
                         Delete(c);
@@ -290,7 +274,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     }
                     else
                     {
-                        await context.ValidateInputAsync(command.Data);
+                        await context.ValidateInputAsync(command.Data, false);
                     }
                 }
 
@@ -385,14 +369,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             return change;
-        }
-
-        private void VerifyNotDeleted()
-        {
-            if (Snapshot.IsDeleted)
-            {
-                throw new DomainException(T.Get("contents.alreadyDeleted"));
-            }
         }
 
         private Task LoadContext(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, bool optimized = false)

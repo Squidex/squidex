@@ -35,6 +35,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string? ContentSidebarUrl { get; set; }
 
         /// <summary>
+        /// True to validate the content items on publish.
+        /// </summary>
+        public bool ValidateOnPublish { get; set; }
+
+        /// <summary>
         /// Tags for automation processes.
         /// </summary>
         public ReadOnlyCollection<string>? Tags { get; set; }

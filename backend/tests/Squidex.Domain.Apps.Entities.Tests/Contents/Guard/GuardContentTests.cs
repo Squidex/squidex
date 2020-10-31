@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Guards;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -26,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
     public class GuardContentTests : IClassFixture<TranslationsFixture>
     {
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
+        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
@@ -254,7 +256,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             CreateSchema(false);
 
-            var content = new ContentState();
+            var content = CreateContent(Status.Published);
             var command = new DeleteContentDraft();
 
             Assert.Throws<DomainException>(() => GuardContent.CanDeleteDraft(command, content));
@@ -270,23 +272,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         }
 
         [Fact]
-        public void CanDelete_should_throw_exception_if_singleton()
+        public async Task CanDelete_should_throw_exception_if_singleton()
         {
             var schema = CreateSchema(true);
 
+            var content = CreateContent(Status.Published);
             var command = new DeleteContent();
 
-            Assert.Throws<DomainException>(() => GuardContent.CanDelete(schema, command));
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanDelete(schema, content, contentRepository, command));
         }
 
         [Fact]
-        public void CanDelete_should_not_throw_exception()
+        public async Task CanDelete_should_throw_exception_if_referenced()
+        {
+            var schema = CreateSchema(true);
+
+            var content = CreateContent(Status.Published);
+            var command = new DeleteContent();
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, content.Id))
+                .Returns(true);
+
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanDelete(schema, content, contentRepository, command));
+        }
+
+        [Fact]
+        public async Task CanDelete_should_not_throw_exception()
         {
             var schema = CreateSchema(false);
 
+            var content = CreateContent(Status.Published);
             var command = new DeleteContent();
 
-            GuardContent.CanDelete(schema, command);
+            await GuardContent.CanDelete(schema, content, contentRepository, command);
         }
 
         private void SetupCanUpdate(bool canUpdate)
@@ -306,19 +324,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "my-schema"), new Schema("schema", isSingleton: isSingleton));
         }
 
-        private static ContentState CreateDraftContent(Status status)
+        private ContentState CreateDraftContent(Status status)
         {
             return new ContentState
             {
-                NewVersion = new ContentVersion(status, new NamedContentData())
+                Id = DomainId.NewGuid(),
+                NewVersion = new ContentVersion(status, new NamedContentData()),
+                AppId = appId
             };
         }
 
-        private static ContentState CreateContent(Status status)
+        private ContentState CreateContent(Status status)
         {
             return new ContentState
             {
-                CurrentVersion = new ContentVersion(status, new NamedContentData())
+                Id = DomainId.NewGuid(),
+                CurrentVersion = new ContentVersion(status, new NamedContentData()),
+                AppId = appId
             };
         }
     }

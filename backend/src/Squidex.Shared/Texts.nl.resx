@@ -442,9 +442,6 @@
   <data name="common.workflowTransition" xml:space="preserve">
     <value>Overgang</value>
   </data>
-  <data name="contents.alreadyDeleted" xml:space="preserve">
-    <value>Content is al verwijderd.</value>
-  </data>
   <data name="contents.bulkInsertQueryNotUnique" xml:space="preserve">
     <value>Meer dan één inhoud komt overeen met de zoekopdracht.</value>
   </data>

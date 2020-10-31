@@ -643,6 +643,7 @@ describe('SchemasService', () => {
                 label: `label${id}${suffix}`,
                 contentsSidebarUrl: `url/to/contents/${id}${suffix}`,
                 contentSidebarUrl: `url/to/content/${id}${suffix}`,
+                validateOnPublish: id % 2 === 1,
                 tags: [
                     `tags${id}${suffix}`
                 ],
@@ -823,6 +824,7 @@ function createSchemaProperties(id: number, suffix = '') {
         `hints${id}${suffix}`,
         `url/to/contents/${id}${suffix}`,
         `url/to/content/${id}${suffix}`,
+        id % 2 === 0,
         [
             `tags${id}${suffix}`
         ]

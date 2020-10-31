@@ -31,11 +31,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
-            if (context.Mode == ValidationMode.Optimized)
-            {
-                return;
-            }
-
             if (value is ICollection<DomainId> contentIds)
             {
                 var foundIds = await checkReferences(contentIds.ToHashSet());

@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public void LoadData(NamedContentData data, Schema schema, DataConverter converter)
         {
-            ReferencedIds = data.GetReferencedIds(schema).Select(x => DomainId.Combine(AppId, x)).ToHashSet();
+            ReferencedIds = data.GetReferencedIds(schema).ToHashSet();
 
             DataByIds = converter.ToMongoModel(data, schema);
         }

@@ -135,6 +135,7 @@ export abstract class FieldPropertiesDto {
     public readonly editorUrl?: string;
     public readonly hints?: string;
     public readonly isRequired: boolean = false;
+    public readonly isRequiredOnPublish: boolean = false;
     public readonly isHalfWidth: boolean = false;
     public readonly label?: string;
     public readonly placeholder?: string;

@@ -31,44 +31,44 @@ namespace Squidex.Domain.Apps.Entities
 
         public Q WithQuery(ClrQuery? query)
         {
-            return Clone(c => c.Query = query);
+            return Clone(clone => clone.Query = query);
         }
 
         public Q WithODataQuery(string? odataQuery)
         {
-            return Clone(c => c.ODataQuery = odataQuery);
+            return Clone(clone => clone.ODataQuery = odataQuery);
         }
 
         public Q WithJsonQuery(string? jsonQuery)
         {
-            return Clone(c => c.JsonQuery = jsonQuery);
+            return Clone(clone => clone.JsonQuery = jsonQuery);
         }
 
         public Q WithJsonQuery(Query<IJsonValue>? jsonQuery)
         {
-            return Clone(c => c.ParsedJsonQuery = jsonQuery);
+            return Clone(clone => clone.ParsedJsonQuery = jsonQuery);
         }
 
         public Q WithIds(params DomainId[] ids)
         {
-            return Clone(c => c.Ids = ids.ToList());
+            return Clone(clone => clone.Ids = ids.ToList());
         }
 
         public Q WithReference(DomainId? reference)
         {
-            return Clone(c => c.Reference = reference);
+            return Clone(clone => clone.Reference = reference);
         }
 
         public Q WithIds(IEnumerable<DomainId> ids)
         {
-            return Clone(c => c.Ids = ids.ToList());
+            return Clone(clone => clone.Ids = ids.ToList());
         }
 
         public Q WithIds(string? ids)
         {
             if (!string.IsNullOrEmpty(ids))
             {
-                return Clone(c =>
+                return Clone(clone =>
                 {
                     var idsList = new List<DomainId>();
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities
                         idsList.Add(DomainId.Create(id));
                     }
 
-                    c.Ids = idsList;
+                    clone.Ids = idsList;
                 });
             }
 

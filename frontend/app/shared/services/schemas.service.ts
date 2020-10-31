@@ -325,6 +325,7 @@ export class SchemaPropertiesDto {
         public readonly hints?: string,
         public readonly contentsSidebarUrl?: string,
         public readonly contentSidebarUrl?: string,
+        public readonly validateOnPublish?: boolean,
         public readonly tags?: ReadonlyArray<string>
     ) {
     }
@@ -366,6 +367,7 @@ export interface UpdateSchemaDto {
     readonly hints?: string;
     readonly contentsSidebarUrl?: string;
     readonly contentSidebarUrl?: string;
+    readonly validateOnPublish?: boolean;
     readonly tags?: ReadonlyArray<string>;
 }
 
@@ -741,6 +743,7 @@ function parseProperties(response: any) {
         response.hints,
         response.contentsSidebarUrl,
         response.contentSidebarUrl,
+        response.validateOnPublish,
         response.tags);
 }
 

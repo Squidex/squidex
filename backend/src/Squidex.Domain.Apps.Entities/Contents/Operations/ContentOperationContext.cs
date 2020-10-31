@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.DefaultValues;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -16,6 +17,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
@@ -23,7 +25,7 @@ using Squidex.Infrastructure.Validation;
 
 #pragma warning disable IDE0016 // Use 'throw' expression
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Operations
 {
     public sealed class ContentOperationContext
     {
@@ -37,20 +39,37 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IScriptEngine scriptEngine;
         private readonly ISemanticLog log;
         private readonly IAppProvider appProvider;
-        private readonly IEnumerable<IValidatorsFactory> factories;
+        private readonly IEnumerable<IValidatorsFactory> validators;
+        private readonly IContentWorkflow contentWorkflow;
+        private readonly IContentRepository contentRepository;
         private ISchemaEntity schema;
         private IAppEntity app;
         private ContentCommand command;
         private ValidationContext validationContext;
 
+        public IContentWorkflow Workflow => contentWorkflow;
+
+        public IContentRepository Repository => contentRepository;
+
         public ContentOperationContext(
             IAppProvider appProvider,
-            IEnumerable<IValidatorsFactory> factories,
+            IEnumerable<IValidatorsFactory> validators,
+            IContentWorkflow contentWorkflow,
+            IContentRepository contentRepository,
             IScriptEngine scriptEngine,
             ISemanticLog log)
         {
+            Guard.NotDefault(appProvider, nameof(appProvider));
+            Guard.NotDefault(validators, nameof(validators));
+            Guard.NotDefault(contentWorkflow, nameof(contentWorkflow));
+            Guard.NotDefault(contentRepository, nameof(contentRepository));
+            Guard.NotDefault(scriptEngine, nameof(scriptEngine));
+            Guard.NotDefault(log, nameof(log));
+
             this.appProvider = appProvider;
-            this.factories = factories;
+            this.validators = validators;
+            this.contentWorkflow = contentWorkflow;
+            this.contentRepository = contentRepository;
             this.scriptEngine = scriptEngine;
 
             this.log = log;
@@ -84,16 +103,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
             validationContext = new ValidationContext(appId, schemaId, schema.SchemaDef, command.ContentId).Optimized(optimized);
         }
 
+        public Task<Status> GetInitialStatusAsync()
+        {
+            return contentWorkflow.GetInitialStatusAsync(schema);
+        }
+
         public Task GenerateDefaultValuesAsync(NamedContentData data)
         {
-            data.GenerateDefaultValues(schema.SchemaDef, app.PartitionResolver());
+            data.GenerateDefaultValues(schema.SchemaDef, Partition());
 
             return Task.CompletedTask;
         }
 
-        public async Task ValidateInputAsync(NamedContentData data)
+        public async Task ValidateInputAsync(NamedContentData data, bool publish)
         {
-            var validator = new ContentValidator(app.PartitionResolver(), validationContext, factories, log);
+            var validator =
+                new ContentValidator(Partition(),
+                    validationContext.AsPublishing(publish), validators, log);
 
             await validator.ValidateInputAsync(data);
 
@@ -102,7 +128,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task ValidateInputPartialAsync(NamedContentData data)
         {
-            var validator = new ContentValidator(app.PartitionResolver(), validationContext, factories, log);
+            var validator =
+                new ContentValidator(Partition(),
+                    validationContext, validators, log);
 
             await validator.ValidateInputPartialAsync(data);
 
@@ -111,8 +139,27 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task ValidateContentAsync(NamedContentData data)
         {
-            var validator = new ContentValidator(app.PartitionResolver(), validationContext, factories, log);
+            var validator =
+                new ContentValidator(Partition(),
+                    validationContext, validators, log);
 
+            await validator.ValidateContentAsync(data);
+
+            CheckErrors(validator);
+        }
+
+        public async Task ValidateOnPublishAsync(NamedContentData data)
+        {
+            if (!schema.SchemaDef.Properties.ValidateOnPublish)
+            {
+                return;
+            }
+
+            var validator =
+                new ContentValidator(Partition(),
+                    validationContext.AsPublishing(), validators, log);
+
+            await validator.ValidateInputAsync(data);
             await validator.ValidateContentAsync(data);
 
             CheckErrors(validator);
@@ -124,6 +171,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 throw new ValidationException(validator.Errors.ToList());
             }
+        }
+
+        public bool HasScript(Func<SchemaScripts, string> script)
+        {
+            return !string.IsNullOrWhiteSpace(GetScript(script));
         }
 
         public async Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptVars context)
@@ -152,6 +204,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             await scriptEngine.ExecuteAsync(context, GetScript(script), ScriptOptions);
+        }
+
+        private PartitionResolver Partition()
+        {
+            return app.PartitionResolver();
         }
 
         private void Enrich(ScriptVars context)

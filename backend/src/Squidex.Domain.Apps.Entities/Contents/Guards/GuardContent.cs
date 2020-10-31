@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -112,13 +113,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             });
         }
 
-        public static void CanDelete(ISchemaEntity schema, DeleteContent command)
+        public static async Task CanDelete(ISchemaEntity schema, ContentState content, IContentRepository contentRepository, DeleteContent command)
         {
             Guard.NotNull(command, nameof(command));
 
             if (schema.SchemaDef.IsSingleton)
             {
                 throw new DomainException(T.Get("contents.singletonNotDeletable"));
+            }
+
+            if (command.CheckReferrers)
+            {
+                var hasReferrer = await contentRepository.HasReferrersAsync(content.AppId.Id, command.ContentId);
+
+                if (hasReferrer)
+                {
+                    throw new DomainException(T.Get("contents.referenced"));
+                }
             }
         }
 

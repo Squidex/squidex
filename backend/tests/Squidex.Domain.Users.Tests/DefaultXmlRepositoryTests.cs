@@ -28,17 +28,17 @@ namespace Squidex.Domain.Users
         [Fact]
         public void Should_read_from_store()
         {
-            A.CallTo(() => store.ReadAllAsync(A< Func<DefaultXmlRepository.State, long, Task>>._, A<CancellationToken>._))
+            A.CallTo(() => store.ReadAllAsync(A<Func<DefaultXmlRepository.State, long, Task>>._, A<CancellationToken>._))
                 .Invokes((Func<DefaultXmlRepository.State, long, Task> callback, CancellationToken _) =>
                 {
                     callback(new DefaultXmlRepository.State
                     {
-                        Xml = new XElement("a").ToString()
+                        Xml = new XElement("xml").ToString()
                     }, 0);
 
                     callback(new DefaultXmlRepository.State
                     {
-                        Xml = new XElement("b").ToString()
+                        Xml = new XElement("xml").ToString()
                     }, 0);
                 });
 
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Users
         [Fact]
         public void Should_write_to_store()
         {
-            var xml = new XElement("x");
+            var xml = new XElement("xml");
 
             sut.StoreElement(xml, "name");
 

@@ -39,11 +39,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(factories, nameof(factories));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
+            Guard.NotNull(log, nameof(log));
 
             this.context = context;
             this.factories = factories;
-            this.log = log;
             this.partitionResolver = partitionResolver;
+
+            this.log = log;
         }
 
         private void AddError(IEnumerable<string> path, string message)
@@ -82,28 +84,28 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         private IValidator CreateSchemaValidator(bool isPartial)
         {
-            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(context.Schema.Fields.Count);
+            var fieldValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(context.Schema.Fields.Count);
 
             foreach (var field in context.Schema.Fields)
             {
-                fieldsValidators[field.Name] = (!field.RawProperties.IsRequired, CreateFieldValidator(field, isPartial));
+                fieldValidators[field.Name] = (!field.RawProperties.IsRequired, CreateFieldValidator(field, isPartial));
             }
 
-            return new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field");
+            return new ObjectValidator<ContentFieldData>(fieldValidators, isPartial, "field");
         }
 
         private IValidator CreateFieldValidator(IRootField field, bool isPartial)
         {
-            var partitioning = partitionResolver(field.Partitioning);
-
             var fieldValidator = CreateFieldValidator(field);
-            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
+
+            var partitioning = partitionResolver(field.Partitioning);
+            var partitioningValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
 
             foreach (var partitionKey in partitioning.AllKeys)
             {
                 var optional = partitioning.IsOptional(partitionKey);
 
-                fieldsValidators[partitionKey] = (optional, fieldValidator);
+                partitioningValidators[partitionKey] = (optional, fieldValidator);
             }
 
             var typeName = partitioning.ToString()!;
@@ -111,7 +113,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return new AggregateValidator(
                 CreateFieldValidators(field)
                     .Union(Enumerable.Repeat(
-                        new ObjectValidator<IJsonValue>(fieldsValidators, isPartial, typeName), 1)), log);
+                        new ObjectValidator<IJsonValue>(partitioningValidators, isPartial, typeName), 1)), log);
         }
 
         private IValidator CreateFieldValidator(IField field)

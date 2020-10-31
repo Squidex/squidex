@@ -35,11 +35,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
-            if (context.Mode == ValidationMode.Optimized)
-            {
-                return;
-            }
-
             if (value is ICollection<DomainId> assetIds && assetIds.Count > 0)
             {
                 var assets = await checkAssets(assetIds);
@@ -61,12 +56,16 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (properties.MinSize.HasValue && asset.FileSize < properties.MinSize)
                     {
-                        addError(path, T.Get("contents.validation.minimumSize", new { size = asset.FileSize.ToReadableSize(), min = properties.MinSize.Value.ToReadableSize() }));
+                        var min = properties.MinSize.Value.ToReadableSize();
+
+                        addError(path, T.Get("contents.validation.minimumSize", new { size = asset.FileSize.ToReadableSize(), min }));
                     }
 
                     if (properties.MaxSize.HasValue && asset.FileSize > properties.MaxSize)
                     {
-                        addError(path, T.Get("contents.validation.maximumSize", new { size = asset.FileSize.ToReadableSize(), max = properties.MaxSize.Value.ToReadableSize() }));
+                        var max = properties.MaxSize.Value.ToReadableSize();
+
+                        addError(path, T.Get("contents.validation.maximumSize", new { size = asset.FileSize.ToReadableSize(), max }));
                     }
 
                     if (properties.AllowedExtensions != null &&

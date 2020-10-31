@@ -17,18 +17,21 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumerable<IValidator>>
     {
+        private readonly ValidatorContext context;
         private readonly FieldValidatorFactory createFieldValidator;
 
-        private DefaultFieldValueValidatorsFactory(FieldValidatorFactory createFieldValidator)
+        private DefaultFieldValueValidatorsFactory(ValidatorContext context, FieldValidatorFactory createFieldValidator)
         {
+            this.context = context;
             this.createFieldValidator = createFieldValidator;
         }
 
-        public static IEnumerable<IValidator> CreateValidators(IField field, FieldValidatorFactory createFieldValidator)
+        public static IEnumerable<IValidator> CreateValidators(ValidatorContext context, IField field, FieldValidatorFactory createFieldValidator)
         {
+            Guard.NotNull(context, nameof(context));
             Guard.NotNull(field, nameof(field));
 
-            var visitor = new DefaultFieldValueValidatorsFactory(createFieldValidator);
+            var visitor = new DefaultFieldValueValidatorsFactory(context, createFieldValidator);
 
             return field.Accept(visitor);
         }
@@ -37,28 +40,32 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator(properties.IsRequired, properties.MinItems, properties.MaxItems);
+                yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }
 
-            var nestedSchema = new Dictionary<string, (bool IsOptional, IValidator Validator)>(field.Fields.Count);
+            var nestedValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(field.Fields.Count);
 
             foreach (var nestedField in field.Fields)
             {
-                nestedSchema[nestedField.Name] = (false, createFieldValidator(nestedField));
+                nestedValidators[nestedField.Name] = (false, createFieldValidator(nestedField));
             }
 
-            yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedSchema, false, "field"));
+            yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedValidators, false, "field"));
         }
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator(properties.IsRequired, properties.MinItems, properties.MaxItems);
+                yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }
 
             if (!properties.AllowDuplicates)
@@ -71,7 +78,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired)
             {
                 yield return new RequiredValidator();
             }
@@ -81,7 +90,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired)
             {
                 yield return new RequiredValidator();
             }
@@ -96,7 +107,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired)
             {
                 yield return new RequiredValidator();
             }
@@ -106,7 +119,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired)
             {
                 yield return new RequiredValidator();
             }
@@ -116,7 +131,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired)
             {
                 yield return new RequiredValidator();
             }
@@ -136,9 +153,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator(properties.IsRequired, properties.MinItems, properties.MaxItems);
+                yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }
 
             if (!properties.AllowDuplicates)
@@ -151,7 +170,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired)
             {
                 yield return new RequiredStringValidator(true);
             }
@@ -200,9 +221,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var properties = field.Properties;
 
-            if (properties.IsRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
+            var isRequired = IsRequired(properties);
+
+            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator(properties.IsRequired, properties.MinItems, properties.MaxItems);
+                yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }
 
             if (properties.AllowedValues != null)
@@ -219,6 +242,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             {
                 yield return NoValueValidator.Instance;
             }
+        }
+
+        private bool IsRequired(FieldProperties properties)
+        {
+            var isRequired = properties.IsRequired;
+
+            if (context.Action == ValidationAction.Publish)
+            {
+                isRequired = isRequired || properties.IsRequiredOnPublish;
+            }
+
+            return isRequired;
         }
     }
 }

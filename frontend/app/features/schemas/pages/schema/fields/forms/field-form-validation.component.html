@@ -9,6 +9,17 @@
             </div>
         </div>
     </div>
+
+    <div class="form-group row mb-3">
+        <div class="col-9 offset-3">
+            <div class="custom-control custom-checkbox">
+                <input class="custom-control-input" type="checkbox" id="{{field.fieldId}}_fieldRequiredOnPublish" formControlName="isRequiredOnPublish">
+                <label class="custom-control-label" for="{{field.fieldId}}_fieldRequiredOnPublish">
+                    {{ 'schemas.field.requiredOnPublish' | sqxTranslate }}
+                </label>
+            </div>
+        </div>
+    </div>
 </div>
 
 <ng-container [ngSwitch]="field.rawProperties.fieldType">

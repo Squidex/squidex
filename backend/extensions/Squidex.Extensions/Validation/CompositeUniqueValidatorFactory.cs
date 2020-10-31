@@ -25,7 +25,7 @@ namespace Squidex.Extensions.Validation
             this.contentRepository = contentRepository;
         }
 
-        public IEnumerable<IValidator> CreateContentValidators(ValidationContext context, FieldValidatorFactory createFieldValidator)
+        public IEnumerable<IValidator> CreateContentValidators(ValidatorContext context, FieldValidatorFactory createFieldValidator)
         {
             foreach (var validatorTag in ValidatorTags(context.Schema.Properties.Tags))
             {

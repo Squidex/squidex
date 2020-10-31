@@ -18,7 +18,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public CollectionItemValidator(params IValidator[] itemValidators)
         {
-            Guard.NotNull(itemValidators, nameof(itemValidators));
             Guard.NotEmpty(itemValidators, nameof(itemValidators));
 
             this.itemValidators = itemValidators;

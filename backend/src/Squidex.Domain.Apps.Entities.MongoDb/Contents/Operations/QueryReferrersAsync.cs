@@ -28,14 +28,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public async Task<bool> DoAsync(DomainId appId, DomainId contentId)
         {
-            var currentId = DomainId.Combine(appId, contentId);
-
             var filter =
                 Filter.And(
-                    Filter.AnyEq(x => x.ReferencedIds, appId),
+                    Filter.AnyEq(x => x.ReferencedIds, contentId),
                     Filter.Eq(x => x.IndexedAppId, appId),
                     Filter.Ne(x => x.IsDeleted, true),
-                    Filter.Ne(x => x.Id, currentId));
+                    Filter.Ne(x => x.Id, contentId));
 
             var hasReferrerAsync =
                 await Collection.Find(filter).Only(x => x.Id)

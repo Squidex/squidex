@@ -119,7 +119,6 @@
   "common.workflow": "Workflow",
   "common.workflowStep": "Stap",
   "common.workflowTransition": "Overgang",
-  "contents.alreadyDeleted": "Content is al verwijderd.",
   "contents.bulkInsertQueryNotUnique": "Meer dan één inhoud komt overeen met de zoekopdracht.",
   "contents.draftNotCreateForUnpublished": "Je kunt alleen een nieuwe versie maken wanneer de inhoud is gepubliceerd.",
   "contents.draftToDeleteNotFound": "Er is niets te verwijderen.",

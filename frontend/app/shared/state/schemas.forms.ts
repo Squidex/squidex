@@ -214,6 +214,7 @@ export class EditFieldForm extends Form<FormGroup, {}, FieldPropertiesDto> {
             ],
             editorUrl: null,
             isRequired: false,
+            isRequiredOnPublish: false,
             isHalfWidth: false,
             tags: []
         }));
@@ -235,6 +236,7 @@ export class EditSchemaForm extends Form<FormGroup, UpdateSchemaDto, SchemaPrope
             ],
             contentsSidebarUrl: '',
             contentSidebarUrl: '',
+            validateOnPublish: false,
             tags: []
         }));
     }

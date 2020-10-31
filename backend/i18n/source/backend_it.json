@@ -118,7 +118,6 @@
   "common.workflow": "Workflow",
   "common.workflowStep": "Step",
   "common.workflowTransition": "Transizione",
-  "contents.alreadyDeleted": "Il contento è stato già eliminato.",
   "contents.bulkInsertQueryNotUnique": "Ci sono più contenuti che corrispondono alla query.",
   "contents.draftNotCreateForUnpublished": "Puoi creare versioni del contenuto solo se questo è pubblicato.",
   "contents.draftToDeleteNotFound": "Non c'è niente da eliminare.",

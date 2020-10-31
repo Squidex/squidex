@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -108,9 +109,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var validators = Enumerable.Repeat(new DefaultValidatorsFactory(), 1);
 
-            var context = new ContentOperationContext(appProvider, validators, scriptEngine, A.Fake<ISemanticLog>());
+            var context = new ContentOperationContext(appProvider,
+                validators,
+                contentWorkflow,
+                contentRepository,
+                scriptEngine, A.Fake<ISemanticLog>());
 
-            sut = new ContentDomainObject(Store, A.Dummy<ISemanticLog>(), contentWorkflow, contentRepository, context);
+            sut = new ContentDomainObject(Store, A.Dummy<ISemanticLog>(), context);
             sut.Setup(Id);
         }
 
@@ -588,7 +593,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
@@ -601,7 +606,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId))
                 .Returns(true);
 
             await PublishAsync(command);

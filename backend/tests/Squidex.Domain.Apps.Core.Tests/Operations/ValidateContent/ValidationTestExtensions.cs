@@ -118,14 +118,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         public static ValidationContext CreateContext(
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
-            ValidationUpdater? updater = null)
+            ValidationUpdater? updater = null,
+            ValidationAction action = ValidationAction.Upsert)
         {
             var context = new ValidationContext(
                 AppId,
                 SchemaId,
                 schema ?? new Schema(SchemaId.Name),
-                DomainId.NewGuid(),
-                mode);
+                DomainId.NewGuid());
+
+            context = context.WithMode(mode).WithAction(action);
 
             if (updater != null)
             {

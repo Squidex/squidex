@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.ObjectModel;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -19,9 +18,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string? ContentSidebarUrl { get; set; }
 
-        public bool DeepEquals(SchemaProperties properties)
-        {
-            return SimpleEquals.IsEquals(this, properties);
-        }
+        public bool ValidateOnPublish { get; set; }
     }
 }

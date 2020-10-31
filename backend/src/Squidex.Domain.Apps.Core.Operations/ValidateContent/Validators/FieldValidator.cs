@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,14 +18,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class FieldValidator : IValidator
     {
-        private readonly IValidator[]? validators;
+        private readonly IValidator[] validators;
         private readonly IField field;
 
         public FieldValidator(IEnumerable<IValidator>? validators, IField field)
         {
             Guard.NotNull(field, nameof(field));
 
-            this.validators = validators?.ToArray();
+            this.validators = validators?.ToArray() ?? Array.Empty<IValidator>();
 
             this.field = field;
         }
@@ -62,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 return;
             }
 
-            if (validators?.Length > 0)
+            if (validators.Length > 0)
             {
                 var tasks = new List<Task>();
 

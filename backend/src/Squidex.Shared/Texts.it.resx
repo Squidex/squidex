@@ -442,9 +442,6 @@
   <data name="common.workflowTransition" xml:space="preserve">
     <value>Transizione</value>
   </data>
-  <data name="contents.alreadyDeleted" xml:space="preserve">
-    <value>Il contento è stato già eliminato.</value>
-  </data>
   <data name="contents.bulkInsertQueryNotUnique" xml:space="preserve">
     <value>Ci sono più contenuti che corrispondono alla query.</value>
   </data>

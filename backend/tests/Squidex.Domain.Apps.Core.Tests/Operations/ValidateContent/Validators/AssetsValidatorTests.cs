@@ -103,18 +103,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_asset_are_not_valid_but_in_optimized_mode()
-        {
-            var assetId = DomainId.NewGuid();
-
-            var sut = Validator(new AssetsFieldProperties());
-
-            await sut.ValidateAsync(CreateValue(assetId), errors, updater: c => c.Optimized());
-
-            Assert.Empty(errors);
-        }
-
-        [Fact]
         public async Task Should_add_error_if_document_is_too_small()
         {
             var sut = Validator(new AssetsFieldProperties { MinSize = 5 * 1024 });

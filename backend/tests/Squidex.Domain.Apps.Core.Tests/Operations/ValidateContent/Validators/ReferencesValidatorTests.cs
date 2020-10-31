@@ -35,16 +35,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_reference_are_not_valid_but_in_optimized_mode()
-        {
-            var sut = new ReferencesValidator(Enumerable.Repeat(schemaId, 1), FoundReferences());
-
-            await sut.ValidateAsync(CreateValue(ref1), errors, updater: c => c.Optimized());
-
-            Assert.Empty(errors);
-        }
-
-        [Fact]
         public async Task Should_not_add_error_if_schemas_not_defined()
         {
             var sut = new ReferencesValidator(null, FoundReferences((DomainId.NewGuid(), ref2)));
