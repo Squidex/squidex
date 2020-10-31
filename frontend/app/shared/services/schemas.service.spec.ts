@@ -600,6 +600,19 @@ describe('SchemasService', () => {
         req.flush({});
     }));
 
+    function schemaPropertiesResponse(id: number, suffix = '') {
+        return {
+            label: `label${id}${suffix}`,
+            contentsSidebarUrl: `url/to/contents/${id}${suffix}`,
+            contentSidebarUrl: `url/to/content/${id}${suffix}`,
+            tags: [
+                `tags${id}${suffix}`
+            ],
+            validateOnPublish: id % 2 === 1,
+            hints: `hints${id}${suffix}`
+        };
+    }
+
     function schemaResponse(id: number, suffix = '') {
         return {
             id: `schema-id${id}${suffix}`,
@@ -611,15 +624,7 @@ describe('SchemasService', () => {
             createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
             lastModifiedBy: `modifier${id}`,
-            properties: {
-                label: `label${id}${suffix}`,
-                contentsSidebarUrl: `url/to/contents/${id}${suffix}`,
-                contentSidebarUrl: `url/to/content/${id}${suffix}`,
-                tags: [
-                    `tags${id}${suffix}`
-                ],
-                hints: `hints${id}${suffix}`
-            },
+            properties: schemaPropertiesResponse(id, suffix),
             version: `${id}`,
             _links: {
                 update: { method: 'PUT', href: `/schemas/${id}` }
@@ -639,16 +644,7 @@ describe('SchemasService', () => {
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
             lastModifiedBy: `modifier${id}`,
             version: `${id}`,
-            properties: {
-                label: `label${id}${suffix}`,
-                contentsSidebarUrl: `url/to/contents/${id}${suffix}`,
-                contentSidebarUrl: `url/to/content/${id}${suffix}`,
-                validateOnPublish: id % 2 === 1,
-                tags: [
-                    `tags${id}${suffix}`
-                ],
-                hints: `hints${id}${suffix}`
-            },
+            properties: schemaPropertiesResponse(id, suffix),
             previewUrls: {
                 Default: 'url'
             },
@@ -824,7 +820,7 @@ function createSchemaProperties(id: number, suffix = '') {
         `hints${id}${suffix}`,
         `url/to/contents/${id}${suffix}`,
         `url/to/content/${id}${suffix}`,
-        id % 2 === 0,
+        id % 2 === 1,
         [
             `tags${id}${suffix}`
         ]
