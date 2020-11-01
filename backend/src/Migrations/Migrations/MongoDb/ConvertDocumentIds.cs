@@ -116,10 +116,7 @@ namespace Migrations.Migrations.MongoDb
                     document["id"] = documentIdOld;
                     document["_id"] = documentIdNew;
 
-                    if (extraAction != null)
-                    {
-                        extraAction(document);
-                    }
+                    extraAction?.Invoke(document);
 
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", documentIdNew);
 
