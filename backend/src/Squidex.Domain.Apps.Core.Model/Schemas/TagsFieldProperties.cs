@@ -18,6 +18,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxItems { get; set; }
 
+        public string[]? DefaultValue { get; set; }
+
         public TagsFieldEditor Editor { get; set; }
 
         public TagsFieldNormalization Normalization { get; set; }

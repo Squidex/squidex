@@ -151,7 +151,7 @@ describe('ArrayField', () => {
         expect(FieldFormatter.format(field, 1)).toBe('0 Items');
     });
 
-    it('should return null for default properties', () => {
+    it('should return default value as null', () => {
         expect(FieldDefaultValue.get(field)).toBeNull();
     });
 });
@@ -179,8 +179,10 @@ describe('AssetsField', () => {
         expect(FieldFormatter.format(field, 1)).toBe('0 Assets');
     });
 
-    it('should return null for default properties', () => {
-        expect(FieldDefaultValue.get(field)).toBeNull();
+    it('should return default value from properties', () => {
+        const field2 = createField({ properties: createProperties('Assets', { defaultValue: ['1', '2'] }) });
+
+        expect(FieldDefaultValue.get(field2)).toEqual(['1', '2']);
     });
 });
 
@@ -203,8 +205,10 @@ describe('TagsField', () => {
         expect(FieldFormatter.format(field, 1)).toBe('');
     });
 
-    it('should return null for default properties', () => {
-        expect(FieldDefaultValue.get(field)).toBeNull();
+    it('should return default value from properties', () => {
+        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'] }) });
+
+        expect(FieldDefaultValue.get(field2)).toEqual(['1', '2']);
     });
 });
 
@@ -227,7 +231,7 @@ describe('BooleanField', () => {
         expect(FieldFormatter.format(field, false)).toBe('No');
     });
 
-    it('should return default value for default properties', () => {
+    it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('Boolean', { editor: 'Checkbox', defaultValue: true }) });
 
         expect(FieldDefaultValue.get(field2)).toBeTruthy();
@@ -277,19 +281,19 @@ describe('DateTimeField', () => {
         expect(FieldFormatter.format(field2, '2017-12-12T16:00:00Z')).toBe('12/12/2017, 4:00:00 PM');
     });
 
-    it('should return default for DateFieldProperties', () => {
+    it('should return default from properties value', () => {
         const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', defaultValue: '2017-10-12T16:00:00Z' }) });
 
         expect(FieldDefaultValue.get(field2)).toEqual('2017-10-12T16:00:00Z');
     });
 
-    it('should return calculated date when Today for DateFieldProperties', () => {
+    it('should return default from Today', () => {
         const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', calculatedDefaultValue: 'Today' }) });
 
         expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12T00:00:00Z');
     });
 
-    it('should return calculated date when Now for DateFieldProperties', () => {
+    it('should return default value from Today', () => {
         const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', calculatedDefaultValue: 'Now' }) });
 
         expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12T16:30:10Z');
@@ -311,7 +315,7 @@ describe('GeolocationField', () => {
         expect(FieldFormatter.format(field, { latitude: 42, longitude: 3.14 })).toBe('3.14, 42');
     });
 
-    it('should return null for default properties', () => {
+    it('should return default value as null', () => {
         expect(FieldDefaultValue.get(field)).toBeNull();
     });
 });
@@ -331,7 +335,7 @@ describe('JsonField', () => {
         expect(FieldFormatter.format(field, {})).toBe('<Json />');
     });
 
-    it('should return null for default properties', () => {
+    it('should return default value as null', () => {
         expect(FieldDefaultValue.get(field)).toBeNull();
     });
 });
@@ -381,7 +385,7 @@ describe('NumberField', () => {
         expect(FieldFormatter.format(field2, 3, false)).toEqual('3');
     });
 
-    it('should return default value for default properties', () => {
+    it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('Number', { defaultValue: 13 }) });
 
         expect(FieldDefaultValue.get(field2)).toEqual(13);
@@ -411,8 +415,10 @@ describe('ReferencesField', () => {
         expect(FieldFormatter.format(field, 1)).toBe('0 References');
     });
 
-    it('should return null for default properties', () => {
-        expect(FieldDefaultValue.get(field)).toBeNull();
+    it('should return default value from properties', () => {
+        const field2 = createField({ properties: createProperties('References', { defaultValue: ['1', '2'] }) });
+
+        expect(FieldDefaultValue.get(field2)).toEqual(['1', '2']);
     });
 });
 
@@ -449,7 +455,7 @@ describe('StringField', () => {
         expect(FieldFormatter.format(field2, 'https://images.com/123?x', true)).toBe('https://images.com/123?x');
     });
 
-    it('should return default value for default properties', () => {
+    it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('String', { defaultValue: 'MyDefault' }) });
 
         expect(FieldDefaultValue.get(field2)).toEqual('MyDefault');

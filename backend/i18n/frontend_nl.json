@@ -257,6 +257,7 @@
   "common.history": "Geschiedenis",
   "common.httpConflict": "De update is mislukt. Een andere gebruiker heeft een wijziging aangebracht. Laad opnieuw.",
   "common.httpLimit": "Je hebt de maximale limiet van API-aanroepen overschreden.",
+  "common.id": "Identity",
   "common.label": "Label",
   "common.language": "Language",
   "common.languages": "Talen",

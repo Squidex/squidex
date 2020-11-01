@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public AssetPreviewMode PreviewMode { get; set; }
 
+        public string[]? DefaultValue { get; set; }
+
         public int? MinItems { get; set; }
 
         public int? MaxItems { get; set; }

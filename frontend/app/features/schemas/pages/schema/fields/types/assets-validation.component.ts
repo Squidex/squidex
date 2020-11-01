@@ -63,5 +63,8 @@ export class AssetsValidationComponent implements OnInit {
 
         this.fieldForm.setControl('allowDuplicates',
             new FormControl(this.properties.allowDuplicates));
+
+        this.fieldForm.setControl('defaultValue',
+            new FormControl(this.properties.defaultValue));
     }
 }

@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public IJsonValue Visit(IField<AssetsFieldProperties> field)
         {
-            return JsonValue.Array();
+            return Array(field.Properties.DefaultValue);
         }
 
         public IJsonValue Visit(IField<BooleanFieldProperties> field)
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public IJsonValue Visit(IField<ReferencesFieldProperties> field)
         {
-            return JsonValue.Array();
+            return Array(field.Properties.DefaultValue);
         }
 
         public IJsonValue Visit(IField<StringFieldProperties> field)
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public IJsonValue Visit(IField<TagsFieldProperties> field)
         {
-            return JsonValue.Array();
+            return Array(field.Properties.DefaultValue);
         }
 
         public IJsonValue Visit(IField<UIFieldProperties> field)
@@ -92,6 +92,18 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             }
 
             return JsonValue.Create(field.Properties.DefaultValue);
+        }
+
+        private IJsonValue Array(string[]? values)
+        {
+            if (values != null)
+            {
+                return JsonValue.Array(values);
+            }
+            else
+            {
+                return JsonValue.Array();
+            }
         }
     }
 }

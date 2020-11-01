@@ -15,6 +15,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
     public sealed class ReferencesFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
+        /// The default value as a list of content ids.
+        /// </summary>
+        public string[]? DefaultValue { get; set; }
+
+        /// <summary>
         /// The minimum allowed items for the field value.
         /// </summary>
         public int? MinItems { get; set; }

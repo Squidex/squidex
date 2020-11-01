@@ -91,6 +91,16 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
+        public void Should_get_default_value_from_assets_field_when_set()
+        {
+            var field =
+                Fields.Assets(1, "1", Partitioning.Invariant,
+                    new AssetsFieldProperties { DefaultValue = new[] { "1", "2" } });
+
+            Assert.Equal(JsonValue.Array("1", "2"), DefaultValueFactory.CreateDefaultValue(field, now));
+        }
+
+        [Fact]
         public void Should_get_default_value_from_boolean_field()
         {
             var field =
@@ -171,6 +181,16 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
+        public void Should_get_default_value_from_references_field_when_set()
+        {
+            var field =
+                Fields.References(1, "1", Partitioning.Invariant,
+                    new ReferencesFieldProperties { DefaultValue = new[] { "1", "2" } });
+
+            Assert.Equal(JsonValue.Array("1", "2"), DefaultValueFactory.CreateDefaultValue(field, now));
+        }
+
+        [Fact]
         public void Should_get_default_value_from_string_field()
         {
             var field =
@@ -185,9 +205,9 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var field =
                 Fields.Tags(1, "1", Partitioning.Invariant,
-                    new TagsFieldProperties());
+                    new TagsFieldProperties { DefaultValue = new[] { "tag1", "tag2" } });
 
-            Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now));
+            Assert.Equal(JsonValue.Array("tag1", "tag2"), DefaultValueFactory.CreateDefaultValue(field, now));
         }
 
         private Instant FutureDays(int days)

@@ -41,5 +41,8 @@ export class ReferencesValidationComponent implements OnInit {
 
         this.fieldForm.setControl('schemaIds',
             new FormControl(this.properties.schemaIds));
+
+        this.fieldForm.setControl('defaultValue',
+            new FormControl(this.properties.defaultValue));
     }
 }

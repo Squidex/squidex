@@ -257,6 +257,7 @@
   "common.history": "Cronologia",
   "common.httpConflict": "Non è stato possibile effettuare l'aggiornamento. Un altro utente ha fatto delle modifiche. Per favore ricarica.",
   "common.httpLimit": "Hai superato il limite massimo di chiamate API.",
+  "common.id": "Identity",
   "common.label": "Etichetta",
   "common.language": "Language",
   "common.languages": "Lingue",

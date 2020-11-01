@@ -14,6 +14,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
     public sealed class TagsFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
+        /// The default value.
+        /// </summary>
+        public string[]? DefaultValue { get; set; }
+
+        /// <summary>
         /// The minimum allowed items for the field value.
         /// </summary>
         public int? MinItems { get; set; }

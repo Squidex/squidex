@@ -368,8 +368,8 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         return null;
     }
 
-    public visitAssets(_: AssetsFieldPropertiesDto): any {
-        return null;
+    public visitAssets(properties: AssetsFieldPropertiesDto): any {
+        return properties.defaultValue;
     }
 
     public visitBoolean(properties: BooleanFieldPropertiesDto): any {
@@ -388,16 +388,16 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         return properties.defaultValue;
     }
 
-    public visitReferences(_: ReferencesFieldPropertiesDto): any {
-        return null;
+    public visitReferences(properties: ReferencesFieldPropertiesDto): any {
+        return properties.defaultValue;
     }
 
     public visitString(properties: StringFieldPropertiesDto): any {
         return properties.defaultValue;
     }
 
-    public visitTags(_: TagsFieldPropertiesDto): any {
-        return null;
+    public visitTags(properties: TagsFieldPropertiesDto): any {
+        return properties.defaultValue;
     }
 
     public visitUI(_: UIFieldPropertiesDto): any {

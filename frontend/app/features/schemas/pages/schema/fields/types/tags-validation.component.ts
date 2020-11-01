@@ -30,5 +30,8 @@ export class TagsValidationComponent implements OnInit {
 
         this.fieldForm.setControl('minItems',
             new FormControl(this.properties.minItems));
+
+        this.fieldForm.setControl('defaultValue',
+            new FormControl(this.properties.defaultValue));
     }
 }

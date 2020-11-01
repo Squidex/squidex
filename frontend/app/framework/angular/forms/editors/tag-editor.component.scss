@@ -14,13 +14,15 @@ $inner-height: 1.75rem;
 .form-control {
     & {
         cursor: text;
+        padding: .25rem;
         padding-bottom: 0;
-        padding-left: .25rem;
-        padding-right: 2rem;
-        padding-top: .25rem;
         position: relative;
         text-align: left;
         text-decoration: none;
+    }
+
+    &.suggested {
+        padding-right: 2rem;
     }
 
     &.disabled {
@@ -63,6 +65,13 @@ $inner-height: 1.75rem;
 
 .multiline {
     height: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
+
+    .item {
+        @include truncate;
+        display: inline-block;
+    }
 }
 
 div {
@@ -131,8 +140,14 @@ div {
         margin-bottom: .25rem;
         margin-right: 2px;
         padding: 1px .5rem;
+        padding-right: 1.5rem;
+        position: relative;
         vertical-align: top;
         white-space: nowrap;
+    }
+
+    .icon-close {
+        @include absolute(.6125rem, .5rem);
     }
 
     &.disabled {
@@ -144,7 +159,7 @@ div {
     }
 
     &:hover {
-        background: $color-theme-blue-dark;
+        background: darken($color-input, 10%);
     }
 }
 

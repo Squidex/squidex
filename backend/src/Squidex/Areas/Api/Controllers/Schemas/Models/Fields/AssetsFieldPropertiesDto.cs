@@ -20,6 +20,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public AssetPreviewMode PreviewMode { get; set; }
 
         /// <summary>
+        /// The default value as a list of asset ids.
+        /// </summary>
+        public string[]? DefaultValue { get; set; }
+
+        /// <summary>
         /// The minimum allowed items for the field value.
         /// </summary>
         public int? MinItems { get; set; }

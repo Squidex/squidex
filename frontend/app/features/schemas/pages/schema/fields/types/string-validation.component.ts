@@ -33,7 +33,6 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
 
     public contentTypes = STRING_CONTENT_TYPES;
 
-    public showDefaultValue: Observable<boolean>;
     public showPatternMessage: Observable<boolean>;
     public showPatternSuggestions: Observable<boolean>;
 
@@ -79,9 +78,6 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
 
         this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
-
-        this.showDefaultValue =
-            hasNoValue$(this.fieldForm.controls['isRequired']);
 
         this.showPatternSuggestions =
             hasNoValue$(this.fieldForm.controls['pattern']);

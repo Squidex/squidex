@@ -179,6 +179,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Assets';
 
     public readonly previewMode: AssetPreviewMode;
+    public readonly defaultValue?: ReadonlyArray<string>;
     public readonly allowDuplicates?: boolean;
     public readonly allowedExtensions?: ReadonlyArray<string>;
     public readonly resolveFirst: boolean;
@@ -325,6 +326,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'References';
 
     public readonly allowDuplicates?: boolean;
+    public readonly defaultValue?: ReadonlyArray<string>;
     public readonly editor: ReferencesFieldEditor = 'List';
     public readonly maxItems?: number;
     public readonly minItems?: number;
@@ -405,6 +407,7 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Tags';
 
     public readonly allowedValues?: ReadonlyArray<string>;
+    public readonly defaultValue?: ReadonlyArray<string>;
     public readonly editor: TagsFieldEditor = 'Tags';
     public readonly maxItems?: number;
     public readonly minItems?: number;

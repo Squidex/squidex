@@ -19,16 +19,16 @@ const DESCRIPTIONS = {
 type Property = { name: string, key: string };
 
 const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
-    name: 'roles.properties.hideSchemas',
+    name: 'i18n:roles.properties.hideSchemas',
     key: Settings.AppProperties.HIDE_SCHEMAS
 }, {
-    name: 'roles.properties.hideAssets',
+    name: 'i18n:roles.properties.hideAssets',
     key: Settings.AppProperties.HIDE_ASSETS
 }, {
-    name: 'roles.properties.hideSettings',
+    name: 'i18n:roles.properties.hideSettings',
     key: Settings.AppProperties.HIDE_SETTINGS
 }, {
-    name: 'roles.properties.hideAPI',
+    name: 'i18n:roles.properties.hideAPI',
     key: Settings.AppProperties.HIDE_API
 }];
 
