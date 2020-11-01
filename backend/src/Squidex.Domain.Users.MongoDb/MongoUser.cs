@@ -25,7 +25,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         [BsonRequired]
         [BsonElement]
-        public List<UserLoginInfo> Logins { get; set; } = new List<UserLoginInfo>();
+        public List<UserLogin> Logins { get; set; } = new List<UserLogin>();
 
         [BsonRequired]
         [BsonElement]
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         internal void AddLogin(UserLoginInfo login)
         {
-            Logins.Add(new UserLoginInfo(login.LoginProvider, login.ProviderKey, login.ProviderDisplayName));
+            Logins.Add(new UserLogin(login));
         }
 
         internal void AddRole(string role)
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         internal void AddClaims(IEnumerable<Claim> claims)
         {
-            claims.Foreach((x, _) => AddClaim(x));
+            claims.Foreach(x => AddClaim(x));
         }
 
         internal void AddToken(string provider, string name, string value)
@@ -66,24 +66,24 @@ namespace Squidex.Domain.Users.MongoDb
             Logins.RemoveAll(x => x.LoginProvider == provider && x.ProviderKey == providerKey);
         }
 
-        internal void RemoveRole(string role)
-        {
-            Roles.Remove(role);
-        }
-
         internal void RemoveClaim(Claim claim)
         {
             Claims.RemoveAll(x => x.Type == claim.Type && x.Value == claim.Value);
         }
 
-        internal void RemoveClaims(IEnumerable<Claim> claims)
-        {
-            claims.Foreach((x, _) => RemoveClaim(x));
-        }
-
         internal void RemoveToken(string provider, string name)
         {
             Tokens.RemoveAll(x => x.LoginProvider == provider && x.Name == name);
+        }
+
+        internal void RemoveRole(string role)
+        {
+            Roles.Remove(role);
+        }
+
+        internal void RemoveClaims(IEnumerable<Claim> claims)
+        {
+            claims.Foreach(x => RemoveClaim(x));
         }
 
         internal void ReplaceClaim(Claim existingClaim, Claim newClaim)
@@ -103,5 +103,18 @@ namespace Squidex.Domain.Users.MongoDb
 
     public sealed class UserTokenInfo : IdentityUserToken<string>
     {
+    }
+
+    public sealed class UserLogin : UserLoginInfo
+    {
+        public UserLogin(string provider, string providerKey, string displayName)
+            : base(provider, providerKey, displayName)
+        {
+        }
+
+        public UserLogin(UserLoginInfo source)
+            : base(source.LoginProvider, source.ProviderKey, source.ProviderDisplayName)
+        {
+        }
     }
 }

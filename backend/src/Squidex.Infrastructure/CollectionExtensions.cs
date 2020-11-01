@@ -263,6 +263,11 @@ namespace Squidex.Infrastructure
             return result;
         }
 
+        public static void Foreach<T>(this IEnumerable<T> collection, Action<T> action)
+        {
+            collection.Foreach((x, i) => action(x));
+        }
+
         public static void Foreach<T>(this IEnumerable<T> collection, Action<T, int> action)
         {
             var index = 0;

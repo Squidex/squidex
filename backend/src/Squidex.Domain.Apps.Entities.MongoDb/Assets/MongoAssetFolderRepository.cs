@@ -37,8 +37,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 new CreateIndexModel<MongoAssetFolderEntity>(
                     Index
                         .Ascending(x => x.IndexedAppId)
-                        .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.ParentId))
+                        .Ascending(x => x.ParentId)
+                        .Ascending(x => x.IsDeleted))
             }, ct);
         }
 
@@ -46,10 +46,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>("QueryAsyncByQuery"))
             {
+                var filter = BuildFilter(appId, parentId);
+
                 var assetFolderEntities =
-                    await Collection
-                        .Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).SortBy(x => x.FolderName)
-                            .ToListAsync();
+                    await Collection.Find(filter).SortBy(x => x.FolderName)
+                        .ToListAsync();
 
                 return ResultList.Create<IAssetFolderEntity>(assetFolderEntities.Count, assetFolderEntities);
             }
@@ -59,8 +60,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
+                var filter = BuildFilter(appId, parentId);
+
                 var assetFolderEntities =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
+                    await Collection.Find(filter).Only(x => x.Id)
                         .ToListAsync();
 
                 return assetFolderEntities.Select(x => DomainId.Create(x[Fields.AssetFolderId].AsString)).ToList();
@@ -79,6 +82,32 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 return assetFolderEntity;
             }
+        }
+
+        private static FilterDefinition<MongoAssetFolderEntity> BuildFilter(DomainId appId, DomainId? parentId)
+        {
+            var filters = new List<FilterDefinition<MongoAssetFolderEntity>>
+            {
+                Filter.Eq(x => x.IndexedAppId, appId),
+                Filter.Eq(x => x.IsDeleted, false)
+            };
+
+            if (parentId.HasValue)
+            {
+                if (parentId == DomainId.Empty)
+                {
+                    filters.Add(
+                        Filter.Or(
+                            Filter.Exists(x => x.ParentId, false),
+                            Filter.Eq(x => x.ParentId, DomainId.Empty)));
+                }
+                else
+                {
+                    filters.Add(Filter.Eq(x => x.ParentId, parentId.Value));
+                }
+            }
+
+            return Filter.And(filters);
         }
     }
 }

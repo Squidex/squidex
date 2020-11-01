@@ -66,14 +66,20 @@ namespace Squidex.Domain.Users.MongoDb
                 cm.MapMember(x => x.Value);
             });
 
-            BsonClassMap.RegisterClassMap<UserLoginInfo>(cm =>
+            BsonClassMap.RegisterClassMap<UserLogin>(cm =>
             {
-                cm.MapConstructor(typeof(UserLoginInfo).GetConstructors().First())
+                cm.MapConstructor(typeof(UserLogin).GetConstructors()
+                    .First(x =>
+                    {
+                        var parameters = x.GetParameters();
+
+                        return parameters.Length == 3;
+                    }))
                     .SetArguments(new[]
                     {
-                        nameof(UserLoginInfo.LoginProvider),
-                        nameof(UserLoginInfo.ProviderKey),
-                        nameof(UserLoginInfo.ProviderDisplayName)
+                        nameof(UserLogin.LoginProvider),
+                        nameof(UserLogin.ProviderKey),
+                        nameof(UserLogin.ProviderDisplayName)
                     });
 
                 cm.AutoMap();

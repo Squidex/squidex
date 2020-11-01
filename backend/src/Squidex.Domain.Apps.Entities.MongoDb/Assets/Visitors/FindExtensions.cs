@@ -73,18 +73,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
                 }
             }
 
-            if (filters.Count > 1)
-            {
-                return Filter.And(filters);
-            }
-            else if (filters.Count == 1)
-            {
-                return filters[0];
-            }
-            else
-            {
-                return new BsonDocument();
-            }
+            return Filter.And(filters);
         }
     }
 }

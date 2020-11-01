@@ -18,7 +18,7 @@ namespace Migrations
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 22;
+        private const int CurrentVersion = 23;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -108,7 +108,8 @@ namespace Migrations
                     }
 
                     // Version 22: Introduce domain id.
-                    if (version < 22)
+                    // Version 23: Fix parent id.
+                    if (version < 23)
                     {
                         yield return serviceProvider.GetRequiredService<ConvertDocumentIds>().ForAssets();
                     }

@@ -59,25 +59,25 @@ namespace Migrations.Migrations.MongoDb
             switch (scope)
             {
                 case Scope.Assets:
-                    await RebuildAsync(database, "States_Assets");
-                    await RebuildAsync(database, "States_AssetFolders", null, ConvertParentId);
+                    await RebuildAsync(database, ConvertParentId, "States_Assets");
+                    await RebuildAsync(database, ConvertParentId, "States_AssetFolders");
                     break;
                 case Scope.Contents:
-                    await RebuildAsync(databaseContent, "State_Contents_All", "States_Contents_All2");
-                    await RebuildAsync(databaseContent, "State_Contents_Published", "States_Contents_Published2");
+                    await RebuildAsync(databaseContent, null, "State_Contents_All");
+                    await RebuildAsync(databaseContent, null, "State_Contents_Published");
                     break;
             }
         }
 
-        private static async Task RebuildAsync(IMongoDatabase database, string collectionNameOld, string? collectionNameNew = null, Action<BsonDocument>? extraAction = null)
+        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameOld)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 10;
 
-            if (string.IsNullOrWhiteSpace(collectionNameNew))
-            {
-                collectionNameNew = $"{collectionNameOld}2";
-            }
+            string collectionNameNew;
+
+            collectionNameNew = $"{collectionNameOld}2";
+            collectionNameNew = collectionNameNew.Replace("State_", "States_");
 
             var collectionOld = database.GetCollection<BsonDocument>(collectionNameOld);
             var collectionNew = database.GetCollection<BsonDocument>(collectionNameNew);
@@ -151,7 +151,10 @@ namespace Migrations.Migrations.MongoDb
 
         private static void ConvertParentId(BsonDocument document)
         {
-            document["pi"] = document["pi"].AsGuid.ToString();
+            if (document.Contains("pi"))
+            {
+                document["pi"] = document["pi"].AsGuid.ToString();
+            }
         }
     }
 }

@@ -62,39 +62,39 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static IFindFluent<TDocument, BsonDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,
-            Expression<Func<TDocument, object>> include)
+        public static IFindFluent<T, BsonDocument> Only<T>(this IFindFluent<T, T> find,
+            Expression<Func<T, object>> include)
         {
-            return find.Project<BsonDocument>(Builders<TDocument>.Projection.Include(include));
+            return find.Project<BsonDocument>(Builders<T>.Projection.Include(include));
         }
 
-        public static IFindFluent<TDocument, BsonDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,
-            Expression<Func<TDocument, object>> include1,
-            Expression<Func<TDocument, object>> include2)
+        public static IFindFluent<T, BsonDocument> Only<T>(this IFindFluent<T, T> find,
+            Expression<Func<T, object>> include1,
+            Expression<Func<T, object>> include2)
         {
-            return find.Project<BsonDocument>(Builders<TDocument>.Projection.Include(include1).Include(include2));
+            return find.Project<BsonDocument>(Builders<T>.Projection.Include(include1).Include(include2));
         }
 
-        public static IFindFluent<TDocument, TDocument> Not<TDocument>(this IFindFluent<TDocument, TDocument> find,
-            Expression<Func<TDocument, object>> exclude)
+        public static IFindFluent<T, T> Not<T>(this IFindFluent<T, T> find,
+            Expression<Func<T, object>> exclude)
         {
-            return find.Project<TDocument>(Builders<TDocument>.Projection.Exclude(exclude));
+            return find.Project<T>(Builders<T>.Projection.Exclude(exclude));
         }
 
-        public static IFindFluent<TDocument, TDocument> Not<TDocument>(this IFindFluent<TDocument, TDocument> find,
-            Expression<Func<TDocument, object>> exclude1,
-            Expression<Func<TDocument, object>> exclude2)
+        public static IFindFluent<T, T> Not<T>(this IFindFluent<T, T> find,
+            Expression<Func<T, object>> exclude1,
+            Expression<Func<T, object>> exclude2)
         {
-            return find.Project<TDocument>(Builders<TDocument>.Projection.Exclude(exclude1).Exclude(exclude2));
+            return find.Project<T>(Builders<T>.Projection.Exclude(exclude1).Exclude(exclude2));
         }
 
-        public static async Task UpsertVersionedAsync<TEntity, TKey>(this IMongoCollection<TEntity> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<TEntity>, UpdateDefinition<TEntity>> updater)
-            where TEntity : IVersionedEntity<TKey>
+        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<T>, UpdateDefinition<T>> updater)
+            where T : IVersionedEntity<TKey>
             where TKey : notnull
         {
             try
             {
-                var update = updater(Builders<TEntity>.Update.Set(x => x.Version, newVersion));
+                var update = updater(Builders<T>.Update.Set(x => x.Version, newVersion));
 
                 if (oldVersion > EtagVersion.Any)
                 {
@@ -113,7 +113,7 @@ namespace Squidex.Infrastructure.MongoDb
 
                 if (existingVersion != null)
                 {
-                    var versionField = GetVersionField<TEntity, TKey>();
+                    var versionField = GetVersionField<T, TKey>();
 
                     throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
                 }
@@ -124,22 +124,22 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task UpsertVersionedAsync<TEntity, TKey>(this IMongoCollection<TEntity> collection, TKey key, long oldVersion, long newVersion, TEntity doc)
-            where TEntity : IVersionedEntity<TKey>
+        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, T document)
+            where T : IVersionedEntity<TKey>
             where TKey : notnull
         {
             try
             {
-                doc.DocumentId = key;
-                doc.Version = newVersion;
+                document.DocumentId = key;
+                document.Version = newVersion;
 
                 if (oldVersion > EtagVersion.Any)
                 {
-                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key) && x.Version == oldVersion, doc, UpsertReplace);
+                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key) && x.Version == oldVersion, document, UpsertReplace);
                 }
                 else
                 {
-                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key), doc, UpsertReplace);
+                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key), document, UpsertReplace);
                 }
             }
             catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
@@ -150,7 +150,7 @@ namespace Squidex.Infrastructure.MongoDb
 
                 if (existingVersion != null)
                 {
-                    var versionField = GetVersionField<TEntity, TKey>();
+                    var versionField = GetVersionField<T, TKey>();
 
                     throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
                 }
@@ -161,14 +161,14 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        private static string GetVersionField<TEntity, TKey>()
-            where TEntity : IVersionedEntity<TKey>
+        private static string GetVersionField<T, TKey>()
+            where T : IVersionedEntity<TKey>
             where TKey : notnull
         {
-            return BsonClassMap.LookupClassMap(typeof(TEntity)).GetMemberMap(nameof(IVersionedEntity<TKey>.Version)).ElementName;
+            return BsonClassMap.LookupClassMap(typeof(T)).GetMemberMap(nameof(IVersionedEntity<TKey>.Version)).ElementName;
         }
 
-        public static async Task ForEachPipedAsync<TDocument>(this IAsyncCursorSource<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
+        public static async Task ForEachPipedAsync<T>(this IAsyncCursorSource<T> source, Func<T, Task> processor, CancellationToken cancellationToken = default)
         {
             using (var cursor = await source.ToCursorAsync(cancellationToken))
             {
@@ -176,14 +176,14 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task ForEachPipedAsync<TDocument>(this IAsyncCursor<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
+        public static async Task ForEachPipedAsync<T>(this IAsyncCursor<T> source, Func<T, Task> processor, CancellationToken cancellationToken = default)
         {
             using (var selfToken = new CancellationTokenSource())
             {
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(selfToken.Token, cancellationToken))
                 {
                     var actionBlock =
-                        new ActionBlock<TDocument>(async x =>
+                        new ActionBlock<T>(async x =>
                             {
                                 if (!combined.IsCancellationRequested)
                                 {
