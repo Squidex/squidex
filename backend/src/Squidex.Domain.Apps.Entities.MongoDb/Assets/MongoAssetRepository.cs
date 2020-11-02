@@ -129,18 +129,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug)
-        {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
-            {
-                var assetEntity =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.Slug == slug)
-                        .FirstOrDefaultAsync();
-
-                return assetEntity;
-            }
-        }
-
         public async Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(DomainId appId, string hash)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
@@ -150,6 +138,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         .ToListAsync();
 
                 return assetEntities.OfType<IAssetEntity>().ToList();
+            }
+        }
+
+        public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug)
+        {
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var assetEntity =
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.Slug == slug)
+                        .FirstOrDefaultAsync();
+
+                return assetEntity;
             }
         }
 
