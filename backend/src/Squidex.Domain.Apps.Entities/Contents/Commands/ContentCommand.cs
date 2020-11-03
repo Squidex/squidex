@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Runtime.Serialization;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -20,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool DoNotScript { get; set; }
 
+        [IgnoreDataMember]
         public DomainId AggregateId
         {
             get { return DomainId.Combine(AppId, ContentId); }

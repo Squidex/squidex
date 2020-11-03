@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -45,11 +46,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
         public AssetType Type { get; set; }
 
+        [IgnoreDataMember]
         public DomainId AssetId
         {
             get { return Id; }
         }
 
+        [IgnoreDataMember]
         public DomainId UniqueId
         {
             get { return DomainId.Combine(AppId, Id); }
