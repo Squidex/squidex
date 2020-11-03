@@ -80,7 +80,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 asset = await assetRepository.FindAssetBySlugAsync(AppId, idOrSlug);
             }
 
-            return await DeliverAssetAsync(asset, queries);
+            if (asset != null && queries.Version > EtagVersion.Any && asset.Version != queries.Version)
+            {
+                asset = await assetLoader.GetAsync(App.Id, asset.Id, queries.Version);
+            }
+
+            return DeliverAsset(asset, queries);
         }
 
         /// <summary>
@@ -103,10 +108,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var asset = await assetRepository.FindAssetAsync(id);
 
-            return await DeliverAssetAsync(asset, queries);
+            return DeliverAsset(asset, queries);
         }
 
-        private async Task<IActionResult> DeliverAssetAsync(IAssetEntity? asset, AssetContentQueryDto queries)
+        private IActionResult DeliverAsset(IAssetEntity? asset, AssetContentQueryDto queries)
         {
             queries ??= new AssetContentQueryDto();
 
@@ -120,11 +125,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 Response.Headers[HeaderNames.CacheControl] = $"public,max-age=0";
 
                 return StatusCode(403);
-            }
-
-            if (queries.Version > EtagVersion.Any && asset.Version != queries.Version)
-            {
-                asset = await assetLoader.GetAsync(App.Id, asset.Id, queries.Version);
             }
 
             var resizeOptions = queries.ToResizeOptions(asset);
