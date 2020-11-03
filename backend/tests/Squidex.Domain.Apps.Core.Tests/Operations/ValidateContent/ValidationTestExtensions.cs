@@ -31,9 +31,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         public static Task ValidateAsync(this IValidator validator, object? value, IList<string> errors,
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
-            ValidationUpdater? updater = null)
+            ValidationUpdater? updater = null,
+            ValidationAction action = ValidationAction.Upsert)
         {
-            var context = CreateContext(schema, mode, updater);
+            var context = CreateContext(schema, mode, updater, action);
 
             return validator.ValidateAsync(value, context, CreateFormatter(errors));
         }
@@ -42,9 +43,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
-            IValidatorsFactory? factory = null)
+            IValidatorsFactory? factory = null,
+            ValidationAction action = ValidationAction.Upsert)
         {
-            var context = CreateContext(schema, mode, updater);
+            var context = CreateContext(schema, mode, updater, action);
 
             var validators = Factories(factory).SelectMany(x => x.CreateValueValidators(context, field, null!)).ToArray();
 
@@ -56,9 +58,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
-            IValidatorsFactory? factory = null)
+            IValidatorsFactory? factory = null,
+            ValidationAction action = ValidationAction.Upsert)
         {
-            var context = CreateContext(schema, mode, updater);
+            var context = CreateContext(schema, mode, updater, action);
 
             var validator = new ContentValidator(partitionResolver, context, Factories(factory), Log);
 
@@ -74,9 +77,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
-            IValidatorsFactory? factory = null)
+            IValidatorsFactory? factory = null,
+            ValidationAction action = ValidationAction.Upsert)
         {
-            var context = CreateContext(schema, mode, updater);
+            var context = CreateContext(schema, mode, updater, action);
 
             var validator = new ContentValidator(partitionResolver, context, Factories(factory), Log);
 

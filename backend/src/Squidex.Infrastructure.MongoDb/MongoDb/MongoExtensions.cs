@@ -75,6 +75,14 @@ namespace Squidex.Infrastructure.MongoDb
             return find.Project<BsonDocument>(Builders<T>.Projection.Include(include1).Include(include2));
         }
 
+        public static IFindFluent<T, BsonDocument> Only<T>(this IFindFluent<T, T> find,
+            Expression<Func<T, object>> include1,
+            Expression<Func<T, object>> include2,
+            Expression<Func<T, object>> include3)
+        {
+            return find.Project<BsonDocument>(Builders<T>.Projection.Include(include1).Include(include2).Include(include3));
+        }
+
         public static IFindFluent<T, T> Not<T>(this IFindFluent<T, T> find,
             Expression<Func<T, object>> exclude)
         {

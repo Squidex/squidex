@@ -42,7 +42,7 @@ export function getCellWidth(field: TableField) {
             case MetaFields.statusNext:
                 return 240;
             case MetaFields.statusColor:
-                return 80;
+                return 50;
             case MetaFields.version:
                 return 80;
         }

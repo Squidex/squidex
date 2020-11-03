@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
@@ -91,7 +92,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             {
                 filter?.Invoke(filterNode.ToString());
 
-                return Task.FromResult<IReadOnlyList<(DomainId, DomainId)>>(new List<(DomainId, DomainId)> { (schemaId, id) });
+                return Task.FromResult<IReadOnlyList<(DomainId, DomainId, Status)>>(new List<(DomainId, DomainId, Status)> { (schemaId, id, Status.Published) });
             };
         }
     }

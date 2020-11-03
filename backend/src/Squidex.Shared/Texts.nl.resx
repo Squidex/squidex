@@ -403,12 +403,6 @@
   <data name="common.readonlyMode" xml:space="preserve">
     <value>Applicatie is momenteel in de alleen-lezen modus.</value>
   </data>
-  <data name="common.referenceNotFound" xml:space="preserve">
-    <value>Bevat ongeldige referentie '{id}'.</value>
-  </data>
-  <data name="common.referenceToInvalidSchema" xml:space="preserve">
-    <value>Bevat verwijzing '{id}' naar ongeldig schema.</value>
-  </data>
   <data name="common.remove" xml:space="preserve">
     <value>Verwijderen</value>
   </data>
@@ -600,6 +594,12 @@
   </data>
   <data name="contents.validation.pattern" xml:space="preserve">
     <value>Moet het patroon volgen.</value>
+  </data>
+  <data name="contents.validation.referenceNotFound" xml:space="preserve">
+    <value>Bevat ongeldige referentie '{id}'.</value>
+  </data>
+  <data name="contents.validation.referenceToInvalidSchema" xml:space="preserve">
+    <value>Bevat verwijzing '{id}' naar ongeldig schema.</value>
   </data>
   <data name="contents.validation.regexTooSlow" xml:space="preserve">
     <value>Regex is te traag.</value>

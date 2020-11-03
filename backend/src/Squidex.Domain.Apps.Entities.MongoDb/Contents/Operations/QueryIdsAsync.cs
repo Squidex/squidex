@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
@@ -19,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryIdsAsync : OperationBase
     {
-        private static readonly List<(DomainId SchemaId, DomainId Id)> EmptyIds = new List<(DomainId SchemaId, DomainId Id)>();
+        private static readonly List<(DomainId SchemaId, DomainId Id, Status Status)> EmptyIds = new List<(DomainId SchemaId, DomainId Id, Status Status)>();
         private readonly IAppProvider appProvider;
 
         public QueryIdsAsync(IAppProvider appProvider)
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> DoAsync(DomainId appId, HashSet<DomainId> ids)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> DoAsync(DomainId appId, HashSet<DomainId> ids)
         {
             var documentIds = ids.Select(x => DomainId.Combine(appId, x));
 
@@ -47,14 +48,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     Filter.In(x => x.DocumentId, documentIds),
                     Filter.Ne(x => x.IsDeleted, true));
 
-            var contentEntities =
-                await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
-                    .ToListAsync();
-
-            return contentEntities.Select(x => (DomainId.Create(x[Fields.SchemaId].AsString), DomainId.Create(x[Fields.Id].AsString))).ToList();
+            return await SearchAsync(filter);
         }
 
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id)>> DoAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> DoAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
         {
             var schema = await appProvider.GetSchemaAsync(appId, schemaId, false);
 
@@ -65,14 +62,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             var filter = BuildFilter(filterNode.AdjustToModel(schema.SchemaDef), appId, schemaId);
 
-            var contentEntities =
-                await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId)
-                    .ToListAsync();
-
-            return contentEntities.Select(x => (DomainId.Create(x[Fields.SchemaId].AsString), DomainId.Create(x[Fields.Id].AsString))).ToList();
+            return await SearchAsync(filter);
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filterNode, DomainId appId, DomainId schemaId)
+        private async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> SearchAsync(FilterDefinition<MongoContentEntity> filter)
+        {
+            var contentEntities =
+                await Collection.Find(filter).Only(x => x.Id, x => x.IndexedSchemaId, x => x.Status)
+                    .ToListAsync();
+
+            return contentEntities.Select(x => (
+                DomainId.Create(x[Fields.SchemaId].AsString),
+                DomainId.Create(x[Fields.Id].AsString),
+                new Status(x[Fields.Status].AsString)
+            )).ToList();
+        }
+
+        private static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filterNode, DomainId appId, DomainId schemaId)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {

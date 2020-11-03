@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool AllowDuplicates { get; set; }
 
+        public bool MustBePublished { get; set; }
+
         public string[]? DefaultValue { get; set; }
 
         public ReferencesFieldEditor Editor { get; set; }

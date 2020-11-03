@@ -59,19 +59,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)
         {
-            var properties = field.Properties;
-
-            var isRequired = IsRequired(properties);
-
-            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
-            {
-                yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
-            }
-
-            if (!properties.AllowDuplicates)
-            {
-                yield return new UniqueValuesValidator<string>();
-            }
+            yield break;
         }
 
         public IEnumerable<IValidator> Visit(IField<BooleanFieldProperties> field)
@@ -151,19 +139,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IEnumerable<IValidator> Visit(IField<ReferencesFieldProperties> field)
         {
-            var properties = field.Properties;
-
-            var isRequired = IsRequired(properties);
-
-            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
-            {
-                yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
-            }
-
-            if (!properties.AllowDuplicates)
-            {
-                yield return new UniqueValuesValidator<string>();
-            }
+            yield break;
         }
 
         public IEnumerable<IValidator> Visit(IField<StringFieldProperties> field)

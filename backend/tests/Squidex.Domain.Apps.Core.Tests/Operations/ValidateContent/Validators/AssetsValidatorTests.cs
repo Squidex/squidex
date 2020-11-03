@@ -90,6 +90,47 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
+        public async Task Should_not_add_error_if_assets_are_null_but_not_required()
+        {
+            var sut = Validator(new AssetsFieldProperties());
+
+            await sut.ValidateAsync(null, errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_assets_are_empty_but_not_required()
+        {
+            var sut = Validator(new AssetsFieldProperties());
+
+            await sut.ValidateAsync(CreateValue(), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_duplicates_are_allowed()
+        {
+            var sut = Validator(new AssetsFieldProperties { AllowDuplicates = true });
+
+            await sut.ValidateAsync(CreateValue(image1.AssetId, image1.AssetId), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_references_are_required()
+        {
+            var sut = Validator(new AssetsFieldProperties { IsRequired = true });
+
+            await sut.ValidateAsync(CreateValue(), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Field is required." });
+        }
+
+        [Fact]
         public async Task Should_add_error_if_asset_are_not_valid()
         {
             var assetId = DomainId.NewGuid();
@@ -191,6 +232,39 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
+        public async Task Should_add_error_if_value_has_not_enough_items()
+        {
+            var sut = Validator(new AssetsFieldProperties { MinItems = 2 });
+
+            await sut.ValidateAsync(CreateValue(image1.AssetId), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must have at least 2 item(s)." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_value_has_too_much_items()
+        {
+            var sut = Validator(new AssetsFieldProperties { MaxItems = 1 });
+
+            await sut.ValidateAsync(CreateValue(image1.AssetId, image2.AssetId), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must not have more than 1 item(s)." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_reference_contains_duplicate_values()
+        {
+            var sut = Validator(new AssetsFieldProperties());
+
+            await sut.ValidateAsync(CreateValue(image1.AssetId, image1.AssetId), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must not contain duplicate values." });
+        }
+
+        [Fact]
         public async Task Should_add_error_if_image_has_invalid_extension()
         {
             var sut = Validator(new AssetsFieldProperties { AllowedExtensions = ReadOnlyCollection.Create("mp4") });
@@ -212,7 +286,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
         private IValidator Validator(AssetsFieldProperties properties)
         {
-            return new AssetsValidator(properties, ids =>
+            return new AssetsValidator(properties.IsRequired, properties, ids =>
             {
                 return Task.FromResult<IReadOnlyList<IAssetInfo>>(new List<IAssetInfo> { document, image1, image2 });
             });

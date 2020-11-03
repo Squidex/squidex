@@ -403,12 +403,6 @@
   <data name="common.readonlyMode" xml:space="preserve">
     <value>Application is in readonly mode at the moment.</value>
   </data>
-  <data name="common.referenceNotFound" xml:space="preserve">
-    <value>Contains invalid reference '{id}'.</value>
-  </data>
-  <data name="common.referenceToInvalidSchema" xml:space="preserve">
-    <value>Contains reference '{id}' to invalid schema.</value>
-  </data>
   <data name="common.remove" xml:space="preserve">
     <value>Remove</value>
   </data>
@@ -600,6 +594,12 @@
   </data>
   <data name="contents.validation.pattern" xml:space="preserve">
     <value>Must follow the pattern.</value>
+  </data>
+  <data name="contents.validation.referenceNotFound" xml:space="preserve">
+    <value>Reference '{id}' not found.</value>
+  </data>
+  <data name="contents.validation.referenceToInvalidSchema" xml:space="preserve">
+    <value>Reference '{id}' has invalid schema.</value>
   </data>
   <data name="contents.validation.regexTooSlow" xml:space="preserve">
     <value>Regex is too slow.</value>

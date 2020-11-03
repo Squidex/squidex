@@ -44,7 +44,9 @@
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <input type="checkbox" class="custom-control custom-checkbox" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)">
+                                    <input type="checkbox" class="custom-control custom-checkbox" 
+                                        [ngModel]="selectedAll" 
+                                        (ngModelChange)="selectAll($event)">
                                 </th>
                                 <th sqxContentListCell="meta.lastModifiedBy.avatar">
                                     <sqx-content-list-header field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
@@ -56,6 +58,9 @@
                                         (queryChange)="search($event)"
                                         [language]="language">
                                     </sqx-content-list-header>
+                                </th>
+                                <th sqxContentListCell="meta.status.color">
+                                    <sqx-content-list-header field="meta.status.color"></sqx-content-list-header>
                                 </th>
                             </tr>
                         </thead>

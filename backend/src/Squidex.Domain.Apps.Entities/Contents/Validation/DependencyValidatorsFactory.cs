@@ -36,6 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
                 yield break;
             }
 
+            var isRequired = IsRequired(context, field.RawProperties);
+
             if (field is IField<AssetsFieldProperties> assetsField)
             {
                 var checkAssets = new CheckAssets(async ids =>
@@ -43,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
                     return await assetRepository.QueryAsync(context.AppId.Id, new HashSet<DomainId>(ids));
                 });
 
-                yield return new AssetsValidator(assetsField.Properties, checkAssets);
+                yield return new AssetsValidator(isRequired, assetsField.Properties, checkAssets);
             }
 
             if (field is IField<ReferencesFieldProperties> referencesField)
@@ -53,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
                     return await contentRepository.QueryIdsAsync(context.AppId.Id, ids, SearchScope.All);
                 });
 
-                yield return new ReferencesValidator(referencesField.Properties.SchemaIds, checkReferences);
+                yield return new ReferencesValidator(isRequired, referencesField.Properties, checkReferences);
             }
 
             if (field is IField<NumberFieldProperties> numberField && numberField.Properties.IsUnique)
@@ -75,6 +77,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
 
                 yield return new UniqueValidator(checkUniqueness);
             }
+        }
+
+        private static bool IsRequired(ValidatorContext context, FieldProperties properties)
+        {
+            var isRequired = properties.IsRequired;
+
+            if (context.Action == ValidationAction.Publish)
+            {
+                isRequired = isRequired || properties.IsRequiredOnPublish;
+            }
+
+            return isRequired;
         }
     }
 }

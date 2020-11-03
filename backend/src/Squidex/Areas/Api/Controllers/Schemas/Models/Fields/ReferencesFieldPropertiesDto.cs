@@ -40,6 +40,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public bool ResolveReference { get; set; }
 
         /// <summary>
+        /// True when all references must be published.
+        /// </summary>
+        public bool MustBePublished { get; set; }
+
+        /// <summary>
         /// The editor that is used to manage this field.
         /// </summary>
         public ReferencesFieldEditor Editor { get; set; }

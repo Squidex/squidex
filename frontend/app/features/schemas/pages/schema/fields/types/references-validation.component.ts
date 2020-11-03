@@ -44,5 +44,8 @@ export class ReferencesValidationComponent implements OnInit {
 
         this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
+
+        this.fieldForm.setControl('mustBePublished',
+            new FormControl(this.properties.mustBePublished));
     }
 }

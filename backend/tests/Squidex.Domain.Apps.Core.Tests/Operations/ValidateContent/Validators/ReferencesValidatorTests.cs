@@ -9,7 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
 using Xunit;
@@ -19,25 +22,29 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
     public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
-        private readonly DomainId schemaId = DomainId.NewGuid();
+        private readonly DomainId schemaId1 = DomainId.NewGuid();
+        private readonly DomainId schemaId2 = DomainId.NewGuid();
         private readonly DomainId ref1 = DomainId.NewGuid();
         private readonly DomainId ref2 = DomainId.NewGuid();
 
         [Fact]
-        public async Task Should_add_error_if_references_are_not_valid()
+        public async Task Should_not_add_error_if_reference_invalid_but_publishing()
         {
-            var sut = new ReferencesValidator(Enumerable.Repeat(schemaId, 1), FoundReferences());
+            var properties = new ReferencesFieldProperties { SchemaId = schemaId1 };
 
-            await sut.ValidateAsync(CreateValue(ref1), errors);
+            var sut = Validator(properties, FoundReferences((schemaId2, ref2, Status.Published)));
 
-            errors.Should().BeEquivalentTo(
-                new[] { $"Contains invalid reference '{ref1}'." });
+            await sut.ValidateAsync(CreateValue(ref2), errors, action: ValidationAction.Publish);
+
+            Assert.Empty(errors);
         }
 
         [Fact]
         public async Task Should_not_add_error_if_schemas_not_defined()
         {
-            var sut = new ReferencesValidator(null, FoundReferences((DomainId.NewGuid(), ref2)));
+            var properties = new ReferencesFieldProperties();
+
+            var sut = Validator(properties, FoundReferences((schemaId2, ref2, Status.Published)));
 
             await sut.ValidateAsync(CreateValue(ref2), errors);
 
@@ -45,14 +52,155 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
+        public async Task Should_not_add_error_if_schema_is_valid()
+        {
+            var properties = new ReferencesFieldProperties { SchemaId = schemaId1 };
+
+            var sut = Validator(properties, FoundReferences((schemaId1, ref2, Status.Published)));
+
+            await sut.ValidateAsync(CreateValue(ref2), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_references_are_null_but_not_required()
+        {
+            var properties = new ReferencesFieldProperties();
+
+            var sut = Validator(properties, FoundReferences());
+
+            await sut.ValidateAsync(null, errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_references_are_empty_but_not_required()
+        {
+            var properties = new ReferencesFieldProperties();
+
+            var sut = Validator(properties, FoundReferences());
+
+            await sut.ValidateAsync(CreateValue(), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_duplicates_are_allowed()
+        {
+            var properties = new ReferencesFieldProperties { AllowDuplicates = true };
+
+            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published)));
+
+            await sut.ValidateAsync(CreateValue(ref1, ref1), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_references_are_required()
+        {
+            var properties = new ReferencesFieldProperties { IsRequired = true };
+
+            var sut = Validator(properties, FoundReferences());
+
+            await sut.ValidateAsync(CreateValue(), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Field is required." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_references_are_published_required()
+        {
+            var properties = new ReferencesFieldProperties { MustBePublished = true, IsRequired = true };
+
+            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published)));
+
+            await sut.ValidateAsync(CreateValue(), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Field is required." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_references_are_not_valid()
+        {
+            var properties = new ReferencesFieldProperties();
+
+            var sut = Validator(properties, FoundReferences());
+
+            await sut.ValidateAsync(CreateValue(ref1), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { $"[1]: Reference '{ref1}' not found." });
+        }
+
+        [Fact]
         public async Task Should_add_error_if_reference_schema_is_not_valid()
         {
-            var sut = new ReferencesValidator(Enumerable.Repeat(schemaId, 1), FoundReferences((DomainId.NewGuid(), ref2)));
+            var properties = new ReferencesFieldProperties { SchemaId = schemaId1 };
+
+            var sut = Validator(properties, FoundReferences((schemaId2, ref2, Status.Draft)));
 
             await sut.ValidateAsync(CreateValue(ref2), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"Contains reference '{ref2}' to invalid schema." });
+                new[] { $"[1]: Reference '{ref2}' has invalid schema." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_value_has_not_enough_items()
+        {
+            var properties = new ReferencesFieldProperties { MinItems = 2 };
+
+            var sut = Validator(properties, FoundReferences((schemaId2, ref2, Status.Draft)));
+
+            await sut.ValidateAsync(CreateValue(ref2), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must have at least 2 item(s)." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_value_has_not_enough_published_items()
+        {
+            var properties = new ReferencesFieldProperties { MinItems = 2, MustBePublished = true };
+
+            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published), (schemaId1, ref2, Status.Draft)));
+
+            await sut.ValidateAsync(CreateValue(ref1, ref2), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must have at least 2 item(s)." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_value_has_too_much_items()
+        {
+            var properties = new ReferencesFieldProperties { MaxItems = 1 };
+
+            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published), (schemaId1, ref2, Status.Draft)));
+
+            await sut.ValidateAsync(CreateValue(ref1, ref2), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must not have more than 1 item(s)." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_reference_contains_duplicate_values()
+        {
+            var properties = new ReferencesFieldProperties();
+
+            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published)));
+
+            await sut.ValidateAsync(CreateValue(ref1, ref1), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must not contain duplicate values." });
         }
 
         private static List<DomainId> CreateValue(params DomainId[] ids)
@@ -60,9 +208,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             return ids.ToList();
         }
 
-        private static CheckContentsByIds FoundReferences(params (DomainId SchemaId, DomainId Id)[] references)
+        private static CheckContentsByIds FoundReferences(params (DomainId SchemaId, DomainId Id, Status Status)[] references)
         {
-            return x => Task.FromResult<IReadOnlyList<(DomainId SchemaId, DomainId Id)>>(references.ToList());
+            return x => Task.FromResult<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>>(references.ToList());
+        }
+
+        private IValidator Validator(ReferencesFieldProperties properties, CheckContentsByIds found)
+        {
+            return new ReferencesValidator(properties.IsRequired, properties, found);
         }
     }
 }

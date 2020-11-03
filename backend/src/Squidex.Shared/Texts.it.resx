@@ -403,12 +403,6 @@
   <data name="common.readonlyMode" xml:space="preserve">
     <value>Al momento l'applicazione è in sola lettura.</value>
   </data>
-  <data name="common.referenceNotFound" xml:space="preserve">
-    <value>Contiene un collegamento '{id}' non valido.</value>
-  </data>
-  <data name="common.referenceToInvalidSchema" xml:space="preserve">
-    <value>Contiene dei collegamenti '{id}' ad uno schema errato.</value>
-  </data>
   <data name="common.remove" xml:space="preserve">
     <value>Rimuovi</value>
   </data>
@@ -600,6 +594,12 @@
   </data>
   <data name="contents.validation.pattern" xml:space="preserve">
     <value>Deve seguire il pattern.</value>
+  </data>
+  <data name="contents.validation.referenceNotFound" xml:space="preserve">
+    <value>Contiene un collegamento '{id}' non valido.</value>
+  </data>
+  <data name="contents.validation.referenceToInvalidSchema" xml:space="preserve">
+    <value>Contiene dei collegamenti '{id}' ad uno schema errato.</value>
   </data>
   <data name="contents.validation.regexTooSlow" xml:space="preserve">
     <value>La Regex è troppo lenta.</value>
