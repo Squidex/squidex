@@ -166,12 +166,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         public async Task Should_fetch_infos_from_all_grains()
         {
             A.CallTo(() => grainA.GetStateAsync())
-                .Returns(new Immutable<EventConsumerInfo>(
-                    new EventConsumerInfo { Name = "A", Error = "A-Error", IsStopped = false, Position = "123" }));
+                .Returns(new EventConsumerInfo { Name = "A", Error = "A-Error", IsStopped = false, Position = "123" });
 
             A.CallTo(() => grainB.GetStateAsync())
-                .Returns(new Immutable<EventConsumerInfo>(
-                    new EventConsumerInfo { Name = "B", Error = "B-Error", IsStopped = false, Position = "456" }));
+                .Returns( new EventConsumerInfo { Name = "B", Error = "B-Error", IsStopped = false, Position = "456" });
 
             var infos = await sut.GetConsumersAsync();
 

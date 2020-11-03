@@ -22,6 +22,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
+        private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
         private TaskScheduler? scheduler;
         private BatchSubscriber? currentSubscriber;
         private IEventConsumer? eventConsumer;
@@ -197,34 +198,42 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private async Task DoAndUpdateStateAsync(Func<Task> action, [CallerMemberName] string? caller = null)
         {
-            var previousState = State;
-
+            await semaphore.WaitAsync();
             try
             {
-                await action();
-            }
-            catch (Exception ex)
-            {
+                var previousState = State;
+
                 try
                 {
-                    Unsubscribe();
+                    await action();
                 }
-                catch (Exception unsubscribeException)
+                catch (Exception ex)
                 {
-                    ex = new AggregateException(ex, unsubscribeException);
+                    try
+                    {
+                        Unsubscribe();
+                    }
+                    catch (Exception unsubscribeException)
+                    {
+                        ex = new AggregateException(ex, unsubscribeException);
+                    }
+
+                    log.LogFatal(ex, w => w
+                        .WriteProperty("action", caller)
+                        .WriteProperty("status", "Failed")
+                        .WriteProperty("eventConsumer", eventConsumer!.Name));
+
+                    State = previousState.Stopped(ex);
                 }
 
-                log.LogFatal(ex, w => w
-                    .WriteProperty("action", caller)
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("eventConsumer", eventConsumer!.Name));
-
-                State = previousState.Stopped(ex);
+                if (State != previousState)
+                {
+                    await state.WriteAsync();
+                }
             }
-
-            if (State != previousState)
+            finally
             {
-                await state.WriteAsync();
+                semaphore.Release();
             }
         }
 
