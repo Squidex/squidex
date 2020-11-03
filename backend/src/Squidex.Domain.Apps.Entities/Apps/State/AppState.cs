@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Apps;
@@ -46,6 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         public bool IsArchived { get; set; }
 
+        [IgnoreDataMember]
         public DomainId UniqueId
         {
             get { return Id; }

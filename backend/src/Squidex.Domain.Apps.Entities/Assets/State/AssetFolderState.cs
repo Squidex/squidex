@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -23,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
         public DomainId ParentId { get; set; }
 
+        [IgnoreDataMember]
         public DomainId UniqueId
         {
             get { return DomainId.Combine(AppId, Id); }

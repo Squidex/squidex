@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
@@ -27,26 +28,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
         public ScheduleJob? ScheduleJob { get; set; }
 
+        [IgnoreDataMember]
         public DomainId UniqueId
         {
             get { return DomainId.Combine(AppId, Id); }
         }
 
+        [IgnoreDataMember]
         public NamedContentData Data
         {
             get { return NewVersion?.Data ?? CurrentVersion.Data; }
         }
 
+        [IgnoreDataMember]
         public Status EditingStatus
         {
             get { return NewStatus ?? Status; }
         }
 
+        [IgnoreDataMember]
         public Status Status
         {
             get { return CurrentVersion.Status; }
         }
 
+        [IgnoreDataMember]
         public Status? NewStatus
         {
             get { return NewVersion?.Status; }

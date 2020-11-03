@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
         public long SchemaFieldsTotal { get; set; }
 
+        [IgnoreDataMember]
         public DomainId UniqueId
         {
             get { return DomainId.Combine(AppId, Id); }

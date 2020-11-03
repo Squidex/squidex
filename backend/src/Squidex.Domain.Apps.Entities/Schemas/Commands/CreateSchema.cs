@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -39,6 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public Dictionary<string, string>? PreviewUrls { get; set; }
 
+        [IgnoreDataMember]
         public override DomainId AggregateId
         {
             get { return DomainId.Combine(AppId, SchemaId); }
