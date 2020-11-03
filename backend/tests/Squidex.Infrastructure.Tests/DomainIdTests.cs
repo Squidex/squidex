@@ -8,6 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
+using FluentAssertions;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -16,6 +18,21 @@ namespace Squidex.Infrastructure
     public class DomainIdTests
     {
         private readonly TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(DomainId));
+
+        public class MyTest
+        {
+            [IgnoreDataMember]
+            public DomainId Calculated
+            {
+                get { return DomainId.Combine(Id0, Id1.Id); }
+            }
+
+            public DomainId Id0 { get; set; }
+
+            public NamedId<DomainId> Id1 { get; set; }
+
+            public NamedId<DomainId> Id2 { get; set; }
+        }
 
         [Fact]
         public void Should_initialize_default()
@@ -159,6 +176,21 @@ namespace Squidex.Infrastructure
             var serialized = dictionary.SerializeAndDeserialize();
 
             Assert.Equal(321, serialized[DomainId.Create("123")]);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_in_object()
+        {
+            var obj = new MyTest
+            {
+                Id0 = DomainId.NewGuid(),
+                Id1 = NamedId.Of(DomainId.NewGuid(), "1"),
+                Id2 = NamedId.Of(DomainId.NewGuid(), "2")
+            };
+
+            var serialized = obj.SerializeAndDeserialize();
+
+            serialized.Should().BeEquivalentTo(obj);
         }
     }
 }

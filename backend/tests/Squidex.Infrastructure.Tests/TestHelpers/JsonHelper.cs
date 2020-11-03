@@ -40,6 +40,7 @@ namespace Squidex.Infrastructure.TestHelpers
                     new InstantConverter(),
                     new JsonValueConverter(),
                     new LanguageConverter(),
+                    new NamedDomainIdConverter(),
                     new NamedGuidIdConverter(),
                     new NamedLongIdConverter(),
                     new NamedStringIdConverter(),
