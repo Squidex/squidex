@@ -19,15 +19,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 {
     public class UniqueValidatorTests : IClassFixture<TranslationsFixture>
     {
-        private readonly DomainId schemaId = DomainId.NewGuid();
         private readonly List<string> errors = new List<string>();
 
         [Fact]
-        public async Task Should_add_error_if_string_value_not_found()
+        public async Task Should_add_error_if_other_content_with_string_value_found()
         {
             var filter = string.Empty;
 
-            var sut = new UniqueValidator(Check(DomainId.NewGuid(), f => filter = f));
+            var sut = new UniqueValidator(FoundDuplicates(DomainId.NewGuid(), f => filter = f));
 
             await sut.ValidateAsync("hi", errors, updater: c => c.Nested("property").Nested("iv"));
 
@@ -38,11 +37,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
-        public async Task Should_add_error_if_double_value_not_found()
+        public async Task Should_add_error_if_other_content_with_double_value_found()
         {
             var filter = string.Empty;
 
-            var sut = new UniqueValidator(Check(DomainId.NewGuid(), f => filter = f));
+            var sut = new UniqueValidator(FoundDuplicates(DomainId.NewGuid(), f => filter = f));
 
             await sut.ValidateAsync(12.5, errors, updater: c => c.Nested("property").Nested("iv"));
 
@@ -53,9 +52,23 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_string_value_not_found_but_in_optimized_mode()
+        public async Task Should_not_check_uniqueness_if_localized_string()
         {
-            var sut = new UniqueValidator(Check(DomainId.NewGuid()));
+            var filter = string.Empty;
+
+            var sut = new UniqueValidator(FoundDuplicates(DomainId.NewGuid(), f => filter = f));
+
+            await sut.ValidateAsync(12.5, errors, updater: c => c.Nested("property").Nested("de"));
+
+            Assert.Empty(errors);
+
+            Assert.Empty(filter);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_value_is_null()
+        {
+            var sut = new UniqueValidator(FoundDuplicates(DomainId.NewGuid()));
 
             await sut.ValidateAsync(null, errors);
 
@@ -63,11 +76,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_string_value_found_with_same_content_id()
+        public async Task Should_not_add_error_if_same_content_with_string_value_found()
         {
-            var ctx = ValidationTestExtensions.CreateContext();
+            var ctx = ValidationTestExtensions.CreateContext().Nested("property").Nested("iv");
 
-            var sut = new UniqueValidator(Check(ctx.ContentId));
+            var sut = new UniqueValidator(FoundDuplicates(ctx.ContentId));
 
             await sut.ValidateAsync("hi", ctx, ValidationTestExtensions.CreateFormatter(errors));
 
@@ -75,24 +88,29 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_double_value_found_with_same_content_id()
+        public async Task Should_not_add_error_if_same_content_with_double_value_found()
         {
-            var ctx = ValidationTestExtensions.CreateContext();
+            var ctx = ValidationTestExtensions.CreateContext().Nested("property").Nested("iv");
 
-            var sut = new UniqueValidator(Check(ctx.ContentId));
+            var sut = new UniqueValidator(FoundDuplicates(ctx.ContentId));
 
             await sut.ValidateAsync(12.5, ctx, ValidationTestExtensions.CreateFormatter(errors));
 
             Assert.Empty(errors);
         }
 
-        private CheckUniqueness Check(DomainId id, Action<string>? filter = null)
+        private CheckUniqueness FoundDuplicates(DomainId id, Action<string>? filter = null)
         {
             return filterNode =>
             {
                 filter?.Invoke(filterNode.ToString());
 
-                return Task.FromResult<IReadOnlyList<(DomainId, DomainId, Status)>>(new List<(DomainId, DomainId, Status)> { (schemaId, id, Status.Published) });
+                var foundIds = new List<(DomainId, DomainId, Status)>
+                {
+                    (id, id, Status.Draft)
+                };
+
+                return Task.FromResult<IReadOnlyList<(DomainId, DomainId, Status)>>(foundIds);
             };
         }
     }

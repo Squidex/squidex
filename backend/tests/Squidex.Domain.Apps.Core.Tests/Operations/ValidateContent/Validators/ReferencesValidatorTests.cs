@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties { SchemaId = schemaId1 };
 
-            var sut = Validator(properties, FoundReferences((schemaId2, ref2, Status.Published)));
+            var sut = Validator(properties, schemaId2, (ref2, Status.Published));
 
             await sut.ValidateAsync(CreateValue(ref2), errors, action: ValidationAction.Publish);
 
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties();
 
-            var sut = Validator(properties, FoundReferences((schemaId2, ref2, Status.Published)));
+            var sut = Validator(properties, schemaId2, (ref2, Status.Published));
 
             await sut.ValidateAsync(CreateValue(ref2), errors);
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties { SchemaId = schemaId1 };
 
-            var sut = Validator(properties, FoundReferences((schemaId1, ref2, Status.Published)));
+            var sut = Validator(properties, schemaId1, (ref2, Status.Published));
 
             await sut.ValidateAsync(CreateValue(ref2), errors);
 
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties();
 
-            var sut = Validator(properties, FoundReferences());
+            var sut = Validator(properties);
 
             await sut.ValidateAsync(null, errors);
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties();
 
-            var sut = Validator(properties, FoundReferences());
+            var sut = Validator(properties);
 
             await sut.ValidateAsync(CreateValue(), errors);
 
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties { AllowDuplicates = true };
 
-            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published)));
+            var sut = Validator(properties, schemaId1, (ref1, Status.Published));
 
             await sut.ValidateAsync(CreateValue(ref1, ref1), errors);
 
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties { IsRequired = true };
 
-            var sut = Validator(properties, FoundReferences());
+            var sut = Validator(properties, schemaId1);
 
             await sut.ValidateAsync(CreateValue(), errors);
 
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties { MustBePublished = true, IsRequired = true };
 
-            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published)));
+            var sut = Validator(properties, schemaId1, (ref1, Status.Published));
 
             await sut.ValidateAsync(CreateValue(), errors);
 
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties();
 
-            var sut = Validator(properties, FoundReferences());
+            var sut = Validator(properties);
 
             await sut.ValidateAsync(CreateValue(ref1), errors);
 
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties { SchemaId = schemaId1 };
 
-            var sut = Validator(properties, FoundReferences((schemaId2, ref2, Status.Draft)));
+            var sut = Validator(properties, schemaId2, (ref2, Status.Draft));
 
             await sut.ValidateAsync(CreateValue(ref2), errors);
 
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties { MinItems = 2 };
 
-            var sut = Validator(properties, FoundReferences((schemaId2, ref2, Status.Draft)));
+            var sut = Validator(properties, schemaId2, (ref2, Status.Draft));
 
             await sut.ValidateAsync(CreateValue(ref2), errors);
 
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties { MinItems = 2, MustBePublished = true };
 
-            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published), (schemaId1, ref2, Status.Draft)));
+            var sut = Validator(properties, schemaId1, (ref1, Status.Published), (ref2, Status.Draft));
 
             await sut.ValidateAsync(CreateValue(ref1, ref2), errors);
 
@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties { MaxItems = 1 };
 
-            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published), (schemaId1, ref2, Status.Draft)));
+            var sut = Validator(properties, schemaId1, (ref1, Status.Published), (ref2, Status.Draft));
 
             await sut.ValidateAsync(CreateValue(ref1, ref2), errors);
 
@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var properties = new ReferencesFieldProperties();
 
-            var sut = Validator(properties, FoundReferences((schemaId1, ref1, Status.Published)));
+            var sut = Validator(properties, schemaId1, (ref1, Status.Published));
 
             await sut.ValidateAsync(CreateValue(ref1, ref1), errors);
 
@@ -208,14 +208,24 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             return ids.ToList();
         }
 
-        private static CheckContentsByIds FoundReferences(params (DomainId SchemaId, DomainId Id, Status Status)[] references)
+        private IValidator Validator(ReferencesFieldProperties properties)
         {
-            return x => Task.FromResult<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>>(references.ToList());
+            return new ReferencesValidator(properties.IsRequired, properties, FoundReferences(schemaId1));
         }
 
-        private IValidator Validator(ReferencesFieldProperties properties, CheckContentsByIds found)
+        private IValidator Validator(ReferencesFieldProperties properties, DomainId schemaId, params (DomainId Id, Status Status)[] references)
         {
-            return new ReferencesValidator(properties.IsRequired, properties, found);
+            return new ReferencesValidator(properties.IsRequired, properties, FoundReferences(schemaId, references));
+        }
+
+        private static CheckContentsByIds FoundReferences(DomainId schemaId, params (DomainId Id, Status Status)[] references)
+        {
+            return x =>
+            {
+                var result = references.Select(x => (schemaId, x.Id, x.Status)).ToList();
+
+                return Task.FromResult<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>>(result);
+            };
         }
     }
 }

@@ -286,10 +286,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
         private IValidator Validator(AssetsFieldProperties properties)
         {
-            return new AssetsValidator(properties.IsRequired, properties, ids =>
+            return new AssetsValidator(properties.IsRequired, properties, FoundAssets());
+        }
+
+        private CheckAssets FoundAssets()
+        {
+            return ids =>
             {
-                return Task.FromResult<IReadOnlyList<IAssetInfo>>(new List<IAssetInfo> { document, image1, image2 });
-            });
+                var result = new List<IAssetInfo> { document, image1, image2 };
+
+                return Task.FromResult<IReadOnlyList<IAssetInfo>>(result);
+            };
         }
     }
 }

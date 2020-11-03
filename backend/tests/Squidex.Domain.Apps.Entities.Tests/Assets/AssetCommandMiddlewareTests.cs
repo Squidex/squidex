@@ -291,7 +291,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 FileSize = fileSize
             };
 
-            A.CallTo(() => assetQuery.FindByHashAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), A<string>._, A<string>._, A<long>._))
+            A.CallTo(() => assetQuery.FindByHashAsync(requestContext, A<string>._, fileName, fileSize))
                 .Returns(duplicate);
         }
 

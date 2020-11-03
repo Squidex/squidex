@@ -58,12 +58,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         {
                             await EnrichWithHashAndUploadAsync(createAsset, tempFile);
 
-                            var ctx = contextProvider.Context.Clone().WithoutAssetEnrichment();
-
                             if (!createAsset.Duplicate)
                             {
                                 var existing =
-                                    await assetQuery.FindByHashAsync(ctx,
+                                    await assetQuery.FindByHashAsync(contextProvider.Context,
                                         createAsset.FileHash,
                                         createAsset.File.FileName,
                                         createAsset.File.FileSize);

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -48,8 +49,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             Assert.NotNull(recordedRequest);
 
-            Assert.Contains(request.Bytes.ToString(), recordedRequest!.Properties.Values);
-            Assert.Contains(request.Costs.ToString(), recordedRequest!.Properties.Values);
+            Assert.Contains(request.Bytes.ToString(CultureInfo.InvariantCulture), recordedRequest!.Properties.Values);
+            Assert.Contains(request.Costs.ToString(CultureInfo.InvariantCulture), recordedRequest!.Properties.Values);
             Assert.Contains(request.ElapsedMs.ToString(), recordedRequest!.Properties.Values);
             Assert.Contains(request.RequestMethod, recordedRequest!.Properties.Values);
             Assert.Contains(request.RequestPath, recordedRequest!.Properties.Values);
