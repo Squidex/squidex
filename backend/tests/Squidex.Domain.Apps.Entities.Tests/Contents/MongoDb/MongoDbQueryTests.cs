@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var app = A.Dummy<IAppEntity>();
             A.CallTo(() => app.Id).Returns(DomainId.NewGuid());
             A.CallTo(() => app.Version).Returns(3);
-            A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
+            A.CallTo(() => app.Languages).Returns(languagesConfig);
         }
 
         [Fact]

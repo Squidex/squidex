@@ -5,8 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Orleans.Concurrency;
+
 namespace Squidex.Infrastructure.EventSourcing
 {
+    [Immutable]
     public sealed class EventConsumerInfo
     {
         public bool IsStopped { get; set; }

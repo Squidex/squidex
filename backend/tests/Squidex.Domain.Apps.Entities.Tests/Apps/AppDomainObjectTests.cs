@@ -498,7 +498,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.True(sut.Snapshot.LanguagesConfig.Contains(Language.DE));
+            Assert.True(sut.Snapshot.Languages.Contains(Language.DE));
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -518,7 +518,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.False(sut.Snapshot.LanguagesConfig.Contains(Language.DE));
+            Assert.False(sut.Snapshot.Languages.Contains(Language.DE));
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -538,7 +538,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.True(sut.Snapshot.LanguagesConfig.Contains(Language.DE));
+            Assert.True(sut.Snapshot.Languages.Contains(Language.DE));
 
             LastEvents
                 .ShouldHaveSameEvents(

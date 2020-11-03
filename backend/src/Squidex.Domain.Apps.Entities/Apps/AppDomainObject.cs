@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AddLanguage addLanguage:
                     return UpdateReturn(addLanguage, c =>
                     {
-                        GuardAppLanguages.CanAdd(Snapshot.LanguagesConfig, c);
+                        GuardAppLanguages.CanAdd(Snapshot.Languages, c);
 
                         AddLanguage(c);
 
@@ -202,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case RemoveLanguage removeLanguage:
                     return UpdateReturn(removeLanguage, c =>
                     {
-                        GuardAppLanguages.CanRemove(Snapshot.LanguagesConfig, c);
+                        GuardAppLanguages.CanRemove(Snapshot.Languages, c);
 
                         RemoveLanguage(c);
 
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case UpdateLanguage updateLanguage:
                     return UpdateReturn(updateLanguage, c =>
                     {
-                        GuardAppLanguages.CanUpdate(Snapshot.LanguagesConfig, c);
+                        GuardAppLanguages.CanUpdate(Snapshot.Languages, c);
 
                         UpdateLanguage(c);
 

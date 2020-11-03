@@ -76,6 +76,11 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
+            if (exception is OperationCanceledException)
+            {
+                return;
+            }
+
             Unsubscribe();
 
             if (retryWindow.CanRetryAfterFailure())

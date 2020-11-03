@@ -115,21 +115,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 yield return FieldConverters.ForValues(ValueConverters.ForNested(cleanReferences));
             }
 
-            yield return FieldConverters.ResolveInvariant(context.App.LanguagesConfig);
-            yield return FieldConverters.ResolveLanguages(context.App.LanguagesConfig);
+            yield return FieldConverters.ResolveInvariant(context.App.Languages);
+            yield return FieldConverters.ResolveLanguages(context.App.Languages);
 
             if (!context.IsFrontendClient)
             {
                 if (context.ShouldResolveLanguages())
                 {
-                    yield return FieldConverters.ResolveFallbackLanguages(context.App.LanguagesConfig);
+                    yield return FieldConverters.ResolveFallbackLanguages(context.App.Languages);
                 }
 
                 var languages = context.Languages();
 
                 if (languages.Any())
                 {
-                    yield return FieldConverters.FilterLanguages(context.App.LanguagesConfig, languages);
+                    yield return FieldConverters.FilterLanguages(context.App.Languages, languages);
                 }
 
                 var assetUrls = context.AssetUrls().ToList();

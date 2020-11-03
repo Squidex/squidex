@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             var consumerInfos = await Task.WhenAll(tasks);
 
-            return new Immutable<List<EventConsumerInfo>>(consumerInfos.Select(r => r.Value).ToList());
+            return consumerInfos.ToList().AsImmutable();
         }
 
         public Task StartAllAsync()
@@ -84,21 +84,21 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     .Select(c => StopAsync(c.Name)));
         }
 
-        public Task<Immutable<EventConsumerInfo>> ResetAsync(string consumerName)
+        public Task<EventConsumerInfo> ResetAsync(string consumerName)
         {
             var eventConsumer = GrainFactory.GetGrain<IEventConsumerGrain>(consumerName);
 
             return eventConsumer.ResetAsync();
         }
 
-        public Task<Immutable<EventConsumerInfo>> StartAsync(string consumerName)
+        public Task<EventConsumerInfo> StartAsync(string consumerName)
         {
             var eventConsumer = GrainFactory.GetGrain<IEventConsumerGrain>(consumerName);
 
             return eventConsumer.StartAsync();
         }
 
-        public Task<Immutable<EventConsumerInfo>> StopAsync(string consumerName)
+        public Task<EventConsumerInfo> StopAsync(string consumerName)
         {
             var eventConsumer = GrainFactory.GetGrain<IEventConsumerGrain>(consumerName);
 

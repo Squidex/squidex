@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IFieldResolver FlatData = Resolve((content, c, context) =>
         {
-            var language = context.Context.App.LanguagesConfig.Master;
+            var language = context.Context.App.Languages.Master;
 
             return content.Data.ToFlatten(language);
         });

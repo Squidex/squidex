@@ -17,7 +17,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     internal sealed class BatchSubscriber : IEventSubscriber
     {
         private readonly ITargetBlock<Job> pipelineStart;
-        private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventSubscription eventSubscription;
         private readonly IDataflowBlock pipelineEnd;
 
@@ -46,8 +45,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             Func<IEventSubscriber, IEventSubscription> factory,
             TaskScheduler scheduler)
         {
-            this.eventDataFormatter = eventDataFormatter;
-
             var batchSize = Math.Max(1, eventConsumer!.BatchSize);
             var batchDelay = Math.Max(100, eventConsumer.BatchDelay);
 
@@ -168,6 +165,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
+            if (exception is OperationCanceledException)
+            {
+                return Task.CompletedTask;
+            }
+
             var job = new Job
             {
                 Sender = subscription,

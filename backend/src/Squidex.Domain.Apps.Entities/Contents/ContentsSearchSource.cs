@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var url = urlGenerator.ContentUI(appId, content.SchemaId, content.Id);
 
-                var name = FormatName(content, context.App.LanguagesConfig.Master);
+                var name = FormatName(content, context.App.Languages.Master);
 
                 result.Add(name, SearchResultType.Content, url, content.SchemaDisplayName);
             }

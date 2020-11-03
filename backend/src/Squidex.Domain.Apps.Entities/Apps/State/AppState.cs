@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         public AppContributors Contributors { get; set; } = AppContributors.Empty;
 
-        public LanguagesConfig LanguagesConfig { get; set; } = LanguagesConfig.English;
+        public LanguagesConfig Languages { get; set; } = LanguagesConfig.English;
 
         public Workflows Workflows { get; set; } = Workflows.Empty;
 
@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
                         if (ev.IsMaster)
                         {
-                            l = LanguagesConfig.MakeMaster(ev.Language);
+                            l = Languages.MakeMaster(ev.Language);
                         }
 
                         return l;
@@ -177,11 +177,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         private bool UpdateLanguages<T>(T @event, Func<T, LanguagesConfig, LanguagesConfig> update)
         {
-            var previous = LanguagesConfig;
+            var previous = Languages;
 
-            LanguagesConfig = update(@event, previous);
+            Languages = update(@event, previous);
 
-            return !ReferenceEquals(previous, LanguagesConfig);
+            return !ReferenceEquals(previous, Languages);
         }
 
         private bool UpdatePatterns<T>(T @event, Func<T, AppPatterns, AppPatterns> update)

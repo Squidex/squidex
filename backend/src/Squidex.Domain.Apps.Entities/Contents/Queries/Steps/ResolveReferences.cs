@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private static JsonObject Format(IContentEntity content, Context context, ISchemaEntity referencedSchema)
         {
-            return content.Data.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig);
+            return content.Data.FormatReferences(referencedSchema.SchemaDef, context.App.Languages);
         }
 
         private static JsonObject CreateFallback(Context context, List<IEnrichedContentEntity> referencedContents)
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
             var value = JsonValue.Object();
 
-            foreach (var partitionKey in context.App.LanguagesConfig.AllKeys)
+            foreach (var partitionKey in context.App.Languages.AllKeys)
             {
                 value.Add(partitionKey, text);
             }

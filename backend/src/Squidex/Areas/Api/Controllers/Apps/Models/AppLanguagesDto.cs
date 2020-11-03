@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static AppLanguagesDto FromApp(IAppEntity app, Resources resources)
         {
-            var config = app.LanguagesConfig;
+            var config = app.Languages;
 
             var result = new AppLanguagesDto
             {

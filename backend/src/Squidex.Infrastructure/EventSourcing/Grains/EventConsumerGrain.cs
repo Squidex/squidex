@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Orleans.Concurrency;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 
@@ -71,14 +70,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public Task<Immutable<EventConsumerInfo>> GetStateAsync()
+        public Task<EventConsumerInfo> GetStateAsync()
         {
             return Task.FromResult(CreateInfo());
         }
 
-        private Immutable<EventConsumerInfo> CreateInfo()
+        private EventConsumerInfo CreateInfo()
         {
-            return State.ToInfo(eventConsumer!.Name).AsImmutable();
+            return State.ToInfo(eventConsumer!.Name);
         }
 
         public Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
@@ -128,7 +127,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public async Task<Immutable<EventConsumerInfo>> StartAsync()
+        public async Task<EventConsumerInfo> StartAsync()
         {
             if (!State.IsStopped)
             {
@@ -145,7 +144,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return CreateInfo();
         }
 
-        public async Task<Immutable<EventConsumerInfo>> StopAsync()
+        public async Task<EventConsumerInfo> StopAsync()
         {
             if (State.IsStopped)
             {
@@ -162,7 +161,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return CreateInfo();
         }
 
-        public async Task<Immutable<EventConsumerInfo>> ResetAsync()
+        public async Task<EventConsumerInfo> ResetAsync()
         {
             await DoAndUpdateStateAsync(async () =>
             {

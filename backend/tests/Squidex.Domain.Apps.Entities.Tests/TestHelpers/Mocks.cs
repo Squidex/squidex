@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
             A.CallTo(() => app.Id).Returns(appId.Id);
             A.CallTo(() => app.Name).Returns(appId.Name);
-            A.CallTo(() => app.LanguagesConfig).Returns(config);
+            A.CallTo(() => app.Languages).Returns(config);
             A.CallTo(() => app.UniqueId).Returns(appId.Id);
 
             return app;

@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         public static PartitionResolver PartitionResolver(this IAppEntity entity)
         {
-            return entity.LanguagesConfig.ToResolver();
+            return entity.Languages.ToResolver();
         }
     }
 }

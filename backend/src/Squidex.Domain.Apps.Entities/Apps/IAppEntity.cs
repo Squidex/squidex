@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         AppContributors Contributors { get; }
 
-        LanguagesConfig LanguagesConfig { get; }
+        LanguagesConfig Languages { get; }
 
         Workflows Workflows { get; }
 
