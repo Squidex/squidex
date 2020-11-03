@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
