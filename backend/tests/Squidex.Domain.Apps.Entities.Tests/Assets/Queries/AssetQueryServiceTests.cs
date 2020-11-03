@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetEnricher.EnrichAsync(found, requestContext))
                 .Returns(enriched);
 
-            var result = await sut.FindAssetAsync(requestContext, found.Id);
+            var result = await sut.FindAsync(requestContext, found.Id);
 
             Assert.Same(enriched, result);
         }
@@ -62,15 +62,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var enriched = new AssetEntity();
 
-            A.CallTo(() => assetRepository.QueryByHashAsync(appId.Id, "hash"))
-                .Returns(new List<IAssetEntity> { found });
+            A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, "hash", "name", 123))
+                .Returns(found);
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found), requestContext))
-                .Returns(new List<IEnrichedAssetEntity> { enriched });
+            A.CallTo(() => assetEnricher.EnrichAsync(found, requestContext))
+                .Returns(enriched);
 
-            var result = await sut.QueryByHashAsync(requestContext, appId.Id, "hash");
+            var result = await sut.FindByHashAsync(requestContext, "hash", "name", 123);
 
-            Assert.Same(enriched, result.Single());
+            Assert.Same(enriched, result);
         }
 
         [Fact]

@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, A<SearchScope>._))
                 .Returns(CreateContent(contentId));
 
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindContentAsync(ctx, schemaId.Name, contentId));
+            await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindAsync(ctx, schemaId.Name, contentId));
         }
 
         [Fact]
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, A<SearchScope>._))
                 .Returns<IContentEntity?>(null);
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(ctx, schemaId.Name, contentId));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindAsync(ctx, schemaId.Name, contentId));
         }
 
         [Theory]
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, scope))
                 .Returns(content);
 
-            var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
+            var result = await sut.FindAsync(ctx, schemaId.Name, contentId);
 
             Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentVersionLoader.GetAsync(appId.Id, contentId, 13))
                 .Returns(content);
 
-            var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId, 13);
+            var result = await sut.FindAsync(ctx, schemaId.Name, contentId, 13);
 
             Assert.Equal(contentTransformed, result!.Data);
             Assert.Equal(content.Id, result.Id);

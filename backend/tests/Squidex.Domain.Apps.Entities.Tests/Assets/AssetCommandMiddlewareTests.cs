@@ -70,8 +70,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntity>._, requestContext))
                 .ReturnsLazily(() => SimpleMapper.Map(asset.Snapshot, new AssetEntity()));
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), AppId, A<string>._))
-                .Returns(new List<IEnrichedAssetEntity>());
+            A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._))
+                .Returns(Task.FromResult<IEnrichedAssetEntity?>(null));
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id.ToString(), null))
                 .Returns(asset);
@@ -193,21 +193,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_but_other_name_found()
-        {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
-
-            SetupSameHashAsset("other-name", file.FileSize, out _);
-
-            await sut.HandleAsync(context);
-
-            var result = context.Result<AssetCreatedResult>();
-
-            Assert.False(result.IsDuplicate);
-        }
-
-        [Fact]
         public async Task Create_should_pass_through_duplicate()
         {
             var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
@@ -222,19 +207,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Assert.True(result.IsDuplicate);
 
             result.Should().BeEquivalentTo(duplicate, x => x.ExcludingMissingMembers());
-        }
-
-        [Fact]
-        public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_but_other_size_found()
-        {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
-
-            SetupSameHashAsset(file.FileName, 12345, out _);
-
-            await sut.HandleAsync(context);
-
-            Assert.False(context.Result<AssetCreatedResult>().IsDuplicate);
         }
 
         [Fact]
@@ -319,8 +291,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 FileSize = fileSize
             };
 
-            A.CallTo(() => assetQuery.QueryByHashAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), A<DomainId>._, A<string>._))
-                .Returns(new List<IEnrichedAssetEntity> { duplicate });
+            A.CallTo(() => assetQuery.FindByHashAsync(A<Context>.That.Matches(x => x.ShouldEnrichAsset()), A<string>._, A<string>._, A<long>._))
+                .Returns(duplicate);
         }
 
         private void AssertMetadataEnriched()

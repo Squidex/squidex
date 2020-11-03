@@ -152,7 +152,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, DomainId id)
         {
-            var asset = await assetQuery.FindAssetAsync(Context, id);
+            var asset = await assetQuery.FindAsync(Context, id);
 
             if (asset == null)
             {

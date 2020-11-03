@@ -14,8 +14,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 {
     public interface IAssetRepository
     {
-        Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(DomainId appId, string hash);
-
         Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, ClrQuery query);
 
         Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, HashSet<DomainId> ids);
@@ -23,6 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
         Task<IReadOnlyList<DomainId>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids);
 
         Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId);
+
+        Task<IAssetEntity?> FindAssetAsync(DomainId appId, string hash, string fileName, long fileSize);
 
         Task<IAssetEntity?> FindAssetAsync(DomainId appId);
 

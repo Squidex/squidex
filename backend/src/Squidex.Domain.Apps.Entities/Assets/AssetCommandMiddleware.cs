@@ -62,19 +62,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             if (!createAsset.Duplicate)
                             {
-                                var existings = await assetQuery.QueryByHashAsync(ctx, createAsset.AppId.Id, createAsset.FileHash);
+                                var existing =
+                                    await assetQuery.FindByHashAsync(ctx,
+                                        createAsset.FileHash,
+                                        createAsset.File.FileName,
+                                        createAsset.File.FileSize);
 
-                                foreach (var existing in existings)
+                                if (existing != null)
                                 {
-                                    if (IsDuplicate(existing, createAsset.File))
-                                    {
-                                        var result = new AssetCreatedResult(existing, true);
+                                    var result = new AssetCreatedResult(existing, true);
 
-                                        context.Complete(result);
+                                    context.Complete(result);
 
-                                        await next(context);
-                                        return;
-                                    }
+                                    await next(context);
+                                    return;
                                 }
                             }
 
@@ -147,11 +148,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
 
             return null;
-        }
-
-        private static bool IsDuplicate(IAssetEntity asset, AssetFile file)
-        {
-            return asset?.FileName == file.FileName && asset.FileSize == file.FileSize;
         }
 
         private async Task EnrichWithHashAndUploadAsync(UploadAssetCommand command, string tempFile)

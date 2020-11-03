@@ -60,7 +60,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     Index
                         .Ascending(x => x.IndexedAppId)
                         .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.FileHash))
+                        .Ascending(x => x.FileHash)
+                        .Ascending(x => x.FileName)
+                        .Ascending(x => x.FileSize))
             }, ct);
         }
 
@@ -129,15 +131,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(DomainId appId, string hash)
+        public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, string hash, string fileName, long fileSize)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
-                var assetEntities =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.FileHash == hash)
-                        .ToListAsync();
+                var assetEntity =
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.FileHash == hash && x.FileName == fileName && x.FileSize == fileSize)
+                        .FirstOrDefaultAsync();
 
-                return assetEntities.OfType<IAssetEntity>().ToList();
+                return assetEntity;
             }
         }
 

@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public async Task Should_query_asset_by_hash()
         {
-            var assets = await _.AssetRepository.QueryByHashAsync(_.RandomAppId(), _.RandomValue());
+            var assets = await _.AssetRepository.FindAssetAsync(_.RandomAppId(), _.RandomValue(), _.RandomValue(), 123);
 
             Assert.NotNull(assets);
         }

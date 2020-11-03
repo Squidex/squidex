@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 await maxRequests.WaitAsync();
                 try
                 {
-                    asset = await assetQuery.FindAssetAsync(context, id);
+                    asset = await assetQuery.FindAsync(context, id);
                 }
                 finally
                 {
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 await maxRequests.WaitAsync();
                 try
                 {
-                    content = await contentQuery.FindContentAsync(context, schemaId.ToString(), id);
+                    content = await contentQuery.FindAsync(context, schemaId.ToString(), id);
                 }
                 finally
                 {

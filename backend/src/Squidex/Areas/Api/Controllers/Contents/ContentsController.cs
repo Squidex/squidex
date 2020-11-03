@@ -278,7 +278,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, DomainId id)
         {
-            var content = await contentQuery.FindContentAsync(Context, name, id);
+            var content = await contentQuery.FindAsync(Context, name, id);
 
             var response = ContentDto.FromContent(Context, content, Resources);
 
@@ -305,7 +305,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string name, DomainId id, int version)
         {
-            var content = await contentQuery.FindContentAsync(Context, name, id, version);
+            var content = await contentQuery.FindAsync(Context, name, id, version);
 
             var response = ContentDto.FromContent(Context, content, Resources);
 

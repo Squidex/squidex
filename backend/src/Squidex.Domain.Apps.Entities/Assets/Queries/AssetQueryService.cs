@@ -37,8 +37,24 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedAssetEntity?> FindAssetAsync(Context context, DomainId id)
+        public async Task<IEnrichedAssetEntity?> FindByHashAsync(Context context, string hash, string fileName, long fileSize)
         {
+            Guard.NotNull(context, nameof(context));
+
+            var asset = await assetRepository.FindAssetAsync(context.App.Id, hash, fileName, fileSize);
+
+            if (asset != null)
+            {
+                return await assetEnricher.EnrichAsync(asset, context);
+            }
+
+            return null;
+        }
+
+        public async Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id)
+        {
+            Guard.NotNull(context, nameof(context));
+
             var asset = await assetRepository.FindAssetAsync(context.App.Id, id);
 
             if (asset != null)
@@ -76,15 +92,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var assetFolders = await assetFolderRepository.QueryAsync(context.App.Id, parentId);
 
             return assetFolders;
-        }
-
-        public async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Context context, DomainId appId, string hash)
-        {
-            Guard.NotNull(hash, nameof(hash));
-
-            var assets = await assetRepository.QueryByHashAsync(appId, hash);
-
-            return await assetEnricher.EnrichAsync(assets, context);
         }
 
         public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q query)
