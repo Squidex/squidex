@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    internal sealed class AggregateValidator : IValidator
+    public sealed class AggregateValidator : IValidator
     {
         private readonly IValidator[]? validators;
         private readonly ISemanticLog log;

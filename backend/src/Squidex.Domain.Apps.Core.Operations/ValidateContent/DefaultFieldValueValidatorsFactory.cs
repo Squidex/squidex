@@ -18,15 +18,15 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumerable<IValidator>>
     {
         private readonly ValidatorContext context;
-        private readonly FieldValidatorFactory createFieldValidator;
+        private readonly ValidatorFactory createFieldValidator;
 
-        private DefaultFieldValueValidatorsFactory(ValidatorContext context, FieldValidatorFactory createFieldValidator)
+        private DefaultFieldValueValidatorsFactory(ValidatorContext context, ValidatorFactory createFieldValidator)
         {
             this.context = context;
             this.createFieldValidator = createFieldValidator;
         }
 
-        public static IEnumerable<IValidator> CreateValidators(ValidatorContext context, IField field, FieldValidatorFactory createFieldValidator)
+        public static IEnumerable<IValidator> CreateValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(field, nameof(field));

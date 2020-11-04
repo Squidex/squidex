@@ -14,13 +14,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class CollectionItemValidator : IValidator
     {
-        private readonly IValidator[] itemValidators;
+        private readonly IValidator itemValidator;
 
-        public CollectionItemValidator(params IValidator[] itemValidators)
+        public CollectionItemValidator(IValidator itemValidator)
         {
-            Guard.NotEmpty(itemValidators, nameof(itemValidators));
+            Guard.NotNull(itemValidator, nameof(itemValidator));
 
-            this.itemValidators = itemValidators;
+            this.itemValidator = itemValidator;
         }
 
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
@@ -34,10 +34,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     var innerContext = context.Nested($"[{index}]");
 
-                    foreach (var itemValidator in itemValidators)
-                    {
-                        innerTasks.Add(itemValidator.ValidateAsync(item, innerContext, addError));
-                    }
+                    await itemValidator.ValidateAsync(item, innerContext, addError);
 
                     index++;
                 }

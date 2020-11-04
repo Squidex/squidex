@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -36,12 +37,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<AssetsFieldProperties> field)
         {
-            return ConvertToStringList();
+            return ConvertToIdList();
         }
 
         public (object? Result, JsonError? Error) Visit(IField<ReferencesFieldProperties> field)
         {
-            return ConvertToStringList();
+            return ConvertToIdList();
         }
 
         public (object? Result, JsonError? Error) Visit(IField<TagsFieldProperties> field)
@@ -151,6 +152,30 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field)
         {
             return (value, null);
+        }
+
+        private (object? Result, JsonError? Error) ConvertToIdList()
+        {
+            if (value is JsonArray array)
+            {
+                var result = new List<DomainId>(array.Count);
+
+                foreach (var item in array)
+                {
+                    if (item is JsonString s && !string.IsNullOrWhiteSpace(s.Value))
+                    {
+                        result.Add(DomainId.Create(s.Value));
+                    }
+                    else
+                    {
+                        return (null, new JsonError("Invalid json type, expected array of strings."));
+                    }
+                }
+
+                return (result, null);
+            }
+
+            return (null, new JsonError("Invalid json type, expected array of strings."));
         }
 
         private (object? Result, JsonError? Error) ConvertToStringList()

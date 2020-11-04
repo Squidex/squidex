@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent;
@@ -23,61 +22,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
     public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
-
-        public sealed class AssetInfo : IAssetInfo
-        {
-            public DomainId AssetId { get; set; }
-
-            public string FileName { get; set; }
-
-            public string FileHash { get; set; }
-
-            public string Slug { get; set; }
-
-            public long FileSize { get; set; }
-
-            public bool IsImage { get; set; }
-
-            public int? PixelWidth { get; set; }
-
-            public int? PixelHeight { get; set; }
-
-            public AssetMetadata Metadata { get; set; }
-
-            public AssetType Type { get; set; }
-        }
-
-        private readonly AssetInfo document = new AssetInfo
-        {
-            AssetId = DomainId.NewGuid(),
-            FileName = "MyDocument.pdf",
-            FileSize = 1024 * 4,
-            Type = AssetType.Unknown
-        };
-
-        private readonly AssetInfo image1 = new AssetInfo
-        {
-            AssetId = DomainId.NewGuid(),
-            FileName = "MyImage.png",
-            FileSize = 1024 * 8,
-            Type = AssetType.Image,
-            Metadata =
-                new AssetMetadata()
-                    .SetPixelWidth(800)
-                    .SetPixelHeight(600)
-        };
-
-        private readonly AssetInfo image2 = new AssetInfo
-        {
-            AssetId = DomainId.NewGuid(),
-            FileName = "MyImage.png",
-            FileSize = 1024 * 8,
-            Type = AssetType.Image,
-            Metadata =
-                new AssetMetadata()
-                    .SetPixelWidth(800)
-                    .SetPixelHeight(600)
-        };
+        private readonly IAssetInfo document = TestAssets.Document(DomainId.NewGuid());
+        private readonly IAssetInfo image1 = TestAssets.Image(DomainId.NewGuid());
+        private readonly IAssetInfo image2 = TestAssets.Image(DomainId.NewGuid());
 
         [Fact]
         public async Task Should_not_add_error_if_assets_are_valid()

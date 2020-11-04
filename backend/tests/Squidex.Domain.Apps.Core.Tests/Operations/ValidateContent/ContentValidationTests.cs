@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             var validatorFactory = A.Fake<IValidatorsFactory>();
 
-            A.CallTo(() => validatorFactory.CreateValueValidators(A<ValidationContext>._, A<IField>._, A<FieldValidatorFactory>._))
+            A.CallTo(() => validatorFactory.CreateValueValidators(A<ValidationContext>._, A<IField>._, A<ValidatorFactory>._))
                 .Returns(Enumerable.Repeat(validator, 1));
 
             schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             var validatorFactory = A.Fake<IValidatorsFactory>();
 
-            A.CallTo(() => validatorFactory.CreateFieldValidators(A<ValidationContext>._, A<IField>._, A<FieldValidatorFactory>._))
+            A.CallTo(() => validatorFactory.CreateFieldValidators(A<ValidationContext>._, A<IField>._, A<ValidatorFactory>._))
                 .Returns(Enumerable.Repeat(validator, 1));
 
             schema = schema.AddNumber(1, "my-field", Partitioning.Invariant,

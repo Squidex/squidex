@@ -10,21 +10,21 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public delegate IValidator FieldValidatorFactory(IField field);
+    public delegate IValidator ValidatorFactory(IField field);
 
     public interface IValidatorsFactory
     {
-        IEnumerable<IValidator> CreateFieldValidators(ValidatorContext context, IField field, FieldValidatorFactory createFieldValidator)
+        IEnumerable<IValidator> CreateFieldValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
         {
             yield break;
         }
 
-        IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, FieldValidatorFactory createFieldValidator)
+        IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
         {
             yield break;
         }
 
-        IEnumerable<IValidator> CreateContentValidators(ValidatorContext context, FieldValidatorFactory createFieldValidator)
+        IEnumerable<IValidator> CreateContentValidators(ValidatorContext context, ValidatorFactory createFieldValidator)
         {
             yield break;
         }

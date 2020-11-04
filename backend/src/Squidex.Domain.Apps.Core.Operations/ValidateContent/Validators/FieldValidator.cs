@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -18,16 +15,16 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class FieldValidator : IValidator
     {
-        private readonly IValidator[] validators;
+        private readonly IValidator fieldValueValidator;
         private readonly IField field;
 
-        public FieldValidator(IEnumerable<IValidator>? validators, IField field)
+        public FieldValidator(IValidator fieldValueValidator, IField field)
         {
             Guard.NotNull(field, nameof(field));
-
-            this.validators = validators?.ToArray() ?? Array.Empty<IValidator>();
+            Guard.NotNull(fieldValueValidator, nameof(fieldValueValidator));
 
             this.field = field;
+            this.fieldValueValidator = fieldValueValidator;
         }
 
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
@@ -63,17 +60,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 return;
             }
 
-            if (validators.Length > 0)
-            {
-                var tasks = new List<Task>();
-
-                foreach (var validator in validators)
-                {
-                    tasks.Add(validator.ValidateAsync(typedValue, context, addError));
-                }
-
-                await Task.WhenAll(tasks);
-            }
+            await fieldValueValidator.ValidateAsync(typedValue, context, addError);
         }
     }
 }

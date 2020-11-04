@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
             this.contentRepository = contentRepository;
         }
 
-        public IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, FieldValidatorFactory createFieldValidator)
+        public IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
         {
             if (context.Mode == ValidationMode.Optimized)
             {

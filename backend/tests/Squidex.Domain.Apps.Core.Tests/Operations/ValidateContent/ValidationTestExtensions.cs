@@ -49,8 +49,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             var context = CreateContext(schema, mode, updater, action);
 
             var validators = Factories(factory).SelectMany(x => x.CreateValueValidators(context, field, null!)).ToArray();
+            var validator = new AggregateValidator(validators, Log);
 
-            return new FieldValidator(validators, field)
+            return new FieldValidator(validator, field)
                 .ValidateAsync(value, context, CreateFormatter(errors));
         }
 

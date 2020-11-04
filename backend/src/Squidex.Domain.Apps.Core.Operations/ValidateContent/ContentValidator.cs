@@ -118,7 +118,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         private IValidator CreateFieldValidator(IField field)
         {
-            return new FieldValidator(CreateValueValidators(field), field);
+            return new FieldValidator(CreateValueValidator(field), field);
+        }
+
+        private IValidator CreateValueValidator(IField field)
+        {
+            return new AggregateValidator(CreateValueValidators(field), log);
         }
 
         private IEnumerable<IValidator> CreateContentValidators()
