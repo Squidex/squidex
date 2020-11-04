@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     catch (Exception ex)
                     {
                         log.LogWarning(ex, w => w
-                            .WriteProperty("action", "reolveField")
+                            .WriteProperty("action", "resolveField")
                             .WriteProperty("status", "failed")
                             .WriteProperty("field", context.FieldName));
 
