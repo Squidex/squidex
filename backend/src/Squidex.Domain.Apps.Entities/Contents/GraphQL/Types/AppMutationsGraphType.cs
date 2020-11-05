@@ -66,11 +66,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                 AddField(new FieldType
                 {
-                    Name = $"publish{schemaType}Content",
+                    Name = $"change{schemaType}Content",
                     Arguments = ContentActions.ChangeStatus.Arguments,
                     ResolvedType = contentType,
                     Resolver = ContentActions.ChangeStatus.Resolver(appId, schemaId),
-                    Description = $"Publish a {schemaName} content."
+                    Description = $"Change a {schemaName} content."
                 });
 
                 AddField(new FieldType
@@ -80,6 +80,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     ResolvedType = EntitySavedGraphType.NonNull,
                     Resolver = ContentActions.Delete.Resolver(appId, schemaId),
                     Description = $"Delete an {schemaName} content."
+                });
+
+                AddField(new FieldType
+                {
+                    Name = $"publish{schemaType}Content",
+                    Arguments = ContentActions.ChangeStatus.Arguments,
+                    ResolvedType = contentType,
+                    Resolver = ContentActions.ChangeStatus.Resolver(appId, schemaId),
+                    Description = $"Publish a {schemaName} content.",
+                    DeprecationReason = $"Use 'change{schemaType}Content' instead"
                 });
             }
 

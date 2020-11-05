@@ -336,7 +336,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var query = @"
                 mutation {
-                  publishMySchemaContent(id: ""<ID>"", status: ""Published"", dueTime: ""<TIME>"", expectedVersion: 10) {
+                  changeMySchemaContent(id: ""<ID>"", status: ""Published"", dueTime: ""<TIME>"", expectedVersion: 10) {
                     <FIELDS>
                   }
                 }".Replace("<ID>", contentId.ToString()).Replace("<TIME>", dueTime.ToString()).Replace("<FIELDS>", TestContent.AllFields);
@@ -349,7 +349,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 data = new
                 {
-                    publishMySchemaContent = TestContent.Response(content)
+                    changeMySchemaContent = TestContent.Response(content)
                 }
             };
 
@@ -359,6 +359,72 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<ChangeContentStatus>.That.Matches(x =>
                     x.ContentId == contentId &&
                     x.DueTime == dueTime &&
+                    x.ExpectedVersion == 10 &&
+                    x.Status == Status.Published)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_publish_command_for_status_change_without_due_time()
+        {
+            var query = @"
+                mutation {
+                  changeMySchemaContent(id: ""<ID>"", status: ""Published"", expectedVersion: 10) {
+                    <FIELDS>
+                  }
+                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+
+            commandContext.Complete(content);
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    changeMySchemaContent = TestContent.Response(content)
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<ChangeContentStatus>.That.Matches(x =>
+                    x.ContentId == contentId &&
+                    x.DueTime == null &&
+                    x.ExpectedVersion == 10 &&
+                    x.Status == Status.Published)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_publish_command_for_status_change_with_null_due_time()
+        {
+            var query = @"
+                mutation {
+                  changeMySchemaContent(id: ""<ID>"", status: ""Published"", dueTime: null, expectedVersion: 10) {
+                    <FIELDS>
+                  }
+                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+
+            commandContext.Complete(content);
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    changeMySchemaContent = TestContent.Response(content)
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<ChangeContentStatus>.That.Matches(x =>
+                    x.ContentId == contentId &&
+                    x.DueTime == null &&
                     x.ExpectedVersion == 10 &&
                     x.Status == Status.Published)))
                 .MustHaveHappened();
