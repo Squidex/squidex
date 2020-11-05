@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -22,6 +23,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
     public class AssetsFieldTests : IClassFixture<TranslationsFixture>
     {
         private readonly List<string> errors = new List<string>();
+        private readonly DomainId asset1 = DomainId.NewGuid();
+        private readonly DomainId asset2 = DomainId.NewGuid();
         private readonly IValidatorsFactory factory;
 
         private class CustomFactory : IValidatorsFactory
@@ -54,6 +57,21 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
+        public async Task Should_not_add_error_if_assets_are_valid()
+        {
+            var sut = Field(new AssetsFieldProperties
+            {
+                IsRequired = true,
+                MinItems = 1,
+                MaxItems = 3
+            });
+
+            await sut.ValidateAsync(CreateValue(asset1), errors, factory: factory);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
         public async Task Should_not_add_error_if_assets_are_null_and_valid()
         {
             var sut = Field(new AssetsFieldProperties());
@@ -68,17 +86,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MinItems = 2, MaxItems = 2 });
 
-            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors, factory: factory);
+            await sut.ValidateAsync(CreateValue(asset1, asset2), errors, factory: factory);
 
             Assert.Empty(errors);
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_duplicate_values_are_ignored()
+        public async Task Should_not_add_error_if_duplicate_values_are_allowed()
         {
             var sut = Field(new AssetsFieldProperties { AllowDuplicates = true });
 
-            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors, factory: factory);
+            await sut.ValidateAsync(CreateValue(asset1, asset2), errors, factory: factory);
 
             Assert.Empty(errors);
         }
@@ -110,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MinItems = 3 });
 
-            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors, factory: factory);
+            await sut.ValidateAsync(CreateValue(asset1, asset2), errors, factory: factory);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have at least 3 item(s)." });
@@ -121,7 +139,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MaxItems = 1 });
 
-            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors, factory: factory);
+            await sut.ValidateAsync(CreateValue(asset1, asset2), errors, factory: factory);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must not have more than 1 item(s)." });
@@ -132,17 +150,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties());
 
-            var id = Guid.NewGuid();
-
-            await sut.ValidateAsync(CreateValue(id, id), errors, factory: factory);
+            await sut.ValidateAsync(CreateValue(asset1, asset1), errors, factory: factory);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must not contain duplicate values." });
         }
 
-        private static IJsonValue CreateValue(params Guid[]? ids)
+        private static IJsonValue CreateValue(params DomainId[]? ids)
         {
-            return ids == null ? JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
+            return ids == null ?
+                JsonValue.Null :
+                JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
         }
 
         private static RootField<AssetsFieldProperties> Field(AssetsFieldProperties properties)

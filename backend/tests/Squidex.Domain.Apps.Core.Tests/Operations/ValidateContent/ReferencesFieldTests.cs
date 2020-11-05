@@ -67,7 +67,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_references_are_valid()
         {
-            var sut = Field(new ReferencesFieldProperties());
+            var sut = Field(new ReferencesFieldProperties
+            {
+                IsRequired = true,
+                MinItems = 1,
+                MaxItems = 3
+            });
 
             await sut.ValidateAsync(CreateValue(ref1), errors, factory: factory);
 
@@ -97,7 +102,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_duplicate_values_are_allowed()
         {
-            var sut = Field(new ReferencesFieldProperties { MinItems = 2, MaxItems = 2, AllowDuplicates = true });
+            var sut = Field(new ReferencesFieldProperties { AllowDuplicates = true });
 
             await sut.ValidateAsync(CreateValue(ref1, ref1), errors, factory: factory);
 
@@ -161,7 +166,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static IJsonValue CreateValue(params DomainId[]? ids)
         {
-            return ids == null ? JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
+            return ids == null ?
+                JsonValue.Null :
+                JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
         }
 
         private static RootField<ReferencesFieldProperties> Field(ReferencesFieldProperties properties)
