@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL;
@@ -17,6 +18,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public static class Extensions
     {
+        public static string SafeTypeName(this string typeName)
+        {
+            if (typeName.Equals("Content", StringComparison.Ordinal))
+            {
+                return $"{typeName}Entity";
+            }
+
+            return typeName;
+        }
+
         public static IEnumerable<(T Field, string Name, string Type)> SafeFields<T>(this IEnumerable<T> fields) where T : IField
         {
             var allFields =

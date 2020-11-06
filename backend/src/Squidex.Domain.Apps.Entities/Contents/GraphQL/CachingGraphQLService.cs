@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
@@ -94,7 +95,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     allSchemas,
                     GetPageSizeForContents(),
                     GetPageSizeForAssets(),
-                    resolver.GetRequiredService<IUrlGenerator>());
+                    resolver.GetRequiredService<IUrlGenerator>(),
+                    resolver.GetRequiredService<ISemanticLog>());
             });
         }
 

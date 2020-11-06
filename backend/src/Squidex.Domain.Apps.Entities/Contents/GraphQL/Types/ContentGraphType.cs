@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
@@ -20,12 +21,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public ContentGraphType(ISchemaEntity schema)
         {
-            this.schemaId = schema.Id;
+            schemaId = schema.Id;
 
             var schemaType = schema.TypeName();
             var schemaName = schema.DisplayName();
 
-            Name = $"{schemaType}";
+            Name = schemaType.SafeTypeName();
 
             AddField(new FieldType
             {

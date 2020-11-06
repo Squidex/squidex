@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using GraphQLSchema = GraphQL.Types.Schema;
 
 #pragma warning disable IDE0003
@@ -31,6 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly IObjectGraphType assetType;
         private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
+        private readonly ISemanticLog log;
 
         public bool CanGenerateAssetSourceUrl { get; }
 
@@ -43,8 +45,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             IEnumerable<ISchemaEntity> schemas,
             int pageSizeContents,
             int pageSizeAssets,
-            IUrlGenerator urlGenerator)
+            IUrlGenerator urlGenerator, ISemanticLog log)
         {
+            this.log = log;
+
             partitionResolver = app.PartitionResolver();
 
             CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
@@ -147,7 +151,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 execution.Schema = graphQLSchema;
                 execution.Inputs = query.Inputs;
                 execution.Query = query.Query;
-            }).ConfigureAwait(false);
+            });
+
+            if (result.Errors != null && result.Errors.Any())
+            {
+                log.LogWarning(w => w
+                    .WriteProperty("action", "GraphQL")
+                    .WriteProperty("status", "Failed")
+                    .WriteArray("errors", a =>
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            a.WriteObject(error, (error, e) => e.WriteException(error));
+                        }
+                    }));
+            }
 
             var errors = result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray();
 

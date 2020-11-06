@@ -41,11 +41,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly ISchemaEntity schema;
         protected readonly ISchemaEntity schemaRef1;
         protected readonly ISchemaEntity schemaRef2;
+        protected readonly ISchemaEntity schemaInvalidName;
         protected readonly Context requestContext;
         protected readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         protected readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         protected readonly NamedId<DomainId> schemaRefId1 = NamedId.Of(DomainId.NewGuid(), "my-ref-schema1");
         protected readonly NamedId<DomainId> schemaRefId2 = NamedId.Of(DomainId.NewGuid(), "my-ref-schema2");
+        protected readonly NamedId<DomainId> schemaInvalidNameId = NamedId.Of(DomainId.NewGuid(), "content");
         protected readonly IGraphQLService sut;
 
         public GraphQLTestBase()
@@ -107,6 +109,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             schemaRef2 = Mocks.Schema(appId, schemaRefId2, schemaRef2Def);
 
+            var schemaInvalidNameDef =
+                new Schema(schemaInvalidNameId.Name)
+                    .Publish()
+                    .AddString(1, "my-field", Partitioning.Invariant);
+
+            schemaInvalidName = Mocks.Schema(appId, schemaInvalidNameId, schemaInvalidNameDef);
+
             requestContext = new Context(Mocks.FrontendUser(), app);
 
             sut = CreateSut();
@@ -139,7 +148,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 var appProvider = A.Fake<IAppProvider>();
 
                 A.CallTo(() => appProvider.GetSchemasAsync(testBase.appId.Id))
-                    .Returns(new List<ISchemaEntity> { testBase.schema, testBase.schemaRef1, testBase.schemaRef2 });
+                    .Returns(new List<ISchemaEntity>
+                    {
+                        testBase.schema,
+                        testBase.schemaRef1,
+                        testBase.schemaRef2,
+                        testBase.schemaInvalidName
+                    });
 
                 var dataLoaderContext = new DataLoaderContextAccessor();
 
