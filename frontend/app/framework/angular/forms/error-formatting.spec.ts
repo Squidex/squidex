@@ -12,6 +12,7 @@ import { ValidatorsEx } from './validators';
 
 describe('formatErrors', () => {
     const localizer = new LocalizerService({
+        'common.backendError': 'Backend Error',
         'users.passwordConfirmValidationMessage': 'Passwords must be the same.',
         'validation.between': '{field} must be between \'{min}\' and \'{max}\'.',
         'validation.betweenlength': '{field|upper} must have between {minlength} and {maxlength} item(s).',
@@ -35,6 +36,38 @@ describe('formatErrors', () => {
         'validation.validarrayvalues': '{field|upper} contains an invalid value: {invalidvalue}.',
         'validation.validdatetime': '{field|upper} is not a valid date time.',
         'validation.validvalues': '{field|upper} is not a valid value.'
+    });
+
+    it('should format custom', () => {
+        const error = formatError(localizer, 'field', 'custom', 123, {
+             errors: [
+                'My Message.'
+            ]
+        });
+
+        expect(error).toEqual('Backend Error: My Message.');
+    });
+
+    it('should format custom errors', () => {
+        const error = formatError(localizer, 'field', 'custom', 123, {
+             errors: [
+                'My Message1.',
+                'My Message2.'
+            ]
+        });
+
+        expect(error).toEqual('Backend Error: My Message1. Backend Error: My Message2.');
+    });
+
+    it('should format custom errors without dots', () => {
+        const error = formatError(localizer, 'field', 'custom', 123, {
+             errors: [
+                'My Message1',
+                'My Message2'
+            ]
+        });
+
+        expect(error).toEqual('Backend Error: My Message1. Backend Error: My Message2.');
     });
 
     it('should format min', () => {

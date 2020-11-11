@@ -5,11 +5,16 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { Types } from '@app/framework/internal';
-import { LocalizerService } from '@app/shared';
+import { LocalizerService, StringHelper, Types } from '@app/framework/internal';
 
 export function formatError(localizer: LocalizerService, field: string, type: string, properties: any, value: any, errors?: any)  {
     type = type.toLowerCase();
+
+    if (type === 'custom') {
+        const backendError = localizer.get('common.backendError');
+
+        return properties.errors.map((e: string) => StringHelper.appendLast(`${backendError}: ${e}`, '.'));
+    }
 
     if (Types.isString(value)) {
         if (type === 'minlength') {

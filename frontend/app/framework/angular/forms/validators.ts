@@ -139,15 +139,15 @@ export module ValidatorsEx {
         }
     }
 
-    export function validValues<T>(values: ReadonlyArray<T>): ValidatorFn {
-        if (!values) {
+    export function validValues<T>(allowed: ReadonlyArray<T>): ValidatorFn {
+        if (!allowed || allowed.length === 0) {
             return Validators.nullValidator;
         }
 
         return (control: AbstractControl) => {
-            const n: T = control.value;
+            const values: T = control.value;
 
-            if (values.indexOf(n) < 0) {
+            if (allowed.indexOf(values) < 0) {
                 return { validvalues: false };
             }
 
@@ -155,18 +155,18 @@ export module ValidatorsEx {
         };
     }
 
-    export function validArrayValues<T>(values: ReadonlyArray<T>): ValidatorFn {
-        if (!values) {
+    export function validArrayValues<T>(allowed: ReadonlyArray<T>): ValidatorFn {
+        if (!allowed || allowed.length === 0) {
             return Validators.nullValidator;
         }
 
         return (control: AbstractControl) => {
-            const ns: T[] = control.value;
+            const values: T[] = control.value;
 
-            if (ns) {
-                for (const n of ns) {
-                    if (values.indexOf(n) < 0) {
-                        return { validarrayvalues: { invalidvalue: n } };
+            if (values) {
+                for (const value of values) {
+                    if (values.indexOf(value) < 0) {
+                        return { validarrayvalues: { invalidvalue: value } };
                     }
                 }
             }
@@ -181,14 +181,14 @@ export module ValidatorsEx {
                 return null;
             }
 
-            const a: string[] = control.value;
-            const unique: { [key: string]: boolean } = {};
+            const values: string[] = control.value;
+            const valuesUnique: { [key: string]: boolean } = {};
 
-            for (const value of a) {
-                if (unique[value]) {
+            for (const value of values) {
+                if (valuesUnique[value]) {
                     return { uniquestrings: false };
                 } else {
-                    unique[value] = true;
+                    valuesUnique[value] = true;
                 }
             }
 

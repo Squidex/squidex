@@ -753,6 +753,8 @@ describe('ContentForm', () => {
             }]);
 
             const field1 = contentForm.get('field1');
+            const field1_iv = contentForm.get('field1')!.get('iv');
+
             const field2 = contentForm.get('field2');
 
             expect(field1!.form.disabled).toBeFalsy();
@@ -767,10 +769,12 @@ describe('ContentForm', () => {
             });
 
             expect(field1!.form.disabled).toBeTruthy();
+            expect(field1_iv!.form.disabled).toBeTruthy();
 
             field2?.get('iv')!.form.setValue(99);
 
             expect(field1!.form.disabled).toBeFalsy();
+            expect(field1_iv!.form.disabled).toBeFalsy();
         });
 
         it('should hide field based on condition', () => {
@@ -782,6 +786,8 @@ describe('ContentForm', () => {
             }]);
 
             const field1 = contentForm.get('field1');
+            const field1_iv = contentForm.get('field1')!.get('iv');
+
             const field2 = contentForm.get('field2');
 
             expect(field1!.hidden).toBeFalsy();
@@ -796,10 +802,13 @@ describe('ContentForm', () => {
             });
 
             expect(field1!.hidden).toBeTruthy();
+            expect(field1_iv!.hidden).toBeTruthy();
 
             field2?.get('iv')!.form.setValue(99);
 
             expect(field1!.hidden).toBeFalsy();
+            expect(field1_iv!.hidden).toBeFalsy();
+
         });
 
         it('should disable nested fields based on condition', () => {
@@ -1002,7 +1011,7 @@ describe('ContentForm', () => {
 
             let value: any;
 
-            simpleForm.value.subscribe(v => {
+            simpleForm.valueChanges.subscribe(v => {
                 value = v;
             });
 

@@ -24,15 +24,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 {
                     sb.Append(property);
                 }
-                else if (index == 1)
-                {
-                    if (!property.Equals(InvariantPartitioning.Key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        sb.Append("(");
-                        sb.Append(property);
-                        sb.Append(")");
-                    }
-                }
                 else
                 {
                     if (property[0] != '[')

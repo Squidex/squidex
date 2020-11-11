@@ -6,26 +6,57 @@
  */
 
 import { LocalizerService } from './../services/localizer.service';
+import { StringHelper } from './string-helper';
+import { Types } from './types';
+
+export class ErrorDetailsDto {
+    public readonly message: string;
+    public readonly properties: ReadonlyArray<string> = [];
+
+    constructor(
+        public readonly originalMessage: string
+    ) {
+        const propertySeparator = originalMessage.indexOf(': ');
+
+        if (propertySeparator > 0 && propertySeparator < originalMessage.length - 1) {
+            this.properties =
+                originalMessage
+                    .substr(0, propertySeparator)
+                    .split(', ')
+                    .map(x => x.trim()).filter(x => x.length > 0);
+
+            this.message = originalMessage.substr(propertySeparator + 2);
+        } else {
+            this.message = originalMessage;
+        }
+
+    }
+}
 
 export class ErrorDto {
+    public readonly details: ReadonlyArray<ErrorDetailsDto>;
+
     constructor(
         public readonly statusCode: number,
         public readonly message: string,
-        public readonly details: ReadonlyArray<string> = [],
+        details?: ReadonlyArray<string>,
         public readonly inner?: any
     ) {
+        if (Types.isArrayOfString(details)) {
+            this.details = details.map(x => new ErrorDetailsDto(x));
+        }
     }
 
     public translate(localizer: LocalizerService) {
-        let result = appendLast(localizer.getOrKey(this.message), '.');
+        let result = StringHelper.appendLast(localizer.getOrKey(this.message), '.');
 
         if (this.details && this.details.length > 0) {
             result += '\n\n';
 
             for (const detail of this.details) {
-                const translated = localizer.getOrKey(detail);
+                const translated = localizer.getOrKey(detail.originalMessage);
 
-                result += ` * ${appendLast(translated, '.')}\n`;
+                result += ` * ${StringHelper.appendLast(translated, '.')}\n`;
             }
         }
 
@@ -34,15 +65,5 @@ export class ErrorDto {
 
     public toString() {
         return `ErrorDto(${JSON.stringify(this)})`;
-    }
-}
-
-function appendLast(row: string, char: string) {
-    const last = row[row.length - 1];
-
-    if (last !== char) {
-        return row + char;
-    } else {
-        return row;
     }
 }

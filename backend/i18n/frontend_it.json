@@ -200,6 +200,7 @@
   "common.aspectRatio": "Proporzioni",
   "common.assets": "Risorse",
   "common.back": "Indietro",
+  "common.backendError": "Backend ERROR",
   "common.backups": "Backup",
   "common.bytes": "byte",
   "common.cancel": "Annulla",

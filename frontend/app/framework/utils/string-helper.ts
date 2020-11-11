@@ -35,4 +35,14 @@ export module StringHelper {
 
         return url;
     }
+
+    export function appendLast(row: string, char: string) {
+        const last = row[row.length - 1];
+
+        if (last !== char) {
+            return row + char;
+        } else {
+            return row;
+        }
+    }
 }

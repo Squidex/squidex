@@ -200,6 +200,7 @@
   "common.aspectRatio": "AspectRatio",
   "common.assets": "Bestanden",
   "common.back": "Terug",
+  "common.backendError": "Backend ERROR",
   "common.backups": "Back-ups",
   "common.bytes": "bytes",
   "common.cancel": "Annuleren",

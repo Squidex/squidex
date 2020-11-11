@@ -1,22 +1,25 @@
-<ng-container *ngIf="hasFields; else noFields">
-    <div class="array-container" *ngIf="formModel.items.length > 0"
+<ng-container *ngIf="hasFields && formModel.itemChanges | async; let items; else noFields">
+    <div class="array-container" *ngIf="items.length > 0"
         cdkDropList
         [cdkDropListDisabled]="false"
-        [cdkDropListData]="formModel.items"
+        [cdkDropListData]="items"
         (cdkDropListDropped)="sort($event)">
-        <div *ngFor="let itemForm of formModel.items; index as i; last as isLast; first as isFirst" class="table-drag item" cdkDrag cdkDragLockAxis="y">
+        <div *ngFor="let itemForm of items; index as i; last as isLast; first as isFirst" class="table-drag item"
+            cdkDrag
+            cdkDragLockAxis="y">
             <sqx-array-item
+                (remove)="removeItem(i)"
                 [canUnset]="canUnset"
                 [form]="form"
                 [formContext]="formContext"
                 [formModel]="itemForm"
                 [index]="i"
-                [isDisabled]="formModel.form.disabled"
+                [isDisabled]="isDisabled | async"
                 [isFirst]="isFirst"
                 [isLast]="isLast"
                 [language]="language"
                 [languages]="languages"
-                (clone)="itemAdd(itemForm)" (move)="move(itemForm, $event)" (remove)="itemRemove(i)">
+                (clone)="addItem(itemForm)" (move)="move(itemForm, $event)" >
                 <i cdkDragHandle class="icon-drag2"></i>
             </sqx-array-item>
         </div>
@@ -24,12 +27,12 @@
 
     <div class="row">
         <div class="col">
-            <button type="button" class="btn btn-outline-success" [disabled]="!canAdd || formModel.form.disabled" (click)="itemAdd(undefined)">
+            <button type="button" class="btn btn-outline-success" [disabled]="isFull | async" (click)="addItem()">
                 {{ 'contents.arrayAddItem' | sqxTranslate }}
             </button>
         </div>
     
-        <div class="col-auto" *ngIf="formModel.items.length > 0">
+        <div class="col-auto" *ngIf="items.length > 0">
             <button type="button" class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll">
                 <i class="icon-plus-square"></i>
             </button>

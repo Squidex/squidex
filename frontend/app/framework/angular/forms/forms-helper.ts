@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup, ValidatorFn } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { Types } from './../../utils/types';
@@ -22,6 +22,73 @@ export function formControls(form: AbstractControl): ReadonlyArray<AbstractContr
     } else {
         return [];
     }
+}
+
+export function updateAll(form: AbstractControl) {
+    form.updateValueAndValidity({ onlySelf: true, emitEvent: true });
+
+    for (const child of formControls(form)) {
+        updateAll(child);
+    }
+}
+
+export function addValidator(form: AbstractControl, validator: ValidatorFn) {
+    if (form.validator) {
+        form.setValidators([form.validator, validator]);
+    } else {
+        form.setValidators(validator);
+    }
+
+    for (const child of formControls(form)) {
+        addValidator(child, validator);
+    }
+}
+
+export function getControlPath(control: AbstractControl | undefined | null, apiCompatible = false): string  {
+    if (!control || !control.parent) {
+        return '';
+    }
+
+    let name = '';
+
+    if (control.parent instanceof FormGroup) {
+        for (const key in control.parent.controls) {
+            if (control.parent.controls[key] === control) {
+                name = key;
+            }
+        }
+    } else if (control.parent instanceof FormArray) {
+        for (let i = 0; i < control.parent.controls.length; i++) {
+            if (control.parent.controls[i] === control) {
+                if (apiCompatible) {
+                    name = `[${i + 1}]`;
+                } else {
+                    name = i.toString();
+                }
+                break;
+            }
+        }
+    }
+
+    if (!name) {
+        return '';
+    }
+
+    const parentName = getControlPath(control.parent, apiCompatible);
+
+    if (parentName) {
+        if (name.startsWith('[')) {
+            return `${parentName}${name}`;
+        } else {
+            return `${parentName}.${name}`;
+        }
+    }
+
+    return name;
+}
+
+export function disabled$(form: AbstractControl): Observable<boolean> {
+    return form.statusChanges.pipe(map(() => form.disabled), startWith(form.disabled), distinctUntilChanged());
 }
 
 export function invalid$(form: AbstractControl): Observable<boolean> {
