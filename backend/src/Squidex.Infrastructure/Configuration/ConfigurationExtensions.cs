@@ -16,7 +16,7 @@ namespace Microsoft.Extensions.Configuration
     {
         public static T GetOptionalValue<T>(this IConfiguration config, string path, T defaultValue = default)
         {
-            var value = config.GetValue(path, defaultValue);
+            var value = config.GetValue(path, defaultValue!);
 
             return value;
         }
