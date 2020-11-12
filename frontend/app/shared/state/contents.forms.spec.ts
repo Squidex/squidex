@@ -726,10 +726,10 @@ describe('ContentForm', () => {
                 field: 'field1', action: 'Require', condition: 'data.field2.iv < 100'
             }]);
 
-            const field1 = contentForm.get('field1');
+            const field1 = contentForm.get('field1')!.get('iv');
             const field2 = contentForm.get('field2');
 
-            expect(field1!.form.disabled).toBeFalsy();
+            expect(field1!.form.valid).toBeFalsy();
 
             contentForm.load({
                 field2: {
@@ -1066,7 +1066,7 @@ describe('ContentForm', () => {
 
     function createForm(fields: RootFieldDto[], fieldRules: FieldRule[] = []) {
         return new EditContentForm(languages,
-            createSchema({ fields, fieldRules }));
+            createSchema({ fields, fieldRules }), {}, 0);
     }
 });
 

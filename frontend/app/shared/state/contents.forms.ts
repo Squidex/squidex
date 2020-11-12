@@ -10,6 +10,7 @@
 import { FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Form, Types, valueAll$ } from '@app/framework';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { debounceTime, onErrorResumeNext } from 'rxjs/operators';
 import { AppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 import { NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
@@ -91,7 +92,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto,
-        private readonly user: any = {}
+        private readonly user: any = {}, debounce = 100
     ) {
         super(new FormGroup({}));
 
@@ -126,7 +127,15 @@ export class EditContentForm extends Form<FormGroup, any> {
 
         this.sections = sections;
 
-        valueAll$(this.form).subscribe(value => {
+        let change$ = valueAll$(this.form);
+
+        if (debounce > 0) {
+            change$ = change$.pipe(debounceTime(debounce), onErrorResumeNext());
+        } else {
+            change$ = change$.pipe(onErrorResumeNext());
+        }
+
+        change$.subscribe(value => {
             this.valueChange$.next(value);
 
             this.updateState(value);
@@ -241,6 +250,8 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
         const isRequired = state.isRequired === true;
 
         if (this.isRequired !== isRequired) {
+            this.isRequired = isRequired;
+
             for (const partition of Object.values(this.partitions)) {
                 if (!partition.isOptional) {
                     let validators = FieldsValidators.create(this.field, false);
@@ -259,8 +270,6 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
                     partition.form.updateValueAndValidity();
                 }
             }
-
-            this.isRequired = isRequired;
         }
 
         for (const partition of Object.values(this.partitions)) {
@@ -462,6 +471,8 @@ export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto,
         const isRequired = state.isRequired === true;
 
         if (!this.isOptional && this.isRequired !== isRequired) {
+            this.isRequired = isRequired;
+
             let validators = FieldsValidators.create(this.field, true);
 
             if (isRequired) {
@@ -472,8 +483,6 @@ export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto,
 
             this.form.setValidators(validators);
             this.form.updateValueAndValidity();
-
-            this.isRequired = isRequired;
         }
     }
 

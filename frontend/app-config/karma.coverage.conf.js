@@ -30,7 +30,7 @@ module.exports = function (config) {
         },
 
         webpackServer: {
-            noInfo: true
+            noInfo: true, watch: false
         },
 
         /**
