@@ -120,3 +120,29 @@ export function getRawValue(form: AbstractControl): any {
         return form.value;
     }
 }
+
+export function hasNonCustomError(form: AbstractControl) {
+    if (form.errors) {
+        for (const key in form.errors) {
+            if (key !== 'custom') {
+                return true;
+            }
+        }
+    }
+
+    if (Types.is(form, FormGroup)) {
+        for (const key in form.controls) {
+            if (hasNonCustomError(form.controls[key])) {
+                return true;
+            }
+        }
+    } else if (Types.is(form, FormArray)) {
+        for (const control of form.controls) {
+            if (hasNonCustomError(control)) {
+                return true;
+            }
+        }
+    } else {
+        return false;
+    }
+}

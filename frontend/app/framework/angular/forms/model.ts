@@ -9,7 +9,7 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { ErrorDto, Types } from '@app/framework/internal';
 import { State } from './../../state';
 import { ErrorValidator } from './error-validator';
-import { addValidator, getRawValue, updateAll } from './forms-helper';
+import { addValidator, getRawValue, hasNonCustomError, updateAll } from './forms-helper';
 
 export interface FormState {
     // The number of submits.
@@ -87,11 +87,11 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
     }
 
     public submit(): TOut | null {
-        this.updateSubmitState(this.state.snapshot.error, true);
+        this.updateSubmitState(null, true);
 
         this.form.markAllAsTouched();
 
-        if (this.form.valid) {
+        if (!hasNonCustomError(this.form)) {
             const value = this.transformSubmit(getRawValue(this.form));
 
             if (value) {
