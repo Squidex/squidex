@@ -67,6 +67,8 @@ module.exports = function (config) {
          */
         singleRun: true,
 
+        autoWatch: false,
+
         customLaunchers: {
             ChromeCustom: {
 			    base: 'ChromeHeadless',
