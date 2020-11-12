@@ -29,10 +29,6 @@ module.exports = function (config) {
             stats: 'errors-only'
         },
 
-        webpackServer: {
-            noInfo: true, watch: false
-        },
-
         /**
          * Use a mocha style console reporter, html reporter and the code coverage reporter.
          */
@@ -66,8 +62,6 @@ module.exports = function (config) {
          * Disable continuous Integration mode, run only one time.
          */
         singleRun: true,
-
-        autoWatch: false,
 
         customLaunchers: {
             ChromeCustom: {

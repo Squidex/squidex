@@ -38,9 +38,6 @@ RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --co
 #
 FROM buildkite/puppeteer:latest as frontend
 
-# Increase watchers
-RUN echo fs.inotify.max_user_watches=288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-
 WORKDIR /src
 
 # Copy Node project files.
