@@ -7,13 +7,13 @@
 
 import { LocalizerService, StringHelper, Types } from '@app/framework/internal';
 
-export function formatError(localizer: LocalizerService, field: string, type: string, properties: any, value: any, errors?: any)  {
+export function formatError(localizer: LocalizerService, field: string, type: string, properties: any, value: any, errors?: any): string | readonly string[]  {
     type = type.toLowerCase();
 
-    if (type === 'custom') {
+    if (type === 'custom' && Types.isArrayOfString(properties.errors)) {
         const backendError = localizer.get('common.backendError');
 
-        return properties.errors.map((e: string) => StringHelper.appendLast(`${backendError}: ${e}`, '.'));
+        return properties.errors.map((error: string) => StringHelper.appendLast(`${backendError}: ${error}`, '.'));
     }
 
     if (Types.isString(value)) {

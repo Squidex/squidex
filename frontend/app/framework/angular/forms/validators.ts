@@ -145,9 +145,9 @@ export module ValidatorsEx {
         }
 
         return (control: AbstractControl) => {
-            const values: T = control.value;
+            const value: T = control.value;
 
-            if (allowed.indexOf(values) < 0) {
+            if (allowed.indexOf(value) < 0) {
                 return { validvalues: false };
             }
 
@@ -165,7 +165,7 @@ export module ValidatorsEx {
 
             if (values) {
                 for (const value of values) {
-                    if (values.indexOf(value) < 0) {
+                    if (allowed.indexOf(value) < 0) {
                         return { validarrayvalues: { invalidvalue: value } };
                     }
                 }

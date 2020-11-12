@@ -124,8 +124,12 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
                 if (this.control.errors.hasOwnProperty(key)) {
                     const message = formatError(this.localizer, this.displayFieldName, key, this.control.errors[key], this.control.value);
 
-                    if (message) {
+                    if (Types.isString(message)) {
                         errors.push(message);
+                    } else if (Types.isArray(message)) {
+                        for (const error of message) {
+                            errors.push(error);
+                        }
                     }
                 }
             }

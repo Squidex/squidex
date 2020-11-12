@@ -194,7 +194,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         const context = { user: this.user, data };
 
         for (const field of Object.values(this.fields)) {
-            field.updateState(context, {});
+            field.updateState(context, { isDisabled: this.form.disabled });
         }
 
         for (const section of this.sections) {

@@ -39,35 +39,35 @@ describe('formatErrors', () => {
     });
 
     it('should format custom', () => {
-        const error = formatError(localizer, 'field', 'custom', 123, {
+        const error = formatError(localizer, 'field', 'custom', {
              errors: [
                 'My Message.'
             ]
-        });
+        }, 123);
 
-        expect(error).toEqual('Backend Error: My Message.');
+        expect(error).toEqual(['Backend Error: My Message.']);
     });
 
     it('should format custom errors', () => {
-        const error = formatError(localizer, 'field', 'custom', 123, {
+        const error = formatError(localizer, 'field', 'custom', {
              errors: [
                 'My Message1.',
                 'My Message2.'
             ]
-        });
+        }, 123);
 
-        expect(error).toEqual('Backend Error: My Message1. Backend Error: My Message2.');
+        expect(error).toEqual(['Backend Error: My Message1.', 'Backend Error: My Message2.']);
     });
 
     it('should format custom errors without dots', () => {
-        const error = formatError(localizer, 'field', 'custom', 123, {
+        const error = formatError(localizer, 'field', 'custom', {
              errors: [
                 'My Message1',
                 'My Message2'
             ]
-        });
+        }, 123);
 
-        expect(error).toEqual('Backend Error: My Message1. Backend Error: My Message2.');
+        expect(error).toEqual(['Backend Error: My Message1.', 'Backend Error: My Message2.']);
     });
 
     it('should format min', () => {

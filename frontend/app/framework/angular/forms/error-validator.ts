@@ -6,8 +6,8 @@
  */
 
 import { ValidatorFn } from '@angular/forms';
-import { ErrorDto } from '@app/framework/internal';
-import { getControlPath } from './forms-helper';
+import { ErrorDto, Types } from '@app/framework/internal';
+import { getControlPath, getRawValue } from './forms-helper';
 
 export class ErrorValidator {
     private values: { [path: string]: { value: any } } = {};
@@ -24,11 +24,11 @@ export class ErrorValidator {
             return null;
         }
 
-        const value = control.value;
+        const value = getRawValue(control);
 
         const current = this.values[path];
 
-        if (current && current.value !== value) {
+        if (current && !Types.equals(value, current.value, true)) {
             this.values[path] = { value };
             return null;
         }

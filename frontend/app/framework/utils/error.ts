@@ -34,16 +34,18 @@ export class ErrorDetailsDto {
 }
 
 export class ErrorDto {
-    public readonly details: ReadonlyArray<ErrorDetailsDto>;
+    public readonly details: ReadonlyArray<ErrorDetailsDto> = [];
 
     constructor(
         public readonly statusCode: number,
         public readonly message: string,
-        details?: ReadonlyArray<string>,
+        details?: ReadonlyArray<string> | ReadonlyArray<ErrorDetailsDto>,
         public readonly inner?: any
     ) {
         if (Types.isArrayOfString(details)) {
             this.details = details.map(x => new ErrorDetailsDto(x));
+        } else if (Types.isArray(details)) {
+            this.details = details;
         }
     }
 

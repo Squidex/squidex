@@ -87,7 +87,7 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
     }
 
     public submit(): TOut | null {
-        this.updateSubmitState(null, true);
+        this.updateSubmitState(this.state.snapshot.error, true);
 
         this.form.markAllAsTouched();
 
@@ -116,13 +116,13 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
         }
     }
 
-    public submitFailed(errorOrMessage?: string | ErrorDto) {
-        this.updateSubmitState(errorOrMessage, false);
+    public submitFailed(errorOrMessage?: string | ErrorDto, replaceDetails = true) {
+        this.updateSubmitState(errorOrMessage, false, replaceDetails);
 
         this.enable();
     }
 
-    private updateSubmitState(errorOrMessage: string | ErrorDto | null | undefined, submitting: boolean) {
+    private updateSubmitState(errorOrMessage: string | ErrorDto | null | undefined, submitting: boolean, replaceDetails = true) {
         const error = getError(errorOrMessage);
 
         this.state.next(s => ({
@@ -131,9 +131,11 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
             error
         }));
 
-        this.errorValidator.setError(error);
+        if (replaceDetails) {
+            this.errorValidator.setError(error);
 
-        updateAll(this.form);
+            updateAll(this.form);
+        }
     }
 }
 
