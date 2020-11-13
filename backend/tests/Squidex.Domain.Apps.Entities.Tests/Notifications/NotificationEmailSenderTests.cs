@@ -13,7 +13,7 @@ using FakeItEasy;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure.Email;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Xunit;

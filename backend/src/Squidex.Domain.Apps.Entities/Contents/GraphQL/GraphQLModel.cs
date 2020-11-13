@@ -17,7 +17,7 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using GraphQLSchema = GraphQL.Types.Schema;
 
 #pragma warning disable IDE0003

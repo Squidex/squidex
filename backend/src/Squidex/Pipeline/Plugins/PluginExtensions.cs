@@ -14,8 +14,8 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Plugins;
+using Squidex.Log;
 using Squidex.Web;
 
 namespace Squidex.Pipeline.Plugins

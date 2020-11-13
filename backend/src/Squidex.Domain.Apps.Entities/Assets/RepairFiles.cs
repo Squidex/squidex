@@ -9,9 +9,9 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Assets

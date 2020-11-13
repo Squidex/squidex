@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Xunit;
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void

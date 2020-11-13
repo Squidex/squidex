@@ -15,7 +15,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {

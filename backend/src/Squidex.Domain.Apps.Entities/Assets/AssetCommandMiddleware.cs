@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets

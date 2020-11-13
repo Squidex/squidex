@@ -8,8 +8,8 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {

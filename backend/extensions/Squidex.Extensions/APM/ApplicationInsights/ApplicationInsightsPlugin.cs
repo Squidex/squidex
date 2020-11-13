@@ -13,8 +13,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Plugins;
+using Squidex.Log;
 
 namespace Squidex.Extensions.APM.ApplicationInsights
 {

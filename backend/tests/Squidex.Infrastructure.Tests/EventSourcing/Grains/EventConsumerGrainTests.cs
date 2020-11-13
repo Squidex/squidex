@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.TestHelpers;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains

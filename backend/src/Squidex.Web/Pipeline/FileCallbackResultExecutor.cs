@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using Squidex.Assets;
 using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline

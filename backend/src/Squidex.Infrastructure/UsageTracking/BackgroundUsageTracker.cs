@@ -11,8 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Timers;
+using Squidex.Log;
 
 #pragma warning disable SA1401 // Fields must be private
 

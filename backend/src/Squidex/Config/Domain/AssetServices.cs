@@ -9,17 +9,18 @@ using System;
 using FluentFTP;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using Squidex.Assets;
+using Squidex.Assets.ImageSharp;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.Assets.ImageSharp;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Config.Domain
 {
@@ -92,7 +93,7 @@ namespace Squidex.Config.Domain
                 {
                     var path = config.GetRequiredValue("assetStore:folder:path");
 
-                    services.AddSingletonAs(c => new FolderAssetStore(path, c.GetRequiredService<ISemanticLog>()))
+                    services.AddSingletonAs(c => new FolderAssetStore(path, c.GetRequiredService<ILogger<FolderAssetStore>>()))
                         .As<IAssetStore>();
                 },
                 ["GoogleCloud"] = () =>
@@ -151,7 +152,7 @@ namespace Squidex.Config.Domain
                         {
                             var factory = new Func<FtpClient>(() => new FtpClient(serverHost, serverPort, username, password));
 
-                            return new FTPAssetStore(factory, path, c.GetRequiredService<ISemanticLog>());
+                            return new FTPAssetStore(factory, path, c.GetRequiredService<ILogger<FTPAssetStore>>());
                         })
                         .As<IAssetStore>();
                 }
@@ -159,6 +160,11 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ImageSharpAssetThumbnailGenerator>()
                 .As<IAssetThumbnailGenerator>();
+
+            services.AddSingletonAs(c => new DelegateInitializer(
+                    c.GetRequiredService<IAssetStore>().GetType().FullName!,
+                    c.GetRequiredService<IAssetStore>().InitializeAsync))
+                .As<IInitializable>();
         }
     }
 }

@@ -7,7 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Infrastructure.Commands
 {

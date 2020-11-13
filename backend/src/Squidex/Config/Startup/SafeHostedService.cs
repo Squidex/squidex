@@ -8,7 +8,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Config.Startup
 {

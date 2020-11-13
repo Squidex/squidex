@@ -11,8 +11,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Timers;
+using Squidex.Log;
 
-namespace Squidex.Infrastructure.Log.Store
+namespace Squidex.Infrastructure.Log
 {
     public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLogStore
     {

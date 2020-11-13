@@ -20,8 +20,8 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
+using Squidex.Log;
 
 #pragma warning disable IDE0016 // Use 'throw' expression
 

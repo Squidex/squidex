@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Notifications

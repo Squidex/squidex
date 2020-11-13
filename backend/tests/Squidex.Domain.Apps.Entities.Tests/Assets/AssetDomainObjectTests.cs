@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -17,9 +18,8 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets

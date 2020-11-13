@@ -7,7 +7,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {

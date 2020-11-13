@@ -20,7 +20,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Schema = Avro.Schema;
 
 namespace Squidex.Extensions.Actions.Kafka

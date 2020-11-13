@@ -10,8 +10,8 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Log;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {

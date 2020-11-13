@@ -8,7 +8,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Migrations;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Config.Startup
 {

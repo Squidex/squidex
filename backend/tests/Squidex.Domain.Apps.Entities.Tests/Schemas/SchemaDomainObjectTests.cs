@@ -17,7 +17,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas

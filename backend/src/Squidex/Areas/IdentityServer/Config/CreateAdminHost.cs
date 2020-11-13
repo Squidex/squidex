@@ -16,8 +16,8 @@ using Microsoft.IdentityModel.Logging;
 using Squidex.Config;
 using Squidex.Config.Startup;
 using Squidex.Domain.Users;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
+using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 

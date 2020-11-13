@@ -13,8 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Log.Adapter;
-using Squidex.Infrastructure.Log.Store;
+using Squidex.Log;
+using Squidex.Log.Adapter;
 using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Domain

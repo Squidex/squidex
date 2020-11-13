@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Invitation

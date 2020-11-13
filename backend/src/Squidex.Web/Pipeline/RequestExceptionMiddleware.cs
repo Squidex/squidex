@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {

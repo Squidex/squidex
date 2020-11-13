@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models

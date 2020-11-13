@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Log;
 
 namespace Squidex.Infrastructure.States
 {

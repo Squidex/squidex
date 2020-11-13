@@ -8,6 +8,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Assets;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets

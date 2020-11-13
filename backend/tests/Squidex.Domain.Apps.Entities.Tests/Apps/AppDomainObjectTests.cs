@@ -18,7 +18,7 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Squidex.Shared.Users;
 using Xunit;
 

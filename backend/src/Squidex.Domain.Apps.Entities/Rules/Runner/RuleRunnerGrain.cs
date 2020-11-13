@@ -14,11 +14,11 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {

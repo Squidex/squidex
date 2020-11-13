@@ -9,8 +9,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps

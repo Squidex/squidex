@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log.Store;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {

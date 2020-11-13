@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.IO;
-using Squidex.Infrastructure.Assets;
+using Squidex.Assets;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {

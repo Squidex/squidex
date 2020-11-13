@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
+using Squidex.Log;
 
 namespace Squidex.Infrastructure.Commands
 {

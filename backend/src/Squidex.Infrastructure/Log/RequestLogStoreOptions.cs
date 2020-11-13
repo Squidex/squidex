@@ -7,8 +7,8 @@
 
 namespace Squidex.Infrastructure.Log
 {
-    public sealed class SemanticLogOptions
+    public sealed class RequestLogStoreOptions
     {
-        public SemanticLogLevel Level { get; set; } = SemanticLogLevel.Information;
+        public int StoreRetentionInDays { get; set; } = 90;
     }
 }

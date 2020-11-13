@@ -13,7 +13,7 @@ using System.Reflection;
 using McMaster.NETCore.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Infrastructure.Plugins
 {

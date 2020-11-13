@@ -7,9 +7,9 @@
 
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;

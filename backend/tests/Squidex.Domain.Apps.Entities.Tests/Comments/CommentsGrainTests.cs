@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         public CommentsGrainTests()
         {
             A.CallTo(() => eventStore.AppendAsync(A<Guid>._, A<string>._, A<long>._, A<ICollection<EventData>>._))
-                .Invokes(x => LastEvents = sut.GetUncommittedEvents().Select(x => x.To<IEvent>()).ToList());
+                .Invokes(x => LastEvents = sut!.GetUncommittedEvents().Select(x => x.To<IEvent>()).ToList());
 
             sut = new CommentsGrain(eventStore, eventDataFormatter);
             sut.ActivateAsync(Id).Wait();

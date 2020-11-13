@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
+using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {

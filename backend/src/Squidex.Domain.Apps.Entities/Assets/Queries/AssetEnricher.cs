@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {

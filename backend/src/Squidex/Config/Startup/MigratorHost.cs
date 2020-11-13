@@ -7,8 +7,8 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Log;
 
 namespace Squidex.Config.Startup
 {

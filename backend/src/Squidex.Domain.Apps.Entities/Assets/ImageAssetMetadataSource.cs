@@ -9,10 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {

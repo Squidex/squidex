@@ -18,7 +18,7 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {

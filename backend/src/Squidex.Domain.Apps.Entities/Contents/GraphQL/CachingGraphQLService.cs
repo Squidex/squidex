@@ -15,7 +15,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {

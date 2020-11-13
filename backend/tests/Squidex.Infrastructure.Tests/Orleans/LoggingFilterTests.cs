@@ -9,8 +9,8 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Infrastructure.Orleans

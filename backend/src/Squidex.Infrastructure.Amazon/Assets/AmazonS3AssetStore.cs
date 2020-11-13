@@ -14,7 +14,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 
-namespace Squidex.Infrastructure.Assets
+namespace Squidex.Assets
 {
     public sealed class AmazonS3AssetStore : DisposableObjectBase, IAssetStore, IInitializable
     {

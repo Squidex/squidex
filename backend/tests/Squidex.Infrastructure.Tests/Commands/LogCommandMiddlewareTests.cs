@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands

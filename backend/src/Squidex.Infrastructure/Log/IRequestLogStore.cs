@@ -6,21 +6,15 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.Assets
+namespace Squidex.Infrastructure.Log
 {
-    public sealed class GoogleCloudAssetStoreFixture : IDisposable
+    public interface IRequestLogStore
     {
-        public GoogleCloudAssetStore AssetStore { get; }
+        Task LogAsync(Request request);
 
-        public GoogleCloudAssetStoreFixture()
-        {
-            AssetStore = new GoogleCloudAssetStore("squidex-test");
-            AssetStore.InitializeAsync().Wait();
-        }
-
-        public void Dispose()
-        {
-        }
+        Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default);
     }
 }

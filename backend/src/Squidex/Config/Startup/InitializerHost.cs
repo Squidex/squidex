@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Config.Startup
 {
@@ -30,7 +30,7 @@ namespace Squidex.Config.Startup
             {
                 await target.InitializeAsync(ct);
 
-                log.LogInformation(w => w.WriteProperty("initializedSystem", target.GetType().Name));
+                log.LogInformation(w => w.WriteProperty("initializedSystem", target.ToString()));
             }
         }
     }

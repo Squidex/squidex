@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Infrastructure.Assets;
+using Squidex.Assets;
 using Xunit;
 
 namespace Squidex.Domain.Users

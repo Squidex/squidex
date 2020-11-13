@@ -22,10 +22,8 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users.MongoDb\Squidex.Domain.Users.MongoDb.csproj" />
-    <ProjectReference Include="..\Squidex.Infrastructure.Amazon\Squidex.Infrastructure.Amazon.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
-    <ProjectReference Include="..\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj" />
@@ -59,6 +57,11 @@
     <PackageReference Include="OrleansDashboard" Version="3.1.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="4.7.1" PrivateAssets="all" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="1.0.0" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="1.0.0" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="1.1.0" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="1.0.0" />
+    <PackageReference Include="Squidex.Assets.S3" Version="1.0.0" />
     <PackageReference Include="Squidex.Caching.Orleans" Version="1.1.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="5.5.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />

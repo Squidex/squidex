@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans.Internal;
 using Squidex.Infrastructure.EventSourcing.Grains;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.TestHelpers;
+using Squidex.Log;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter

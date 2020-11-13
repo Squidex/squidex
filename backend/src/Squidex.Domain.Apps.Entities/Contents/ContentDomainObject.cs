@@ -19,9 +19,9 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {

@@ -9,9 +9,9 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 

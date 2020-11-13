@@ -8,11 +8,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 

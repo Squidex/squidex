@@ -12,16 +12,16 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Orleans;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets

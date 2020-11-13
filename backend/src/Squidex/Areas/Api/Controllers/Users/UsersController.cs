@@ -15,7 +15,7 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Squidex.Shared.Users;
 using Squidex.Web;
 

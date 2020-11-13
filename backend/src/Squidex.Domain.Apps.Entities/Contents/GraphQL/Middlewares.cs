@@ -10,7 +10,7 @@ using GraphQL;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {

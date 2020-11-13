@@ -23,7 +23,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Xunit;
 
 #pragma warning disable SA1311 // Static readonly fields must begin with upper-case letter

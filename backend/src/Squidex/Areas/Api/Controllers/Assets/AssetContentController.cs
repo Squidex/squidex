@@ -13,13 +13,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Squidex.Web;
 
 #pragma warning disable 1573

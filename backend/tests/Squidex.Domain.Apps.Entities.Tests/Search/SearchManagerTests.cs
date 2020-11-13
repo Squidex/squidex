@@ -9,7 +9,7 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Search

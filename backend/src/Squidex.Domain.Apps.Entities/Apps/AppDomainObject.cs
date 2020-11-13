@@ -18,9 +18,9 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps

@@ -7,17 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Assets\Images\logo-wide-rotated.jpg" />
-    <None Remove="Assets\Images\logo.gif" />
-    <None Remove="Assets\Images\logo.jpeg" />
-    <None Remove="Assets\Images\logo.png" />
-    <None Remove="Assets\Images\logo.tga" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Squidex.Infrastructure.Amazon\Squidex.Infrastructure.Amazon.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
-    <ProjectReference Include="..\..\src\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
   </ItemGroup>
@@ -46,13 +37,6 @@
   </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\Images\logo-wide-rotated.jpg" />
-    <EmbeddedResource Include="Assets\Images\logo.gif" />
-    <EmbeddedResource Include="Assets\Images\logo.jpeg" />
-    <EmbeddedResource Include="Assets\Images\logo.png" />
-    <EmbeddedResource Include="Assets\Images\logo.tga" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Translations\SampleResources.Designer.cs">

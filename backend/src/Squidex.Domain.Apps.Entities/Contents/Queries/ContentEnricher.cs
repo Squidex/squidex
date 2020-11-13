@@ -11,8 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {

@@ -32,10 +32,10 @@ using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Log.Store;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
+using Squidex.Log;
 
 namespace Squidex.Config.Domain
 {

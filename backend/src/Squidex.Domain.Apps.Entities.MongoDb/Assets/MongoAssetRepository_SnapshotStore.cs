@@ -12,10 +12,10 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {

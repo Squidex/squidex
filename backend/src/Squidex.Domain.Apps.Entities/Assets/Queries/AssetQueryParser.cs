@@ -15,12 +15,12 @@ using NJsonSchema;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Log;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries

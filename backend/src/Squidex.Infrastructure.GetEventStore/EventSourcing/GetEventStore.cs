@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Infrastructure.EventSourcing
 {

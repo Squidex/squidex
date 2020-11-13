@@ -24,8 +24,8 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents

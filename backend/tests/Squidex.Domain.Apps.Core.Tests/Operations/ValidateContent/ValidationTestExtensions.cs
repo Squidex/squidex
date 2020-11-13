@@ -14,8 +14,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {

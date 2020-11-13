@@ -8,7 +8,7 @@
 using System;
 using System.IO;
 
-namespace Squidex.Infrastructure.Assets
+namespace Squidex.Assets
 {
     public sealed class SeekFakerStream : Stream
     {

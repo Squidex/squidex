@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Web.Pipeline

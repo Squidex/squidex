@@ -11,7 +11,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Web
 {

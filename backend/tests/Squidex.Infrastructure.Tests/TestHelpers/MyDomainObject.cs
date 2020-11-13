@@ -8,8 +8,8 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
+using Squidex.Log;
 
 namespace Squidex.Infrastructure.TestHelpers
 {

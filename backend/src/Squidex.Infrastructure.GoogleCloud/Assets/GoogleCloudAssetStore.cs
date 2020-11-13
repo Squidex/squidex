@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using Google;
 using Google.Cloud.Storage.V1;
 
-namespace Squidex.Infrastructure.Assets
+namespace Squidex.Assets
 {
     public sealed class GoogleCloudAssetStore : IAssetStore, IInitializable
     {

@@ -5,16 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Assets
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Squidex.Infrastructure.Log
 {
-    public enum ResizeMode
+    public interface IRequestLogRepository
     {
-        Crop,
-        CropUpsize,
-        Pad,
-        BoxPad,
-        Max,
-        Min,
-        Stretch
+        Task InsertManyAsync(IEnumerable<Request> items);
+
+        Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default);
     }
 }

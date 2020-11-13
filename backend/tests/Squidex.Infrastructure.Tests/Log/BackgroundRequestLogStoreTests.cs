@@ -9,9 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Log;
 using Xunit;
 
-namespace Squidex.Infrastructure.Log.Store
+namespace Squidex.Infrastructure.Log
 {
     public class BackgroundRequestLogStoreTests
     {

@@ -15,8 +15,8 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets

@@ -14,12 +14,12 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {

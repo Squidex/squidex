@@ -12,7 +12,7 @@ using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log.Store;
+using Squidex.Infrastructure.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps

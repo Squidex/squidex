@@ -17,9 +17,9 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Log;
 using JobList = System.Collections.Generic.List<(Squidex.Domain.Apps.Core.Rules.RuleJob Job, System.Exception? Exception)>;
 
 namespace Squidex.Domain.Apps.Core.HandleRules

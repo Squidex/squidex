@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.Assets;
+using Squidex.Assets;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Samples.AssetStore

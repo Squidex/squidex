@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Assets;
 using Squidex.Infrastructure;
 using Squidex.Web.Pipeline;
 

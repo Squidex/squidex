@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Http;
-using Squidex.Infrastructure.Assets;
+using Squidex.Assets;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 

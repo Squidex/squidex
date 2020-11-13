@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using NodaTime;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Infrastructure.EventSourcing
 {

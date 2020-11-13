@@ -11,8 +11,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Log;
 using EventFilter = MongoDB.Driver.FilterDefinition<Squidex.Infrastructure.EventSourcing.MongoEventCommit>;
 
 namespace Squidex.Infrastructure.EventSourcing

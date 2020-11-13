@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Assets;
+using Squidex.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {

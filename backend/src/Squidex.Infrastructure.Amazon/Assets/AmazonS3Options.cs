@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Assets
+namespace Squidex.Assets
 {
     public sealed class AmazonS3Options
     {

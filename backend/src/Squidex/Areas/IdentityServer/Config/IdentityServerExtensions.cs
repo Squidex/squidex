@@ -14,9 +14,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Squidex.Config;
 using Squidex.Domain.Users;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Log;
 using Squidex.Shared;
 
 namespace Squidex.Areas.IdentityServer.Config

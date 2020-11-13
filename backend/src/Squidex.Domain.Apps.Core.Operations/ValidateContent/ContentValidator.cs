@@ -14,8 +14,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Validation;
+using Squidex.Log;
 
 #pragma warning disable SA1028, IDE0004 // Code must not contain trailing whitespace
 

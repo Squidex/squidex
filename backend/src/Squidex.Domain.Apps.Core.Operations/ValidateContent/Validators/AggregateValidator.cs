@@ -9,8 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Translations;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {

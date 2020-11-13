@@ -12,7 +12,7 @@ using Orleans;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {

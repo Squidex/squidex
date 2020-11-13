@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SharpPwned.NET;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Translations;
+using Squidex.Log;
 
 namespace Squidex.Domain.Users
 {

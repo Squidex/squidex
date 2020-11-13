@@ -8,9 +8,9 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 

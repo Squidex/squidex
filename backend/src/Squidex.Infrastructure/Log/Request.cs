@@ -5,17 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using NodaTime;
 
-namespace Squidex.Infrastructure.Log.Store
+#pragma warning disable SA1401 // Fields should be private
+
+namespace Squidex.Infrastructure.Log
 {
-    public interface IRequestLogRepository
+    public sealed class Request
     {
-        Task InsertManyAsync(IEnumerable<Request> items);
+        public Instant Timestamp;
 
-        Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default);
+        public string Key;
+
+        public Dictionary<string, string> Properties;
     }
 }
