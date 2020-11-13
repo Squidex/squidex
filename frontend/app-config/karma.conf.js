@@ -28,10 +28,6 @@ module.exports = function (config) {
         webpackMiddleware: {
             stats: 'errors-only'
         },
-        
-        webpackServer: {
-            noInfo: true
-        },
 
         /**
          * Leave Jasmine Spec Runner output visible in browser.

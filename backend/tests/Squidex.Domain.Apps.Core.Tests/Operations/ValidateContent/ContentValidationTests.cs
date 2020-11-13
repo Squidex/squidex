@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Validation failed with internal error.", "my-field")
+                    new ValidationError("Validation failed with internal error.", "my-field.iv")
                 });
         }
 
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Must be less or equal to 100.", "my-field")
+                    new ValidationError("Must be less or equal to 100.", "my-field.iv")
                 });
         }
 
@@ -146,8 +146,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known invariant value.", "my-field(es)"),
-                    new ValidationError("Not a known invariant value.", "my-field(it)")
+                    new ValidationError("Not a known invariant value.", "my-field.es"),
+                    new ValidationError("Not a known invariant value.", "my-field.it")
                 });
         }
 
@@ -165,8 +165,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Field is required.", "my-field(de)"),
-                    new ValidationError("Field is required.", "my-field(en)")
+                    new ValidationError("Field is required.", "my-field.de"),
+                    new ValidationError("Field is required.", "my-field.en")
                 });
         }
 
@@ -184,7 +184,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Field is required.", "my-field")
+                    new ValidationError("Field is required.", "my-field.iv")
                 });
         }
 
@@ -202,7 +202,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Field is required.", "my-field")
+                    new ValidationError("Field is required.", "my-field.iv")
                 });
         }
 
@@ -216,14 +216,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     .AddField("my-field",
                         new ContentFieldData()
                             .AddValue("de", 1)
-                            .AddValue("xx", 1));
+                            .AddValue("ru", 1));
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known language.", "my-field(xx)")
+                    new ValidationError("Not a known language.", "my-field.ru")
                 });
         }
 
@@ -267,8 +267,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known language.", "my-field(es)"),
-                    new ValidationError("Not a known language.", "my-field(it)")
+                    new ValidationError("Not a known language.", "my-field.es"),
+                    new ValidationError("Not a known language.", "my-field.it")
                 });
         }
 
@@ -306,7 +306,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Must be less or equal to 100.", "my-field")
+                    new ValidationError("Must be less or equal to 100.", "my-field.iv")
                 });
         }
 
@@ -327,8 +327,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known invariant value.", "my-field(es)"),
-                    new ValidationError("Not a known invariant value.", "my-field(it)")
+                    new ValidationError("Not a known invariant value.", "my-field.es"),
+                    new ValidationError("Not a known invariant value.", "my-field.it")
                 });
         }
 
@@ -370,14 +370,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     .AddField("my-field",
                         new ContentFieldData()
                             .AddValue("de", 1)
-                            .AddValue("xx", 1));
+                            .AddValue("ru", 1));
 
             await data.ValidatePartialAsync(languagesConfig.ToResolver(), errors, schema);
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known language.", "my-field(xx)")
+                    new ValidationError("Not a known language.", "my-field.ru")
                 });
         }
 
@@ -398,8 +398,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Not a known language.", "my-field(es)"),
-                    new ValidationError("Not a known language.", "my-field(it)")
+                    new ValidationError("Not a known language.", "my-field.es"),
+                    new ValidationError("Not a known language.", "my-field.it")
                 });
         }
 
@@ -424,8 +424,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Field is required.", "my-field[1].my-nested"),
-                    new ValidationError("Field is required.", "my-field[3].my-nested")
+                    new ValidationError("Field is required.", "my-field.iv[1].my-nested"),
+                    new ValidationError("Field is required.", "my-field.iv[3].my-nested")
                 });
         }
 

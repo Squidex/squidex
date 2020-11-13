@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, Validators } from '@angular/forms';
-import { value$ } from './forms-helper';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { getControlPath, value$ } from './forms-helper';
 
 describe('FormHelpers', () => {
     describe('value$', () => {
@@ -41,6 +41,66 @@ describe('FormHelpers', () => {
             form.setValue('4');
 
             expect(values).toEqual(['1', '2', '3', '4']);
+        });
+    });
+
+    describe('getControlPath', () => {
+        it('should calculate path for standalone control', () => {
+            const control = new FormControl();
+
+            const path = getControlPath(control);
+
+            expect(path).toEqual('');
+        });
+
+        it('should calculate path for nested control', () => {
+            const control = new FormGroup({
+                nested: new FormControl()
+            });
+
+            const path = getControlPath(control.get('nested'));
+
+            expect(path).toEqual('nested');
+        });
+
+        it('should calculate path for deeply nested control', () => {
+            const control = new FormGroup({
+                nested1: new FormGroup({
+                    nested2: new FormControl()
+                })
+            });
+
+            const path = getControlPath(control.get('nested1.nested2'));
+
+            expect(path).toEqual('nested1.nested2');
+        });
+
+        it('should calculate path for deeply nested array control', () => {
+            const control = new FormGroup({
+                nested1: new FormArray([
+                    new FormGroup({
+                        nested2: new FormControl()
+                    })
+                ])
+            });
+
+            const path = getControlPath(control.get('nested1.0.nested2'));
+
+            expect(path).toEqual('nested1.0.nested2');
+        });
+
+        it('should calculate api compatible path for deeply nested array control', () => {
+            const control = new FormGroup({
+                nested1: new FormArray([
+                    new FormGroup({
+                        nested2: new FormControl()
+                    })
+                ])
+            });
+
+            const path = getControlPath(control.get('nested1.0.nested2'), true);
+
+            expect(path).toEqual('nested1[1].nested2');
         });
     });
 });

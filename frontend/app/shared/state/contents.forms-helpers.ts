@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
-import { FieldRule, RootFieldDto } from './../services/schemas.service';
+import { FieldDto, FieldRule, RootFieldDto } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
 
 export abstract class Hidden {
@@ -31,7 +32,8 @@ export abstract class Hidden {
 export class FieldSection<TSeparator, TChild extends { hidden: boolean }> extends Hidden {
     constructor(
         public readonly separator: TSeparator | undefined,
-        public readonly fields: ReadonlyArray<TChild>
+        public readonly fields: ReadonlyArray<TChild>,
+        public readonly remoteValidator?: ValidatorFn
     ) {
         super();
     }
@@ -70,6 +72,8 @@ export class PartitionConfig {
     }
 }
 
+type RuleContext = { data: any, itemData?: any, user?: any };
+
 export class CompiledRule {
     private readonly function: Function;
 
@@ -91,11 +95,82 @@ export class CompiledRule {
         }
     }
 
-    public eval(user: any, data: any, itemData?: any) {
+    public eval(context: RuleContext) {
         try {
-            return this.function(user, data, itemData);
+            return this.function(context.user, context.data, context.itemData);
         } catch {
             return false;
         }
     }
 }
+
+export type AbstractContentFormState = {
+    isDisabled?: boolean;
+    isHidden?: boolean;
+    isRequired?: boolean
+};
+
+export abstract class AbstractContentForm<T extends FieldDto, TForm extends AbstractControl> extends Hidden {
+    private readonly disabled$ = new BehaviorSubject<boolean>(false);
+
+    public get disabled() {
+        return this.disabled$.value;
+    }
+
+    public get disabledChanges(): Observable<boolean> {
+        return this.disabled$;
+    }
+
+    constructor(
+        public readonly field: T,
+        public readonly form: TForm,
+        public readonly isOptional: boolean,
+        private readonly rules?: ReadonlyArray<CompiledRule>
+    ) {
+        super();
+    }
+
+    public updateState(context: RuleContext, parentState: AbstractContentFormState) {
+        const state = {
+            isDisabled: this.field.isDisabled || parentState.isDisabled === true,
+            isHidden: parentState.isHidden === true,
+            isRequired: this.field.properties.isRequired && !this.isOptional
+        };
+
+        if (this.rules) {
+            for (const rule of this.rules) {
+                if (rule.eval(context)) {
+                    if (rule.action === 'Disable') {
+                        state.isDisabled = true;
+                    } else if (rule.action === 'Hide') {
+                        state.isHidden = true;
+                    } else {
+                        state.isRequired = true;
+                    }
+                }
+            }
+        }
+
+        this.setHidden(state.isHidden);
+
+        if (state.isDisabled !== this.form.disabled) {
+            if (state.isDisabled) {
+                this.form.disable(SELF);
+            } else {
+                this.form.enable(SELF);
+            }
+        }
+
+        this.updateCustomState(context, state);
+    }
+
+    protected updateCustomState(_context: RuleContext, _state: AbstractContentFormState) {
+        return;
+    }
+
+    public prepareLoad(_data: any) {
+        return;
+    }
+}
+
+const SELF = { onlySelf: true };

@@ -120,7 +120,7 @@
             <table class="table-fixed">
                 <tr>
                     <td class="col-name">
-                        <div class="file-name editable" (click)="edit()">
+                        <div class="file-name truncate editable" (click)="edit()">
                             <i class="icon-lock" *ngIf="asset?.isProtected"></i>
                             
                             {{asset.fileName}}

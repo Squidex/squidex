@@ -29,10 +29,6 @@ module.exports = function (config) {
             stats: 'errors-only'
         },
 
-        webpackServer: {
-            noInfo: true
-        },
-
         /**
          * Use a mocha style console reporter, html reporter and the code coverage reporter.
          */

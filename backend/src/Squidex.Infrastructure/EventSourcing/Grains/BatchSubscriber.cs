@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             var handle = new ActionBlock<IList<Job>>(async jobs =>
             {
-                var sender = eventSubscription.Sender;
+                var sender = eventSubscription?.Sender;
 
                 foreach (var jobsBySender in jobs.GroupBy(x => x.Sender))
                 {

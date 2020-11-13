@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync("hi", errors, updater: c => c.Nested("property").Nested("iv"));
 
             errors.Should().BeEquivalentTo(
-                new[] { "property: Another content with the same value exists." });
+                new[] { "property.iv: Another content with the same value exists." });
 
             Assert.Equal("Data.property.iv == 'hi'", filter);
         }
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(12.5, errors, updater: c => c.Nested("property").Nested("iv"));
 
             errors.Should().BeEquivalentTo(
-                new[] { "property: Another content with the same value exists." });
+                new[] { "property.iv: Another content with the same value exists." });
 
             Assert.Equal("Data.property.iv == 12.5", filter);
         }

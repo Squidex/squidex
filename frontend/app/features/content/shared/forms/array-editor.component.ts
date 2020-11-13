@@ -7,7 +7,9 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ArrayFieldPropertiesDto, EditContentForm, FieldArrayForm, FieldArrayItemForm, sorted } from '@app/shared';
+import { AppLanguageDto, ArrayFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, FieldArrayItemForm, sorted } from '@app/shared';
+import { combineLatest, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
@@ -38,7 +40,9 @@ export class ArrayEditorComponent implements OnChanges {
     @ViewChildren(ArrayItemComponent)
     public children: QueryList<ArrayItemComponent>;
 
-    public maxItems: number;
+    public isDisabled: Observable<boolean>;
+
+    public isFull: Observable<boolean>;
 
     public get field() {
         return this.formModel.field;
@@ -48,23 +52,28 @@ export class ArrayEditorComponent implements OnChanges {
         return this.field.nested.length > 0;
     }
 
-    public get canAdd() {
-        return this.formModel.items.length < this.maxItems;
-    }
-
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
             const properties = this.field.properties as ArrayFieldPropertiesDto;
 
-            this.maxItems = properties.maxItems || Number.MAX_VALUE;
+            const maxItems = properties.maxItems || Number.MAX_VALUE;
+
+            this.isDisabled = disabled$(this.formModel.form);
+
+            this.isFull = combineLatest([
+                this.isDisabled,
+                this.formModel.itemChanges
+            ]).pipe(map(([disabled, items]) => {
+                return disabled || items.length >= maxItems;
+            }));
         }
     }
 
-    public itemRemove(index: number) {
+    public removeItem(index: number) {
         this.formModel.removeItemAt(index);
     }
 
-    public itemAdd(value?: FieldArrayItemForm) {
+    public addItem(value?: FieldArrayItemForm) {
         this.formModel.addItem(value);
     }
 

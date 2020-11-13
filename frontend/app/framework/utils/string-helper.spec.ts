@@ -39,6 +39,14 @@ describe('StringHelper', () => {
         expect(StringHelper.firstNonEmpty(null!, undefined!, '')).toBe('');
     });
 
+    it('should append dot if not added', () => {
+        expect(StringHelper.appendLast('text', '.')).toBe('text.');
+    });
+
+    it('should not append dot if already added', () => {
+        expect(StringHelper.appendLast('text.', '.')).toBe('text.');
+    });
+
     it('should append query string to url when url already contains query', () => {
         const url = StringHelper.appendToUrl('http://squidex.io?query=value', 'other', 1);
 

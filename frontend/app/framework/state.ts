@@ -5,116 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl } from '@angular/forms';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
-import { getRawValue } from './angular/forms/forms-helper';
-import { ErrorDto } from './utils/error';
 import { ResourceLinks } from './utils/hateos';
 import { Types } from './utils/types';
 
 export type Mutable<T> = {
     -readonly [P in keyof T ]: T[P]
 };
-
-export interface FormState {
-    submitted: boolean;
-
-    error?: ErrorDto | null;
-}
-
-export class Form<T extends AbstractControl, TOut, TIn = TOut> {
-    private readonly state = new State<FormState>({ submitted: false });
-
-    public submitted =
-        this.state.project(s => s.submitted);
-
-    public error =
-        this.state.project(s => s.error);
-
-    constructor(
-        public readonly form: T
-    ) {
-    }
-
-    public setEnabled(isEnabled: boolean) {
-        if (isEnabled) {
-            this.enable();
-        } else {
-            this.disable();
-        }
-    }
-
-    protected enable() {
-        this.form.enable();
-    }
-
-    protected disable() {
-        this.form.disable();
-    }
-
-    protected setValue(value?: Partial<TIn>) {
-        if (value) {
-            this.form.reset(this.transformLoad(value));
-        } else {
-            this.form.reset();
-        }
-    }
-
-    protected transformLoad(value: Partial<TIn>): any {
-        return value;
-    }
-
-    protected transformSubmit(value: any): TOut {
-        return value;
-    }
-
-    public load(value: Partial<TIn> | undefined) {
-        this.state.next({ submitted: false, error: null });
-
-        this.setValue(value);
-    }
-
-    public submit(): TOut | null {
-        this.form.markAllAsTouched();
-
-        this.state.next({ submitted: true, error: null });
-
-        if (this.form.valid) {
-            const value = this.transformSubmit(getRawValue(this.form));
-
-            if (value) {
-                this.disable();
-            }
-
-            return value;
-        } else {
-            return null;
-        }
-    }
-
-    public submitCompleted(options?: { newValue?: TOut, noReset?: boolean }) {
-        this.state.next({ submitted: false, error: null });
-
-        this.enable();
-
-        if (options && options.noReset) {
-            this.form.markAsPristine();
-        } else {
-            this.setValue(options?.newValue);
-        }
-    }
-
-    public submitFailed(error?: string | ErrorDto) {
-        if (Types.isString(error)) {
-            error = new ErrorDto(500, error);
-        }
-
-        this.state.next({ submitted: false, error });
-
-        this.enable();
-    }
-}
 
 export class Model<T> {
     public with(value: Partial<T>, validOnly = false): T {

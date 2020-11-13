@@ -91,7 +91,7 @@ function createRequest(status: ImportStatus) {
 }
 
 function getError(error: ErrorDto): string {
-    return error.details[0];
+    return error.details[0].originalMessage;
 }
 
 function getSuccess(created: boolean | undefined): string {

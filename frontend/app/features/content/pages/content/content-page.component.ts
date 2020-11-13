@@ -9,9 +9,9 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, valueAll$, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
-import { debounceTime, filter, tap } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-content-page',
@@ -115,11 +115,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }));
 
         this.own(
-            valueAll$(this.contentForm.form).pipe(
-                    filter(_ => !this.isLoadingContent),
-                    filter(_ => this.contentForm.form.enabled),
-                    debounceTime(2000)
-                ).subscribe(value => {
+            this.contentForm.valueChanges.pipe(filter(_ => !this.isLoadingContent && this.contentForm.form.enabled))
+                .subscribe(value => {
                     this.autoSaveService.set(this.autoSaveKey, value);
                 }));
     }
@@ -172,7 +169,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     });
             }
         } else {
-            this.contentForm.submitFailed('i18n:contents.contentNotValid');
+            this.contentForm.submitFailed('i18n:contents.contentNotValid', false);
         }
     }
 

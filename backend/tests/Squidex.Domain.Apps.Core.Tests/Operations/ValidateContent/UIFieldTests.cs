@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             dataErrors.Should().BeEquivalentTo(
                 new[]
                 {
-                    new ValidationError("Value must not be defined.", "my-array[1].my-ui")
+                    new ValidationError("Value must not be defined.", "my-array.iv[1].my-ui")
                 });
         }
 
