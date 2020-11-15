@@ -241,37 +241,15 @@ namespace TestSuite.ApiTests
 
 
                 // STEP 2: Make an update with the upsert endpoint.
-                content = await _.Contents.UpsertAsync(id, new TestEntityData { Number = 2 }, true);
+                content = await _.Contents.UpsertAsync(id, new TestEntityData { Number = 2 });
 
-                Assert.Equal(2, content.Version);
-            }
-            finally
-            {
-                if (content != null)
-                {
-                    await _.Contents.DeleteAsync(content.Id);
-                }
-            }
-        }
-
-        [Fact]
-        public async Task Should_upsert_item()
-        {
-            var id = Guid.NewGuid().ToString();
-
-            TestEntity content = null;
-            try
-            {
-                // STEP 1: Upsert a new item with a custom id.
-                content = await _.Contents.UpsertAsync(id, new TestEntityData { Number = 1 }, true);
+                Assert.Equal(2, content.Data.Number);
 
 
-                // STEP 2: Upsert the item with a custom id and ensure that is has been updated.
-                await _.Contents.UpsertAsync(id, new TestEntityData { Number = 2 });
+                // STEP 3: Make an update with the update endpoint.
+                content = await _.Contents.UpdateAsync(id, new TestEntityData { Number = 3 });
 
-                var updated = await _.Contents.GetAsync(content.Id);
-
-                Assert.Equal(2, updated.Data.Number);
+                Assert.Equal(3, content.Data.Number);
             }
             finally
             {
@@ -297,7 +275,7 @@ namespace TestSuite.ApiTests
 
                 var updated = await _.Contents.GetAsync(content.Id);
 
-                Assert.Equal(2, updated.Data.Number);
+                Assert.Equal(2, content.Data.Number);
             }
             finally
             {
