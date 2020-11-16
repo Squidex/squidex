@@ -23,15 +23,15 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Add("2", "my-secret");
 
-            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret", Role.Editor));
+            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret"));
         }
 
         [Fact]
         public void Should_assign_clients_with_permission()
         {
-            var clients_1 = clients_0.Add("2", new AppClient("my-name", "my-secret", Role.Reader));
+            var clients_1 = clients_0.Add("2", "my-secret", Role.Reader);
 
-            clients_1["2"].Should().BeEquivalentTo(new AppClient("my-name", "my-secret", Role.Reader));
+            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret") with { Role = Role.Reader });
         }
 
         [Fact]
@@ -43,19 +43,11 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_do_nothing_if_assigning_client_object_with_same_id()
-        {
-            var clients_1 = clients_0.Add("2", "my-secret");
-
-            clients_1.Add("2", new AppClient("my-name", "my-secret", "my-role"));
-        }
-
-        [Fact]
         public void Should_update_client_with_role()
         {
             var client_1 = clients_0.Update("1", role: Role.Reader);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Reader));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret") with { Role = Role.Reader });
         }
 
         [Fact]
@@ -63,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", name: "New-Name");
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("New-Name", "my-secret", Role.Editor));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("New-Name", "my-secret"));
         }
 
         [Fact]
@@ -71,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", allowAnonymous: true);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, 0, 0, true));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret") with { AllowAnonymous = true });
         }
 
         [Fact]
@@ -79,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", apiCallsLimit: 1000);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, 1000, 0, false));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret") with { ApiCallsLimit = 1000 });
         }
 
         [Fact]
@@ -87,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", apiTrafficLimit: 1000);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Editor, 0, 1000, false));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret") with { ApiTrafficLimit = 1000 });
         }
 
         [Fact]

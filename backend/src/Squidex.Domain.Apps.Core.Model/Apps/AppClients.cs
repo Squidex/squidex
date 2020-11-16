@@ -35,27 +35,22 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppClients Add(string id, AppClient client)
+        public AppClients Add(string id, string secret, string? role = null)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
-            Guard.NotNull(client, nameof(client));
-
-            return With<AppClients>(id, client);
-        }
-
-        [Pure]
-        public AppClients Add(string id, string secret)
-        {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(secret, nameof(secret));
 
             if (ContainsKey(id))
             {
                 throw new ArgumentException("Id already exists.", nameof(id));
             }
 
-            var newClient = new AppClient(id, secret, Role.Editor);
+            var newClient = new AppClient(id, secret)
+            {
+                Role = role.Or(Role.Editor)
+            };
 
-            return Add(id, newClient);
+            return With<AppClients>(id, newClient);
         }
 
         [Pure]
@@ -71,7 +66,30 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            var newClient = client.Update(name, role, apiCallsLimit, apiTrafficLimit, allowAnonymous);
+            var newClient = client with
+            {
+                AllowAnonymous = allowAnonymous ?? client.AllowAnonymous
+            };
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                newClient = newClient with { Name = name };
+            }
+
+            if (!string.IsNullOrWhiteSpace(role))
+            {
+                newClient = newClient with { Role = role };
+            }
+
+            if (apiCallsLimit >= 0)
+            {
+                newClient = newClient with { ApiCallsLimit = apiCallsLimit.Value };
+            }
+
+            if (apiTrafficLimit >= 0)
+            {
+                newClient = newClient with { ApiTrafficLimit = apiTrafficLimit.Value };
+            }
 
             return With<AppClients>(id, newClient);
         }

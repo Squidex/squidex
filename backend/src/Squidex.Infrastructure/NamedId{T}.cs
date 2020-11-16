@@ -8,14 +8,11 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-#pragma warning disable RECS0108 // Warns about static fields in generic types
-
 namespace Squidex.Infrastructure
 {
     public delegate bool Parser<T>(ReadOnlySpan<char> input, out T result);
 
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class NamedId<T> where T : notnull
+    public sealed record NamedId<T> where T : notnull
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
