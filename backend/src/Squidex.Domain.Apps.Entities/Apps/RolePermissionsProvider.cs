@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             {
                 if (permission.Length > Permissions.App.Length + 1)
                 {
-                    var trimmed = permission.Substring(Permissions.App.Length + 1);
+                    var trimmed = permission[(Permissions.App.Length + 1)..];
 
                     if (trimmed.Length > 0)
                     {
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             foreach (var permission in Permissions.ForAppsSchema)
             {
-                var trimmed = permission.Substring(Permissions.App.Length + 1);
+                var trimmed = permission[(Permissions.App.Length + 1)..];
 
                 foreach (var schema in schemaNames)
                 {

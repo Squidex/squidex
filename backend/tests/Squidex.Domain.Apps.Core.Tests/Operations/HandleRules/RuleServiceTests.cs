@@ -26,8 +26,6 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Log;
 using Xunit;
 
-#pragma warning disable xUnit2009 // Do not use boolean check to check for string equality
-
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
     public class RuleServiceTests

@@ -26,6 +26,8 @@ using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Web;
 
+#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods that take one
+
 namespace Squidex.Areas.Api.Controllers.Apps
 {
     /// <summary>

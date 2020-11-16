@@ -13,8 +13,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
-#pragma warning disable IDE0060 // Remove unused parameter
-
 namespace Squidex.Domain.Apps.Entities.Rules.State
 {
     [CollectionName("Rules")]

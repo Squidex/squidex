@@ -42,11 +42,11 @@ namespace Squidex.Infrastructure.EventSourcing
             try
             {
                 sb.Append(position.Timestamp.Timestamp);
-                sb.Append("-");
+                sb.Append('-');
                 sb.Append(position.Timestamp.Increment);
-                sb.Append("-");
+                sb.Append('-');
                 sb.Append(position.CommitOffset);
-                sb.Append("-");
+                sb.Append('-');
                 sb.Append(position.CommitSize);
 
                 return sb.ToString();

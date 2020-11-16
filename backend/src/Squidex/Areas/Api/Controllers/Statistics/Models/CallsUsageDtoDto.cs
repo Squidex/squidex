@@ -11,8 +11,6 @@ using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Infrastructure.Validation;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
     public sealed class CallsUsageDtoDto

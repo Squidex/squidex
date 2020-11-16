@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             if (permission.StartsWith(prefix.Id, StringComparison.OrdinalIgnoreCase))
             {
-                permission = permission.Substring(prefix.Id.Length);
+                permission = permission[prefix.Id.Length..];
             }
 
             if (permission.Length == 0)
@@ -183,7 +183,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return Permission.Any;
             }
 
-            return permission.Substring(1);
+            return permission[1..];
         }
 
         private static Dictionary<string, Role> Cleaned(Dictionary<string, Role> inner)

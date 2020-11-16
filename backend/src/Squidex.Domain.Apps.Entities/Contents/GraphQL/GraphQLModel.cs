@@ -20,8 +20,6 @@ using Squidex.Infrastructure;
 using Squidex.Log;
 using GraphQLSchema = GraphQL.Types.Schema;
 
-#pragma warning disable IDE0003
-
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLModel : IGraphModel

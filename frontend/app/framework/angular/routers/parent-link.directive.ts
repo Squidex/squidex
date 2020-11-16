@@ -48,9 +48,7 @@ export class ParentLinkDirective extends ResourceOwner implements OnInit {
 
     @HostListener('click')
     public onClick(): boolean {
-        this.router.navigateByUrl(this.url, {
-            queryParamsHandling: 'preserve'
-        });
+        this.router.navigateByUrl(this.url);
 
         return false;
     }

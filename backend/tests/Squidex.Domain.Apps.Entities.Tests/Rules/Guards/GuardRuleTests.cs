@@ -18,8 +18,6 @@ using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
-#pragma warning disable SA1310 // Field names must not contain underscore
-
 namespace Squidex.Domain.Apps.Entities.Rules.Guards
 {
     public class GuardRuleTests : IClassFixture<TranslationsFixture>

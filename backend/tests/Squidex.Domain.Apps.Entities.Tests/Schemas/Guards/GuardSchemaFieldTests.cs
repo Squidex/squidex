@@ -17,7 +17,6 @@ using Squidex.Infrastructure.Validation;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
-#pragma warning disable SA1401 // Fields must be private
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {

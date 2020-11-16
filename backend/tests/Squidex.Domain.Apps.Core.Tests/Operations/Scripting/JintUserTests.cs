@@ -12,8 +12,6 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 using Xunit;
 
-#pragma warning disable xUnit2004 // Do not use equality check to test for boolean conditions
-
 namespace Squidex.Domain.Apps.Core.Operations.Scripting
 {
     public class JintUserTests

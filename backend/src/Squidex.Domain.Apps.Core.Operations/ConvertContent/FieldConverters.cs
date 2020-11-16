@@ -15,8 +15,6 @@ using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-#pragma warning disable RECS0002 // Convert anonymous method to method group
-
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
     public delegate ContentFieldData? FieldConverter(ContentFieldData data, IRootField field);

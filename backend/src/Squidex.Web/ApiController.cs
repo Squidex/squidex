@@ -68,7 +68,7 @@ namespace Squidex.Web
         {
             var request = context.HttpContext.Request;
 
-            if (!request.PathBase.HasValue || !request.PathBase.Value.EndsWith("/api", StringComparison.OrdinalIgnoreCase))
+            if (!request.PathBase.HasValue || request.PathBase.Value?.EndsWith("/api", StringComparison.OrdinalIgnoreCase) != true)
             {
                 context.Result = new RedirectResult("/");
             }

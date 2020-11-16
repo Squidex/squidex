@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Translations
 
                     indexOfStart++;
 
-                    var indexOfEnd = span.Slice(indexOfStart).IndexOf('}');
+                    var indexOfEnd = span[indexOfStart..].IndexOf('}');
 
                     if (indexOfEnd < 0)
                     {
@@ -119,13 +119,13 @@ namespace Squidex.Infrastructure.Translations
                         {
                             sb.Append(char.ToLower(variableValue[0]));
 
-                            sb.Append(variableValue.AsSpan().Slice(1));
+                            sb.Append(variableValue.AsSpan()[1..]);
                         }
                         else if (shouldUpper && !char.IsUpper(variableValue[0]))
                         {
                             sb.Append(char.ToUpper(variableValue[0]));
 
-                            sb.Append(variableValue.AsSpan().Slice(1));
+                            sb.Append(variableValue.AsSpan()[1..]);
                         }
                         else
                         {
@@ -133,7 +133,7 @@ namespace Squidex.Infrastructure.Translations
                         }
                     }
 
-                    span = span.Slice(indexOfEnd + 1);
+                    span = span[(indexOfEnd + 1)..];
                 }
 
                 sb.Append(span);

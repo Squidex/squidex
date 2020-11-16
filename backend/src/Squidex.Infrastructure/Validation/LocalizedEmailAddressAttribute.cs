@@ -15,9 +15,9 @@ namespace Squidex.Infrastructure.Validation
     [AttributeUsage(AttributeTargets.Property)]
     public class LocalizedEmailAddressAttribute : ValidationAttribute
     {
-        public override bool IsValid(object value)
+        public override bool IsValid(object? value)
         {
-            return !(value is string s) || s.IsEmail();
+            return value is not string s || s.IsEmail();
         }
 
         public override string FormatErrorMessage(string name)

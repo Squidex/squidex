@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             this.connection = connection;
 
-            this.position = projectionClient.ParsePositionOrNull(position);
+            this.position = ProjectionClient.ParsePositionOrNull(position);
             this.prefix = prefix;
 
             var streamName = AsyncHelper.Sync(() => projectionClient.CreateProjectionAsync(streamFilter));

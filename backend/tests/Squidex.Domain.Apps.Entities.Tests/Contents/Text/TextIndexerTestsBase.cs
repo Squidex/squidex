@@ -19,9 +19,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
 #pragma warning disable SA1401 // Fields should be private
-#pragma warning disable SA1114 // Parameter list should follow declaration
 #pragma warning disable SA1115 // Parameter should follow comma
-#pragma warning disable RECS0021 // Warns about calls to virtual member functions occuring in the constructor
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {

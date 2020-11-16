@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
-            if (!(value is ICollection items) || items.Count == 0)
+            if (value is not ICollection items || items.Count == 0)
             {
                 if (isRequired && !context.IsOptional)
                 {

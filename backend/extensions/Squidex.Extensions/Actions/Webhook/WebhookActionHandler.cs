@@ -81,7 +81,7 @@ namespace Squidex.Extensions.Actions.Webhook
                 if (indexEqual > 0 && indexEqual < line.Length - 1)
                 {
                     var key = line.Substring(0, indexEqual);
-                    var val = line.Substring(indexEqual + 1);
+                    var val = line[(indexEqual + 1)..];
 
                     val = await FormatAsync(val, @event);
 

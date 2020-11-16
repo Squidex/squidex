@@ -82,7 +82,7 @@ namespace Squidex.Web.Pipeline
 
                 if (!AllowAnonymous(context) && !HasPermission(appName, requestContext))
                 {
-                    if (string.IsNullOrWhiteSpace(user.Identity.AuthenticationType))
+                    if (string.IsNullOrWhiteSpace(user.Identity?.AuthenticationType))
                     {
                         context.Result = new UnauthorizedResult();
                     }

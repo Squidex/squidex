@@ -23,7 +23,7 @@ namespace Squidex.Config.Authentication
 
         public override Task TokenValidated(TokenValidatedContext context)
         {
-            var identity = (ClaimsIdentity)context.Principal.Identity;
+            var identity = (ClaimsIdentity)context.Principal!.Identity!;
 
             if (!string.IsNullOrWhiteSpace(options.OidcRoleClaimType) && options.OidcRoleMapping?.Count >= 0)
             {

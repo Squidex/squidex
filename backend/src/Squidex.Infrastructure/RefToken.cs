@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure
 
                 if (idx > 0 && idx < value.Length - 1)
                 {
-                    result = new RefToken(value.Substring(0, idx), value.Substring(idx + 1));
+                    result = new RefToken(value.Substring(0, idx), value[(idx + 1)..]);
 
                     return true;
                 }

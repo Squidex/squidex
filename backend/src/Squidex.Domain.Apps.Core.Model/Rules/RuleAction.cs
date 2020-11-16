@@ -24,7 +24,10 @@ namespace Squidex.Domain.Apps.Core.Rules
             {
                 foreach (var error in errors)
                 {
-                    yield return new ValidationError(error.ErrorMessage, error.MemberNames.ToArray());
+                    if (!string.IsNullOrWhiteSpace(error.ErrorMessage))
+                    {
+                        yield return new ValidationError(error.ErrorMessage, error.MemberNames.ToArray());
+                    }
                 }
             }
 

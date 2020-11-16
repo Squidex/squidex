@@ -77,7 +77,7 @@ namespace Squidex.Web.CommandMiddlewares
             {
                 if (etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
                 {
-                    etag = etag.Substring(2);
+                    etag = etag[2..];
                 }
 
                 if (long.TryParse(etag, NumberStyles.Any, CultureInfo.InvariantCulture, out version))

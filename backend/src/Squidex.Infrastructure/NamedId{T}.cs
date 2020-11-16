@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure
                     {
                         if (parser(span.Slice(0, GuidLength), out var id))
                         {
-                            result = new NamedId<T>(id, value.Substring(GuidLength + 1));
+                            result = new NamedId<T>(id, value[(GuidLength + 1)..]);
 
                             return true;
                         }
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure
                     {
                         if (parser(span.Slice(0, index), out var id))
                         {
-                            result = new NamedId<T>(id, value.Substring(index + 1));
+                            result = new NamedId<T>(id, value[(index + 1)..]);
 
                             return true;
                         }

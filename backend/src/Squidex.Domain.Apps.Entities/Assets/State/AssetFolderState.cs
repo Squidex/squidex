@@ -12,8 +12,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-#pragma warning disable IDE0060 // Remove unused parameter
-
 namespace Squidex.Domain.Apps.Entities.Assets.State
 {
     public sealed class AssetFolderState : DomainObjectState<AssetFolderState>, IAssetFolderEntity

@@ -55,7 +55,7 @@ namespace Squidex.Web.Pipeline
             {
                 isNextCalled = true;
 
-                return Task.FromResult<ActionExecutedContext?>(null);
+                return Task.FromResult<ActionExecutedContext>(null!);
             };
 
             sut = new SchemaResolver(appProvider);

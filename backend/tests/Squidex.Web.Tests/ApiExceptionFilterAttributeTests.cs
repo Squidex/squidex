@@ -196,7 +196,7 @@ namespace Squidex.Web
 
             var result = new ObjectResult(problem) { StatusCode = problem.Status };
 
-            return new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), result, null);
+            return new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), result, null!);
         }
 
         private ExceptionContext Error(Exception exception)
@@ -229,20 +229,20 @@ namespace Squidex.Web
             return actionContext;
         }
 
-        private static void Validate(int statusCode, IActionResult actionResult, Exception? exception)
+        private static void Validate(int statusCode, IActionResult? actionResult, Exception? exception)
         {
-            var result = (ObjectResult)actionResult;
+            var result = actionResult as ObjectResult;
 
-            var error = (ErrorDto)result.Value;
+            var error = result?.Value as ErrorDto;
 
-            Assert.NotNull(error.Type);
+            Assert.NotNull(error?.Type);
 
-            Assert.Equal(statusCode, result.StatusCode);
-            Assert.Equal(statusCode, error.StatusCode);
+            Assert.Equal(statusCode, result?.StatusCode);
+            Assert.Equal(statusCode, error?.StatusCode);
 
             if (exception != null)
             {
-                Assert.Equal(exception.Message, error.Message);
+                Assert.Equal(exception.Message, error?.Message);
             }
         }
     }

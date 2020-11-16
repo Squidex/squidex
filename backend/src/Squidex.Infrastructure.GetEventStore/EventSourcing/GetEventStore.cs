@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
 
-                var sliceStart = projectionClient.ParsePosition(position);
+                var sliceStart = ProjectionClient.ParsePosition(position);
 
                 await QueryAsync(callback, streamName, sliceStart, ct);
             }
@@ -236,7 +236,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static int ParseVersion(string message)
         {
-            return int.Parse(message.Substring(message.LastIndexOf(':') + 1));
+            return int.Parse(message[(message.LastIndexOf(':') + 1)..]);
         }
 
         private string GetStreamName(string streamName)

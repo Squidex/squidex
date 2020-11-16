@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             Assert.True(found);
             Assert.Equal("ToArchivedExpr", transition?.Expression);
-            Assert.Equal("ToArchivedRole", transition?.Roles.Single());
+            Assert.Equal("ToArchivedRole", transition?.Roles?.Single());
         }
 
         [Fact]
@@ -116,14 +116,14 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             Assert.Equal(Status.Archived, status1);
             Assert.Equal("ToArchivedExpr", transition1?.Expression);
-            Assert.Equal("ToArchivedRole", transition1?.Roles.Single());
+            Assert.Equal("ToArchivedRole", transition1?.Roles?.Single());
             Assert.Same(workflow.Steps[status1], step1);
 
             var (status2, step2, transition2) = transitions[1];
 
             Assert.Equal(Status.Published, status2);
             Assert.Equal("ToPublishedExpr", transition2?.Expression);
-            Assert.Equal("ToPublishedRole", transition2?.Roles.Single());
+            Assert.Equal("ToPublishedRole", transition2?.Roles?.Single());
             Assert.Same(workflow.Steps[status2], step2);
         }
 

@@ -1,7 +1,7 @@
 #
 # Stage 1, Build Backend
 #
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster as backend
+FROM mcr.microsoft.com/dotnet/sdk:5.0 as backend
 
 ARG SQUIDEX__VERSION=4.0.0
 
@@ -59,7 +59,7 @@ RUN cp -a build /build/
 #
 # Stage 3, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim
+FROM mcr.microsoft.com/dotnet/core/aspnet:5.0.0-buster-slim
 
 # Default AspNetCore directory
 WORKDIR /app

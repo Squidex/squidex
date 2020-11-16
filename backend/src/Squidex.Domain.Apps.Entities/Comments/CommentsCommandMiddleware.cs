@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         {
             if (!string.IsNullOrWhiteSpace(command.Text))
             {
-                var emails = MentionRegex.Matches(command.Text).Select(x => x.Value.Substring(1)).ToArray();
+                var emails = MentionRegex.Matches(command.Text).Select(x => x.Value[1..]).ToArray();
 
                 if (emails.Length > 0)
                 {

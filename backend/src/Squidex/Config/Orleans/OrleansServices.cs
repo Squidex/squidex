@@ -20,8 +20,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Web;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-
 namespace Squidex.Config.Orleans
 {
     public static class OrleansServices

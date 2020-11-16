@@ -22,8 +22,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Log;
 using Squidex.Web;
 
-#pragma warning disable 1573
-
 namespace Squidex.Areas.Api.Controllers.Assets
 {
     /// <summary>

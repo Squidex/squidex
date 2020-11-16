@@ -84,7 +84,7 @@ namespace Squidex.Shared.Users
         public static List<(string Name, string Value)> GetCustomProperties(this IUser user)
         {
             return user.Claims.Where(x => x.Type.StartsWith(SquidexClaimTypes.CustomPrefix, StringComparison.OrdinalIgnoreCase))
-                .Select(x => (x.Type.Substring(SquidexClaimTypes.CustomPrefix.Length + 1), x.Value)).ToList();
+                .Select(x => (x.Type[(SquidexClaimTypes.CustomPrefix.Length + 1)..], x.Value)).ToList();
         }
 
         public static bool HasClaim(this IUser user, string type)

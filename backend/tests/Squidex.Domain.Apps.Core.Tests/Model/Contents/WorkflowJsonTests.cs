@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             var result = serialized.ToTransition();
 
-            Assert.Equal(source.Role, result?.Roles.Single());
+            Assert.Equal(source.Role, result?.Roles?.Single());
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Squidex.Areas.IdentityServer.Controllers
             var externalProviders = externalSchemes
                 .Where(x => x.Name != OpenIdConnectDefaults.AuthenticationScheme)
                 .Where(x => x.Name != Constants.ApiSecurityScheme)
-                .Select(x => new ExternalProvider(x.Name, x.DisplayName))
+                .Select(x => new ExternalProvider(x.Name, x.DisplayName ?? x.Name))
                 .ToList();
 
             return externalProviders;

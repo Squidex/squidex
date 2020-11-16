@@ -106,12 +106,12 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public long? ParsePositionOrNull(string? position)
+        public static long? ParsePositionOrNull(string? position)
         {
             return long.TryParse(position, out var parsedPosition) ? (long?)parsedPosition : null;
         }
 
-        public long ParsePosition(string? position)
+        public static long ParsePosition(string? position)
         {
             return long.TryParse(position, out var parsedPosition) ? parsedPosition + 1 : StreamPosition.Start;
         }
