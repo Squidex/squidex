@@ -59,7 +59,7 @@ RUN cp -a build /build/
 #
 # Stage 3, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/core/aspnet:5.0.0-buster-slim
+FROM mcr.microsoft.com/dotnet/aspnet:5.0.0-buster-slim
 
 # Default AspNetCore directory
 WORKDIR /app
