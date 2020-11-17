@@ -2,7 +2,7 @@
     <div class="inner-header">
         <ul class="nav nav-tabs2">
             <li class="nav-item" *ngFor="let script of editForm.form.controls | sqxKeys">
-                <a class="nav-link" [class.active]="selectedField === script" (click)="selectField(script)">{{script | titlecase}}</a>
+                <a class="nav-link" [class.active]="selectedField === script" (click)="selectField(script)">{{ 'schemas.tabScripts.' + script | sqxTranslate | titlecase}}</a>
             </li>
         </ul>
         
