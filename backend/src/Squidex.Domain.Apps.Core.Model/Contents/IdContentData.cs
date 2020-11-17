@@ -48,9 +48,19 @@ namespace Squidex.Domain.Apps.Core.Contents
             return this;
         }
 
-        public bool Equals([AllowNull] IdContentData other)
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as IdContentData);
+        }
+
+        public bool Equals(IdContentData? other)
         {
             return base.Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

@@ -107,7 +107,7 @@ namespace Squidex.Infrastructure.Security
             return Id;
         }
 
-        public int CompareTo([AllowNull] Permission other)
+        public int CompareTo(Permission? other)
         {
             return other == null ? -1 : string.Compare(Id, other.Id, StringComparison.Ordinal);
         }

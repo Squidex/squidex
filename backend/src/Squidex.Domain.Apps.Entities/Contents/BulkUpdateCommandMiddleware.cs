@@ -15,6 +15,8 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Translations;
 
+#pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
+
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class BulkUpdateCommandMiddleware : ICommandMiddleware

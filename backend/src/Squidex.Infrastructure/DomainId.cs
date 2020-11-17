@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure
             return id ?? EmptyString;
         }
 
-        public int CompareTo([AllowNull] DomainId other)
+        public int CompareTo(DomainId other)
         {
             return string.Compare(ToString(), other.ToString(), StringComparison.Ordinal);
         }

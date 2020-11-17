@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_only_invoke_pre_enrich_for_empty_results()
         {
-            var source = new IContentEntity[0];
+            var source = Array.Empty<IContentEntity>();
 
             var step1 = A.Fake<IContentEnricherStep>();
             var step2 = A.Fake<IContentEnricherStep>();

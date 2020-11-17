@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             for (var i = 0; i < size; i++)
             {
-                sb.Append("x");
+                sb.Append('x');
             }
 
             return sb.ToString();

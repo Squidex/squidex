@@ -22,6 +22,8 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Log;
 using Squidex.Web;
 
+#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods that take one
+
 namespace Squidex.Areas.Api.Controllers.Assets
 {
     /// <summary>
@@ -101,7 +103,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]
-        [Obsolete]
+        [Obsolete("Use overload with app name")]
         public async Task<IActionResult> GetAssetContent(DomainId id, [FromQuery] AssetContentQueryDto queries)
         {
             var asset = await assetRepository.FindAssetAsync(id);

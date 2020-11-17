@@ -41,6 +41,8 @@ namespace Squidex.Infrastructure.EventSourcing
         public void Dispose()
         {
             Cleanup();
+
+            GC.SuppressFinalize(this);
         }
     }
 

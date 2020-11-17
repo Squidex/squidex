@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_not_create_enriched_events_when_mentions_is_empty()
         {
-            var envelope = Envelope.Create<AppEvent>(new CommentCreated { Mentions = new string[0] });
+            var envelope = Envelope.Create<AppEvent>(new CommentCreated { Mentions = Array.Empty<string>() });
 
             var result = await sut.CreateEnrichedEventsAsync(envelope);
 

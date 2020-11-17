@@ -97,8 +97,7 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<T>, UpdateDefinition<T>> updater)
-            where T : IVersionedEntity<TKey>
-            where TKey : notnull
+            where T : IVersionedEntity<TKey> where TKey : notnull
         {
             try
             {
@@ -133,8 +132,7 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, T document)
-            where T : IVersionedEntity<TKey>
-            where TKey : notnull
+            where T : IVersionedEntity<TKey> where TKey : notnull
         {
             try
             {
@@ -170,8 +168,7 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         private static string GetVersionField<T, TKey>()
-            where T : IVersionedEntity<TKey>
-            where TKey : notnull
+            where T : IVersionedEntity<TKey> where TKey : notnull
         {
             return BsonClassMap.LookupClassMap(typeof(T)).GetMemberMap(nameof(IVersionedEntity<TKey>.Version)).ElementName;
         }

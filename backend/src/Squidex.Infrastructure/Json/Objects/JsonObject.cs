@@ -113,7 +113,7 @@ namespace Squidex.Infrastructure.Json.Objects
             return Equals(obj as JsonObject);
         }
 
-        public bool Equals([AllowNull] IJsonValue other)
+        public bool Equals(IJsonValue? other)
         {
             return Equals(other as JsonObject);
         }

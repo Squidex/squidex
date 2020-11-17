@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             return JsonValue.Create(field.Properties.DefaultValue);
         }
 
-        private IJsonValue Array(string[]? values)
+        private static IJsonValue Array(string[]? values)
         {
             if (values != null)
             {

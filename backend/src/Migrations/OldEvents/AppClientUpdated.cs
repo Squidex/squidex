@@ -16,7 +16,7 @@ using AppClientUpdatedV2 = Squidex.Domain.Apps.Events.Apps.AppClientUpdated;
 namespace Migrations.OldEvents
 {
     [EventType(nameof(AppClientUpdated))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class AppClientUpdated : AppEvent, IMigrated<IEvent>
     {
         public string Id { get; set; }

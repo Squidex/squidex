@@ -62,7 +62,8 @@ namespace Squidex.Extensions.Actions.Email
                         job.MessageFrom,
                         job.MessageTo,
                         job.MessageSubject,
-                        job.MessageBody);
+                        job.MessageBody,
+                        ct);
                 }
             }
 

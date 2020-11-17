@@ -235,7 +235,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var contents = new[]
             {
-                CreateContent(new[] { DomainId.NewGuid() }, new DomainId[0])
+                CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
             };
 
             var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
@@ -253,7 +253,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var contents = new[]
             {
-                CreateContent(new[] { DomainId.NewGuid() }, new DomainId[0])
+                CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
             };
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).WithoutContentEnrichment(true);
@@ -271,7 +271,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var contents = new[]
             {
-                CreateContent(new DomainId[0], new DomainId[0])
+                CreateContent(Array.Empty<DomainId>(), Array.Empty<DomainId>())
             };
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);

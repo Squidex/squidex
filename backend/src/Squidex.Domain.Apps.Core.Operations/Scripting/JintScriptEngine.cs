@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                 using (cts.Token.Register(() => tcs.TrySetCanceled()))
                 {
-                    var context = CreateEngine(vars, options, cts.Token, tcs.TrySetException, true);
+                    var context = CreateEngine(vars, options, tcs.TrySetException, true, cts.Token);
 
                     context.Engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                 using (cts.Token.Register(() => tcs.TrySetCanceled()))
                 {
-                    var context = CreateEngine(vars, options, cts.Token, tcs.TrySetException, true);
+                    var context = CreateEngine(vars, options, tcs.TrySetException, true, cts.Token);
 
                     context.Engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return JsonMapper.Map(context.Engine.GetCompletionValue());
         }
 
-        private ExecutionContext CreateEngine(ScriptVars vars, ScriptOptions options, CancellationToken cancellationToken = default, ExceptionHandler? exceptionHandler = null, bool async = false)
+        private ExecutionContext CreateEngine(ScriptVars vars, ScriptOptions options, ExceptionHandler? exceptionHandler = null, bool async = false, CancellationToken ct = default)
         {
             var engine = new Engine(options =>
             {
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 extension.Extend(engine);
             }
 
-            var context = new ExecutionContext(engine, cancellationToken, exceptionHandler);
+            var context = new ExecutionContext(engine, ct, exceptionHandler);
 
             context.AddVariables(vars, options);
 

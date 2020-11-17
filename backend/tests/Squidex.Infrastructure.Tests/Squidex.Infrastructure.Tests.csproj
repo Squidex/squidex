@@ -34,6 +34,7 @@
   </ItemGroup>
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />

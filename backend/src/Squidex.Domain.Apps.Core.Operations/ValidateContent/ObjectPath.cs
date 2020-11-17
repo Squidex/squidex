@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 {
                     if (property[0] != '[')
                     {
-                        sb.Append(".");
+                        sb.Append('.');
                     }
 
                     sb.Append(property);

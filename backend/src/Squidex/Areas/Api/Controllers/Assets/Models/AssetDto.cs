@@ -133,7 +133,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// Determines of the created file is an image.
         /// </summary>
-        [Obsolete]
+        [Obsolete("Use Type instead")]
         public bool IsImage
         {
             get { return Type == AssetType.Image; }
@@ -142,7 +142,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The width of the image in pixels if the asset is an image.
         /// </summary>
-        [Obsolete]
+        [Obsolete("Use Metdata instead")]
         public int? PixelWidth
         {
             get { return Metadata.GetPixelWidth(); }
@@ -151,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The height of the image in pixels if the asset is an image.
         /// </summary>
-        [Obsolete]
+        [Obsolete("Use Metdata instead")]
         public int? PixelHeight
         {
             get { return Metadata.GetPixelHeight(); }

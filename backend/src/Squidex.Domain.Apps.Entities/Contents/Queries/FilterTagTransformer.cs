@@ -53,19 +53,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return nodeIn;
         }
 
-        private static bool IsDataPath(IReadOnlyList<string> path)
-        {
-            return path.Count == 3 && string.Equals(path[0], nameof(IContentEntity.Data), StringComparison.OrdinalIgnoreCase);
-        }
-
         private bool IsTagField(IReadOnlyList<string> path)
         {
             return schema.SchemaDef.FieldsByName.TryGetValue(path[1], out var field) && IsTagField(field);
         }
 
-        private bool IsTagField(IField field)
+        private static bool IsTagField(IField field)
         {
             return field is IField<TagsFieldProperties> tags && tags.Properties.Normalization == TagsFieldNormalization.Schema;
+        }
+
+        private static bool IsDataPath(IReadOnlyList<string> path)
+        {
+            return path.Count == 3 && string.Equals(path[0], nameof(IContentEntity.Data), StringComparison.OrdinalIgnoreCase);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Reflection.Equality
             this.comparer = comparer ?? SimpleEquals.Build(typeof(T));
         }
 
-        public bool Equals([AllowNull] T x, [AllowNull] T y)
+        public bool Equals(T? x, T? y)
         {
             return comparer.IsEquals(x, y);
         }
