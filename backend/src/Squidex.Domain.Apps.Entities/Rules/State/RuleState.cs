@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events.Rules;

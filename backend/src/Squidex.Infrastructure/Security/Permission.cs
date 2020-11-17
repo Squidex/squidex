@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Security
 {

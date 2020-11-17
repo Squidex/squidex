@@ -7,7 +7,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {

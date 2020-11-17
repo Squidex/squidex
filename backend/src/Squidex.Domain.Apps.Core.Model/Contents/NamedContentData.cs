@@ -6,9 +6,10 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Squidex.Infrastructure;
+
+#pragma warning disable CA1067 // Override Object.Equals(object) when implementing IEquatable<T>
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
@@ -65,19 +66,9 @@ namespace Squidex.Domain.Apps.Core.Contents
             return clone;
         }
 
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as IdContentData);
-        }
-
         public bool Equals(NamedContentData? other)
         {
             return base.Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
         }
 
         public override string ToString()
