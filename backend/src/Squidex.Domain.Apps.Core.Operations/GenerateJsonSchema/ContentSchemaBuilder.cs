@@ -11,9 +11,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
-    public sealed class ContentSchemaBuilder
+    public static class ContentSchemaBuilder
     {
-        public JsonSchema CreateContentSchema(Schema schema, JsonSchema dataSchema)
+        public static JsonSchema CreateContentSchema(Schema schema, JsonSchema dataSchema)
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(dataSchema, nameof(dataSchema));

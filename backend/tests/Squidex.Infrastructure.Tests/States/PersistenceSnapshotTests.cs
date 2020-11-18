@@ -11,8 +11,6 @@ using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
-#pragma warning disable RECS0002 // Convert anonymous method to method group
-
 namespace Squidex.Infrastructure.States
 {
     public class PersistenceSnapshotTests

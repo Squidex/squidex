@@ -21,8 +21,6 @@ using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
-#pragma warning disable SA1133 // Do not combine attributes
-
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
     public class SchemasIndexTests

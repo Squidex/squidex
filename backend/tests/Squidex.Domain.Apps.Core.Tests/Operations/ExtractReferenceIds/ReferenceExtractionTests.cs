@@ -15,8 +15,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
-#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
-
 namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 {
     public class ReferenceExtractionTests

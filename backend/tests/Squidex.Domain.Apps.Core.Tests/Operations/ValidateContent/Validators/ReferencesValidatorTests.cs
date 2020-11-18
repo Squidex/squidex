@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             return new ReferencesValidator(properties.IsRequired, properties, FoundReferences(schemaId1));
         }
 
-        private IValidator Validator(ReferencesFieldProperties properties, DomainId schemaId, params (DomainId Id, Status Status)[] references)
+        private static IValidator Validator(ReferencesFieldProperties properties, DomainId schemaId, params (DomainId Id, Status Status)[] references)
         {
             return new ReferencesValidator(properties.IsRequired, properties, FoundReferences(schemaId, references));
         }

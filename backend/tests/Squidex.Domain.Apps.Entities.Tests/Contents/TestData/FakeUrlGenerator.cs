@@ -66,11 +66,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             throw new NotSupportedException();
         }
 
-        public string ContentsUI(NamedId<DomainId> appId)
-        {
-            throw new NotSupportedException();
-        }
-
         public string ContentsUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
         {
             throw new NotSupportedException();

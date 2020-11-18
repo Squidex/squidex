@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Security
                         {
                             result[j] = Parse(current.Slice(0, i));
 
-                            current = current.Slice(i + 1);
+                            current = current[(i + 1)..];
                             currentSpan = current.Span;
 
                             i = 0;
@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.Security
                 {
                     isExclusion = true;
 
-                    current = current.Slice(1);
+                    current = current[1..];
                     currentSpan = current.Span;
                 }
 
@@ -109,7 +109,7 @@ namespace Squidex.Infrastructure.Security
                             {
                                 alternatives[j] = current.Slice(0, i);
 
-                                current = current.Slice(i + 1);
+                                current = current[(i + 1)..];
                                 currentSpan = current.Span;
 
                                 i = 0;

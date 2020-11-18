@@ -36,13 +36,13 @@ namespace Squidex.Web.Pipeline
                 new ActionExecutingContext(
                     new ActionContext(httpContext, new RouteData(),
                         new ActionDescriptor()),
-                    new List<IFilterMetadata>(), new Dictionary<string, object>(), null);
+                    new List<IFilterMetadata>(), new Dictionary<string, object>(), null!);
 
             next = () =>
             {
                 isNextCalled = true;
 
-                return Task.FromResult<ActionExecutedContext?>(null);
+                return Task.FromResult<ActionExecutedContext>(null!);
             };
 
             sut = new ApiCostsFilter(usageGate);

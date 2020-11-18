@@ -6,35 +6,28 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Security
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed partial class Permission : IComparable<Permission>
+    public sealed partial class Permission : IComparable<Permission>, IEquatable<Permission>
     {
         public const string Any = "*";
         public const string Exclude = "^";
 
-        private readonly string id;
         private Part[] path;
 
-        public string Id
-        {
-            get { return id; }
-        }
+        public string Id { get; }
 
-        [IgnoreDuringEquals]
         private Part[] Path
         {
-            get { return path ??= Part.ParsePath(id); }
+            get { return path ??= Part.ParsePath(Id); }
         }
 
         public Permission(string id)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            this.id = id;
+            Id = id;
         }
 
         public bool Allows(Permission permission)
@@ -90,7 +83,7 @@ namespace Squidex.Infrastructure.Security
 
         public bool StartsWith(string test)
         {
-            return id.StartsWith(test, StringComparison.OrdinalIgnoreCase);
+            return Id.StartsWith(test, StringComparison.OrdinalIgnoreCase);
         }
 
         public override bool Equals(object? obj)
@@ -100,22 +93,22 @@ namespace Squidex.Infrastructure.Security
 
         public bool Equals(Permission? other)
         {
-            return other != null && string.Equals(id, other.id, StringComparison.OrdinalIgnoreCase);
+            return other != null && other.Id.Equals(Id);
         }
 
         public override int GetHashCode()
         {
-            return id.GetHashCode();
+            return Id.GetHashCode();
         }
 
         public override string ToString()
         {
-            return id;
+            return Id;
         }
 
-        public int CompareTo([AllowNull] Permission other)
+        public int CompareTo(Permission? other)
         {
-            return other == null ? -1 : string.Compare(id, other.id, StringComparison.Ordinal);
+            return other == null ? -1 : string.Compare(Id, other.Id, StringComparison.Ordinal);
         }
     }
 }

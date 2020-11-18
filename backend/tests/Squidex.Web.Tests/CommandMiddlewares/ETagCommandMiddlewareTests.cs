@@ -95,7 +95,7 @@ namespace Squidex.Web.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext.Response.Headers[HeaderNames.ETag]);
+            Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Squidex.Web.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext.Response.Headers[HeaderNames.ETag]);
+            Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
         }
 
         private CommandContext Ctx(ICommand command)

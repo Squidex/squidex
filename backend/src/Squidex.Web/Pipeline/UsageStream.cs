@@ -10,6 +10,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+#pragma warning disable CA1835 // Prefer the 'Memory'-based overloads for 'ReadAsync' and 'WriteAsync'
+
 namespace Squidex.Web.Pipeline
 {
     internal sealed class UsageStream : Stream
@@ -53,7 +55,7 @@ namespace Squidex.Web.Pipeline
             this.inner = inner;
         }
 
-        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object? state)
+        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback? callback, object? state)
         {
             var result = inner.BeginWrite(buffer, offset, count, callback, state);
 

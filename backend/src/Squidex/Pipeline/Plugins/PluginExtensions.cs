@@ -63,7 +63,7 @@ namespace Squidex.Pipeline.Plugins
         {
             var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
 
-            pluginManager.Log(app.ApplicationServices.GetService<ISemanticLog>());
+            pluginManager.Log(app.ApplicationServices.GetRequiredService<ISemanticLog>());
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             var languages = Languages.ToDictionary(x => x.Key, x => x.Value.ToConfig());
 
-            var master = Master ?? languages.Keys.FirstOrDefault();
+            var master = Master ?? languages.Keys.First();
 
             return new LanguagesConfig(languages, master);
         }

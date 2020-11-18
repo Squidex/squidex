@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         public async Task Should_return_true_if_over_client_limit()
         {
             A.CallTo(() => appEntity.Clients)
-                .Returns(AppClients.Empty.Add(clientId, new AppClient(clientId, clientId, Role.Developer, 100)));
+                .Returns(AppClients.Empty.Add(clientId, clientId).Update(clientId, apiCallsLimit: 1000));
 
             apiCallsCurrent = 1000;
             apiCallsBlocking = 1600;

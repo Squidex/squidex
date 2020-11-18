@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 try
                 {
-                    var domainObject = (T)serviceProvider.GetService(typeof(T));
+                    var domainObject = (T)serviceProvider.GetService(typeof(T))!;
 
                     domainObject.Setup(id);
 

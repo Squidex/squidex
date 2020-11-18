@@ -103,7 +103,7 @@ namespace Squidex.Extensions.Actions.Medium
                     {
                         response = await httpClient.SendAsync(meRequest, ct);
 
-                        var responseString = await response.Content.ReadAsStringAsync();
+                        var responseString = await response.Content.ReadAsStringAsync(ct);
                         var responseJson = serializer.Deserialize<UserResponse>(responseString);
 
                         var id = responseJson.Data?.Id;

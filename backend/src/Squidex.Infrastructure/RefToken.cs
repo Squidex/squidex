@@ -10,20 +10,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class RefToken
+    public sealed record RefToken
     {
         public string Type { get; }
 
         public string Identifier { get; }
 
-        [IgnoreDuringEquals]
         public bool IsClient
         {
             get { return string.Equals(Type, RefTokenType.Client, StringComparison.OrdinalIgnoreCase); }
         }
 
-        [IgnoreDuringEquals]
         public bool IsSubject
         {
             get { return string.Equals(Type, RefTokenType.Subject, StringComparison.OrdinalIgnoreCase); }
@@ -57,7 +54,7 @@ namespace Squidex.Infrastructure
 
                 if (idx > 0 && idx < value.Length - 1)
                 {
-                    result = new RefToken(value.Substring(0, idx), value.Substring(idx + 1));
+                    result = new RefToken(value.Substring(0, idx), value[(idx + 1)..]);
 
                     return true;
                 }

@@ -9,7 +9,7 @@ using System;
 
 namespace Migrations.OldEvents
 {
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public enum AppClientPermission
     {
         Developer,

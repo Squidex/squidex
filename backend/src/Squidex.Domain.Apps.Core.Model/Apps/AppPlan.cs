@@ -9,8 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class AppPlan
+    public sealed record AppPlan
     {
         public RefToken Owner { get; }
 

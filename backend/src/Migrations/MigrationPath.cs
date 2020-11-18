@@ -38,7 +38,7 @@ namespace Migrations
             return (CurrentVersion, migrations);
         }
 
-        private IEnumerable<IMigration> ResolveMigrators(int version)
+        private IEnumerable<IMigration?> ResolveMigrators(int version)
         {
             yield return serviceProvider.GetRequiredService<StopEventConsumers>();
 

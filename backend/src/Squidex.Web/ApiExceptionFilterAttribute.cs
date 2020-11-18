@@ -33,7 +33,7 @@ namespace Squidex.Web
 
             if (!wellKnown)
             {
-                var log = context.HttpContext.RequestServices.GetService<ISemanticLog>();
+                var log = context.HttpContext.RequestServices.GetRequiredService<ISemanticLog>();
 
                 log.LogError(context.Exception, w => w
                     .WriteProperty("message", "An unexpected exception has occurred."));

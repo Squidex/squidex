@@ -17,8 +17,6 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 using Squidex.Log;
 
-#pragma warning disable SA1028, IDE0004 // Code must not contain trailing whitespace
-
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public sealed class ContentValidator

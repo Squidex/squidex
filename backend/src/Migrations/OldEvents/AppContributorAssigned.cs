@@ -16,7 +16,7 @@ using AppContributorAssignedV2 = Squidex.Domain.Apps.Events.Apps.AppContributorA
 namespace Migrations.OldEvents
 {
     [EventType(nameof(AppContributorAssigned))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class AppContributorAssigned : AppEvent, IMigrated<IEvent>
     {
         public string ContributorId { get; set; }

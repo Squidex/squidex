@@ -14,6 +14,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Text;
 
+#pragma warning disable RECS0015 // If an extension method is called as static method convert it to method syntax
+
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public static class Extensions

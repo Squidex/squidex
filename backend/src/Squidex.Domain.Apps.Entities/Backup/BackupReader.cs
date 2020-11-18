@@ -16,8 +16,6 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 
-#pragma warning disable SA1401 // Fields must be private
-
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     public class BackupReader : DisposableObjectBase, IBackupReader

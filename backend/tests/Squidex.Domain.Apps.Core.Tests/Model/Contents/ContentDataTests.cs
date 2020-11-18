@@ -9,8 +9,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
-#pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
-
 namespace Squidex.Domain.Apps.Core.Model.Contents
 {
     public class ContentDataTests

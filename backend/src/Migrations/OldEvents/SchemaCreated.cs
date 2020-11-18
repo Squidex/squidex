@@ -18,7 +18,7 @@ using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Events.
 namespace Migrations.OldEvents
 {
     [EventType(nameof(SchemaCreated))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class SchemaCreated : SchemaEvent, IMigrated<IEvent>
     {
         public string Name { get; set; }

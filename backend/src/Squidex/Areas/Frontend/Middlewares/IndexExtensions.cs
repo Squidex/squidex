@@ -26,12 +26,12 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public static bool IsIndex(this HttpContext context)
         {
-            return context.Request.Path.Value.EndsWith("/index.html", StringComparison.OrdinalIgnoreCase);
+            return context.Request.Path.Value?.EndsWith("/index.html", StringComparison.OrdinalIgnoreCase) == true;
         }
 
         public static bool IsHtmlPath(this HttpContext context)
         {
-            return context.Request.Path.Value.EndsWith(".html", StringComparison.OrdinalIgnoreCase);
+            return context.Request.Path.Value?.EndsWith(".html", StringComparison.OrdinalIgnoreCase) == true;
         }
 
         public static bool IsNotModified(this HttpResponse response)
@@ -62,7 +62,7 @@ namespace Squidex.Areas.Frontend.Middlewares
                     uiOptions.More["info"] = values.ToString();
                 }
 
-                var notifo = httpContext.RequestServices.GetService<IOptions<NotifoOptions>>();
+                var notifo = httpContext.RequestServices!.GetRequiredService<IOptions<NotifoOptions>>();
 
                 if (notifo.Value.IsConfigured())
                 {

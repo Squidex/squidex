@@ -7,7 +7,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
@@ -50,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return Name;
         }
 
-        public int CompareTo([AllowNull] Status other)
+        public int CompareTo(Status other)
         {
             return string.Compare(Name, other.Name, StringComparison.Ordinal);
         }

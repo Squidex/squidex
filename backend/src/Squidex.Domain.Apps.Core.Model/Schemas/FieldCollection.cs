@@ -11,8 +11,6 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
 
-#pragma warning disable IDE0044 // Add readonly modifier
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class FieldCollection<T> : Cloneable<FieldCollection<T>> where T : IField

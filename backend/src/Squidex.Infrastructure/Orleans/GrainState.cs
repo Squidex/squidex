@@ -46,13 +46,13 @@ namespace Squidex.Infrastructure.Orleans
 
             if (context.GrainIdentity.PrimaryKeyString != null)
             {
-                var store = context.ActivationServices.GetService<IStore<string>>();
+                var store = context.ActivationServices.GetRequiredService<IStore<string>>();
 
                 persistence = store.WithSnapshots<T>(GetType(), context.GrainIdentity.PrimaryKeyString, ApplyState);
             }
             else
             {
-                var store = context.ActivationServices.GetService<IStore<Guid>>();
+                var store = context.ActivationServices.GetRequiredService<IStore<Guid>>();
 
                 persistence = store.WithSnapshots<T>(GetType(), context.GrainIdentity.PrimaryKey, ApplyState);
             }

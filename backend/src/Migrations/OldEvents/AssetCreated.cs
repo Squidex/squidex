@@ -17,7 +17,7 @@ using AssetCreatedV2 = Squidex.Domain.Apps.Events.Assets.AssetCreated;
 namespace Migrations.OldEvents
 {
     [EventType(nameof(AssetCreated))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class AssetCreated : AssetEvent, IMigrated<IEvent>
     {
         public Guid ParentId { get; set; }

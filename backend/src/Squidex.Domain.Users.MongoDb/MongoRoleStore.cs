@@ -63,11 +63,6 @@ namespace Squidex.Domain.Users.MongoDb
         {
         }
 
-        public IdentityRole Create(string name)
-        {
-            return new IdentityRole { Name = name };
-        }
-
         public async Task<IdentityRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
         {
             return await Collection.Find(x => x.Id == roleId).FirstOrDefaultAsync(cancellationToken);

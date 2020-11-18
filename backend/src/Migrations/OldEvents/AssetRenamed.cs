@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Reflection;
 namespace Migrations.OldEvents
 {
     [EventType(nameof(AssetRenamed))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class AssetRenamed : AssetEvent, IMigrated<IEvent>
     {
         public string FileName { get; set; }

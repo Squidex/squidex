@@ -31,23 +31,23 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var patterns_1 = patterns_0.Add(id, "NewPattern", "New Pattern", "Message");
 
-            patterns_1[id].Should().BeEquivalentTo(new AppPattern("NewPattern", "New Pattern", "Message"));
+            patterns_1[id].Should().BeEquivalentTo(new AppPattern("NewPattern", "New Pattern") with { Message = "Message" });
         }
 
         [Fact]
         public void Should_do_nothing_if_adding_pattern_with_same_id()
         {
-            var patterns_1 = patterns_0.Add(id, "NewPattern", "New Pattern", "Message");
+            var patterns_1 = patterns_0.Add(firstId, "Default", "Default Pattern", "Message");
 
-            patterns_1.Add(id, "NewPattern", "New Pattern", "Message");
+            Assert.Same(patterns_1, patterns_0);
         }
 
         [Fact]
         public void Should_update_pattern()
         {
-            var patterns_1 = patterns_0.Update(firstId, "UpdatePattern", "Update Pattern", "Message");
+            var patterns_1 = patterns_0.Update(firstId, "UpdatePattern", "Update Pattern");
 
-            patterns_1[firstId].Should().BeEquivalentTo(new AppPattern("UpdatePattern", "Update Pattern", "Message"));
+            patterns_1[firstId].Should().BeEquivalentTo(new AppPattern("UpdatePattern", "Update Pattern"));
         }
 
         [Fact]

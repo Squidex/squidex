@@ -12,7 +12,7 @@ using Squidex.Infrastructure.EventSourcing;
 namespace Migrations.OldEvents
 {
     [EventType(nameof(WebhookDeleted))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class WebhookDeleted : SchemaEvent
     {
         public Guid Id { get; set; }

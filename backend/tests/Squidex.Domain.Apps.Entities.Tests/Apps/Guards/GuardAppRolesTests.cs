@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var roles_1 = roles_0.Add(roleName);
 
-            var clients_1 = clients.Add("1", new AppClient("client", "1", roleName));
+            var clients_1 = clients.Add("1", "my-secret", roleName);
 
             var command = new DeleteRole { Name = roleName };
 

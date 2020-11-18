@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Orleans;
-using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Runtime;
 using Xunit;

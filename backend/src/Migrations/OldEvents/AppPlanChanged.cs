@@ -16,7 +16,7 @@ using AppPlanChangedV2 = Squidex.Domain.Apps.Events.Apps.AppPlanChanged;
 namespace Migrations.OldEvents
 {
     [TypeName("AppPlanChanged")]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class AppPlanChanged : AppEvent, IMigrated<IEvent>
     {
         public string PlanId { get; set; }

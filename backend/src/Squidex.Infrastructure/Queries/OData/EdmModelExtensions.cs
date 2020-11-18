@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Queries.OData
 
             if (query.StartsWith("?", StringComparison.Ordinal))
             {
-                query = query.Substring(1);
+                query = query[1..];
             }
 
             var parser = new ODataUriParser(model, new Uri($"{path}?{query}", UriKind.Relative));

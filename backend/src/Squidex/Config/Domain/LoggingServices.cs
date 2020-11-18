@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Log;
 using Squidex.Log;
-using Squidex.Log.Adapter;
 using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Domain

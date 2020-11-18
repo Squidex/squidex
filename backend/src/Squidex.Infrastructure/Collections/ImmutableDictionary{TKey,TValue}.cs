@@ -9,9 +9,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-#pragma warning disable IDE0044 // Add readonly modifier
-#pragma warning disable RECS0108 // Warns about static fields in generic types
-
 namespace Squidex.Infrastructure.Collections
 {
     public class ImmutableDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> where TKey : notnull

@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
                         Filter.Exists(propertyName, false),
                         Filter.Eq(propertyName, default(T)!),
                         Filter.Eq(propertyName, string.Empty),
-                        Filter.Eq(propertyName, new T[0]));
+                        Filter.Eq(propertyName, Array.Empty<T>()));
                 case CompareOperator.StartsWith:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => "^" + s));
                 case CompareOperator.Contains:

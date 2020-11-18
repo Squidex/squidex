@@ -21,8 +21,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
-#pragma warning disable SA1401 // Fields must be private
-
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetChangedTriggerHandlerTests

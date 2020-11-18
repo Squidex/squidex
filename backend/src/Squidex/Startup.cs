@@ -21,8 +21,6 @@ using Squidex.Config.Web;
 using Squidex.Pipeline.Plugins;
 using Squidex.Web.Pipeline;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-
 namespace Squidex
 {
     public sealed class Startup

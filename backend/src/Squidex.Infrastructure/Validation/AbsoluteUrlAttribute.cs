@@ -21,9 +21,9 @@ namespace Squidex.Infrastructure.Validation
             return T.Get("annotations_AbsoluteUrl", new { property });
         }
 
-        public override bool IsValid(object value)
+        public override bool IsValid(object? value)
         {
-            return !(value is Uri uri) || uri.IsAbsoluteUri;
+            return value is not Uri uri || uri.IsAbsoluteUri;
         }
     }
 }

@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
-
-#pragma warning disable IDE0060 // Remove unused parameter
 
 namespace Squidex.Domain.Apps.Entities.Rules.State
 {

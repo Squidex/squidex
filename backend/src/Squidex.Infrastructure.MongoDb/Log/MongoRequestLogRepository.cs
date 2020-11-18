@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.Log

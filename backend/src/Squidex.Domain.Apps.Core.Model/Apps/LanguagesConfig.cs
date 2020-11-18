@@ -10,8 +10,6 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
 
-#pragma warning disable IDE0028 // Simplify collection initialization
-
 namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class LanguagesConfig : IFieldPartitioning

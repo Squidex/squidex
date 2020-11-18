@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             Assert.Empty(errors);
         }
 
-        private CheckUniqueness FoundDuplicates(DomainId id, Action<string>? filter = null)
+        private static CheckUniqueness FoundDuplicates(DomainId id, Action<string>? filter = null)
         {
             return filterNode =>
             {

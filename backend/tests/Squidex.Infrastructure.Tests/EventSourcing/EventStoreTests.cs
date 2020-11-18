@@ -179,8 +179,8 @@ namespace Squidex.Infrastructure.EventSourcing
                 new StoredEvent(streamName, "Position", 3, events2[1])
             };
 
-            ShouldBeEquivalentTo(readEventsFromPosition.TakeLast(2), expectedFromPosition);
-            ShouldBeEquivalentTo(readEventsFromBeginning.TakeLast(4), expectedFromBeginning);
+            ShouldBeEquivalentTo(readEventsFromPosition?.TakeLast(2), expectedFromPosition);
+            ShouldBeEquivalentTo(readEventsFromBeginning?.TakeLast(4), expectedFromBeginning);
         }
 
         [Fact]
@@ -240,7 +240,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 .Select((x, i) => new StoredEvent(streamName, "Position", i + offset, events[i + offset]))
                 .ToArray();
 
-            var expected2 = new StoredEvent[0];
+            var expected2 = Array.Empty<StoredEvent>();
 
             var readEvents1 = await Sut.QueryLatestAsync(streamName, take);
             var readEvents2 = await Sut.QueryLatestAsync(streamName, 0);
@@ -341,7 +341,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static void ShouldBeEquivalentTo(IEnumerable<StoredEvent>? actual, params StoredEvent[] expected)
         {
-            var actualArray = actual.Select(x => new StoredEvent(x.StreamName, "Position", x.EventStreamNumber, x.Data)).ToArray();
+            var actualArray = actual?.Select(x => new StoredEvent(x.StreamName, "Position", x.EventStreamNumber, x.Data)).ToArray();
 
             actualArray.Should().BeEquivalentTo(expected);
         }

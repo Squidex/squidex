@@ -8,9 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure.Collections;
 using Xunit;
+
+#pragma warning disable CA1822 // Mark members as static
 
 namespace Squidex.Infrastructure.Reflection
 {
@@ -40,7 +41,7 @@ namespace Squidex.Infrastructure.Reflection
                 return Equals(obj as CustomEquals);
             }
 
-            public bool Equals([AllowNull] CustomEquals other)
+            public bool Equals(CustomEquals? other)
             {
                 return other != null && other.value == value;
             }

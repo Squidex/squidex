@@ -22,8 +22,6 @@ using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
-#pragma warning disable SA1133 // Do not combine attributes
-
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
     public sealed class AppsIndexTests
