@@ -14,11 +14,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public ReadOnlyCollection<string>? AllowedValues { get; set; }
 
+        public LocalizedValue<string[]?> DefaultValues { get; set; }
+
+        public string[]? DefaultValue { get; set; }
+
         public int? MinItems { get; set; }
 
         public int? MaxItems { get; set; }
-
-        public string[]? DefaultValue { get; set; }
 
         public TagsFieldEditor Editor { get; set; }
 

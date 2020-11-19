@@ -1,17 +1,10 @@
 .minmax {
-    &-col {
-        position: relative;
-    }
-
-    &-label {
-        @include absolute(0, -.2rem, auto, auto);
-    }
+    text-align: center;
+    text-decoration: none;
+    width: 2rem;
 }
 
-.form-group {
-    margin-top: .5rem;
-}
-
-.form-group2 {
-    margin-top: 3rem;
+.col-label {
+    @include force-width(5rem);
+    padding-left: .5rem;
 }

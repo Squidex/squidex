@@ -14,6 +14,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
     public sealed class TagsFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
+        /// The language specific default value for the field value.
+        /// </summary>
+        public LocalizedValue<string[]?> DefaultValues { get; set; }
+
+        /// <summary>
         /// The default value.
         /// </summary>
         public string[]? DefaultValue { get; set; }

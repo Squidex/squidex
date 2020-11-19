@@ -14,6 +14,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
     public sealed class NumberFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
+        /// The language specific default value for the field value.
+        /// </summary>
+        public LocalizedValue<double?> DefaultValues { get; set; }
+
+        /// <summary>
         /// The default value for the field value.
         /// </summary>
         public double? DefaultValue { get; set; }

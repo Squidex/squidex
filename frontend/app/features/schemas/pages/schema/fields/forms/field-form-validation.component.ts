@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto, PatternDto } from '@app/shared';
+import { FieldDto, LanguageDto, PatternDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form-validation',
@@ -23,4 +23,10 @@ export class FieldFormValidationComponent {
 
     @Input()
     public patterns: ReadonlyArray<PatternDto>;
+
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public isLocalizable: boolean;
 }

@@ -6,25 +6,28 @@
     </button>
 </div>
 
-<ng-container *ngIf="patternsState.patterns | async; let patterns">
-    <div
-        cdkDropList
-        [cdkDropListDisabled]="!schema.canOrderFields"
-        [cdkDropListData]="schema.fields"
-        (cdkDropListDropped)="sortFields($event)">
-        <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn" class="table-drag" cdkDrag cdkDragLockAxis="y">
-            <sqx-field [field]="field" [schema]="schema" [patterns]="patterns">
-                <i cdkDragHandle class="icon-drag2 drag-handle"></i>
-            </sqx-field>
+<ng-container *ngIf="languageState.languagesDtos | async; let languages">
+    <ng-container *ngIf="patternsState.patterns | async; let patterns">
+        <div
+            cdkDropList
+            [cdkDropListDisabled]="!schema.canOrderFields"
+            [cdkDropListData]="schema.fields"
+            (cdkDropListDropped)="sortFields($event)">
+            <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn" class="table-drag" cdkDrag cdkDragLockAxis="y">
+                <sqx-field [field]="field" [schema]="schema" [patterns]="patterns" [languages]="languages">
+                    <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+                </sqx-field>
+            </div>
         </div>
-    </div>
 
-    <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
-        <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">{{ 'schemas.addFieldButton' | sqxTranslate }}</div>
-    </button>
+        <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
+            <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">{{ 'schemas.addFieldButton' | sqxTranslate }}</div>
+        </button>
+    </ng-container>
 </ng-container>
 
 <ng-container *sqxModal="addFieldDialog">
-    <sqx-field-wizard [schema]="schema" (complete)="addFieldDialog.hide()">
+    <sqx-field-wizard 
+        [schema]="schema" (complete)="addFieldDialog.hide()">
     </sqx-field-wizard>
 </ng-container>

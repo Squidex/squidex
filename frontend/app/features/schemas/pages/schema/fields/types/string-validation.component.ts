@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { fadeAnimation, FieldDto, hasNoValue$, hasValue$, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
+import { fadeAnimation, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -30,6 +30,12 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
 
     @Input()
     public patterns: ReadonlyArray<PatternDto>;
+
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public isLocalizable: boolean;
 
     public contentTypes = STRING_CONTENT_TYPES;
 
@@ -78,6 +84,9 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
 
         this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
+
+        this.fieldForm.setControl('defaultValues',
+            new FormControl(this.properties.defaultValues));
 
         this.showPatternSuggestions =
             hasNoValue$(this.fieldForm.controls['pattern']);

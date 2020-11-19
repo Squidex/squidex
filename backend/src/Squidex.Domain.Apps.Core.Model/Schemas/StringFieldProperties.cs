@@ -14,6 +14,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public ReadOnlyCollection<string>? AllowedValues { get; set; }
 
+        public LocalizedValue<string?> DefaultValues { get; set; }
+
+        public string? DefaultValue { get; set; }
+
+        public string? Pattern { get; set; }
+
+        public string? PatternMessage { get; set; }
+
         public int? MinLength { get; set; }
 
         public int? MaxLength { get; set; }
@@ -29,12 +37,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public bool IsUnique { get; set; }
 
         public bool InlineEditable { get; set; }
-
-        public string? DefaultValue { get; set; }
-
-        public string? Pattern { get; set; }
-
-        public string? PatternMessage { get; set; }
 
         public StringContentType ContentType { get; set; }
 

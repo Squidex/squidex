@@ -14,11 +14,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public ReadOnlyCollection<double>? AllowedValues { get; set; }
 
+        public LocalizedValue<double?> DefaultValues { get; set; }
+
+        public double? DefaultValue { get; set; }
+
         public double? MaxValue { get; set; }
 
         public double? MinValue { get; set; }
-
-        public double? DefaultValue { get; set; }
 
         public bool IsUnique { get; set; }
 
