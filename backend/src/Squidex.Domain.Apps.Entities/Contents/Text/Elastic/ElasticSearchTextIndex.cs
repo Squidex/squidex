@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 {
                     field = $"texts.{candidateLanguage}";
 
-                    queryText = queryText.Substring(3);
+                    queryText = queryText[3..];
                 }
             }
 

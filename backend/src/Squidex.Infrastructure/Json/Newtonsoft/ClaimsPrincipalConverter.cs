@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                         {
                             return new JsonClaim { Type = c.Type, Value = c.Value };
                         }).ToArray(),
-                        AuthenticationType = identity.AuthenticationType
+                        AuthenticationType = identity.AuthenticationType!
                     }).ToArray();
 
             serializer.Serialize(writer, jsonIdentities);
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         protected override ClaimsPrincipal ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            var jsonIdentities = serializer.Deserialize<JsonIdentity[]>(reader);
+            var jsonIdentities = serializer.Deserialize<JsonIdentity[]>(reader)!;
 
             return new ClaimsPrincipal(
                 jsonIdentities.Select(identity =>

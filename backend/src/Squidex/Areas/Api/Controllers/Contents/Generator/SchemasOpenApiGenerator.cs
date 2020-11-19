@@ -100,7 +100,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private JsonSchema AppendSchema(string name, JsonSchema schema)
         {
-            name = char.ToUpperInvariant(name[0]) + name.Substring(1);
+            name = char.ToUpperInvariant(name[0]) + name[1..];
 
             return new JsonSchema { Reference = document.Definitions.GetOrAdd(name, schema, (k, c) => c) };
         }

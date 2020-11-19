@@ -26,6 +26,8 @@ using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Xunit;
 
+#pragma warning disable CA2012 // Use ValueTasks correctly
+
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
     public class RuleEventFormatterTests

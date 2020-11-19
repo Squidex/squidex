@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Reflection;
 namespace Migrations.OldEvents
 {
     [EventType(nameof(ScriptsConfigured))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class ScriptsConfigured : SchemaEvent, IMigrated<IEvent>
     {
         public string ScriptQuery { get; set; }

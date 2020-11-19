@@ -19,8 +19,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
-#pragma warning disable IDE0067 // Dispose objects before losing scope
-
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class AppCommandMiddlewareTests : HandlerTestBase<AppState>

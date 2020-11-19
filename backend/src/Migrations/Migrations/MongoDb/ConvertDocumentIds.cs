@@ -108,7 +108,7 @@ namespace Migrations.Migrations.MongoDb
                     {
                         var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
 
-                        documentIdOld = documentIdOld.Substring(index + 2);
+                        documentIdOld = documentIdOld[(index + 2)..];
                     }
 
                     var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();

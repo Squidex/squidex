@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
         public void ShouldBeUrl(string url)
         {
-            Assert.Equal(url, madeRequest.RequestUri.ToString());
+            Assert.Equal(url, madeRequest.RequestUri?.ToString());
         }
 
         public void ShouldBeHeader(string key, string value)

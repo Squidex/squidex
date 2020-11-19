@@ -8,9 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Reflection.Equality;
 using Xunit;
+
+#pragma warning disable CA1822 // Mark members as static
 
 namespace Squidex.Infrastructure.Reflection
 {
@@ -40,7 +42,7 @@ namespace Squidex.Infrastructure.Reflection
                 return Equals(obj as CustomEquals);
             }
 
-            public bool Equals([AllowNull] CustomEquals other)
+            public bool Equals(CustomEquals? other)
             {
                 return other != null && other.value == value;
             }
@@ -97,7 +99,10 @@ namespace Squidex.Infrastructure.Reflection
         public void Should_compare_values(object lhs, object rhs)
         {
             Assert.True(SimpleEquals.IsEquals(lhs, lhs));
+            Assert.True(DeepEqualityComparer<object>.Default.Equals(lhs, lhs));
+
             Assert.False(SimpleEquals.IsEquals(lhs, rhs));
+            Assert.True(DeepEqualityComparer<object>.Default.Equals(lhs, rhs));
         }
 
         [Fact]

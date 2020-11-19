@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/shared';
+import { FieldDto, LanguageDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-validation',
@@ -23,6 +23,12 @@ export class ReferencesValidationComponent implements OnInit {
 
     @Input()
     public properties: ReferencesFieldPropertiesDto;
+
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public isLocalizable: boolean;
 
     constructor(
         public readonly schemasSource: SchemaTagSource
@@ -44,6 +50,9 @@ export class ReferencesValidationComponent implements OnInit {
 
         this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
+
+        this.fieldForm.setControl('defaultValues',
+            new FormControl(this.properties.defaultValues));
 
         this.fieldForm.setControl('mustBePublished',
             new FormControl(this.properties.mustBePublished));

@@ -62,12 +62,12 @@ namespace Squidex.Infrastructure.Validation
 
                     if (!error.EndsWith(".", StringComparison.OrdinalIgnoreCase))
                     {
-                        sb.Append(".");
+                        sb.Append('.');
                     }
 
                     if (i < errors.Count - 1)
                     {
-                        sb.Append(" ");
+                        sb.Append(' ');
                     }
                 }
             }

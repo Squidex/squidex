@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.States
 
         public ISnapshotStore<TState, TKey> GetSnapshotStore<TState>()
         {
-            return (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
+            return (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>))!;
         }
     }
 }

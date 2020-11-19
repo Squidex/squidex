@@ -23,8 +23,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Squidex.Log;
 
-#pragma warning disable IDE0016 // Use 'throw' expression
-
 namespace Squidex.Domain.Apps.Entities.Contents.Operations
 {
     public sealed class ContentOperationContext

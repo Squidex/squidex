@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 #pragma warning disable RECS0026 // Possible unassigned object created by 'new'
+#pragma warning disable CA1806 // Do not ignore method results
 
 namespace Squidex.Infrastructure.Validation
 {

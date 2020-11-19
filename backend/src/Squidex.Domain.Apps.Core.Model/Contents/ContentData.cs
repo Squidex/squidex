@@ -70,16 +70,19 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             foreach (var fieldValue in source.ValidValues)
             {
-                var resultValue = new ContentFieldData();
-
-                foreach (var (key, value) in fieldValue.Value.Where(x => x.Value.Type != JsonValueType.Null))
+                if (fieldValue.Value != null)
                 {
-                    resultValue[key] = value;
-                }
+                    var resultValue = new ContentFieldData();
 
-                if (resultValue.Count > 0)
-                {
-                    target[fieldValue.Key] = resultValue;
+                    foreach (var (key, value) in fieldValue.Value.Where(x => x.Value.Type != JsonValueType.Null))
+                    {
+                        resultValue[key] = value;
+                    }
+
+                    if (resultValue.Count > 0)
+                    {
+                        target[fieldValue.Key] = resultValue;
+                    }
                 }
             }
 

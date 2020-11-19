@@ -14,8 +14,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
-#pragma warning disable IDE0019 // Use pattern matching
-
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public abstract class RuleTriggerHandler<TTrigger, TEvent, TEnrichedEvent> : IRuleTriggerHandler

@@ -99,7 +99,7 @@ namespace Squidex.Config.Domain
             {
                 var allEventConsumers = c.GetServices<IEventConsumer>();
 
-                return new EventConsumerFactory(n => allEventConsumers.FirstOrDefault(x => x.Name == n));
+                return new EventConsumerFactory(n => allEventConsumers.First(x => x.Name == n));
             });
         }
     }

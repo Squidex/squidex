@@ -80,7 +80,7 @@ namespace Squidex.Infrastructure.Tasks
             });
         }
 
-        public DataflowMessageStatus OfferMessage(DataflowMessageHeader messageHeader, TInput messageValue, ISourceBlock<TInput> source, bool consumeToAccept)
+        public DataflowMessageStatus OfferMessage(DataflowMessageHeader messageHeader, TInput messageValue, ISourceBlock<TInput>? source, bool consumeToAccept)
         {
             return distributor.OfferMessage(messageHeader, messageValue, source, consumeToAccept);
         }

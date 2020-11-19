@@ -31,6 +31,8 @@ using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
+#pragma warning disable CA1827 // Do not use Count() or LongCount() when Any() can be used
+
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     public sealed class AccountController : IdentityServerController
@@ -153,7 +155,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         {
             await signInManager.SignOutAsync();
 
-            if (User?.Identity.IsAuthenticated == true)
+            if (User.Identity?.IsAuthenticated == true)
             {
                 var provider = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
 
@@ -291,7 +293,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
             else
             {
-                var email = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
+                var email = externalLogin.Principal.FindFirst(ClaimTypes.Email)?.Value!;
 
                 user = await userManager.FindByEmailWithClaimsAsync(email);
 

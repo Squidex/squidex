@@ -26,7 +26,6 @@ using Squidex.Infrastructure.Json;
 using Squidex.Log;
 using Xunit;
 
-#pragma warning disable SA1311 // Static readonly fields must begin with upper-case letter
 #pragma warning disable SA1401 // Fields must be private
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL

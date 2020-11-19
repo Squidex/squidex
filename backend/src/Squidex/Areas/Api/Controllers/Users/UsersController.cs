@@ -108,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                     .WriteProperty("status", "Failed"));
             }
 
-            return Ok(new UserDto[0]);
+            return Ok(Array.Empty<UserDto>());
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                             if (response.IsSuccessStatusCode)
                             {
-                                var contentType = response.Content.Headers.ContentType.ToString();
+                                var contentType = response.Content.Headers.ContentType?.ToString();
 
                                 var etag = response.Headers.ETag;
 

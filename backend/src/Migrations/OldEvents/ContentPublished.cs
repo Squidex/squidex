@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Reflection;
 namespace Migrations.OldEvents
 {
     [EventType(nameof(ContentPublished))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class ContentPublished : ContentEvent, IMigrated<IEvent>
     {
         public IEvent Migrate()

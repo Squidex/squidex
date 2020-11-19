@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.Log
             {
                 var localJobs = Interlocked.Exchange(ref jobs, new ConcurrentQueue<Request>());
 
-                if (localJobs.Count > 0)
+                if (!localJobs.IsEmpty)
                 {
                     var pages = (int)Math.Ceiling((double)localJobs.Count / BatchSize);
 

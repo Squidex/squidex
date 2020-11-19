@@ -65,7 +65,7 @@ namespace Migrations.Migrations.MongoDb
                         }
 
                         var domainType = eventStream.Substring(0, indexOfType);
-                        var domainId = eventStream.Substring(indexOfId);
+                        var domainId = eventStream[indexOfId..];
 
                         if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
                         {

@@ -18,7 +18,7 @@ namespace Squidex.Areas.IdentityServer.Controllers
         {
             var request = context.HttpContext.Request;
 
-            if (!request.PathBase.HasValue || !request.PathBase.Value.EndsWith("/identity-server", StringComparison.OrdinalIgnoreCase))
+            if (!request.PathBase.HasValue || request.PathBase.Value?.EndsWith("/identity-server", StringComparison.OrdinalIgnoreCase) != true)
             {
                 context.Result = new NotFoundResult();
             }

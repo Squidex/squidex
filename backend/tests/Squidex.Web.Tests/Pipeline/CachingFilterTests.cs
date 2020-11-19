@@ -71,7 +71,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_append_authorization_as_header_when_user_has_subject()
         {
-            var identity = (ClaimsIdentity)httpContext.User.Identity;
+            var identity = (ClaimsIdentity)httpContext.User.Identity!;
 
             identity.AddClaim(new Claim(OpenIdClaims.Subject, "my-id"));
 
@@ -83,7 +83,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_append_client_id_as_header_when_user_has_client_but_no_subject()
         {
-            var identity = (ClaimsIdentity)httpContext.User.Identity;
+            var identity = (ClaimsIdentity)httpContext.User.Identity!;
 
             identity.AddClaim(new Claim(OpenIdClaims.ClientId, "my-client"));
 

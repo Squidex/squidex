@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(newProperties, nameof(newProperties));
 
-            if (!(newProperties is T typedProperties))
+            if (newProperties is not T typedProperties)
             {
                 throw new ArgumentException($"Properties must be of type '{typeof(T)}", nameof(newProperties));
             }

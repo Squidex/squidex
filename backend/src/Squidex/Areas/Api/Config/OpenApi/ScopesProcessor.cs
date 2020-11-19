@@ -40,7 +40,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
                 if (authorizeAttributes.Any())
                 {
-                    var scopes = authorizeAttributes.Where(a => a.Roles != null).SelectMany(a => a.Roles.Split(',')).Distinct().ToList();
+                    var scopes = authorizeAttributes.Where(a => a.Roles != null).SelectMany(a => a.Roles!.Split(',')).Distinct().ToList();
 
                     context.OperationDescription.Operation.Security.Add(new OpenApiSecurityRequirement
                     {

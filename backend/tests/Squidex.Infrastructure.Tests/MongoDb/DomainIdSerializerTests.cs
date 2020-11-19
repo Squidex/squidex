@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.MongoDb
             Assert.Equal(result.Id.ToString(), id.ToString());
         }
 
-        public TOut SerializeAndDeserialize<TIn, TOut>(TIn source)
+        public static TOut SerializeAndDeserialize<TIn, TOut>(TIn source)
         {
             var stream = new MemoryStream();
 

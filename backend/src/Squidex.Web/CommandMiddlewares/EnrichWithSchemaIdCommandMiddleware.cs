@@ -44,7 +44,7 @@ namespace Squidex.Web.CommandMiddlewares
 
         private NamedId<DomainId> GetSchemaId()
         {
-            var feature = httpContextAccessor.HttpContext.Features.Get<ISchemaFeature>();
+            var feature = httpContextAccessor.HttpContext?.Features.Get<ISchemaFeature>();
 
             if (feature == null)
             {

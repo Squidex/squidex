@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
+import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-validation',
@@ -23,6 +23,12 @@ export class AssetsValidationComponent implements OnInit {
 
     @Input()
     public properties: AssetsFieldPropertiesDto;
+
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public isLocalizable: boolean;
 
     public ngOnInit() {
         this.fieldForm.setControl('minItems',
@@ -66,5 +72,8 @@ export class AssetsValidationComponent implements OnInit {
 
         this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
+
+        this.fieldForm.setControl('defaultValues',
+            new FormControl(this.properties.defaultValues));
     }
 }

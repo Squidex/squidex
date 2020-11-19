@@ -52,7 +52,7 @@ steps:
         - release/*
 
   - name: test_run
-    image: mcr.microsoft.com/dotnet/core/sdk:3.1-buster
+    image: mcr.microsoft.com/dotnet/sdk:5.0
     environment:
       CONFIG__SERVER__URL: http://localhost:8080
       CONFIG__WAIT: 60

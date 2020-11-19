@@ -53,7 +53,7 @@ namespace Squidex.Extensions.Actions
             {
                 response = await client.SendAsync(request, ct);
 
-                var responseString = await response.Content.ReadAsStringAsync();
+                var responseString = await response.Content.ReadAsStringAsync(ct);
                 var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString);
 
                 if (!response.IsSuccessStatusCode)

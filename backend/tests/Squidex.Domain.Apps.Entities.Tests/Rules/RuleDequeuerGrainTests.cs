@@ -16,8 +16,6 @@ using Squidex.Infrastructure;
 using Squidex.Log;
 using Xunit;
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-
 namespace Squidex.Domain.Apps.Entities.Rules
 {
     public class RuleDequeuerGrainTests

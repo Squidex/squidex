@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
 import * as Pikaday from 'pikaday/pikaday';
@@ -34,6 +34,9 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     private picker: any;
     private dateTime: DateTime | null;
     private suppressEvents = false;
+
+    @Output()
+    public blur = new EventEmitter();
 
     @Input()
     public mode: 'DateTime' | 'Date';
@@ -108,6 +111,12 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         }
 
         this.updateControls();
+    }
+
+    public callTouched() {
+        this.blur.next();
+
+        super.callTouched();
     }
 
     public setDisabledState(isDisabled: boolean): void {

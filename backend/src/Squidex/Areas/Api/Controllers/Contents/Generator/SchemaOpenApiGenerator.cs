@@ -23,7 +23,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemaOpenApiGenerator
     {
-        private readonly ContentSchemaBuilder schemaBuilder = new ContentSchemaBuilder();
         private readonly OpenApiDocument document;
         private readonly JsonSchema contentSchema;
         private readonly JsonSchema dataSchema;
@@ -56,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             dataSchema = schemaResolver($"{schemaType}Dto", schema.BuildJsonSchema(partitionResolver, schemaResolver));
 
-            contentSchema = schemaResolver($"{schemaType}ContentDto", schemaBuilder.CreateContentSchema(schema, dataSchema));
+            contentSchema = schemaResolver($"{schemaType}ContentDto", ContentSchemaBuilder.CreateContentSchema(schema, dataSchema));
         }
 
         public void GenerateSchemaOperations()

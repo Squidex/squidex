@@ -152,7 +152,7 @@ describe('ArrayField', () => {
     });
 
     it('should return default value as null', () => {
-        expect(FieldDefaultValue.get(field)).toBeNull();
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
     });
 });
 
@@ -182,7 +182,13 @@ describe('AssetsField', () => {
     it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('Assets', { defaultValue: ['1', '2'] }) });
 
-        expect(FieldDefaultValue.get(field2)).toEqual(['1', '2']);
+        expect(FieldDefaultValue.get(field2, 'iv')).toEqual(['1', '2']);
+    });
+
+    it('should override default value from localizable properties', () => {
+        const field2 = createField({ properties: createProperties('Assets', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 });
 
@@ -208,7 +214,13 @@ describe('TagsField', () => {
     it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'] }) });
 
-        expect(FieldDefaultValue.get(field2)).toEqual(['1', '2']);
+        expect(FieldDefaultValue.get(field2, 'iv')).toEqual(['1', '2']);
+    });
+
+    it('should override default value from localizable properties', () => {
+        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 });
 
@@ -234,7 +246,13 @@ describe('BooleanField', () => {
     it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('Boolean', { editor: 'Checkbox', defaultValue: true }) });
 
-        expect(FieldDefaultValue.get(field2)).toBeTruthy();
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeTruthy();
+    });
+
+    it('should override default value from localizable properties', () => {
+        const field2 = createField({ properties: createProperties('Boolean', { defaultValue: true, defaultValues: { 'iv': null } }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 });
 
@@ -284,19 +302,25 @@ describe('DateTimeField', () => {
     it('should return default from properties value', () => {
         const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', defaultValue: '2017-10-12T16:00:00Z' }) });
 
-        expect(FieldDefaultValue.get(field2)).toEqual('2017-10-12T16:00:00Z');
+        expect(FieldDefaultValue.get(field2, 'iv')).toEqual('2017-10-12T16:00:00Z');
+    });
+
+    it('should override default value from localizable properties', () => {
+        const field2 = createField({ properties: createProperties('DateTime', { defaultValue: '2017-10-12T16:00:00Z', defaultValues: { 'iv': null } }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 
     it('should return default from Today', () => {
         const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', calculatedDefaultValue: 'Today' }) });
 
-        expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12T00:00:00Z');
+        expect(FieldDefaultValue.get(field2, 'iv', now)).toEqual('2017-10-12T00:00:00Z');
     });
 
     it('should return default value from Today', () => {
         const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', calculatedDefaultValue: 'Now' }) });
 
-        expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12T16:30:10Z');
+        expect(FieldDefaultValue.get(field2, 'iv', now)).toEqual('2017-10-12T16:30:10Z');
     });
 });
 
@@ -316,7 +340,7 @@ describe('GeolocationField', () => {
     });
 
     it('should return default value as null', () => {
-        expect(FieldDefaultValue.get(field)).toBeNull();
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
     });
 });
 
@@ -336,7 +360,7 @@ describe('JsonField', () => {
     });
 
     it('should return default value as null', () => {
-        expect(FieldDefaultValue.get(field)).toBeNull();
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
     });
 });
 
@@ -388,7 +412,13 @@ describe('NumberField', () => {
     it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('Number', { defaultValue: 13 }) });
 
-        expect(FieldDefaultValue.get(field2)).toEqual(13);
+        expect(FieldDefaultValue.get(field2, 'iv')).toEqual(13);
+    });
+
+    it('should override default value from localizable properties', () => {
+        const field2 = createField({ properties: createProperties('Number', { defaultValue: 13, defaultValues: { 'iv': null } }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 });
 
@@ -418,7 +448,13 @@ describe('ReferencesField', () => {
     it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('References', { defaultValue: ['1', '2'] }) });
 
-        expect(FieldDefaultValue.get(field2)).toEqual(['1', '2']);
+        expect(FieldDefaultValue.get(field2, 'iv')).toEqual(['1', '2']);
+    });
+
+    it('should override default value from localizable properties', () => {
+        const field2 = createField({ properties: createProperties('References', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 });
 
@@ -458,7 +494,13 @@ describe('StringField', () => {
     it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('String', { defaultValue: 'MyDefault' }) });
 
-        expect(FieldDefaultValue.get(field2)).toEqual('MyDefault');
+        expect(FieldDefaultValue.get(field2, 'iv')).toEqual('MyDefault');
+    });
+
+    it('should override default value from localizable properties', () => {
+        const field2 = createField({ properties: createProperties('String', { defaultValue: 'MyDefault', defaultValues: { 'iv': null } }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 });
 

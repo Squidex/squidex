@@ -9,8 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class AppImage
+    public sealed record AppImage
     {
         public string MimeType { get; }
 

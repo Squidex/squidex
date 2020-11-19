@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { FieldDto, NumberFieldPropertiesDto, RootFieldDto, Types } from '@app/shared';
+import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-validation',
@@ -23,6 +23,12 @@ export class NumberValidationComponent implements OnInit {
 
     @Input()
     public properties: NumberFieldPropertiesDto;
+
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public isLocalizable: boolean;
 
     public showUnique: boolean;
 
@@ -42,5 +48,8 @@ export class NumberValidationComponent implements OnInit {
 
         this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
+
+        this.fieldForm.setControl('defaultValues',
+            new FormControl(this.properties.defaultValues));
     }
 }

@@ -2,7 +2,7 @@
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldName">{{ 'common.name' | sqxTranslate }}</label>
 
-        <div class="col-7">
+        <div class="col-9">
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldName" readonly [ngModel]="field.name" [ngModelOptions]="standalone">
 
             <sqx-form-hint>
@@ -14,7 +14,7 @@
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldLabel">{{ 'common.label' | sqxTranslate }}</label>
 
-        <div class="col-7">
+        <div class="col-9">
             <sqx-control-errors for="label"></sqx-control-errors>
 
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldLabel" maxlength="100" formControlName="label">
@@ -28,7 +28,7 @@
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldHints">{{ 'common.hints' | sqxTranslate }}</label>
 
-        <div class="col-7">
+        <div class="col-9">
             <sqx-control-errors for="hints"></sqx-control-errors>
 
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldHints" maxlength="100" formControlName="hints">
@@ -42,7 +42,7 @@
     <div class="form-group row" *ngIf="field.properties.isContentField">
          <label class="col-3 col-form-label">{{ 'common.tags' | sqxTranslate }}</label>
 
-        <div class="col-7">
+        <div class="col-9">
             <sqx-tag-editor id="schemaTags" formControlName="tags"></sqx-tag-editor>
 
             <sqx-form-hint>

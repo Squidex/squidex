@@ -20,6 +20,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public AssetPreviewMode PreviewMode { get; set; }
 
         /// <summary>
+        /// The language specific default value as a list of asset ids.
+        /// </summary>
+        public LocalizedValue<string[]?> DefaultValues { get; set; }
+
+        /// <summary>
         /// The default value as a list of asset ids.
         /// </summary>
         public string[]? DefaultValue { get; set; }

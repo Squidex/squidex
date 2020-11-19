@@ -12,8 +12,6 @@ using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
-#pragma warning disable CS0612 // Type or member is obsolete
-
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public sealed class JsonSchemaModel

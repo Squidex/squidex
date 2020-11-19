@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 {
                     parts.Add(TextPart.Text(currentOffset, i - currentOffset));
 
-                    var (length, part) = GetReplacement(span.Slice(i + 1).ToString(), @event);
+                    var (length, part) = GetReplacement(span[(i + 1)..].ToString(), @event);
 
                     if (length > 0)
                     {

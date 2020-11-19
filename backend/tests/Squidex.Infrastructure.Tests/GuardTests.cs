@@ -308,7 +308,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void NotEmpty_should_throw_for_empty_collection()
         {
-            Assert.Throws<ArgumentException>(() => Guard.NotEmpty(new int[0], "parameter"));
+            Assert.Throws<ArgumentException>(() => Guard.NotEmpty(Array.Empty<int>(), "parameter"));
         }
 
         [Fact]

@@ -14,8 +14,6 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.Timers;
 using Squidex.Log;
 
-#pragma warning disable SA1401 // Fields must be private
-
 namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
@@ -60,7 +58,7 @@ namespace Squidex.Infrastructure.UsageTracking
             {
                 var localUsages = Interlocked.Exchange(ref jobs, new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>());
 
-                if (localUsages.Count > 0)
+                if (!localUsages.IsEmpty)
                 {
                     var updates = new UsageUpdate[localUsages.Count];
                     var updateIndex = 0;

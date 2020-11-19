@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { fadeAnimation, LanguageDto, ModalModel } from '@app/shared/internal';
+import { fadeAnimation, ModalModel } from '@app/framework/internal';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage: true; }
 
@@ -24,7 +24,7 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     public selectedLanguageChange = new EventEmitter<Language>();
 
     @Input()
-    public size: string;
+    public size: 'sm' | 'md' | 'lg' = 'md';
 
     @Input()
     public languages: ReadonlyArray<Language> = [];
@@ -61,11 +61,13 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     }
 
     public selectLanguage(language: Language) {
-        this.selectedLanguage = language;
-        this.selectedLanguageChange.emit(language);
+        if (language?.iso2Code !== this.selectedLanguage?.iso2Code) {
+            this.selectedLanguage = language;
+            this.selectedLanguageChange.emit(language);
+        }
     }
 
-    public trackByLanguage(_index: number, language: LanguageDto) {
+    public trackByLanguage(_index: number, language: Language) {
         return language.iso2Code;
     }
 }

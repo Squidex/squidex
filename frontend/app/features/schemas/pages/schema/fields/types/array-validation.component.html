@@ -2,13 +2,18 @@
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.array.count' | sqxTranslate }}</label>
 
-        <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.array.countMin' | sqxTranslate }}">
-            
-            <label class="col-form-label minmax-label">-</label>
-        </div>
-        <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.fieldTypes.array.countMax' | sqxTranslate }}">
+        <div class="col-9">
+            <div class="row no-gutters">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.array.countMin' | sqxTranslate }}">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.fieldTypes.array.countMax' | sqxTranslate }}">
+                </div>
+            </div>
         </div>
     </div>
 </div>

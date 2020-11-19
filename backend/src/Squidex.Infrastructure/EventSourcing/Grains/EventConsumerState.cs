@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             Count = count;
         }
 
-        public EventConsumerState Reset()
+        public static EventConsumerState Reset()
         {
             return new EventConsumerState();
         }

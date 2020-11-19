@@ -34,8 +34,6 @@ using Squidex.Pipeline.Robots;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 
-#pragma warning disable RECS0092 // Convert field to readonly
-
 namespace Squidex.Config.Domain
 {
     public static class InfrastructureServices

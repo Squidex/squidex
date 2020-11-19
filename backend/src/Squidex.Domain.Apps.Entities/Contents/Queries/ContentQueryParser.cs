@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), (n, s) => s, withHiddenFields);
 
-            return new ContentSchemaBuilder().CreateContentSchema(schema, dataSchema);
+            return ContentSchemaBuilder.CreateContentSchema(schema, dataSchema);
         }
 
         private static EdmModel BuildEdmModel(Schema schema, IAppEntity app, bool withHiddenFields)

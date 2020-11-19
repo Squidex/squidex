@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_not_set_handled_if_no_handler_registered()
         {
-            var sut = new InMemoryCommandBus(new ICommandMiddleware[0]);
+            var sut = new InMemoryCommandBus(Array.Empty<ICommandMiddleware>());
             var ctx = await sut.PublishAsync(command);
 
             Assert.False(ctx.IsCompleted);

@@ -212,7 +212,7 @@ namespace Squidex.Infrastructure
         {
             NotNullOrEmpty(target, parameterName);
 
-            if (target.Intersect(Path.GetInvalidFileNameChars()).Any())
+            if (target != null && target.Intersect(Path.GetInvalidFileNameChars()).Any())
             {
                 throw new ArgumentException("Value contains an invalid character.", parameterName);
             }

@@ -14,8 +14,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
 
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-
 namespace Squidex.Infrastructure.Translations
 {
     [ExcludeFromCodeCoverage]
@@ -70,11 +68,11 @@ namespace Squidex.Infrastructure.Translations
                 parameters["source_lang"] = GetLanguageCode(sourceLanguage);
             }
 
-            var body = new FormUrlEncodedContent(parameters);
+            var body = new FormUrlEncodedContent(parameters!);
 
             using (var response = await httpClient.PostAsync(Url, body, ct))
             {
-                var responseString = await response.Content.ReadAsStringAsync();
+                var responseString = await response.Content.ReadAsStringAsync(ct);
 
                 if (response.IsSuccessStatusCode)
                 {

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -28,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 {
                     if (property[0] != '[')
                     {
-                        sb.Append(".");
+                        sb.Append('.');
                     }
 
                     sb.Append(property);

@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Log;
 
 namespace Squidex.Config.Domain
 {

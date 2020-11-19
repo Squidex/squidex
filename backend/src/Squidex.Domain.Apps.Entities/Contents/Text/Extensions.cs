@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 if (sb.Length > 0)
                 {
-                    sb.Append(" ");
+                    sb.Append(' ');
                 }
 
                 sb.Append(text);

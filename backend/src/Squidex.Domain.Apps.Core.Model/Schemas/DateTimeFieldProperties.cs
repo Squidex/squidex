@@ -12,11 +12,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [Equals(DoNotAddEqualityOperators = true)]
     public sealed class DateTimeFieldProperties : FieldProperties
     {
+        public LocalizedValue<Instant?> DefaultValues { get; set; }
+
+        public Instant? DefaultValue { get; set; }
+
         public Instant? MaxValue { get; set; }
 
         public Instant? MinValue { get; set; }
-
-        public Instant? DefaultValue { get; set; }
 
         public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; set; }
 

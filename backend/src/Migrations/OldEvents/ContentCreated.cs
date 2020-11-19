@@ -16,7 +16,7 @@ using ContentCreatedV2 = Squidex.Domain.Apps.Events.Contents.ContentCreated;
 namespace Migrations.OldEvents
 {
     [EventType(nameof(ContentCreated))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class ContentCreated : ContentEvent, IMigrated<IEvent>
     {
         public Status Status { get; set; }

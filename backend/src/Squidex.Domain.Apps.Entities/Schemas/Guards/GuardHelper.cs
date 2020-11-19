@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
     {
         public static IArrayField GetArrayFieldOrThrow(Schema schema, long parentId, bool allowLocked)
         {
-            if (!schema.FieldsById.TryGetValue(parentId, out var rootField) || !(rootField is IArrayField arrayField))
+            if (!schema.FieldsById.TryGetValue(parentId, out var rootField) || rootField is not IArrayField arrayField)
             {
                 throw new DomainObjectNotFoundException(parentId.ToString());
             }

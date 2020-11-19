@@ -35,7 +35,6 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
-using Squidex.Log;
 
 namespace Squidex.Config.Domain
 {

@@ -8,6 +8,8 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
+
 namespace Squidex.Infrastructure.TestHelpers
 {
     public static class BinaryFormatterHelper
@@ -18,7 +20,7 @@ namespace Squidex.Infrastructure.TestHelpers
         {
             var stream = new MemoryStream();
 
-            Formatter.Serialize(stream, source);
+            Formatter.Serialize(stream, source!);
 
             stream.Position = 0;
 

@@ -10,6 +10,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [Equals(DoNotAddEqualityOperators = true)]
     public sealed class BooleanFieldProperties : FieldProperties
     {
+        public LocalizedValue<bool?> DefaultValues { get; set; }
+
         public bool? DefaultValue { get; set; }
 
         public bool InlineEditable { get; set; }

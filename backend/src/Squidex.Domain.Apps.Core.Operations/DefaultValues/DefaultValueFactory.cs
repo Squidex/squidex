@@ -16,17 +16,19 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
     public sealed class DefaultValueFactory : IFieldVisitor<IJsonValue>
     {
         private readonly Instant now;
+        private readonly string partition;
 
-        private DefaultValueFactory(Instant now)
+        private DefaultValueFactory(Instant now, string partition)
         {
             this.now = now;
+            this.partition = partition;
         }
 
-        public static IJsonValue CreateDefaultValue(IField field, Instant now)
+        public static IJsonValue CreateDefaultValue(IField field, Instant now, string partition)
         {
             Guard.NotNull(field, nameof(field));
 
-            return field.Accept(new DefaultValueFactory(now));
+            return field.Accept(new DefaultValueFactory(now, partition));
         }
 
         public IJsonValue Visit(IArrayField field)
@@ -36,12 +38,16 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public IJsonValue Visit(IField<AssetsFieldProperties> field)
         {
-            return Array(field.Properties.DefaultValue);
+            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+
+            return Array(value);
         }
 
         public IJsonValue Visit(IField<BooleanFieldProperties> field)
         {
-            return JsonValue.Create(field.Properties.DefaultValue);
+            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+
+            return JsonValue.Create(value);
         }
 
         public IJsonValue Visit(IField<GeolocationFieldProperties> field)
@@ -56,22 +62,30 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public IJsonValue Visit(IField<NumberFieldProperties> field)
         {
-            return JsonValue.Create(field.Properties.DefaultValue);
+            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+
+            return JsonValue.Create(value);
         }
 
         public IJsonValue Visit(IField<ReferencesFieldProperties> field)
         {
-            return Array(field.Properties.DefaultValue);
+            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+
+            return Array(value);
         }
 
         public IJsonValue Visit(IField<StringFieldProperties> field)
         {
-            return JsonValue.Create(field.Properties.DefaultValue);
+            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+
+            return JsonValue.Create(value);
         }
 
         public IJsonValue Visit(IField<TagsFieldProperties> field)
         {
-            return Array(field.Properties.DefaultValue);
+            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+
+            return Array(value);
         }
 
         public IJsonValue Visit(IField<UIFieldProperties> field)
@@ -91,10 +105,22 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
                 return JsonValue.Create($"{now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}T00:00:00Z");
             }
 
-            return JsonValue.Create(field.Properties.DefaultValue);
+            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+
+            return JsonValue.Create(value);
         }
 
-        private IJsonValue Array(string[]? values)
+        private T GetDefaultValue<T>(T value, LocalizedValue<T>? values)
+        {
+            if (values != null && values.TryGetValue(partition, out var @default))
+            {
+                return @default;
+            }
+
+            return value;
+        }
+
+        private static IJsonValue Array(string[]? values)
         {
             if (values != null)
             {

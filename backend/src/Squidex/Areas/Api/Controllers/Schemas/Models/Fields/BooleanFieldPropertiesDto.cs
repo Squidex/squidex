@@ -13,6 +13,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
     public sealed class BooleanFieldPropertiesDto : FieldPropertiesDto
     {
         /// <summary>
+        /// The language specific default value for the field value.
+        /// </summary>
+        public LocalizedValue<bool?> DefaultValues { get; set; }
+
+        /// <summary>
         /// The default value for the field value.
         /// </summary>
         public bool? DefaultValue { get; set; }

@@ -16,7 +16,7 @@ using ContentStatusChangedV2 = Squidex.Domain.Apps.Events.Contents.ContentStatus
 namespace Migrations.OldEvents
 {
     [EventType(nameof(ContentStatusChanged))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class ContentStatusChanged : ContentEvent, IMigrated<IEvent>
     {
         public string Change { get; set; }

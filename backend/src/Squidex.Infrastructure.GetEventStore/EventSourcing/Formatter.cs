@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             if (prefix != null && streamName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
-                streamName = streamName.Substring(prefix.Length + 1);
+                streamName = streamName[(prefix.Length + 1)..];
             }
 
             return streamName;

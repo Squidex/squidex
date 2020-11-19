@@ -112,7 +112,7 @@ namespace Squidex.Pipeline.Squid
 
                 if (line.Length > 0)
                 {
-                    line.Append(" ");
+                    line.Append(' ');
                 }
 
                 line.Append(word);

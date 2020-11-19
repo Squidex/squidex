@@ -12,6 +12,7 @@ using Squidex.Infrastructure;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
+#pragma warning disable CA1806 // Do not ignore method results
 
 namespace Squidex.Domain.Apps.Core.Model.Apps
 {

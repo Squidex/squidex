@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(requestContext, new[] { content }, null!);
 
-            Assert.Equal(Status.Published, content.NextStatuses.Single().Status);
+            Assert.Equal(Status.Published, content.NextStatuses?.Single().Status);
 
             A.CallTo(() => contentWorkflow.GetNextAsync(content, A<Status>._, requestContext.User))
                 .MustNotHaveHappened();

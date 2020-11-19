@@ -58,6 +58,9 @@ export class LanguagesState extends State<Snapshot> {
     public languages =
         this.project(x => x.languages);
 
+    public languagesDtos =
+        this.project(x => x.languages.map(y => y.language));
+
     public newLanguages =
         this.project(x => x.allLanguagesNew);
 

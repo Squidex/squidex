@@ -34,7 +34,10 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppPatterns Add(DomainId id, string name, string pattern, string? message = null)
         {
-            var newPattern = new AppPattern(name, pattern, message);
+            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(pattern, nameof(pattern));
+
+            var newPattern = new AppPattern(name, pattern) { Message = message };
 
             return With<AppPatterns>(id, newPattern);
         }
@@ -47,7 +50,20 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            var newPattern = appPattern.Update(name, pattern, message);
+            var newPattern = appPattern with
+            {
+                Message = message
+            };
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                newPattern = newPattern with { Name = name };
+            }
+
+            if (!string.IsNullOrWhiteSpace(pattern))
+            {
+                newPattern = newPattern with { Pattern = pattern };
+            }
 
             return With<AppPatterns>(id, newPattern);
         }

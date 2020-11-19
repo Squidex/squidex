@@ -17,6 +17,8 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Infrastructure;
 
+#pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
+
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ReferencesFluidExtension : IFluidExtension

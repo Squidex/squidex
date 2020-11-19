@@ -21,11 +21,11 @@ namespace Squidex.Areas.IdentityServer.Views
 
             if (contentPath[0] == '~')
             {
-                var segment = new PathString(contentPath.Substring(1));
+                var segment = new PathString(contentPath[1..]);
 
                 var applicationPath = urlHelper.ActionContext.HttpContext.Request.PathBase;
 
-                if (applicationPath.HasValue)
+                if (applicationPath.Value != null)
                 {
                     var indexOfLastPart = applicationPath.Value.LastIndexOf('/');
 

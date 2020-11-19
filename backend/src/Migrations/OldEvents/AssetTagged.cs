@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Reflection;
 namespace Migrations.OldEvents
 {
     [EventType(nameof(AssetTagged))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class AssetTagged : AssetEvent, IMigrated<IEvent>
     {
         public HashSet<string> Tags { get; set; }

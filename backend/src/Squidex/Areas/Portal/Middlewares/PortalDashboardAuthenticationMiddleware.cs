@@ -37,7 +37,7 @@ namespace Squidex.Areas.Portal.Middlewares
             }
             else
             {
-                context.User = authentication.Principal;
+                context.User = authentication.Principal!;
 
                 await next(context);
             }

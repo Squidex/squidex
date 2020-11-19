@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Reflection;
 namespace Migrations.OldEvents
 {
     [EventType(nameof(AppWorkflowConfigured))]
-    [Obsolete]
+    [Obsolete("New Event introduced")]
     public sealed class AppWorkflowConfigured : AppEvent, IMigrated<IEvent>
     {
         public Workflow Workflow { get; set; }

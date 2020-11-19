@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.MongoDb
                 return toReplace.ToString();
             }
 
-            return replacement + value.Substring(1);
+            return replacement + value[1..];
         }
     }
 }

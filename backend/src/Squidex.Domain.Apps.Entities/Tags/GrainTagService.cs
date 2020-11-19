@@ -17,11 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Tags
     {
         private readonly IGrainFactory grainFactory;
 
-        public string Name
-        {
-            get { return "Tags"; }
-        }
-
         public GrainTagService(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));

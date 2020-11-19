@@ -13,7 +13,7 @@ using NodaTime.Text;
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public sealed class InstantConverter : JsonConverter
+    public sealed class InstantConverter : JsonConverter, ISupportedTypes
     {
         public IEnumerable<Type> SupportedTypes
         {

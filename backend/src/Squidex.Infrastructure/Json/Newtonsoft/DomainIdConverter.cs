@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public sealed class DomainIdConverter : JsonConverter
+    public sealed class DomainIdConverter : JsonConverter, ISupportedTypes
     {
         public IEnumerable<Type> SupportedTypes
         {
