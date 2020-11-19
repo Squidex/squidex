@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Reflection
 {
     public static class SimpleEquals
     {
-        private static readonly ConcurrentDictionary<Type, IDeepComparer> Comparers = new ConcurrentDictionary<Type, IDeepComparer>();
+        private static readonly ConcurrentDictionary<Type, IDeepComparer?> Comparers = new ConcurrentDictionary<Type, IDeepComparer?>();
         private static readonly HashSet<Type> SimpleTypes = new HashSet<Type>();
         private static readonly DefaultComparer DefaultComparer = new DefaultComparer();
         private static readonly NoopComparer NoopComparer = new NoopComparer();
@@ -38,13 +38,13 @@ namespace Squidex.Infrastructure.Reflection
             return BuildCore(type) ?? NoopComparer;
         }
 
-        private static IDeepComparer BuildCore(Type t)
+        private static IDeepComparer? BuildCore(Type t)
         {
             return Comparers.GetOrAdd(t, type =>
             {
                 if (IsSimpleType(type) || IsEquatable(type))
                 {
-                    return NoopComparer;
+                    return null;
                 }
 
                 if (IsArray(type))
