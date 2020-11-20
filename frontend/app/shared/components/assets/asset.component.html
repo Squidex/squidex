@@ -141,8 +141,8 @@
                         </td>
                     </ng-container>
 
-                    <td class="col-actions text-right" *ngIf="!isDisabled">
-                        <button type="button" class="btn btn-text-danger" *ngIf="!removeMode && asset.canDelete"
+                    <td class="col-actions text-right">
+                        <button type="button" class="btn btn-text-danger" *ngIf="!removeMode && asset.canDelete" [disabled]="isDisabled"
                             (sqxConfirmClick)="delete.emit()"
                             confirmTitle="i18n:assets.deleteConfirmTitle"
                             confirmText="i18n:assets.deleteConfirmText"
@@ -150,7 +150,7 @@
                             <i class="icon-bin2"></i>
                         </button>
 
-                        <button type="button" class="btn btn-text-secondary" *ngIf="removeMode"
+                        <button type="button" class="btn btn-text-secondary" *ngIf="removeMode" [disabled]="isDisabled"
                             (sqxConfirmClick)="remove.emit()"
                             confirmTitle="i18n:assets.removeConfirmTitle"
                             confirmText="i18n:assets.removeConfirmText"
