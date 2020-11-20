@@ -39,7 +39,7 @@
             <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValues">{{ 'schemas.field.defaultValues' | sqxTranslate }}</label>
     
             <div class="col-9">
-                <sqx-localized-input type="dateTime" [languages]="languages" formControlName="defaultValues" id="{{field.fieldId}}_fieldDefaultValues"></sqx-localized-input>
+                <sqx-localized-input type="datetime" [languages]="languages" formControlName="defaultValues" id="{{field.fieldId}}_fieldDefaultValues"></sqx-localized-input>
 
                 <sqx-form-hint>
                     {{ 'schemas.field.defaultValuesHint' | sqxTranslate }}

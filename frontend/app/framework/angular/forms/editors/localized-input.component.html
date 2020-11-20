@@ -16,6 +16,12 @@
             (ngModelChange)="setValue($event)"
             (blur)="callTouched()" />
     </ng-container>
+    <ng-container *ngSwitchCase="'number'">
+        <input class="form-control" [attr.type]="type" [attr.id]="id" [attr.name]="name"
+            [ngModel]="currentValue"
+            (ngModelChange)="setValue($event)"
+            (blur)="callTouched()" />
+    </ng-container>
     <ng-container *ngSwitchCase="'tags'">
         <sqx-tag-editor
             [ngModel]="currentValue"
