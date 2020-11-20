@@ -344,12 +344,13 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
 
 export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     private constructor(
+        private readonly partitionKey: string,
         private readonly now?: DateTime
     ) {
     }
 
-    public static get(field: FieldDto, now?: DateTime) {
-        return field.properties.accept(new FieldDefaultValue(now));
+    public static get(field: FieldDto, partitionKey: string, now?: DateTime) {
+        return field.properties.accept(new FieldDefaultValue(partitionKey, now));
     }
 
     public visitDateTime(properties: DateTimeFieldPropertiesDto): any {
@@ -360,7 +361,7 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         } else if (properties.calculatedDefaultValue === 'Today') {
             return `${now.toISODate()}T00:00:00Z`;
         } else {
-            return properties.defaultValue;
+            return this.getValue(properties.defaultValue, properties.defaultValues);
         }
     }
 
@@ -369,11 +370,11 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     }
 
     public visitAssets(properties: AssetsFieldPropertiesDto): any {
-        return properties.defaultValue;
+        return this.getValue(properties.defaultValue, properties.defaultValues);
     }
 
     public visitBoolean(properties: BooleanFieldPropertiesDto): any {
-        return properties.defaultValue;
+        return this.getValue(properties.defaultValue, properties.defaultValues);
     }
 
     public visitGeolocation(_: GeolocationFieldPropertiesDto): any {
@@ -385,22 +386,30 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     }
 
     public visitNumber(properties: NumberFieldPropertiesDto): any {
-        return properties.defaultValue;
+        return this.getValue(properties.defaultValue, properties.defaultValues);
     }
 
     public visitReferences(properties: ReferencesFieldPropertiesDto): any {
-        return properties.defaultValue;
+        return this.getValue(properties.defaultValue, properties.defaultValues);
     }
 
     public visitString(properties: StringFieldPropertiesDto): any {
-        return properties.defaultValue;
+        return this.getValue(properties.defaultValue, properties.defaultValues);
     }
 
     public visitTags(properties: TagsFieldPropertiesDto): any {
-        return properties.defaultValue;
+        return this.getValue(properties.defaultValue, properties.defaultValues);
     }
 
     public visitUI(_: UIFieldPropertiesDto): any {
         return null;
+    }
+
+    private getValue(value: any, values?: object) {
+        if (values && values.hasOwnProperty(this.partitionKey)) {
+            return values[this.partitionKey];
+        }
+
+        return value;
     }
 }

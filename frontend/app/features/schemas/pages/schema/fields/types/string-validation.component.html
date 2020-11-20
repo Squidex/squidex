@@ -13,20 +13,25 @@
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.string.length' | sqxTranslate }}</label>
 
-        <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minLength" placeholder="{{ 'schemas.fieldTypes.string.lengthMin' | sqxTranslate }}">
-            
-            <label class="col-form-label minmax-label">-</label>
-        </div>
-        <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxLength" placeholder="{{ 'schemas.fieldTypes.string.lengthMax' | sqxTranslate }}">
+        <div class="col-9">
+            <div class="row no-gutters">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minLength" placeholder="{{ 'schemas.fieldTypes.string.lengthMin' | sqxTranslate }}">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxLength" placeholder="{{ 'schemas.fieldTypes.string.lengthMax' | sqxTranslate }}">
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPattern">{{ 'common.pattern' | sqxTranslate }}</label>
 
-        <div class="col-6">
+        <div class="col-9">
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldPattern" formControlName="pattern" placeholder="{{ 'schemas.fieldTypes.string.pattern' | sqxTranslate }}" #inputPattern autocomplete="off" autocorrect="off" autocapitalize="off" (focus)="patternsModal.show()">
 
             <ng-container *ngIf="patterns.length > 0 && (showPatternSuggestions | async)">
@@ -49,13 +54,13 @@
     <div class="form-group row" *ngIf="showPatternMessage | async">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPatternMessage">{{ 'schemas.fieldTypes.string.patternMessage' | sqxTranslate }}</label>
 
-        <div class="col-6">
+        <div class="col-9">
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldPatternMessage" formControlName="patternMessage">
         </div>
     </div>
 
     <div class="form-group row">
-        <div class="col-7 offset-3">
+        <div class="col-9 offset-3">
             <sqx-form-hint>
                 {{ 'schemas.fieldTypes.string.wordHint' | sqxTranslate}}
             </sqx-form-hint>
@@ -64,7 +69,7 @@
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.string.contentType' | sqxTranslate }}</label>
 
-        <div class="col-6">
+        <div class="col-9">
             <select class="custom-select" formControlName="contentType">
                 <option *ngFor="let contentType of contentTypes" [ngValue]="contentType">{{contentType}}</option>
             </select>
@@ -73,33 +78,55 @@
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.string.characters' | sqxTranslate }}</label>
 
-        <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minCharacters" placeholder="{{ 'schemas.fieldTypes.string.charactersMin' | sqxTranslate }}">
-            
-            <label class="col-form-label minmax-label">-</label>
-        </div>
-        <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxCharacters" placeholder="{{ 'schemas.fieldTypes.string.charactersMax' | sqxTranslate }}">
+        <div class="col-9">
+            <div class="row no-gutters">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minCharacters" placeholder="{{ 'schemas.fieldTypes.string.charactersMin' | sqxTranslate }}">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxCharacters" placeholder="{{ 'schemas.fieldTypes.string.charactersMax' | sqxTranslate }}">
+                </div>
+            </div>
         </div>
     </div>
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.string.words' | sqxTranslate }}</label>
 
-        <div class="col-3 minmax-col">
-            <input type="number" class="form-control" formControlName="minWords" placeholder="{{ 'schemas.fieldTypes.string.wordsMin' | sqxTranslate }}">
-            
-            <label class="col-form-label minmax-label">-</label>
-        </div>
-        <div class="col-3">
-            <input type="number" class="form-control" formControlName="maxWords" placeholder="{{ 'schemas.fieldTypes.string.wordsMax' | sqxTranslate }}">
+        <div class="col-9">
+            <div class="row no-gutters">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minWords" placeholder="{{ 'schemas.fieldTypes.string.wordsMin' | sqxTranslate }}">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxWords" placeholder="{{ 'schemas.fieldTypes.string.wordsMax' | sqxTranslate }}">
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValue">{{ 'schemas.field.defaultValue' | sqxTranslate }}</label>
 
-        <div class="col-6">
+        <div class="col-9">
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldDefaultValue" formControlName="defaultValue">
+        </div>
+    </div>
+
+    <div class="form-group row" *ngIf="isLocalizable">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValues">{{ 'schemas.field.defaultValues' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-localized-input type="text" [languages]="languages" formControlName="defaultValues" id="{{field.fieldId}}_fieldDefaultValues"></sqx-localized-input>
+
+            <sqx-form-hint>
+                {{ 'schemas.field.defaultValuesHint' | sqxTranslate }}
+            </sqx-form-hint>
         </div>
     </div>
 </div>

@@ -129,6 +129,8 @@ export interface FieldPropertiesVisitor<T> {
     visitUI(properties: UIFieldPropertiesDto): T;
 }
 
+type DefaultValue<T> = { [key: string]: T | null | undefined };
+
 export abstract class FieldPropertiesDto {
     public abstract fieldType: FieldType;
 
@@ -180,6 +182,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly previewMode: AssetPreviewMode;
     public readonly defaultValue?: ReadonlyArray<string>;
+    public readonly defaultValues?: DefaultValue<ReadonlyArray<string>>;
     public readonly allowDuplicates?: boolean;
     public readonly allowedExtensions?: ReadonlyArray<string>;
     public readonly resolveFirst: boolean;
@@ -215,6 +218,7 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Boolean';
 
     public readonly defaultValue?: boolean;
+    public readonly defaultValues?: DefaultValue<boolean>;
     public readonly editor: BooleanFieldEditor = 'Checkbox';
     public readonly inlineEditable: boolean = false;
 
@@ -239,6 +243,7 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly calculatedDefaultValue?: string;
     public readonly defaultValue?: string;
+    public readonly defaultValues?: DefaultValue<string>;
     public readonly editor: DateTimeFieldEditor = 'DateTime';
     public readonly maxValue?: string;
     public readonly minValue?: string;
@@ -298,6 +303,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly allowedValues?: ReadonlyArray<number>;
     public readonly defaultValue?: number;
+    public readonly defaultValues?: DefaultValue<number>;
     public readonly editor: NumberFieldEditor = 'Input';
     public readonly inlineEditable: boolean = false;
     public readonly isUnique: boolean = false;
@@ -327,6 +333,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly allowDuplicates?: boolean;
     public readonly defaultValue?: ReadonlyArray<string>;
+    public readonly defaultValues?: DefaultValue<ReadonlyArray<string>>;
     public readonly editor: ReferencesFieldEditor = 'List';
     public readonly maxItems?: number;
     public readonly minItems?: number;
@@ -374,6 +381,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly allowedValues?: ReadonlyArray<string>;
     public readonly defaultValue?: string;
+    public readonly defaultValues?: DefaultValue<string>;
     public readonly editor: StringFieldEditor = 'Input';
     public readonly inlineEditable: boolean = false;
     public readonly isUnique: boolean = false;
@@ -409,6 +417,7 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly allowedValues?: ReadonlyArray<string>;
     public readonly defaultValue?: ReadonlyArray<string>;
+    public readonly defaultValues?: DefaultValue<ReadonlyArray<string>>;
     public readonly editor: TagsFieldEditor = 'Tags';
     public readonly maxItems?: number;
     public readonly minItems?: number;

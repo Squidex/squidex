@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
         {
             Guard.NotNull(fieldData, nameof(fieldData));
 
-            var defaultValue = DefaultValueFactory.CreateDefaultValue(field, SystemClock.Instance.GetCurrentInstant());
+            var defaultValue = DefaultValueFactory.CreateDefaultValue(field, SystemClock.Instance.GetCurrentInstant(), partitionKey);
 
             if (field.RawProperties.IsRequired || defaultValue == null || defaultValue.Type == JsonValueType.Null)
             {

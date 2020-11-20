@@ -7,7 +7,7 @@
 
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto, PatternDto } from '@app/shared';
+import { FieldDto, LanguageDto, PatternDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form',
@@ -29,6 +29,12 @@ export class FieldFormComponent implements AfterViewInit {
 
     @Input()
     public patterns: ReadonlyArray<PatternDto>;
+
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public isLocalizable: boolean;
 
     @Output()
     public cancel = new EventEmitter();

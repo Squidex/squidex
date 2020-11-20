@@ -7,7 +7,7 @@
 
 // tslint:disable: template-use-track-by-function
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { fadeAnimation, getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
@@ -56,6 +56,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     @ViewChild('input', { static: false })
     public inputElement: ElementRef<HTMLInputElement>;
+
+    @Output()
+    public blur = new EventEmitter();
 
     @Input()
     public converter = StringConverter.INSTANCE;
@@ -375,6 +378,12 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public isSelected(tagValue: TagValue) {
         return this.snapshot.items.find(x => x.id === tagValue.id);
+    }
+
+    public callTouched() {
+        this.blur.next();
+
+        super.callTouched();
     }
 
     public onCut(event: ClipboardEvent) {

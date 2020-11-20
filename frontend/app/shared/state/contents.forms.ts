@@ -219,8 +219,8 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
         for (const { key, isOptional } of partitions.getAll(field)) {
             const child =
                 field.isArray ?
-                    new FieldArrayForm(field, isOptional, rules, this.remoteValidator) :
-                    new FieldValueForm(field, isOptional, this.remoteValidator);
+                    new FieldArrayForm(field, isOptional, key, rules, this.remoteValidator) :
+                    new FieldValueForm(field, isOptional, key, this.remoteValidator);
 
             this.partitions[key] = child;
 
@@ -295,14 +295,14 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
 }
 
 export class FieldValueForm extends AbstractContentForm<RootFieldDto, FormControl> {
-    constructor(field: RootFieldDto, isOptional: boolean,
+    constructor(field: RootFieldDto, isOptional: boolean, key: string,
         remoteValidator?: ValidatorFn
     ) {
-        super(field, FieldValueForm.buildControl(field, isOptional, remoteValidator), isOptional);
+        super(field, FieldValueForm.buildControl(field, isOptional, key, remoteValidator), isOptional);
     }
 
-    private static buildControl(field: RootFieldDto, isOptional: boolean, remoteValidator?: ValidatorFn) {
-        const value = FieldDefaultValue.get(field);
+    private static buildControl(field: RootFieldDto, isOptional: boolean, key: string, remoteValidator?: ValidatorFn) {
+        const value = FieldDefaultValue.get(field, key);
 
         const validators = FieldsValidators.create(field, isOptional);
 
@@ -330,6 +330,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
     }
 
     constructor(field: RootFieldDto, isOptional: boolean,
+        private readonly partition: string,
         private readonly allRules: CompiledRule[],
         private readonly remoteValidator?: ValidatorFn
     ) {
@@ -341,7 +342,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
     }
 
     public addItem(source?: FieldArrayItemForm) {
-        const child = new FieldArrayItemForm(this.field, this.isOptional, this.allRules, source, this.remoteValidator);
+        const child = new FieldArrayItemForm(this.field, this.isOptional, this.allRules, source, this.partition, this.remoteValidator);
 
         this.items = [...this.items, child];
 
@@ -401,7 +402,7 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
 
     public readonly sections: ReadonlyArray<FieldSection<NestedFieldDto, FieldArrayItemValueForm>>;
 
-    constructor(field: RootFieldDto, isOptional: boolean, allRules: CompiledRule[], source: FieldArrayItemForm | undefined,
+    constructor(field: RootFieldDto, isOptional: boolean, allRules: CompiledRule[], source: FieldArrayItemForm | undefined, partition: string,
         private readonly remoteValidator?: ValidatorFn
     ) {
         super(field, new FormGroup({}), isOptional);
@@ -413,7 +414,7 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
 
         for (const nestedField of field.nested) {
             if (nestedField.properties.isContentField) {
-                const child = new FieldArrayItemValueForm(nestedField, field, allRules, isOptional, source, this.remoteValidator);
+                const child = new FieldArrayItemValueForm(nestedField, field, allRules, isOptional, partition, source, this.remoteValidator);
 
                 currentFields.push(child);
 
@@ -455,11 +456,11 @@ export class FieldArrayItemForm extends AbstractContentForm<RootFieldDto, FormGr
 export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto, FormControl> {
     private isRequired = false;
 
-    constructor(field: NestedFieldDto, parent: RootFieldDto, rules: CompiledRule[], isOptional: boolean, source: FieldArrayItemForm | undefined,
-        remoteValidator?: ValidatorFn
+    constructor(field: NestedFieldDto, parent: RootFieldDto, rules: CompiledRule[], isOptional: boolean, partition: string,
+        source: FieldArrayItemForm | undefined, remoteValidator?: ValidatorFn
     ) {
         super(field,
-            FieldArrayItemValueForm.buildControl(field, isOptional, remoteValidator, source),
+            FieldArrayItemValueForm.buildControl(field, isOptional, partition, remoteValidator, source),
             isOptional,
             FieldArrayItemValueForm.buildRules(field, parent, rules)
         );
@@ -492,8 +493,8 @@ export class FieldArrayItemValueForm extends AbstractContentForm<NestedFieldDto,
         return rules.filter(x => x.field === fullName);
     }
 
-    private static buildControl(field: NestedFieldDto, isOptional: boolean, remoteValidator?: ValidatorFn, source?: FieldArrayItemForm) {
-        let value = FieldDefaultValue.get(field);
+    private static buildControl(field: NestedFieldDto, isOptional: boolean, partition: string, remoteValidator?: ValidatorFn, source?: FieldArrayItemForm) {
+        let value = FieldDefaultValue.get(field, partition);
 
         if (source) {
             const sourceField = source.form.get(field.name);

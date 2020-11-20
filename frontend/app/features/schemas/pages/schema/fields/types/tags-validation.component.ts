@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { FieldDto, TagsFieldPropertiesDto } from '@app/shared';
+import { FieldDto, LanguageDto, TagsFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-tags-validation',
@@ -24,6 +24,12 @@ export class TagsValidationComponent implements OnInit {
     @Input()
     public properties: TagsFieldPropertiesDto;
 
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public isLocalizable: boolean;
+
     public ngOnInit() {
         this.fieldForm.setControl('maxItems',
             new FormControl(this.properties.maxItems));
@@ -33,5 +39,8 @@ export class TagsValidationComponent implements OnInit {
 
         this.fieldForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
+
+        this.fieldForm.setControl('defaultValues',
+            new FormControl(this.properties.defaultValues));
     }
 }

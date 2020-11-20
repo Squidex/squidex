@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Reflection.Equality;
 using Xunit;
 
 #pragma warning disable CA1822 // Mark members as static
@@ -98,7 +99,10 @@ namespace Squidex.Infrastructure.Reflection
         public void Should_compare_values(object lhs, object rhs)
         {
             Assert.True(SimpleEquals.IsEquals(lhs, lhs));
+            Assert.True(DeepEqualityComparer<object>.Default.Equals(lhs, lhs));
+
             Assert.False(SimpleEquals.IsEquals(lhs, rhs));
+            Assert.True(DeepEqualityComparer<object>.Default.Equals(lhs, rhs));
         }
 
         [Fact]

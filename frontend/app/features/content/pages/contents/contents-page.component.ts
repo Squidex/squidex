@@ -94,9 +94,9 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 }));
 
         this.own(
-            this.languagesState.languages
+            this.languagesState.languagesDtos
                 .subscribe(languages => {
-                    this.languages = languages.map(x => x.language);
+                    this.languages = languages;
                     this.language = this.languages.find(x => x.isMaster)!;
                     this.languageMaster = this.language;
                 }));

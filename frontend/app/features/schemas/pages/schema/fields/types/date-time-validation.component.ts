@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, ValidatorsEx } from '@app/shared';
+import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto, ValidatorsEx } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -24,6 +24,12 @@ export class DateTimeValidationComponent implements OnInit {
 
     @Input()
     public properties: DateTimeFieldPropertiesDto;
+
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public isLocalizable: boolean;
 
     public showDefaultValues: Observable<boolean>;
     public showDefaultValue: Observable<boolean>;
@@ -45,9 +51,10 @@ export class DateTimeValidationComponent implements OnInit {
             ]));
 
         this.fieldForm.setControl('defaultValue',
-            new FormControl(this.properties.defaultValue, [
-                ValidatorsEx.validDateTime()
-            ]));
+            new FormControl(this.properties.defaultValue));
+
+        this.fieldForm.setControl('defaultValues',
+            new FormControl(this.properties.defaultValues));
 
         this.showDefaultValues =
             hasNoValue$(this.fieldForm.controls['isRequired']);
