@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var @event = SimpleMapper.Map(command, new RuleManuallyTriggered { RuleId = Snapshot.Id, AppId = Snapshot.AppId });
 
-            await ruleEnqueuer.EnqueueAsync(Snapshot.RuleDef, Snapshot.UniqueId, Envelope.Create(@event));
+            await ruleEnqueuer.EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
 
             return null;
         }
