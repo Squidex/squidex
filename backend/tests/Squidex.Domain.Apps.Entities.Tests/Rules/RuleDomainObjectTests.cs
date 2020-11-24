@@ -164,8 +164,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             Assert.Null(result);
 
-            A.CallTo(() => ruleEnqueuer.EnqueueAsync(sut.Snapshot.RuleDef, sut.UniqueId,
-                A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered)))
+            A.CallTo(() => ruleEnqueuer.EnqueueAsync(sut.Snapshot.RuleDef, sut.Snapshot.Id,
+                    A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered)))
                 .MustHaveHappened();
         }
 
