@@ -27,10 +27,20 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string? Label { get; set; }
 
         /// <summary>
+        /// Localized label.
+        /// </summary>
+        public LocalizedValue<string>? DefaultValuesLabel { get; set; }
+
+        /// <summary>
         /// Hints to describe the schema.
         /// </summary>
         [LocalizedStringLength(1000)]
         public string? Hints { get; set; }
+
+        /// <summary>
+        /// Localized Hints.
+        /// </summary>
+        public LocalizedValue<string>? DefaultValuesHints { get; set; }
 
         /// <summary>
         /// Placeholder to show when no value has been entered.

@@ -637,8 +637,8 @@
   "schemas.clone": "Clona lo Schema",
   "schemas.contentSidebarUrl": "Content Sidebar Extension",
   "schemas.contentSidebarUrlHint": "URL to the plugin for the sidebar in the details view.",
-  "schemas.contentsSidebarUrl": "Contenuti Estensione della barra laterale",
-  "schemas.contentsSidebarUrlHint": "URL del plug-in per la barra laterale nella visualizzazione elenco.",
+  "schemas.contentsSidebarUrl": "Contents Sidebar Extension",
+  "schemas.contentsSidebarUrlHint": "URL to the plugin for the sidebar in the list view.",
   "schemas.contextMenuTour": "Apri il menu per cancellare lo schema o per inserire alcuni script che modificano il contenuto.",
   "schemas.create": "Crea uno Schema",
   "schemas.createCategory": "Crea una nuova categoria...",
@@ -661,6 +661,9 @@
   "schemas.field.defaultValue": "Valori predefiniti",
   "schemas.field.defaultValues": "Default Values",
   "schemas.field.defaultValuesHint": "Set the default value per language and override the default value property, if defined. Only use it if really needed.",
+  "schemas.field.defaultValuesHints": "Hints Default Values",
+  "schemas.field.defaultValuesLabel": "Label's Default Values",
+  "schemas.field.defaultValuesLabelHint": "Set the label's default value per language and override the default value property, if defined. Only use it if really needed.",
   "schemas.field.deleteConfirmText": "Sei sicuro di voler eliminare il campo?",
   "schemas.field.deleteConfirmTitle": "Cancella il campo",
   "schemas.field.disable": "Disabilita nella UI",
@@ -812,7 +815,7 @@
   "schemas.updateRulesFailed": "Non è stato possibile aggiornare le regole dello schema. Per favore ricarica.",
   "schemas.updateScriptsFailed": "Non è stato possibile aggiornare gli script dello schema. Per favore ricarica.",
   "schemas.updateUIFieldsFailed": "Non è stato possibile aggiornare i campi della UI. Per favore ricarica.",
-  "schemas.validateOnPublish": "Convalida durante la pubblicazione",
+  "schemas.validateOnPublish": "Validate when publishing",
   "search.addFilter": "Aggiungi un Filtro",
   "search.addGroup": "Aggiungi un Gruppo",
   "search.addSorting": "Aggiungi ordinamento",
@@ -920,7 +923,5 @@
   "workflows.tabVisualize": "Visualizza",
   "workflows.updateFailed": "Non è stato possibile aggiornare il Workflow. Per favore ricarica.",
   "workflows.workflowNameHint": "Nome facoltativo per il workflow.",
-  "workflows.workflowNamePlaceholder": "Inserisci il nome del workflow",
-
-  "status_good": "status"
+  "workflows.workflowNamePlaceholder": "Inserisci il nome del workflow"
 }

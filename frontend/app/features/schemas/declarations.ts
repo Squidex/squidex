@@ -41,4 +41,3 @@ export * from './pages/schema/ui/field-list.component';
 export * from './pages/schema/ui/schema-ui-form.component';
 export * from './pages/schemas/schema-form.component';
 export * from './pages/schemas/schemas-page.component';
-export * from './pages/schema/common//field-form-common-label/field-form-common-label.component';

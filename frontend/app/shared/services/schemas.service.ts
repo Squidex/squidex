@@ -319,10 +319,14 @@ export class NestedFieldDto extends FieldDto {
     }
 }
 
+type DefaultValue<T> = { [key: string]: T | null | undefined };
+
 export class SchemaPropertiesDto {
     constructor(
         public readonly label?: string,
+        public readonly defaultValuesLabel?: DefaultValue<string>,
         public readonly hints?: string,
+        public readonly defaultValuesHints?: DefaultValue<string>,
         public readonly contentsSidebarUrl?: string,
         public readonly contentSidebarUrl?: string,
         public readonly validateOnPublish?: boolean,
@@ -364,7 +368,9 @@ export interface SynchronizeSchemaDto {
 
 export interface UpdateSchemaDto {
     readonly label?: string;
+    readonly defaultValuesLabel?: DefaultValue<string>;
     readonly hints?: string;
+    readonly defaultValuesHints?: DefaultValue<string>;
     readonly contentsSidebarUrl?: string;
     readonly contentSidebarUrl?: string;
     readonly validateOnPublish?: boolean;

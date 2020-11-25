@@ -11,7 +11,53 @@
         </div>
     </div>
 
-    <sqx-field-form-common-label></sqx-field-form-common-label>
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldLabel">{{ 'common.label' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="label"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldLabel" maxlength="100" formControlName="label">
+
+            <sqx-form-hint>
+                {{ 'schemas.field.labelHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValuesLabel">{{ 'schemas.field.defaultValuesLabel' | sqxTranslate }}</label> 
+        <div class="col-9">
+            <sqx-localized-input type="text" [languages]="languages" formControlName="defaultValuesLabel" id="{{field.fieldId}}_fieldDefaultValuesLabel"></sqx-localized-input>
+            <sqx-form-hint>
+                {{ 'schemas.field.defaultValuesLabelHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>   
+    </div>        
+    
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldHints">{{ 'common.hints' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="hints"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldHints" maxlength="100" formControlName="hints">
+
+            <sqx-form-hint>
+                {{ 'schemas.field.hintsHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValuesHints">{{ 'schemas.field.defaultValuesHints' | sqxTranslate }}</label> 
+        <div class="col-9">
+            <sqx-localized-input type="text" [languages]="languages" formControlName="defaultValuesHints" id="{{field.fieldId}}_fieldDefaultValuesHints"></sqx-localized-input>
+            <sqx-form-hint>
+                {{ 'schemas.field.defaultValuesLabelHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>   
+    </div>
 
     <div class="form-group row" *ngIf="field.properties.isContentField">
         <label class="col-3 col-form-label">{{ 'common.tags' | sqxTranslate }}</label>
