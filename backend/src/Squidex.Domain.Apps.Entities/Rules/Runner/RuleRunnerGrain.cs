@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     }
 
                     await state.WriteAsync();
-                }, $"\\-{Key}", job.Position, ct);
+                }, $"^([a-z]+)\\-{Key}", job.Position, ct);
             }
             catch (OperationCanceledException)
             {
