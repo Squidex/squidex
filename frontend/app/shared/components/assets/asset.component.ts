@@ -30,6 +30,9 @@ export class AssetComponent implements OnInit {
     @Output()
     public select = new EventEmitter();
 
+    @Output()
+    public selectFolder = new EventEmitter<string>();
+
     @Input()
     public assetFile: File;
 

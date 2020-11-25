@@ -22,14 +22,18 @@
     }
 }
 
-.invisible {
-    visibility: hidden;
-}
-
 .metadata {
     margin: 1rem auto;
     max-width: 500px;
     min-width: 0;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.path {
+    min-height: 2.5rem;
 }
 
 .slug {

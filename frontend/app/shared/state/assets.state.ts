@@ -21,7 +21,7 @@ export type Tag = { name: string, count: number; };
 
 const EMPTY_FOLDERS: { canCreate: boolean, items: ReadonlyArray<AssetFolderDto>, path?: ReadonlyArray<AssetFolderDto> } = { canCreate: false, items: [] };
 
-const ROOT_ITEM: AssetPathItem = { id: MathHelper.EMPTY_GUID, folderName: 'i18n:assets.specialFolder.root' };
+export const ROOT_ITEM: AssetPathItem = { id: MathHelper.EMPTY_GUID, folderName: 'i18n:assets.specialFolder.root' };
 
 interface Snapshot {
     // All assets tags.
@@ -367,7 +367,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public navigate(parentId: string) {
-        this.next({ parentId });
+        this.next({ parentId, assetsQuery: undefined, tagsSelected: {} });
 
         return this.loadInternal(false);
     }
