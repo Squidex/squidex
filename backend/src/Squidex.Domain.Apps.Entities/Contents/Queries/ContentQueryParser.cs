@@ -89,6 +89,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
                 }
 
+                if (!result.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
+                {
+                    result.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
+                }
+
                 if (result.Take == long.MaxValue)
                 {
                     result.Take = options.DefaultPageSize;

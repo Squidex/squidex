@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
@@ -82,6 +83,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 if (result.Sort.Count == 0)
                 {
                     result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
+                }
+
+                if (!result.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
+                {
+                    result.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
                 }
 
                 if (result.Take == long.MaxValue)
