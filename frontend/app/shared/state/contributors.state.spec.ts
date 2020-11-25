@@ -71,6 +71,13 @@ describe('ContributorsState', () => {
             expect(contributorsState.snapshot.isLoading).toBeFalsy();
         });
 
+        it('should not load if already loaded', () => {
+            contributorsState.load(true).subscribe();
+            contributorsState.loadIfNotLoaded().subscribe();
+
+            expect().nothing();
+        });
+
         it('should only show current page of contributors', () => {
             contributorsState.load().subscribe();
 

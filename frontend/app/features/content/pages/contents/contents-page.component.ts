@@ -9,7 +9,7 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
@@ -53,6 +53,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     constructor(
         public readonly contentsRoute: Router2State,
         public readonly contentsState: ContentsState,
+        private readonly appsState: AppsState,
+        private readonly contributorsState: ContributorsState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly languagesState: LanguagesState,
@@ -64,6 +66,10 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
+        if (this.appsState.snapshot.selectedApp?.canReadContributors) {
+            this.contributorsState.loadIfNotLoaded();
+        }
+
         this.own(
             combineLatest([
                 this.schemasState.selectedSchema,

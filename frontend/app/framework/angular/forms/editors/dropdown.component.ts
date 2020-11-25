@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: prefer-for-of
+
 import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, forwardRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, TemplateRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
@@ -17,9 +19,6 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 interface State {
     // The suggested item.
     suggestedItems: ReadonlyArray<any>;
-
-    // The selected suggested item.
-    selectedItem: any;
 
     // The selected suggested index.
     selectedIndex: number;
@@ -40,11 +39,16 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, ControlValueAccessor, OnChanges, OnInit {
+    private value: any;
+
     @Input()
     public items: ReadonlyArray<any> = [];
 
     @Input()
     public searchProperty = 'name';
+
+    @Input()
+    public valueProperty?: string;
 
     @Input()
     public canSearch = true;
@@ -62,9 +66,12 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public queryInput = new FormControl();
 
+    public get selectedItem() {
+        return this.items[this.snapshot.selectedIndex];
+    }
+
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            selectedItem: undefined,
             selectedIndex: -1,
             suggestedItems: []
         });
@@ -102,11 +109,13 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['items']) {
+            this.items = this.items || [];
+
             this.resetSearch();
 
             this.next(s => ({
                 ...s,
-                suggestedIndex: 0,
+                suggestedIndex: this.getSelectedIndex(this.value),
                 suggestedItems: this.items || []
             }));
         }
@@ -127,7 +136,9 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     public writeValue(obj: any) {
-        this.selectIndex(this.items && obj ? this.items.indexOf(obj) : -1, false);
+        this.value = obj;
+
+        this.selectIndex(this.getSelectedIndex(obj), false);
     }
 
     public setDisabledState(isDisabled: boolean): void {
@@ -141,21 +152,18 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        switch (event.keyCode) {
-            case Keys.UP:
-                this.selectPrevIndex();
-                return false;
-            case Keys.DOWN:
-                this.selectNextIndex();
-                return false;
-            case Keys.ENTER:
-                this.selectIndexAndClose(this.snapshot.selectedIndex);
-                return false;
-            case Keys.ESCAPE:
-                if (this.dropdown.isOpen) {
-                    this.close();
-                    return false;
-                }
+        if (Keys.isUp(event)) {
+            this.selectPrevIndex();
+            return false;
+        } else if (Keys.isDown(event)) {
+            this.selectNextIndex();
+            return false;
+        } else if (Keys.isEnter(event)) {
+            this.selectIndexAndClose(this.snapshot.selectedIndex);
+            return false;
+        } else if (Keys.isEscape(event) && this.dropdown.isOpen) {
+            this.close();
+            return false;
         }
 
         return true;
@@ -194,25 +202,53 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     public selectIndex(selectedIndex: number, fromUserAction: boolean) {
-        if (selectedIndex < 0 && fromUserAction) {
-            selectedIndex = 0;
-        }
+        if (fromUserAction) {
+            const items = this.snapshot.suggestedItems || [];
 
-        const items = this.snapshot.suggestedItems || [];
-
-        if (selectedIndex >= items.length && fromUserAction) {
-            selectedIndex = items.length - 1;
-        }
-
-        const value = items[selectedIndex];
-
-        if (value !== this.snapshot.selectedItem) {
-            if (fromUserAction) {
-                this.callChange(value);
-                this.callTouched();
+            if (selectedIndex < 0) {
+                selectedIndex = 0;
             }
 
-            this.next(s => ({ ...s, selectedIndex, selectedItem: value }));
+            if (selectedIndex >= items.length) {
+                selectedIndex = items.length - 1;
+            }
+
+            const selectedItem = items[selectedIndex];
+
+            let selectedValue = selectedItem;
+
+            if (this.valueProperty && this.valueProperty.length > 0 && selectedValue) {
+                selectedValue = selectedValue[this.valueProperty];
+            }
+
+            if (this.value !== selectedValue) {
+                this.value = selectedValue;
+
+                this.callChange(selectedValue);
+                this.callTouched();
+            }
         }
+
+        this.next(s => ({ ...s, selectedIndex }));
+    }
+
+    private getSelectedIndex(value: any) {
+        if (!value) {
+            return -1;
+        }
+
+        if (this.valueProperty && this.valueProperty.length > 0) {
+            for (let i = 0; i < this.items.length; i++) {
+                const item = this.items[i];
+
+                if (item && item[this.valueProperty] === value) {
+                    return i;
+                }
+            }
+        } else {
+            return this.items.indexOf(value);
+        }
+
+        return -1;
     }
 }

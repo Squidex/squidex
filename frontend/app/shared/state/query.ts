@@ -21,7 +21,8 @@ export type QueryValueType =
     'reference' |
     'status' |
     'string' |
-    'tags';
+    'tags' |
+    'user';
 
 export interface FilterOperator {
     // The optional display value.
@@ -255,6 +256,11 @@ const TypeStatus: QueryFieldModel = {
     operators: EqualOperators
 };
 
+const TypeUser: QueryFieldModel = {
+    type: 'user',
+    operators: EqualOperators
+};
+
 const TypeString: QueryFieldModel = {
     type: 'string',
     operators: [...EqualOperators, ...CompareOperator, ...StringOperators, ...ArrayOperators]
@@ -272,7 +278,7 @@ const DEFAULT_FIELDS: QueryModelFields = {
         description: 'i18n:contents.createFieldDescription'
     },
     createdBy: {
-        ...TypeString,
+        ...TypeUser,
         displayName: 'meta.createdBy',
         description: 'i18n:contents.createdByFieldDescription'
     },
@@ -282,7 +288,7 @@ const DEFAULT_FIELDS: QueryModelFields = {
         description: 'i18n:contents.lastModifiedFieldDescription'
     },
     lastModifiedBy: {
-        ...TypeString,
+        ...TypeUser,
         displayName: 'meta.lastModifiedBy',
         description: 'i18n:contents.lastModifiedByFieldDescription'
     },

@@ -6,7 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { FilterComparison, LanguageDto, QueryFieldModel, QueryModel, StatusInfo } from '@app/shared/internal';
+import { FilterComparison, LanguageDto, QueryFieldModel, QueryModel } from '@app/shared/internal';
+import { ContributorsState } from '@app/shared/state/contributors.state';
 
  @Component({
     selector: 'sqx-filter-comparison',
@@ -34,19 +35,16 @@ export class FilterComparisonComponent implements OnChanges {
 
     public noValue = false;
 
+    constructor(
+        public readonly contributorsState: ContributorsState
+    ) {
+    }
+
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['filter']) {
             this.updatePath(false);
             this.updateOperator();
         }
-    }
-
-    public getStatus(statuses: ReadonlyArray<StatusInfo>) {
-        return statuses.find(x => x.status === this.filter.value);
-    }
-
-    public changeStatus(status: StatusInfo) {
-        this.changeValue(status.status);
     }
 
     public changeValue(value: any) {

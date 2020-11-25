@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { DialogService, ErrorDto, Pager, shareMapSubscribed, shareSubscribed, State, StateSynchronizer, Types, Version } from '@app/framework';
-import { Observable, throwError } from 'rxjs';
+import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from './../services/contributors.service';
 import { AppsState } from './apps.state';
@@ -95,6 +95,14 @@ export class ContributorsState extends State<Snapshot> {
             .withPager('contributorsPager', 'contributors', 10)
             .whenSynced(() => this.loadInternal(false))
             .build();
+    }
+
+    public loadIfNotLoaded(): Observable<any> {
+        if (this.snapshot.isLoaded) {
+            return EMPTY;
+        }
+
+        return this.loadInternal(false);
     }
 
     public load(isReload = false): Observable<any> {
