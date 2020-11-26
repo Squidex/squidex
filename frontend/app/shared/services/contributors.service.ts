@@ -26,6 +26,10 @@ export class ContributorDto {
     public readonly canUpdate: boolean;
     public readonly canRevoke: boolean;
 
+    public get token() {
+        return `subject:${this.contributorId}`;
+    }
+
     constructor(
         links: ResourceLinks,
         public readonly contributorId: string,

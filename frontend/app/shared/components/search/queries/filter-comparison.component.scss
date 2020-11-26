@@ -5,3 +5,13 @@
 .operator {
     width: 10rem;
 }
+
+.dropdown-user {
+    & {
+        @include truncate;
+    }
+
+    .user-name {
+        margin-left: .25rem;
+    }
+}

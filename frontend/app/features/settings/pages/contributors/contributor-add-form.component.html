@@ -5,9 +5,9 @@
                 <sqx-autocomplete [source]="usersDataSource" formControlName="user" inputName="contributor" placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}" displayProperty="displayName">
                     <ng-template let-user="$implicit">
                         <span class="autocomplete-user">
-                            <img class="user-picture autocomplete-user-picture" [src]="user | sqxUserDtoPicture">
+                            <img class="user-picture" [src]="user | sqxUserDtoPicture">
 
-                            <span class="user-name autocomplete-user-name">{{user.displayName}}</span>
+                            <span class="user-name">{{user.displayName}}</span>
                         </span>
                     </ng-template>
                 </sqx-autocomplete>

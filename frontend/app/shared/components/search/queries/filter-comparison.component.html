@@ -49,13 +49,39 @@
         </ng-container>
         <ng-container *ngSwitchCase="'status'">
             <sqx-dropdown [items]="fieldModel.extra"
-                [ngModel]="getStatus(fieldModel.extra)"
-                (ngModelChange)="changeStatus($event)"
+                valueProperty="status"
+                [ngModel]="filter.value"
+                (ngModelChange)="changeValue($event)"
                 [canSearch]="false">
-                <ng-template let-target="$implicit">
-                    <i class="icon-circle" [style.color]="target.color"></i> {{target.status}}
+                <ng-template let-status="$implicit">
+                    <i class="icon-circle" [style.color]="status.color"></i> {{status.status}}
                 </ng-template>
             </sqx-dropdown>
+        </ng-container>
+        <ng-container *ngSwitchCase="'user'">
+            <ng-container *ngIf="contributorsState.isLoaded | async; else noPermission">
+                <sqx-dropdown [items]="contributorsState.contributors | async"
+                    valueProperty="token"
+                    [ngModel]="filter.value"
+                    (ngModelChange)="changeValue($event)">
+                    <ng-template let-user="$implicit">
+                        <span class="dropdown-user">
+                            <img class="user-picture" [src]="user | sqxUserDtoPicture">
+
+                            <span class="user-name ">{{user.contributorName}}</span>
+                        </span>
+                    </ng-template>
+                    <ng-template let-user="$implicit">
+                        <span class="user-name">{{user.contributorName}}</span>
+                    </ng-template>
+                </sqx-dropdown>
+            </ng-container>
+            <ng-template #noPermission>
+                <input type="text" class="form-control" *ngIf="!fieldModel.extra"
+                    [ngModel]="filter.value"
+                    (ngModelChange)="changeValue($event)"
+                />
+            </ng-template>
         </ng-container>
         <ng-container *ngSwitchCase="'string'">
             <input type="text" class="form-control" *ngIf="!fieldModel.extra"

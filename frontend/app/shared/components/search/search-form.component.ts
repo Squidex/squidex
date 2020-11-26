@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { DialogModel, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm } from '@app/shared/internal';
+import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, Types } from '@app/shared/internal';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -18,6 +18,7 @@ import { Observable } from 'rxjs';
 })
 export class SearchFormComponent implements OnChanges {
     public readonly standalone = { standalone: true };
+    private previousQuery?: Query;
 
     @Output()
     public queryChange = new EventEmitter<Query>();
@@ -32,7 +33,7 @@ export class SearchFormComponent implements OnChanges {
     public queryModel: QueryModel;
 
     @Input()
-    public query: Query | undefined;
+    public query?: Query;
 
     @Input()
     public queries: Queries;
@@ -62,6 +63,8 @@ export class SearchFormComponent implements OnChanges {
         }
 
         if (changes['query']) {
+            this.previousQuery = Types.clone(this.query);
+
             this.hasFilter = hasFilter(this.query);
         }
     }
@@ -69,7 +72,13 @@ export class SearchFormComponent implements OnChanges {
     public search(close = false) {
         this.hasFilter = hasFilter(this.query);
 
-        this.queryChange.emit(this.query);
+        if (!equalsQuery(this.query, this.previousQuery)) {
+            const clone = Types.clone(this.query);
+
+            this.queryChange.emit(clone);
+
+            this.previousQuery = this.query;
+        }
 
         if (close) {
             this.searchDialog.hide();
