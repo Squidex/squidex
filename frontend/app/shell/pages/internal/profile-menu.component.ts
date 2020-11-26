@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ApiUrlConfig, AuthService, fadeAnimation, ModalModel, StatefulComponent, UIOptions, UIState } from '@app/shared';
+import { ApiUrlConfig, AuthService, fadeAnimation, ModalModel, StatefulComponent, UILanguages, UIOptions, UIState } from '@app/shared';
 
 interface State {
     // The display name of the user.
@@ -21,17 +21,6 @@ interface State {
     // The url to the user profile.
     profileUrl: string;
 }
-
-const ALL_LANGUAGES: ReadonlyArray<{ code: string, name: string }> = [{
-    code: 'en',
-    name: 'English'
-}, {
-    code: 'nl',
-    name: 'Nederlands'
-}, {
-    code: 'it',
-    name: 'Italiano'
-}];
 
 @Component({
     selector: 'sqx-profile-menu',
@@ -48,7 +37,7 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     public showSubmenu = false;
 
     public language = this.uiOptions.get('more.culture');
-    public languages = ALL_LANGUAGES;
+    public languages = UILanguages.ALL;
 
     constructor(changeDetector: ChangeDetectorRef, apiUrl: ApiUrlConfig,
         public readonly uiState: UIState,

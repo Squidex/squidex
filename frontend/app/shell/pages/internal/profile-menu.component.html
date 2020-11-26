@@ -37,8 +37,9 @@
             </a>
 
             <div class="dropdown-menu" [class.open]="showSubmenu">
-                <a class="dropdown-item" *ngFor="let availableLanguage of languages" [class.active]="availableLanguage.code === language" (click)="changeLanguage(availableLanguage.code)">
-                    {{ availableLanguage.name }}
+                <a class="dropdown-item" *ngFor="let availableLanguage of languages" [class.active]="availableLanguage.iso2Code === language"
+                    (click)="changeLanguage(availableLanguage.iso2Code)">
+                    {{ availableLanguage.localName }}
                 </a>
             </div>
           </div>
