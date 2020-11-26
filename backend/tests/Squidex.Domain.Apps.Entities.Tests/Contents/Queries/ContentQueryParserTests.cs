@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
 
-            Assert.Equal("FullText: 'Hello World'; Take: 100; Sort: data.firstName.iv Ascending", parsed.ToString());
+            Assert.Equal("FullText: 'Hello World'; Take: 100; Sort: data.firstName.iv Ascending, id Ascending", parsed.ToString());
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
 
-            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 200; Sort: lastModified Descending", parsed.ToString());
+            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 200; Sort: lastModified Descending, id Ascending", parsed.ToString());
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
 
-            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending", parsed.ToString());
+            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
         }
 
         [Fact]
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
 
-            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending", parsed.ToString());
+            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
 
-            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending", parsed.ToString());
+            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
 
-            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending", parsed.ToString());
+            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
         }
 
         [Fact]
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
 
-            Assert.Equal("Take: 30; Sort: lastModified Descending", parsed.ToString());
+            Assert.Equal("Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
         }
 
         [Fact]
@@ -156,7 +156,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
 
-            Assert.Equal("Skip: 20; Take: 200; Sort: lastModified Descending", parsed.ToString());
+            Assert.Equal("Skip: 20; Take: 200; Sort: lastModified Descending, id Ascending", parsed.ToString());
+        }
+
+        [Fact]
+        public async Task Should_not_apply_id_ordering_twice()
+        {
+            var query = Q.Empty.WithODataQuery("$top=300&$skip=20&$orderby=id desc");
+
+            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+
+            Assert.Equal("Skip: 20; Take: 200; Sort: id Descending", parsed.ToString());
         }
 
         private static string Json(string text)
