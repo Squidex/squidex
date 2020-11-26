@@ -31,7 +31,6 @@ namespace Squidex.Extensions.Actions.Email
         [DataType(DataType.Text)]
         public int ServerPort { get; set; }
 
-        [LocalizedRequired]
         [Display(Name = "Use SSL", Description = "Specify whether the SMPT client uses Secure Sockets Layer (SSL) to encrypt the connection.")]
         [DataType(DataType.Text)]
         public bool ServerUseSsl { get; set; }
