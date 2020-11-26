@@ -176,7 +176,7 @@
     <value>Hai raggiunto la dimensione massima consentito per le risorse.</value>
   </data>
   <data name="assets.referenced" xml:space="preserve">
-    <value>Assets is referenced by a content and cannot be deleted.</value>
+    <value>La risorsa è collegata ad un contenuto pertanto non può essere cancellata.</value>
   </data>
   <data name="backups.alreadyRunning" xml:space="preserve">
     <value>E' in esecuzione una altro processo di backup.</value>
@@ -476,7 +476,7 @@
     <value>{count} Collegamenti(s)</value>
   </data>
   <data name="contents.referenced" xml:space="preserve">
-    <value>Content is referenced by another content and cannot be deleted.</value>
+    <value>Il contenuto è collegato ad un altro contenuto e pertanto non può essere cancellato.</value>
   </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>Il contenuto singleton non può essere aggiornato</value>
@@ -512,7 +512,7 @@
     <value>Non può avere valori duplicati.</value>
   </data>
   <data name="contents.validation.error" xml:space="preserve">
-    <value>Validation failed with internal error.</value>
+    <value>Non è stato possibile validare a causa di un errore interno.</value>
   </data>
   <data name="contents.validation.exactValue" xml:space="preserve">
     <value>Deve essere esattamente {value}.</value>
@@ -677,7 +677,7 @@
     <value>La query Json non è valida: {message}</value>
   </data>
   <data name="exceptions.domainObjectConflict" xml:space="preserve">
-    <value>Entity ({id}) already exists.</value>
+    <value>L'entità ({id}) esiste già.</value>
   </data>
   <data name="exceptions.domainObjectDeleted" xml:space="preserve">
     <value>L'entità ({id}) è stata cancellata.</value>

@@ -31,21 +31,22 @@ export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
                     ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:schemas.schemaNameValidationMessage')
                 ]
             ],
+            initialCategory: undefined,
             isSingleton: false,
             importing: {}
         }));
     }
 
     public transformLoad(value: CreateSchemaDto) {
-        const { name, isSingleton, ...importing } = value;
+        const { name, isSingleton, category, ...importing } = value;
 
-        return { name, isSingleton, importing };
+        return { name, isSingleton, importing, initialCategory: category };
     }
 
     public transformSubmit(value: any): CreateSchemaDto {
-        const { name, isSingleton, importing } = value;
+        const { name, isSingleton, importing, initialCategory } = value;
 
-        return { name, isSingleton, ...importing };
+        return { name, isSingleton, category: initialCategory, ...importing };
     }
 }
 

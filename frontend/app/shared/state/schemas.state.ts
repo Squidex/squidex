@@ -43,7 +43,7 @@ function sameSchema(lhs: SchemaDetailsDto | null, rhs?: SchemaDetailsDto | null)
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
-    public categoriesPlain =
+    public categoryNames =
         this.project(x => x.categories);
 
     public selectedSchemaOrNull =
@@ -68,7 +68,7 @@ export class SchemasState extends State<Snapshot> {
         this.projectFrom(this.schemas, x => x.filter(s => s.isPublished));
 
     public categories =
-        this.projectFrom2(this.schemas, this.categoriesPlain, (s, c) => buildCategories(c, s));
+        this.projectFrom2(this.schemas, this.categoryNames, (s, c) => buildCategories(c, s));
 
     public get schemaId() {
         return this.snapshot.selectedSchema?.id || '';
@@ -383,8 +383,10 @@ function getField(x: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldD
     }
 }
 
+const NO_NAME = '';
+
 function buildCategories(categories: ReadonlyArray<string>, schemas: SchemasList): ReadonlyArray<SchemaCategory> {
-    const uniqueCategories: { [name: string]: true } = {};
+    const uniqueCategories: { [name: string]: true } = { [NO_NAME]: true };
 
     for (const category of categories) {
         uniqueCategories[category] = true;
@@ -408,7 +410,7 @@ function buildCategories(categories: ReadonlyArray<string>, schemas: SchemasList
 }
 
 function getCategory(schema: SchemaDto) {
-    return schema.category || 'Schemas';
+    return schema.category || NO_NAME;
 }
 
 export function isSameCategory(name: string, schema: SchemaDto): boolean {

@@ -31,8 +31,8 @@ export class SchemaFormComponent implements OnInit {
     constructor(
         public readonly apiUrl: ApiUrlConfig,
         public readonly appsState: AppsState,
-        private readonly formBuilder: FormBuilder,
-        private readonly schemasState: SchemasState
+        public readonly schemasState: SchemasState,
+        private readonly formBuilder: FormBuilder
     ) {
     }
 

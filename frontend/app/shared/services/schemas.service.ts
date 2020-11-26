@@ -345,8 +345,10 @@ export interface UpdateUIFields {
 export interface CreateSchemaDto {
     readonly name: string;
     readonly fields?: ReadonlyArray<RootFieldDto>;
-    readonly properties?: SchemaPropertiesDto;
+    readonly category?: string;
     readonly isSingleton?: boolean;
+    readonly isPublished?: boolean;
+    readonly properties?: SchemaPropertiesDto;
 }
 
 export interface UpdateSchemaCategoryDto {

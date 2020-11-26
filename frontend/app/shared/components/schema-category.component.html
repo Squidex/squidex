@@ -12,7 +12,14 @@
                 </button>
             </div>
             <div class="col">
-                <h3 class="truncate">{{schemaCategory.name}} </h3>
+                <h3 class="truncate">
+                    <ng-container *ngIf="schemaCategory.name?.length > 0; else noName">
+                        {{schemaCategory.name}}
+                    </ng-container>
+                    <ng-template #noName>
+                        {{ 'i18n:common.schemas' | sqxTranslate }}
+                    </ng-template>
+                </h3>
             </div>
             <div class="col-auto">
                 <ng-container *ngIf="schemaCategory.schemas.length > 0; else noSchemas">
@@ -31,7 +38,6 @@
         <ng-container *ngIf="!forContent; else simpleMode">
             <div *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item"
                 routerLinkActive="active"
-                cdkDropList
                 cdkDrag
                 cdkDragLockAxis="y"
                 [cdkDragData]="schema">
