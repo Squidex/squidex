@@ -7,7 +7,11 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AnnotateAssetDto, AnnotateAssetForm, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, Types, UploadCanceled } from '@app/shared/internal';
+import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, Types, UploadCanceled } from '@app/shared/internal';
+import { AssetsService } from '@app/shared/services/assets.service';
+import { AssetPathItem, ROOT_ITEM } from '@app/shared/state/assets.state';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
@@ -48,6 +52,8 @@ export class AssetDialogComponent implements OnChanges {
     @ViewChildren(ImageFocusPointComponent)
     public imageFocus: QueryList<ImageFocusPointComponent>;
 
+    public path: Observable<ReadonlyArray<AssetPathItem>>;
+
     public isEditable = false;
     public isEditableAny = false;
     public isUploadable = false;
@@ -60,8 +66,10 @@ export class AssetDialogComponent implements OnChanges {
     public annotateForm = new AnnotateAssetForm(this.formBuilder);
 
     constructor(
+        private readonly appsState: AppsState,
         private readonly assetsState: AssetsState,
         private readonly assetUploader: AssetUploaderState,
+        private readonly assetsService: AssetsService,
         private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
@@ -85,6 +93,14 @@ export class AssetDialogComponent implements OnChanges {
         if (this.selectableTabs.indexOf(this.selectedTab) < 0) {
             this.selectTab(this.selectableTabs[0]);
         }
+
+        this.path =
+            this.assetsService.getAssetFolders(this.appsState.appName, this.asset.parentId).pipe(
+                map(folders => [ROOT_ITEM, ...folders.path]));
+    }
+
+    public navigate(id: string) {
+        this.assetsState.navigate(id);
     }
 
     public selectTab(tab: string) {

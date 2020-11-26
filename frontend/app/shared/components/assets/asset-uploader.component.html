@@ -31,7 +31,13 @@
                                     <div class="upload-name">{{upload.name}}</div>
                                 </div>
                                 <div class="col">
-                                    <sqx-progress-bar [value]="upload.progress" [trailWidth]="1.5" [strokeWidth]="1.5" [showText]="false" [animated]="false"></sqx-progress-bar>
+                                    <sqx-progress-bar 
+                                        [value]="upload.progress" 
+                                        [trailWidth]="1.5"
+                                        [strokeWidth]="1.5" 
+                                        [showText]="false"
+                                        [animated]="false">
+                                    </sqx-progress-bar>
                                 </div>
                                 <div class="col-auto">
                                     <button type="button" class="btn btn-text-secondary" (click)="stopUpload(upload)">

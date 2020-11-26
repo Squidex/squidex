@@ -33,7 +33,11 @@
                         <sqx-image-editor [imageSource]="asset | sqxAssetPreviewUrl"></sqx-image-editor>
                         
                         <div class="image-progress" *ngIf="progress > 0">
-                            <sqx-progress-bar [strokeWidth]="2" [trailColor]="'transparent'" [trailWidth]="0" [value]="progress">
+                            <sqx-progress-bar
+                                [value]="progress"
+                                [strokeWidth]="2" 
+                                [trailColor]="'transparent'"
+                                [trailWidth]="0">
                             </sqx-progress-bar>
                         </div>
                     </div>
@@ -43,14 +47,27 @@
                         <sqx-image-focus-point [imageSource]="asset | sqxAssetPreviewUrl" [focusPoint]="asset.metadata"></sqx-image-focus-point>
                         
                         <div class="image-progress" *ngIf="progress > 0">
-                            <sqx-progress-bar [strokeWidth]="2" [trailColor]="'transparent'" [trailWidth]="0" [value]="progress">
+                            <sqx-progress-bar
+                                [value]="progress"
+                                [strokeWidth]="2" 
+                                [trailColor]="'transparent'"
+                                [trailWidth]="0">
                             </sqx-progress-bar>
                         </div>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'i18n:assets.tabMetadata'">
+
                     <div class="metadata">
                         <sqx-form-error [error]="annotateForm.error | async"></sqx-form-error>
+
+                        <div class="form-group no-gutters">
+                            <label for="id">{{ 'common.folder' | sqxTranslate }}</label>
+
+                            <div class="path">
+                                <sqx-asset-path [path]="path | async" all="true" (navigate)="navigate($event.id)"></sqx-asset-path>
+                            </div>
+                        </div>
 
                         <div class="form-group no-gutters">
                             <label for="id">{{ 'common.id' | sqxTranslate }}</label>
@@ -61,6 +78,21 @@
                                 </div>
                                 <div class="col-auto">
                                     <button type="button" class="btn btn-text" [sqxCopy]="inputId">
+                                        <i class="icon-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group no-gutters">
+                            <label for="url">{{ 'common.url' | sqxTranslate }}</label>
+
+                            <div class="row no-gutters">
+                                <div class="col">
+                                    <input readonly class="form-control" name="url" id="url" value="{{asset | sqxAssetUrl:asset.fileVersion:false}}" #inputUrl>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-text" [sqxCopy]="inputUrl">
                                         <i class="icon-copy"></i>
                                     </button>
                                 </div>

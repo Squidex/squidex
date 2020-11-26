@@ -18,10 +18,12 @@ export class AssetUrlPipe implements PipeTransform {
     ) {
     }
 
-    public transform(asset: AssetDto, version?: number): string {
+    public transform(asset: AssetDto, version?: number, withQuery = false): string {
         let url = asset.fullUrl(this.apiUrl);
 
-        url = StringHelper.appendToUrl(url, 'sq', MathHelper.guid());
+        if (withQuery) {
+            url = StringHelper.appendToUrl(url, 'sq', MathHelper.guid());
+        }
 
         if (Types.isNumber(version)) {
             url = StringHelper.appendToUrl(url, 'version', version);

@@ -78,7 +78,8 @@
                         [isSelectable]="!!selectedIds"
                         [isSelected]="isSelected(asset)"
                         [allTags]="tags" 
-                        (select)="select.emit(asset)" (delete)="deleteAsset(asset)">
+                        (select)="select.emit(asset)" (delete)="deleteAsset(asset)"
+                        (selectFolder)="selectFolder(asset)">
                     </sqx-asset>
                 </div>
             </ng-container>

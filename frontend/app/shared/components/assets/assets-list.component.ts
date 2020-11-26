@@ -70,6 +70,10 @@ export class AssetsListComponent {
         }
     }
 
+    public selectFolder(asset: AssetDto) {
+        this.state.navigate(asset.parentId);
+    }
+
     public deleteAsset(asset: AssetDto) {
         this.state.deleteAsset(asset);
     }
