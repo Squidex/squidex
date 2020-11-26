@@ -34,13 +34,15 @@
         </div>
     </div>
 
-    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="!isCollapsed" @fade>
+    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
         <ng-container *ngIf="!forContent; else simpleMode">
             <div *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item"
+                [style.height]="getItemHeight()"
                 routerLinkActive="active"
                 cdkDrag
                 cdkDragLockAxis="y"
-                [cdkDragData]="schema">
+                [cdkDragData]="schema"
+                (cdkDragStarted)="dragStarted($event)">
 
                 <i cdkDragHandle class="icon-drag2 drag-handle"></i>
 

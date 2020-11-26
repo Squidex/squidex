@@ -5,11 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { fadeAnimation, LocalStoreService, SchemaCategory, SchemaDto, SchemasList, SchemasState } from '@app/shared/internal';
 import { AppsState } from '../state/apps.state';
 import { Settings } from '../state/settings';
+
+const ITEM_HEIGHT = 3.125;
 
 @Component({
     selector: 'sqx-schema-category',
@@ -81,6 +83,25 @@ export class SchemaCategoryComponent implements OnChanges {
         if (drag.previousContainer !== drag.container) {
             this.schemasState.changeCategory(drag.item.data, this.schemaCategory.name);
         }
+    }
+
+    public dragStarted(event: CdkDragStart) {
+        setTimeout(() => {
+            const dropContainer = event.source._dragRef['_dropContainer'];
+
+            if (dropContainer) {
+                dropContainer['_cacheOwnPosition']();
+                dropContainer['_cacheItemPositions']();
+            }
+        });
+    }
+
+    public getItemHeight() {
+        return `${ITEM_HEIGHT}rem`;
+    }
+
+    public getContainerHeight() {
+        return `${ITEM_HEIGHT * this.filteredSchemas.length}rem`;
     }
 
     public trackBySchema(_index: number, schema: SchemaDto) {

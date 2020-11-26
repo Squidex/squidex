@@ -42,6 +42,22 @@ $drag-margin: -8px;
     }
 }
 
+.cdk-drag-preview {
+    background: $color-dark2-background !important;
+
+    a {
+        color: $color-dark1-foreground !important;
+    }
+}
+
+.cdk-drag-placeholder {
+    display: none;
+}
+
+.cdk-drag-animating {
+    transition: none;
+}
+
 .header {
     line-height: 2rem;
     margin-bottom: 0;
@@ -84,18 +100,6 @@ $drag-margin: -8px;
     .drag-handle {
         @include absolute(1rem, auto, auto, 1rem);
     }
-}
-
-.cdk-drag-preview {
-    background: $color-dark2-background !important;
-
-    a {
-        color: $color-dark1-foreground !important;
-    }
-}
-
-.cdk-drag-animating {
-    transition: none;
 }
 
 .schema {
