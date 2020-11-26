@@ -13,7 +13,7 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'Checkbox'">
                     <div class="custom-control custom-checkbox">
-                        <input class="custom-control-input" type="checkbox" id="{{property.name}}">
+                        <input class="custom-control-input" type="checkbox" id="{{property.name}}" [formControlName]="property.name">
                         <label class="custom-control-label" for="{{property.name}}">
                             {{property.display}}
                         </label>
