@@ -28,7 +28,7 @@
                     {{ 'backups.backupCountAssetsLabel' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledAssets | sqxKNumber}}</strong>
                 </span>
             </div>
-            <div *ngIf="backup.stopped && !backup.isFailed">
+            <div *ngIf="backup.canDownload">
                 {{ 'backups.backupDownload' | sqxTranslate }}:
 
                 <a href="{{apiUrl.buildUrl(backup.downloadUrl)}}" sqxExternalLink="noicon">

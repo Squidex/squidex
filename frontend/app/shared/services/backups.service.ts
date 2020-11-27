@@ -21,6 +21,7 @@ export class BackupDto {
     public readonly _links: ResourceLinks;
 
     public readonly canDelete: boolean;
+    public readonly canDownload: boolean;
 
     public readonly downloadUrl: string;
 
@@ -40,6 +41,7 @@ export class BackupDto {
         this._links = links;
 
         this.canDelete = hasAnyLink(links, 'delete');
+        this.canDownload = !!stopped && !this.isFailed;
 
         this.downloadUrl = links['download'].href;
     }
