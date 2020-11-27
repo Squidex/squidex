@@ -614,6 +614,7 @@
   "rules.ruleSyntax.then": "then",
   "rules.run": "Esegui",
   "rules.runFailed": "Non è stato possibile eseguire la regola. Per favore ricarica.",
+  "rules.runFromSnapshots": "Run with latest states",
   "rules.runningRule": "La regola '{name}' è attualmente in esecuzione.",
   "rules.runRuleConfirmText": "Sei sicuro di voler eseguire la regola per tutti gli eventi?",
   "rules.runRuleConfirmTitle": "Esegui la regola",

@@ -17,6 +17,8 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
@@ -31,6 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly ILocalCache localCache = new AsyncLocalCache();
         private readonly IContentLoader contentLoader = A.Fake<IContentLoader>();
+        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaMatch = NamedId.Of(DomainId.NewGuid(), "my-schema1");
         private readonly NamedId<DomainId> schemaNonMatch = NamedId.Of(DomainId.NewGuid(), "my-schema2");
@@ -45,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
                 .Returns(false);
 
-            sut = new ContentChangedTriggerHandler(scriptEngine, contentLoader);
+            sut = new ContentChangedTriggerHandler(scriptEngine, contentLoader, contentRepository);
         }
 
         public static IEnumerable<object[]> TestEvents()
@@ -56,6 +59,61 @@ namespace Squidex.Domain.Apps.Entities.Contents
             yield return new object[] { new ContentStatusChanged { Change = StatusChange.Change }, EnrichedContentEventType.StatusChanged };
             yield return new object[] { new ContentStatusChanged { Change = StatusChange.Published }, EnrichedContentEventType.Published };
             yield return new object[] { new ContentStatusChanged { Change = StatusChange.Unpublished }, EnrichedContentEventType.Unpublished };
+        }
+
+        [Fact]
+        public void Should_return_true_when_asking_for_snapshot_support()
+        {
+            Assert.True(sut.CanCreateSnapshotEvents);
+        }
+
+        [Fact]
+        public async Task Should_create_events_from_snapshots()
+        {
+            var trigger = new ContentChangedTriggerV2();
+
+            A.CallTo(() => contentRepository.StreamAll(appId.Id, null))
+                .Returns(new List<ContentEntity>
+                {
+                    new ContentEntity { SchemaId = schemaMatch },
+                    new ContentEntity { SchemaId = schemaMatch }
+                }.ToAsyncEnumerable());
+
+            var result = await sut.CreateSnapshotEvents(trigger, appId.Id).ToListAsync();
+
+            var typed = result.OfType<EnrichedContentEvent>().ToList();
+
+            Assert.Equal(2, typed.Count);
+            Assert.Equal(2, typed.Count(x => x.Type == EnrichedContentEventType.Created));
+        }
+
+        [Fact]
+        public async Task Should_create_events_from_snapshots_with_schema_ids()
+        {
+            var trigger = new ContentChangedTriggerV2
+            {
+                Schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(new List<ContentChangedTriggerSchemaV2>
+                {
+                    new ContentChangedTriggerSchemaV2
+                    {
+                        SchemaId = schemaMatch.Id
+                    }
+                })
+            };
+
+            A.CallTo(() => contentRepository.StreamAll(appId.Id, A<HashSet<DomainId>>.That.Is(schemaMatch.Id)))
+                .Returns(new List<ContentEntity>
+                {
+                    new ContentEntity { SchemaId = schemaMatch },
+                    new ContentEntity { SchemaId = schemaMatch }
+                }.ToAsyncEnumerable());
+
+            var result = await sut.CreateSnapshotEvents(trigger, appId.Id).ToListAsync();
+
+            var typed = result.OfType<EnrichedContentEvent>().ToList();
+
+            Assert.Equal(2, typed.Count);
+            Assert.Equal(2, typed.Count(x => x.Type == EnrichedContentEventType.Created));
         }
 
         [Theory]

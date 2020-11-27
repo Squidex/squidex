@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             queryContentAsync = new QueryContent(converter);
             queryContentsById = new QueryContentsByIds(converter, appProvider);
-            queryContentsByQuery = new QueryContentsByQuery(converter, indexer);
+            queryContentsByQuery = new QueryContentsByQuery(converter, indexer, appProvider);
             queryIdsAsync = new QueryIdsAsync(appProvider);
         }
 

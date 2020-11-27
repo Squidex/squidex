@@ -176,6 +176,14 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public runFromSnapshots(rule: RuleDto): Observable<any> {
+        return this.rulesService.runRuleFromSnapshots(this.appName, rule).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('i18n:rules.restarted');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public trigger(rule: RuleDto): Observable<any> {
         return this.rulesService.triggerRule(this.appName, rule).pipe(
             tap(() => {

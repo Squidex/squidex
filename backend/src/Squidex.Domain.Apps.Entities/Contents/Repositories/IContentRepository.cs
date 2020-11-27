@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
 {
     public interface IContentRepository
     {
+        IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds);
+
         Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<DomainId> ids, SearchScope scope);
 
         Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<DomainId> ids, SearchScope scope);

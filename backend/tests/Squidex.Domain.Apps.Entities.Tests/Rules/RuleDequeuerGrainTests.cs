@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IClock clock = A.Fake<IClock>();
         private readonly ISemanticLog log = A.Dummy<ISemanticLog>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
-        private readonly RuleService ruleService = A.Fake<RuleService>();
+        private readonly IRuleService ruleService = A.Fake<IRuleService>();
         private readonly RuleDequeuerGrain sut;
 
         public RuleDequeuerGrainTests()

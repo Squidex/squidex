@@ -9,25 +9,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public interface IRuleTriggerHandler
+    public interface IRuleService
     {
-        Type TriggerType { get; }
+        bool CanCreateSnapshotEvents(Rule rule);
 
-        bool CanCreateSnapshotEvents { get; }
+        IAsyncEnumerable<(RuleJob? Job, Exception? Exception)> CreateSnapshotJobsAsync(Rule rule, DomainId ruleId, DomainId appId);
 
-        IAsyncEnumerable<EnrichedEvent> CreateSnapshotEvents(RuleTrigger trigger, DomainId appId);
+        Task<List<(RuleJob Job, Exception? Exception)>> CreateJobsAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event, bool ignoreStale = true);
 
-        Task<List<EnrichedEvent>> CreateEnrichedEventsAsync(Envelope<AppEvent> @event);
-
-        bool Trigger(EnrichedEvent @event, RuleTrigger trigger);
-
-        bool Trigger(AppEvent @event, RuleTrigger trigger, DomainId ruleId);
+        Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job);
     }
 }

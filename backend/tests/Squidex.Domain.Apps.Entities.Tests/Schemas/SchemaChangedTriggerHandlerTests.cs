@@ -48,6 +48,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             yield return new object[] { new SchemaUnpublished(), EnrichedSchemaEventType.Unpublished };
         }
 
+        [Fact]
+        public void Should_return_false_when_asking_for_snapshot_support()
+        {
+            Assert.False(sut.CanCreateSnapshotEvents);
+        }
+
         [Theory]
         [MemberData(nameof(TestEvents))]
         public async Task Should_create_enriched_events(SchemaEvent @event, EnrichedSchemaEventType type)

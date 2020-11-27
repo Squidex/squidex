@@ -31,13 +31,18 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.userResolver = userResolver;
         }
 
-        public async Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent> @event)
+        public async Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent>? @event)
         {
-            enrichedEvent.Timestamp = @event.Headers.Timestamp();
+            if (@event != null)
+            {
+                enrichedEvent.Timestamp = @event.Headers.Timestamp();
+
+                enrichedEvent.AppId = @event.Payload.AppId;
+            }
 
             if (enrichedEvent is EnrichedUserEventBase userEvent)
             {
-                if (@event.Payload is SquidexEvent squidexEvent)
+                if (@event?.Payload is SquidexEvent squidexEvent)
                 {
                     userEvent.Actor = squidexEvent.Actor;
                 }
@@ -47,8 +52,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     userEvent.User = await FindUserAsync(userEvent.Actor);
                 }
             }
-
-            enrichedEvent.AppId = @event.Payload.AppId;
         }
 
         private Task<IUser?> FindUserAsync(RefToken actor)

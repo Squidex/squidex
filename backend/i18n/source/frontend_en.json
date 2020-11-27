@@ -614,6 +614,7 @@
   "rules.ruleSyntax.then": "then",
   "rules.run": "Run",
   "rules.runFailed": "Failed to run rule. Please reload.",
+  "rules.runFromSnapshots": "Run with latest states",
   "rules.runningRule": "Rule '{name}' is currently running.",
   "rules.runRuleConfirmText": "Do you really want to run the rule for all events?",
   "rules.runRuleConfirmTitle": "Run rule",

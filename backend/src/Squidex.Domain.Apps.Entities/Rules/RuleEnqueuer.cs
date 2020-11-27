@@ -22,19 +22,20 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromSeconds(10);
-        private readonly IRuleEventRepository ruleEventRepository;
-        private readonly IAppProvider appProvider;
         private readonly IMemoryCache cache;
+        private readonly IRuleEventRepository ruleEventRepository;
+        private readonly IRuleService ruleService;
+        private readonly IAppProvider appProvider;
         private readonly ILocalCache localCache;
-        private readonly RuleService ruleService;
 
         public string Name
         {
             get { return GetType().Name; }
         }
 
-        public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, ILocalCache localCache, IRuleEventRepository ruleEventRepository,
-            RuleService ruleService)
+        public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, ILocalCache localCache,
+            IRuleEventRepository ruleEventRepository,
+            IRuleService ruleService)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(cache, nameof(cache));
@@ -59,22 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             foreach (var (job, ex) in jobs)
             {
-                if (ex != null)
-                {
-                    await ruleEventRepository.EnqueueAsync(job, null);
-
-                    await ruleEventRepository.UpdateAsync(job, new RuleJobUpdate
-                    {
-                        JobResult = RuleJobResult.Failed,
-                        ExecutionResult = RuleResult.Failed,
-                        ExecutionDump = ex.ToString(),
-                        Finished = job.Created
-                    });
-                }
-                else
-                {
-                    await ruleEventRepository.EnqueueAsync(job, job.Created);
-                }
+                await ruleEventRepository.EnqueueAsync(job, ex);
             }
         }
 

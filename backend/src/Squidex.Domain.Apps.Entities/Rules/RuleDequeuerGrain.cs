@@ -25,12 +25,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         private readonly ITargetBlock<IRuleEventEntity> requestBlock;
         private readonly IRuleEventRepository ruleEventRepository;
-        private readonly RuleService ruleService;
+        private readonly IRuleService ruleService;
         private readonly ConcurrentDictionary<DomainId, bool> executing = new ConcurrentDictionary<DomainId, bool>();
         private readonly IClock clock;
         private readonly ISemanticLog log;
 
-        public RuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
+        public RuleDequeuerGrain(
+            IRuleService ruleService,
+            IRuleEventRepository ruleEventRepository,
+            ISemanticLog log, IClock clock)
         {
             Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
             Guard.NotNull(ruleService, nameof(ruleService));

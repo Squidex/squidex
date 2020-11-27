@@ -54,6 +54,10 @@ export class RuleComponent {
         this.rulesState.run(this.rule);
     }
 
+    public runFromSnapshots() {
+        this.rulesState.runFromSnapshots(this.rule);
+    }
+
     public rename(name: string) {
         this.rulesState.rename(this.rule, name);
     }

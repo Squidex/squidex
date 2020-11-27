@@ -44,6 +44,12 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
+        public void Should_return_false_when_asking_for_snapshot_support()
+        {
+            Assert.False(sut.CanCreateSnapshotEvents);
+        }
+
+        [Fact]
         public async Task Should_create_enriched_events()
         {
             var user1 = CreateUser("1");

@@ -10,7 +10,6 @@ using NodaTime;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -104,11 +103,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static ContentDto FromContent(Context context, IEnrichedContentEntity content, Resources resources)
+        public static ContentDto FromContent(IEnrichedContentEntity content, Resources resources)
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
-            if (context.ShouldFlatten())
+            if (resources.Context.ShouldFlatten())
             {
                 response.Data = content.Data.ToFlatten();
             }

@@ -30,9 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly ILocalCache localCache = A.Fake<ILocalCache>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
+        private readonly IRuleService ruleService = A.Fake<IRuleService>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly RuleEnqueuer sut;
 
         public sealed class TestAction : RuleAction
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
-            A.CallTo(() => ruleEventRepository.EnqueueAsync(job, now, default))
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(job, (Exception?)null))
                 .MustHaveHappened();
         }
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.On(@event);
 
-            A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, now, default))
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, (Exception?)null))
                 .MustHaveHappened();
         }
 

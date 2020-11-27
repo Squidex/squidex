@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -23,14 +26,45 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IScriptEngine scriptEngine;
         private readonly IContentLoader contentLoader;
+        private readonly IContentRepository contentRepository;
 
-        public ContentChangedTriggerHandler(IScriptEngine scriptEngine, IContentLoader contentLoader)
+        public override bool CanCreateSnapshotEvents => true;
+
+        public ContentChangedTriggerHandler(
+            IScriptEngine scriptEngine,
+            IContentLoader contentLoader,
+            IContentRepository contentRepository)
         {
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(contentLoader, nameof(contentLoader));
+            Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.scriptEngine = scriptEngine;
             this.contentLoader = contentLoader;
+            this.contentRepository = contentRepository;
+        }
+
+        public override async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEvents(ContentChangedTriggerV2 trigger, DomainId appId)
+        {
+            var schemaIds =
+                trigger.Schemas?.Count > 0 ?
+                trigger.Schemas.Select(x => x.SchemaId).Distinct().ToHashSet() :
+                null;
+
+            await foreach (var content in contentRepository.StreamAll(appId, schemaIds))
+            {
+                var result = new EnrichedContentEvent
+                {
+                    Type = EnrichedContentEventType.Created
+                };
+
+                SimpleMapper.Map(content, result);
+
+                result.Actor = content.LastModifiedBy;
+                result.Name = $"{content.SchemaId.Name.ToPascalCase()}CreatedFromSnapshot";
+
+                yield return result;
+            }
         }
 
         protected override async Task<EnrichedContentEvent?> CreateEnrichedEventAsync(Envelope<ContentEvent> @event)

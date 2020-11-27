@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using Lazy;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using P = Squidex.Shared.Permissions;
@@ -176,13 +177,15 @@ namespace Squidex.Web
 
         public ApiController Controller { get; }
 
-        public PermissionSet Permissions { get; }
+        public PermissionSet Permissions => Context.Permissions;
+
+        public Context Context { get; set; }
 
         public Resources(ApiController controller)
         {
             Controller = controller;
 
-            Permissions = controller.HttpContext.Context().Permissions;
+            Context = controller.HttpContext.Context();
         }
 
         public string Url<T>(Func<T?, string> action, object? values = null) where T : ApiController

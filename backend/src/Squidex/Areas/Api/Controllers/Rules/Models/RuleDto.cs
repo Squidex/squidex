@@ -10,6 +10,7 @@ using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
@@ -89,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public Instant? LastExecuted { get; set; }
 
-        public static RuleDto FromRule(IEnrichedRuleEntity rule, DomainId? runningRuleId, Resources resources)
+        public static RuleDto FromRule(IEnrichedRuleEntity rule, bool canRun, IRuleRunnerService ruleRunnerService, Resources resources)
         {
             var result = new RuleDto();
 
@@ -101,10 +102,10 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 result.Trigger = RuleTriggerDtoFactory.Create(rule.RuleDef.Trigger);
             }
 
-            return result.CreateLinks(resources, runningRuleId);
+            return result.CreateLinks(resources, rule, canRun, ruleRunnerService);
         }
 
-        private RuleDto CreateLinks(Resources resources, DomainId? runningRuleId)
+        private RuleDto CreateLinks(Resources resources, IEnrichedRuleEntity rule, bool canRun, IRuleRunnerService ruleRunnerService)
         {
             var values = new { app = resources.App, id = Id };
 
@@ -129,9 +130,16 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
             {
                 AddPutLink("trigger", resources.Url<RulesController>(x => nameof(x.TriggerRule), values));
 
-                if (runningRuleId == null)
+                if (canRun && ruleRunnerService.CanRunRule(rule))
                 {
                     AddPutLink("run", resources.Url<RulesController>(x => nameof(x.PutRuleRun), values));
+                }
+
+                if (canRun && ruleRunnerService.CanRunFromSnapshots(rule))
+                {
+                    var snaphshotValues = new { app = resources.App, id = Id, fromSnapshots = true };
+
+                    AddPutLink("run/snapshots", resources.Url<RulesController>(x => nameof(x.PutRuleRun), snaphshotValues));
                 }
 
                 AddGetLink("logs", resources.Url<RulesController>(x => nameof(x.GetEvents), values));

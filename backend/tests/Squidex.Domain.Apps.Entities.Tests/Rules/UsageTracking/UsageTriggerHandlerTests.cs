@@ -24,6 +24,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         private readonly IRuleTriggerHandler sut = new UsageTriggerHandler();
 
         [Fact]
+        public void Should_return_false_when_asking_for_snapshot_support()
+        {
+            Assert.False(sut.CanCreateSnapshotEvents);
+        }
+
+        [Fact]
         public void Should_not_trigger_precheck_when_event_type_not_correct()
         {
             var result = sut.Trigger(new ContentCreated(), new UsageTrigger(), ruleId);

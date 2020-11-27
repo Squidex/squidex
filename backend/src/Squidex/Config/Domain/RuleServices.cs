@@ -83,10 +83,10 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<PredefinedPatternsFormatter>()
                 .As<IRuleEventFormatter>();
 
-            services.AddSingletonAs<RuleEventFormatter>()
-                .AsSelf();
-
             services.AddSingletonAs<RuleService>()
+                .As<IRuleService>();
+
+            services.AddSingletonAs<RuleEventFormatter>()
                 .AsSelf();
 
             services.AddSingletonAs<GrainBootstrap<IRuleDequeuerGrain>>()
