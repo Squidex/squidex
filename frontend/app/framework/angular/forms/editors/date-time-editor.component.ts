@@ -8,6 +8,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
+import format from 'date-fns/format';
 import * as Pikaday from 'pikaday/pikaday';
 import { FocusComponent } from './../forms-helper';
 
@@ -136,7 +137,12 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     }
 
     public ngAfterViewInit() {
-        this.picker = new Pikaday({field: this.dateInput.nativeElement, format: 'YYYY-MM-DD',
+        const i18n = getLocalizationSettings();
+
+        this.picker = new Pikaday({
+            field: this.dateInput.nativeElement,
+            i18n,
+            format: 'YYYY-MM-DD',
             onSelect: () => {
                 if (this.suppressEvents) {
                     return;
@@ -242,4 +248,33 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     public setCompact(isCompact: boolean) {
         this.next(s => ({ ...s, isCompact }));
     }
+}
+
+let localizedValues: any;
+
+function getLocalizationSettings() {
+    if (!localizedValues) {
+        localizedValues = {
+            months: [],
+            weekdays: [],
+            weekdaysShort: []
+        };
+
+        const options = { locale: DateHelper.getFnsLocale() };
+
+        for (let i = 0; i < 12; i++) {
+            const firstOfMonth = new Date(2020, i, 1);
+
+            localizedValues.months.push(format(firstOfMonth, 'LLLL', options));
+        }
+
+        for (let i = 1; i <= 7; i++) {
+            const weekDay = new Date(2020, 11, i);
+
+            localizedValues.weekdays.push(format(weekDay, 'EEEE', options));
+            localizedValues.weekdaysShort.push(format(weekDay, 'EEE', options));
+        }
+    }
+
+    return localizedValues;
 }

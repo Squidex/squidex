@@ -24,6 +24,7 @@ export * from './services/temp.service';
 export * from './services/title.service';
 export * from './services/localizer.service';
 export * from './utils/array-helper';
+export * from './utils/cookies';
 export * from './utils/date-helper';
 export * from './utils/date-time';
 export * from './utils/duration';

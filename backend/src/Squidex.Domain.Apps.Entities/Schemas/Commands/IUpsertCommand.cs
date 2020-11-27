@@ -21,15 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         SchemaField[]? Fields { get; set; }
 
+        SchemaScripts? Scripts { get; set; }
+
+        SchemaProperties Properties { get; set; }
+
         FieldNames? FieldsInReferences { get; set; }
 
         FieldNames? FieldsInLists { get; set; }
 
         FieldRuleCommand[]? FieldRules { get; set; }
-
-        SchemaScripts? Scripts { get; set; }
-
-        SchemaProperties Properties { get; set; }
 
         Dictionary<string, string>? PreviewUrls { get; set; }
 

@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ApiUrlConfig, AuthService, fadeAnimation, ModalModel, StatefulComponent, UILanguages, UIOptions, UIState } from '@app/shared';
+import { ApiUrlConfig, AuthService, Cookies, fadeAnimation, ModalModel, StatefulComponent, UILanguages, UIOptions, UIState } from '@app/shared';
 
 interface State {
     // The display name of the user.
@@ -71,7 +71,8 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     }
 
     public changeLanguage(code: string) {
-        document.cookie = `.AspNetCore.Culture=c=${code}|uic=${code}`;
+        Cookies.remove('.AspNetCore.Culture');
+        Cookies.set('.AspNetCore.Culture', `c=${code}|uic=${code}`, 365);
 
         location.reload();
     }
