@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
+        private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly IRuleTriggerHandler sut;
 
@@ -38,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
                 .Returns(false);
 
-            sut = new AssetChangedTriggerHandler(scriptEngine, assetLoader);
+            sut = new AssetChangedTriggerHandler(scriptEngine, assetLoader, assetRepository);
         }
 
         public static IEnumerable<object[]> TestEvents()
@@ -47,6 +49,26 @@ namespace Squidex.Domain.Apps.Entities.Assets
             yield return new object[] { new AssetUpdated(), EnrichedAssetEventType.Updated };
             yield return new object[] { new AssetAnnotated(), EnrichedAssetEventType.Annotated };
             yield return new object[] { new AssetDeleted(), EnrichedAssetEventType.Deleted };
+        }
+
+        [Fact]
+        public async Task Should_create_events_from_snapshots()
+        {
+            var trigger = new AssetChangedTriggerV2();
+
+            A.CallTo(() => assetRepository.StreamAll(appId.Id))
+                .Returns(new List<AssetEntity>
+                {
+                    new AssetEntity(),
+                    new AssetEntity()
+                }.ToAsyncEnumerable());
+
+            var result = await sut.CreateSnapshotEvents(trigger, appId.Id).ToListAsync();
+
+            var typed = result.OfType<EnrichedAssetEvent>().ToList();
+
+            Assert.Equal(2, typed.Count);
+            Assert.Equal(2, typed.Count(x => x.Type == EnrichedAssetEventType.Created));
         }
 
         [Theory]

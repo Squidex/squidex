@@ -614,6 +614,7 @@
   "rules.ruleSyntax.then": "then",
   "rules.run": "Uitvoeren",
   "rules.runFailed": "Uitvoeren van regel mislukt. Laad opnieuw.",
+  "rules.runFromSnapshots": "Run with latest states",
   "rules.runningRule": "Regel '{name}' is momenteel actief.",
   "rules.runRuleConfirmText": "Wil je de regel echt voor alle evenementen uitvoeren?",
   "rules.runRuleConfirmTitle": "Regel uitvoeren",

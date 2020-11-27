@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
@@ -27,11 +28,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public DomainId? RunningRuleId { get; set; }
 
-        public static RulesDto FromRules(IEnumerable<IEnrichedRuleEntity> items, DomainId? runningRuleId, Resources resources)
+        public static RulesDto FromRules(IEnumerable<IEnrichedRuleEntity> items, DomainId? runningRuleId, IRuleRunnerService ruleRunnerService, Resources resources)
         {
             var result = new RulesDto
             {
-                Items = items.Select(x => RuleDto.FromRule(x, runningRuleId, resources)).ToArray()
+                Items = items.Select(x => RuleDto.FromRule(x, runningRuleId, ruleRunnerService, resources)).ToArray()
             };
 
             result.RunningRuleId = runningRuleId;

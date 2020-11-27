@@ -297,6 +297,25 @@ describe('RulesService', () => {
         req.flush({});
     }));
 
+    it('should make put request to run rule from snapshots',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                ['run/snapshots']: { method: 'PUT', href: '/api/apps/my-app/rules/123/run?fromSnapshots=true' }
+            }
+        };
+
+        rulesService.runRuleFromSnapshots('my-app', resource).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123/run?fromSnapshots=true');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+    }));
+
     it('should make delete request to cancel run rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 

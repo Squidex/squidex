@@ -130,6 +130,7 @@ export class RuleDto {
     public readonly canDisable: boolean;
     public readonly canEnable: boolean;
     public readonly canRun: boolean;
+    public readonly canRunFromSnapshots: boolean;
     public readonly canTrigger: boolean;
     public readonly canUpdate: boolean;
 
@@ -157,6 +158,7 @@ export class RuleDto {
         this.canDisable = hasAnyLink(links, 'disable');
         this.canEnable = hasAnyLink(links, 'enable');
         this.canRun = hasAnyLink(links, 'run');
+        this.canRunFromSnapshots = hasAnyLink(links, 'run/snapshots');
         this.canTrigger = hasAnyLink(links, 'logs');
         this.canUpdate = hasAnyLink(links, 'update');
     }
@@ -332,6 +334,18 @@ export class RulesService {
 
     public runRule(appName: string, resource: Resource): Observable<any> {
         const link = resource._links['run'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url, {}).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Rule', 'Run', appName);
+            }),
+            pretifyError('i18n:rules.runFailed'));
+    }
+
+    public runRuleFromSnapshots(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['run/snapshots'];
 
         const url = this.apiUrl.buildUrl(link.href);
 

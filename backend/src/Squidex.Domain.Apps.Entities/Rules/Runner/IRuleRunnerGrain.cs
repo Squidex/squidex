@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
     public interface IRuleRunnerGrain : IGrainWithStringKey
     {
-        Task RunAsync(DomainId ruleId);
+        Task RunAsync(DomainId ruleId, bool fromSnapshots);
 
         Task CancelAsync();
 

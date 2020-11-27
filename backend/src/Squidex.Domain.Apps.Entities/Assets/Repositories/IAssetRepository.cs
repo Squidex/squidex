@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 {
     public interface IAssetRepository
     {
+        IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId);
+
         Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, ClrQuery query);
 
         Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, HashSet<DomainId> ids);

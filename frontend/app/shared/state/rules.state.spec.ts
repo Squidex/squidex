@@ -175,11 +175,22 @@ describe('RulesState', () => {
             expect(rule1New).toEqual(rule1);
         });
 
-        it('should not update rule when run', () => {
+        it('should not update rule when rurunningn', () => {
             rulesService.setup(x => x.runRule(app, rule1))
                 .returns(() => of()).verifiable();
 
             rulesState.run(rule1).subscribe();
+
+            const rule1New = rulesState.snapshot.rules[0];
+
+            expect(rule1New).toEqual(rule1);
+        });
+
+        it('should not update rule when running from snapshots', () => {
+            rulesService.setup(x => x.runRuleFromSnapshots(app, rule1))
+                .returns(() => of()).verifiable();
+
+            rulesState.runFromSnapshots(rule1).subscribe();
 
             const rule1New = rulesState.snapshot.rules[0];
 

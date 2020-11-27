@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             queryContentAsync = new QueryContent(converter);
             queryContentsById = new QueryContentsByIds(converter, appProvider);
-            queryContentsByQuery = new QueryContentsByQuery(converter, indexer);
+            queryContentsByQuery = new QueryContentsByQuery(converter, indexer, appProvider);
             queryIdsAsync = new QueryIdsAsync(appProvider);
             queryReferrersAsync = new QueryReferrersAsync();
             queryScheduledItems = new QueryScheduledContents();
@@ -63,6 +63,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await queryIdsAsync.PrepareAsync(collection, ct);
             await queryReferrersAsync.PrepareAsync(collection, ct);
             await queryScheduledItems.PrepareAsync(collection, ct);
+        }
+
+        public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds)
+        {
+            return queryContentsByQuery.StreamAll(appId, schemaIds);
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, DomainId? referenced)

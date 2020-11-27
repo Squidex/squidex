@@ -66,6 +66,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }, ct);
         }
 
+        public async IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId)
+        {
+            var find = Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
+
+            using (var cursor = await find.ToCursorAsync())
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    foreach (var entity in cursor.Current)
+                    {
+                        yield return entity;
+                    }
+                }
+            }
+        }
+
         public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, ClrQuery query)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByQuery"))

@@ -28,6 +28,17 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get { return typeof(TTrigger); }
         }
 
+        public virtual bool CanCreateSnapshotEvents
+        {
+            get { return false; }
+        }
+
+        public virtual async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEvents(TTrigger trigger, DomainId appId)
+        {
+            await Task.Yield();
+            yield break;
+        }
+
         public virtual async Task<List<EnrichedEvent>> CreateEnrichedEventsAsync(Envelope<AppEvent> @event)
         {
             var enrichedEvent = await CreateEnrichedEventAsync(@event.To<TEvent>());
@@ -43,6 +54,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 return emptyEnrichedEvents;
             }
+        }
+
+        IAsyncEnumerable<EnrichedEvent> IRuleTriggerHandler.CreateSnapshotEvents(RuleTrigger trigger, DomainId appId)
+        {
+            return CreateSnapshotEvents((TTrigger)trigger, appId);
         }
 
         bool IRuleTriggerHandler.Trigger(EnrichedEvent @event, RuleTrigger trigger)

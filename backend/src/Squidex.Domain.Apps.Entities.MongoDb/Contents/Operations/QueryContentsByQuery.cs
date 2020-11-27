@@ -27,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     {
         private readonly DataConverter converter;
         private readonly ITextIndex indexer;
+        private readonly IAppProvider appProvider;
 
         [BsonIgnoreExtraElements]
         internal sealed class IdOnly
@@ -38,11 +39,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public MongoContentEntity[] Joined { get; set; }
         }
 
-        public QueryContentsByQuery(DataConverter converter, ITextIndex indexer)
+        public QueryContentsByQuery(DataConverter converter, ITextIndex indexer, IAppProvider appProvider)
         {
             this.converter = converter;
-
             this.indexer = indexer;
+            this.appProvider = appProvider;
         }
 
         protected override async Task PrepareAsync(CancellationToken ct = default)
@@ -64,6 +65,32 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     .Descending(x => x.LastModified));
 
             await Collection.Indexes.CreateOneAsync(indexBySchema, cancellationToken: ct);
+        }
+
+        public async IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds)
+        {
+            var find =
+                schemaIds != null ?
+                    Collection.Find(x => x.IndexedAppId == appId && schemaIds.Contains(x.IndexedSchemaId) && !x.IsDeleted) :
+                    Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
+
+            using (var cursor = await find.ToCursorAsync())
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    foreach (var entity in cursor.Current)
+                    {
+                        var schema = await appProvider.GetSchemaAsync(appId, entity.SchemaId.Id, false);
+
+                        if (schema != null)
+                        {
+                            entity.ParseData(schema.SchemaDef, converter);
+
+                            yield return entity;
+                        }
+                    }
+                }
+            }
         }
 
         public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, DomainId? referenced, SearchScope scope)

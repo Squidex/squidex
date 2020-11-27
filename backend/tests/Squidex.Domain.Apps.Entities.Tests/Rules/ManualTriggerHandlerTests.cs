@@ -23,6 +23,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IRuleTriggerHandler sut = new ManualTriggerHandler();
 
         [Fact]
+        public void Should_return_false_when_asking_for_snapshot_support()
+        {
+            Assert.False(sut.CanCreateSnapshotEvents);
+        }
+
+        [Fact]
         public async Task Should_create_event_with_name()
         {
             var envelope = Envelope.Create<AppEvent>(new RuleManuallyTriggered());

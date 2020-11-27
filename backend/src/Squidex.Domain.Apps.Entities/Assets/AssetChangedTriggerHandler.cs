@@ -5,11 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -21,15 +23,40 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly IScriptEngine scriptEngine;
         private readonly IAssetLoader assetLoader;
+        private readonly IAssetRepository assetRepository;
 
-        public AssetChangedTriggerHandler(IScriptEngine scriptEngine, IAssetLoader assetLoader)
+        public override bool CanCreateSnapshotEvents => true;
+
+        public AssetChangedTriggerHandler(
+            IScriptEngine scriptEngine,
+            IAssetLoader assetLoader,
+            IAssetRepository assetRepository)
         {
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(assetLoader, nameof(assetLoader));
+            Guard.NotNull(assetRepository, nameof(assetRepository));
 
             this.scriptEngine = scriptEngine;
-
             this.assetLoader = assetLoader;
+            this.assetRepository = assetRepository;
+        }
+
+        public override async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEvents(AssetChangedTriggerV2 trigger, DomainId appId)
+        {
+            await foreach (var asset in assetRepository.StreamAll(appId))
+            {
+                var result = new EnrichedAssetEvent
+                {
+                    Type = EnrichedAssetEventType.Created
+                };
+
+                SimpleMapper.Map(asset, result);
+
+                result.Actor = asset.LastModifiedBy;
+                result.Name = "AssetCreatedFromSnapshot";
+
+                yield return result;
+            }
         }
 
         protected override async Task<EnrichedAssetEvent?> CreateEnrichedEventAsync(Envelope<AssetEvent> @event)

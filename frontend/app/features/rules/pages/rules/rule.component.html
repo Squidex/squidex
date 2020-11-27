@@ -24,6 +24,14 @@
                             confirmRememberKey="runRule">
                             {{ 'rules.run' | sqxTranslate }}
                         </a>
+
+                        <a class="dropdown-item" *ngIf="rule.canRunFromSnapshots"
+                            (sqxConfirmClick)="runFromSnapshots()"
+                            confirmTitle="i18n:rules.runRuleConfirmTitle"
+                            confirmText="i18n:rules.runRuleConfirmText"
+                            confirmRememberKey="runRule">
+                            {{ 'rules.runFromSnapshots' | sqxTranslate }}
+                        </a>
             
                         <a class="dropdown-item dropdown-item-delete" *ngIf="rule.canDelete"
                             (sqxConfirmClick)="delete()"

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NodaTime;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
@@ -17,6 +18,26 @@ namespace Squidex.Domain.Apps.Entities.Rules.Repositories
 {
     public interface IRuleEventRepository
     {
+        async Task EnqueueAsync(RuleJob job, Exception? ex)
+        {
+            if (ex != null)
+            {
+                await EnqueueAsync(job, null);
+
+                await UpdateAsync(job, new RuleJobUpdate
+                {
+                    JobResult = RuleJobResult.Failed,
+                    ExecutionResult = RuleResult.Failed,
+                    ExecutionDump = ex.ToString(),
+                    Finished = job.Created
+                });
+            }
+            else
+            {
+                await EnqueueAsync(job, job.Created);
+            }
+        }
+
         Task UpdateAsync(RuleJob job, RuleJobUpdate update);
 
         Task EnqueueAsync(RuleJob job, Instant? nextAttempt, CancellationToken ct = default);

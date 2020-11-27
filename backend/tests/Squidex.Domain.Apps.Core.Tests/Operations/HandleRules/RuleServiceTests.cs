@@ -94,6 +94,138 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
+        public void Should_not_run_from_snapshots_if_no_trigger_handler_registered()
+        {
+            var result = sut.CanCreateSnapshotEvents(RuleInvalidTrigger());
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void Should_not_run_from_snapshots_if_trigger_handler_does_not_support_it()
+        {
+            A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
+                .Returns(false);
+
+            var result = sut.CanCreateSnapshotEvents(ValidRule());
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void Should_run_from_snapshots_if_trigger_handler_does_support_it()
+        {
+            A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
+                .Returns(true);
+
+            var result = sut.CanCreateSnapshotEvents(ValidRule());
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task Should_not_create_job_from_snapshots_if_trigger_handler_does_not_support_it()
+        {
+            A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
+                .Returns(false);
+
+            var jobs = await sut.CreateSnapshotJobsAsync(ValidRule(), ruleId, appId.Id).ToListAsync();
+
+            Assert.Empty(jobs);
+
+            A.CallTo(() => ruleTriggerHandler.CreateSnapshotEvents(A<RuleTrigger>._, A<DomainId>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_create_job_from_snapshots_if_rule_disabled()
+        {
+            A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
+                .Returns(true);
+
+            var jobs = await sut.CreateSnapshotJobsAsync(ValidRule().Disable(), ruleId, appId.Id).ToListAsync();
+
+            Assert.Empty(jobs);
+
+            A.CallTo(() => ruleTriggerHandler.CreateSnapshotEvents(A<RuleTrigger>._, A<DomainId>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_create_job_from_snapshots_if_no_trigger_handler_registered()
+        {
+            A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
+                .Returns(true);
+
+            var jobs = await sut.CreateSnapshotJobsAsync(RuleInvalidTrigger(), ruleId, appId.Id).ToListAsync();
+
+            Assert.Empty(jobs);
+
+            A.CallTo(() => ruleTriggerHandler.CreateSnapshotEvents(A<RuleTrigger>._, A<DomainId>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_create_job_from_snapshots_if_no_action_handler_registered()
+        {
+            A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
+                .Returns(true);
+
+            var jobs = await sut.CreateSnapshotJobsAsync(RuleInvalidAction(), ruleId, appId.Id).ToListAsync();
+
+            Assert.Empty(jobs);
+
+            A.CallTo(() => ruleTriggerHandler.CreateSnapshotEvents(A<RuleTrigger>._, A<DomainId>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_create_jobs_from_snapshots()
+        {
+            var rule = ValidRule();
+
+            A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
+                .Returns(true);
+
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<EnrichedEvent>._, rule.Trigger))
+                .Returns(true);
+
+            A.CallTo(() => ruleTriggerHandler.CreateSnapshotEvents(rule.Trigger, appId.Id))
+                .Returns(new List<EnrichedEvent>
+                {
+                    new EnrichedContentEvent { AppId = appId },
+                    new EnrichedContentEvent { AppId = appId }
+                }.ToAsyncEnumerable());
+
+            var result = await sut.CreateSnapshotJobsAsync(rule, ruleId, appId.Id).ToListAsync();
+
+            Assert.Equal(2, result.Count(x => x.Job != null && x.Exception == null));
+        }
+
+        [Fact]
+        public async Task Should_create_jobs_with_exceptions_from_snapshots()
+        {
+            var rule = ValidRule();
+
+            A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
+                .Returns(true);
+
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<EnrichedEvent>._, rule.Trigger))
+                .Throws(new InvalidOperationException());
+
+            A.CallTo(() => ruleTriggerHandler.CreateSnapshotEvents(rule.Trigger, appId.Id))
+                .Returns(new List<EnrichedEvent>
+                {
+                    new EnrichedContentEvent { AppId = appId },
+                    new EnrichedContentEvent { AppId = appId }
+                }.ToAsyncEnumerable());
+
+            var result = await sut.CreateSnapshotJobsAsync(rule, ruleId, appId.Id).ToListAsync();
+
+            Assert.Equal(2, result.Count(x => x.Job == null && x.Exception != null));
+        }
+
+        [Fact]
         public async Task Should_not_create_job_if_rule_disabled()
         {
             var @event = Envelope.Create(new ContentCreated());

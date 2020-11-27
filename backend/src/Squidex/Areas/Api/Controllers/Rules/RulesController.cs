@@ -90,11 +90,11 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var rules = await ruleQuery.QueryAsync(Context);
 
-            var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id);
-
-            var response = Deferred.Response(() =>
+            var response = Deferred.AsyncResponse(async () =>
             {
-                return RulesDto.FromRules(rules, runningRuleId, Resources);
+                var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id);
+
+                return RulesDto.FromRules(rules, runningRuleId, ruleRunnerService, Resources);
             });
 
             return Ok(response);
@@ -241,6 +241,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the rule to run.</param>
+        /// <param name="fromSnapshots">Runs the rule from snapeshots if possible.</param>
         /// <returns>
         /// 204 => Rule started.
         /// </returns>
@@ -249,9 +250,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ProducesResponseType(204)]
         [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutRuleRun(string app, DomainId id)
+        public async Task<IActionResult> PutRuleRun(string app, DomainId id, [FromQuery] bool fromSnapshots = false)
         {
-            await ruleRunnerService.RunAsync(App.Id, id);
+            await ruleRunnerService.RunAsync(App.Id, id, fromSnapshots);
 
             return NoContent();
         }
@@ -362,7 +363,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
             var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id);
 
             var result = context.Result<IEnrichedRuleEntity>();
-            var response = RuleDto.FromRule(result, runningRuleId, Resources);
+            var response = RuleDto.FromRule(result, runningRuleId, ruleRunnerService, Resources);
 
             return response;
         }
