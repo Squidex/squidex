@@ -158,7 +158,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = Deferred.AsyncResponse(() =>
             {
-                return ContentsDto.FromContentsAsync(contents, Context, Resources, null, contentWorkflow);
+                return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
             });
 
             return Ok(response);
@@ -187,7 +187,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = Deferred.AsyncResponse(() =>
             {
-                return ContentsDto.FromContentsAsync(contents, Context, Resources, null, contentWorkflow);
+                return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
             });
 
             return Ok(response);
@@ -218,9 +218,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var contents = await contentQuery.QueryAsync(Context, name, CreateQuery(ids, q));
 
-            var response = Deferred.AsyncResponse(async () =>
+            var response = Deferred.AsyncResponse(() =>
             {
-                return await ContentsDto.FromContentsAsync(contents, Context, Resources, schema, contentWorkflow);
+                return ContentsDto.FromContentsAsync(contents, Resources, schema, contentWorkflow);
             });
 
             return Ok(response);
@@ -250,9 +250,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var contents = await contentQuery.QueryAsync(Context, name, query?.ToQuery() ?? Q.Empty);
 
-            var response = Deferred.AsyncResponse(async () =>
+            var response = Deferred.AsyncResponse(() =>
             {
-                return await ContentsDto.FromContentsAsync(contents, Context, Resources, schema, contentWorkflow);
+                return ContentsDto.FromContentsAsync(contents, Resources, schema, contentWorkflow);
             });
 
             return Ok(response);
@@ -280,7 +280,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var content = await contentQuery.FindAsync(Context, name, id);
 
-            var response = ContentDto.FromContent(Context, content, Resources);
+            var response = ContentDto.FromContent(content, Resources);
 
             return Ok(response);
         }
@@ -307,7 +307,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var content = await contentQuery.FindAsync(Context, name, id, version);
 
-            var response = ContentDto.FromContent(Context, content, Resources);
+            var response = ContentDto.FromContent(content, Resources);
 
             return Ok(response.Data);
         }
@@ -613,7 +613,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IEnrichedContentEntity>();
-            var response = ContentDto.FromContent(Context, result, Resources);
+            var response = ContentDto.FromContent(result, Resources);
 
             return response;
         }

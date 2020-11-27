@@ -75,8 +75,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.StreamAll(appId.Id, null))
                 .Returns(new List<ContentEntity>
                 {
-                    new ContentEntity(),
-                    new ContentEntity()
+                    new ContentEntity { SchemaId = schemaMatch },
+                    new ContentEntity { SchemaId = schemaMatch }
                 }.ToAsyncEnumerable());
 
             var result = await sut.CreateSnapshotEvents(trigger, appId.Id).ToListAsync();
@@ -104,8 +104,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.StreamAll(appId.Id, A<HashSet<DomainId>>.That.Is(schemaMatch.Id)))
                 .Returns(new List<ContentEntity>
                 {
-                    new ContentEntity(),
-                    new ContentEntity()
+                    new ContentEntity { SchemaId = schemaMatch },
+                    new ContentEntity { SchemaId = schemaMatch }
                 }.ToAsyncEnumerable());
 
             var result = await sut.CreateSnapshotEvents(trigger, appId.Id).ToListAsync();

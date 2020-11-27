@@ -7,7 +7,6 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -35,13 +34,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         [LocalizedRequired]
         public StatusInfoDto[] Statuses { get; set; }
 
-        public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents, Context context, Resources resources,
+        public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents, Resources resources,
             ISchemaEntity? schema, IContentWorkflow workflow)
         {
             var result = new ContentsDto
             {
                 Total = contents.Total,
-                Items = contents.Select(x => ContentDto.FromContent(context, x, resources)).ToArray()
+                Items = contents.Select(x => ContentDto.FromContent(x, resources)).ToArray()
             };
 
             if (schema != null)

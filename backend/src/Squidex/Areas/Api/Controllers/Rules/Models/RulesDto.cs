@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure;
@@ -28,11 +29,13 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public DomainId? RunningRuleId { get; set; }
 
-        public static RulesDto FromRules(IEnumerable<IEnrichedRuleEntity> items, DomainId? runningRuleId, IRuleRunnerService ruleRunnerService, Resources resources)
+        public static async Task<RulesDto> FromRulesAsync(IEnumerable<IEnrichedRuleEntity> items, IRuleRunnerService ruleRunnerService, Resources resources)
         {
+            var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(resources.Context.App.Id);
+
             var result = new RulesDto
             {
-                Items = items.Select(x => RuleDto.FromRule(x, runningRuleId, ruleRunnerService, resources)).ToArray()
+                Items = items.Select(x => RuleDto.FromRule(x, runningRuleId == null, ruleRunnerService, resources)).ToArray()
             };
 
             result.RunningRuleId = runningRuleId;
