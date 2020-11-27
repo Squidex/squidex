@@ -385,23 +385,25 @@ function getField(x: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldD
 
 const NO_NAME = '';
 
-function buildCategories(categories: ReadonlyArray<string>, schemas: SchemasList): ReadonlyArray<SchemaCategory> {
-    const uniqueCategories: { [name: string]: true } = { [NO_NAME]: true };
+function buildCategories(categories: ReadonlyArray<string>, allSchemas: SchemasList): ReadonlyArray<SchemaCategory> {
+    const uniqueCategories: { [name: string]: true } = {
+        [NO_NAME]: true
+    };
 
     for (const category of categories) {
         uniqueCategories[category] = true;
     }
 
-    for (const schema of schemas) {
+    for (const schema of allSchemas) {
         uniqueCategories[getCategory(schema)] = true;
     }
 
     const result: SchemaCategory[] = [];
 
-    for (const name in uniqueCategories) {
-        if (uniqueCategories.hasOwnProperty(name)) {
-            result.push({ name, upper: name.toUpperCase(), schemas: schemas.filter(x => isSameCategory(name, x))});
-        }
+    for (const name of Object.keys(uniqueCategories)) {
+        const schemas = allSchemas.filter(x => isSameCategory(name, x));
+
+        result.push({ name, upper: name.toUpperCase(), schemas });
     }
 
     result.sort((a, b) => compareStrings(a.upper, b.upper));

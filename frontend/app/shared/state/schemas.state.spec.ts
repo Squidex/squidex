@@ -63,6 +63,7 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { name: '', upper: '', schemas: [] },
                 { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
                 { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] }
             ]);
@@ -84,6 +85,7 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { name: '', upper: '', schemas: [] },
                 { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
                 { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] },
                 { name: 'category3', upper: 'CATEGORY3', schemas: [] }
@@ -151,6 +153,7 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { name: '', upper: '', schemas: [] },
                 { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
                 { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] },
                 { name: 'category3', upper: 'CATEGORY3', schemas: [] }
@@ -163,6 +166,7 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { name: '', upper: '', schemas: [] },
                 { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
                 { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] }
             ]);
@@ -175,6 +179,7 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { name: '', upper: '', schemas: [] },
                 { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
                 { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] }
             ]);
