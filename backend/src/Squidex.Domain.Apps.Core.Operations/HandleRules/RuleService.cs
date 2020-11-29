@@ -24,7 +24,7 @@ using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public class RuleService : IRuleService
+    public sealed class RuleService : IRuleService
     {
         private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers;
         private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers;
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        public virtual async Task<List<(RuleJob Job, Exception? Exception)>> CreateJobsAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event, bool ignoreStale = true)
+        public async Task<List<(RuleJob Job, Exception? Exception)>> CreateJobsAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event, bool ignoreStale = true)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
@@ -261,7 +261,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        public virtual async Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job)
+        public async Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job)
         {
             var actionWatch = ValueStopwatch.StartNew();
 
