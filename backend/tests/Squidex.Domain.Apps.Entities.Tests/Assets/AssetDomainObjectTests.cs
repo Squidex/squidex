@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
@@ -254,7 +255,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
@@ -267,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
                 .Returns(true);
 
             await PublishAsync(command);

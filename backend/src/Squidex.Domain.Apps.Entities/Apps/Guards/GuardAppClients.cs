@@ -15,9 +15,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppClients
     {
-        public static void CanAttach(AppClients clients, AttachClient command)
+        public static void CanAttach(AttachClient command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var clients = app.Clients;
 
             Validate.It(e =>
             {
@@ -32,9 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanRevoke(AppClients clients, RevokeClient command)
+        public static void CanRevoke(RevokeClient command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var clients = app.Clients;
 
             GetClientOrThrow(clients, command.Id);
 
@@ -47,9 +51,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanUpdate(AppClients clients, UpdateClient command, Roles roles)
+        public static void CanUpdate(UpdateClient command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var clients = app.Clients;
 
             GetClientOrThrow(clients, command.Id);
 
@@ -60,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     e(Not.Defined("Clientd"), nameof(command.Id));
                 }
 
-                if (command.Role != null && !roles.Contains(command.Role))
+                if (command.Role != null && !app.Roles.Contains(command.Role))
                 {
                     e(Not.Valid(nameof(command.Role)), nameof(command.Role));
                 }

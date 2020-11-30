@@ -73,7 +73,7 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
         this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
                 filter(x => !!x),
                 switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
-                switchMap(d => this.contentsState.changeStatus(this.content, status, d)),
+                switchMap(d => this.contentsState.changeManyStatus([this.content], status, d)),
                 onErrorResumeNext())
             .subscribe();
     }

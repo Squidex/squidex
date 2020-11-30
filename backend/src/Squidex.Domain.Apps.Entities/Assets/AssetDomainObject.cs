@@ -20,7 +20,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 using IAssetTagService = Squidex.Domain.Apps.Core.Tags.ITagService;
 
@@ -102,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case MoveAsset moveAsset:
                     return UpdateReturnAsync(moveAsset, async c =>
                     {
-                        await GuardAsset.CanMove(c, assetQuery, Snapshot.ParentId);
+                        await GuardAsset.CanMove(c, Snapshot, assetQuery);
 
                         Move(c);
 
@@ -111,17 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
                     {
-                        GuardAsset.CanDelete(c);
-
-                        if (c.CheckReferrers)
-                        {
-                            var hasReferrer = await contentRepository.HasReferrersAsync(Snapshot.AppId.Id, c.AssetId);
-
-                            if (hasReferrer)
-                            {
-                                throw new DomainException(T.Get("assets.referenced"));
-                            }
-                        }
+                        await GuardAsset.CanDelete(c, Snapshot, contentRepository);
 
                         await assetTags.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, null, Snapshot.Tags);
 

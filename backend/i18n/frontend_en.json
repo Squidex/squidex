@@ -422,6 +422,8 @@
   "contents.tableHeaders.nextStatus": "Next Status",
   "contents.tableHeaders.status": "Status",
   "contents.tableHeaders.version": "Version",
+  "contents.unpublishReferrerConfirmText": "The content is referenced by another published content item.\n\nDo you really want to unpublish this content?",
+  "contents.unpublishReferrerConfirmTitle": "Unpublish content",
   "contents.unsavedChangesText": "You have unsaved changes. Do you want to load them now?",
   "contents.unsavedChangesTitle": "Unsaved changes",
   "contents.updated": "Content updated successfully.",

@@ -28,9 +28,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanUpdate(Workflows workflows, UpdateWorkflow command)
+        public static void CanUpdate(UpdateWorkflow command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var workflows = app.Workflows;
 
             CheckWorkflowExists(workflows, command.WorkflowId);
 
@@ -90,9 +92,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanDelete(Workflows workflows, DeleteWorkflow command)
+        public static void CanDelete(DeleteWorkflow command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var workflows = app.Workflows;
 
             CheckWorkflowExists(workflows, command.WorkflowId);
         }

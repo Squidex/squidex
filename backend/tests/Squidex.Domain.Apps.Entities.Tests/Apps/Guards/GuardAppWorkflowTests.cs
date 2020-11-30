@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 WorkflowId = DomainId.NewGuid()
             };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppWorkflows.CanUpdate(workflows, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppWorkflows.CanUpdate(command, App()));
         }
 
         [Fact]
@@ -60,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateWorkflow { WorkflowId = workflowId };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(workflows, command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
                 new ValidationError("Workflow is required.", "Workflow"));
         }
 
@@ -78,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 WorkflowId = workflowId
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(workflows, command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
                 new ValidationError("Initial step is required.", "Workflow.Initial"));
         }
 
@@ -96,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 WorkflowId = workflowId
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(workflows, command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
                 new ValidationError("Initial step cannot be published step.", "Workflow.Initial"));
         }
 
@@ -114,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 WorkflowId = workflowId
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(workflows, command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
                 new ValidationError("Workflow must have a published step.", "Workflow.Steps"));
         }
 
@@ -133,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 WorkflowId = workflowId
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(workflows, command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
                 new ValidationError("Step is required.", "Workflow.Steps.Published"));
         }
 
@@ -157,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 WorkflowId = workflowId
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(workflows, command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
                 new ValidationError("Transition has an invalid target.", "Workflow.Steps.Published.Transitions.Archived"));
         }
 
@@ -182,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 WorkflowId = workflowId
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(workflows, command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App()),
                 new ValidationError("Transition is required.", "Workflow.Steps.Published.Transitions.Draft"));
         }
 
@@ -191,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateWorkflow { Workflow = Workflow.Default, WorkflowId = workflowId };
 
-            GuardAppWorkflows.CanUpdate(workflows, command);
+            GuardAppWorkflows.CanUpdate(command, App());
         }
 
         [Fact]
@@ -199,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new DeleteWorkflow { WorkflowId = DomainId.NewGuid() };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppWorkflows.CanDelete(workflows, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppWorkflows.CanDelete(command, App()));
         }
 
         [Fact]
@@ -207,7 +208,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new DeleteWorkflow { WorkflowId = workflowId };
 
-            GuardAppWorkflows.CanDelete(workflows, command);
+            GuardAppWorkflows.CanDelete(command, App());
+        }
+
+        private IAppEntity App()
+        {
+            var app = A.Fake<IAppEntity>();
+
+            A.CallTo(() => app.Workflows)
+                .Returns(workflows);
+
+            return app;
         }
     }
 }

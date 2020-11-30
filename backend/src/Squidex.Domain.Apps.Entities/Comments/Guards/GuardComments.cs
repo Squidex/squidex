@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             });
         }
 
-        public static void CanUpdate(string commentsId, List<Envelope<CommentsEvent>> events, UpdateComment command)
+        public static void CanUpdate(UpdateComment command, string commentsId, List<Envelope<CommentsEvent>> events)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             });
         }
 
-        public static void CanDelete(string commentsId, List<Envelope<CommentsEvent>> events, DeleteComment command)
+        public static void CanDelete(DeleteComment command, string commentsId, List<Envelope<CommentsEvent>> events)
         {
             Guard.NotNull(command, nameof(command));
 

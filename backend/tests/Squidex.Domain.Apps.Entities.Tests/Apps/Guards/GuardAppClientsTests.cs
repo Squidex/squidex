@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AttachClient();
 
-            ValidationAssert.Throws(() => GuardAppClients.CanAttach(clients_0, command),
+            ValidationAssert.Throws(() => GuardAppClients.CanAttach(command, App(clients_0)),
                 new ValidationError("Client ID is required.", "Id"));
         }
 
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("android", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanAttach(clients_1, command),
+            ValidationAssert.Throws(() => GuardAppClients.CanAttach(command, App(clients_1)),
                 new ValidationError("A client with the same id already exists."));
         }
 
@@ -49,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("android", "secret");
 
-            GuardAppClients.CanAttach(clients_1, command);
+            GuardAppClients.CanAttach(command, App(clients_1));
         }
 
         [Fact]
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new RevokeClient();
 
-            ValidationAssert.Throws(() => GuardAppClients.CanRevoke(clients_0, command),
+            ValidationAssert.Throws(() => GuardAppClients.CanRevoke(command, App(clients_0)),
                 new ValidationError("Client ID is required.", "Id"));
         }
 
@@ -66,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new RevokeClient { Id = "ios" };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanRevoke(clients_0, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanRevoke(command, App(clients_0)));
         }
 
         [Fact]
@@ -76,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            GuardAppClients.CanRevoke(clients_1, command);
+            GuardAppClients.CanRevoke(command, App(clients_1));
         }
 
         [Fact]
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateClient { Name = "iOS" };
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_0, command, Roles.Empty),
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App(clients_0)),
                 new ValidationError("Client ID is required.", "Id"));
         }
 
@@ -93,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateClient { Id = "ios", Name = "iOS" };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanUpdate(clients_0, command, Roles.Empty));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanUpdate(command, App(clients_0)));
         }
 
         [Fact]
@@ -103,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App(clients_1)),
                 new ValidationError("Role is not a valid value.", "Role"));
         }
 
@@ -114,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App(clients_1)),
                 new ValidationError("ApiCallsLimit must be greater or equal to 0.", "ApiCallsLimit"));
         }
 
@@ -125,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App(clients_1)),
                 new ValidationError("ApiTrafficLimit must be greater or equal to 0.", "ApiTrafficLimit"));
         }
 
@@ -136,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            GuardAppClients.CanUpdate(clients_1, command, roles);
+            GuardAppClients.CanUpdate(command, App(clients_1));
         }
 
         [Fact]
@@ -146,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            GuardAppClients.CanUpdate(clients_1, command, roles);
+            GuardAppClients.CanUpdate(command, App(clients_1));
         }
 
         [Fact]
@@ -156,7 +157,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            GuardAppClients.CanUpdate(clients_1, command, roles);
+            GuardAppClients.CanUpdate(command, App(clients_1));
+        }
+
+        private IAppEntity App(AppClients clients)
+        {
+            var app = A.Fake<IAppEntity>();
+
+            A.CallTo(() => app.Clients)
+                .Returns(clients);
+            A.CallTo(() => app.Roles)
+                .Returns(roles);
+
+            return app;
         }
     }
 }

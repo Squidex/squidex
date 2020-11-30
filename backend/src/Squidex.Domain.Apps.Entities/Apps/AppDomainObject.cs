@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AssignContributor assignContributor:
                     return UpdateReturnAsync(assignContributor, async c =>
                     {
-                        await GuardAppContributors.CanAssign(Snapshot.Contributors, Snapshot.Roles, c, userResolver, GetPlan());
+                        await GuardAppContributors.CanAssign(c, Snapshot, userResolver, GetPlan());
 
                         AssignContributor(c, !Snapshot.Contributors.ContainsKey(assignContributor.ContributorId));
 
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case RemoveContributor removeContributor:
                     return UpdateReturn(removeContributor, c =>
                     {
-                        GuardAppContributors.CanRemove(Snapshot.Contributors, c);
+                        GuardAppContributors.CanRemove(c, Snapshot);
 
                         RemoveContributor(c);
 
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AttachClient attachClient:
                     return UpdateReturn(attachClient, c =>
                     {
-                        GuardAppClients.CanAttach(Snapshot.Clients, c);
+                        GuardAppClients.CanAttach(c, Snapshot);
 
                         AttachClient(c);
 
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case UpdateClient updateClient:
                     return UpdateReturn(updateClient, c =>
                     {
-                        GuardAppClients.CanUpdate(Snapshot.Clients, c, Snapshot.Roles);
+                        GuardAppClients.CanUpdate(c, Snapshot);
 
                         UpdateClient(c);
 
@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case RevokeClient revokeClient:
                     return UpdateReturn(revokeClient, c =>
                     {
-                        GuardAppClients.CanRevoke(Snapshot.Clients, c);
+                        GuardAppClients.CanRevoke(c, Snapshot);
 
                         RevokeClient(c);
 
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case UpdateWorkflow updateWorkflow:
                     return UpdateReturn(updateWorkflow, c =>
                     {
-                        GuardAppWorkflows.CanUpdate(Snapshot.Workflows, c);
+                        GuardAppWorkflows.CanUpdate(c, Snapshot);
 
                         UpdateWorkflow(c);
 
@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case DeleteWorkflow deleteWorkflow:
                     return UpdateReturn(deleteWorkflow, c =>
                     {
-                        GuardAppWorkflows.CanDelete(Snapshot.Workflows, c);
+                        GuardAppWorkflows.CanDelete(c, Snapshot);
 
                         DeleteWorkflow(c);
 
@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AddLanguage addLanguage:
                     return UpdateReturn(addLanguage, c =>
                     {
-                        GuardAppLanguages.CanAdd(Snapshot.Languages, c);
+                        GuardAppLanguages.CanAdd(c, Snapshot);
 
                         AddLanguage(c);
 
@@ -202,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case RemoveLanguage removeLanguage:
                     return UpdateReturn(removeLanguage, c =>
                     {
-                        GuardAppLanguages.CanRemove(Snapshot.Languages, c);
+                        GuardAppLanguages.CanRemove(c, Snapshot);
 
                         RemoveLanguage(c);
 
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case UpdateLanguage updateLanguage:
                     return UpdateReturn(updateLanguage, c =>
                     {
-                        GuardAppLanguages.CanUpdate(Snapshot.Languages, c);
+                        GuardAppLanguages.CanUpdate(c, Snapshot);
 
                         UpdateLanguage(c);
 
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AddRole addRole:
                     return UpdateReturn(addRole, c =>
                     {
-                        GuardAppRoles.CanAdd(Snapshot.Roles, c);
+                        GuardAppRoles.CanAdd(c, Snapshot);
 
                         AddRole(c);
 
@@ -232,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case DeleteRole deleteRole:
                     return UpdateReturn(deleteRole, c =>
                     {
-                        GuardAppRoles.CanDelete(Snapshot.Roles, c, Snapshot.Contributors, Snapshot.Clients);
+                        GuardAppRoles.CanDelete(c, Snapshot);
 
                         DeleteRole(c);
 
@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case UpdateRole updateRole:
                     return UpdateReturn(updateRole, c =>
                     {
-                        GuardAppRoles.CanUpdate(Snapshot.Roles, c);
+                        GuardAppRoles.CanUpdate(c, Snapshot);
 
                         UpdateRole(c);
 
@@ -252,7 +252,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AddPattern addPattern:
                     return UpdateReturn(addPattern, c =>
                     {
-                        GuardAppPatterns.CanAdd(Snapshot.Patterns, c);
+                        GuardAppPatterns.CanAdd(c, Snapshot);
 
                         AddPattern(c);
 
@@ -262,7 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case DeletePattern deletePattern:
                     return UpdateReturn(deletePattern, c =>
                     {
-                        GuardAppPatterns.CanDelete(Snapshot.Patterns, c);
+                        GuardAppPatterns.CanDelete(c, Snapshot);
 
                         DeletePattern(c);
 
@@ -272,7 +272,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case UpdatePattern updatePattern:
                     return UpdateReturn(updatePattern, c =>
                     {
-                        GuardAppPatterns.CanUpdate(Snapshot.Patterns, c);
+                        GuardAppPatterns.CanUpdate(c, Snapshot);
 
                         UpdatePattern(c);
 
@@ -282,7 +282,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case ChangePlan changePlan:
                     return UpdateReturnAsync(changePlan, async c =>
                     {
-                        GuardApp.CanChangePlan(c, Snapshot.Plan, appPlansProvider);
+                        GuardApp.CanChangePlan(c, Snapshot, appPlansProvider);
 
                         if (c.FromCallback)
                         {

@@ -120,6 +120,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
+        public Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId, SearchScope scope)
+        {
+            if (scope == SearchScope.All)
+            {
+                return collectionAll.HasReferrersAsync(appId, contentId);
+            }
+            else
+            {
+                return collectionPublished.HasReferrersAsync(appId, contentId);
+            }
+        }
+
         public Task ResetScheduledAsync(DomainId documentId)
         {
             return collectionAll.ResetScheduledAsync(documentId);
@@ -133,11 +145,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
         {
             return collectionAll.QueryIdsAsync(appId, schemaId, filterNode);
-        }
-
-        public Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId)
-        {
-            return collectionAll.HasReferrersAsync(appId, contentId);
         }
 
         public IEnumerable<IMongoCollection<MongoContentEntity>> GetInternalCollections()

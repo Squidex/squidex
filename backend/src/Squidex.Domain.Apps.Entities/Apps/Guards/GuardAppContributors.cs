@@ -20,13 +20,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppContributors
     {
-        public static Task CanAssign(AppContributors contributors, Roles roles, AssignContributor command, IUserResolver users, IAppLimitsPlan plan)
+        public static Task CanAssign(AssignContributor command, IAppEntity app, IUserResolver users, IAppLimitsPlan plan)
         {
             Guard.NotNull(command, nameof(command));
 
+            var contributors = app.Contributors;
+
             return Validate.It(async e =>
             {
-                if (!roles.Contains(command.Role))
+                if (!app.Roles.Contains(command.Role))
                 {
                     e(Not.Valid(nameof(command.Role)), nameof(command.Role));
                 }
@@ -63,9 +65,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanRemove(AppContributors contributors, RemoveContributor command)
+        public static void CanRemove(RemoveContributor command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var contributors = app.Contributors;
 
             Validate.It(e =>
             {

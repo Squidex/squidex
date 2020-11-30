@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case MoveAssetFolder moveAssetFolder:
                     return UpdateReturnAsync(moveAssetFolder, async c =>
                     {
-                        await GuardAssetFolder.CanMove(c, assetQuery, Snapshot.Id, Snapshot.ParentId);
+                        await GuardAssetFolder.CanMove(c, Snapshot, assetQuery);
 
                         Move(c);
 
