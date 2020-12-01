@@ -366,7 +366,7 @@ describe('ContentsService', () => {
 
         let content: ContentDto;
 
-        contentsService.putStatus('my-app', resource, 'published', '2016-12-12T10:10:00', version).subscribe(result => {
+        contentsService.putStatus('my-app', resource, 'published', true, '2016-12-12T10:10:00', version).subscribe(result => {
             content = result;
         });
 

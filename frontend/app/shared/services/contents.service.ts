@@ -301,12 +301,12 @@ export class ContentsService {
             pretifyError('i18n:contents.deleteVersionFailed'));
     }
 
-    public putStatus(appName: string, resource: Resource, status: string, dueTime: string | null, version: Version): Observable<ContentDto> {
+    public putStatus(appName: string, resource: Resource, status: string, checkReferrers: boolean, dueTime: string | null, version: Version): Observable<ContentDto> {
         const link = resource._links[`status/${status}`];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, { status, dueTime }).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, { status, dueTime, checkReferrers }).pipe(
             map(({ payload }) => {
                 return parseContent(payload.body);
             }),

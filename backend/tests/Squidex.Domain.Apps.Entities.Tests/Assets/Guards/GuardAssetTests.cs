@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
@@ -20,6 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
     public class GuardAssetTests : IClassFixture<TranslationsFixture>
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
+        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
 
         [Fact]
@@ -28,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             var command = new CreateAsset { AppId = appId, ParentId = DomainId.NewGuid() };
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
-                .Returns(new List<IAssetFolderEntity> { CreateFolder() });
+                .Returns(new List<IAssetFolderEntity> { AssetFolder() });
 
             await GuardAsset.CanCreate(command, assetQuery);
         }
@@ -61,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
                 .Returns(new List<IAssetFolderEntity>());
 
-            await ValidationAssert.ThrowsAsync(() => GuardAsset.CanMove(command, assetQuery, DomainId.NewGuid()),
+            await ValidationAssert.ThrowsAsync(() => GuardAsset.CanMove(command, Asset(), assetQuery),
                 new ValidationError("Asset folder does not exist.", "ParentId"));
         }
 
@@ -70,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new MoveAsset { AppId = appId, ParentId = DomainId.NewGuid() };
 
-            await GuardAsset.CanMove(command, assetQuery, command.ParentId);
+            await GuardAsset.CanMove(command, Asset(parentId: command.ParentId), assetQuery);
         }
 
         [Fact]
@@ -79,9 +82,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             var command = new MoveAsset { AppId = appId, ParentId = DomainId.NewGuid() };
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
-                .Returns(new List<IAssetFolderEntity> { CreateFolder() });
+                .Returns(new List<IAssetFolderEntity> { AssetFolder() });
 
-            await GuardAsset.CanMove(command, assetQuery, DomainId.NewGuid());
+            await GuardAsset.CanMove(command, Asset(), assetQuery);
         }
 
         [Fact]
@@ -89,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new MoveAsset { AppId = appId };
 
-            await GuardAsset.CanMove(command, assetQuery, DomainId.NewGuid());
+            await GuardAsset.CanMove(command, Asset(), assetQuery);
         }
 
         [Fact]
@@ -117,18 +120,50 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         }
 
         [Fact]
-        public void CanDelete_should_not_throw_exception()
+        public async Task CanDelete_should_throw_exception_if_referenced()
+        {
+            var asset = Asset();
+
+            var command = new DeleteAsset { AppId = appId, CheckReferrers = true };
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, asset.Id, SearchScope.All))
+                .Returns(true);
+
+            await Assert.ThrowsAsync<DomainException>(() => GuardAsset.CanDelete(command, asset, contentRepository));
+        }
+
+        [Fact]
+        public async Task CanDelete_should_not_throw_exception()
         {
             var command = new DeleteAsset { AppId = appId };
 
-            GuardAsset.CanDelete(command);
+            await GuardAsset.CanDelete(command, Asset(), contentRepository);
         }
 
-        private static IAssetFolderEntity CreateFolder(DomainId id = default)
+        private IAssetEntity Asset(DomainId id = default, DomainId parentId = default)
+        {
+            var asset = A.Fake<IAssetEntity>();
+
+            A.CallTo(() => asset.Id)
+                .Returns(id == default ? DomainId.NewGuid() : id);
+            A.CallTo(() => asset.AppId)
+                .Returns(appId);
+            A.CallTo(() => asset.ParentId)
+                .Returns(parentId == default ? DomainId.NewGuid() : parentId);
+
+            return asset;
+        }
+
+        private IAssetFolderEntity AssetFolder(DomainId id = default, DomainId parentId = default)
         {
             var assetFolder = A.Fake<IAssetFolderEntity>();
 
-            A.CallTo(() => assetFolder.Id).Returns(id);
+            A.CallTo(() => assetFolder.Id)
+                .Returns(id == default ? DomainId.NewGuid() : id);
+            A.CallTo(() => assetFolder.AppId)
+                .Returns(appId);
+            A.CallTo(() => assetFolder.ParentId)
+                .Returns(parentId == default ? DomainId.NewGuid() : parentId);
 
             return assetFolder;
         }

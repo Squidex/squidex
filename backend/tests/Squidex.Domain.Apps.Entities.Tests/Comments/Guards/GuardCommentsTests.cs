@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 Envelope.Create<CommentsEvent>(new CommentCreated { CommentId = commentId, Actor = user1 }).To<CommentsEvent>()
             };
 
-            ValidationAssert.Throws(() => GuardComments.CanUpdate(commentsId, events, command),
+            ValidationAssert.Throws(() => GuardComments.CanUpdate(command, commentsId, events),
                 new ValidationError("Text is required.", "Text"));
         }
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 Envelope.Create<CommentsEvent>(new CommentCreated { CommentId = commentId, Actor = user1 }).To<CommentsEvent>()
             };
 
-            Assert.Throws<DomainException>(() => GuardComments.CanUpdate(commentsId, events, command));
+            Assert.Throws<DomainException>(() => GuardComments.CanUpdate(command, commentsId, events));
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
             var events = new List<Envelope<CommentsEvent>>();
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardComments.CanUpdate(commentsId, events, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardComments.CanUpdate(command, commentsId, events));
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 Envelope.Create<CommentsEvent>(new CommentDeleted { CommentId = commentId }).To<CommentsEvent>()
             };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardComments.CanUpdate(commentsId, events, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardComments.CanUpdate(command, commentsId, events));
         }
 
         [Fact]
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 Envelope.Create<CommentsEvent>(new CommentCreated { CommentId = commentId, Actor = user1 }).To<CommentsEvent>()
             };
 
-            GuardComments.CanUpdate(user1.Identifier, events, command);
+            GuardComments.CanUpdate(command, user1.Identifier, events);
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 Envelope.Create<CommentsEvent>(new CommentCreated { CommentId = commentId, Actor = user1 }).To<CommentsEvent>()
             };
 
-            GuardComments.CanUpdate(commentsId, events, command);
+            GuardComments.CanUpdate(command, commentsId, events);
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 Envelope.Create<CommentsEvent>(new CommentCreated { CommentId = commentId, Actor = user1 }).To<CommentsEvent>()
             };
 
-            Assert.Throws<DomainException>(() => GuardComments.CanDelete(commentsId, events, command));
+            Assert.Throws<DomainException>(() => GuardComments.CanDelete(command, commentsId, events));
         }
 
         [Fact]
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
 
             var events = new List<Envelope<CommentsEvent>>();
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardComments.CanDelete(commentsId, events, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardComments.CanDelete(command, commentsId, events));
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 Envelope.Create<CommentsEvent>(new CommentDeleted { CommentId = commentId })
             };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardComments.CanDelete(commentsId, events, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardComments.CanDelete(command, commentsId, events));
         }
 
         [Fact]
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 Envelope.Create<CommentsEvent>(new CommentCreated { CommentId = commentId, Actor = user1 }).To<CommentsEvent>()
             };
 
-            GuardComments.CanDelete(user1.Identifier, events, command);
+            GuardComments.CanDelete(command, user1.Identifier, events);
         }
 
         [Fact]
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
                 Envelope.Create<CommentsEvent>(new CommentCreated { CommentId = commentId, Actor = user1 }).To<CommentsEvent>()
             };
 
-            GuardComments.CanDelete(commentsId, events, command);
+            GuardComments.CanDelete(command, commentsId, events);
         }
     }
 }

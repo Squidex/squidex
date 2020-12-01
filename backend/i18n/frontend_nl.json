@@ -422,6 +422,8 @@
   "contents.tableHeaders.nextStatus": "Volgende status",
   "contents.tableHeaders.status": "Status",
   "contents.tableHeaders.version": "Versie",
+  "contents.unpublishReferrerConfirmText": "The content is referenced by another published content item.\n\nDo you really want to unpublish this content?",
+  "contents.unpublishReferrerConfirmTitle": "Unpublish content",
   "contents.unsavedChangesText": "Je hebt niet-opgeslagen wijzigingen. Wil je ze nu laden?",
   "contents.unsavedChangesTitle": "Niet-opgeslagen wijzigingen",
   "contents.updated": "Inhoud succesvol bijgewerkt.",

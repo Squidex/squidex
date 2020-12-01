@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -24,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddLanguage();
 
-            ValidationAssert.Throws(() => GuardAppLanguages.CanAdd(languages, command),
+            ValidationAssert.Throws(() => GuardAppLanguages.CanAdd(command, App(languages)),
                 new ValidationError("Language code is required.", "Language"));
         }
 
@@ -33,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddLanguage { Language = Language.EN };
 
-            ValidationAssert.Throws(() => GuardAppLanguages.CanAdd(languages, command),
+            ValidationAssert.Throws(() => GuardAppLanguages.CanAdd(command, App(languages)),
                 new ValidationError("Language has already been added."));
         }
 
@@ -42,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddLanguage { Language = Language.IT };
 
-            GuardAppLanguages.CanAdd(languages, command);
+            GuardAppLanguages.CanAdd(command, App(languages));
         }
 
         [Fact]
@@ -50,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new RemoveLanguage();
 
-            ValidationAssert.Throws(() => GuardAppLanguages.CanRemove(languages, command),
+            ValidationAssert.Throws(() => GuardAppLanguages.CanRemove(command, App(languages)),
                 new ValidationError("Language code is required.", "Language"));
         }
 
@@ -59,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new RemoveLanguage { Language = Language.IT };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanRemove(languages, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanRemove(command, App(languages)));
         }
 
         [Fact]
@@ -67,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new RemoveLanguage { Language = Language.EN };
 
-            ValidationAssert.Throws(() => GuardAppLanguages.CanRemove(languages, command),
+            ValidationAssert.Throws(() => GuardAppLanguages.CanRemove(command, App(languages)),
                 new ValidationError("Master language cannot be removed."));
         }
 
@@ -76,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new RemoveLanguage { Language = Language.DE };
 
-            GuardAppLanguages.CanRemove(languages, command);
+            GuardAppLanguages.CanRemove(command, App(languages));
         }
 
         [Fact]
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateLanguage();
 
-            ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages, command),
+            ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(command, App(languages)),
                 new ValidationError("Language code is required.", "Language"));
         }
 
@@ -93,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.EN, IsOptional = true };
 
-            ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages, command),
+            ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(command, App(languages)),
                 new ValidationError("Master language cannot be made optional.", "IsMaster"));
         }
 
@@ -102,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.EN, Fallback = new[] { Language.DE } };
 
-            ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages, command),
+            ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(command, App(languages)),
                 new ValidationError("Master language cannot have fallback languages.", "Fallback"));
         }
 
@@ -111,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.DE, Fallback = new[] { Language.IT } };
 
-            ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages, command),
+            ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(command, App(languages)),
                 new ValidationError("App does not have fallback language 'Italian'.", "Fallback"));
         }
 
@@ -120,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.IT };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanUpdate(languages, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanUpdate(command, App(languages)));
         }
 
         [Fact]
@@ -128,7 +129,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.DE, Fallback = new[] { Language.EN } };
 
-            GuardAppLanguages.CanUpdate(languages, command);
+            GuardAppLanguages.CanUpdate(command, App(languages));
+        }
+
+        private static IAppEntity App(LanguagesConfig languages)
+        {
+            var app = A.Fake<IAppEntity>();
+
+            A.CallTo(() => app.Languages)
+                .Returns(languages);
+
+            return app;
         }
     }
 }

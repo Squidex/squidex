@@ -17,9 +17,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppRoles
     {
-        public static void CanAdd(Roles roles, AddRole command)
+        public static void CanAdd(AddRole command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var roles = app.Roles;
 
             Validate.It(e =>
             {
@@ -34,9 +36,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanDelete(Roles roles, DeleteRole command, AppContributors contributors, AppClients clients)
+        public static void CanDelete(DeleteRole command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var roles = app.Roles;
 
             CheckRoleExists(roles, command.Name);
 
@@ -51,21 +55,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     e(T.Get("apps.roles.defaultRoleNotRemovable"));
                 }
 
-                if (clients.Values.Any(x => string.Equals(x.Role, command.Name, StringComparison.OrdinalIgnoreCase)))
+                if (app.Clients.Values.Any(x => string.Equals(x.Role, command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     e(T.Get("apps.roles.usedRoleByClientsNotRemovable"));
                 }
 
-                if (contributors.Values.Any(x => string.Equals(x, command.Name, StringComparison.OrdinalIgnoreCase)))
+                if (app.Contributors.Values.Any(x => string.Equals(x, command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     e(T.Get("apps.roles.usedRoleByContributorsNotRemovable"));
                 }
             });
         }
 
-        public static void CanUpdate(Roles roles, UpdateRole command)
+        public static void CanUpdate(UpdateRole command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var roles = app.Roles;
 
             CheckRoleExists(roles, command.Name);
 

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(command, App(patterns_0)),
                 new ValidationError("Name is required.", "Name"));
         }
 
@@ -36,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(command, App(patterns_0)),
                 new ValidationError("Pattern is required.", "Pattern"));
         }
 
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(command, App(patterns_0)),
                 new ValidationError("Pattern is not a valid value.", "Pattern"));
         }
 
@@ -56,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(command, App(patterns_1)),
                 new ValidationError("A pattern with the same name already exists."));
         }
 
@@ -67,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new AddPattern { PatternId = patternId, Name = "other", Pattern = "[a-z]" };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(command, App(patterns_1)),
                 new ValidationError("This pattern already exists but with another name."));
         }
 
@@ -76,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
-            GuardAppPatterns.CanAdd(patterns_0, command);
+            GuardAppPatterns.CanAdd(command, App(patterns_0));
         }
 
         [Fact]
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new DeletePattern { PatternId = patternId };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPatterns.CanDelete(patterns_0, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPatterns.CanDelete(command, App(patterns_0)));
         }
 
         [Fact]
@@ -94,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new DeletePattern { PatternId = patternId };
 
-            GuardAppPatterns.CanDelete(patterns_1, command);
+            GuardAppPatterns.CanDelete(command, App(patterns_1));
         }
 
         [Fact]
@@ -104,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(command, App(patterns_1)),
                 new ValidationError("Name is required.", "Name"));
         }
 
@@ -115,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(command, App(patterns_1)),
                 new ValidationError("Pattern is required.", "Pattern"));
         }
 
@@ -126,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(command, App(patterns_1)),
                 new ValidationError("Pattern is not a valid value.", "Pattern"));
         }
 
@@ -141,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = id2, Name = "Pattern1", Pattern = "[0-4]" };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_2, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(command, App(patterns_2)),
                 new ValidationError("A pattern with the same name already exists."));
         }
 
@@ -156,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = id2, Name = "Pattern2", Pattern = "[0-5]" };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_2, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(command, App(patterns_2)),
                 new ValidationError("This pattern already exists but with another name."));
         }
 
@@ -165,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdatePattern { PatternId = patternId, Name = "Pattern1", Pattern = ".*" };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPatterns.CanUpdate(patterns_0, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPatterns.CanUpdate(command, App(patterns_0)));
         }
 
         [Fact]
@@ -175,7 +176,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = "Pattern1", Pattern = ".*" };
 
-            GuardAppPatterns.CanUpdate(patterns_1, command);
+            GuardAppPatterns.CanUpdate(command, App(patterns_1));
+        }
+
+        private static IAppEntity App(AppPatterns patterns)
+        {
+            var app = A.Fake<IAppEntity>();
+
+            A.CallTo(() => app.Patterns)
+                .Returns(patterns);
+
+            return app;
         }
     }
 }

@@ -565,11 +565,39 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Delete_should_create_events_and_update_deleted_flag()
+        public async Task ChangeStatus_should_throw_exception_if_referenced_by_other_item()
         {
-            var command = new DeleteContent();
+            var command = new ChangeContentStatus { Status = Status.Draft, CheckReferrers = true };
 
             await ExecuteCreateAsync();
+            await ExecuteChangeStatusAsync(Status.Published);
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.Published))
+                .Returns(true);
+
+            await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
+        }
+
+        [Fact]
+        public async Task ChangeStatus_should_not_throw_exception_if_referenced_by_other_item_but_forced()
+        {
+            var command = new ChangeContentStatus { Status = Status.Draft, CheckReferrers = false };
+
+            await ExecuteCreateAsync();
+            await ExecuteChangeStatusAsync(Status.Published);
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.Published))
+                .Returns(true);
+
+            await PublishAsync(command);
+        }
+
+        [Fact]
+        public async Task Delete_should_create_events_and_update_deleted_flag()
+        {
+            await ExecuteCreateAsync();
+
+            var command = new DeleteContent();
 
             var result = await PublishAsync(command);
 
@@ -589,11 +617,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Delete_should_throw_exception_if_referenced_by_other_item()
         {
-            var command = new DeleteContent { CheckReferrers = true };
-
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId))
+            var command = new DeleteContent { CheckReferrers = true };
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.All))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
@@ -606,7 +634,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.All))
                 .Returns(true);
 
             await PublishAsync(command);

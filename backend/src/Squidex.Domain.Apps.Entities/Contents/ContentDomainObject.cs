@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         await LoadContext(c.AppId, c.SchemaId, c, c.OptimizeValidation);
 
-                        await GuardContent.CanCreate(context.Schema, context.Workflow, c);
+                        await GuardContent.CanCreate(c, context.Workflow, context.Schema);
 
                         var status = await context.GetInitialStatusAsync();
 
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case UpdateContent updateContent:
                     return UpdateReturnAsync(updateContent, async c =>
                     {
-                        await GuardContent.CanUpdate(Snapshot, context.Workflow, c);
+                        await GuardContent.CanUpdate(c, Snapshot, context.Workflow);
 
                         return await UpdateAsync(c, x => c.Data, false);
                     });
@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case PatchContent patchContent:
                     return UpdateReturnAsync(patchContent, async c =>
                     {
-                        await GuardContent.CanPatch(Snapshot, context.Workflow, c);
+                        await GuardContent.CanPatch(c, Snapshot, context.Workflow);
 
                         return await UpdateAsync(c, c.Data.MergeInto, true);
                     });
@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
 
-                            await GuardContent.CanChangeStatus(context.Schema, Snapshot, context.Workflow, c);
+                            await GuardContent.CanChangeStatus(c, Snapshot, context.Workflow, context.Repository, context.Schema);
 
                             if (c.DueTime.HasValue)
                             {
@@ -234,7 +234,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
 
-                        await GuardContent.CanDelete(context.Schema, Snapshot, context.Repository, c);
+                        await GuardContent.CanDelete(c, Snapshot, context.Repository, context.Schema);
 
                         if (!c.DoNotScript)
                         {

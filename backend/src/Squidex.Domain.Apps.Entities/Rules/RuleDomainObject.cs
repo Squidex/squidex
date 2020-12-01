@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 case UpdateRule updateRule:
                     return UpdateReturnAsync(updateRule, async c =>
                     {
-                        await GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider);
+                        await GuardRule.CanUpdate(c, Snapshot, appProvider);
 
                         Update(c);
 

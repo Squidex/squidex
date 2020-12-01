@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             AppPlan? plan = null;
 
-            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), appPlans),
                 new ValidationError("Plan ID is required.", "PlanId"));
         }
 
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             AppPlan? plan = null;
 
-            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), appPlans),
                 new ValidationError("A plan with this id does not exist.", "PlanId"));
         }
 
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var plan = new AppPlan(new RefToken("user", "other"), "premium");
 
-            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App(plan), appPlans),
                 new ValidationError("Plan can only changed from the user who configured the plan initially."));
         }
 
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var plan = new AppPlan(command.Actor, "basic");
 
-            GuardApp.CanChangePlan(command, plan, appPlans);
+            GuardApp.CanChangePlan(command, App(plan), appPlans);
         }
 
         [Fact]
@@ -124,7 +124,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var plan = new AppPlan(command.Actor, "premium");
 
-            GuardApp.CanChangePlan(command, plan, appPlans);
+            GuardApp.CanChangePlan(command, App(plan), appPlans);
+        }
+
+        private static IAppEntity App(AppPlan? plan)
+        {
+            var app = A.Fake<IAppEntity>();
+
+            A.CallTo(() => app.Plan)
+                .Returns(plan);
+
+            return app;
         }
     }
 }

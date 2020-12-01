@@ -55,7 +55,7 @@ export function configCurrency() {
     return new CurrencyConfig('EUR', '€', true);
 }
 
-export function configTranslations() {
+export function configLocalizerService() {
     if (process.env.NODE_ENV === 'production') {
         return new LocalizerService(window['texts']);
     } else {
@@ -86,8 +86,8 @@ export function configTranslations() {
         { provide: ApiUrlConfig, useFactory: configApiUrl },
         { provide: CurrencyConfig, useFactory: configCurrency },
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
+        { provide: LocalizerService, useFactory: configLocalizerService },
         { provide: TitlesConfig, useFactory: configTitles },
-        { provide: LocalizerService, useFactory: configTranslations },
         { provide: UIOptions, useFactory: configUIOptions }
     ],
     entryComponents: [AppComponent]

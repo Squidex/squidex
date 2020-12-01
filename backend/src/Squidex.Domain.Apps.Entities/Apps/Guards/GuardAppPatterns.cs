@@ -4,9 +4,9 @@
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
+
 using System;
 using System.Linq;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
@@ -16,9 +16,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppPatterns
     {
-        public static void CanAdd(AppPatterns patterns, AddPattern command)
+        public static void CanAdd(AddPattern command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var patterns = app.Patterns;
 
             Validate.It(e =>
             {
@@ -53,9 +55,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanDelete(AppPatterns patterns, DeletePattern command)
+        public static void CanDelete(DeletePattern command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var patterns = app.Patterns;
 
             if (!patterns.ContainsKey(command.PatternId))
             {
@@ -63,9 +67,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             }
         }
 
-        public static void CanUpdate(AppPatterns patterns, UpdatePattern command)
+        public static void CanUpdate(UpdatePattern command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var patterns = app.Patterns;
 
             if (!patterns.ContainsKey(command.PatternId))
             {

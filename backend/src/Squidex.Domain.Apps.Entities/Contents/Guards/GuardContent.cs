@@ -11,7 +11,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
@@ -21,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 {
     public static class GuardContent
     {
-        public static async Task CanCreate(ISchemaEntity schema, IContentWorkflow contentWorkflow, CreateContent command)
+        public static async Task CanCreate(CreateContent command, IContentWorkflow contentWorkflow, ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -41,7 +40,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             });
         }
 
-        public static async Task CanUpdate(ContentState content, IContentWorkflow contentWorkflow, UpdateContent command)
+        public static async Task CanUpdate(UpdateContent command,
+            IContentEntity content,
+            IContentWorkflow contentWorkflow)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -53,7 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             await ValidateCanUpdate(content, contentWorkflow, command.User);
         }
 
-        public static async Task CanPatch(ContentState content, IContentWorkflow contentWorkflow, PatchContent command)
+        public static async Task CanPatch(PatchContent command,
+            IContentEntity content,
+            IContentWorkflow contentWorkflow)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -65,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             await ValidateCanUpdate(content, contentWorkflow, command.User);
         }
 
-        public static void CanDeleteDraft(DeleteContentDraft command, ContentState content)
+        public static void CanDeleteDraft(DeleteContentDraft command, IContentEntity content)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -75,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             }
         }
 
-        public static void CanCreateDraft(CreateContentDraft command, ContentState content)
+        public static void CanCreateDraft(CreateContentDraft command, IContentEntity content)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -85,13 +88,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             }
         }
 
-        public static Task CanChangeStatus(ISchemaEntity schema, ContentState content, IContentWorkflow contentWorkflow, ChangeContentStatus command)
+        public static Task CanChangeStatus(ChangeContentStatus command,
+            IContentEntity content,
+            IContentWorkflow contentWorkflow,
+            IContentRepository contentRepository,
+            ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
 
             if (schema.SchemaDef.IsSingleton)
             {
-                if (content.NewVersion == null || command.Status != Status.Published)
+                if (content.NewStatus == null || command.Status != Status.Published)
                 {
                     throw new DomainException(T.Get("contents.singletonNotChangeable"));
                 }
@@ -101,9 +108,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             return Validate.It(async e =>
             {
-                if (!await contentWorkflow.CanMoveToAsync(content, content.EditingStatus, command.Status, command.User))
+                var status = content.NewStatus ?? content.Status;
+
+                if (!await contentWorkflow.CanMoveToAsync(content, status, command.Status, command.User))
                 {
-                    e(T.Get("contents.statusTransitionNotAllowed", new { oldStatus = content.EditingStatus, newStatus = command.Status }), nameof(command.Status));
+                    var values = new { oldStatus = status, newStatus = command.Status };
+
+                    e(T.Get("contents.statusTransitionNotAllowed", values), nameof(command.Status));
+                }
+
+                if (content.Status == Status.Published && command.CheckReferrers)
+                {
+                    var hasReferrer = await contentRepository.HasReferrersAsync(content.AppId.Id, command.ContentId, SearchScope.Published);
+
+                    if (hasReferrer)
+                    {
+                        throw new DomainException(T.Get("contents.referenced"));
+                    }
                 }
 
                 if (command.DueTime.HasValue && command.DueTime.Value < SystemClock.Instance.GetCurrentInstant())
@@ -113,7 +134,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             });
         }
 
-        public static async Task CanDelete(ISchemaEntity schema, ContentState content, IContentRepository contentRepository, DeleteContent command)
+        public static async Task CanDelete(DeleteContent command,
+            IContentEntity content,
+            IContentRepository contentRepository,
+            ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -124,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             if (command.CheckReferrers)
             {
-                var hasReferrer = await contentRepository.HasReferrersAsync(content.AppId.Id, command.ContentId);
+                var hasReferrer = await contentRepository.HasReferrersAsync(content.AppId.Id, command.ContentId, SearchScope.All);
 
                 if (hasReferrer)
                 {
@@ -141,11 +165,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             }
         }
 
-        private static async Task ValidateCanUpdate(ContentState content, IContentWorkflow contentWorkflow, ClaimsPrincipal user)
+        private static async Task ValidateCanUpdate(IContentEntity content, IContentWorkflow contentWorkflow, ClaimsPrincipal user)
         {
-            if (!await contentWorkflow.CanUpdateAsync(content, content.EditingStatus, user))
+            var status = content.NewStatus ?? content.Status;
+
+            if (!await contentWorkflow.CanUpdateAsync(content, status, user))
             {
-                throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status = content.EditingStatus }));
+                throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
             }
         }
     }

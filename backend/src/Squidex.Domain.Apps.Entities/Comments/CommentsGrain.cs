@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 case UpdateComment updateComment:
                     return Upsert(updateComment, c =>
                     {
-                        GuardComments.CanUpdate(Key, events, c);
+                        GuardComments.CanUpdate(c, Key, events);
 
                         Update(c);
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 case DeleteComment deleteComment:
                     return Upsert(deleteComment, c =>
                     {
-                        GuardComments.CanDelete(Key, events, c);
+                        GuardComments.CanDelete(c, Key, events);
 
                         Delete(c);
 

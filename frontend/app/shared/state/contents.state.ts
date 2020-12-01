@@ -224,7 +224,28 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public changeManyStatus(contentsToChange: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<any> {
-        return this.updateManyStatus(contentsToChange, status, dueTime).pipe(
+        return this.changeManyStatusCore(contentsToChange, status, true, dueTime).pipe(
+            switchMap(results => {
+                const referenced = results.filter(x => x.error?.statusCode === 400).map(x => x.content);
+
+                if (referenced.length > 0) {
+                    return this.dialogs.confirm(
+                        'i18n:contents.unpublishReferrerConfirmTitle',
+                        'i18n:contents.unpublishReferrerConfirmText',
+                        'unpublishReferencngContent'
+                    ).pipe(
+                        switchMap(confirmed => {
+                            if (confirmed) {
+                                return this.changeManyStatusCore(referenced, status, false, dueTime);
+                            } else {
+                                return of([]);
+                            }
+                        })
+                    );
+                } else {
+                    return of(results);
+                }
+            }),
             tap(results => {
                 const errors = results.filter(x => !!x.error);
 
@@ -260,7 +281,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     return this.dialogs.confirm(
                         'i18n:contents.deleteReferrerConfirmTitle',
                         'i18n:contents.deleteReferrerConfirmText',
-                        'deleteReferencedAsset'
+                        'deleteReferencingContent'
                     ).pipe(
                         switchMap(confirmed => {
                             if (confirmed) {
@@ -300,14 +321,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
-    }
-
-    public changeStatus(content: ContentDto, status: string, dueTime: string | null): Observable<ContentDto> {
-        return this.contentsService.putStatus(this.appName, content, status, dueTime, content.version).pipe(
-            tap(updated => {
-                this.replaceContent(updated, content.version, 'i18n:contents.updated');
-            }),
-            shareSubscribed(this.dialogs));
     }
 
     public update(content: ContentDto, request: any): Observable<ContentDto> {
@@ -379,9 +392,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             contents.map(c => this.deleteCore(c, checkReferrers)));
     }
 
-    private updateManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<ReadonlyArray<Updated>> {
+    private changeManyStatusCore(contents: ReadonlyArray<ContentDto>, status: string, checkReferrers: boolean, dueTime: string | null): Observable<ReadonlyArray<Updated>> {
         return forkJoin(
-            contents.map(c => this.updateStatus(c, status, dueTime)));
+            contents.map(c => this.changeStatusCore(c, status, checkReferrers, dueTime)));
     }
 
     private deleteCore(content: ContentDto, checkReferrers: boolean): Observable<Updated> {
@@ -389,8 +402,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             map(() => ({ content })), catchError(error => of({ content, error })));
     }
 
-    private updateStatus(content: ContentDto, status: string, dueTime: string | null): Observable<Updated> {
-        return this.contentsService.putStatus(this.appName, content, status, dueTime, content.version).pipe(
+    private changeStatusCore(content: ContentDto, status: string, checkReferrers: boolean, dueTime: string | null): Observable<Updated> {
+        return this.contentsService.putStatus(this.appName, content, status, checkReferrers, dueTime, content.version).pipe(
             map(x => ({ content: x })), catchError(error => of({ content, error })));
     }
 

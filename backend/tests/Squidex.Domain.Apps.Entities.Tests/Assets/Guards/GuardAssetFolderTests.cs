@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             var command = new CreateAssetFolder { AppId = appId, FolderName = "My Folder", ParentId = DomainId.NewGuid() };
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
-                .Returns(new List<IAssetFolderEntity> { CreateFolder() });
+                .Returns(new List<IAssetFolderEntity> { AssetFolder() });
 
             await GuardAssetFolder.CanCreate(command, assetQuery);
         }
@@ -75,11 +75,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
                 .Returns(new List<IAssetFolderEntity>
                 {
-                    CreateFolder(id),
-                    CreateFolder(command.ParentId)
+                    AssetFolder(id),
+                    AssetFolder(command.ParentId)
                 });
 
-            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, assetQuery, id, DomainId.NewGuid()),
+            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, AssetFolder(id), assetQuery),
                 new ValidationError("Cannot add folder to its own child.", "ParentId"));
         }
 
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
                 .Returns(new List<IAssetFolderEntity>());
 
-            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, assetQuery, DomainId.NewGuid(), DomainId.NewGuid()),
+            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, AssetFolder(), assetQuery),
                 new ValidationError("Asset folder does not exist.", "ParentId"));
         }
 
@@ -101,9 +101,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
-                .Returns(new List<IAssetFolderEntity> { CreateFolder() });
+                .Returns(new List<IAssetFolderEntity> { AssetFolder() });
 
-            await GuardAssetFolder.CanMove(command, assetQuery, DomainId.NewGuid(), DomainId.NewGuid());
+            await GuardAssetFolder.CanMove(command, AssetFolder(), assetQuery);
         }
 
         [Fact]
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
 
-            await GuardAssetFolder.CanMove(command, assetQuery, DomainId.NewGuid(), command.ParentId);
+            await GuardAssetFolder.CanMove(command, AssetFolder(parentId: command.ParentId), assetQuery);
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new MoveAssetFolder { AppId = appId };
 
-            await GuardAssetFolder.CanMove(command, assetQuery, DomainId.NewGuid(), DomainId.NewGuid());
+            await GuardAssetFolder.CanMove(command, AssetFolder(), assetQuery);
         }
 
         [Fact]
@@ -147,11 +147,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             GuardAssetFolder.CanDelete(command);
         }
 
-        private static IAssetFolderEntity CreateFolder(DomainId id = default)
+        private IAssetFolderEntity AssetFolder(DomainId id = default, DomainId parentId = default)
         {
             var assetFolder = A.Fake<IAssetFolderEntity>();
 
-            A.CallTo(() => assetFolder.Id).Returns(id);
+            A.CallTo(() => assetFolder.Id)
+                .Returns(id == default ? DomainId.NewGuid() : id);
+            A.CallTo(() => assetFolder.AppId)
+                .Returns(appId);
+            A.CallTo(() => assetFolder.ParentId)
+                .Returns(parentId == default ? DomainId.NewGuid() : parentId);
 
             return assetFolder;
         }

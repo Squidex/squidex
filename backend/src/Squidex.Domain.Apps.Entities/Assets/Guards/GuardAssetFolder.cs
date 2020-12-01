@@ -43,15 +43,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             });
         }
 
-        public static Task CanMove(MoveAssetFolder command, IAssetQueryService assetQuery, DomainId id, DomainId oldParentId)
+        public static Task CanMove(MoveAssetFolder command, IAssetFolderEntity assetFolder, IAssetQueryService assetQuery)
         {
             Guard.NotNull(command, nameof(command));
 
             return Validate.It(async e =>
             {
-                if (command.ParentId != oldParentId)
+                if (command.ParentId != assetFolder.ParentId)
                 {
-                    await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, id, e);
+                    await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, assetFolder.Id, e);
                 }
             });
         }

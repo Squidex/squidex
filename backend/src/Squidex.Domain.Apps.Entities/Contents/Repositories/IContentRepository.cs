@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
 
         Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, DomainId id, SearchScope scope);
 
-        Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId);
+        Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId, SearchScope scope);
 
         Task ResetScheduledAsync(DomainId documentId);
 

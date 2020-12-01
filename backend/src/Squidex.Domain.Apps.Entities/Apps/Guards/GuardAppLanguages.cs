@@ -15,9 +15,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppLanguages
     {
-        public static void CanAdd(LanguagesConfig languages, AddLanguage command)
+        public static void CanAdd(AddLanguage command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var languages = app.Languages;
 
             Validate.It(e =>
             {
@@ -34,9 +36,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanRemove(LanguagesConfig languages, RemoveLanguage command)
+        public static void CanRemove(RemoveLanguage command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var languages = app.Languages;
 
             Validate.It(e =>
             {
@@ -58,9 +62,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanUpdate(LanguagesConfig languages, UpdateLanguage command)
+        public static void CanUpdate(UpdateLanguage command, IAppEntity app)
         {
             Guard.NotNull(command, nameof(command));
+
+            var languages = app.Languages;
 
             Validate.It(e =>
             {

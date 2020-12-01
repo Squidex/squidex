@@ -30,6 +30,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryContentsByIds queryContentsById;
         private readonly QueryContentsByQuery queryContentsByQuery;
         private readonly QueryIdsAsync queryIdsAsync;
+        private readonly QueryReferrersAsync queryReferrersAsync;
 
         public MongoContentCollectionPublished(IMongoDatabase database, IAppProvider appProvider, ITextIndex indexer, DataConverter converter)
             : base(database)
@@ -37,6 +38,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryContentAsync = new QueryContent(converter);
             queryContentsById = new QueryContentsByIds(converter, appProvider);
             queryContentsByQuery = new QueryContentsByQuery(converter, indexer, appProvider);
+            queryReferrersAsync = new QueryReferrersAsync();
             queryIdsAsync = new QueryIdsAsync(appProvider);
         }
 
@@ -63,6 +65,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await queryContentAsync.PrepareAsync(collection, ct);
             await queryContentsById.PrepareAsync(collection, ct);
             await queryContentsByQuery.PrepareAsync(collection, ct);
+            await queryReferrersAsync.PrepareAsync(collection, ct);
             await queryIdsAsync.PrepareAsync(collection, ct);
         }
 
@@ -111,6 +114,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
                 return await queryIdsAsync.DoAsync(appId, ids);
+            }
+        }
+
+        public async Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                return await queryReferrersAsync.DoAsync(appId, contentId);
             }
         }
 

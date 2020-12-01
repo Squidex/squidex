@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
@@ -53,9 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             Guard.NotNull(command, nameof(command));
         }
 
-        public static void CanChangePlan(ChangePlan command, AppPlan? plan, IAppPlansProvider appPlans)
+        public static void CanChangePlan(ChangePlan command, IAppEntity app, IAppPlansProvider appPlans)
         {
             Guard.NotNull(command, nameof(command));
+
+            var plan = app.Plan;
 
             Validate.It(e =>
             {
