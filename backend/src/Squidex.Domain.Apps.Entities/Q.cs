@@ -79,9 +79,9 @@ namespace Squidex.Domain.Apps.Entities
 
         public Q WithIds(string? ids)
         {
-            if (ids == null)
+            if (string.IsNullOrWhiteSpace(ids))
             {
-                return this;
+                return this with { Ids = null };
             }
 
             var idsList = new List<DomainId>();

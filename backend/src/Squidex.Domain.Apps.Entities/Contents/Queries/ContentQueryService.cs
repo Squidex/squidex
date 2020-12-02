@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 var contents = await contentRepository.QueryAsync(context.App, schema, q, context.Scope());
 
-                if (q.Ids != null)
+                if (q.Ids != null && q.Ids.Count > 0)
                 {
                     contents = contents.SortSet(x => x.Id, q.Ids);
                 }
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 var contents = await contentRepository.QueryAsync(context.App, schemas, q, context.Scope());
 
-                if (q.Ids != null)
+                if (q.Ids != null && q.Ids.Count > 0)
                 {
                     contents = contents.SortSet(x => x.Id, q.Ids);
                 }

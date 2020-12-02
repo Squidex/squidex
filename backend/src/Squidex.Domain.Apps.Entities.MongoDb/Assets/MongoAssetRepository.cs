@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 try
                 {
-                    if (q.Ids != null)
+                    if (q.Ids != null && q.Ids.Count > 0)
                     {
                         var assetEntities =
                             await Collection.Find(BuildFilter(appId, q.Ids.ToHashSet())).SortByDescending(x => x.LastModified)

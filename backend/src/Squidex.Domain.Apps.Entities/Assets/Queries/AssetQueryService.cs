@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var assets = await assetRepository.QueryAsync(context.App.Id, parentId, q);
 
-            if (q.Ids != null)
+            if (q.Ids != null && q.Ids.Count > 0)
             {
                 assets = assets.SortSet(x => x.Id, q.Ids);
             }
