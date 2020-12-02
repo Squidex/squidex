@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 
             var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema { Reference = s });
 
-            Assert.NotNull(ContentSchemaBuilder.CreateContentSchema(schema, jsonSchema));
+            Assert.NotNull(jsonSchema);
         }
 
         private static HashSet<string> AllPropertyNames(JsonSchema schema)

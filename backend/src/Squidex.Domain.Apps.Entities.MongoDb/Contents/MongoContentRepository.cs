@@ -28,8 +28,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         private readonly IAppProvider appProvider;
         private readonly DataConverter converter;
-        private readonly MongoContentCollectionAll collectionAll;
-        private readonly MongoContentCollectionPublished collectionPublished;
+        private readonly MongoContentCollection collectionAll;
+        private readonly MongoContentCollection collectionPublished;
 
         static MongoContentRepository()
         {
@@ -45,8 +45,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             converter = new DataConverter(serializer);
 
-            collectionAll = new MongoContentCollectionAll(database, appProvider, indexer, converter);
-            collectionPublished = new MongoContentCollectionPublished(database, appProvider, indexer, converter);
+            collectionAll =
+                new MongoContentCollection(
+                    "States_Contents_All2", database, appProvider, indexer, converter);
+
+            collectionPublished =
+                new MongoContentCollection(
+                    "States_Contents_Published2", database, appProvider, indexer, converter);
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)
@@ -60,39 +65,27 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionAll.StreamAll(appId, schemaIds);
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, DomainId? referenced, SearchScope scope)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schema, query, referenced);
+                return collectionAll.QueryAsync(app, schemas, q);
             }
             else
             {
-                return collectionPublished.QueryAsync(app, schema, query, referenced);
+                return collectionPublished.QueryAsync(app, schemas, q);
             }
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<DomainId> ids, SearchScope scope)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q, SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schema, ids);
+                return collectionAll.QueryAsync(app, schema, q, scope);
             }
             else
             {
-                return collectionPublished.QueryAsync(app, schema, ids);
-            }
-        }
-
-        public Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<DomainId> ids, SearchScope scope)
-        {
-            if (scope == SearchScope.All)
-            {
-                return collectionAll.QueryAsync(app, ids);
-            }
-            else
-            {
-                return collectionPublished.QueryAsync(app, ids);
+                return collectionPublished.QueryAsync(app, schema, q, scope);
             }
         }
 

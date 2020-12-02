@@ -12,7 +12,6 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Queries;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
@@ -32,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
             A.CallTo(() => queryParser.ParseQueryAsync(requestContext, A<Q>._))
-                .Returns(new ClrQuery());
+                .ReturnsLazily(c => new ValueTask<Q>(c.GetArgument<Q>(1)!));
 
             sut = new AssetQueryService(assetEnricher, assetRepository, assetFolderRepository, queryParser);
         }
@@ -74,30 +73,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_load_assets_from_ids_and_resolve_tags()
-        {
-            var found1 = new AssetEntity { Id = DomainId.NewGuid() };
-            var found2 = new AssetEntity { Id = DomainId.NewGuid() };
-
-            var enriched1 = new AssetEntity();
-            var enriched2 = new AssetEntity();
-
-            var ids = HashSet.Of(found1.Id, found2.Id);
-
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<HashSet<DomainId>>.That.Is(ids)))
-                .Returns(ResultList.CreateFrom(8, found1, found2));
-
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))
-                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
-
-            var result = await sut.QueryAsync(requestContext, null, Q.Empty.WithIds(ids));
-
-            Assert.Equal(8, result.Total);
-
-            Assert.Equal(new[] { enriched1, enriched2 }, result.ToArray());
-        }
-
-        [Fact]
         public async Task Should_load_assets_with_query_and_resolve_tags()
         {
             var found1 = new AssetEntity { Id = DomainId.NewGuid() };
@@ -108,13 +83,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var parentId = DomainId.NewGuid();
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, parentId, A<ClrQuery>._))
+            var q = A<Q>.That.HasOData("fileName eq 'Name'");
+
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, parentId, q))
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))
                 .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
-            var result = await sut.QueryAsync(requestContext, parentId, Q.Empty);
+            var result = await sut.QueryAsync(requestContext, parentId, q);
 
             Assert.Equal(8, result.Total);
 

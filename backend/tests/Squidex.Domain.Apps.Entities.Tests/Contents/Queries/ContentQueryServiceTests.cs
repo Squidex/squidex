@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
@@ -53,8 +52,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, A<bool>._))
                 .Returns(schema);
 
-            A.CallTo(() => queryParser.ParseQueryAsync(A<Context>._, schema, A<Q>._))
-                .Returns(new ClrQuery());
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+                .Returns(new List<ISchemaEntity> { schema });
+
+            A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, null))
+                .ReturnsLazily(c => new ValueTask<Q>(c.GetArgument<Q>(2)!));
+
+            A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, schema))
+                .ReturnsLazily(c => new ValueTask<Q>(c.GetArgument<Q>(2)!));
 
             sut = new ContentQueryService(
                 appProvider,
@@ -180,18 +185,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [InlineData(0, 0, SearchScope.Published)]
         public async Task QueryAsync_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
-            var reference = DomainId.NewGuid();
-
             var ctx =
                 CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
                     .WithUnpublished(unpublished == 1);
 
             var content = CreateContent(contentId);
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<ClrQuery>._, reference, scope))
+            var q = Q.Empty.WithReference(DomainId.NewGuid());
+
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, q, scope))
                 .Returns(ResultList.CreateFrom(5, content));
 
-            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty.WithReference(reference));
+            var result = await sut.QueryAsync(ctx, schemaId.Name, q);
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(contentId, result[0].Id);
@@ -200,16 +205,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task QueryByIds_should_not_return_contents_if_user_has_no_permission()
+        public async Task QueryAll_should_not_return_contents_if_user_has_no_permission()
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: false);
 
             var ids = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<DomainId>>._, SearchScope.All))
-                .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
+            var q = Q.Empty.WithIds(ids);
 
-            var result = await sut.QueryAsync(ctx, ids);
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<List<ISchemaEntity>>.That.Matches(x => x.Count == 0), q, SearchScope.All))
+                .Returns(ResultList.Create(0, ids.Select(CreateContent)));
+
+            var result = await sut.QueryAsync(ctx, q);
 
             Assert.Empty(result);
         }
@@ -219,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [InlineData(1, 1, SearchScope.All)]
         [InlineData(0, 1, SearchScope.All)]
         [InlineData(0, 0, SearchScope.Published)]
-        public async Task QueryByIds_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
+        public async Task QueryAll_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
             var ctx =
                 CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
@@ -227,25 +234,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ids = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<DomainId>>._, scope))
-                .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
+            var q = Q.Empty.WithIds(ids);
 
-            var result = await sut.QueryAsync(ctx, ids);
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<List<ISchemaEntity>>.That.Matches(x => x.Count == 1), q, scope))
+                .Returns(ResultList.Create(5, ids.Select(CreateContent)));
+
+            var result = await sut.QueryAsync(ctx, q);
 
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
-        }
-
-        [Fact]
-        public async Task QueryByIds_should_not_call_repository_if_no_id_defined()
-        {
-            var ctx = CreateContext(isFrontend: false, allowSchema: true);
-
-            var result = await sut.QueryAsync(ctx, new List<DomainId>());
-
-            Assert.Empty(result);
-
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<HashSet<DomainId>>._, A<SearchScope>._))
-                .MustNotHaveHappened();
         }
 
         private void SetupEnricher()

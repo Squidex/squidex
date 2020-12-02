@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 await maxRequests.WaitAsync();
                 try
                 {
-                    contents = await contentQuery.QueryAsync(context, notLoadedContents);
+                    contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(notLoadedContents));
                 }
                 finally
                 {

@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
-using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
@@ -82,27 +81,40 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, ClrQuery query)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, Q q)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByQuery"))
             {
                 try
                 {
-                    query = query.AdjustToModel();
+                    if (q.Ids != null)
+                    {
+                        var assetEntities =
+                            await Collection.Find(BuildFilter(appId, q.Ids.ToHashSet())).SortByDescending(x => x.LastModified)
+                                .QueryLimit(q.Query)
+                                .QuerySkip(q.Query)
+                                .ToListAsync();
 
-                    var filter = query.BuildFilter(appId, parentId);
+                        return ResultList.Create(assetEntities.Count, assetEntities.OfType<IAssetEntity>());
+                    }
+                    else
+                    {
+                        var query = q.Query.AdjustToModel();
 
-                    var assetCount = Collection.Find(filter).CountDocumentsAsync();
-                    var assetItems =
-                        Collection.Find(filter)
-                            .QueryLimit(query)
-                            .QuerySkip(query)
-                            .QuerySort(query)
-                            .ToListAsync();
+                        var filter = query.BuildFilter(appId, parentId);
 
-                    var (items, total) = await AsyncHelper.WhenAll(assetItems, assetCount);
+                        var assetCount = Collection.Find(filter).CountDocumentsAsync();
+                        var assetItems =
+                            Collection.Find(filter)
+                                .QueryLimit(query)
+                                .QuerySkip(query)
+                                .QuerySort(query)
+                                .ToListAsync();
 
-                    return ResultList.Create<IAssetEntity>(total, items);
+                        var (items, total) = await AsyncHelper.WhenAll(assetItems, assetCount);
+
+                        return ResultList.Create<IAssetEntity>(total, items);
+                    }
                 }
                 catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
                 {
@@ -132,18 +144,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         .ToListAsync();
 
                 return assetEntities.Select(x => DomainId.Create(x[Fields.AssetId].AsString)).ToList();
-            }
-        }
-
-        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, HashSet<DomainId> ids)
-        {
-            using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
-            {
-                var assetEntities =
-                    await Collection.Find(BuildFilter(appId, ids)).SortByDescending(x => x.LastModified)
-                        .ToListAsync();
-
-                return ResultList.Create(assetEntities.Count, assetEntities.OfType<IAssetEntity>());
             }
         }
 

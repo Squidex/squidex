@@ -56,10 +56,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 AppId = appId
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<IReadOnlyList<DomainId>>.That.Contains(referenceId1)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId1)))
                 .Returns(ResultList.CreateFrom(1, reference1));
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<IReadOnlyList<DomainId>>.That.Contains(referenceId2)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId2)))
                 .Returns(ResultList.CreateFrom(1, reference2));
 
             var vars = new TemplateVars

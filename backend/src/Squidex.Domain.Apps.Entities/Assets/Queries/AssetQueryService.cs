@@ -94,44 +94,23 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             return assetFolders;
         }
 
-        public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q query)
+        public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q q)
         {
             Guard.NotNull(context, nameof(context));
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(q, nameof(q));
 
-            IResultList<IAssetEntity> assets;
+            q = await queryParser.ParseQueryAsync(context, q);
 
-            if (query.Ids != null && query.Ids.Count > 0)
+            var assets = await assetRepository.QueryAsync(context.App.Id, parentId, q);
+
+            if (q.Ids != null)
             {
-                assets = await QueryByIdsAsync(context, query);
-            }
-            else
-            {
-                assets = await QueryByQueryAsync(context, parentId, query);
+                assets = assets.SortSet(x => x.Id, q.Ids);
             }
 
             var enriched = await assetEnricher.EnrichAsync(assets, context);
 
             return ResultList.Create(assets.Total, enriched);
-        }
-
-        private async Task<IResultList<IAssetEntity>> QueryByQueryAsync(Context context, DomainId? parentId, Q query)
-        {
-            var parsedQuery = await queryParser.ParseQueryAsync(context, query);
-
-            return await assetRepository.QueryAsync(context.App.Id, parentId, parsedQuery);
-        }
-
-        private async Task<IResultList<IAssetEntity>> QueryByIdsAsync(Context context, Q query)
-        {
-            var assets = await assetRepository.QueryAsync(context.App.Id, new HashSet<DomainId>(query.Ids));
-
-            return Sort(assets, query.Ids);
-        }
-
-        private static IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<DomainId> ids)
-        {
-            return assets.SortSet(x => x.Id, ids);
         }
     }
 }

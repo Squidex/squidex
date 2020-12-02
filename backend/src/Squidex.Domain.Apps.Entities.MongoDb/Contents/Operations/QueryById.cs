@@ -13,16 +13,14 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryContent : OperationBase
+    internal sealed class QueryById : OperationBase
     {
-        private readonly DataConverter converter;
-
-        public QueryContent(DataConverter converter)
+        public QueryById(DataConverter dataConverter)
+            : base(dataConverter)
         {
-            this.converter = converter;
         }
 
-        public async Task<IContentEntity?> DoAsync(ISchemaEntity schema, DomainId id)
+        public async Task<IContentEntity?> QueryAsync(ISchemaEntity schema, DomainId id)
         {
             Guard.NotNull(schema, nameof(schema));
 
@@ -39,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     return null;
                 }
 
-                contentEntity?.ParseData(schema.SchemaDef, converter);
+                contentEntity?.ParseData(schema.SchemaDef, DataConverter);
             }
 
             return contentEntity;

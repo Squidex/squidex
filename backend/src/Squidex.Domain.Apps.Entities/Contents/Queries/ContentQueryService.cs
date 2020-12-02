@@ -12,12 +12,9 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 using Squidex.Shared;
-
-#pragma warning disable RECS0147
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
@@ -62,8 +59,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
-            CheckPermission(context, schema);
-
             using (Profiler.TraceMethod<ContentQueryService>())
             {
                 IContentEntity? content;
@@ -86,58 +81,60 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query)
+        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q q)
         {
             Guard.NotNull(context, nameof(context));
 
-            if (query == null)
+            if (q == null)
             {
                 return EmptyContents;
             }
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
-            CheckPermission(context, schema);
-
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                IResultList<IContentEntity> contents;
+                q = await queryParser.ParseAsync(context, q, schema);
 
-                if (query.Ids != null && query.Ids.Count > 0)
+                var contents = await contentRepository.QueryAsync(context.App, schema, q, context.Scope());
+
+                if (q.Ids != null)
                 {
-                    contents = await QueryByIdsAsync(context, schema, query);
-                }
-                else
-                {
-                    contents = await QueryByQueryAsync(context, schema, query);
+                    contents = contents.SortSet(x => x.Id, q.Ids);
                 }
 
                 return await TransformAsync(context, contents);
             }
         }
 
-        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, IReadOnlyList<DomainId> ids)
+        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, Q q)
         {
             Guard.NotNull(context, nameof(context));
 
-            if (ids == null || ids.Count == 0)
+            if (q == null)
+            {
+                return EmptyContents;
+            }
+
+            var schemas = await GetSchemasAsync(context);
+
+            if (schemas.Count == 0)
             {
                 return EmptyContents;
             }
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var contents = await QueryCoreAsync(context, ids);
+                q = await queryParser.ParseAsync(context, q);
 
-                var filtered =
-                    contents
-                        .GroupBy(x => x.Schema.Id)
-                        .Select(g => FilterContents(g, context))
-                        .SelectMany(c => c);
+                var contents = await contentRepository.QueryAsync(context.App, schemas, q, context.Scope());
 
-                var results = await TransformCoreAsync(context, filtered);
+                if (q.Ids != null)
+                {
+                    contents = contents.SortSet(x => x.Id, q.Ids);
+                }
 
-                return ResultList.Create(results.Count, results.SortList(x => x.Id, ids));
+                return await TransformAsync(context, contents);
             }
         }
 
@@ -186,68 +183,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 throw new DomainObjectNotFoundException(schemaIdOrName);
             }
 
+            if (!HasPermission(context, schema))
+            {
+                throw new DomainForbiddenException(T.Get("schemas.noPermission"));
+            }
+
             return schema;
         }
 
-        private static void CheckPermission(Context context, params ISchemaEntity[] schemas)
+        private async Task<List<ISchemaEntity>> GetSchemasAsync(Context context)
         {
-            foreach (var schema in schemas)
-            {
-                if (!HasPermission(context, schema))
-                {
-                    throw new DomainForbiddenException(T.Get("schemas.noPermission"));
-                }
-            }
-        }
+            var schemas = await appProvider.GetSchemasAsync(context.App.Id);
 
-        private static IEnumerable<IContentEntity> FilterContents(IGrouping<DomainId, (IContentEntity Content, ISchemaEntity Schema)> group, Context context)
-        {
-            var schema = group.First().Schema;
-
-            if (HasPermission(context, schema))
-            {
-                return group.Select(x => x.Content);
-            }
-            else
-            {
-                return Enumerable.Empty<IContentEntity>();
-            }
+            return schemas.Where(x => HasPermission(context, x)).ToList();
         }
 
         private static bool HasPermission(Context context, ISchemaEntity schema)
         {
-            var permission = Permissions.ForApp(Permissions.AppContentsRead, schema.AppId.Name, schema.SchemaDef.Name);
+            var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schema.SchemaDef.Name);
 
             return context.Permissions.Allows(permission);
-        }
-
-        private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, ISchemaEntity schema, Q query)
-        {
-            var parsedQuery = await queryParser.ParseQueryAsync(context, schema, query);
-
-            return await QueryCoreAsync(context, schema, parsedQuery, query.Reference);
-        }
-
-        private async Task<IResultList<IContentEntity>> QueryByIdsAsync(Context context, ISchemaEntity schema, Q query)
-        {
-            var contents = await QueryCoreAsync(context, schema, query.Ids.ToHashSet());
-
-            return contents.SortSet(x => x.Id, query.Ids);
-        }
-
-        private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryCoreAsync(Context context, IReadOnlyList<DomainId> ids)
-        {
-            return contentRepository.QueryAsync(context.App, new HashSet<DomainId>(ids), context.Scope());
-        }
-
-        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query, DomainId? referenced)
-        {
-            return contentRepository.QueryAsync(context.App, schema, query, referenced, context.Scope());
-        }
-
-        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, HashSet<DomainId> ids)
-        {
-            return contentRepository.QueryAsync(context.App, schema, ids, context.Scope());
         }
 
         private Task<IContentEntity?> FindCoreAsync(Context context, DomainId id, ISchemaEntity schema)

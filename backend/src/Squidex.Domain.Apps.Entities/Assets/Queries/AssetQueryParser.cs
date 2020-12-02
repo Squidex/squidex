@@ -46,60 +46,49 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.options = options.Value;
         }
 
-        public virtual async ValueTask<ClrQuery> ParseQueryAsync(Context context, Q q)
+        public virtual async ValueTask<Q> ParseQueryAsync(Context context, Q q)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(q, nameof(q));
 
             using (Profiler.TraceMethod<AssetQueryParser>())
             {
-                ClrQuery result;
+                var query = q.Query;
 
-                if (q.Query != null)
+                if (!string.IsNullOrWhiteSpace(q?.JsonQueryString))
                 {
-                    result = q.Query;
+                    query = ParseJson(q.JsonQueryString);
                 }
-                else
+                else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
                 {
-                    if (!string.IsNullOrWhiteSpace(q?.JsonQuery))
-                    {
-                        result = ParseJson(q.JsonQuery);
-                    }
-                    else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
-                    {
-                        result = ParseOData(q.ODataQuery);
-                    }
-                    else
-                    {
-                        result = new ClrQuery();
-                    }
+                    query = ParseOData(q.ODataQuery);
                 }
 
-                if (result.Filter != null)
+                if (query.Filter != null)
                 {
-                    result.Filter = await FilterTagTransformer.TransformAsync(result.Filter, context.App.Id, tagService);
+                    query.Filter = await FilterTagTransformer.TransformAsync(query.Filter, context.App.Id, tagService);
                 }
 
-                if (result.Sort.Count == 0)
+                if (query.Sort.Count == 0)
                 {
-                    result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
+                    query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
                 }
 
-                if (!result.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
+                if (!query.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
                 {
-                    result.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
+                    query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
                 }
 
-                if (result.Take == long.MaxValue)
+                if (query.Take == long.MaxValue)
                 {
-                    result.Take = options.DefaultPageSize;
+                    query.Take = options.DefaultPageSize;
                 }
-                else if (result.Take > options.MaxResults)
+                else if (query.Take > options.MaxResults)
                 {
-                    result.Take = options.MaxResults;
+                    query.Take = options.MaxResults;
                 }
 
-                return result;
+                return q!.WithQuery(query);
             }
         }
 

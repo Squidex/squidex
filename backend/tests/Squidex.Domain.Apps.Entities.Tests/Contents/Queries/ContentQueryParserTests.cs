@@ -46,21 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_use_existing_query()
-        {
-            var clrQuery = new ClrQuery();
-
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, Q.Empty.WithQuery(clrQuery));
-
-            Assert.Same(parsed, clrQuery);
-        }
-
-        [Fact]
         public async Task Should_throw_if_odata_query_is_invalid()
         {
             var query = Q.Empty.WithODataQuery("$filter=invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, schema, query).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema).AsTask());
         }
 
         [Fact]
@@ -68,7 +58,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithJsonQuery("invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, schema, query).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema).AsTask());
+        }
+
+        [Fact]
+        public async Task Should_parse_odata_query_without_schema()
+        {
+            var query = Q.Empty.WithODataQuery("$filter=status eq 'Draft'");
+
+            var q = await sut.ParseAsync(requestContext, query);
+
+            Assert.Equal("Filter: status == 'Draft'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_parse_json_query_without_schema()
+        {
+            var query = Q.Empty.WithJsonQuery("{ 'filter': { 'path': 'status', 'op': 'eq', 'value': 'Draft' } }");
+
+            var q = await sut.ParseAsync(requestContext, query);
+
+            Assert.Equal("Filter: status == 'Draft'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -76,9 +86,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithODataQuery("$top=100&$orderby=data/firstName/iv asc&$search=Hello World");
 
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+            var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("FullText: 'Hello World'; Take: 100; Sort: data.firstName.iv Ascending, id Ascending", parsed.ToString());
+            Assert.Equal("FullText: 'Hello World'; Take: 100; Sort: data.firstName.iv Ascending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -86,9 +96,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithODataQuery("$top=200&$filter=data/firstName/iv eq 'ABC'");
 
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+            var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 200; Sort: lastModified Descending, id Ascending", parsed.ToString());
+            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 200; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -96,9 +106,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithJsonQuery(Json("{ 'filter': { 'path': 'data.firstName.iv', 'op': 'eq', 'value': 'ABC' } }"));
 
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+            var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
+            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -110,9 +120,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     Filter = new CompareFilter<IJsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC"))
                 });
 
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+            var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
+            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -120,9 +130,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithJsonQuery(Json("{ 'fullText': 'Hello' }"));
 
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+            var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
+            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -134,9 +144,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     FullText = "Hello"
                 });
 
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+            var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
+            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -144,9 +154,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty;
 
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+            var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("Take: 30; Sort: lastModified Descending, id Ascending", parsed.ToString());
+            Assert.Equal("Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -154,9 +164,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
 
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+            var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("Skip: 20; Take: 200; Sort: lastModified Descending, id Ascending", parsed.ToString());
+            Assert.Equal("Skip: 20; Take: 200; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -164,9 +174,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20&$orderby=id desc");
 
-            var parsed = await sut.ParseQueryAsync(requestContext, schema, query);
+            var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("Skip: 20; Take: 200; Sort: id Descending", parsed.ToString());
+            Assert.Equal("Skip: 20; Take: 200; Sort: id Descending", q.Query.ToString());
         }
 
         private static string Json(string text)

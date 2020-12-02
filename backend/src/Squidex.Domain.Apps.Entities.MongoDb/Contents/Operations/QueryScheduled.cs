@@ -5,41 +5,44 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using NodaTime;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryReferrersAsync : OperationBase
+    internal sealed class QueryScheduled : OperationBase
     {
+        public QueryScheduled(DataConverter dataConverter)
+            : base(dataConverter)
+        {
+        }
+
         protected override Task PrepareAsync(CancellationToken ct = default)
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.ReferencedIds)
-                    .Ascending(x => x.IndexedAppId)
-                    .Ascending(x => x.IsDeleted));
+                   .Ascending(x => x.ScheduledAt)
+                   .Ascending(x => x.IsDeleted));
 
             return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
-        public async Task<bool> DoAsync(DomainId appId, DomainId contentId)
+        public Task QueryAsync(Instant now, Func<IContentEntity, Task> callback)
         {
-            var filter =
-                Filter.And(
-                    Filter.AnyEq(x => x.ReferencedIds, contentId),
-                    Filter.Eq(x => x.IndexedAppId, appId),
-                    Filter.Ne(x => x.IsDeleted, true),
-                    Filter.Ne(x => x.Id, contentId));
+            Guard.NotNull(callback, nameof(callback));
 
-            var hasReferrerAsync =
-                await Collection.Find(filter).Only(x => x.Id)
-                    .AnyAsync();
-
-            return hasReferrerAsync;
+            return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true)
+                .Not(x => x.DataByIds)
+                .ForEachAsync(c =>
+                {
+                    callback(c);
+                });
         }
     }
 }

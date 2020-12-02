@@ -13,75 +13,88 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public sealed class Q : Cloneable<Q>
+    public record Q
     {
-        public static readonly Q Empty = new Q();
+        public static Q Empty => new Q();
 
-        public IReadOnlyList<DomainId> Ids { get; private set; }
+        public IReadOnlyList<DomainId>? Ids { get; init; }
 
-        public DomainId? Reference { get; private set; }
+        public DomainId ReferenceOwner { get; init; }
 
-        public string? ODataQuery { get; private set; }
+        public DomainId Reference { get; init; }
 
-        public string? JsonQuery { get; private set; }
+        public string? ODataQuery { get; init; }
 
-        public Query<IJsonValue>? ParsedJsonQuery { get; private set; }
+        public string? JsonQueryString { get; init; }
 
-        public ClrQuery? Query { get; private set; }
+        public Query<IJsonValue>? JsonQuery { get; init; }
 
-        public Q WithQuery(ClrQuery? query)
+        public ClrQuery Query { get; init; } = new ClrQuery();
+
+        private Q()
         {
-            return Clone(clone => clone.Query = query);
         }
 
-        public Q WithODataQuery(string? odataQuery)
+        public Q WithQuery(ClrQuery query)
         {
-            return Clone(clone => clone.ODataQuery = odataQuery);
+            Guard.NotNull(query, nameof(query));
+
+            return this with { Query = query };
         }
 
-        public Q WithJsonQuery(string? jsonQuery)
+        public Q WithODataQuery(string? query)
         {
-            return Clone(clone => clone.JsonQuery = jsonQuery);
+            return this with { ODataQuery = query };
         }
 
-        public Q WithJsonQuery(Query<IJsonValue>? jsonQuery)
+        public Q WithJsonQuery(string? query)
         {
-            return Clone(clone => clone.ParsedJsonQuery = jsonQuery);
+            return this with { JsonQueryString = query };
+        }
+
+        public Q WithJsonQuery(Query<IJsonValue>? query)
+        {
+            return this with { JsonQuery = query };
+        }
+
+        public Q WithReferenceOwner(DomainId id)
+        {
+            return this with { ReferenceOwner = id };
+        }
+
+        public Q WithReference(DomainId id)
+        {
+            return this with { Reference = id };
         }
 
         public Q WithIds(params DomainId[] ids)
         {
-            return Clone(clone => clone.Ids = ids.ToList());
-        }
-
-        public Q WithReference(DomainId? reference)
-        {
-            return Clone(clone => clone.Reference = reference);
+            return this with { Ids = ids?.ToList() };
         }
 
         public Q WithIds(IEnumerable<DomainId> ids)
         {
-            return Clone(clone => clone.Ids = ids.ToList());
+            return this with { Ids = ids?.ToList() };
         }
 
         public Q WithIds(string? ids)
         {
-            if (!string.IsNullOrEmpty(ids))
+            if (string.IsNullOrWhiteSpace(ids))
             {
-                return Clone(clone =>
-                {
-                    var idsList = new List<DomainId>();
-
-                    foreach (var id in ids.Split(','))
-                    {
-                        idsList.Add(DomainId.Create(id));
-                    }
-
-                    clone.Ids = idsList;
-                });
+                return this;
             }
 
-            return this;
+            var idsList = new List<DomainId>();
+
+            if (!string.IsNullOrEmpty(ids))
+            {
+                foreach (var id in ids.Split(','))
+                {
+                    idsList.Add(DomainId.Create(id));
+                }
+            }
+
+            return this with { Ids = idsList };
         }
     }
 }

@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
             {
                 var checkAssets = new CheckAssets(async ids =>
                 {
-                    return await assetRepository.QueryAsync(context.AppId.Id, new HashSet<DomainId>(ids));
+                    return await assetRepository.QueryAsync(context.AppId.Id, null, Q.Empty.WithIds(ids));
                 });
 
                 yield return new AssetsValidator(isRequired, assetsField.Properties, checkAssets);

@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 return EmptyContents;
             }
 
-            var references = await ContentQuery.QueryAsync(context.Clone().WithoutContentEnrichment(true), ids.ToList());
+            var references = await ContentQuery.QueryAsync(context.Clone().WithoutContentEnrichment(true), Q.Empty.WithIds(ids));
 
             return references.ToLookup(x => x.Id);
         }

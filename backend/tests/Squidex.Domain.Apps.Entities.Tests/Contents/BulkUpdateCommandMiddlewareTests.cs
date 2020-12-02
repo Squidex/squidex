@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var (id, data, query) = CreateTestData(true);
 
-            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.ParsedJsonQuery == query)))
+            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
                 .Returns(ResultList.CreateFrom(1, CreateContent(id)));
 
             var command = new BulkUpdateContents
@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var (id, data, query) = CreateTestData(true);
 
-            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.ParsedJsonQuery == query)))
+            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
                 .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
 
             var command = new BulkUpdateContents
