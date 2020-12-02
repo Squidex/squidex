@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var parentId = DomainId.NewGuid();
 
-            var q = A<Q>.That.HasOData("fileName eq 'Name'");
+            var q = Q.Empty.WithODataQuery("fileName eq 'Name'");
 
             A.CallTo(() => assetRepository.QueryAsync(appId.Id, parentId, q))
                 .Returns(ResultList.CreateFrom(8, found1, found2));

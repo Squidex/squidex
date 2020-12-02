@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public async Task<IResultList<IContentEntity>> QueryAsync(DomainId appId, List<ISchemaEntity> schemas, Q q)
         {
-            var documentId = DomainId.Combine(appId, q.ReferenceOwner);
+            var documentId = DomainId.Combine(appId, q.Referencing);
 
             var find =
                 Collection
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             if (contentEntity == null)
             {
-                throw new DomainObjectNotFoundException(q.ReferenceOwner.ToString());
+                throw new DomainObjectNotFoundException(q.Referencing.ToString());
             }
 
             if (contentEntity.ReferencedIds == null || contentEntity.ReferencedIds.Count == 0)
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 return EmptyIds;
             }
 
-            q = q.WithReferenceOwner(default).WithIds(contentEntity.ReferencedIds!);
+            q = q.WithReferencing(default).WithIds(contentEntity.ReferencedIds!);
 
             return await queryByIds.QueryAsync(appId, schemas, q);
         }

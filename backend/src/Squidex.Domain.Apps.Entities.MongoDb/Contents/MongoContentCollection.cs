@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     return await queryByIds.QueryAsync(app.Id, schemas, q);
                 }
 
-                if (q.ReferenceOwner != default)
+                if (q.Referencing != default)
                 {
                     return await queryReferences.QueryAsync(app.Id, schemas, q);
                 }
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     return await queryByIds.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q);
                 }
 
-                if (q.ReferenceOwner == default)
+                if (q.Referencing == default)
                 {
                     return await queryByQuery.QueryAsync(app, schema, q, scope);
                 }

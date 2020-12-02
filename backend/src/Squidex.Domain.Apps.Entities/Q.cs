@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public IReadOnlyList<DomainId>? Ids { get; init; }
 
-        public DomainId ReferenceOwner { get; init; }
+        public DomainId Referencing { get; init; }
 
         public DomainId Reference { get; init; }
 
@@ -57,9 +57,9 @@ namespace Squidex.Domain.Apps.Entities
             return this with { JsonQuery = query };
         }
 
-        public Q WithReferenceOwner(DomainId id)
+        public Q WithReferencing(DomainId id)
         {
-            return this with { ReferenceOwner = id };
+            return this with { Referencing = id };
         }
 
         public Q WithReference(DomainId id)

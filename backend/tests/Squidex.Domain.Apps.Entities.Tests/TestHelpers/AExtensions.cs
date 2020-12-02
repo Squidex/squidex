@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata, DomainId reference = default)
         {
-            return that.Matches(x => x.ODataQuery == odata && x.ReferenceOwner == reference);
+            return that.Matches(x => x.ODataQuery == odata && x.Reference == reference);
         }
 
         public static Q HasIds(this INegatableArgumentConstraintManager<Q> that, params DomainId[] ids)

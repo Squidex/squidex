@@ -306,7 +306,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetReferences(string app, string name, DomainId id, [FromQuery] string? q = null)
         {
-            var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReferenceOwner(id));
+            var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReferencing(id));
 
             var response = Deferred.AsyncResponse(() =>
             {
