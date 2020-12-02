@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.Queries.Json
             }
         }
 
-        private static Query<IJsonValue> ParseFromJson(string json, IJsonSerializer jsonSerializer)
+        public static Query<IJsonValue> ParseFromJson(string json, IJsonSerializer jsonSerializer)
         {
             try
             {

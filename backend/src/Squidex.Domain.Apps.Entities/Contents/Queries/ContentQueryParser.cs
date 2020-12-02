@@ -35,6 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public class ContentQueryParser
     {
         private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
+        private readonly EdmModel genericEdmModel = BuildEdmModel("Generic", "Content", new EdmModel(), null);
+        private readonly JsonSchema genericJsonSchema = BuildJsonSchema("Content", null);
         private readonly IMemoryCache cache;
         private readonly IJsonSerializer jsonSerializer;
         private readonly ContentOptions options;
@@ -50,78 +52,68 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.options = options.Value;
         }
 
-        public virtual ValueTask<ClrQuery> ParseQueryAsync(Context context, ISchemaEntity schema, Q q)
+        public virtual ValueTask<Q> ParseAsync(Context context, Q q, ISchemaEntity? schema = null)
         {
             Guard.NotNull(context, nameof(context));
-            Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(q, nameof(q));
 
             using (Profiler.TraceMethod<ContentQueryParser>())
             {
-                ClrQuery result;
+                var query = q.Query;
 
-                if (q.Query != null)
+                if (!string.IsNullOrWhiteSpace(q.JsonQueryString))
                 {
-                    result = q.Query;
+                    query = ParseJson(context, schema, q.JsonQueryString);
                 }
-                else
+                else if (q?.JsonQuery != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(q?.JsonQuery))
-                    {
-                        result = ParseJson(context, schema, q.JsonQuery);
-                    }
-                    else if (q?.ParsedJsonQuery != null)
-                    {
-                        result = ParseJson(context, schema, q.ParsedJsonQuery);
-                    }
-                    else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
-                    {
-                        result = ParseOData(context, schema, q.ODataQuery);
-                    }
-                    else
-                    {
-                        result = new ClrQuery();
-                    }
+                    query = ParseJson(context, schema, q.JsonQuery);
+                }
+                else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+                {
+                    query = ParseOData(context, schema, q.ODataQuery);
                 }
 
-                if (result.Sort.Count == 0)
+                if (query.Sort.Count == 0)
                 {
-                    result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
+                    query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
                 }
 
-                if (!result.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
+                if (!query.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
                 {
-                    result.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
+                    query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
                 }
 
-                if (result.Take == long.MaxValue)
+                if (query.Take == long.MaxValue)
                 {
-                    result.Take = options.DefaultPageSize;
+                    query.Take = options.DefaultPageSize;
                 }
-                else if (result.Take > options.MaxResults)
+                else if (query.Take > options.MaxResults)
                 {
-                    result.Take = options.MaxResults;
+                    query.Take = options.MaxResults;
                 }
 
-                return new ValueTask<ClrQuery>(result);
+                q = q!.WithQuery(query);
+
+                return new ValueTask<Q>(q);
             }
         }
 
-        private ClrQuery ParseJson(Context context, ISchemaEntity schema, Query<IJsonValue> query)
+        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, Query<IJsonValue> query)
         {
             var jsonSchema = BuildJsonSchema(context, schema);
 
             return jsonSchema.Convert(query);
         }
 
-        private ClrQuery ParseJson(Context context, ISchemaEntity schema, string json)
+        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, string json)
         {
             var jsonSchema = BuildJsonSchema(context, schema);
 
             return jsonSchema.Parse(json, jsonSerializer);
         }
 
-        private ClrQuery ParseOData(Context context, ISchemaEntity schema, string odata)
+        private ClrQuery ParseOData(Context context, ISchemaEntity? schema, string odata)
         {
             try
             {
@@ -139,8 +131,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private JsonSchema BuildJsonSchema(Context context, ISchemaEntity schema)
+        private JsonSchema BuildJsonSchema(Context context, ISchemaEntity? schema)
         {
+            if (schema == null)
+            {
+                return genericJsonSchema;
+            }
+
             var cacheKey = BuildJsonCacheKey(context.App, schema, context.IsFrontendClient);
 
             var result = cache.GetOrCreate(cacheKey, entry =>
@@ -153,8 +150,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return result;
         }
 
-        private IEdmModel BuildEdmModel(Context context, ISchemaEntity schema)
+        private IEdmModel BuildEdmModel(Context context, ISchemaEntity? schema)
         {
+            if (schema == null)
+            {
+                return genericEdmModel;
+            }
+
             var cacheKey = BuildEmdCacheKey(context.App, schema, context.IsFrontendClient);
 
             var result = cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
@@ -171,7 +173,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), (n, s) => s, withHiddenFields);
 
-            return ContentSchemaBuilder.CreateContentSchema(schema, dataSchema);
+            return BuildJsonSchema(schema.DisplayName(), dataSchema);
+        }
+
+        private static JsonSchema BuildJsonSchema(string name, JsonSchema? dataSchema)
+        {
+            var schema = new JsonSchema
+            {
+                Properties =
+                {
+                    ["id"] = SchemaBuilder.StringProperty($"The id of the {name} content.", true),
+                    ["version"] = SchemaBuilder.NumberProperty($"The version of the {name}.", true),
+                    ["created"] = SchemaBuilder.DateTimeProperty($"The date and time when the {name} content has been created.", true),
+                    ["createdBy"] = SchemaBuilder.StringProperty($"The user that has created the {name} content.", true),
+                    ["lastModified"] = SchemaBuilder.DateTimeProperty($"The date and time when the {name} content has been modified last.", true),
+                    ["lastModifiedBy"] = SchemaBuilder.StringProperty($"The user that has updated the {name} content last.", true),
+                    ["newStatus"] = SchemaBuilder.StringProperty($"The new status of the content.", false),
+                    ["status"] = SchemaBuilder.StringProperty($"The status of the content.", true)
+                },
+                Type = JsonObjectType.Object
+            };
+
+            if (dataSchema != null)
+            {
+                schema.Properties["data"] = SchemaBuilder.ObjectProperty(dataSchema, $"The data of the {name}.", true);
+                schema.Properties["dataDraft"] = SchemaBuilder.ObjectProperty(dataSchema, $"The draft data of the {name}.");
+            }
+
+            return schema;
         }
 
         private static EdmModel BuildEdmModel(Schema schema, IAppEntity app, bool withHiddenFields)
@@ -207,7 +236,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var schemaType = schema.BuildEdmType(withHiddenFields, app.PartitionResolver(), typeFactory);
 
-            var entityType = new EdmEntityType(app.Name.ToPascalCase(), schema.Name);
+            return BuildEdmModel(app.Name.ToPascalCase(), schema.Name, model, schemaType);
+        }
+
+        private static EdmModel BuildEdmModel(string modelName, string name, EdmModel model, EdmComplexType? schemaType)
+        {
+            var entityType = new EdmEntityType(modelName, name);
+
             entityType.AddStructuralProperty(nameof(IContentEntity.Id).ToCamelCase(), EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty(nameof(IContentEntity.Created).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);
             entityType.AddStructuralProperty(nameof(IContentEntity.CreatedBy).ToCamelCase(), EdmPrimitiveTypeKind.String);
@@ -216,14 +251,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             entityType.AddStructuralProperty(nameof(IContentEntity.NewStatus).ToCamelCase(), EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty(nameof(IContentEntity.Status).ToCamelCase(), EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty(nameof(IContentEntity.Version).ToCamelCase(), EdmPrimitiveTypeKind.Int32);
-            entityType.AddStructuralProperty(nameof(IContentEntity.Data).ToCamelCase(), new EdmComplexTypeReference(schemaType, false));
+
+            if (schemaType != null)
+            {
+                entityType.AddStructuralProperty("data", new EdmComplexTypeReference(schemaType, false));
+                entityType.AddStructuralProperty("dataDraft", new EdmComplexTypeReference(schemaType, false));
+
+                model.AddElement(schemaType);
+            }
 
             var container = new EdmEntityContainer("Squidex", "Container");
 
             container.AddEntitySet("ContentSet", entityType);
 
             model.AddElement(container);
-            model.AddElement(schemaType);
             model.AddElement(entityType);
 
             return model;

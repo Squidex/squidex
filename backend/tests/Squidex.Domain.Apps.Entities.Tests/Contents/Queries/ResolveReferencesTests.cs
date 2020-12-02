@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<IReadOnlyList<DomainId>>.That.Matches(x => x.Count == 4)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<IReadOnlyList<DomainId>>.That.Matches(x => x.Count == 4)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_1.Id, ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<IReadOnlyList<DomainId>>.That.Matches(x => x.Count == 4)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -244,7 +244,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Null(contents[0].ReferenceData);
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<List<DomainId>>._))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._))
                 .MustNotHaveHappened();
         }
 
@@ -262,7 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Null(contents[0].ReferenceData);
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<List<DomainId>>._))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._))
                 .MustNotHaveHappened();
         }
 
@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.NotNull(contents[0].ReferenceData);
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<List<DomainId>>._))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._))
                 .MustNotHaveHappened();
         }
 

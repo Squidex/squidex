@@ -35,13 +35,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return x.Name;
         }
 
-        public static Func<PropertyPath, PropertyPath> Path(Schema schema)
+        public static Func<PropertyPath, PropertyPath> Path(Schema? schema)
         {
             return propertyNames =>
             {
                 var result = new List<string>(propertyNames);
 
-                if (result.Count > 1)
+                if (result.Count > 1 && schema != null)
                 {
                     var rootEdmName = result[1].UnescapeEdmField();
                     var rootField = schema.FieldsByName[rootEdmName];
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             };
         }
 
-        public static ClrQuery AdjustToModel(this ClrQuery query, Schema schema)
+        public static ClrQuery AdjustToModel(this ClrQuery query, Schema? schema)
         {
             var pathConverter = Path(schema);
 

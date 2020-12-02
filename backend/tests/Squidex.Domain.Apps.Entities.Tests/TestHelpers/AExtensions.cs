@@ -22,12 +22,22 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata)
         {
-            return that.HasOData(odata, null);
+            return that.HasOData(odata, default);
         }
 
-        public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata, DomainId? reference = null)
+        public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata, DomainId reference = default)
         {
             return that.Matches(x => x.ODataQuery == odata && x.Reference == reference);
+        }
+
+        public static Q HasIds(this INegatableArgumentConstraintManager<Q> that, params DomainId[] ids)
+        {
+            return that.Matches(x => x.Ids != null && x.Ids.SetEquals(ids));
+        }
+
+        public static Q HasIds(this INegatableArgumentConstraintManager<Q> that, IEnumerable<DomainId> ids)
+        {
+            return that.Matches(x => x.Ids != null && x.Ids.SetEquals(ids.ToHashSet()));
         }
 
         public static ClrQuery Is(this INegatableArgumentConstraintManager<ClrQuery> that, string query)

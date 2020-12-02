@@ -30,7 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public async Task Should_find_asset_by_slug()
         {
-            var asset = await _.AssetRepository.FindAssetBySlugAsync(_.RandomAppId(), _.RandomValue());
+            var random = _.RandomValue();
+
+            var asset = await _.AssetRepository.FindAssetBySlugAsync(_.RandomAppId(), random);
 
             Assert.NotNull(asset);
         }
@@ -38,7 +40,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public async Task Should_query_asset_by_hash()
         {
-            var assets = await _.AssetRepository.FindAssetAsync(_.RandomAppId(), _.RandomValue(), _.RandomValue(), 123);
+            var random = _.RandomValue();
+
+            var assets = await _.AssetRepository.FindAssetAsync(_.RandomAppId(), random, random, 1024);
 
             Assert.NotNull(assets);
         }
@@ -68,9 +72,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [MemberData(nameof(ParentIds))]
         public async Task Should_query_assets_by_tags(DomainId? parentId)
         {
+            var random = _.RandomValue();
+
             var query = new ClrQuery
             {
-                Filter = F.Eq("Tags", _.RandomValue())
+                Filter = F.Eq("Tags", random)
             };
 
             var assets = await QueryAsync(parentId, query);
@@ -82,9 +88,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [MemberData(nameof(ParentIds))]
         public async Task Should_query_assets_by_tags_and_name(DomainId? parentId)
         {
+            var random = _.RandomValue();
+
             var query = new ClrQuery
             {
-                Filter = F.And(F.Eq("Tags", _.RandomValue()), F.Contains("FileName", _.RandomValue()))
+                Filter = F.And(F.Eq("Tags", random), F.Contains("FileName", random))
             };
 
             var assets = await QueryAsync(parentId, query);
@@ -96,9 +104,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [MemberData(nameof(ParentIds))]
         public async Task Should_query_assets_by_fileName(DomainId? parentId)
         {
+            var random = _.RandomValue();
+
             var query = new ClrQuery
             {
-                Filter = F.Contains("FileName", _.RandomValue())
+                Filter = F.Contains("FileName", random)
             };
 
             var assets = await QueryAsync(parentId, query);
@@ -110,9 +120,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [MemberData(nameof(ParentIds))]
         public async Task Should_query_assets_by_fileName_and_tags(DomainId? parentId)
         {
+            var random = _.RandomValue();
+
             var query = new ClrQuery
             {
-                Filter = F.And(F.Contains("FileName", _.RandomValue()), F.Eq("Tags", _.RandomValue()))
+                Filter = F.And(F.Contains("FileName", random), F.Eq("Tags", random))
             };
 
             var assets = await QueryAsync(parentId, query);
@@ -137,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                 new SortNode("LastModified", SortOrder.Descending)
             };
 
-            var assets = await _.AssetRepository.QueryAsync(_.RandomAppId(), parentId, query);
+            var assets = await _.AssetRepository.QueryAsync(_.RandomAppId(), parentId, Q.Empty.WithQuery(query));
 
             return assets;
         }

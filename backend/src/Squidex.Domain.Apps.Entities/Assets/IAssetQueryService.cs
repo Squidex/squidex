@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetQueryService
     {
-        Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q query);
+        Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q q);
 
         Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId);
 

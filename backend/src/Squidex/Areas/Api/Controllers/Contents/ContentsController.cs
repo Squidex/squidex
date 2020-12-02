@@ -154,7 +154,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids)
         {
-            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(ids).Ids);
+            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(ids));
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -183,7 +183,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] ContentsIdsQueryDto query)
         {
-            var contents = await contentQuery.QueryAsync(Context, query.Ids);
+            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(query.Ids));
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -273,7 +273,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentDto), 200)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, DomainId id)
@@ -281,6 +281,68 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var content = await contentQuery.FindAsync(Context, name, id);
 
             var response = ContentDto.FromContent(content, Resources);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get all references of a content.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the content to fetch.</param>
+        /// <param name="q">The optional json query.</param>
+        /// <returns>
+        /// 200 => Contents returned.
+        /// 404 => Content, schema or app not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpGet]
+        [Route("content/{app}/{name}/{id}/references")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetReferences(string app, string name, DomainId id, [FromQuery] string? q = null)
+        {
+            var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReferencing(id));
+
+            var response = Deferred.AsyncResponse(() =>
+            {
+                return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
+            });
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get a referencing contents of a content item.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the content to fetch.</param>
+        /// <param name="q">The optional json query.</param>
+        /// <returns>
+        /// 200 => Content returned.
+        /// 404 => Content, schema or app not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpGet]
+        [Route("content/{app}/{name}/{id}/referencing")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetReferencing(string app, string name, DomainId id, [FromQuery] string? q = null)
+        {
+            var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReference(id));
+
+            var response = Deferred.AsyncResponse(() =>
+            {
+                return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
+            });
 
             return Ok(response);
         }

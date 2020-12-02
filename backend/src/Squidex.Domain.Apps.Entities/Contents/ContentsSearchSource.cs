@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var appId = context.App.NamedId();
 
-            var contents = await contentQuery.QueryAsync(context, ids);
+            var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids));
 
             foreach (var content in contents)
             {

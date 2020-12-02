@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -23,9 +25,8 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class QueryContentsByQuery : OperationBase
+    internal sealed class QueryByQuery : OperationBase
     {
-        private readonly DataConverter converter;
         private readonly ITextIndex indexer;
         private readonly IAppProvider appProvider;
 
@@ -39,10 +40,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public MongoContentEntity[] Joined { get; set; }
         }
 
-        public QueryContentsByQuery(DataConverter converter, ITextIndex indexer, IAppProvider appProvider)
+        public QueryByQuery(DataConverter dataConverter, ITextIndex indexer, IAppProvider appProvider)
+            : base(dataConverter)
         {
-            this.converter = converter;
             this.indexer = indexer;
+
             this.appProvider = appProvider;
         }
 
@@ -67,41 +69,89 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             await Collection.Indexes.CreateOneAsync(indexBySchema, cancellationToken: ct);
         }
 
-        public async IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
         {
-            var find =
-                schemaIds != null ?
-                    Collection.Find(x => x.IndexedAppId == appId && schemaIds.Contains(x.IndexedSchemaId) && !x.IsDeleted) :
-                    Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
-
-            using (var cursor = await find.ToCursorAsync())
-            {
-                while (await cursor.MoveNextAsync())
-                {
-                    foreach (var entity in cursor.Current)
-                    {
-                        var schema = await appProvider.GetSchemaAsync(appId, entity.SchemaId.Id, false);
-
-                        if (schema != null)
-                        {
-                            entity.ParseData(schema.SchemaDef, converter);
-
-                            yield return entity;
-                        }
-                    }
-                }
-            }
-        }
-
-        public async Task<IResultList<IContentEntity>> DoAsync(IAppEntity app, ISchemaEntity schema, ClrQuery query, DomainId? referenced, SearchScope scope)
-        {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(filterNode, nameof(filterNode));
 
             try
             {
-                query = query.AdjustToModel(schema.SchemaDef);
+                var schema = await appProvider.GetSchemaAsync(appId, schemaId, false);
+
+                if (schema == null)
+                {
+                    return new List<(DomainId SchemaId, DomainId Id, Status Status)>();
+                }
+
+                var filter = BuildFilter(appId, schemaId, filterNode.AdjustToModel(schema.SchemaDef));
+
+                var contentItems = await Collection.FindStatusAsync(filter);
+
+                return contentItems.Select(x => (x.IndexedSchemaId, x.Id, x.Status)).ToList();
+            }
+            catch (MongoCommandException ex) when (ex.Code == 96)
+            {
+                throw new DomainException(T.Get("common.resultTooLarge"));
+            }
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            {
+                throw new DomainException(T.Get("common.resultTooLarge"));
+            }
+        }
+
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q)
+        {
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(q, nameof(q));
+
+            try
+            {
+                var query = q.Query.AdjustToModel(null);
+
+                List<DomainId>? fullTextIds = null;
+
+                if (!string.IsNullOrWhiteSpace(query.FullText))
+                {
+                    throw new NotSupportedException();
+                }
+
+                var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), fullTextIds, query, q.Reference);
+
+                var contentCount = Collection.Find(filter).CountDocumentsAsync();
+                var contentItems = FindContentsAsync(query, filter);
+
+                var (items, total) = await AsyncHelper.WhenAll(contentItems, contentCount);
+
+                if (items.Count > 0)
+                {
+                    var contentSchemas = schemas.ToDictionary(x => x.Id);
+
+                    foreach (var entity in items)
+                    {
+                        entity.ParseData(contentSchemas[entity.IndexedSchemaId].SchemaDef, DataConverter);
+                    }
+                }
+
+                return ResultList.Create<IContentEntity>(total, items);
+            }
+            catch (MongoCommandException ex) when (ex.Code == 96)
+            {
+                throw new DomainException(T.Get("common.resultTooLarge"));
+            }
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            {
+                throw new DomainException(T.Get("common.resultTooLarge"));
+            }
+        }
+
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q, SearchScope scope)
+        {
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(q, nameof(q));
+
+            try
+            {
+                var query = q.Query.AdjustToModel(schema.SchemaDef);
 
                 List<DomainId>? fullTextIds = null;
 
@@ -117,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     }
                 }
 
-                var filter = CreateFilter(schema.AppId.Id, schema.Id, fullTextIds, query, referenced);
+                var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), fullTextIds, query, q.Reference);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems = FindContentsAsync(query, filter);
@@ -126,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 foreach (var entity in items)
                 {
-                    entity.ParseData(schema.SchemaDef, converter);
+                    entity.ParseData(schema.SchemaDef, DataConverter);
                 }
 
                 return ResultList.Create<IContentEntity>(total, items);
@@ -180,12 +230,29 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return query.Sort?.All(x => x.Path.ToString() == "mt" && x.Order == SortOrder.Descending) == true;
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, DomainId schemaId, ICollection<DomainId>? ids, ClrQuery? query, DomainId? referenced)
+        private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId schemaId, FilterNode<ClrValue>? filterNode)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IndexedSchemaId, schemaId),
+                Filter.Ne(x => x.IsDeleted, true)
+            };
+
+            if (filterNode != null)
+            {
+                filters.Add(filterNode.BuildFilter<MongoContentEntity>());
+            }
+
+            return Filter.And(filters);
+        }
+
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds, ICollection<DomainId>? ids, ClrQuery? query, DomainId referenced)
+        {
+            var filters = new List<FilterDefinition<MongoContentEntity>>
+            {
+                Filter.Eq(x => x.IndexedAppId, appId),
+                Filter.In(x => x.IndexedSchemaId, schemaIds),
                 Filter.Ne(x => x.IsDeleted, true)
             };
 
@@ -204,9 +271,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 filters.Add(query.Filter.BuildFilter<MongoContentEntity>());
             }
 
-            if (referenced != null)
+            if (referenced != default)
             {
-                filters.Add(Filter.AnyEq(x => x.ReferencedIds, referenced.Value));
+                filters.Add(Filter.AnyEq(x => x.ReferencedIds, referenced));
             }
 
             return Filter.And(filters);

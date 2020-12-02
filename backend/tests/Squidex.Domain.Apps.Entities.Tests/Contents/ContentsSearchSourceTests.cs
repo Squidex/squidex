@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentQuery.QueryAsync(ctx, A<IReadOnlyList<DomainId>>._))
+            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>._))
                 .MustNotHaveHappened();
         }
 
@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentIndex.SearchAsync("query~", ctx.App, A<SearchFilter>.That.IsEqualTo(searchFilter), ctx.Scope()))
                 .Returns(ids);
 
-            A.CallTo(() => contentQuery.QueryAsync(ctx, ids))
+            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>.That.HasIds(ids)))
                 .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1, content));
 
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId1, content.Id))
