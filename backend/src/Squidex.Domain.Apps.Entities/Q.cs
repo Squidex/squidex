@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Q WithIds(string? ids)
         {
-            if (string.IsNullOrWhiteSpace(ids))
+            if (ids == null)
             {
                 return this;
             }
