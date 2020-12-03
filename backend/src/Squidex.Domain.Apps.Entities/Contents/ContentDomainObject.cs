@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -79,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case CreateContent createContent:
                     return CreateReturnAsync(createContent, async c =>
                     {
-                        await LoadContext(c.AppId, c.SchemaId, c, c.OptimizeValidation);
+                        await LoadContext(c, c.OptimizeValidation);
 
                         await GuardContent.CanCreate(c, context.Workflow, context.Schema);
 
@@ -126,10 +127,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         return Snapshot;
                     });
 
+                case ValidateContent validateContent:
+                    return UpdateReturnAsync(validateContent, async c =>
+                    {
+                        await LoadContext(c);
+
+                        var errors = await context.GetErrorsAsync(Snapshot.Data);
+
+                        var result = new ValidationResult { Errors = errors.ToArray() };
+
+                        return result;
+                    });
+
                 case CreateContentDraft createContentDraft:
                     return UpdateReturnAsync(createContentDraft, async c =>
                     {
-                        await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
+                        await LoadContext(c);
 
                         GuardContent.CanCreateDraft(c, Snapshot);
 
@@ -143,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case DeleteContentDraft deleteContentDraft:
                     return UpdateReturnAsync(deleteContentDraft, async c =>
                     {
-                        await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
+                        await LoadContext(c);
 
                         GuardContent.CanDeleteDraft(c, Snapshot);
 
@@ -173,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         try
                         {
-                            await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
+                            await LoadContext(c);
 
                             await GuardContent.CanChangeStatus(c, Snapshot, context.Workflow, context.Repository, context.Schema);
 
@@ -183,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             }
                             else
                             {
-                                var change = GetChange(c);
+                                var change = GetChange(c.Status);
 
                                 if (!c.DoNotScript && context.HasScript(c => c.Change))
                                 {
@@ -232,7 +245,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        await LoadContext(Snapshot.AppId, Snapshot.SchemaId, c);
+                        await LoadContext(c);
 
                         await GuardContent.CanDelete(c, Snapshot, context.Repository, context.Schema);
 
@@ -264,7 +277,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!currentData!.Equals(newData))
             {
-                await LoadContext(Snapshot.AppId, Snapshot.SchemaId, command, command.OptimizeValidation);
+                await LoadContext(command, command.OptimizeValidation);
 
                 if (!command.DoNotValidate)
                 {
@@ -304,76 +317,85 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public void Create(CreateContent command, Status status)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentCreated { Status = status }));
+            Raise(command, new ContentCreated { Status = status });
 
             if (command.Publish)
             {
-                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Status = Status.Published, Change = StatusChange.Published }));
+                var published = Status.Published;
+
+                Raise(command, new ContentStatusChanged { Status = published, Change = GetChange(published) });
             }
         }
 
         public void CreateDraft(CreateContentDraft command, Status status)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentDraftCreated { Status = status }));
+            Raise(command, new ContentDraftCreated { Status = status });
         }
 
         public void Delete(DeleteContent command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentDeleted()));
+            Raise(command, new ContentDeleted());
         }
 
         public void DeleteDraft(DeleteContentDraft command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentDraftDeleted()));
+            Raise(command, new ContentDraftDeleted());
         }
 
         public void Update(ContentCommand command, NamedContentData data)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentUpdated { Data = data }));
+            Raise(command, new ContentUpdated { Data = data });
         }
 
         public void ChangeStatus(ChangeContentStatus command, StatusChange change)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Change = change }));
+            Raise(command, new ContentStatusChanged { Change = change });
         }
 
         public void CancelChangeStatus(ChangeContentStatus command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentSchedulingCancelled()));
+            Raise(command, new ContentSchedulingCancelled());
         }
 
         public void ScheduleStatus(ChangeContentStatus command, Instant dueTime)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = dueTime }));
+            Raise(command, new ContentStatusScheduled { DueTime = dueTime });
         }
 
-        private void RaiseEvent(SchemaEvent @event)
+        private void Raise<T, TEvent>(T command, TEvent @event) where TEvent : SchemaEvent where T : class
         {
+            SimpleMapper.Map(command, @event);
+
             @event.AppId ??= Snapshot.AppId;
             @event.SchemaId ??= Snapshot.SchemaId;
 
             RaiseEvent(Envelope.Create(@event));
         }
 
-        private StatusChange GetChange(ChangeContentStatus command)
+        private StatusChange GetChange(Status status)
         {
-            var change = StatusChange.Change;
-
-            if (command.Status == Status.Published)
+            if (status == Status.Published)
             {
-                change = StatusChange.Published;
+                return StatusChange.Published;
             }
             else if (Snapshot.EditingStatus == Status.Published)
             {
-                change = StatusChange.Unpublished;
+                return StatusChange.Unpublished;
             }
-
-            return change;
+            else
+            {
+                return StatusChange.Change;
+            }
         }
 
-        private Task LoadContext(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, bool optimized = false)
+        private Task LoadContext(ContentCommand command, bool optimized = false)
         {
-            return context.LoadAsync(appId, schemaId, command, optimized);
+            return context.LoadAsync(Snapshot.AppId, Snapshot.SchemaId, command, optimized);
+        }
+
+        private Task LoadContext(CreateContent command, bool optimized = false)
+        {
+            return context.LoadAsync(command.AppId, command.SchemaId, command, optimized);
         }
     }
 }

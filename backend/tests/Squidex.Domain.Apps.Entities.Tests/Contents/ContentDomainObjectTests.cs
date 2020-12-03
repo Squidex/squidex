@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -590,6 +591,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns(true);
 
             await PublishAsync(command);
+        }
+
+        [Fact]
+        public async Task Validate_should_not_update_state()
+        {
+            await ExecuteCreateAsync();
+
+            var command = new ValidateContent();
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(new ValidationResult { Errors = Array.Empty<ValidationError>() });
+
+            Assert.Equal(0, sut.Snapshot.Version);
         }
 
         [Fact]

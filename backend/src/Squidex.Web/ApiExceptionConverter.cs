@@ -83,7 +83,7 @@ namespace Squidex.Web
             switch (exception)
             {
                 case ValidationException ex:
-                    return (CreateError(400, T.Get("common.httpValidationError"), ToDetails(ex)), true);
+                    return (CreateError(400, T.Get("common.httpValidationError"), ToErrors(ex.Errors).ToArray()), true);
 
                 case DomainObjectNotFoundException _:
                     return (CreateError(404), true);
@@ -121,7 +121,7 @@ namespace Squidex.Web
             return error;
         }
 
-        private static string[] ToDetails(ValidationException ex)
+        public static IEnumerable<string> ToErrors(IEnumerable<ValidationError> errors)
         {
             static string FixPropertyName(string property)
             {
@@ -155,7 +155,7 @@ namespace Squidex.Web
                 return builder.ToString();
             }
 
-            return ex.Errors.Select(e =>
+            return errors.Select(e =>
             {
                 if (e.PropertyNames?.Any() == true)
                 {
@@ -165,7 +165,7 @@ namespace Squidex.Web
                 {
                     return e.Message;
                 }
-            }).ToArray();
+            });
         }
     }
 }

@@ -72,9 +72,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         await GuardAsset.CanCreate(c, assetQuery);
 
-                        var tagIds = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
+                        c.Tags = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
 
-                        Create(c, tagIds);
+                        Create(c);
 
                         return Snapshot;
                     });
@@ -92,9 +92,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         GuardAsset.CanAnnotate(c);
 
-                        var tagIds = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
+                        c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
 
-                        Annotate(c, tagIds);
+                        Annotate(c);
 
                         return Snapshot;
                     });
@@ -133,9 +133,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return new HashSet<string>(normalized.Values);
         }
 
-        public void Create(CreateAsset command, HashSet<string>? tagIds)
+        public void Create(CreateAsset command)
         {
-            var @event = SimpleMapper.Map(command, new AssetCreated
+            Raise(command, new AssetCreated
             {
                 MimeType = command.File.MimeType,
                 FileName = command.File.FileName,
@@ -143,45 +143,37 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 FileVersion = 0,
                 Slug = command.File.FileName.ToAssetSlug()
             });
-
-            @event.Tags = tagIds;
-
-            RaiseEvent(@event);
         }
 
         public void Update(UpdateAsset command)
         {
-            var @event = SimpleMapper.Map(command, new AssetUpdated
+            Raise(command, new AssetUpdated
             {
                 MimeType = command.File.MimeType,
                 FileVersion = Snapshot.FileVersion + 1,
                 FileSize = command.File.FileSize
             });
-
-            RaiseEvent(@event);
         }
 
-        public void Annotate(AnnotateAsset command, HashSet<string>? tagIds)
+        public void Annotate(AnnotateAsset command)
         {
-            var @event = SimpleMapper.Map(command, new AssetAnnotated());
-
-            @event.Tags = tagIds;
-
-            RaiseEvent(@event);
+            Raise(command, new AssetAnnotated());
         }
 
         public void Move(MoveAsset command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetMoved()));
+            Raise(command, new AssetMoved());
         }
 
         public void Delete(DeleteAsset command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize }));
+            Raise(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize });
         }
 
-        private void RaiseEvent(AppEvent @event)
+        private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
         {
+            SimpleMapper.Map(command, @event);
+
             @event.AppId ??= Snapshot.AppId;
 
             RaiseEvent(Envelope.Create(@event));

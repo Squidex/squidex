@@ -286,6 +286,36 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
+        /// Get a content item validity.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the content to fetch.</param>
+        /// <returns>
+        /// 200 => Content validation result returned.
+        /// 404 => Content, schema or app not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpGet]
+        [Route("content/{app}/{name}/{id}/validity")]
+        [ProducesResponseType(typeof(ValidationResultDto), 200)]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetContentValidity(string app, string name, DomainId id)
+        {
+            var command = new ValidateContent { ContentId = id };
+
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<ValidationResult>();
+            var response = ValidationResultDto.FromResult(result);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Get all references of a content.
         /// </summary>
         /// <param name="app">The name of the app.</param>
