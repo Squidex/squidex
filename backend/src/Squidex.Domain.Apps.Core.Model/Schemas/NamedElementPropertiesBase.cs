@@ -16,35 +16,25 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             get
             {
-                if (DefaultValuesLabel == null)
+                if (LocalizedLabel == null)
                 {
                     return string.Empty;
                 }
 
-                if (DefaultValuesLabel.TryGetValue(CultureInfo.CurrentUICulture.ToString(), out var current))
-                {
-                    return current;
-                }
-
-                if (DefaultValuesLabel.TryGetValue("en", out var english))
-                {
-                    return english;
-                }
-
-                return DefaultValuesLabel.Values.FirstOrDefault();
+                return LocalizedLabel.GetLocalizedValue();
             }
             set
             {
                 if (!string.IsNullOrWhiteSpace(value))
                 {
-                    DefaultValuesLabel = new LocalizedValue<string>
+                    LocalizedLabel = new LocalizedValue<string>
                     {
                         ["en"] = value
                     };
                 }
                 else
                 {
-                    DefaultValuesLabel = null;
+                    LocalizedLabel = null;
                 }
             }
         }
@@ -53,41 +43,31 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             get
             {
-                if (DefaultValuesHints == null)
+                if (LocalizedHints == null)
                 {
                     return string.Empty;
                 }
 
-                if (DefaultValuesHints.TryGetValue(CultureInfo.CurrentUICulture.ToString(), out var current))
-                {
-                    return current;
-                }
-
-                if (DefaultValuesHints.TryGetValue("en", out var english))
-                {
-                    return english;
-                }
-
-                return DefaultValuesHints.Values.FirstOrDefault();
+                return LocalizedHints.GetLocalizedValue();
             }
             set
             {
                 if (!string.IsNullOrWhiteSpace(value))
                 {
-                    DefaultValuesHints = new LocalizedValue<string>
+                    LocalizedHints = new LocalizedValue<string>
                     {
                         ["en"] = value
                     };
                 }
                 else
                 {
-                    DefaultValuesHints = null;
+                    LocalizedHints = null;
                 }
             }
         }
 
-        public LocalizedValue<string>? DefaultValuesLabel { get; set; }
+        public LocalizedValue<string>? LocalizedLabel { get; set; }
 
-        public LocalizedValue<string>? DefaultValuesHints { get; set; }
+        public LocalizedValue<string>? LocalizedHints { get; set; }
     }
 }

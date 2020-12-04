@@ -9,6 +9,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { LanguageDto } from '@app/shared';
 import { fadeAnimation, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { Language } from './../../language-selector.component';
 
@@ -34,7 +35,7 @@ export class LocalizedInputComponent extends StatefulControlComponent<{}, { [key
     private value: { [key: string]: any } | undefined;
 
     @Input()
-    public languages: ReadonlyArray<Language>;
+    public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
     public type: 'text' | 'boolean' | 'datetime' | 'date' | 'tags' = 'text';
@@ -45,7 +46,7 @@ export class LocalizedInputComponent extends StatefulControlComponent<{}, { [key
     @Input()
     public id: string;
 
-    public selectedLanguage: Language;
+    public selectedLanguage: LanguageDto;
 
     public dropdown = new ModalModel();
 

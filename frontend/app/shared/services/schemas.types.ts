@@ -133,17 +133,16 @@ type DefaultValue<T> = { [key: string]: T | null | undefined };
 
 export abstract class FieldPropertiesDto {
     public abstract fieldType: FieldType;
-
-    public readonly editorUrl?: string;
+    public readonly label: string;
     public readonly hints?: string;
-    public readonly defaultValuesHints?: DefaultValue<string>;
+
+    public readonly localizedHints?: DefaultValue<string>;
+    public readonly localizedLabel?: DefaultValue<string>;
+    
+    public readonly editorUrl?: string;
     public readonly isRequired: boolean = false;
     public readonly isRequiredOnPublish: boolean = false;
     public readonly isHalfWidth: boolean = false;
-    
-    public readonly label?: string;
-    public readonly defaultValuesLabel?: DefaultValue<string>;
-    
     public readonly placeholder?: string;
     public readonly tags?: ReadonlyArray<string>;
 

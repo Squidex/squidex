@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -24,23 +25,75 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// Optional label for the editor.
         /// </summary>
         [LocalizedStringLength(100)]
-        public string? Label { get; set; }
+        [Obsolete("Use LocalizedLabel instead")]
+        public string? Label
+        {
+            get
+            {
+                if (LocalizedLabel == null)
+                {
+                    return string.Empty;
+                }
+
+                return LocalizedLabel.GetLocalizedValue();
+            }
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    LocalizedLabel = new LocalizedValue<string>
+                    {
+                        ["en"] = value
+                    };
+                }
+                else
+                {
+                    LocalizedLabel = null;
+                }
+            }
+        }
 
         /// <summary>
         /// Localized label.
         /// </summary>
-        public LocalizedValue<string>? DefaultValuesLabel { get; set; }
+        public LocalizedValue<string>? LocalizedLabel { get; set; }
 
         /// <summary>
         /// Hints to describe the schema.
         /// </summary>
         [LocalizedStringLength(1000)]
-        public string? Hints { get; set; }
+        [Obsolete("Use LocalizedHints instead")]
+        public string? Hints
+        {
+            get
+            {
+                if (LocalizedHints == null)
+                {
+                    return string.Empty;
+                }
+
+                return LocalizedHints.GetLocalizedValue();
+            }
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    LocalizedHints = new LocalizedValue<string>
+                    {
+                        ["en"] = value
+                    };
+                }
+                else
+                {
+                    LocalizedHints = null;
+                }
+            }
+        }
 
         /// <summary>
         /// Localized Hints.
         /// </summary>
-        public LocalizedValue<string>? DefaultValuesHints { get; set; }
+        public LocalizedValue<string>? LocalizedHints { get; set; }
 
         /// <summary>
         /// Placeholder to show when no value has been entered.

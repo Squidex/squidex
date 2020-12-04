@@ -7,6 +7,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection.Equality;
 
@@ -27,6 +29,23 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public override int GetHashCode()
         {
             return this.DictionaryHashCode(EqualityComparer<string>.Default, DeepEqualityComparer<T>.Default);
+        }
+
+        public T GetLocalizedValue()
+        {
+            if (TryGetValue(CultureInfo.CurrentUICulture.ToString(), out var current))
+            {
+                return current;
+            }
+
+            if (TryGetValue("en", out var english))
+            {
+                return english;
+            }
+
+            var key = Keys.FirstOrDefault();
+
+            return this.GetValueOrDefault(key);
         }
     }
 }

@@ -8,7 +8,22 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { FieldDto, LanguageDto } from '@app/shared';
+import { Language } from '../../../../../../framework/angular/language-selector.component';
 import { Observable } from 'rxjs';
+
+class LanguageCommon implements Language {
+    
+    constructor(
+        public readonly iso2Code: string,
+        public readonly englishName: string,
+        public readonly isMasterLanguage: true) {}    
+} 
+
+
+const ALL_LANGUAGES: ReadonlyArray<LanguageDto> = [
+    new LanguageDto('en', 'English'),
+    new LanguageDto ('nl', 'Nederlands'), 
+    new LanguageDto ('it', 'Italiano')];
 
 @Component({
     selector: 'sqx-field-form-common',
@@ -25,21 +40,15 @@ export class FieldFormCommonComponent implements OnInit {
     public field: FieldDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages: ReadonlyArray<LanguageDto> = ALL_LANGUAGES;
 
     public showDefaultValue: Observable<string>;
 
     public ngOnInit() {
-        this.fieldForm.setControl('label',
-            new FormControl(this.field.properties.label));
+        this.fieldForm.setControl('localizedLabel',
+            new FormControl(this.field.properties.localizedLabel));
 
-         this.fieldForm.setControl('defaultValuesLabel',
-            new FormControl(this.field.properties.defaultValuesLabel));
-
-        this.fieldForm.setControl('hints',
-            new FormControl(this.field.properties.hints));
-
-         this.fieldForm.setControl('defaultValuesHints',
-            new FormControl(this.field.properties.defaultValuesHints));   
+        this.fieldForm.setControl('localizedHints',
+            new FormControl(this.field.properties.localizedHints));   
     }
 }
