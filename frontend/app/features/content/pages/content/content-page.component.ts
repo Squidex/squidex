@@ -9,9 +9,15 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, tap } from 'rxjs/operators';
+
+const TABS: ReadonlyArray<string> = [
+    'i18n:contents.contentTab.editor',
+    'i18n:contents.contentTab.references',
+    'i18n:contents.contentTab.referencing'
+];
 
 @Component({
     selector: 'sqx-content-page',
@@ -33,6 +39,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
     public contentFormCompare: EditContentForm | null = null;
+
+    public selectableTabs = TABS;
+    public selectedTab = this.selectableTabs[0];
 
     public dropdown = new ModalModel();
 
@@ -129,6 +138,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }
             })
         );
+    }
+
+    public selectTab(tab: string) {
+        this.selectedTab = tab;
     }
 
     public saveAndPublish() {
@@ -256,10 +269,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         } finally {
             this.isLoadingContent = false;
         }
-    }
-
-    public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {
-        return section.separator?.fieldId;
     }
 }
 

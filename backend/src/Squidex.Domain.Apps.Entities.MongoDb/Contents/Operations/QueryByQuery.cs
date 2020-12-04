@@ -116,22 +116,25 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), fullTextIds, query, q.Reference);
 
-                var contentCount = Collection.Find(filter).CountDocumentsAsync();
-                var contentItems = FindContentsAsync(query, filter);
+                var contentEntities = await FindContentsAsync(query, filter);
+                var contentTotal = (long)contentEntities.Count;
 
-                var (items, total) = await AsyncHelper.WhenAll(contentItems, contentCount);
-
-                if (items.Count > 0)
+                if (contentEntities.Count > 0)
                 {
+                    if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+                    {
+                        contentTotal = await Collection.Find(filter).CountDocumentsAsync();
+                    }
+
                     var contentSchemas = schemas.ToDictionary(x => x.Id);
 
-                    foreach (var entity in items)
+                    foreach (var entity in contentEntities)
                     {
                         entity.ParseData(contentSchemas[entity.IndexedSchemaId].SchemaDef, DataConverter);
                     }
                 }
 
-                return ResultList.Create<IContentEntity>(total, items);
+                return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
             }
             catch (MongoCommandException ex) when (ex.Code == 96)
             {
@@ -169,17 +172,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), fullTextIds, query, q.Reference);
 
-                var contentCount = Collection.Find(filter).CountDocumentsAsync();
-                var contentItems = FindContentsAsync(query, filter);
+                var contentEntities = await FindContentsAsync(query, filter);
+                var contentTotal = (long)contentEntities.Count;
 
-                var (items, total) = await AsyncHelper.WhenAll(contentItems, contentCount);
-
-                foreach (var entity in items)
+                if (contentEntities.Count > 0)
                 {
-                    entity.ParseData(schema.SchemaDef, DataConverter);
+                    if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+                    {
+                        contentTotal = await Collection.Find(filter).CountDocumentsAsync();
+                    }
+
+                    foreach (var entity in contentEntities)
+                    {
+                        entity.ParseData(schema.SchemaDef, DataConverter);
+                    }
                 }
 
-                return ResultList.Create<IContentEntity>(total, items);
+                return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
             }
             catch (MongoCommandException ex) when (ex.Code == 96)
             {

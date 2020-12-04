@@ -23,7 +23,7 @@
                 class="table-drag"
                 cdkDrag
                 cdkDragLockAxis="y" 
-                [columns]="snapshot.columns"
+                [columns]="snapshot.contentItems | sqxContentsColumns"
                 [isCompact]="snapshot.isCompact"
                 [isDisabled]="snapshot.isDisabled"
                 [language]="language"

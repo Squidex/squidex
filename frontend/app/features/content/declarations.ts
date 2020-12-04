@@ -7,11 +7,13 @@
 
 export * from './pages/comments/comments-page.component';
 export * from './pages/content/content-event.component';
-export * from './pages/content/content-field.component';
 export * from './pages/content/content-history-page.component';
 export * from './pages/content/content-page.component';
-export * from './pages/content/content-section.component';
-export * from './pages/content/field-languages.component';
+export * from './pages/content/editor/content-editor.component';
+export * from './pages/content/editor/content-field.component';
+export * from './pages/content/editor/content-section.component';
+export * from './pages/content/editor/field-languages.component';
+export * from './pages/content/references/content-references.component';
 export * from './pages/contents/contents-filters-page.component';
 export * from './pages/contents/contents-page.component';
 export * from './pages/contents/custom-view-editor.component';

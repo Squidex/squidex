@@ -24,6 +24,9 @@ export class ReferenceItemComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
+    public canRemove = true;
+
+    @Input()
     public isCompact = false;
 
     @Input()

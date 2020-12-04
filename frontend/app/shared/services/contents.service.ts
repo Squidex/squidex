@@ -106,43 +106,9 @@ export class ContentsService {
     }
 
     public getContents(appName: string, schemaName: string, q?: ContentQueryDto): Observable<ContentsDto> {
-        const { ids, maxLength, query, skip, take } = q || {};
+        const { ids, maxLength } = q || {};
 
-        const queryParts: string[] = [];
-        const queryOdataParts: string[] = [];
-
-        let queryObj: Query | undefined;
-
-        if (ids && ids.length > 0) {
-            queryParts.push(`ids=${ids.join(',')}`);
-        } else {
-
-            if (query && query.fullText && query.fullText.indexOf('$') >= 0) {
-                queryOdataParts.push(`${query.fullText.trim()}`);
-
-                if (take && take > 0) {
-                    queryOdataParts.push(`$top=${take}`);
-                }
-
-                if (skip && skip > 0) {
-                    queryOdataParts.push(`$skip=${skip}`);
-                }
-            } else {
-                queryObj = { ...query };
-
-                if (take && take > 0) {
-                    queryObj.take = take;
-                }
-
-                if (skip && skip > 0) {
-                    queryObj.skip = skip;
-                }
-
-                queryParts.push(`q=${encodeQuery(queryObj)}`);
-            }
-        }
-
-        const fullQuery = [...queryParts, ...queryOdataParts].join('&');
+        const { fullQuery, queryOdataParts, queryObj } = buildQuery(q);
 
         if (fullQuery.length > (maxLength || 2000)) {
             const body: any = {};
@@ -216,6 +182,34 @@ export class ContentsService {
                 return parseContent(payload.body);
             }),
             pretifyError('i18n:contents.loadContentFailed'));
+    }
+
+    public getContentReferences(appName: string, schemaName: string, id: string, q?: ContentQueryDto): Observable<ContentsDto> {
+        const { fullQuery } = buildQuery(q);
+
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/references?${fullQuery}`);
+
+        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
+            map(({ total, items, statuses, _links }) => {
+                const contents = items.map(x => parseContent(x));
+
+                return new ContentsDto(statuses, total, contents, _links);
+            }),
+            pretifyError('i18n:contents.loadFailed'));
+    }
+
+    public getContentReferencing(appName: string, schemaName: string, id: string, q?: ContentQueryDto): Observable<ContentsDto> {
+        const { fullQuery } = buildQuery(q);
+
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/referencing?${fullQuery}`);
+
+        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
+            map(({ total, items, statuses, _links }) => {
+                const contents = items.map(x => parseContent(x));
+
+                return new ContentsDto(statuses, total, contents, _links);
+            }),
+            pretifyError('i18n:contents.loadFailed'));
     }
 
     public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
@@ -327,6 +321,47 @@ export class ContentsService {
             }),
             pretifyError('i18n:contents.deleteFailed'));
     }
+}
+
+function buildQuery(q?: ContentQueryDto) {
+    const { ids, query, skip, take } = q || {};
+
+    const queryParts: string[] = [];
+    const queryOdataParts: string[] = [];
+
+    let queryObj: Query | undefined;
+
+    if (ids && ids.length > 0) {
+        queryParts.push(`ids=${ids.join(',')}`);
+    } else {
+
+        if (query && query.fullText && query.fullText.indexOf('$') >= 0) {
+            queryOdataParts.push(`${query.fullText.trim()}`);
+
+            if (take && take > 0) {
+                queryOdataParts.push(`$top=${take}`);
+            }
+
+            if (skip && skip > 0) {
+                queryOdataParts.push(`$skip=${skip}`);
+            }
+        } else {
+            queryObj = { ...query };
+
+            if (take && take > 0) {
+                queryObj.take = take;
+            }
+
+            if (skip && skip > 0) {
+                queryObj.skip = skip;
+            }
+
+            queryParts.push(`q=${encodeQuery(queryObj)}`);
+        }
+    }
+
+    const fullQuery = [...queryParts, ...queryOdataParts].join('&');
+    return { fullQuery, queryOdataParts, queryObj };
 }
 
 function parseContent(response: any) {

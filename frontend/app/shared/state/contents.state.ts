@@ -10,7 +10,6 @@ import { DialogService, ErrorDto, Pager, shareSubscribed, State, StateSynchroniz
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
-import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { Query, QuerySynchronizer } from './query';
@@ -33,6 +32,12 @@ interface Snapshot {
 
     // Indicates if the contents are loading.
     isLoading?: boolean;
+
+    // The referencing content id.
+    referencing?: string;
+
+    // The reference content id.
+    reference?: string;
 
     // The statuses.
     statuses?: ReadonlyArray<StatusInfo>;
@@ -133,6 +138,18 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             .build();
     }
 
+    public loadReference(contentId: string) {
+        this.resetState({ reference: contentId });
+
+        return this.loadInternal(false);
+    }
+
+    public loadReferencing(contentId: string) {
+        this.resetState({ referencing: contentId });
+
+        return this.loadInternal(false);
+    }
+
     public load(isReload = false): Observable<any> {
         if (!isReload) {
             this.resetState({ selectedContent: this.snapshot.selectedContent });
@@ -169,7 +186,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             query.query = this.snapshot.contentsQuery;
         }
 
-        return this.contentsService.getContents(this.appName, this.schemaName, query).pipe(
+        const contentQuery =
+            this.snapshot.referencing ?
+                this.contentsService.getContentReferencing(this.appName, this.schemaName, this.snapshot.referencing, query) :
+            this.snapshot.reference ?
+                this.contentsService.getContentReferences(this.appName, this.schemaName, this.snapshot.reference, query) :
+                this.contentsService.getContents(this.appName, this.schemaName, query);
+
+        return contentQuery.pipe(
             tap(({ total, items: contents, canCreate, canCreateAndPublish, statuses }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:contents.reloaded');
@@ -407,8 +431,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             map(x => ({ content: x })), catchError(error => of({ content, error })));
     }
 
-    public abstract get schemaId(): string;
-
     public abstract get schemaName(): string;
 }
 
@@ -420,10 +442,6 @@ export class ContentsState extends ContentsStateBase {
         super(appsState, contentsService, dialogs);
     }
 
-    public get schemaId() {
-        return this.schemasState.schemaId;
-    }
-
     public get schemaName() {
         return this.schemasState.schemaName;
     }
@@ -431,16 +449,12 @@ export class ContentsState extends ContentsStateBase {
 
 @Injectable()
 export class ManualContentsState extends ContentsStateBase {
-    public schema: SchemaDto;
+    public schema: { name: string };
 
     constructor(
         appsState: AppsState, contentsService: ContentsService, dialogs: DialogService
     ) {
         super(appsState, contentsService, dialogs);
-    }
-
-    public get schemaId() {
-        return this.schema.id;
     }
 
     public get schemaName() {

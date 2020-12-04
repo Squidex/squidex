@@ -5,3 +5,11 @@
 .btn-outline-secondary {
     color: $color-text;
 }
+
+.nav-tabs2 {
+    @include absolute(auto, auto, 0, 5rem);
+
+    a {
+        padding-bottom: 1.5rem;
+    }
+}

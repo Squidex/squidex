@@ -8,7 +8,7 @@
     <ng-container menu>
         <div class="row no-gutters pl-1">
             <div class="col-auto ml-8">
-                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{contentsState.schemaId}}/contents"></sqx-notifo>
+                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.id}}/contents"></sqx-notifo>
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
