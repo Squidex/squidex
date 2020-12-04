@@ -1,6 +1,10 @@
 <div class="row mb-1">
     <div class="col">
-        <sqx-language-selector size="sm" [languages]="languages" [(selectedLanguage)]="selectedLanguage"></sqx-language-selector>
+        <sqx-language-selector size="sm" 
+            [languages]="languages" 
+            [selectedLanguage]="snapshot.language"
+            (selectedLanguageChange)="setLanguage($event)">
+        </sqx-language-selector>
     </div>
     <div class="col-auto">
         <button type="button" class="btn btn-sm btn-secondary" [disabled]="isEmpty" (click)="unset()">

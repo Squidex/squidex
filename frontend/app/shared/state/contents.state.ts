@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { DialogService, ErrorDto, Pager, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
-import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
+import { ContentDto, ContentsDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { Query, QuerySynchronizer } from './query';
@@ -177,23 +177,30 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
         this.next({ isLoading: true });
 
-        const query: any = {
-             take: this.snapshot.contentsPager.pageSize,
-             skip: this.snapshot.contentsPager.skip
-        };
+        const {
+            contentsPager: { take, skip },
+            contentsQuery,
+            reference,
+            referencing
+        } = this.snapshot;
 
-        if (this.snapshot.contentsQuery) {
+        const query: any = { take, skip };
+
+        if (contentsQuery) {
             query.query = this.snapshot.contentsQuery;
         }
 
-        const contentQuery =
-            this.snapshot.referencing ?
-                this.contentsService.getContentReferencing(this.appName, this.schemaName, this.snapshot.referencing, query) :
-            this.snapshot.reference ?
-                this.contentsService.getContentReferences(this.appName, this.schemaName, this.snapshot.reference, query) :
-                this.contentsService.getContents(this.appName, this.schemaName, query);
+        let content$: Observable<ContentsDto>;
 
-        return contentQuery.pipe(
+        if (referencing) {
+            content$ = this.contentsService.getContentReferencing(this.appName, this.schemaName, referencing, query);
+        } else if (reference) {
+            content$ = this.contentsService.getContentReferences(this.appName, this.schemaName, reference, query);
+        } else {
+            content$ = this.contentsService.getContents(this.appName, this.schemaName, query);
+        }
+
+        return content$.pipe(
             tap(({ total, items: contents, canCreate, canCreateAndPublish, statuses }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:contents.reloaded');
@@ -380,13 +387,17 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public search(contentsQuery?: Query): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: s.contentsPager.reset(), contentsQuery }));
+        this.next(s => ({
+            ...s,
+            contentsPager: s.contentsPager.reset(),
+            contentsQuery
+        }));
 
         return this.loadInternal(false);
     }
 
     public setPager(contentsPager: Pager) {
-        this.next(s => ({ ...s, contentsPager }));
+        this.next({ contentsPager });
 
         return this.loadInternal(false);
     }

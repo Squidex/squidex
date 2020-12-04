@@ -74,7 +74,7 @@ export class UsersState extends State<Snapshot> {
     public select(id: string | null): Observable<UserDto | null> {
         return this.loadUser(id).pipe(
             tap(selectedUser => {
-                this.next(s => ({ ...s, selectedUser }));
+                this.next({ selectedUser });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -185,7 +185,11 @@ export class UsersState extends State<Snapshot> {
     }
 
     public search(query: string): Observable<UsersResult> {
-        this.next(s => ({ ...s, usersPager: s.usersPager.reset(), usersQuery: query }));
+        this.next(s => ({
+            ...s,
+            usersPager: s.usersPager.reset(),
+            usersQuery: query }
+        ));
 
         return this.loadInternal(false);
     }

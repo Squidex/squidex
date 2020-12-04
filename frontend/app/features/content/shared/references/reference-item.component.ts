@@ -41,10 +41,6 @@ export class ReferenceItemComponent implements OnChanges {
     public values: ReadonlyArray<any> = [];
 
     public ngOnChanges() {
-        this.updateValues();
-    }
-
-    private updateValues() {
         const values = [];
 
         for (let i = 0; i < this.columns; i++) {

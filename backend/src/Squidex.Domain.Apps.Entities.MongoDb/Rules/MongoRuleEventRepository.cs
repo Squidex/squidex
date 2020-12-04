@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             var ruleEventEntities = await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync();
             var ruleEventTotal = (long)ruleEventEntities.Count;
 
-            if (ruleEventTotal >= take || skip > 0)
+            if (ruleEventTotal >= take || skip > 0 || take == 0)
             {
                 ruleEventTotal = await Collection.Find(filter).CountDocumentsAsync();
             }

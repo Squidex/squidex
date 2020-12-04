@@ -27,11 +27,10 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CodeEditorComponent extends StatefulControlComponent<undefined, string> implements AfterViewInit, FocusComponent {
+export class CodeEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, FocusComponent {
     private valueChanged = new Subject();
     private aceEditor: any;
     private value: string;
-    private isDisabled = false;
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
@@ -48,7 +47,7 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector, undefined);
+        super(changeDetector, {});
     }
 
     public writeValue(obj: string) {
@@ -60,7 +59,7 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
+        super.setDisabledState(isDisabled);
 
         if (this.aceEditor) {
             this.aceEditor.setReadOnly(isDisabled);
@@ -87,7 +86,7 @@ export class CodeEditorComponent extends StatefulControlComponent<undefined, str
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
             this.aceEditor.getSession().setMode(this.mode);
-            this.aceEditor.setReadOnly(this.isDisabled);
+            this.aceEditor.setReadOnly(this.snapshot.isDisabled);
             this.aceEditor.setFontSize(14);
 
             this.setValue(this.value);

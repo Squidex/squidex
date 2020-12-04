@@ -125,13 +125,17 @@ export class RuleEventsState extends State<Snapshot> {
             return EMPTY;
         }
 
-        this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.reset(), ruleId }));
+        this.next(s => ({
+            ...s,
+            ruleEventsPager: s.ruleEventsPager.reset(),
+            ruleId
+        }));
 
         return this.loadInternal(false);
     }
 
     public setPager(ruleEventsPager: Pager): Observable<any> {
-        this.next(s => ({ ...s, ruleEventsPager }));
+        this.next({ ruleEventsPager });
 
         return this.loadInternal(false);
     }

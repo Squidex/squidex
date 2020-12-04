@@ -153,7 +153,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
             checkedValues = this.valuesSorted.filter(x => obj.indexOf(x.value) >= 0);
         }
 
-        this.next(s => ({ ...s, checkedValues }));
+        this.next({ checkedValues });
     }
 
     public check(isChecked: boolean, value: TagValue) {
@@ -165,7 +165,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
             checkedValues = checkedValues.removed(value);
         }
 
-        this.next(s => ({ ...s, checkedValues }));
+        this.next({ checkedValues });
 
         this.callChange(checkedValues.map(x => x.id));
     }

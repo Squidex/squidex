@@ -1,6 +1,7 @@
 <ng-container *ngIf="searchSource.selectedAppOrNull | async">
     <div class="search-container ml-4">
-        <sqx-autocomplete [source]="searchSource" inputName="searchMenu" placeholder="{{ 'search.quickNavPlaceholder' | sqxTranslate }}" icon="search" #searchControl dropdownWidth="30rem" [ngModel]="selection" (ngModelChange)="selectResult($event)">
+        <sqx-autocomplete [source]="searchSource" inputName="searchMenu" placeholder="{{ 'search.quickNavPlaceholder' | sqxTranslate }}" icon="search" #searchControl dropdownWidth="30rem" 
+            (ngModelChange)="selectResult($event)">
             <ng-template let-result="$implicit">
                 <div class="row no-gutters">
                     <div class="col-auto pr-4">

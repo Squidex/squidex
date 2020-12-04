@@ -16,6 +16,8 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true
 };
 
+const NO_EMIT = { emitEvent: false };
+
 interface State {
     // The suggested item.
     suggestedItems: ReadonlyArray<any>;
@@ -26,8 +28,6 @@ interface State {
     // The current search query.
     query?: RegExp;
 }
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-dropdown',
@@ -229,7 +229,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
             }
         }
 
-        this.next(s => ({ ...s, selectedIndex }));
+        this.next({ selectedIndex });
     }
 
     private getSelectedIndex(value: any) {

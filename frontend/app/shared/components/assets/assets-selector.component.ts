@@ -81,7 +81,7 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     }
 
     public changeView(isListView: boolean) {
-        this.next(s => ({ ...s, isListView }));
+        this.next({ isListView });
 
         this.localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
     }

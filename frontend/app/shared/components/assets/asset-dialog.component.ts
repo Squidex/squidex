@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, Types, UploadCanceled } from '@app/shared/internal';
 import { AssetsService } from '@app/shared/services/assets.service';
@@ -30,8 +30,7 @@ const TABS_DEFAULT: ReadonlyArray<string> = [
 @Component({
     selector: 'sqx-asset-dialog',
     styleUrls: ['./asset-dialog.component.scss'],
-    templateUrl: './asset-dialog.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './asset-dialog.component.html'
 })
 export class AssetDialogComponent implements OnChanges {
     @Output()

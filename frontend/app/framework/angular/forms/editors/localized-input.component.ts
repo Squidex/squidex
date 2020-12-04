@@ -16,7 +16,12 @@ export const SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => LocalizedInputComponent), multi: true
 };
 
-const DEFAULT_LANGUAGE = { iso2Code: 'iv' };
+const DEFAULT_LANGUAGE = { iso2Code: 'iv', englishName: 'Invariant' };
+
+interface State {
+    // The selected language.
+    language: Language;
+}
 
 @Component({
     selector: 'sqx-localized-input',
@@ -30,7 +35,7 @@ const DEFAULT_LANGUAGE = { iso2Code: 'iv' };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LocalizedInputComponent extends StatefulControlComponent<{}, { [key: string]: any }> {
+export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {
     private value: { [key: string]: any } | undefined;
 
     @Input()
@@ -45,30 +50,32 @@ export class LocalizedInputComponent extends StatefulControlComponent<{}, { [key
     @Input()
     public id: string;
 
-    public selectedLanguage: Language;
-
     public dropdown = new ModalModel();
 
     public get currentValue() {
-        if (!this.selectedLanguage || !this.value) {
+        if (!this.snapshot.language || !this.value) {
             return undefined;
         }
 
-        return this.value[this.selectedLanguage.iso2Code];
+        return this.value[this.snapshot.language.iso2Code];
     }
 
     public get isEmpty() {
-        if (!this.selectedLanguage || !this.value) {
+        if (!this.snapshot.language || !this.value) {
             return true;
         }
 
-        return !this.value.hasOwnProperty(this.selectedLanguage.iso2Code);
+        return !this.value.hasOwnProperty(this.snapshot.language.iso2Code);
     }
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            selectedLanguage: DEFAULT_LANGUAGE
+            language: DEFAULT_LANGUAGE
         });
+    }
+
+    public setLanguage(language: Language) {
+        this.next({ language });
     }
 
     public writeValue(obj: any) {
@@ -81,7 +88,7 @@ export class LocalizedInputComponent extends StatefulControlComponent<{}, { [key
 
     public setValue(value: any) {
         this.value = { ...this.value || {} };
-        this.value[this.selectedLanguage.iso2Code] = value;
+        this.value[this.snapshot.language.iso2Code] = value;
 
         this.callChange(this.value);
     }
@@ -89,7 +96,7 @@ export class LocalizedInputComponent extends StatefulControlComponent<{}, { [key
     public unset() {
         this.value= { ...this.value || {} };
 
-        delete this.value[this.selectedLanguage.iso2Code];
+        delete this.value[this.snapshot.language.iso2Code];
 
         if (Object.keys(this.value).length === 0) {
             this.value = undefined;

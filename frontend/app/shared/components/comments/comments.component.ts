@@ -66,7 +66,7 @@ export class CommentsComponent extends ResourceOwner implements OnChanges {
             let isEditing = false;
 
             this.children.forEach(x => {
-                isEditing = isEditing || x.isEditing;
+                isEditing = isEditing || x.snapshot.isEditing;
             });
 
             if (!isEditing) {

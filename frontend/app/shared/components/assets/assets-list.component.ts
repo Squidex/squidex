@@ -7,7 +7,12 @@
 
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { AssetDto, AssetFolderDto, AssetsState, getFiles, Types } from '@app/shared/internal';
+import { AssetDto, AssetFolderDto, AssetsState, getFiles, StatefulComponent, Types } from '@app/shared/internal';
+
+interface State {
+    // The new files.
+    newFiles: ReadonlyArray<File>;
+}
 
 @Component({
     selector: 'sqx-assets-list',
@@ -15,12 +20,12 @@ import { AssetDto, AssetFolderDto, AssetsState, getFiles, Types } from '@app/sha
     templateUrl: './assets-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetsListComponent {
+export class AssetsListComponent extends StatefulComponent<State> {
     @Output()
     public select = new EventEmitter<AssetDto>();
 
     @Input()
-    public state: AssetsState;
+    public assetsState: AssetsState;
 
     @Input()
     public isDisabled = false;
@@ -37,24 +42,21 @@ export class AssetsListComponent {
     @Input()
     public showPager = true;
 
-    public newFiles: ReadonlyArray<File> = [];
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef
-    ) {
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector, {
+            newFiles: []
+        });
     }
 
     public add(file: File, asset: AssetDto) {
         if (asset.isDuplicate) {
             setTimeout(() => {
-                this.newFiles = this.newFiles.removed(file);
-
-                this.changeDetector.markForCheck();
+                this.remove(file);
             }, 2000);
         } else {
-            this.newFiles = this.newFiles.removed(file);
+            this.remove(file);
 
-            this.state.addAsset(asset);
+            this.assetsState.addAsset(asset);
         }
     }
 
@@ -63,23 +65,23 @@ export class AssetsListComponent {
             const item = drag.item.data;
 
             if (Types.is(item, AssetDto)) {
-                this.state.moveAsset(item, drag.container.data);
+                this.assetsState.moveAsset(item, drag.container.data);
             } else {
-                this.state.moveAssetFolder(item, drag.container.data);
+                this.assetsState.moveAssetFolder(item, drag.container.data);
             }
         }
     }
 
     public selectFolder(asset: AssetDto) {
-        this.state.navigate(asset.parentId);
+        this.assetsState.navigate(asset.parentId);
     }
 
     public deleteAsset(asset: AssetDto) {
-        this.state.deleteAsset(asset);
+        this.assetsState.deleteAsset(asset);
     }
 
     public deleteAssetFolder(assetFolder: AssetFolderDto) {
-        this.state.deleteAssetFolder(assetFolder);
+        this.assetsState.deleteAssetFolder(assetFolder);
     }
 
     public isSelected(asset: AssetDto) {
@@ -87,11 +89,19 @@ export class AssetsListComponent {
     }
 
     public remove(file: File) {
-        this.newFiles = this.newFiles.removed(file);
+        this.next(s => ({
+            ...s,
+            newFiles: s.newFiles.removed(file)
+        }));
+
+        return true;
     }
 
     public addFiles(files: ReadonlyArray<File>) {
-        this.newFiles = [...getFiles(files), ...this.newFiles];
+        this.next(s => ({
+            ...s,
+            newFiles: [...getFiles(files), ...s.newFiles]
+        }));
 
         return true;
     }

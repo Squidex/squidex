@@ -14,6 +14,10 @@ export class Pager {
 
     public skip = 0;
 
+    public get take() {
+        return this.pageSize;
+    }
+
     constructor(
         public readonly numberOfItems: number,
         public readonly page = 0,

@@ -22,5 +22,5 @@ export class ContentValueEditorComponent {
     @Input()
     public form: FormGroup;
 
-    public uniqueId = MathHelper.guid();
+    public readonly uniqueId = MathHelper.guid();
 }

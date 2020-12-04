@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 if (contentEntities.Count > 0)
                 {
-                    if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+                    if (contentTotal >= q.Query.Take || q.Query.Skip > 0 || q.Query.Take == 0)
                     {
                         contentTotal = await Collection.Find(filter).CountDocumentsAsync();
                     }
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 if (contentEntities.Count > 0)
                 {
-                    if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+                    if (contentTotal >= q.Query.Take || q.Query.Skip > 0 || q.Query.Take == 0)
                     {
                         contentTotal = await Collection.Find(filter).CountDocumentsAsync();
                     }

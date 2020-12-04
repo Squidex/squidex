@@ -63,17 +63,17 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
         });
     }
 
-    public writeValue(obj: any) {
+    public writeValue(value: any) {
         const previousColor = this.snapshot.value;
 
-        if (previousColor !== obj) {
+        if (previousColor !== value) {
             let foreground = 'black';
 
-            if (MathHelper.toLuminance(MathHelper.parseColor(obj)!) < .5) {
+            if (MathHelper.toLuminance(MathHelper.parseColor(value)!) < .5) {
                 foreground = 'white';
             }
 
-            this.next(s => ({ ...s, value: obj, foreground }));
+            this.next({ value, foreground });
         }
     }
 

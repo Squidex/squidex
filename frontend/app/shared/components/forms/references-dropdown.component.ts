@@ -52,7 +52,10 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     public set language(value: LanguageDto) {
         this.languageField = value;
 
-        this.next(s => ({ ...s, contentNames: this.createContentNames(s.contents) }));
+        this.next(s => ({
+            ...s,
+            contentNames: this.createContentNames(s.contents)
+        }));
     }
 
     public get isValid() {
@@ -102,11 +105,10 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
             if (this.isValid) {
                 this.contentsService.getContents(this.appsState.appName, this.schemaId, { take: this.itemCount })
-                    .subscribe(contents => {
-                        const contentItems = contents.items;
-                        const contentNames = this.createContentNames(contentItems);
+                    .subscribe(({ items: contents }) => {
+                        const contentNames = this.createContentNames(contents);
 
-                        this.next(s => ({ ...s, contents: contentItems, contentNames }));
+                        this.next({ contents, contentNames });
 
                         this.selectContent();
                     }, () => {

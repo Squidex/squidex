@@ -43,7 +43,7 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
     public writeValue(obj: any) {
         const isChecked = Types.isBoolean(obj) ? obj : null;
 
-        this.next(s => ({ ...s, isChecked  }));
+        this.next({ isChecked });
     }
 
     public changeState(event: MouseEvent) {
@@ -67,7 +67,7 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
             isChecked = !(isChecked === true);
         }
 
-        this.next(s => ({ ...s, isChecked }));
+        this.next({ isChecked });
 
         this.callChange(isChecked);
         this.callTouched();

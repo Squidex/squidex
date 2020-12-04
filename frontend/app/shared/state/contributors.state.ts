@@ -133,11 +133,11 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public setPager(contributorsPager: Pager) {
-        this.next(s => ({ ...s, contributorsPager }));
+        this.next({ contributorsPager });
     }
 
     public search(query: string) {
-        this.next(s => ({ ...s, query }));
+        this.next({ query });
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {

@@ -231,10 +231,10 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         clearTimeout(this.timer);
 
         if (value) {
-            this.next(s => ({ ...s, isLoading: true }));
+            this.next({ isLoading: true });
         } else {
             this.timer = setTimeout(() => {
-                this.next(s => ({ ...s, isLoading: false }));
+                this.next({ isLoading: false });
             }, 250);
         }
     }
@@ -248,7 +248,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
             suggestedIndex = this.snapshot.suggestedItems.length - 1;
         }
 
-        this.next(s => ({ ...s, suggestedIndex }));
+        this.next({ suggestedIndex });
     }
 
     private up() {
