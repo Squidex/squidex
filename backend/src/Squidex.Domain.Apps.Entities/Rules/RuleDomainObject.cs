@@ -121,31 +121,33 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public void Create(CreateRule command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new RuleCreated()));
+            Raise(command, new RuleCreated());
         }
 
         public void Update(UpdateRule command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new RuleUpdated()));
+            Raise(command, new RuleUpdated());
         }
 
         public void Enable(EnableRule command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new RuleEnabled()));
+            Raise(command, new RuleEnabled());
         }
 
         public void Disable(DisableRule command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new RuleDisabled()));
+            Raise(command, new RuleDisabled());
         }
 
         public void Delete(DeleteRule command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new RuleDeleted()));
+            Raise(command, new RuleDeleted());
         }
 
-        private void RaiseEvent(AppEvent @event)
+        private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
         {
+            SimpleMapper.Map(command, @event);
+
             @event.AppId ??= Snapshot.AppId;
 
             RaiseEvent(Envelope.Create(@event));

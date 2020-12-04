@@ -12,13 +12,12 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.EventSynchronization
 {
     public static class SchemaSynchronizer
     {
-        public static IEnumerable<IEvent> Synchronize(this Schema source, Schema? target, Func<long> idGenerator,
+        public static IEnumerable<SchemaEvent> Synchronize(this Schema source, Schema? target, Func<long> idGenerator,
             SchemaSynchronizationOptions? options = null)
         {
             Guard.NotNull(source, nameof(source));
@@ -32,76 +31,64 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
             {
                 options ??= new SchemaSynchronizationOptions();
 
-                static SchemaEvent E(SchemaEvent @event)
-                {
-                    return @event;
-                }
-
                 if (!source.Properties.Equals(target.Properties))
                 {
-                    yield return E(new SchemaUpdated { Properties = target.Properties });
+                    yield return new SchemaUpdated { Properties = target.Properties };
                 }
 
                 if (!source.Category.StringEquals(target.Category))
                 {
-                    yield return E(new SchemaCategoryChanged { Name = target.Category });
+                    yield return new SchemaCategoryChanged { Name = target.Category };
                 }
 
                 if (!source.Scripts.Equals(target.Scripts))
                 {
-                    yield return E(new SchemaScriptsConfigured { Scripts = target.Scripts });
+                    yield return new SchemaScriptsConfigured { Scripts = target.Scripts };
                 }
 
                 if (!source.PreviewUrls.EqualsDictionary(target.PreviewUrls))
                 {
-                    yield return E(new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls.ToDictionary() });
+                    yield return new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls.ToDictionary() };
                 }
 
                 if (source.IsPublished != target.IsPublished)
                 {
                     yield return target.IsPublished ?
-                        E(new SchemaPublished()) :
-                        E(new SchemaUnpublished());
+                        new SchemaPublished() :
+                        new SchemaUnpublished();
                 }
 
-                var events = SyncFields(source.FieldCollection, target.FieldCollection, idGenerator, CanUpdateRoot, null, options);
+                var events = SyncFields(source.FieldCollection, target.FieldCollection, idGenerator, CanUpdateRoot, options);
 
                 foreach (var @event in events)
                 {
-                    yield return E(@event);
+                    yield return @event;
                 }
 
                 if (!source.FieldsInLists.SequenceEqual(target.FieldsInLists))
                 {
-                    yield return E(new SchemaUIFieldsConfigured { FieldsInLists = target.FieldsInLists });
+                    yield return new SchemaUIFieldsConfigured { FieldsInLists = target.FieldsInLists };
                 }
 
                 if (!source.FieldsInReferences.SequenceEqual(target.FieldsInReferences))
                 {
-                    yield return E(new SchemaUIFieldsConfigured { FieldsInReferences = target.FieldsInReferences });
+                    yield return new SchemaUIFieldsConfigured { FieldsInReferences = target.FieldsInReferences };
                 }
 
                 if (!source.FieldRules.SetEquals(target.FieldRules))
                 {
-                    yield return E(new SchemaFieldRulesConfigured { FieldRules = target.FieldRules });
+                    yield return new SchemaFieldRulesConfigured { FieldRules = target.FieldRules };
                 }
             }
         }
 
-        private static IEnumerable<SchemaEvent> SyncFields<T>(
+        private static IEnumerable<ParentFieldEvent> SyncFields<T>(
             FieldCollection<T> source,
             FieldCollection<T> target,
             Func<long> idGenerator,
             Func<T, T, bool> canUpdate,
-            NamedId<long>? parentId, SchemaSynchronizationOptions options) where T : class, IField
+            SchemaSynchronizationOptions options) where T : class, IField
         {
-            FieldEvent E(FieldEvent @event)
-            {
-                @event.ParentFieldId = parentId;
-
-                return @event;
-            }
-
             var sourceIds = source.Ordered.Select(x => x.NamedId()).ToList();
 
             if (!options.NoFieldDeletion)
@@ -114,7 +101,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                         sourceIds.Remove(id);
 
-                        yield return E(new FieldDeleted { FieldId = id });
+                        yield return new FieldDeleted { FieldId = id };
                     }
                 }
             }
@@ -135,7 +122,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     {
                         if (!sourceField.RawProperties.Equals(targetField.RawProperties as object))
                         {
-                            yield return E(new FieldUpdated { FieldId = id, Properties = targetField.RawProperties });
+                            yield return new FieldUpdated { FieldId = id, Properties = targetField.RawProperties };
                         }
                     }
                     else if (!sourceField.IsLocked && !options.NoFieldRecreation)
@@ -144,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                         sourceIds.Remove(id);
 
-                        yield return E(new FieldDeleted { FieldId = id });
+                        yield return new FieldDeleted { FieldId = id };
                     }
                 }
 
@@ -162,7 +149,6 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     yield return new FieldAdded
                     {
                         Name = targetField.Name,
-                        ParentFieldId = parentId,
                         Partitioning = partitioning,
                         Properties = targetField.RawProperties,
                         FieldId = id
@@ -175,31 +161,33 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                 {
                     if (!targetField.IsLocked.BoolEquals(sourceField?.IsLocked))
                     {
-                        yield return E(new FieldLocked { FieldId = id });
+                        yield return new FieldLocked { FieldId = id };
                     }
 
                     if (!targetField.IsHidden.BoolEquals(sourceField?.IsHidden))
                     {
                         yield return targetField.IsHidden ?
-                            E(new FieldHidden { FieldId = id }) :
-                            E(new FieldShown { FieldId = id });
+                            new FieldHidden { FieldId = id } :
+                            new FieldShown { FieldId = id };
                     }
 
                     if (!targetField.IsDisabled.BoolEquals(sourceField?.IsDisabled))
                     {
                         yield return targetField.IsDisabled ?
-                            E(new FieldDisabled { FieldId = id }) :
-                            E(new FieldEnabled { FieldId = id });
+                            new FieldDisabled { FieldId = id } :
+                            new FieldEnabled { FieldId = id };
                     }
 
                     if ((sourceField == null || sourceField is IArrayField) && targetField is IArrayField targetArrayField)
                     {
                         var fields = (sourceField as IArrayField)?.FieldCollection ?? FieldCollection<NestedField>.Empty;
 
-                        var events = SyncFields(fields, targetArrayField.FieldCollection, idGenerator, CanUpdate, id, options);
+                        var events = SyncFields(fields, targetArrayField.FieldCollection, idGenerator, CanUpdate, options);
 
                         foreach (var @event in events)
                         {
+                            @event.ParentFieldId = id;
+
                             yield return @event;
                         }
                     }
@@ -215,7 +203,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                 {
                     var fieldIds = targetNames.Select(x => sourceIds.Find(y => y.Name == x)!.Id).ToArray();
 
-                    yield return new SchemaFieldsReordered { FieldIds = fieldIds, ParentFieldId = parentId };
+                    yield return new SchemaFieldsReordered { FieldIds = fieldIds };
                 }
             }
         }

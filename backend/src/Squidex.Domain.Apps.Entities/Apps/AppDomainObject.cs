@@ -345,10 +345,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             foreach (var @event in events)
             {
-                @event.Actor = command.Actor;
                 @event.AppId = appId;
 
-                RaiseEvent(@event);
+                Raise(command, @event);
             }
         }
 
@@ -356,121 +355,123 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId))
             {
-                RaiseEvent(SimpleMapper.Map(command, new AppPlanReset()));
+                Raise(command, new AppPlanReset());
             }
             else
             {
-                RaiseEvent(SimpleMapper.Map(command, new AppPlanChanged()));
+                Raise(command, new AppPlanChanged());
             }
         }
 
         public void Update(UpdateApp command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppUpdated()));
+            Raise(command, new AppUpdated());
         }
 
         public void UpdateClient(UpdateClient command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated()));
+            Raise(command, new AppClientUpdated());
         }
 
         public void UploadImage(UploadAppImage command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppImageUploaded { Image = new AppImage(command.File.MimeType) }));
+            Raise(command, new AppImageUploaded { Image = new AppImage(command.File.MimeType) });
         }
 
         public void RemoveImage(RemoveAppImage command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppImageRemoved()));
+            Raise(command, new AppImageRemoved());
         }
 
         public void UpdateLanguage(UpdateLanguage command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppLanguageUpdated()));
+            Raise(command, new AppLanguageUpdated());
         }
 
         public void AssignContributor(AssignContributor command, bool isAdded)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned { IsAdded = isAdded }));
+            Raise(command, new AppContributorAssigned { IsAdded = isAdded });
         }
 
         public void RemoveContributor(RemoveContributor command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppContributorRemoved()));
+            Raise(command, new AppContributorRemoved());
         }
 
         public void AttachClient(AttachClient command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppClientAttached()));
+            Raise(command, new AppClientAttached());
         }
 
         public void RevokeClient(RevokeClient command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppClientRevoked()));
+            Raise(command, new AppClientRevoked());
         }
 
         public void AddWorkflow(AddWorkflow command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowAdded()));
+            Raise(command, new AppWorkflowAdded());
         }
 
         public void UpdateWorkflow(UpdateWorkflow command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowUpdated()));
+            Raise(command, new AppWorkflowUpdated());
         }
 
         public void DeleteWorkflow(DeleteWorkflow command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowDeleted()));
+            Raise(command, new AppWorkflowDeleted());
         }
 
         public void AddLanguage(AddLanguage command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppLanguageAdded()));
+            Raise(command, new AppLanguageAdded());
         }
 
         public void RemoveLanguage(RemoveLanguage command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppLanguageRemoved()));
+            Raise(command, new AppLanguageRemoved());
         }
 
         public void AddPattern(AddPattern command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppPatternAdded()));
+            Raise(command, new AppPatternAdded());
         }
 
         public void DeletePattern(DeletePattern command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppPatternDeleted()));
+            Raise(command, new AppPatternDeleted());
         }
 
         public void UpdatePattern(UpdatePattern command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppPatternUpdated()));
+            Raise(command, new AppPatternUpdated());
         }
 
         public void AddRole(AddRole command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppRoleAdded()));
+            Raise(command, new AppRoleAdded());
         }
 
         public void DeleteRole(DeleteRole command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppRoleDeleted()));
+            Raise(command, new AppRoleDeleted());
         }
 
         public void UpdateRole(UpdateRole command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppRoleUpdated()));
+            Raise(command, new AppRoleUpdated());
         }
 
         public void ArchiveApp(ArchiveApp command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppArchived()));
+            Raise(command, new AppArchived());
         }
 
-        private void RaiseEvent(AppEvent @event)
+        private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
         {
+            SimpleMapper.Map(command, @event);
+
             @event.AppId ??= Snapshot.NamedId();
 
             RaiseEvent(Envelope.Create(@event));

@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
     {
         public DomainId ParentId { get; set; }
 
-        public HashSet<string> Tags { get; } = new HashSet<string>();
+        public HashSet<string> Tags { get; set; } = new HashSet<string>();
 
         public bool Duplicate { get; set; }
 

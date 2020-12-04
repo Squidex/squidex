@@ -146,6 +146,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Operations
             CheckErrors(validator);
         }
 
+        public async Task<IEnumerable<ValidationError>> GetErrorsAsync(NamedContentData data)
+        {
+            var validator =
+                new ContentValidator(Partition(),
+                    validationContext, validators, log);
+
+            await validator.ValidateInputAsync(data);
+            await validator.ValidateContentAsync(data);
+
+            return validator.Errors;
+        }
+
         public async Task ValidateOnPublishAsync(NamedContentData data)
         {
             if (!schema.SchemaDef.Properties.ValidateOnPublish)

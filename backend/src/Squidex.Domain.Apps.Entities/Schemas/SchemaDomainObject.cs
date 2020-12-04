@@ -270,106 +270,106 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             foreach (var @event in events)
             {
-                RaiseEvent(SimpleMapper.Map(command, (SchemaEvent)@event));
+                Raise(command, @event);
             }
         }
 
         public void Create(CreateSchema command)
         {
-            RaiseEvent(command, new SchemaCreated { SchemaId = NamedId.Of(command.SchemaId, command.Name), Schema = command.BuildSchema() });
+            Raise(command, new SchemaCreated { SchemaId = NamedId.Of(command.SchemaId, command.Name), Schema = command.BuildSchema() });
         }
 
         public void Add(AddField command)
         {
-            RaiseEvent(command, new FieldAdded { FieldId = CreateFieldId(command) });
+            Raise(command, new FieldAdded { FieldId = CreateFieldId(command) });
         }
 
         public void UpdateField(UpdateField command)
         {
-            RaiseEvent(command, new FieldUpdated());
+            Raise(command, new FieldUpdated());
         }
 
         public void LockField(LockField command)
         {
-            RaiseEvent(command, new FieldLocked());
+            Raise(command, new FieldLocked());
         }
 
         public void HideField(HideField command)
         {
-            RaiseEvent(command, new FieldHidden());
+            Raise(command, new FieldHidden());
         }
 
         public void ShowField(ShowField command)
         {
-            RaiseEvent(command, new FieldShown());
+            Raise(command, new FieldShown());
         }
 
         public void DisableField(DisableField command)
         {
-            RaiseEvent(command, new FieldDisabled());
+            Raise(command, new FieldDisabled());
         }
 
         public void EnableField(EnableField command)
         {
-            RaiseEvent(command, new FieldEnabled());
+            Raise(command, new FieldEnabled());
         }
 
         public void DeleteField(DeleteField command)
         {
-            RaiseEvent(command, new FieldDeleted());
+            Raise(command, new FieldDeleted());
         }
 
         public void Reorder(ReorderFields command)
         {
-            RaiseEvent(command, new SchemaFieldsReordered());
+            Raise(command, new SchemaFieldsReordered());
         }
 
         public void Publish(PublishSchema command)
         {
-            RaiseEvent(command, new SchemaPublished());
+            Raise(command, new SchemaPublished());
         }
 
         public void Unpublish(UnpublishSchema command)
         {
-            RaiseEvent(command, new SchemaUnpublished());
+            Raise(command, new SchemaUnpublished());
         }
 
         public void ConfigureScripts(ConfigureScripts command)
         {
-            RaiseEvent(command, new SchemaScriptsConfigured());
+            Raise(command, new SchemaScriptsConfigured());
         }
 
         public void ConfigureFieldRules(ConfigureFieldRules command)
         {
-            RaiseEvent(command, new SchemaFieldRulesConfigured { FieldRules = command.ToFieldRules() });
+            Raise(command, new SchemaFieldRulesConfigured { FieldRules = command.ToFieldRules() });
         }
 
         public void ChangeCategory(ChangeCategory command)
         {
-            RaiseEvent(command, new SchemaCategoryChanged());
+            Raise(command, new SchemaCategoryChanged());
         }
 
         public void ConfigurePreviewUrls(ConfigurePreviewUrls command)
         {
-            RaiseEvent(command, new SchemaPreviewUrlsConfigured());
+            Raise(command, new SchemaPreviewUrlsConfigured());
         }
 
         public void ConfigureUIFields(ConfigureUIFields command)
         {
-            RaiseEvent(command, new SchemaUIFieldsConfigured());
+            Raise(command, new SchemaUIFieldsConfigured());
         }
 
         public void Update(UpdateSchema command)
         {
-            RaiseEvent(command, new SchemaUpdated());
+            Raise(command, new SchemaUpdated());
         }
 
         public void Delete(DeleteSchema command)
         {
-            RaiseEvent(command, new SchemaDeleted());
+            Raise(command, new SchemaDeleted());
         }
 
-        private void RaiseEvent<TCommand, TEvent>(TCommand command, TEvent @event) where TCommand : class where TEvent : SchemaEvent
+        private void Raise<T, TEvent>(T command, TEvent @event) where TEvent : SchemaEvent where T : class
         {
             SimpleMapper.Map(command, @event);
 
@@ -383,13 +383,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 return null;
             }
 
-            if (command is ParentFieldCommand pc && @event is ParentFieldEvent pe)
+            if (command is ParentFieldCommand parentField && @event is ParentFieldEvent parentFieldEvent)
             {
-                if (pc.ParentFieldId.HasValue)
+                if (parentField.ParentFieldId.HasValue)
                 {
-                    if (Snapshot.SchemaDef.FieldsById.TryGetValue(pc.ParentFieldId.Value, out var field))
+                    if (Snapshot.SchemaDef.FieldsById.TryGetValue(parentField.ParentFieldId.Value, out var field))
                     {
-                        pe.ParentFieldId = field.NamedId();
+                        parentFieldEvent.ParentFieldId = field.NamedId();
 
                         if (command is FieldCommand fc && @event is FieldEvent fe)
                         {
@@ -406,11 +406,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 }
             }
 
-            RaiseEvent(@event);
-        }
+            SimpleMapper.Map(command, @event);
 
-        private void RaiseEvent(SchemaEvent @event)
-        {
             @event.AppId ??= Snapshot.AppId;
             @event.SchemaId ??= Snapshot.NamedId();
 

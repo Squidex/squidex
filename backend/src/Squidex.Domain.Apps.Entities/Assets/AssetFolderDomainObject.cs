@@ -96,26 +96,28 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public void Create(CreateAssetFolder command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetFolderCreated()));
+            Raise(command, new AssetFolderCreated());
         }
 
         public void Move(MoveAssetFolder command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetFolderMoved()));
+            Raise(command, new AssetFolderMoved());
         }
 
         public void Rename(RenameAssetFolder command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetFolderRenamed()));
+            Raise(command, new AssetFolderRenamed());
         }
 
         public void Delete(DeleteAssetFolder command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetFolderDeleted()));
+            Raise(command, new AssetFolderDeleted());
         }
 
-        private void RaiseEvent(AppEvent @event)
+        private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
         {
+            SimpleMapper.Map(command, @event);
+
             @event.AppId ??= Snapshot.AppId;
 
             RaiseEvent(Envelope.Create(@event));
