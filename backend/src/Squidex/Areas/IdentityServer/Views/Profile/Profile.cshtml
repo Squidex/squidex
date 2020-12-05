@@ -198,14 +198,14 @@
 
     <div class="row no-gutters form-group">
         <div class="col-8">
-            <label for="clientId">Client Id</label>
+            <label for="clientId">@T.Get("common.clientId")</label>
 
             <input class="form-control" name="clientId" id="clientId" readonly value="@Model.Id" />
         </div>
     </div>
     <div class="row no-gutters form-group">
         <div class="col-8">
-            <label for="clientSecret">@T.Get("common.clientId")</label>
+            <label for="clientSecret">@T.Get("common.clientSecret")</label>
 
             <input class="form-control" name="clientSecret" id="clientSecret" readonly value="@Model.ClientSecret" />
         </div>
