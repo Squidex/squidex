@@ -21,6 +21,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public bool NoFieldRecreation { get; set; }
 
+        /// <summary>
+        /// True, when schema allows only one item.
+        /// </summary>
+        public bool IsSingleton { get; set; }
+
         public SynchronizeSchema ToCommand()
         {
             return ToCommand(this, new SynchronizeSchema());
