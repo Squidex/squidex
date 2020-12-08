@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, Pager, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
+import { DialogService, getPagingInfo, ListState, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService, StatusInfo } from './../services/contents.service';
@@ -15,21 +15,9 @@ import { SavedQuery } from './queries';
 import { Query, QuerySynchronizer } from './query';
 import { SchemasState } from './schemas.state';
 
-interface Snapshot {
-    // The current comments.
+interface Snapshot extends ListState<Query> {
+    // The current contents.
     contents: ReadonlyArray<ContentDto>;
-
-    // The pagination information.
-    contentsPager: Pager;
-
-    // The query to filter and sort contents.
-    contentsQuery?: Query;
-
-    // Indicates if the contents are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the contents are loading.
-    isLoading?: boolean;
 
     // The referencing content id.
     referencing?: string;
@@ -60,11 +48,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public contents =
         this.project(x => x.contents);
 
-    public contentsPager =
-        this.project(x => x.contentsPager);
+    public paging =
+        this.project(x => getPagingInfo(x, x.contents.length));
 
-    public contentsQuery =
-        this.project(x => x.contentsQuery);
+    public query =
+        this.project(x => x.query);
 
     public validationResults =
         this.project(x => x.validationResults);
@@ -105,7 +93,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     ) {
         super({
             contents: [],
-            contentsPager: new Pager(0),
+            page: 0,
+            pageSize: 10,
+            total: 0,
             validationResults: {}
         });
     }
@@ -137,8 +127,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public loadAndListen(synchronizer: StateSynchronizer) {
         synchronizer.mapTo(this)
             .keep('selectedContent')
-            .withPager('contentsPager', 'contents', 10)
-            .withSynchronizer('contentsQuery', QuerySynchronizer.INSTANCE)
+            .withPaging('contents', 10)
+            .withSynchronizer(QuerySynchronizer.INSTANCE)
             .whenSynced(() => this.loadInternal(false))
             .build();
     }
@@ -182,27 +172,22 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
         this.next({ isLoading: true });
 
-        const {
-            contentsPager: { take, skip },
-            contentsQuery,
-            reference,
-            referencing
-        } = this.snapshot;
+        const { page, pageSize, query, reference, referencing } = this.snapshot;
 
-        const query: any = { take, skip };
+        const q: any = { take: pageSize, skip: pageSize * page };
 
-        if (contentsQuery) {
-            query.query = this.snapshot.contentsQuery;
+        if (query) {
+            q.query = query;
         }
 
         let content$: Observable<ContentsDto>;
 
         if (referencing) {
-            content$ = this.contentsService.getContentReferencing(this.appName, this.schemaName, referencing, query);
+            content$ = this.contentsService.getContentReferencing(this.appName, this.schemaName, referencing, q);
         } else if (reference) {
-            content$ = this.contentsService.getContentReferences(this.appName, this.schemaName, reference, query);
+            content$ = this.contentsService.getContentReferences(this.appName, this.schemaName, reference, q);
         } else {
-            content$ = this.contentsService.getContents(this.appName, this.schemaName, query);
+            content$ = this.contentsService.getContents(this.appName, this.schemaName, q);
         }
 
         return content$.pipe(
@@ -212,8 +197,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 }
 
                 return this.next(s => {
-                    const contentsPager = s.contentsPager.setCount(total);
-
                     statuses = s.statuses || statuses;
 
                     let selectedContent = s.selectedContent;
@@ -226,12 +209,12 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         ...s,
                         canCreate,
                         canCreateAndPublish,
-                        contents,
-                        contentsPager,
                         isLoaded: true,
                         isLoading: false,
+                        contents,
                         selectedContent,
-                        statuses
+                        statuses,
+                        total
                     };
                 });
             }),
@@ -251,10 +234,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.dialogs.notifyInfo('i18n:contents.created');
 
                 return this.next(s => {
-                    const contentsPager = s.contentsPager.incrementCount();
-                    const contents = [payload, ...s.contents].slice(contentsPager.page);
+                    const contents = [payload, ...s.contents].slice(s.pageSize);
 
-                    return { ...s, contents, contentsPager };
+                    return { ...s, contents, total: s.total + 1 };
                 });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
@@ -282,23 +264,21 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         const job: Partial<BulkUpdateJobDto> = { type: 'ChangeStatus', status, dueTime };
 
         return this.bulkWithRetry(contents, job,
-            'i18n:contents.unpublishReferrerConfirmTitle',
-            'i18n:contents.unpublishReferrerConfirmText',
-            'unpublishReferencngContent').pipe(
-                switchMap(() => this.loadInternalCore(false)),
-                shareSubscribed(this.dialogs));
+                'i18n:contents.unpublishReferrerConfirmTitle',
+                'i18n:contents.unpublishReferrerConfirmText',
+                'unpublishReferencngContent').pipe(
+            switchMap(() => this.loadInternalCore(false)), shareSubscribed(this.dialogs));
     }
 
     public deleteMany(contents: ReadonlyArray<ContentDto>) {
         const job: Partial<BulkUpdateJobDto> = { type: 'Delete' };
 
         return this.bulkWithRetry(contents, job,
-            'i18n:contents.deleteReferrerConfirmTitle',
-            'i18n:contents.deleteReferrerConfirmText',
-            'deleteReferencngContent').pipe(
-                switchMap(() => this.loadInternalCore(false)),
-                shareSubscribed(this.dialogs));
-    }
+                'i18n:contents.deleteReferrerConfirmTitle',
+                'i18n:contents.deleteReferrerConfirmText',
+                'deleteReferencngContent').pipe(
+            switchMap(() => this.loadInternalCore(false)), shareSubscribed(this.dialogs));
+}
 
     public update(content: ContentDto, request: any): Observable<ContentDto> {
         return this.contentsService.putContent(this.appName, content, request, content.version).pipe(
@@ -332,18 +312,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public search(contentsQuery?: Query): Observable<any> {
-        this.next(s => ({
-            ...s,
-            contentsPager: s.contentsPager.reset(),
-            contentsQuery
-        }));
+    public search(query?: Query): Observable<any> {
+        this.next({ query, page: 0 });
 
         return this.loadInternal(false);
     }
 
-    public setPager(contentsPager: Pager) {
-        this.next({ contentsPager });
+    public page(paging: { page: number, pageSize: number }) {
+        this.next(paging);
 
         return this.loadInternal(false);
     }
@@ -368,10 +344,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
     }
 
-    private bulkWithRetry(contents: ReadonlyArray<ContentDto>, job: Partial<BulkUpdateJobDto>,
-        confirmTitle: string,
-        confirmText: string,
-        confirmKey: string): Observable<ReadonlyArray<BulkResultDto>> {
+    private bulkWithRetry(contents: ReadonlyArray<ContentDto>, job: Partial<BulkUpdateJobDto>, confirmTitle: string, confirmText: string, confirmKey: string): Observable<ReadonlyArray<BulkResultDto>> {
         return this.bulkMany(contents, true, job).pipe(
             switchMap(results => {
                 const failed = contents.filter(x => results.find(r => r.contentId === x.id)?.error?.statusCode === 400);

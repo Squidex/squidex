@@ -17,7 +17,7 @@
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">
-                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" [query]="assetsState.assetsQuery | async" (queryChange)="search($event)" enableShortcut="true">
+                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" [query]="assetsState.query | async" (queryChange)="search($event)" enableShortcut="true">
                         </sqx-search-form>
                     </div>
                 </div>

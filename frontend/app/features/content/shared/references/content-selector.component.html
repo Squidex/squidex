@@ -21,7 +21,7 @@
                 </div>
                 <div class="col pl-1">
                     <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}" 
-                        [query]="contentsState.contentsQuery | async"
+                        [query]="contentsState.query | async"
                         [queryModel]="queryModel"
                         (queryChange)="search($event)">
                     </sqx-search-form>
@@ -54,7 +54,7 @@
                                 <th *ngFor="let field of schema.defaultReferenceFields" [sqxContentListCell]="field">
                                     <sqx-content-list-header
                                         [field]="field"
-                                        [query]="contentsState.contentsQuery | async"
+                                        [query]="contentsState.query | async"
                                         (queryChange)="search($event)"
                                         [language]="language">
                                     </sqx-content-list-header>
@@ -83,7 +83,7 @@
                 </ng-container>
     
                 <ng-container footer>
-                    <sqx-pager [pager]="contentsState.contentsPager | async" (pagerChange)="contentsState.setPager($event)"></sqx-pager>
+                    <sqx-pager [paging]="contentsState.paging | async" (pagerChange)="contentsState.page($event)"></sqx-pager>
                 </ng-container>
             </sqx-list-view>
         </ng-container>

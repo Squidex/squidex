@@ -6,24 +6,15 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, Pager, Router2State, shareSubscribed, State } from '@app/framework';
+import { DialogService, getPagingInfo, ListState, Router2State, shareSubscribed, State } from '@app/framework';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { RuleEventDto, RulesService } from './../services/rules.service';
 import { AppsState } from './apps.state';
 
-interface Snapshot {
+interface Snapshot extends ListState {
     // The current rule events.
     ruleEvents: ReadonlyArray<RuleEventDto>;
-
-    // The pagination information.
-    ruleEventsPager: Pager;
-
-    // Indicates if the rule events are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the rule events are loading.
-    isLoading?: boolean;
 
     // The current rule id.
     ruleId?: string;
@@ -34,8 +25,11 @@ export class RuleEventsState extends State<Snapshot> {
     public ruleEvents =
         this.project(x => x.ruleEvents);
 
-    public ruleEventsPager =
-        this.project(x => x.ruleEventsPager);
+    public paging =
+        this.project(x => getPagingInfo(x, x.ruleEvents.length));
+
+    public query =
+        this.project(x => x.query);
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
@@ -50,13 +44,15 @@ export class RuleEventsState extends State<Snapshot> {
     ) {
         super({
             ruleEvents: [],
-            ruleEventsPager: new Pager(0)
+            page: 0,
+            pageSize: 10,
+            total: 0
         });
     }
 
     public loadAndListen(route: Router2State) {
         route.mapTo(this)
-            .withPager('ruleEventsPager', 'ruleEvents', 30)
+            .withPaging('ruleEvents', 30)
             .withString('ruleId', 'ruleId')
             .whenSynced(() => this.loadInternal(false))
             .build();
@@ -73,24 +69,24 @@ export class RuleEventsState extends State<Snapshot> {
     private loadInternal(isReload: boolean): Observable<any> {
         this.next({ isLoading: true });
 
+        const { page, pageSize, ruleId } = this.snapshot;
+
         return this.rulesService.getEvents(this.appName,
-                this.snapshot.ruleEventsPager.pageSize,
-                this.snapshot.ruleEventsPager.skip,
-                this.snapshot.ruleId).pipe(
+                pageSize,
+                pageSize * page,
+                ruleId).pipe(
             tap(({ total, items: ruleEvents }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:rules.ruleEvents.reloaded');
                 }
 
                 return this.next(s => {
-                    const ruleEventsPager = s.ruleEventsPager.setCount(total);
-
                     return {
                         ...s,
                         isLoaded: true,
                         isLoading: false,
                         ruleEvents,
-                        ruleEventsPager
+                        total
                     };
                 });
             }),
@@ -125,17 +121,13 @@ export class RuleEventsState extends State<Snapshot> {
             return EMPTY;
         }
 
-        this.next(s => ({
-            ...s,
-            ruleEventsPager: s.ruleEventsPager.reset(),
-            ruleId
-        }));
+        this.next({ page: 0, ruleId });
 
         return this.loadInternal(false);
     }
 
-    public setPager(ruleEventsPager: Pager): Observable<any> {
-        this.next({ ruleEventsPager });
+    public page(paging: { page: number, pageSize: number }) {
+        this.next(paging);
 
         return this.loadInternal(false);
     }

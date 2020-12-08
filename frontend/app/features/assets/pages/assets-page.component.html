@@ -26,7 +26,7 @@
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize"
-                            [query]="assetsState.assetsQuery | async"
+                            [query]="assetsState.query | async"
                             [queries]="queries"
                             (queryChange)="search($event)"
                             enableShortcut="true">
@@ -66,7 +66,7 @@
             </div>
 
             <ng-container footer>
-                <sqx-pager [pager]="assetsState.assetsPager | async" (pagerChange)="assetsState.setPager($event)"></sqx-pager>
+                <sqx-pager [paging]="assetsState.paging | async" (pagerChange)="assetsState.page($event)"></sqx-pager>
             </ng-container>
         </sqx-list-view>
     </ng-container>

@@ -28,7 +28,7 @@ export class UsersPageComponent extends ResourceOwner implements OnInit {
         super();
 
         this.own(
-            this.usersState.usersQuery
+            this.usersState.query
                 .subscribe(q => this.usersFilter.setValue(q || '')));
     }
 

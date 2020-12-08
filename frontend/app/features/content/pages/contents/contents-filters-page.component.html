@@ -6,7 +6,7 @@
     <ng-container content>
         <sqx-query-list
             [types]="'common.contents' | sqxTranslate"
-            [queryUsed]="contentsState.contentsQuery | async"
+            [queryUsed]="contentsState.query | async"
             [queries]="schemaQueries.defaultQueries"
             (search)="search($event)">
         </sqx-query-list>
@@ -18,7 +18,7 @@
 
             <sqx-query-list
                 [types]="'common.contents' | sqxTranslate"
-                [queryUsed]="contentsState.contentsQuery | async"
+                [queryUsed]="contentsState.query | async"
                 [queries]="contentsState.statusQueries | async"
                 (search)="search($event)">
             </sqx-query-list>
@@ -28,7 +28,7 @@
 
         <sqx-shared-queries
             [types]="'common.contents' | sqxTranslate"
-            [queryUsed]="contentsState.contentsQuery | async"
+            [queryUsed]="contentsState.query | async"
             [queries]="schemaQueries"
             (search)="search($event)">
         </sqx-shared-queries>

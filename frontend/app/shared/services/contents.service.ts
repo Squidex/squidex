@@ -9,7 +9,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, parseError, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
+import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { encodeQuery, Query } from './../state/query';
@@ -338,7 +338,7 @@ export class ContentsService {
 
         return this.http.post<any[]>(url, dto).pipe(
             map(body => {
-                return body.map(x => new BulkResultDto(x.contentId, parseError(x.error, '')));
+                return body.map(x => new BulkResultDto(x.contentId, parseError(x.error)));
             }),
             tap(() => {
                 this.analytics.trackEvent('Content', 'Deleted', appName);
@@ -416,4 +416,15 @@ function parseScheduleJob(response: any) {
         response.scheduledBy,
         response.color,
         DateTime.parseISO(response.dueTime));
+}
+
+function parseError(response: any) {
+    if (!response) {
+        return undefined;
+    }
+
+    return new ErrorDto(
+        response.statusCode,
+        response.message,
+        response.details);
 }

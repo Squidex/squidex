@@ -376,15 +376,15 @@ describe('ContentsService', () => {
             results = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/status');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/bulk');
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush([{
-            id: '123'
+            contentId: '123'
         }, {
-            id: '456',
+            contentId: '456',
             error: {
                 statusCode: 400,
                 message: 'Invalid'
@@ -393,7 +393,7 @@ describe('ContentsService', () => {
 
         expect(results!).toEqual([
             new BulkResultDto('123'),
-            new BulkResultDto('123', new ErrorDto(400, 'Invalid'))
+            new BulkResultDto('456', new ErrorDto(400, 'Invalid'))
         ]);
     }));
 

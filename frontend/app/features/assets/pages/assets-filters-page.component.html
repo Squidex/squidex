@@ -16,7 +16,7 @@
 
         <sqx-shared-queries
             [types]="'common.assets' | sqxTranslate"
-            [queryUsed]="assetsState.assetsQuery | async"
+            [queryUsed]="assetsState.query | async"
             [queries]="assetsQueries"
             (search)="search($event)">
         </sqx-shared-queries>

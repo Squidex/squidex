@@ -60,7 +60,7 @@ class DummySynchronizer implements StateSynchronizer, StateSynchronizerMap<any> 
         return this;
     }
 
-    public withPager() {
+    public withPaging() {
         return this;
     }
 

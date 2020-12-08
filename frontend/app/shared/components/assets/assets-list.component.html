@@ -18,7 +18,7 @@
     <ng-container topHeader>
         <div cdkDropListGroup>
             <div class="folders" *ngIf="assetsState.pathAvailable | async">
-                <ng-container *ngIf="(assetsState.assetFolders | async)?.length > 0 || (assetsState.parentFolder | async)">
+                <ng-container *ngIf="(assetsState.hasFolders | async) || (assetsState.parentFolder | async)">
                     <h5>{{ 'common.folders' | sqxTranslate }}</h5>
                 </ng-container>
         
@@ -34,7 +34,7 @@
                         </sqx-asset-folder>
                     </div>
                     
-                    <div class="folder-container" *ngFor="let assetFolder of assetsState.assetFolders | async; trackBy: trackByAssetItem"
+                    <div class="folder-container" *ngFor="let assetFolder of assetsState.folders | async; trackBy: trackByAssetItem"
                         cdkDropList cdkDropListSortingDisabled
                         [cdkDropListData]="assetFolder.id" 
                         (cdkDropListDropped)="move($event)"
@@ -88,5 +88,5 @@
 </sqx-list-view>
 
 <ng-container *ngIf="showPager">
-    <sqx-pager [autoHide]="true" [pager]="assetsState.assetsPager | async" (pagerChange)="assetsState.setPager($event)"></sqx-pager>
+    <sqx-pager [autoHide]="true" [paging]="assetsState.paging | async" (pagerChange)="assetsState.page($event)"></sqx-pager>
 </ng-container>

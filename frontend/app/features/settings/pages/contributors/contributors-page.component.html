@@ -41,11 +41,12 @@
             </ng-container>
 
             <div content>
-                <ng-container *ngIf="contributorsState.contributorsPaged | async; let contributors">
+                <ng-container *ngIf="contributorsState.contributorsFiltered | async; let contributors">
                     <ng-container *ngIf="rolesState.roles | async; let roles">                        
                         <ng-container *ngIf="contributors.length > 0; else noContributors">
                             <table class="table table-items table-fixed">
-                                <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor" [sqxContributor]="contributor" [search]="contributorsState.queryRegex | async" [roles]="roles">
+                                <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor" [sqxContributor]="contributor" 
+                                    [search]="contributorsState.queryRegex | async" [roles]="roles">
                                 </tbody>
                             </table>
                         </ng-container>
@@ -60,7 +61,7 @@
             </div>
 
             <ng-container footer>
-                <sqx-pager [pager]="contributorsState.contributorsPager | async" (pagerChange)="contributorsState.setPager($event)"></sqx-pager>
+                <sqx-pager [paging]="contributorsState.paging | async" (pagerChange)="contributorsState.page($event)"></sqx-pager>
             </ng-container>
         </sqx-list-view>
     </ng-container>
