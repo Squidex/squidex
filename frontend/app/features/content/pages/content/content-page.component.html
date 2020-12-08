@@ -28,7 +28,7 @@
  
         <ng-container menu>
             <ng-container *ngIf="content; else noContent">
-                <ng-container>
+                <ng-container *ngIf="selectedTab === 'i18n:contents.contentTab.editor'">
                     <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
 
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
@@ -50,14 +50,24 @@
                             </div>
                         </ng-container>
                     </ng-container>
-                </ng-container>
 
-                <ng-container *ngIf="content?.canUpdate">
-                    <button type="submit" class="btn btn-primary ml-1" title="i18n:common.saveShortcut">
-                        {{ 'common.save' | sqxTranslate }}
+                    <ng-container *ngIf="content?.canUpdate">
+                        <button type="submit" class="btn btn-primary ml-1" title="i18n:common.saveShortcut">
+                            {{ 'common.save' | sqxTranslate }}
+                        </button>
+    
+                        <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                    </ng-container>
+                </ng-container>
+                
+                <ng-container *ngIf="selectedTab !== 'i18n:contents.contentTab.editor'">
+                    <button type="button" class="btn btn-primary ml-1" (click)="publish()">
+                        {{ 'common.publish' | sqxTranslate }}
                     </button>
 
-                    <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                    <button type="button" class="btn btn-primary ml-1" (click)="validate()">
+                        {{ 'common.validate' | sqxTranslate }}
+                    </button>
                 </ng-container>
             </ng-container>
 

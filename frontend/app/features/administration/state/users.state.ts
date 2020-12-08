@@ -151,8 +151,8 @@ export class UsersState extends State<Snapshot> {
         return this.usersService.postUser(request).pipe(
             tap(created => {
                 this.next(s => {
-                    const users = [created, ...s.users];
                     const usersPager = s.usersPager.incrementCount();
+                    const users = [created, ...s.users].slice(usersPager.pageSize);
 
                     return { ...s, users, usersPager };
                 });

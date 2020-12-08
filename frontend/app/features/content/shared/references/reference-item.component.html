@@ -11,6 +11,11 @@
         <sqx-content-value [value]="value"></sqx-content-value>
     </td>
 
+    <td class="cell-valid" *ngIf="validityVisible">
+        <span class="badge badge-pill badge-success" *ngIf="valid === true">VALID</span>
+        <span class="badge badge-pill badge-danger" *ngIf="valid === false">INVALID</span>
+    </td>
+
     <td sqxContentListCell="meta.status.color">
         <sqx-content-list-field field="meta.status.color" [content]="content"></sqx-content-list-field>
     </td>

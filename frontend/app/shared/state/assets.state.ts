@@ -341,16 +341,7 @@ export class AssetsState extends State<Snapshot> {
                     return throwError(error);
                 }
             }),
-            tap(() => {
-                this.next(s => {
-                    const assets = s.assets.filter(x => x.id !== asset.id);
-                    const assetsPager = s.assetsPager.decrementCount();
-
-                    const tags = updateTags(s, undefined, asset);
-
-                    return { ...s, assets, assetsPager, ...tags };
-                });
-            }),
+            switchMap(() => this.loadInternal(false)),
             shareSubscribed(this.dialogs));
     }
 

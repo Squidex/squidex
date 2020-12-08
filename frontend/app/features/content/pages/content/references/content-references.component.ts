@@ -43,6 +43,14 @@ export class ContentReferencesComponent implements OnChanges {
         }
     }
 
+    public validate() {
+        this.contentsState.validate(this.contentsState.snapshot.contents);
+    }
+
+    public publish() {
+        this.contentsState.changeManyStatus(this.contentsState.snapshot.contents.filter(x => x.canPublish), 'Published');
+    }
+
     public trackByContent(_index: number, content: ContentDto) {
         return content.id;
     }

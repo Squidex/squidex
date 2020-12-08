@@ -21,5 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         Task<IEnrichedContentEntity> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any);
 
         Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName);
+
+        Task<ISchemaEntity?> GetSchemaAsync(Context context, string schemaIdOrName);
     }
 }

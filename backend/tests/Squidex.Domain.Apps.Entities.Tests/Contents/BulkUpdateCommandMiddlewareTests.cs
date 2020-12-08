@@ -292,6 +292,38 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public async Task Should_validate_content()
+        {
+            var (id, _, _) = CreateTestData(false);
+
+            var command = new BulkUpdateContents
+            {
+                Jobs = new[]
+                {
+                    new BulkUpdateJob
+                    {
+                        Type = BulkUpdateType.Validate,
+                        Id = id
+                    }
+                },
+                SchemaId = schemaId
+            };
+
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            var result = context.Result<BulkUpdateResult>();
+
+            Assert.Single(result);
+            Assert.Equal(1, result.Count(x => x.ContentId == id));
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<ValidateContent>.That.Matches(x => x.ContentId == id)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_delete_content()
         {
             var (id, _, _) = CreateTestData(false);

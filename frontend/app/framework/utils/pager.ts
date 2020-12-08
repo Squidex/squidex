@@ -77,11 +77,11 @@ export class Pager {
         return result;
     }
 
-    public decrementCount(): Pager {
-        const result = new Pager(this.numberOfItems - 1, this.page, this.pageSize);
+    public decrementCount(offset = 1): Pager {
+        const result = new Pager(this.numberOfItems - offset, this.page, this.pageSize);
 
         if (result.canGoNext) {
-            result.itemLast = this.itemLast - 1;
+            result.itemLast = this.itemLast - offset;
         }
 
         return result;

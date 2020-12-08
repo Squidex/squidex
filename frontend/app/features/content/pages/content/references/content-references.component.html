@@ -7,6 +7,8 @@
                 [columns]="references | sqxContentsColumns"
                 [isCompact]="false"
                 [isDisabled]="false"
+                [validations]="contentsState.validationResults | async"
+                [validityVisible]="true"
                 [language]="language">
             </tbody>
         </table>

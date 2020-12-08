@@ -140,7 +140,7 @@ namespace Squidex.Shared
         public const string AppContentsRead = "squidex.apps.{app}.contents.{name}.read";
         public const string AppContentsCreate = "squidex.apps.{app}.contents.{name}.create";
         public const string AppContentsUpdate = "squidex.apps.{app}.contents.{name}.update";
-        public const string AppContentsUpdatePartial = "squidex.apps.{app}.contents.{name}.update.partial";
+        public const string AppContentsUpsert = "squidex.apps.{app}.contents.{name}.upsert";
         public const string AppContentsVersionCreate = "squidex.apps.{app}.contents.{name}.version.create";
         public const string AppContentsVersionDelete = "squidex.apps.{app}.contents.{name}.version.delete";
         public const string AppContentsDelete = "squidex.apps.{app}.contents.{name}.delete";

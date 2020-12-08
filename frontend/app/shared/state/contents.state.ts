@@ -6,16 +6,14 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, Pager, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
-import { EMPTY, forkJoin, Observable, of } from 'rxjs';
+import { DialogService, Pager, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
+import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
-import { ContentDto, ContentsDto, ContentsService, StatusInfo } from './../services/contents.service';
+import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { Query, QuerySynchronizer } from './query';
 import { SchemasState } from './schemas.state';
-
-type Updated = { content: ContentDto, error?: ErrorDto };
 
 interface Snapshot {
     // The current comments.
@@ -45,6 +43,9 @@ interface Snapshot {
     // The selected content.
     selectedContent?: ContentDto | null;
 
+    // The validation results.
+    validationResults: { [id: string]: boolean };
+
     // Indicates if the user can create a content.
     canCreate?: boolean;
 
@@ -64,6 +65,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public contentsQuery =
         this.project(x => x.contentsQuery);
+
+    public validationResults =
+        this.project(x => x.validationResults);
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
@@ -101,7 +105,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     ) {
         super({
             contents: [],
-            contentsPager: new Pager(0)
+            contentsPager: new Pager(0),
+            validationResults: {}
         });
     }
 
@@ -217,7 +222,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         selectedContent = contents.find(x => x.id === selectedContent!.id) || selectedContent;
                     }
 
-                    return { ...s,
+                    return {
+                        ...s,
                         canCreate,
                         canCreateAndPublish,
                         contents,
@@ -245,113 +251,53 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.dialogs.notifyInfo('i18n:contents.created');
 
                 return this.next(s => {
-                    const contents = [payload, ...s.contents];
                     const contentsPager = s.contentsPager.incrementCount();
-
-                    return { ...s, contents, contentsPager };
-                });
-            }),
-            shareSubscribed(this.dialogs, {silent: true}));
-    }
-
-    public changeManyStatus(contentsToChange: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<any> {
-        return this.changeManyStatusCore(contentsToChange, status, true, dueTime).pipe(
-            switchMap(results => {
-                const referenced = results.filter(x => x.error?.statusCode === 400).map(x => x.content);
-
-                if (referenced.length > 0) {
-                    return this.dialogs.confirm(
-                        'i18n:contents.unpublishReferrerConfirmTitle',
-                        'i18n:contents.unpublishReferrerConfirmText',
-                        'unpublishReferencngContent'
-                    ).pipe(
-                        switchMap(confirmed => {
-                            if (confirmed) {
-                                return this.changeManyStatusCore(referenced, status, false, dueTime);
-                            } else {
-                                return of([]);
-                            }
-                        })
-                    );
-                } else {
-                    return of(results);
-                }
-            }),
-            tap(results => {
-                const errors = results.filter(x => !!x.error);
-
-                if (errors.length > 0) {
-                    const errror = errors[0].error!;
-
-                    if (errors.length === contentsToChange.length) {
-                        throw errror;
-                    } else {
-                        this.dialogs.notifyError(errror);
-                    }
-                }
-
-                this.next(s => {
-                    let contents = s.contents;
-
-                    for (const updated of results.filter(x => !x.error).map(x => x.content)) {
-                        contents = contents.replaceBy('id', updated);
-                    }
-
-                    return { ...s, contents };
-                });
-            }),
-            shareSubscribed(this.dialogs));
-    }
-
-    public deleteMany(contentsToDelete: ReadonlyArray<ContentDto>) {
-        return this.deleteManyCore(contentsToDelete, true).pipe(
-            switchMap(results => {
-                const referenced = results.filter(x => x.error?.statusCode === 400).map(x => x.content);
-
-                if (referenced.length > 0) {
-                    return this.dialogs.confirm(
-                        'i18n:contents.deleteReferrerConfirmTitle',
-                        'i18n:contents.deleteReferrerConfirmText',
-                        'deleteReferencingContent'
-                    ).pipe(
-                        switchMap(confirmed => {
-                            if (confirmed) {
-                                return this.deleteManyCore(referenced, false);
-                            } else {
-                                return of([]);
-                            }
-                        })
-                    );
-                } else {
-                    return of(results);
-                }
-            }),
-            tap(results => {
-                const errors = results.filter(x => !!x.error);
-
-                if (errors.length > 0) {
-                    const errror = errors[0].error!;
-
-                    if (errors.length === contentsToDelete.length) {
-                        throw errror;
-                    } else {
-                        this.dialogs.notifyError(errror);
-                    }
-                }
-
-                this.next(s => {
-                    let contents = s.contents;
-                    let contentsPager = s.contentsPager;
-
-                    for (const content of results.filter(x => !x.error).map(x => x.content)) {
-                        contents = contents.filter(x => x.id !== content.id);
-                        contentsPager = contentsPager.decrementCount();
-                    }
+                    const contents = [payload, ...s.contents].slice(contentsPager.page);
 
                     return { ...s, contents, contentsPager };
                 });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
+    }
+
+    public validate(contents: ReadonlyArray<ContentDto>): Observable<any> {
+        const job: Partial<BulkUpdateJobDto> = { type: 'Validate' };
+
+        return this.bulkMany(contents, false, job).pipe(
+            tap(results => {
+                return this.next(s => {
+                    const validationResults = { ...s.validationResults || {} };
+
+                    for (const result of results) {
+                        validationResults[result.contentId] = !result.error;
+                    }
+
+                    return { ...s, validationResults };
+                });
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
+    }
+
+    public changeManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime?: string | null): Observable<any> {
+        const job: Partial<BulkUpdateJobDto> = { type: 'ChangeStatus', status, dueTime };
+
+        return this.bulkWithRetry(contents, job,
+            'i18n:contents.unpublishReferrerConfirmTitle',
+            'i18n:contents.unpublishReferrerConfirmText',
+            'unpublishReferencngContent').pipe(
+                switchMap(() => this.loadInternalCore(false)),
+                shareSubscribed(this.dialogs));
+    }
+
+    public deleteMany(contents: ReadonlyArray<ContentDto>) {
+        const job: Partial<BulkUpdateJobDto> = { type: 'Delete' };
+
+        return this.bulkWithRetry(contents, job,
+            'i18n:contents.deleteReferrerConfirmTitle',
+            'i18n:contents.deleteReferrerConfirmText',
+            'deleteReferencngContent').pipe(
+                switchMap(() => this.loadInternalCore(false)),
+                shareSubscribed(this.dialogs));
     }
 
     public update(content: ContentDto, request: any): Observable<ContentDto> {
@@ -413,33 +359,68 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 const selectedContent =
                     s.selectedContent &&
-                    s.selectedContent.id === content.id ?
-                    content :
-                    s.selectedContent;
+                        s.selectedContent.id === content.id ?
+                        content :
+                        s.selectedContent;
 
                 return { ...s, contents, selectedContent };
             });
         }
     }
 
-    private deleteManyCore(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean): Observable<ReadonlyArray<Updated>> {
-        return forkJoin(
-            contents.map(c => this.deleteCore(c, checkReferrers)));
+    private bulkWithRetry(contents: ReadonlyArray<ContentDto>, job: Partial<BulkUpdateJobDto>,
+        confirmTitle: string,
+        confirmText: string,
+        confirmKey: string): Observable<ReadonlyArray<BulkResultDto>> {
+        return this.bulkMany(contents, true, job).pipe(
+            switchMap(results => {
+                const failed = contents.filter(x => results.find(r => r.contentId === x.id)?.error?.statusCode === 400);
+
+                if (failed.length > 0) {
+                    return this.dialogs.confirm(confirmTitle, confirmText, confirmKey).pipe(
+                        switchMap(confirmed => {
+                            if (confirmed) {
+                                return this.bulkMany(failed, false, job);
+                            } else {
+                                return of([]);
+                            }
+                        }),
+                        map(results2 => {
+                            return [...results, ...results2];
+                        })
+                    );
+                } else {
+                    return of(results);
+                }
+            }),
+            tap(results => {
+                const errors = results.filter(x => !!x.error);
+
+                if (errors.length > 0) {
+                    const errror = errors[0].error!;
+
+                    if (errors.length >= contents.length) {
+                        throw errror;
+                    } else {
+                        this.dialogs.notifyError(errror);
+                    }
+                }
+            }));
     }
 
-    private changeManyStatusCore(contents: ReadonlyArray<ContentDto>, status: string, checkReferrers: boolean, dueTime: string | null): Observable<ReadonlyArray<Updated>> {
-        return forkJoin(
-            contents.map(c => this.changeStatusCore(c, status, checkReferrers, dueTime)));
-    }
+    private bulkMany(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean, job: Partial<BulkUpdateJobDto>): Observable<ReadonlyArray<BulkResultDto>> {
+        const update = {
+            jobs: contents.map(x => ({
+                id: x.id,
+                schema: x.schemaName,
+                status: undefined,
+                expectedVersion: parseInt(x.version.value, 10),
+                ...job
+            })),
+            checkReferrers
+        };
 
-    private deleteCore(content: ContentDto, checkReferrers: boolean): Observable<Updated> {
-        return this.contentsService.deleteContent(this.appName, content, checkReferrers, content.version).pipe(
-            map(() => ({ content })), catchError(error => of({ content, error })));
-    }
-
-    private changeStatusCore(content: ContentDto, status: string, checkReferrers: boolean, dueTime: string | null): Observable<Updated> {
-        return this.contentsService.putStatus(this.appName, content, status, checkReferrers, dueTime, content.version).pipe(
-            map(x => ({ content: x })), catchError(error => of({ content, error })));
+        return this.contentsService.bulkUpdate(this.appName, this.schemaName, update as any);
     }
 
     public abstract get schemaName(): string;

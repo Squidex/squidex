@@ -18,10 +18,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public DomainId? Id { get; set; }
 
-        public NamedContentData Data { get; set; }
-
-        public Status? Status { get; set; }
+        public Status Status { get; set; }
 
         public BulkUpdateType Type { get; set; }
+
+        public NamedContentData Data { get; set; }
+
+        public string? Schema { get; set; }
+
+        public long ExpectedVersion { get; set; } = EtagVersion.Any;
     }
 }

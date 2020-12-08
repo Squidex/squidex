@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: no-shadowed-variable
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
+import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, parseError, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { encodeQuery, Query } from './../state/query';
@@ -59,6 +61,10 @@ export class ContentDto {
     public readonly canDraftCreate: boolean;
     public readonly canUpdate: boolean;
 
+    public get canPublish() {
+        return this.statusUpdates.find(x => x.status === 'Published');
+    }
+
     constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly status: string,
@@ -84,8 +90,40 @@ export class ContentDto {
         this.canDraftDelete = hasAnyLink(links, 'draft/delete');
         this.canUpdate = hasAnyLink(links, 'update');
 
-        this.statusUpdates = Object.keys(links).filter(x => x.startsWith('status/')).map(x => ({ status: x.substr(7), color: links[x].metadata! }));
+        const updates: StatusInfo[] = [];
+
+        for (const link in links) {
+            if (link.startsWith('status/')) {
+                const status = link.substr(7);
+
+                updates.push({ status, color: links[link].metadata! });
+            }
+        }
+
+        this.statusUpdates = updates;
     }
+}
+
+export class BulkResultDto {
+    constructor(
+        public readonly contentId: string,
+        public readonly error?: ErrorDto
+    ) {
+    }
+}
+
+export interface BulkUpdateDto {
+    readonly jobs: ReadonlyArray<BulkUpdateJobDto>;
+    readonly checkReferrers?: boolean;
+}
+
+export interface BulkUpdateJobDto {
+    readonly id: string;
+    readonly type: 'Upsert' | 'ChangeStatus' | 'Delete' | 'Validate';
+    readonly status?: string;
+    readonly schema?: string;
+    readonly dueTime?: string | null;
+    readonly expectedVersion?: number;
 }
 
 export interface ContentQueryDto {
@@ -295,31 +333,17 @@ export class ContentsService {
             pretifyError('i18n:contents.deleteVersionFailed'));
     }
 
-    public putStatus(appName: string, resource: Resource, status: string, checkReferrers: boolean, dueTime: string | null, version: Version): Observable<ContentDto> {
-        const link = resource._links[`status/${status}`];
+    public bulkUpdate(appName: string, schemaName: string, dto: BulkUpdateDto): Observable<ReadonlyArray<BulkResultDto>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/bulk`);
 
-        const url = this.apiUrl.buildUrl(link.href);
-
-        return HTTP.requestVersioned(this.http, link.method, url, version, { status, dueTime, checkReferrers }).pipe(
-            map(({ payload }) => {
-                return parseContent(payload.body);
+        return this.http.post<any[]>(url, dto).pipe(
+            map(body => {
+                return body.map(x => new BulkResultDto(x.contentId, parseError(x.error, '')));
             }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'Archived', appName);
-            }),
-            pretifyError(`Failed to ${status} content. Please reload.`));
-    }
-
-    public deleteContent(appName: string, resource: Resource, checkReferrers: boolean, version: Version): Observable<Versioned<any>> {
-        const link = resource._links['delete'];
-
-        const url = this.apiUrl.buildUrl(link.href) + `?checkReferrers=${checkReferrers}`;
-
-        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
             tap(() => {
                 this.analytics.trackEvent('Content', 'Deleted', appName);
             }),
-            pretifyError('i18n:contents.deleteFailed'));
+            pretifyError('i18n:contents.bulkFailed'));
     }
 }
 

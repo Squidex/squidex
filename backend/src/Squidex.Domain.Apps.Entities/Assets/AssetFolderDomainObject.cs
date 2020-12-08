@@ -64,6 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
+
                 case MoveAssetFolder moveAssetFolder:
                     return UpdateReturnAsync(moveAssetFolder, async c =>
                     {
@@ -73,6 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
+
                 case RenameAssetFolder renameAssetFolder:
                     return UpdateReturn(renameAssetFolder, c =>
                     {
@@ -82,6 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
+
                 case DeleteAssetFolder deleteAssetFolder:
                     return Update(deleteAssetFolder, c =>
                     {
@@ -89,6 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         Delete(c);
                     });
+
                 default:
                     throw new NotSupportedException();
             }

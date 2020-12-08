@@ -132,11 +132,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         await LoadContext(c);
 
-                        var errors = await context.GetErrorsAsync(Snapshot.Data);
+                        await context.ValidateContentAndInputAsync(Snapshot.Data);
 
-                        var result = new ValidationResult { Errors = errors.ToArray() };
-
-                        return result;
+                        return true;
                     });
 
                 case CreateContentDraft createContentDraft:
