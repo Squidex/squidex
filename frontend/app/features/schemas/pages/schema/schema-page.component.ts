@@ -8,15 +8,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fadeAnimation, MessageBus, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { map } from 'rxjs/operators';
 import { SchemaCloning } from './../messages';
-
-const TABS: ReadonlyArray<string> = [
-    'i18n:schemas.tabFields',
-    'i18n:schemas.tabUI',
-    'i18n:schemas.tabScripts',
-    'i18n:schemas.tabJson',
-    'i18n:schemas.tabMore'
-];
 
 @Component({
     selector: 'sqx-schema-page',
@@ -30,9 +23,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public readonly exact = { exact: true };
 
     public schema: SchemaDetailsDto;
-
-    public selectableTabs: ReadonlyArray<string> = TABS;
-    public selectedTab = this.selectableTabs[0];
+    public schemaTab = this.route.queryParams.pipe(map(x => x['tab'] || 'fields'));
 
     public editOptionsDropdown = new ModalModel();
 
@@ -70,10 +61,6 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
             .subscribe(() => {
                 this.back();
             });
-    }
-
-    public selectTab(tab: string) {
-        this.selectedTab = tab;
     }
 
     private back() {
