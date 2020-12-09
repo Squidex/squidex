@@ -157,7 +157,7 @@ describe('PatternsService', () => {
 
 export function createPatterns(...ids: ReadonlyArray<number>): PatternsPayload {
     return {
-        items: ids.map(id => createPattern(id)),
+        items: ids.map(createPattern),
         _links: {
             create: { method: 'POST', href: '/patterns' }
         },

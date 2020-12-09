@@ -149,13 +149,13 @@ export class LanguagesState extends State<Snapshot> {
 
             return {
                 ...s,
-                allLanguages: allLanguages,
+                allLanguages,
                 allLanguagesNew: allLanguages.filter(x => !languages.find(l => l.iso2Code === x.iso2Code)),
                 canCreate,
                 isLoaded: true,
                 isLoading: false,
                 languages: languages.map(x => this.createLanguage(x, languages)),
-                version: version
+                version
             };
         });
     }

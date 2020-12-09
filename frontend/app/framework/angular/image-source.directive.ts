@@ -107,8 +107,8 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
         }
 
         this.renderer.setStyle(this.element.nativeElement, 'display', 'inline-block');
-        this.renderer.setStyle(this.element.nativeElement, 'width', this.size.width + 'px');
-        this.renderer.setStyle(this.element.nativeElement, 'height', this.size.height + 'px');
+        this.renderer.setStyle(this.element.nativeElement, 'width', `${this.size.width}px`);
+        this.renderer.setStyle(this.element.nativeElement, 'height', `${this.size.height}px`);
 
         this.setImageSource();
     }

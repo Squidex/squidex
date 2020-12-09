@@ -10,7 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AppMustExistGuard, LoadAppsGuard, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, UnsetAppGuard } from './shared';
 import { AppAreaComponent, ForbiddenPageComponent, HomePageComponent, InternalAreaComponent, LoginPageComponent, LogoutPageComponent, NotFoundPageComponent } from './shell';
 
-export const routes: Routes = [
+const routes: Routes = [
     {
         path: '',
         component: HomePageComponent,

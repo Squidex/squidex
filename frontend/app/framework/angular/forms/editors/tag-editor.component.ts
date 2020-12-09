@@ -244,7 +244,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
                 const width = Math.max(widthText, widthPlaceholder);
 
-                this.inputElement.nativeElement.style.width = <any>((width + 5) + 'px');
+                this.inputElement.nativeElement.style.width = `${width + 5}px`;
             }
         }
 

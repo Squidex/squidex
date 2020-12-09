@@ -53,7 +53,7 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => x.canCreate === true);
 
     public contributorsFiltered =
-        this.project(x => getFilteredContributors(x));
+        this.project(getFilteredContributors);
 
     public get appId() {
         return this.appsState.appId;

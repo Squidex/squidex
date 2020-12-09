@@ -6,7 +6,7 @@
  */
 
 import { AssetDto, AssetsService, AssetsState, AssetUploaderState, DialogService, ofForever, Types } from '@app/shared/internal';
-import { never, of, throwError } from 'rxjs';
+import { NEVER, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock } from 'typemoq';
 import { createAsset } from './../services/assets.service.spec';
@@ -39,7 +39,7 @@ describe('AssetUploaderState', () => {
         const file: File = <any>{ name: 'my-file' };
 
         assetsService.setup(x => x.postAssetFile(app, file, undefined))
-            .returns(() => never()).verifiable();
+            .returns(() => NEVER).verifiable();
 
         assetUploader.uploadFile(file).subscribe();
 
@@ -58,7 +58,7 @@ describe('AssetUploaderState', () => {
         const file: File = <any>{ name: 'my-file' };
 
         assetsService.setup(x => x.postAssetFile(app, file, 'parent1'))
-            .returns(() => never()).verifiable();
+            .returns(() => NEVER).verifiable();
 
         assetUploader.uploadFile(file, assetsState.object).subscribe();
 
@@ -120,7 +120,7 @@ describe('AssetUploaderState', () => {
         const file: File = <any>{ name: 'my-file' };
 
         assetsService.setup(x => x.putAssetFile(app, asset, file, asset.version))
-            .returns(() => never()).verifiable();
+            .returns(() => NEVER).verifiable();
 
         assetUploader.uploadAsset(asset, file).subscribe();
 

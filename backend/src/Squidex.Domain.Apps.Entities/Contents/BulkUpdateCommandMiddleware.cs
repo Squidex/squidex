@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             {
                                 case BulkUpdateType.Upsert:
                                     {
-                                        var command = new UpsertContent { Data = job.Data };
+                                        var command = new UpsertContent { Data = job.Data! };
 
                                         if (id != null && id != DomainId.Empty)
                                         {
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     {
                                         var command = new DeleteContent { ContentId = id.Value };
 
-                                        await PublishAsync(job, command, Permissions.AppCommentsDelete);
+                                        await PublishAsync(job, command, Permissions.AppContentsDelete);
                                         break;
                                     }
                             }

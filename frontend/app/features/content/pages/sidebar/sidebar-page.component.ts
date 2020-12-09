@@ -79,7 +79,7 @@ export class SidebarPageComponent extends ResourceOwner implements AfterViewInit
                     } else if (type === 'resize') {
                         const { height } = event.data;
 
-                        this.iframe.nativeElement.height = height + 'px';
+                        this.iframe.nativeElement.height = `${height}px`;
                     } else if (type === 'navigate') {
                         const { url } = event.data;
 

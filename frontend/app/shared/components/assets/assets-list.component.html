@@ -35,10 +35,11 @@
                     </div>
                     
                     <div class="folder-container" *ngFor="let assetFolder of assetsState.folders | async; trackBy: trackByAssetItem"
-                        cdkDropList cdkDropListSortingDisabled
+                        cdkDropList 
+                        cdkDropListSortingDisabled
+                        [cdkDropListEnterPredicate]="canEnter"
                         [cdkDropListData]="assetFolder.id" 
-                        (cdkDropListDropped)="move($event)"
-                        [cdkDropListEnterPredicate]="canEnter">
+                        (cdkDropListDropped)="move($event)">
                         <div class="folder-container-over"></div>
         
                         <sqx-asset-folder [assetFolder]="assetFolder"

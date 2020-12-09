@@ -76,7 +76,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         this.project(x => x.statuses);
 
     public statusQueries =
-        this.projectFrom(this.statuses, x => buildStatusQueries(x));
+        this.projectFrom(this.statuses, buildStatusQueries);
 
     public get appName() {
         return this.appsState.appName;
@@ -428,7 +428,7 @@ export class ManualContentsState extends ContentsStateBase {
 }
 
 function buildStatusQueries(statuses: ReadonlyArray<StatusInfo> | undefined): ReadonlyArray<SavedQuery> {
-    return statuses?.map(s => buildStatusQuery(s)) || [];
+    return statuses?.map(buildStatusQuery) || [];
 }
 
 function buildStatusQuery(s: StatusInfo) {

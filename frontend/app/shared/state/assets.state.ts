@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { compareStrings, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, StateSynchronizer } from '@app/framework';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
-import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
+import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
 import { AppsState } from './apps.state';
 import { Query, QueryFullTextSynchronizer } from './query';
 
@@ -19,9 +19,9 @@ export type TagsAvailable = { [name: string]: number };
 export type TagsSelected = { [name: string]: boolean };
 export type Tag = { name: string, count: number; };
 
-const EMPTY_FOLDERS: { canCreate: boolean, items: ReadonlyArray<AssetFolderDto>, path?: ReadonlyArray<AssetFolderDto> } = { canCreate: false, items: [] };
-
 export const ROOT_ITEM: AssetPathItem = { id: MathHelper.EMPTY_GUID, folderName: 'i18n:assets.specialFolder.root' };
+
+const EMPTY_FOLDERS: AssetFoldersDto = { canCreate: false, items: [] } as any;
 
 interface Snapshot extends ListState<Query> {
     // The current assets.
@@ -61,7 +61,7 @@ export class AssetsState extends State<Snapshot> {
         this.project(x => x.tagsSelected);
 
     public tags =
-        this.projectFrom(this.tagsUnsorted, x => sort(x));
+        this.projectFrom(this.tagsUnsorted, getSortedTags);
 
     public tagsNames =
         this.projectFrom(this.tagsUnsorted, x => Object.keys(x));
@@ -178,13 +178,13 @@ export class AssetsState extends State<Snapshot> {
                 of(this.snapshot.tagsAvailable);
 
         return forkJoin(([assets$, assetFolders$, tags$])).pipe(
-            tap(([assetsResult, assetFolders, tagsAvailable]) => {
+            tap(([assetsResult, foldersResult, tagsAvailable]) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:assets.reloaded');
                 }
 
-                const path = assetFolders.path ?
-                    [ROOT_ITEM, ...assetFolders.path] :
+                const path = foldersResult.path ?
+                    [ROOT_ITEM, ...foldersResult.path] :
                     [];
 
                 const { items: assets, total } = assetsResult;
@@ -192,9 +192,9 @@ export class AssetsState extends State<Snapshot> {
                 this.next(s => ({
                     ...s,
                     assets,
-                    folders: assetFolders.items,
+                    folders: foldersResult.items,
                     canCreate: assetsResult.canCreate,
-                    canCreateFolders: assetFolders.canCreate,
+                    canCreateFolders: foldersResult.canCreate,
                     isLoaded: true,
                     isLoadedOnce: true,
                     isLoading: false,
@@ -225,15 +225,15 @@ export class AssetsState extends State<Snapshot> {
 
     public createAssetFolder(folderName: string) {
         return this.assetsService.postAssetFolder(this.appName, { folderName, parentId: this.snapshot.parentId }).pipe(
-            tap(assetFolder => {
-                if (assetFolder.parentId !== this.snapshot.parentId) {
+            tap(folder => {
+                if (folder.parentId !== this.snapshot.parentId) {
                     return;
                 }
 
                 this.next(s => {
-                    const assetFolders = [...s.folders, assetFolder].sortedByString(x => x.folderName);
+                    const folders = [...s.folders, folder].sortedByString(x => x.folderName);
 
-                    return { ...s, folders: assetFolders };
+                    return { ...s, folders };
                 });
             }),
             shareSubscribed(this.dialogs));
@@ -253,13 +253,13 @@ export class AssetsState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public updateAssetFolder(assetFolder: AssetFolderDto, request: RenameAssetFolderDto) {
-        return this.assetsService.putAssetFolder(this.appName, assetFolder, request, assetFolder.version).pipe(
+    public updateAssetFolder(folder: AssetFolderDto, request: RenameAssetFolderDto) {
+        return this.assetsService.putAssetFolder(this.appName, folder, request, folder.version).pipe(
             tap(updated => {
                 this.next(s => {
-                    const assetFolders = s.folders.replaceBy('id', updated);
+                    const folders = s.folders.replaceBy('id', updated);
 
-                    return { ...s, folders: assetFolders };
+                    return { ...s, folders };
                 });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
@@ -289,23 +289,23 @@ export class AssetsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public moveAssetFolder(assetFolder: AssetFolderDto, parentId?: string) {
-        if (assetFolder.id === parentId || assetFolder.parentId === parentId) {
+    public moveAssetFolder(folder: AssetFolderDto, parentId?: string) {
+        if (folder.id === parentId || folder.parentId === parentId) {
             return EMPTY;
         }
 
         this.next(s => {
-            const assetFolders = s.folders.filter(x => x.id !== assetFolder.id);
+            const folders = s.folders.filter(x => x.id !== folder.id);
 
-            return { ...s, folders: assetFolders };
+            return { ...s, folders };
         });
 
-        return this.assetsService.putAssetItemParent(this.appName, assetFolder, { parentId }, assetFolder.version).pipe(
+        return this.assetsService.putAssetItemParent(this.appName, folder, { parentId }, folder.version).pipe(
             catchError(error => {
                 this.next(s => {
-                    const assetFolders = [...s.folders, assetFolder].sortedByString(x => x.folderName);
+                    const folders = [...s.folders, folder].sortedByString(x => x.folderName);
 
-                    return { ...s, folders: assetFolders };
+                    return { ...s, folders };
                 });
 
                 return throwError(error);
@@ -346,13 +346,13 @@ export class AssetsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public deleteAssetFolder(assetFolder: AssetFolderDto): Observable<any> {
-        return this.assetsService.deleteAssetItem(this.appName, assetFolder, false, assetFolder.version).pipe(
+    public deleteAssetFolder(folder: AssetFolderDto): Observable<any> {
+        return this.assetsService.deleteAssetItem(this.appName, folder, false, folder.version).pipe(
             tap(() => {
                 this.next(s => {
-                    const assetFolders = s.folders.filter(x => x.id !== assetFolder.id);
+                    const folders = s.folders.filter(x => x.id !== folder.id);
 
-                    return { ...s, folders: assetFolders };
+                    return { ...s, folders };
                 });
             }),
             shareSubscribed(this.dialogs));
@@ -459,12 +459,16 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
     return { tagsAvailable, tagsSelected };
 }
 
-function sort(tags: { [name: string]: number }) {
-    return Object.keys(tags).sort(compareStrings).map(name => ({ name, count: tags[name] }));
+function getParent(path: ReadonlyArray<AssetPathItem>) {
+    if (path.length > 1) {
+        return { folderName: 'i18n:assets.specialFolder.parent', id: path[path.length - 2].id };
+    } else {
+        return undefined;
+    }
 }
 
-function getParent(path: ReadonlyArray<AssetPathItem>) {
-    return path.length > 1 ? { folderName: 'i18n:assets.specialFolder.parent', id: path[path.length - 2].id } : undefined;
+function getSortedTags(tags: { [name: string]: number }) {
+    return Object.keys(tags).sort(compareStrings).map(name => ({ name, count: tags[name] }));
 }
 
 @Injectable()

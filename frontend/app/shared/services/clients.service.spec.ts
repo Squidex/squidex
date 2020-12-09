@@ -181,7 +181,7 @@ describe('ClientsService', () => {
 
 export function createClients(...ids: ReadonlyArray<number>): ClientsPayload {
     return {
-        items: ids.map(id => createClient(id)),
+        items: ids.map(createClient),
         _links: {
             create: { method: 'POST', href: '/clients' }
         },

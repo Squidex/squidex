@@ -140,7 +140,7 @@ describe('WorkflowsService', () => {
                 'Error1',
                 'Error2'
             ],
-            items: names.map(name => workflowResponse(name)),
+            items: names.map(workflowResponse),
             _links: {
                 create: { method: 'POST', href: '/workflows' }
             }
@@ -184,7 +184,7 @@ export function createWorkflows(...names: ReadonlyArray<string>): WorkflowsPaylo
             'Error1',
             'Error2'
         ],
-        items: names.map(name => createWorkflow(name)),
+        items: names.map(createWorkflow),
         _links: {
             create: { method: 'POST', href: '/workflows' }
         },

@@ -130,7 +130,7 @@ describe('ContributorsService', () => {
 
 export function createContributors(...ids: ReadonlyArray<number>): ContributorsPayload {
     return {
-        items: ids.map(id => createContributor(id)),
+        items: ids.map(createContributor),
         maxContributors: ids.length * 13,
         _links: {
             create: { method: 'POST', href: '/contributors' }

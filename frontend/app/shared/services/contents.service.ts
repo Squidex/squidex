@@ -165,7 +165,7 @@ export class ContentsService {
 
             return this.http.post<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url, body).pipe(
                 map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(x => parseContent(x));
+                    const contents = items.map(parseContent);
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
@@ -175,7 +175,7 @@ export class ContentsService {
 
             return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
                 map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(x => parseContent(x));
+                    const contents = items.map(parseContent);
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
@@ -193,7 +193,7 @@ export class ContentsService {
 
             return this.http.post<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url, body).pipe(
                 map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(x => parseContent(x));
+                    const contents = items.map(parseContent);
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
@@ -204,7 +204,7 @@ export class ContentsService {
 
             return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
                 map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(x => parseContent(x));
+                    const contents = items.map(parseContent);
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
@@ -229,7 +229,7 @@ export class ContentsService {
 
         return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
             map(({ total, items, statuses, _links }) => {
-                const contents = items.map(x => parseContent(x));
+                const contents = items.map(parseContent);
 
                 return new ContentsDto(statuses, total, contents, _links);
             }),
@@ -243,7 +243,7 @@ export class ContentsService {
 
         return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
             map(({ total, items, statuses, _links }) => {
-                const contents = items.map(x => parseContent(x));
+                const contents = items.map(parseContent);
 
                 return new ContentsDto(statuses, total, contents, _links);
             }),
@@ -402,7 +402,7 @@ function parseContent(response: any) {
         response.schemaName,
         response.schemaDisplayName,
         response.referenceData,
-        response.referenceFields.map((item: any) => parseField(item)),
+        response.referenceFields.map(parseField),
         new Version(response.version.toString()));
 }
 

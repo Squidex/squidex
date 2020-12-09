@@ -91,7 +91,7 @@ export module MathHelper {
     }
 
     export function guid(): string {
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+        return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
     }
 
     export function s4(): string {
@@ -170,16 +170,16 @@ export module MathHelper {
         let b = Math.round(color.b * 255).toString(16);
 
         if (r.length === 1) {
-            r = '0' + r;
+            r = `0${r}`;
         }
         if (g.length === 1) {
-            g = '0' + g;
+            g = `0${g}`;
         }
         if (b.length === 1) {
-            b = '0' + b;
+            b = `0${b}`;
         }
 
-        return '#' + r + g + b;
+        return `#${r}${g}${b}`;
     }
 
     export function colorFromHsv(h: number, s: number, v: number): Color {

@@ -108,7 +108,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
                     } else if (type === 'resize') {
                         const { height } = event.data;
 
-                        this.renderer.setStyle(this.iframe.nativeElement, 'height', height + 'px');
+                        this.renderer.setStyle(this.iframe.nativeElement, 'height', `${height}px`);
                     } else if (type === 'navigate') {
                         const { url } = event.data;
 
