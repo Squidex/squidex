@@ -36,9 +36,8 @@
                 {{ 'common.language' | sqxTranslate }}
             </a>
 
-            <div class="dropdown-menu" [class.open]="showSubmenu">
-                <a class="dropdown-item" *ngFor="let availableLanguage of languages" [class.active]="availableLanguage.iso2Code === language"
-                    (click)="changeLanguage(availableLanguage.iso2Code)">
+            <div class="dropdown-menu" [class.open]="snapshot.showSubmenu">
+                <a class="dropdown-item" *ngFor="let availableLanguage of languages" [class.active]="availableLanguage.iso2Code === language" (click)="changeLanguage(availableLanguage.iso2Code)">
                     {{ availableLanguage.localName }}
                 </a>
             </div>

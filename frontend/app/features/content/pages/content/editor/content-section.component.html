@@ -3,7 +3,7 @@
         <div class="row no-gutters">
             <div class="col-auto">
                 <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
-                    <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i> 
+                    <i [class.icon-caret-right]="snapshot.isCollapsed" [class.icon-caret-down]="!snapshot.isCollapsed"></i> 
                 </button>
             </div>
             <div class="col">
@@ -17,10 +17,10 @@
     </div>
 </ng-container>
 
-<div class="row small-gutters" [class.hidden]="isCollapsed && !formCompare">
+<div class="row small-gutters" [class.hidden]="snapshot.isCollapsed && !formCompare">
     <sqx-content-field *ngFor="let field of formSection.fields; trackBy: trackByField"
         (languageChange)="languageChange.emit($event)"
-        [compact]="compact"
+        [isCompact]="isCompact"
         [form]="form"
         [formCompare]="formCompare"
         [formContext]="formContext"

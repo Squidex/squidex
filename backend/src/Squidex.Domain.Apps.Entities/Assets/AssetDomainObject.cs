@@ -72,12 +72,31 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         await GuardAsset.CanCreate(c, assetQuery);
 
-                        c.Tags = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
+                        if (c.Tags != null)
+                        {
+                            c.Tags = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
+                        }
 
                         Create(c);
 
                         return Snapshot;
                     });
+
+                case AnnotateAsset annotateAsset:
+                    return UpdateReturnAsync(annotateAsset, async c =>
+                    {
+                        GuardAsset.CanAnnotate(c);
+
+                        if (c.Tags != null)
+                        {
+                            c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
+                        }
+
+                        Annotate(c);
+
+                        return Snapshot;
+                    });
+
                 case UpdateAsset updateAsset:
                     return UpdateReturn(updateAsset, c =>
                     {
@@ -87,17 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
-                case AnnotateAsset annotateAsset:
-                    return UpdateReturnAsync(annotateAsset, async c =>
-                    {
-                        GuardAsset.CanAnnotate(c);
 
-                        c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
-
-                        Annotate(c);
-
-                        return Snapshot;
-                    });
                 case MoveAsset moveAsset:
                     return UpdateReturnAsync(moveAsset, async c =>
                     {
@@ -107,6 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
+
                 case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
                     {
@@ -121,13 +131,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task<HashSet<string>?> NormalizeTagsAsync(DomainId appId, HashSet<string> tags)
+        private async Task<HashSet<string>> NormalizeTagsAsync(DomainId appId, HashSet<string> tags)
         {
-            if (tags == null)
-            {
-                return null;
-            }
-
             var normalized = await assetTags.NormalizeTagsAsync(appId, TagGroups.Assets, tags, Snapshot.Tags);
 
             return new HashSet<string>(normalized.Values);

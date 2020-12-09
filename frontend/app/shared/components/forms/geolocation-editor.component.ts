@@ -76,7 +76,9 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         private readonly formBuilder: FormBuilder,
         private readonly uiOptions: UIOptions
     ) {
-        super(changeDetector, { isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP) });
+        super(changeDetector, {
+            isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP)
+        });
 
         this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';
     }
@@ -382,6 +384,6 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     }
 
     public setCompact(isCompact: boolean) {
-        this.next(s => ({ ...s, isCompact: isCompact }));
+        this.next({ isCompact });
     }
 }

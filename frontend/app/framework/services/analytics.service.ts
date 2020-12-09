@@ -46,7 +46,7 @@ export class AnalyticsService {
             event_category: category,
             event_action: action,
             event_label: label,
-            value: value
+            value
         });
     }
 

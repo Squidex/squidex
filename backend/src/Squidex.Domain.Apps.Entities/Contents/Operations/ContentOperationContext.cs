@@ -146,25 +146,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Operations
             CheckErrors(validator);
         }
 
-        public async Task<IEnumerable<ValidationError>> GetErrorsAsync(NamedContentData data)
+        public async Task ValidateContentAndInputAsync(NamedContentData data)
         {
-            var validator =
-                new ContentValidator(Partition(),
-                    validationContext, validators, log);
-
-            await validator.ValidateInputAsync(data);
-            await validator.ValidateContentAsync(data);
-
-            return validator.Errors;
-        }
-
-        public async Task ValidateOnPublishAsync(NamedContentData data)
-        {
-            if (!schema.SchemaDef.Properties.ValidateOnPublish)
-            {
-                return;
-            }
-
             var validator =
                 new ContentValidator(Partition(),
                     validationContext.AsPublishing(), validators, log);
@@ -173,6 +156,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Operations
             await validator.ValidateContentAsync(data);
 
             CheckErrors(validator);
+        }
+
+        public Task ValidateOnPublishAsync(NamedContentData data)
+        {
+            if (!schema.SchemaDef.Properties.ValidateOnPublish)
+            {
+                return Task.CompletedTask;
+            }
+
+            return ValidateContentAndInputAsync(data);
         }
 
         private static void CheckErrors(ContentValidator validator)

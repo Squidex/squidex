@@ -22,7 +22,7 @@ export class KNumberPipe implements PipeTransform {
                 value = Math.round(value);
             }
 
-            return value + 'k';
+            return `${value}k`;
         } else if (value < 0) {
             return '';
         } else {
@@ -49,5 +49,6 @@ export function calculateFileSize(value: number, factor = 1024) {
         u++;
     }
 
-    return (u ? value.toFixed(1) + ' ' : value) + ' kMGTPEZY'[u] + 'B';
+    // tslint:disable-next-line: prefer-template
+    return (u ? `${value.toFixed(1)} ` : value) + ' kMGTPEZY'[u] + 'B';
 }

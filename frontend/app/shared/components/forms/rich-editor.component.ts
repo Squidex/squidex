@@ -33,10 +33,9 @@ const ImageTypes: ReadonlyArray<any> = [
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RichEditorComponent extends StatefulControlComponent<undefined, string> implements AfterViewInit, OnDestroy {
+export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
     private value: string;
-    private isDisabled = false;
 
     @Output()
     public assetPluginClick = new EventEmitter<any>();
@@ -52,7 +51,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         private readonly resourceLoader: ResourceLoaderService,
         private readonly localizer: LocalizerService
     ) {
-        super(changeDetector, undefined);
+        super(changeDetector, {});
     }
 
     public ngOnDestroy() {
@@ -85,7 +84,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     private showSelector = () => {
-        if (this.isDisabled) {
+        if (this.snapshot.isDisabled) {
             return;
         }
 
@@ -202,7 +201,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
+        super.setDisabledState(isDisabled);
 
         if (this.tinyEditor && this.tinyEditor.initialized) {
             this.setReadOnly();
@@ -214,7 +213,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     private setReadOnly() {
-        this.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
+        this.tinyEditor.setMode(this.snapshot.isDisabled ? 'readonly' : 'design');
     }
 
     public insertAssets(assets: ReadonlyArray<AssetDto>) {

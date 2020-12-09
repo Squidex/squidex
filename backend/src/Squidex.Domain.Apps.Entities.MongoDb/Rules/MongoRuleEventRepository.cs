@@ -73,12 +73,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId.Value));
             }
 
-            var taskForItems = Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync();
-            var taskForCount = Collection.Find(filter).CountDocumentsAsync();
+            var ruleEventEntities = await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync();
+            var ruleEventTotal = (long)ruleEventEntities.Count;
 
-            var (items, total) = await AsyncHelper.WhenAll(taskForItems, taskForCount);
+            if (ruleEventTotal >= take || skip > 0)
+            {
+                ruleEventTotal = await Collection.Find(filter).CountDocumentsAsync();
+            }
 
-            return ResultList.Create(total, items);
+            return ResultList.Create(ruleEventTotal, ruleEventEntities);
         }
 
         public async Task<IRuleEventEntity> FindAsync(DomainId id)

@@ -34,12 +34,22 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The new status when the type is set to 'ChangeStatus'.
         /// </summary>
-        public Status? Status { get; set; }
+        public Status Status { get; set; }
 
         /// <summary>
         /// The update type.
         /// </summary>
         public BulkUpdateType Type { get; set; }
+
+        /// <summary>
+        /// The optional schema id or name.
+        /// </summary>
+        public string? Schema { get; set; }
+
+        /// <summary>
+        /// The expected version.
+        /// </summary>
+        public long ExpectedVersion { get; set; } = EtagVersion.Any;
 
         public BulkUpdateJob ToJob()
         {

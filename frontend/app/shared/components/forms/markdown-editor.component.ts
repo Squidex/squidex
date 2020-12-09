@@ -279,6 +279,6 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
 
         this.renderer.appendChild(target, this.inner.nativeElement);
 
-        this.next(s => ({ ...s, isFullscreen }));
+        this.next({ isFullscreen });
     }
 }

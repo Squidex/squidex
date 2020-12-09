@@ -45,13 +45,13 @@ export class Queries {
         const path = `${prefix}.queries`;
 
         this.queries = this.uiState.get(path, {}).pipe(
-            map(settings => parseQueries(settings)), shareReplay(1));
+            map(parseQueries), shareReplay(1));
 
         this.queriesShared = this.uiState.getShared(path, {}).pipe(
-            map(settings => parseQueries(settings)), shareReplay(1));
+            map(parseQueries), shareReplay(1));
 
         this.queriesUser = this.uiState.getUser(path, {}).pipe(
-            map(settings => parseQueries(settings)), shareReplay(1));
+            map(parseQueries), shareReplay(1));
     }
 
     public add(key: string, query: Query, user = false) {

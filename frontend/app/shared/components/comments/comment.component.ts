@@ -5,9 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { CommentDto, CommentsState, ContributorDto, DialogService, Keys } from '@app/shared/internal';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
+import { CommentDto, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
 import { MentionConfig } from 'angular-mentions';
+
+interface State {
+    isEditing: boolean;
+}
 
 @Component({
     selector: 'sqx-comment',
@@ -15,7 +19,7 @@ import { MentionConfig } from 'angular-mentions';
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CommentComponent implements OnChanges {
+export class CommentComponent extends StatefulComponent<State> implements OnChanges {
     @Input()
     public canFollow = false;
 
@@ -45,13 +49,14 @@ export class CommentComponent implements OnChanges {
     public isDeletable = false;
     public isEditable = false;
 
-    public isEditing = false;
-
     public editingText: string;
 
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService
     ) {
+        super(changeDetector, {
+            isEditing: false
+        });
     }
 
     public ngOnChanges() {
@@ -64,11 +69,11 @@ export class CommentComponent implements OnChanges {
     public startEdit() {
         this.editingText = this.comment.text;
 
-        this.isEditing = true;
+        this.next({ isEditing: true });
     }
 
     public cancelEdit() {
-        this.isEditing = false;
+        this.next({ isEditing: false });
     }
 
     public delete() {

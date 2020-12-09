@@ -20,6 +20,8 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 
 let CACHED_FONT: string;
 
+const NO_EMIT = { emitEvent: false };
+
 interface State {
     // True, when the item has the focus.
     hasFocus: boolean;
@@ -33,8 +35,6 @@ interface State {
     // All available tag values.
     items: ReadonlyArray<TagValue>;
 }
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-tag-editor',
@@ -186,7 +186,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             }
         }
 
-        this.next(s => ({ ...s, items }));
+        this.next({ items });
     }
 
     public setDisabledState(isDisabled: boolean): void {
@@ -201,7 +201,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public focus() {
         if (this.addInput.enabled) {
-            this.next(s => ({ ...s, hasFocus: true }));
+            this.next({ hasFocus: true });
         }
     }
 
@@ -244,7 +244,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
                 const width = Math.max(widthText, widthPlaceholder);
 
-                this.inputElement.nativeElement.style.width = <any>((width + 5) + 'px');
+                this.inputElement.nativeElement.style.width = `${width + 5}px`;
             }
         }
 
@@ -361,15 +361,15 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             suggestedIndex = this.snapshot.suggestedItems.length - 1;
         }
 
-        this.next(s => ({ ...s, suggestedIndex }));
+        this.next({ suggestedIndex });
     }
 
     public resetFocus(): any {
-        this.next(s => ({ ...s, hasFocus: false }));
+        this.next({ hasFocus: false });
     }
 
     private resetAutocompletion() {
-        this.next(s => ({ ...s, suggestedItems: [], suggestedIndex: -1 }));
+        this.next({ suggestedItems: [], suggestedIndex: -1 });
     }
 
     private resetForm() {
@@ -436,7 +436,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     private updateItems(items: ReadonlyArray<TagValue>, touched: boolean) {
-        this.next(s => ({ ...s, items }));
+        this.next({ items });
 
         if (items.length === 0 && this.undefinedWhenEmpty) {
             this.callChange(undefined);

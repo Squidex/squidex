@@ -10,7 +10,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule, UnsetContentGuard } from '@app/shared';
-import { ArrayEditorComponent, ArrayItemComponent, ArraySectionComponent, AssetsEditorComponent, CommentsPageComponent, ContentComponent, ContentCreatorComponent, ContentEventComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentListCellDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthPipe, ContentPageComponent, ContentSectionComponent, ContentSelectorComponent, ContentSelectorItemComponent, ContentsFiltersPageComponent, ContentsPageComponent, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
+import { ArrayEditorComponent, ArrayItemComponent, ArraySectionComponent, AssetsEditorComponent, CommentsPageComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentListCellDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthPipe, ContentPageComponent, ContentReferencesComponent, ContentsColumnsPipe, ContentSectionComponent, ContentSelectorComponent, ContentSelectorItemComponent, ContentsFiltersPageComponent, ContentsPageComponent, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -89,6 +89,7 @@ const routes: Routes = [
         CommentsPageComponent,
         ContentComponent,
         ContentCreatorComponent,
+        ContentEditorComponent,
         ContentEventComponent,
         ContentFieldComponent,
         ContentHistoryPageComponent,
@@ -96,12 +97,14 @@ const routes: Routes = [
         ContentListFieldComponent,
         ContentListHeaderComponent,
         ContentListWidthPipe,
+        ContentsColumnsPipe,
         ContentPageComponent,
         ContentSectionComponent,
         ContentSelectorComponent,
         ContentSelectorItemComponent,
         ContentsFiltersPageComponent,
         ContentsPageComponent,
+        ContentReferencesComponent,
         ContentStatusComponent,
         ContentValueComponent,
         ContentValueEditorComponent,

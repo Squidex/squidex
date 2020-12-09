@@ -104,7 +104,7 @@ export class PlansState extends State<Snapshot> {
                     isLoaded: true,
                     isLoading: false,
                     isOwner: !payload.planOwner || payload.planOwner === this.userId,
-                    plans: plans,
+                    plans,
                     version
                 });
             }),

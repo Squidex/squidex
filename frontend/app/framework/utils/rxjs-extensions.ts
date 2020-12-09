@@ -44,7 +44,7 @@ export function shareMapSubscribed<T, R = T>(dialogs: DialogService, project: (v
             }))
             .subscribe();
 
-        return shared.pipe(map(x => project(x)));
+        return shared.pipe(map(project));
     };
 }
 

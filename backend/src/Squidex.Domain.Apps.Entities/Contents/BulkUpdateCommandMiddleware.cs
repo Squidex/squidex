@@ -10,10 +10,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
+using Squidex.Shared;
 
 #pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
 
@@ -42,6 +45,29 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     var requestContext = contextProvider.Context.WithoutContentEnrichment().WithUnpublished(true);
                     var requestedSchema = bulkUpdates.SchemaId.Name;
 
+                    async Task PublishAsync<TCommand>(BulkUpdateJob job, TCommand command, string permissionId) where TCommand : ContentCommand
+                    {
+                        SimpleMapper.Map(bulkUpdates, command);
+
+                        if (!string.IsNullOrWhiteSpace(job.Schema))
+                        {
+                            var schema = await contentQuery.GetSchemaOrThrowAsync(requestContext, job.Schema);
+
+                            command.SchemaId = schema.NamedId();
+                        }
+
+                        var permission = Permissions.ForApp(permissionId, command.AppId.Name, command.SchemaId.Name);
+
+                        if (!requestContext.Permissions.Allows(permission))
+                        {
+                            throw new DomainForbiddenException("Forbidden");
+                        }
+
+                        command.ExpectedVersion = job.ExpectedVersion;
+
+                        await context.CommandBus.PublishAsync(command);
+                    }
+
                     var results = new BulkUpdateResultItem[bulkUpdates.Jobs.Length];
 
                     var actionBlock = new ActionBlock<int>(async index =>
@@ -54,13 +80,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             var id = await FindIdAsync(requestContext, requestedSchema, job);
 
+                            if (job.Type != BulkUpdateType.Upsert && (id == null || id == DomainId.Empty))
+                            {
+                                throw new DomainObjectNotFoundException("undefined");
+                            }
+
                             result.ContentId = id;
 
                             switch (job.Type)
                             {
                                 case BulkUpdateType.Upsert:
                                     {
-                                        var command = SimpleMapper.Map(bulkUpdates, new UpsertContent { Data = job.Data });
+                                        var command = new UpsertContent { Data = job.Data! };
 
                                         if (id != null && id != DomainId.Empty)
                                         {
@@ -69,38 +100,31 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                                         result.ContentId = command.ContentId;
 
-                                        await context.CommandBus.PublishAsync(command);
+                                        await PublishAsync(job, command, Permissions.AppContentsUpsert);
+                                        break;
+                                    }
+
+                                case BulkUpdateType.Validate:
+                                    {
+                                        var command = new ValidateContent { ContentId = id.Value };
+
+                                        await PublishAsync(job, command, Permissions.AppContentsRead);
                                         break;
                                     }
 
                                 case BulkUpdateType.ChangeStatus:
                                     {
-                                        if (id == null || id == DomainId.Empty)
-                                        {
-                                            throw new DomainObjectNotFoundException("undefined");
-                                        }
+                                        var command = new ChangeContentStatus { ContentId = id.Value, Status = job.Status };
 
-                                        var command = SimpleMapper.Map(bulkUpdates, new ChangeContentStatus { ContentId = id.Value });
-
-                                        if (job.Status != null)
-                                        {
-                                            command.Status = job.Status.Value;
-                                        }
-
-                                        await context.CommandBus.PublishAsync(command);
+                                        await PublishAsync(job, command, Permissions.AppContentsUpdate);
                                         break;
                                     }
 
                                 case BulkUpdateType.Delete:
                                     {
-                                        if (id == null || id == DomainId.Empty)
-                                        {
-                                            throw new DomainObjectNotFoundException("undefined");
-                                        }
+                                        var command = new DeleteContent { ContentId = id.Value };
 
-                                        var command = SimpleMapper.Map(bulkUpdates, new DeleteContent { ContentId = id.Value });
-
-                                        await context.CommandBus.PublishAsync(command);
+                                        await PublishAsync(job, command, Permissions.AppContentsDelete);
                                         break;
                                     }
                             }

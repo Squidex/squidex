@@ -3,7 +3,7 @@
         <img class="user-picture" title="{{comment.user | sqxUserNameRef}}" [src]="comment.user | sqxUserPictureRef">
     </div>
 
-    <ng-container *ngIf="!isEditing; else editing">
+    <ng-container *ngIf="!snapshot.isEditing; else editing">
         <div class="col col-text">
             <div class="comment-message">
                 <div class="user-row">
@@ -20,6 +20,21 @@
                     {{comment.time | sqxFromNow}} 
                 </div>
             </div>
+        </div>
+
+        <div class="actions">
+            <button *ngIf="isEditable && canEdit" type="button" class="btn btn-sm btn-text-secondary" (click)="startEdit()">
+                <i class="icon-pencil"></i>
+            </button>
+        
+            <button *ngIf="isDeletable || canDelete" type="button" class="btn btn-sm btn-text-danger"
+                (sqxConfirmClick)="delete()"
+                confirmTitle="i18n:comments.deleteConfirmTitle"
+                confirmText="i18n:comments.deleteConfirmText"
+                confirmRememberKey="deleteComment"
+                [confirmRequired]="confirmDelete">
+                <i class="icon-bin2"></i>
+            </button>
         </div>
     </ng-container>
 
@@ -40,19 +55,4 @@
             </form>
         </div>
     </ng-template>
-
-    <div class="actions" *ngIf="!isEditing">
-        <button *ngIf="isEditable && canEdit" type="button" class="btn btn-sm btn-text-secondary" (click)="startEdit()">
-            <i class="icon-pencil"></i>
-        </button>
-    
-        <button *ngIf="isDeletable || canDelete" type="button" class="btn btn-sm btn-text-danger"
-            (sqxConfirmClick)="delete()"
-            confirmTitle="i18n:comments.deleteConfirmTitle"
-            confirmText="i18n:comments.deleteConfirmText"
-            confirmRememberKey="deleteComment"
-            [confirmRequired]="confirmDelete">
-            <i class="icon-bin2"></i>
-        </button>
-    </div>
 </div>

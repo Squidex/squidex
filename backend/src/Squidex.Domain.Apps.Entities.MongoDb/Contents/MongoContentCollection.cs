@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                if (q.Ids != null && q.Ids.Count > 0l)
+                if (q.Ids != null && q.Ids.Count > 0)
                 {
                     return await queryByIds.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q);
                 }

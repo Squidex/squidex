@@ -48,13 +48,13 @@ describe('CommentsService', () => {
                 id: '123',
                 text: 'text1',
                 time: '2016-10-12T10:10',
-                user: user
+                user
             }],
             updatedComments: [{
                 id: '456',
                 text: 'text2',
                 time: '2017-11-12T12:12',
-                user: user
+                user
             }],
             deletedComments: ['789'],
             version: '9'
@@ -93,7 +93,7 @@ describe('CommentsService', () => {
             id: '123',
             text: 'text1',
             time: '2016-10-12T10:10',
-            user: user
+            user
         });
 
         expect(comment!).toEqual(new CommentDto('123', DateTime.parseISO('2016-10-12T10:10Z'), 'text1', undefined, user));

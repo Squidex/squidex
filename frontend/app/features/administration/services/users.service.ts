@@ -66,7 +66,7 @@ export class UsersService {
 
         return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
             map(({ total, items, _links }) => {
-                const users = items.map(item => parseUser(item));
+                const users = items.map(parseUser);
 
                 return new UsersDto(total, users, _links);
             }),

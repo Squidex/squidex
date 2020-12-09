@@ -1,3 +1,4 @@
+
 /*
  * Squidex Headless CMS
  *
@@ -19,7 +20,7 @@ import { SqxShellModule } from './shell';
 
 DateHelper.setlocale(window['options']?.more?.culture);
 
-export function configApiUrl() {
+function configApiUrl() {
     const baseElements = document.getElementsByTagName('base');
 
     let baseHref = null;
@@ -35,27 +36,27 @@ export function configApiUrl() {
     if (baseHref.indexOf(window.location.protocol) === 0) {
         return new ApiUrlConfig(baseHref);
     } else {
-        return new ApiUrlConfig(window.location.protocol + '//' + window.location.host + baseHref);
+        return new ApiUrlConfig(`${window.location.protocol}//${window.location.host}${baseHref}`);
     }
 }
 
-export function configUIOptions() {
+function configUIOptions() {
     return new UIOptions(window['options']);
 }
 
-export function configTitles() {
+function configTitles() {
     return new TitlesConfig(undefined, 'i18n:common.product');
 }
 
-export function configDecimalSeparator() {
+function configDecimalSeparator() {
     return new DecimalSeparatorConfig('.');
 }
 
-export function configCurrency() {
+function configCurrency() {
     return new CurrencyConfig('EUR', '€', true);
 }
 
-export function configLocalizerService() {
+function configLocalizerService() {
     if (process.env.NODE_ENV === 'production') {
         return new LocalizerService(window['texts']);
     } else {

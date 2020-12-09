@@ -160,9 +160,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await PublishAsync(command);
+            await PublishAsync(command);
 
-            Assert.Null(result);
+            Assert.Equal(0, sut.Version);
 
             A.CallTo(() => ruleEnqueuer.EnqueueAsync(sut.Snapshot.RuleDef, sut.Snapshot.Id,
                     A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered)))

@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
@@ -15,6 +16,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
+using Squidex.Shared;
+using Squidex.Shared.Identity;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -24,15 +27,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly BulkUpdateCommandMiddleware sut;
 
         public BulkUpdateCommandMiddlewareTests()
         {
-            A.CallTo(() => contextProvider.Context)
-                .Returns(requestContext);
-
             sut = new BulkUpdateCommandMiddleware(contentQuery, contextProvider);
         }
 
@@ -41,11 +41,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new BulkUpdateContents();
 
-            var context = new CommandContext(command, commandBus);
+            var result = await PublishAsync(command);
 
-            await sut.HandleAsync(context);
-
-            Assert.True(context.PlainResult is BulkUpdateResult);
+            Assert.Empty(result);
         }
 
         [Fact]
@@ -53,39 +51,81 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new BulkUpdateContents { Jobs = Array.Empty<BulkUpdateJob>() };
 
-            var context = new CommandContext(command, commandBus);
+            var result = await PublishAsync(command);
 
-            await sut.HandleAsync(context);
+            Assert.Empty(result);
+        }
 
-            Assert.True(context.PlainResult is BulkUpdateResult);
+        [Fact]
+        public async Task Should_throw_exception_when_content_cannot_be_resolved()
+        {
+            SetupContext(Permissions.AppContentsUpdate);
+
+            var (_, _, query) = CreateTestData(true);
+
+            var command = BulkCommand(BulkUpdateType.ChangeStatus);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.ContentId == null && x.Exception is DomainObjectNotFoundException);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_query_resolves_multiple_contents()
+        {
+            var requestContext = SetupContext(Permissions.AppContentsUpdate);
+
+            var (id, data, query) = CreateTestData(true);
+
+            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
+                .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
+
+            var command = BulkCommand(BulkUpdateType.ChangeStatus, query);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.ContentId == null && x.Exception is DomainException);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_upsert_content_with_with_resolved_id()
+        {
+            var requestContext = SetupContext(Permissions.AppContentsUpsert);
+
+            var (id, data, query) = CreateTestData(false);
+
+            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
+                .Returns(ResultList.CreateFrom(1, CreateContent(id)));
+
+            var command = BulkCommand(BulkUpdateType.Upsert, query: query, data: data);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
+                .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
         public async Task Should_upsert_content_with_random_id_if_no_query_and_id_defined()
         {
+            SetupContext(Permissions.AppContentsUpsert);
+
             var (_, data, _) = CreateTestData(false);
 
-            var command = new BulkUpdateContents
-            {
-                Jobs = new[]
-                {
-                    new BulkUpdateJob
-                    {
-                        Type = BulkUpdateType.Upsert,
-                        Data = data
-                    }
-                },
-                SchemaId = schemaId
-            };
+            var command = BulkCommand(BulkUpdateType.Upsert, data: data);
 
-            var context = new CommandContext(command, commandBus);
+            var result = await PublishAsync(command);
 
-            await sut.HandleAsync(context);
-
-            var result = context.Result<BulkUpdateResult>();
-
-            Assert.Single(result);
-            Assert.Equal(1, result.Count(x => x.ContentId != default && x.Exception == null));
+            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
@@ -95,30 +135,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_upsert_content_with_random_id_if_query_returns_no_result()
         {
+            SetupContext(Permissions.AppContentsUpsert);
+
             var (_, data, query) = CreateTestData(false);
 
-            var command = new BulkUpdateContents
-            {
-                Jobs = new[]
-                {
-                    new BulkUpdateJob
-                    {
-                        Type = BulkUpdateType.Upsert,
-                        Data = data,
-                        Query = query
-                    }
-                },
-                SchemaId = schemaId
-            };
+            var command = BulkCommand(BulkUpdateType.Upsert, query: query, data: data);
 
-            var context = new CommandContext(command, commandBus);
+            var result = await PublishAsync(command);
 
-            await sut.HandleAsync(context);
-
-            var result = context.Result<BulkUpdateResult>();
-
-            Assert.Single(result);
-            Assert.Equal(1, result.Count(x => x.ContentId != default && x.Exception == null));
+            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
@@ -128,30 +153,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_upsert_content_when_id_defined()
         {
+            SetupContext(Permissions.AppContentsUpsert);
+
             var (id, data, _) = CreateTestData(false);
 
-            var command = new BulkUpdateContents
-            {
-                Jobs = new[]
-                {
-                    new BulkUpdateJob
-                    {
-                        Type = BulkUpdateType.Upsert,
-                        Data = data,
-                        Id = id
-                    }
-                },
-                SchemaId = schemaId
-            };
+            var command = BulkCommand(BulkUpdateType.Upsert, id: id, data: data);
 
-            var context = new CommandContext(command, commandBus);
+            var result = await PublishAsync(command);
 
-            await sut.HandleAsync(context);
-
-            var result = context.Result<BulkUpdateResult>();
-
-            Assert.Single(result);
-            Assert.Equal(1, result.Count(x => x.ContentId != default && x.Exception == null));
+            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
@@ -161,33 +171,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_upsert_content_with_custom_id()
         {
-            var (id, data, query) = CreateTestData(true);
+            var requestContext = SetupContext(Permissions.AppContentsUpsert);
 
-            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
-                .Returns(ResultList.CreateFrom(1, CreateContent(id)));
+            var (id, data, _) = CreateTestData(true);
 
-            var command = new BulkUpdateContents
-            {
-                Jobs = new[]
-                {
-                    new BulkUpdateJob
-                    {
-                        Type = BulkUpdateType.Upsert,
-                        Data = data,
-                        Query = query
-                    }
-                },
-                SchemaId = schemaId
-            };
+            var command = BulkCommand(BulkUpdateType.Upsert, id: id, data: data);
 
-            var context = new CommandContext(command, commandBus);
+            var result = await PublishAsync(command);
 
-            await sut.HandleAsync(context);
-
-            var result = context.Result<BulkUpdateResult>();
-
-            Assert.Single(result);
-            Assert.Equal(1, result.Count(x => x.ContentId != default && x.Exception == null));
+            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
@@ -195,97 +187,69 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_query_resolves_multiple_contents()
-        {
-            var (id, data, query) = CreateTestData(true);
-
-            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
-                .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
-
-            var command = new BulkUpdateContents
-            {
-                Jobs = new[]
-                {
-                    new BulkUpdateJob
-                    {
-                        Type = BulkUpdateType.Upsert,
-                        Data = data,
-                        Query = query
-                    }
-                },
-                SchemaId = schemaId
-            };
-
-            var context = new CommandContext(command, commandBus);
-
-            await sut.HandleAsync(context);
-
-            var result = context.Result<BulkUpdateResult>();
-
-            Assert.Single(result);
-            Assert.Equal(1, result.Count(x => x.ContentId == null && x.Exception is DomainException));
-
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_change_content_status()
         {
+            SetupContext(Permissions.AppContentsUpdate);
+
             var (id, _, _) = CreateTestData(false);
 
-            var command = new BulkUpdateContents
-            {
-                Jobs = new[]
-                {
-                    new BulkUpdateJob
-                    {
-                        Type = BulkUpdateType.ChangeStatus,
-                        Id = id
-                    }
-                },
-                SchemaId = schemaId
-            };
+            var command = BulkCommand(BulkUpdateType.ChangeStatus, id: id);
 
-            var context = new CommandContext(command, commandBus);
+            var result = await PublishAsync(command);
 
-            await sut.HandleAsync(context);
-
-            var result = context.Result<BulkUpdateResult>();
-
-            Assert.Single(result);
-            Assert.Equal(1, result.Count(x => x.ContentId == id));
+            Assert.Single(result, x => x.ContentId == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id)))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_content_id_to_change_cannot_be_resolved()
+        public async Task Should_throw_security_exception_when_user_has_no_permission_for_changing_status()
         {
-            var (_, _, query) = CreateTestData(true);
+            SetupContext(Permissions.AppContentsRead);
 
-            var command = new BulkUpdateContents
-            {
-                Jobs = new[]
-                {
-                    new BulkUpdateJob
-                    {
-                        Type = BulkUpdateType.ChangeStatus,
-                        Query = query
-                    }
-                },
-                SchemaId = schemaId
-            };
+            var (id, _, _) = CreateTestData(false);
 
-            var context = new CommandContext(command, commandBus);
+            var command = BulkCommand(BulkUpdateType.ChangeStatus, id: id);
 
-            await sut.HandleAsync(context);
+            var result = await PublishAsync(command);
 
-            var result = context.Result<BulkUpdateResult>();
+            Assert.Single(result, x => x.ContentId == id && x.Exception is DomainForbiddenException);
 
-            Assert.Single(result);
-            Assert.Equal(1, result.Count(x => x.ContentId == null && x.Exception is DomainObjectNotFoundException));
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_validate_content()
+        {
+            SetupContext(Permissions.AppContentsRead);
+
+            var (id, _, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateType.Validate, id: id);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.ContentId == id && x.Exception == null);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<ValidateContent>.That.Matches(x => x.ContentId == id)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_security_exception_when_user_has_no_permission_for_validation()
+        {
+            SetupContext(Permissions.AppContentsDelete);
+
+            var (id, _, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateType.Validate, id: id);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.ContentId == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
                 .MustNotHaveHappened();
@@ -294,29 +258,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_delete_content()
         {
+            SetupContext(Permissions.AppContentsDelete);
+
             var (id, _, _) = CreateTestData(false);
 
-            var command = new BulkUpdateContents
-            {
-                Jobs = new[]
-                {
-                    new BulkUpdateJob
-                    {
-                        Type = BulkUpdateType.Delete,
-                        Id = id
-                    }
-                },
-                SchemaId = schemaId
-            };
+            var command = BulkCommand(BulkUpdateType.Delete, id: id);
 
-            var context = new CommandContext(command, commandBus);
+            var result = await PublishAsync(command);
 
-            await sut.HandleAsync(context);
-
-            var result = context.Result<BulkUpdateResult>();
-
-            Assert.Single(result);
-            Assert.Equal(1, result.Count(x => x.ContentId == id));
+            Assert.Single(result, x => x.ContentId == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<DeleteContent>.That.Matches(x => x.ContentId == id)))
@@ -324,34 +274,59 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_content_id_to_delete_cannot_be_resolved()
+        public async Task Should_throw_security_exception_when_user_has_no_permission_for_deletion()
         {
-            var (_, _, query) = CreateTestData(true);
+            SetupContext(Permissions.AppContentsRead);
 
-            var command = new BulkUpdateContents
-            {
-                Jobs = new[]
-                {
-                    new BulkUpdateJob
-                    {
-                        Type = BulkUpdateType.Delete,
-                        Query = query
-                    }
-                },
-                SchemaId = schemaId
-            };
+            var (id, _, _) = CreateTestData(false);
 
+            var command = BulkCommand(BulkUpdateType.Delete, id: id);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.ContentId == id && x.Exception is DomainForbiddenException);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        private async Task<BulkUpdateResult> PublishAsync(ICommand command)
+        {
             var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
-            var result = context.Result<BulkUpdateResult>();
+            return (context.PlainResult as BulkUpdateResult)!;
+        }
 
-            Assert.Single(result);
-            Assert.Equal(1, result.Count(x => x.ContentId == null && x.Exception is DomainObjectNotFoundException));
+        private BulkUpdateContents BulkCommand(BulkUpdateType type, Query<IJsonValue>? query = null, DomainId? id = null, NamedContentData? data = null)
+        {
+            return new BulkUpdateContents
+            {
+                AppId = appId,
+                Jobs = new[]
+                {
+                    new BulkUpdateJob { Type = type, Query = query, Id = id, Data = data! }
+                },
+                SchemaId = schemaId
+            };
+        }
 
-            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
-                .MustNotHaveHappened();
+        private Context SetupContext(string id)
+        {
+            var permission = Permissions.ForApp(id, appId.Name, schemaId.Name).Id;
+
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+
+            var requestContext = new Context(claimsPrincipal);
+
+            A.CallTo(() => contextProvider.Context)
+                .Returns(requestContext);
+
+            return requestContext;
         }
 
         private static (DomainId Id, NamedContentData Data, Query<IJsonValue>? Query) CreateTestData(bool withQuery)

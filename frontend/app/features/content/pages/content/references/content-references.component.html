@@ -1,0 +1,20 @@
+<sqx-list-view [isLoading]="contentsState.isLoading | async" table="true">
+    <ng-container content>
+        <table class="table table-items table-fixed" *ngIf="contentsState.contents | async; let references">
+            <tbody *ngFor="let reference of references; trackBy: trackByContent"
+                [sqxReferenceItem]="reference"
+                [canRemove]="false"
+                [columns]="references | sqxContentsColumns"
+                [isCompact]="false"
+                [isDisabled]="false"
+                [validations]="contentsState.validationResults | async"
+                [validityVisible]="true"
+                [language]="language">
+            </tbody>
+        </table>
+    </ng-container>
+
+    <ng-container footer>
+        <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)"></sqx-pager>
+    </ng-container>
+</sqx-list-view>

@@ -5,8 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings } from '@app/shared';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
+
+interface State {
+    // The when the section is collapsed.
+    isCollapsed: boolean;
+}
 
 @Component({
     selector: 'sqx-content-section',
@@ -14,12 +19,12 @@ import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreSer
     templateUrl: './content-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentSectionComponent implements OnChanges {
+export class ContentSectionComponent extends StatefulComponent<State> implements OnChanges {
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
 
     @Input()
-    public compact = false;
+    public isCompact = false;
 
     @Input()
     public form: EditContentForm;
@@ -42,21 +47,29 @@ export class ContentSectionComponent implements OnChanges {
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    public isCollapsed: boolean;
-
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly localStore: LocalStoreService
     ) {
+        super(changeDetector, {
+            isCollapsed: false
+        });
+
+        this.changes.subscribe(state => {
+            this.localStore.setBoolean(this.configKey(), state.isCollapsed);
+        });
     }
 
     public ngOnChanges() {
-        this.isCollapsed = this.localStore.getBoolean(this.configKey());
+        const isCollapsed = this.localStore.getBoolean(this.configKey());
+
+        this.next({ isCollapsed });
     }
 
     public toggle() {
-        this.isCollapsed = !this.isCollapsed;
-
-        this.localStore.setBoolean(this.configKey(), this.isCollapsed);
+        this.next(s => ({
+            ...s,
+            isCollapsed: !s.isCollapsed
+        }));
     }
 
     public getFieldFormCompare(formState: FieldForm) {

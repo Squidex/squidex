@@ -6,22 +6,22 @@
  */
 
 import { NavigationEnd, NavigationExtras, NavigationStart, Params, Router } from '@angular/router';
-import { LocalStoreService, MathHelper, Pager } from '@app/framework/internal';
+import { LocalStoreService, MathHelper } from '@app/framework/internal';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { State } from './../../state';
-import { PagerSynchronizer, Router2State, StringKeysSynchronizer, StringSynchronizer } from './router-2-state';
+import { PagingSynchronizer, Router2State, StringKeysSynchronizer, StringSynchronizer } from './router-2-state';
 
 describe('Router2State', () => {
     describe('Strings', () => {
-        const synchronizer = new StringSynchronizer('key');
+        const synchronizer = new StringSynchronizer('key', 'key');
 
         it('should write string to route', () => {
             const params: Params = {};
 
             const value = 'my-string';
 
-            synchronizer.writeValue(value, params);
+            synchronizer.writeValuesToRoute({ key: value }, params);
 
             expect(params).toEqual({ key: 'my-string' });
         });
@@ -31,7 +31,7 @@ describe('Router2State', () => {
 
             const value = 123;
 
-            synchronizer.writeValue(value, params);
+            synchronizer.writeValuesToRoute(value, params);
 
             expect(params).toEqual({ key: undefined });
         });
@@ -41,14 +41,14 @@ describe('Router2State', () => {
                 key: 'my-string'
             };
 
-            const value = synchronizer.getValue(params);
+            const value = synchronizer.parseValuesFromRoute(params);
 
-            expect(value).toEqual('my-string');
+            expect(value).toEqual({ key: 'my-string' });
         });
     });
 
     describe('StringKeys', () => {
-        const synchronizer = new StringKeysSynchronizer('key');
+        const synchronizer = new StringKeysSynchronizer('key', 'key');
 
         it('should write object keys to route', () => {
             const params: Params = {};
@@ -58,7 +58,7 @@ describe('Router2State', () => {
                 flag2: false
             };
 
-            synchronizer.writeValue(value, params);
+            synchronizer.writeValuesToRoute({ key: value }, params);
 
             expect(params).toEqual({ key: 'flag1,flag2' });
         });
@@ -68,7 +68,7 @@ describe('Router2State', () => {
 
             const value = {};
 
-            synchronizer.writeValue(value, params);
+            synchronizer.writeValuesToRoute({ key: value }, params);
 
             expect(params).toEqual({ key: undefined });
         });
@@ -78,7 +78,7 @@ describe('Router2State', () => {
 
             const value = 123;
 
-            synchronizer.writeValue(value, params);
+            synchronizer.writeValuesToRoute({ key: value }, params);
 
             expect(params).toEqual({ key: undefined });
         });
@@ -86,84 +86,36 @@ describe('Router2State', () => {
         it('should get object from route', () => {
             const params: Params = { key: 'flag1,flag2' };
 
-            const value = synchronizer.getValue(params);
+            const value = synchronizer.parseValuesFromRoute(params);
 
-            expect(value).toEqual({ flag1: true, flag2: true });
+            expect(value).toEqual({ key: { flag1: true, flag2: true } });
         });
 
         it('should get object with empty keys from route', () => {
             const params: Params = { key: 'flag1,,,flag2' };
 
-            const value = synchronizer.getValue(params);
+            const value = synchronizer.parseValuesFromRoute(params);
 
-            expect(value).toEqual({ flag1: true, flag2: true });
+            expect(value).toEqual({ key: { flag1: true, flag2: true } });
         });
     });
 
-    describe('Pager', () => {
-        let synchronizer: PagerSynchronizer;
+    describe('Paging', () => {
+        let synchronizer: PagingSynchronizer;
         let localStore: IMock<LocalStoreService>;
 
         beforeEach(() => {
             localStore = Mock.ofType<LocalStoreService>();
 
-            synchronizer = new PagerSynchronizer(localStore.object, 'contents', 30);
-        });
-
-        it('should write pager to route and local store', () => {
-            const params: Params = {};
-
-            const value = new Pager(0, 10, 20, true);
-
-            synchronizer.writeValue(value, params);
-
-            expect(params).toEqual({ take: '20', page: '10' });
-
-            localStore.verify(x => x.setInt('contents.pageSize', 20), Times.once());
-        });
-
-        it('Should write undefined when page number is zero', () => {
-            const params: Params = {};
-
-            const value = new Pager(0, 0, 20, true);
-
-            synchronizer.writeValue(value, params);
-
-            expect(params).toEqual({ take: '20', page: undefined });
-
-            localStore.verify(x => x.setInt('contents.pageSize', 20), Times.once());
-        });
-
-        it('should write undefined when value not a pager', () => {
-            const params: Params = {};
-
-            const value = 123;
-
-            synchronizer.writeValue(value, params);
-
-            expect(params).toEqual({ take: undefined, page: undefined });
-
-            localStore.verify(x => x.setInt('contents.pageSize', 20), Times.never());
-        });
-
-        it('should write undefined when value is null', () => {
-            const params: Params = {};
-
-            const value = null;
-
-            synchronizer.writeValue(value, params);
-
-            expect(params).toEqual({ take: undefined, page: undefined });
-
-            localStore.verify(x => x.setInt('contents.pageSize', 20), Times.never());
+            synchronizer = new PagingSynchronizer(localStore.object, 'contents', 30);
         });
 
         it('should get page and size from route', () => {
-            const params: Params = { page: '10', take: '40' };
+            const params: Params = { page: '10', pageSize: '40' };
 
-            const value = synchronizer.getValue(params);
+            const value = synchronizer.parseValuesFromRoute(params);
 
-            expect(value).toEqual(new Pager(0, 10, 40, true));
+            expect(value).toEqual({ page: 10, pageSize: 40 });
         });
 
         it('should get page size from local store as fallback', () => {
@@ -172,9 +124,9 @@ describe('Router2State', () => {
 
             const params: Params = { page: '10' };
 
-            const value = synchronizer.getValue(params);
+            const value = synchronizer.parseValuesFromRoute(params);
 
-            expect(value).toEqual(new Pager(0, 10, 40, true));
+            expect(value).toEqual({ page: 10, pageSize: 40 });
         });
 
         it('should get page size from default if local store is invalid', () => {
@@ -183,25 +135,45 @@ describe('Router2State', () => {
 
             const params: Params = { page: '10' };
 
-            const value = synchronizer.getValue(params);
+            const value = synchronizer.parseValuesFromRoute(params);
 
-            expect(value).toEqual(new Pager(0, 10, 30, true));
+            expect(value).toEqual({ page: 10, pageSize: 30 });
         });
 
         it('should get page size from default as last fallback', () => {
             const params: Params = { page: '10' };
 
-            const value = synchronizer.getValue(params);
+            const value = synchronizer.parseValuesFromRoute(params);
 
-            expect(value).toEqual(new Pager(0, 10, 30, true));
+            expect(value).toEqual({ page: 10, pageSize: 30 });
         });
 
         it('should fix page number if invalid', () => {
             const params: Params = { page: '-10' };
 
-            const value = synchronizer.getValue(params);
+            const value = synchronizer.parseValuesFromRoute(params);
 
-            expect(value).toEqual(new Pager(0, 0, 30, true));
+            expect(value).toEqual({ page: 0, pageSize: 30 });
+        });
+
+        it('should write pager to route and local store', () => {
+            const params: Params = {};
+
+            synchronizer.writeValuesToRoute({ page: 10, pageSize: 20 }, params);
+
+            expect(params).toEqual({ page: '10', pageSize: '20' });
+
+            localStore.verify(x => x.setInt('contents.pageSize', 20), Times.once());
+        });
+
+        it('Should write undefined when page number is zero', () => {
+            const params: Params = {};
+
+            synchronizer.writeValuesToRoute({ page: 0, pageSize: 20 }, params);
+
+            expect(params).toEqual({ page: undefined, pageSize: '20' });
+
+            localStore.verify(x => x.setInt('contents.pageSize', 20), Times.once());
         });
     });
 

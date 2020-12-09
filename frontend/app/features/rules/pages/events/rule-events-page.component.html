@@ -92,7 +92,7 @@
                     </tbody>
                 </table>
 
-                <sqx-pager [autoHide]="true" [pager]="ruleEventsState.ruleEventsPager | async" (pagerChange)="ruleEventsState.setPager($event)"></sqx-pager>
+                <sqx-pager [autoHide]="true" [paging]="ruleEventsState.paging | async" (pagingChange)="ruleEventsState.page($event)"></sqx-pager>
             </ng-container>
         </sqx-list-view>
     </ng-container>

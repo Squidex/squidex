@@ -7,26 +7,14 @@
 
 import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
-import { DialogService, Pager, shareSubscribed, State, StateSynchronizer } from '@app/shared';
+import { DialogService, getPagingInfo, ListState, shareSubscribed, State, StateSynchronizer } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { CreateUserDto, UpdateUserDto, UserDto, UsersService } from './../services/users.service';
 
-interface Snapshot {
+interface Snapshot extends ListState<string> {
     // The current users.
-    users: UsersList;
-
-    // The pagination information.
-    usersPager: Pager;
-
-    // The query to filter users.
-    usersQuery?: string;
-
-    // Indicates if the users are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the users are loading.
-    isLoading?: boolean;
+    users: ReadonlyArray<UserDto>;
 
     // The selected user.
     selectedUser?: UserDto | null;
@@ -43,11 +31,11 @@ export class UsersState extends State<Snapshot> {
     public users =
         this.project(x => x.users);
 
-    public usersPager =
-        this.project(x => x.usersPager);
+    public paging =
+        this.project(x => getPagingInfo(x, x.users.length));
 
-    public usersQuery =
-        this.project(x => x.usersQuery);
+    public query =
+        this.project(x => x.query);
 
     public selectedUser =
         this.project(x => x.selectedUser);
@@ -67,14 +55,16 @@ export class UsersState extends State<Snapshot> {
     ) {
         super({
             users: [],
-            usersPager: new Pager(0)
+            page: 0,
+            pageSize: 10,
+            total: 0
         });
     }
 
     public select(id: string | null): Observable<UserDto | null> {
         return this.loadUser(id).pipe(
             tap(selectedUser => {
-                this.next(s => ({ ...s, selectedUser }));
+                this.next({ selectedUser });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -96,8 +86,8 @@ export class UsersState extends State<Snapshot> {
     public loadAndListen(synchronizer: StateSynchronizer) {
         synchronizer.mapTo(this)
             .keep('selectedUser')
-            .withPager('usersPager', 'users', 10)
-            .withString('usersQuery', 'q')
+            .withPaging('users', 10)
+            .withString('query', 'q')
             .whenSynced(() => this.loadInternal(false))
             .build();
     }
@@ -113,18 +103,18 @@ export class UsersState extends State<Snapshot> {
     private loadInternal(isReload: boolean): Observable<any> {
         this.next({ isLoading: true });
 
+        const { page, pageSize, query } = this.snapshot;
+
         return this.usersService.getUsers(
-                this.snapshot.usersPager.pageSize,
-                this.snapshot.usersPager.skip,
-                this.snapshot.usersQuery).pipe(
+                pageSize,
+                pageSize * page,
+                query).pipe(
             tap(({ total, items: users, canCreate }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:users.reloaded');
                 }
 
                 this.next(s => {
-                    const usersPager = s.usersPager.setCount(total);
-
                     let selectedUser = s.selectedUser;
 
                     if (selectedUser) {
@@ -133,11 +123,11 @@ export class UsersState extends State<Snapshot> {
 
                     return { ...s,
                         canCreate,
+                        users,
                         isLoaded: true,
                         isLoading: false,
                         selectedUser,
-                        users,
-                        usersPager
+                        total
                     };
                 });
             }),
@@ -151,10 +141,9 @@ export class UsersState extends State<Snapshot> {
         return this.usersService.postUser(request).pipe(
             tap(created => {
                 this.next(s => {
-                    const users = [created, ...s.users];
-                    const usersPager = s.usersPager.incrementCount();
+                    const users = [created, ...s.users].slice(0, s.pageSize);
 
-                    return { ...s, users, usersPager };
+                    return { ...s, users, total: s.total + 1 };
                 });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
@@ -185,13 +174,13 @@ export class UsersState extends State<Snapshot> {
     }
 
     public search(query: string): Observable<UsersResult> {
-        this.next(s => ({ ...s, usersPager: s.usersPager.reset(), usersQuery: query }));
+        this.next({ query, page: 0 });
 
         return this.loadInternal(false);
     }
 
-    public setPager(usersPager: Pager) {
-        this.next({ usersPager });
+    public page(paging: { page: number, pageSize: number }) {
+        this.next(paging);
 
         return this.loadInternal(false);
     }

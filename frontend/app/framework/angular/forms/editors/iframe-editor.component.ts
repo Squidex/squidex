@@ -30,7 +30,6 @@ interface State {
 })
 export class IFrameEditorComponent extends StatefulControlComponent<State, any> implements OnChanges, OnDestroy, AfterViewInit {
     private value: any;
-    private isDisabled = false;
     private isInitialized = false;
 
     @ViewChild('iframe', { static: false })
@@ -109,7 +108,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
                     } else if (type === 'resize') {
                         const { height } = event.data;
 
-                        this.renderer.setStyle(this.iframe.nativeElement, 'height', height + 'px');
+                        this.renderer.setStyle(this.iframe.nativeElement, 'height', `${height}px`);
                     } else if (type === 'navigate') {
                         const { url } = event.data;
 
@@ -144,7 +143,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
+        super.setDisabledState(isDisabled);
 
         this.sendDisabled();
     }
@@ -162,7 +161,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     private sendDisabled() {
-        this.sendMessage('disabled', { isDisabled: this.isDisabled });
+        this.sendMessage('disabled', { isDisabled: this.snapshot.isDisabled });
     }
 
     private sendFormValue() {
@@ -178,7 +177,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     private toggleFullscreen(isFullscreen: boolean) {
-        this.next(s => ({ ...s, isFullscreen }));
+        this.next({ isFullscreen });
 
         let target = this.container.nativeElement;
 

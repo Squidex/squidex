@@ -42,8 +42,6 @@ export class SearchMenuComponent {
     @ViewChild(AutocompleteComponent, { static: false })
     public searchControl: AutocompleteComponent;
 
-    public selection: SearchResultDto;
-
     constructor(
         private readonly router: Router,
         private readonly apiUrl: ApiUrlConfig,

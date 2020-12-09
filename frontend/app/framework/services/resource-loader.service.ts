@@ -25,7 +25,7 @@ export class ResourceLoaderService {
             result = new Promise(resolve => {
                 const style = this.renderer.createElement('link');
 
-                this.renderer.listen(style, 'load', () => resolve());
+                this.renderer.listen(style, 'load', resolve);
                 this.renderer.setProperty(style, 'rel', 'stylesheet');
                 this.renderer.setProperty(style, 'href', url);
                 this.renderer.setProperty(style, 'type', 'text/css');
@@ -51,7 +51,7 @@ export class ResourceLoaderService {
             this.renderer.appendChild(document.body, script);
 
             result = new Promise((resolve) => {
-                this.renderer.listen(script, 'load', () => resolve());
+                this.renderer.listen(script, 'load', resolve);
             });
 
             this.cache[key] = result;

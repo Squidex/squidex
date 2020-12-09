@@ -157,7 +157,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     public hasChanges(changes: any) {
-        return !Types.equals(changes, this.value, true);
+        return !Types.equals(this.initialData, changes, true);
     }
 
     public load(value: any, isInitial?: boolean) {

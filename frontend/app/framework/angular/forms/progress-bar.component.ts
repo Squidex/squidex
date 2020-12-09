@@ -88,7 +88,7 @@ export class ProgressBarComponent implements OnChanges, OnInit {
         }
 
         if (value > 0 && this.showText) {
-            this.progressBar.setText(Math.round(value) + '%');
+            this.progressBar.setText(`${Math.round(value)}%`);
         }
     }
 }

@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { fadeAnimation, ModalModel } from '@app/framework/internal';
 
-export interface Language { iso2Code: string; englishName: string; isMasterLanguage: true; }
+export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean; }
 
 @Component({
     selector: 'sqx-language-selector',

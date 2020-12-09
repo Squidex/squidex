@@ -6,10 +6,10 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, ErrorDto, MathHelper, Pager, shareSubscribed, State, StateSynchronizer } from '@app/framework';
+import { compareStrings, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, StateSynchronizer } from '@app/framework';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
-import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
+import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
 import { AppsState } from './apps.state';
 import { Query, QueryFullTextSynchronizer } from './query';
 
@@ -19,28 +19,22 @@ export type TagsAvailable = { [name: string]: number };
 export type TagsSelected = { [name: string]: boolean };
 export type Tag = { name: string, count: number; };
 
-const EMPTY_FOLDERS: { canCreate: boolean, items: ReadonlyArray<AssetFolderDto>, path?: ReadonlyArray<AssetFolderDto> } = { canCreate: false, items: [] };
-
 export const ROOT_ITEM: AssetPathItem = { id: MathHelper.EMPTY_GUID, folderName: 'i18n:assets.specialFolder.root' };
 
-interface Snapshot {
+const EMPTY_FOLDERS: AssetFoldersDto = { canCreate: false, items: [] } as any;
+
+interface Snapshot extends ListState<Query> {
+    // The current assets.
+    assets: ReadonlyArray<AssetDto>;
+
     // All assets tags.
     tagsAvailable: TagsAvailable;
 
     // The selected asset tags.
     tagsSelected: TagsSelected;
 
-    // The current assets.
-    assets: ReadonlyArray<AssetDto>;
-
     // The current asset folders.
-    assetFolders: ReadonlyArray<AssetFolderDto>;
-
-    // The pagination information.
-    assetsPager: Pager;
-
-    // The query to filter assets.
-    assetsQuery?: Query;
+    folders: ReadonlyArray<AssetFolderDto>;
 
     // The folder path.
     path: ReadonlyArray<AssetPathItem>;
@@ -50,12 +44,6 @@ interface Snapshot {
 
     // Indicates if the assets are loaded once.
     isLoadedOnce?: boolean;
-
-    // Indicates if the assets are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the assets are loading.
-    isLoading?: boolean;
 
     // Indicates if the user can create assets.
     canCreate?: boolean;
@@ -73,7 +61,7 @@ export class AssetsState extends State<Snapshot> {
         this.project(x => x.tagsSelected);
 
     public tags =
-        this.projectFrom(this.tagsUnsorted, x => sort(x));
+        this.projectFrom(this.tagsUnsorted, getSortedTags);
 
     public tagsNames =
         this.projectFrom(this.tagsUnsorted, x => Object.keys(x));
@@ -84,14 +72,17 @@ export class AssetsState extends State<Snapshot> {
     public assets =
         this.project(x => x.assets);
 
-    public assetFolders =
-        this.project(x => x.assetFolders);
+    public paging =
+        this.project(x => getPagingInfo(x, x.assets.length));
 
-    public assetsQuery =
-        this.project(x => x.assetsQuery);
+    public query =
+        this.project(x => x.query);
 
-    public assetsPager =
-        this.project(x => x.assetsPager);
+    public folders =
+        this.project(x => x.folders);
+
+    public hasFolders =
+        this.project(x => x.folders.length > 0);
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
@@ -120,22 +111,24 @@ export class AssetsState extends State<Snapshot> {
         private readonly dialogs: DialogService
     ) {
         super({
-            assetFolders: [],
+            folders: [],
             assets: [],
-            assetsPager: new Pager(0, 0, 30),
+            page: 0,
+            pageSize: 30,
             parentId: ROOT_ITEM.id,
             path: [ROOT_ITEM],
             tagsAvailable: {},
-            tagsSelected: {}
+            tagsSelected: {},
+            total: 0
         });
     }
 
     public loadAndListen(synchronizer: StateSynchronizer) {
         synchronizer.mapTo(this)
-            .withPager('assetsPager', 'assets', 20)
+            .withPaging('assets', 30)
             .withString('parentId', 'parent')
             .withStrings('tagsSelected', 'tags')
-            .withSynchronizer('assetsQuery', QueryFullTextSynchronizer.INSTANCE)
+            .withSynchronizer(QueryFullTextSynchronizer.INSTANCE)
             .whenSynced(() => this.loadInternal(false))
             .build();
     }
@@ -151,62 +144,63 @@ export class AssetsState extends State<Snapshot> {
     private loadInternal(isReload: boolean): Observable<any> {
         this.next({ isLoading: true });
 
-        const query: any = {
-            take: this.snapshot.assetsPager.pageSize,
-            skip: this.snapshot.assetsPager.skip
-        };
+        const { page, pageSize, query, tagsSelected } =  this.snapshot;
 
-        const withQuery = hasQuery(this.snapshot);
+        const q: any = { take: pageSize, skip: pageSize * page };
 
-        if (withQuery) {
-            if (this.snapshot.assetsQuery) {
-                query.query = this.snapshot.assetsQuery;
+        const hasQuery = !!query?.fullText || Object.keys(tagsSelected).length > 0;
+
+        if (hasQuery) {
+            if (query) {
+                q.query = query;
             }
 
             const searchTags = Object.keys(this.snapshot.tagsSelected);
 
             if (searchTags.length > 0) {
-                query.tags = searchTags;
+                q.tags = searchTags;
             }
         } else {
-            query.parentId = this.snapshot.parentId;
+            q.parentId = this.snapshot.parentId;
         }
 
         const assets$ =
-            this.assetsService.getAssets(this.appName, query);
+            this.assetsService.getAssets(this.appName, q);
 
         const assetFolders$ =
-            !withQuery ?
+            !hasQuery ?
                 this.assetsService.getAssetFolders(this.appName, this.snapshot.parentId) :
                 of(EMPTY_FOLDERS);
 
         const tags$ =
-            !withQuery || !this.snapshot.isLoadedOnce ?
+            !hasQuery || !this.snapshot.isLoadedOnce ?
                 this.assetsService.getTags(this.appName) :
                 of(this.snapshot.tagsAvailable);
 
         return forkJoin(([assets$, assetFolders$, tags$])).pipe(
-            tap(([assets, assetFolders, tagsAvailable]) => {
+            tap(([assetsResult, foldersResult, tagsAvailable]) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:assets.reloaded');
                 }
 
-                const path = assetFolders.path ?
-                    [ROOT_ITEM, ...assetFolders.path] :
+                const path = foldersResult.path ?
+                    [ROOT_ITEM, ...foldersResult.path] :
                     [];
+
+                const { items: assets, total } = assetsResult;
 
                 this.next(s => ({
                     ...s,
-                    assetFolders: assetFolders.items,
-                    assets: assets.items,
-                    assetsPager: s.assetsPager.setCount(assets.total),
-                    canCreate: assets.canCreate,
-                    canCreateFolders: assetFolders.canCreate,
+                    assets,
+                    folders: foldersResult.items,
+                    canCreate: assetsResult.canCreate,
+                    canCreateFolders: foldersResult.canCreate,
                     isLoaded: true,
                     isLoadedOnce: true,
                     isLoading: false,
                     path,
-                    tagsAvailable
+                    tagsAvailable,
+                    total
                 }));
             }),
             finalize(() => {
@@ -221,26 +215,25 @@ export class AssetsState extends State<Snapshot> {
         }
 
         this.next(s => {
-            const assets = [asset, ...s.assets];
-            const assetsPager = s.assetsPager.incrementCount();
+            const assets = [asset, ...s.assets].slice(0, s.pageSize);
 
             const tags = updateTags(s, asset);
 
-            return { ...s, assets, assetsPager, ...tags };
+            return { ...s, assets, total: s.total + 1, ...tags };
         });
     }
 
     public createAssetFolder(folderName: string) {
         return this.assetsService.postAssetFolder(this.appName, { folderName, parentId: this.snapshot.parentId }).pipe(
-            tap(assetFolder => {
-                if (assetFolder.parentId !== this.snapshot.parentId) {
+            tap(folder => {
+                if (folder.parentId !== this.snapshot.parentId) {
                     return;
                 }
 
                 this.next(s => {
-                    const assetFolders = [...s.assetFolders, assetFolder].sortedByString(x => x.folderName);
+                    const folders = [...s.folders, folder].sortedByString(x => x.folderName);
 
-                    return { ...s, assetFolders };
+                    return { ...s, folders };
                 });
             }),
             shareSubscribed(this.dialogs));
@@ -260,13 +253,13 @@ export class AssetsState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public updateAssetFolder(assetFolder: AssetFolderDto, request: RenameAssetFolderDto) {
-        return this.assetsService.putAssetFolder(this.appName, assetFolder, request, assetFolder.version).pipe(
+    public updateAssetFolder(folder: AssetFolderDto, request: RenameAssetFolderDto) {
+        return this.assetsService.putAssetFolder(this.appName, folder, request, folder.version).pipe(
             tap(updated => {
                 this.next(s => {
-                    const assetFolders = s.assetFolders.replaceBy('id', updated);
+                    const folders = s.folders.replaceBy('id', updated);
 
-                    return { ...s, assetFolders };
+                    return { ...s, folders };
                 });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
@@ -296,23 +289,23 @@ export class AssetsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public moveAssetFolder(assetFolder: AssetFolderDto, parentId?: string) {
-        if (assetFolder.id === parentId || assetFolder.parentId === parentId) {
+    public moveAssetFolder(folder: AssetFolderDto, parentId?: string) {
+        if (folder.id === parentId || folder.parentId === parentId) {
             return EMPTY;
         }
 
         this.next(s => {
-            const assetFolders = s.assetFolders.filter(x => x.id !== assetFolder.id);
+            const folders = s.folders.filter(x => x.id !== folder.id);
 
-            return { ...s, assetFolders };
+            return { ...s, folders };
         });
 
-        return this.assetsService.putAssetItemParent(this.appName, assetFolder, { parentId }, assetFolder.version).pipe(
+        return this.assetsService.putAssetItemParent(this.appName, folder, { parentId }, folder.version).pipe(
             catchError(error => {
                 this.next(s => {
-                    const assetFolders = [...s.assetFolders, assetFolder].sortedByString(x => x.folderName);
+                    const folders = [...s.folders, folder].sortedByString(x => x.folderName);
 
-                    return { ...s, assetFolders };
+                    return { ...s, folders };
                 });
 
                 return throwError(error);
@@ -344,54 +337,35 @@ export class AssetsState extends State<Snapshot> {
             tap(() => {
                 this.next(s => {
                     const assets = s.assets.filter(x => x.id !== asset.id);
-                    const assetsPager = s.assetsPager.decrementCount();
 
                     const tags = updateTags(s, undefined, asset);
 
-                    return { ...s, assets, assetsPager, ...tags };
+                    return { ...s, assets, total: s.total - 1, ...tags };
                 });
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public deleteAssetFolder(assetFolder: AssetFolderDto): Observable<any> {
-        return this.assetsService.deleteAssetItem(this.appName, assetFolder, false, assetFolder.version).pipe(
+    public deleteAssetFolder(folder: AssetFolderDto): Observable<any> {
+        return this.assetsService.deleteAssetItem(this.appName, folder, false, folder.version).pipe(
             tap(() => {
                 this.next(s => {
-                    const assetFolders = s.assetFolders.filter(x => x.id !== assetFolder.id);
+                    const folders = s.folders.filter(x => x.id !== folder.id);
 
-                    return { ...s, assetFolders };
+                    return { ...s, folders };
                 });
             }),
             shareSubscribed(this.dialogs));
     }
 
     public navigate(parentId: string) {
-        this.next({ parentId, assetsQuery: undefined, tagsSelected: {} });
+        this.next({ parentId, query: undefined, tagsSelected: {} });
 
         return this.loadInternal(false);
     }
 
-    public setPager(assetsPager: Pager) {
-        this.next({ assetsPager });
-
-        return this.loadInternal(false);
-    }
-
-    public searchInternal(query?: Query | null, tags?: TagsSelected) {
-        this.next(s => {
-            const newState = { ...s, assetsPager: s.assetsPager.reset() };
-
-            if (query !== null) {
-                newState.assetsQuery = query;
-            }
-
-            if (tags) {
-                newState.tagsSelected = tags;
-            }
-
-            return newState;
-        });
+    public page(paging: { page: number, pageSize: number }) {
+        this.next(paging);
 
         return this.loadInternal(false);
     }
@@ -424,6 +398,24 @@ export class AssetsState extends State<Snapshot> {
 
     public search(query?: Query): Observable<any> {
         return this.searchInternal(query);
+    }
+
+    private searchInternal(query?: Query | null, tags?: TagsSelected) {
+        this.next(s => {
+            const newState = { ...s, page: 0 };
+
+            if (query !== null) {
+                newState.query = query;
+            }
+
+            if (tags) {
+                newState.tagsSelected = tags;
+            }
+
+            return newState;
+        });
+
+        return this.loadInternal(false);
     }
 
     public get parentId() {
@@ -467,16 +459,16 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
     return { tagsAvailable, tagsSelected };
 }
 
-function sort(tags: { [name: string]: number }) {
-    return Object.keys(tags).sort(compareStrings).map(name => ({ name, count: tags[name] }));
-}
-
-function hasQuery(state: Snapshot) {
-    return (state.assetsQuery && !!state.assetsQuery.fullText) || Object.keys(state.tagsSelected).length > 0;
-}
-
 function getParent(path: ReadonlyArray<AssetPathItem>) {
-    return path.length > 1 ? { folderName: 'i18n:assets.specialFolder.parent', id: path[path.length - 2].id } : undefined;
+    if (path.length > 1) {
+        return { folderName: 'i18n:assets.specialFolder.parent', id: path[path.length - 2].id };
+    } else {
+        return undefined;
+    }
+}
+
+function getSortedTags(tags: { [name: string]: number }) {
+    return Object.keys(tags).sort(compareStrings).map(name => ({ name, count: tags[name] }));
 }
 
 @Injectable()

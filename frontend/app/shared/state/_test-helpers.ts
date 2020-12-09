@@ -60,7 +60,7 @@ class DummySynchronizer implements StateSynchronizer, StateSynchronizerMap<any> 
         return this;
     }
 
-    public withPager() {
+    public withPaging() {
         return this;
     }
 
@@ -69,7 +69,7 @@ class DummySynchronizer implements StateSynchronizer, StateSynchronizerMap<any> 
     }
 
     public whenSynced(action: () => void) {
-        this.subject.subscribe(() => action());
+        this.subject.subscribe(action);
 
         return this;
     }

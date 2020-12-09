@@ -60,6 +60,46 @@ export class ResultSet<T> {
     }
 }
 
+export interface PagingInfo {
+    // The current page.
+    page: number;
+
+    // The current page size.
+    pageSize: number;
+
+    // The total number of items.
+    total: number;
+
+    // The current number of items.
+    count: number;
+}
+
+export function getPagingInfo<T>(state: ListState<T>, count: number) {
+    const { page, pageSize, total } = state;
+
+    return { page, pageSize, total, count };
+}
+
+export interface ListState<TQuery = any> {
+    // The total number of items.
+    total: number;
+
+    // True if currently loading.
+    isLoading?: boolean;
+
+    // True if already loaded.
+    isLoaded?: boolean;
+
+    // The current page.
+    page: number;
+
+    // The current page size.
+    pageSize: number;
+
+    // The query.
+    query?: TQuery;
+}
+
 export class State<T extends {}> {
     private readonly state: BehaviorSubject<Readonly<T>>;
 
@@ -73,12 +113,12 @@ export class State<T extends {}> {
 
     public project<M>(project: (value: T) => M, compare?: (x: M, y: M) => boolean) {
         return this.changes.pipe(
-            map(x => project(x)), distinctUntilChanged(compare), shareReplay(1));
+            map(project), distinctUntilChanged(compare), shareReplay(1));
     }
 
     public projectFrom<M, N>(source: Observable<M>, project: (value: M) => N, compare?: (x: N, y: N) => boolean) {
         return source.pipe(
-            map(x => project(x)), distinctUntilChanged(compare), shareReplay(1));
+            map(project), distinctUntilChanged(compare), shareReplay(1));
     }
 
     public projectFrom2<M, N, O>(lhs: Observable<M>, rhs: Observable<N>, project: (l: M, r: N) => O, compare?: (x: O, y: O) => boolean) {

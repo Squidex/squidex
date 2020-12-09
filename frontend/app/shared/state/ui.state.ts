@@ -129,7 +129,8 @@ export class UIState extends State<Snapshot> {
     private loadResources() {
         this.usersService.getResources()
             .subscribe(payload => {
-                this.next(s => ({ ...s,
+                this.next(s => ({
+                    ...s,
                     canReadEvents: hasAnyLink(payload, 'admin/events'),
                     canReadUsers: hasAnyLink(payload, 'admin/users'),
                     canRestore: hasAnyLink(payload, 'admin/restore'),

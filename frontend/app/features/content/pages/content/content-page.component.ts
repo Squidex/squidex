@@ -7,11 +7,18 @@
 
 // tslint:disable: max-line-length
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, FieldForm, FieldSection, LanguagesState, ModalModel, ResourceOwner, RootFieldDto, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, tap } from 'rxjs/operators';
+import { ContentReferencesComponent } from './references/content-references.component';
+
+const TABS: ReadonlyArray<string> = [
+    'i18n:contents.contentTab.editor',
+    'i18n:contents.contentTab.references',
+    'i18n:contents.contentTab.referencing'
+];
 
 @Component({
     selector: 'sqx-content-page',
@@ -25,6 +32,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     private isLoadingContent: boolean;
     private autoSaveKey: AutoSaveKey;
 
+    @ViewChild(ContentReferencesComponent)
+    public references: ContentReferencesComponent;
+
     public schema: SchemaDetailsDto;
 
     public formContext: any;
@@ -33,6 +43,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
     public contentFormCompare: EditContentForm | null = null;
+
+    public selectableTabs = TABS;
+    public selectedTab = this.selectableTabs[0];
 
     public dropdown = new ModalModel();
 
@@ -92,21 +105,16 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         contentId: content?.id
                     };
 
-                    const autosaved = this.autoSaveService.get(this.autoSaveKey);
+                    const dataAutosaved = this.autoSaveService.fetch(this.autoSaveKey);
+                    const dataCloned = this.tempService.fetch();
 
-                    if (content) {
-                        this.loadContent(content.data, true);
-                    }
+                    this.loadContent(dataCloned || content?.data || {}, true);
 
-                    const clone = this.tempService.fetch();
-
-                    if (clone) {
-                        this.loadContent(clone, true);
-                    } else if (isNewContent && autosaved && this.contentForm.hasChanges(autosaved)) {
+                    if (isNewContent && dataAutosaved && this.contentForm.hasChanges(dataAutosaved)) {
                         this.dialogs.confirm('i18n:contents.unsavedChangesTitle', 'i18n:contents.unsavedChangesText')
                             .subscribe(shouldLoad => {
                                 if (shouldLoad) {
-                                    this.loadContent(autosaved, false);
+                                    this.loadContent(dataAutosaved, false);
                                 } else {
                                     this.autoSaveService.remove(this.autoSaveKey);
                                 }
@@ -129,6 +137,18 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }
             })
         );
+    }
+
+    public selectTab(tab: string) {
+        this.selectedTab = tab;
+    }
+
+    public validate() {
+        this.references?.validate();
+    }
+
+    public publish() {
+        this.references?.publish();
     }
 
     public saveAndPublish() {
@@ -256,10 +276,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         } finally {
             this.isLoadingContent = false;
         }
-    }
-
-    public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {
-        return section.separator?.fieldId;
     }
 }
 

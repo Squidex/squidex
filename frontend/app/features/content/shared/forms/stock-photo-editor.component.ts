@@ -11,6 +11,12 @@ import { StatefulControlComponent, StockPhotoDto, StockPhotoService, thumbnail, 
 import { of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
 
+export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true
+};
+
+const NO_EMIT = { emitEvent: false };
+
 interface State {
     // True when loading assets.
     isLoading?: boolean;
@@ -18,12 +24,6 @@ interface State {
     // True, when width less than 600 pixels.
     isCompact?: boolean;
 }
-
-export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true
-};
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-stock-photo-editor',
@@ -93,7 +93,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
     }
 
     public setCompact(isCompact: boolean) {
-        this.next(s => ({ ...s, isCompact: isCompact }));
+        this.next({ isCompact });
     }
 
     public selectPhoto(photo: StockPhotoDto) {

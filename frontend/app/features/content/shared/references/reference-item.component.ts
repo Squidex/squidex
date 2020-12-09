@@ -24,10 +24,19 @@ export class ReferenceItemComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
+    public canRemove = true;
+
+    @Input()
     public isCompact = false;
 
     @Input()
     public isDisabled = false;
+
+    @Input()
+    public validations: { [id: string]: boolean };
+
+    @Input()
+    public validityVisible: boolean;
 
     @Input()
     public columns = 0;
@@ -35,13 +44,13 @@ export class ReferenceItemComponent implements OnChanges {
     @Input('sqxReferenceItem')
     public content: ContentDto;
 
+    public get valid() {
+        return !this.validations ? undefined : this.validations[this.content.id];
+    }
+
     public values: ReadonlyArray<any> = [];
 
     public ngOnChanges() {
-        this.updateValues();
-    }
-
-    private updateValues() {
         const values = [];
 
         for (let i = 0; i < this.columns; i++) {

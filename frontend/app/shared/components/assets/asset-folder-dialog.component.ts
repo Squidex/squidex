@@ -5,15 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-folder-dialog',
     styleUrls: ['./asset-folder-dialog.component.scss'],
-    templateUrl: './asset-folder-dialog.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './asset-folder-dialog.component.html'
 })
 export class AssetFolderDialogComponent implements OnInit {
     @Output()

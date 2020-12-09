@@ -67,6 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                         return Snapshot;
                     });
+
                 case UpdateRule updateRule:
                     return UpdateReturnAsync(updateRule, async c =>
                     {
@@ -76,6 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                         return Snapshot;
                     });
+
                 case EnableRule enableRule:
                     return UpdateReturn(enableRule, c =>
                     {
@@ -85,6 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                         return Snapshot;
                     });
+
                 case DisableRule disableRule:
                     return UpdateReturn(disableRule, c =>
                     {
@@ -94,6 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                         return Snapshot;
                     });
+
                 case DeleteRule deleteRule:
                     return Update(deleteRule, c =>
                     {
@@ -101,22 +105,25 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                         Delete(c);
                     });
+
                 case TriggerRule triggerRule:
-                    return Trigger(triggerRule);
+                    return UpdateReturnAsync(triggerRule, async c =>
+                    {
+                        await Trigger(triggerRule);
+
+                        return true;
+                    });
+
                 default:
                     throw new NotSupportedException();
             }
         }
 
-        private async Task<object?> Trigger(TriggerRule command)
+        private async Task Trigger(TriggerRule command)
         {
-            await EnsureLoadedAsync();
-
             var @event = SimpleMapper.Map(command, new RuleManuallyTriggered { RuleId = Snapshot.Id, AppId = Snapshot.AppId });
 
             await ruleEnqueuer.EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
-
-            return null;
         }
 
         public void Create(CreateRule command)

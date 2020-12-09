@@ -77,7 +77,7 @@ export class BackupsService {
 
         return this.http.get<{ items: any[], _links: {} } & Resource>(url).pipe(
             map(({ items, _links }) => {
-                const backups = items.map(item => parseBackup(item));
+                const backups = items.map(parseBackup);
 
                 return new BackupsDto(backups.length, backups, _links);
             }),

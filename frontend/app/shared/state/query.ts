@@ -122,15 +122,17 @@ const DEFAULT_QUERY = {
 export class QueryFullTextSynchronizer implements RouteSynchronizer {
     public static readonly INSTANCE = new QueryFullTextSynchronizer();
 
-    public getValue(params: Params) {
+    public parseValuesFromRoute(params: Params) {
         const query = params['query'];
 
         if (Types.isString(query)) {
-            return { fullText: query };
+            return { query: { fullText: query } };
         }
+
+        return { query: undefined };
     }
 
-    public writeValue(state: any, params: Params) {
+    public writeValuesToRoute(state: any, params: Params) {
         params['query'] = undefined;
 
         if (Types.isObject(state) && Types.isString(state.fullText) && state.fullText.length > 0) {
@@ -142,15 +144,17 @@ export class QueryFullTextSynchronizer implements RouteSynchronizer {
 export class QuerySynchronizer implements RouteSynchronizer {
     public static readonly INSTANCE = new QuerySynchronizer();
 
-    public getValue(params: Params) {
+    public parseValuesFromRoute(params: Params) {
         const query = params['query'];
 
         if (Types.isString(query)) {
-            return deserializeQuery(query);
+            return { query: deserializeQuery(query) };
         }
+
+        return { query: undefined };
     }
 
-    public writeValue(state: any, params: Params) {
+    public writeValuesToRoute(state: any, params: Params) {
         params['query'] = undefined;
 
         if (Types.isObject(state)) {

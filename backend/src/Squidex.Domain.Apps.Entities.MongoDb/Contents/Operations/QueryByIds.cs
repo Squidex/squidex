@@ -50,13 +50,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             var filter = CreateFilter(appId, schemas.Select(x => x.Id), q.Ids.ToHashSet());
 
-            var items = await FindContentsAsync(q.Query, filter);
+            var contentEntities = await FindContentsAsync(q.Query, filter);
+            var contentTotal = (long)contentEntities.Count;
 
-            if (items.Count > 0)
+            if (contentEntities.Count > 0)
             {
+                if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+                {
+                    contentTotal = await Collection.Find(filter).CountDocumentsAsync();
+                }
+
                 var contentSchemas = schemas.ToDictionary(x => x.Id);
 
-                foreach (var content in items)
+                foreach (var content in contentEntities)
                 {
                     var schema = contentSchemas[content.SchemaId.Id];
 
@@ -64,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 }
             }
 
-            return ResultList.Create(items.Count, items);
+            return ResultList.Create(contentTotal, contentEntities);
         }
 
         private async Task<List<MongoContentEntity>> FindContentsAsync(ClrQuery query, FilterDefinition<MongoContentEntity> filter)

@@ -7,8 +7,10 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
+import { ErrorDto } from '@app/framework';
 import { AnalyticsService, ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ResourceLinks, ScheduleDto, Version, Versioned } from '@app/shared/internal';
 import { encodeQuery, sanitize } from './../state/query';
+import { BulkResultDto, BulkUpdateDto } from './contents.service';
 
 describe('ContentsService', () => {
     const version = new Version('1');
@@ -355,48 +357,44 @@ describe('ContentsService', () => {
         expect(content!).toEqual(createContent(12));
     }));
 
-    it('should make put request to change content status',
+    it('should make post request to for bulk update',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        const resource: Resource = {
-            _links: {
-                ['status/published']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/status' }
-            }
+        const dto: BulkUpdateDto = {
+            jobs: [{
+                id: '123',
+                type: 'Delete'
+            }, {
+                id: '456',
+                type: 'Delete'
+            }]
         };
 
-        let content: ContentDto;
+        let results: ReadonlyArray<BulkResultDto>;
 
-        contentsService.putStatus('my-app', resource, 'published', true, '2016-12-12T10:10:00', version).subscribe(result => {
-            content = result;
+        contentsService.bulkUpdate('my-app', 'my-schema', dto).subscribe(result => {
+            results = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/status');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/bulk');
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush(contentResponse(12));
-
-        expect(content!).toEqual(createContent(12));
-    }));
-
-    it('should make delete request to delete content',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-
-        const resource: Resource = {
-            _links: {
-                delete: { method: 'DELETE', href: '/api/content/my-app/my-schema/content1' }
+        req.flush([{
+            contentId: '123'
+        }, {
+            contentId: '456',
+            error: {
+                statusCode: 400,
+                message: 'Invalid'
             }
-        };
+        }]);
 
-        contentsService.deleteContent('my-app', resource, true, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1?checkReferrers=true');
-
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
-
-        req.flush({});
+        expect(results!).toEqual([
+            new BulkResultDto('123'),
+            new BulkResultDto('456', new ErrorDto(400, 'Invalid'))
+        ]);
     }));
 
     function contentResponse(id: number) {

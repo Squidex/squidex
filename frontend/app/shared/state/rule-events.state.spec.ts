@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DialogService, Pager, RuleEventsDto, RuleEventsState, RulesService } from '@app/shared/internal';
+import { DialogService, RuleEventsDto, RuleEventsState, RulesService } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -39,10 +39,10 @@ describe('RuleEventsState', () => {
     });
 
     it('should load ruleEvents', () => {
+        expect(ruleEventsState.snapshot.ruleEvents).toEqual(oldRuleEvents);
         expect(ruleEventsState.snapshot.isLoaded).toBeTruthy();
         expect(ruleEventsState.snapshot.isLoading).toBeFalsy();
-        expect(ruleEventsState.snapshot.ruleEvents).toEqual(oldRuleEvents);
-        expect(ruleEventsState.snapshot.ruleEventsPager.numberOfItems).toEqual(200);
+        expect(ruleEventsState.snapshot.total).toEqual(200);
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
@@ -68,7 +68,7 @@ describe('RuleEventsState', () => {
         rulesService.setup(x => x.getEvents(app, 10, 10, undefined))
             .returns(() => of(new RuleEventsDto(200, [])));
 
-        ruleEventsState.setPager(new Pager(200, 1, 10)).subscribe();
+        ruleEventsState.page({ page: 1, pageSize: 10 }).subscribe();
 
         expect().nothing();
 

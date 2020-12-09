@@ -31,6 +31,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public bool DoNotScript { get; set; } = true;
 
         /// <summary>
+        /// True to check referrers of this content.
+        /// </summary>
+        public bool CheckReferrers { get; set; }
+
+        /// <summary>
         /// True to turn off costly validation: Unique checks, asset checks and reference checks. Default: true.
         /// </summary>
         public bool OptimizeValidation { get; set; } = true;

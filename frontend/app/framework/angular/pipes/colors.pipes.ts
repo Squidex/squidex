@@ -121,16 +121,16 @@ function colorString({ r, g, b }: RGBColor) {
     let bs = Math.round(b * 255).toString(16);
 
     if (rs.length === 1) {
-        rs = '0' + rs;
+        rs = `0${rs}`;
     }
     if (gs.length === 1) {
-        gs = '0' + gs;
+        gs = `0${gs}`;
     }
     if (bs.length === 1) {
-        bs = '0' + bs;
+        bs = `0${bs}`;
     }
 
-    return '#' + rs + gs + bs;
+    return `#${rs}${gs}${bs}`;
 }
 
 @Pipe({

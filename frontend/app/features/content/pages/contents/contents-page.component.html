@@ -8,7 +8,7 @@
     <ng-container menu>
         <div class="row no-gutters pl-1">
             <div class="col-auto ml-8">
-                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{contentsState.schemaId}}/contents"></sqx-notifo>
+                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.id}}/contents"></sqx-notifo>
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
@@ -19,7 +19,7 @@
             <div class="col pl-1">
                 <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                     (queryChange)="search($event)"
-                    [query]="contentsState.contentsQuery | async"
+                    [query]="contentsState.query | async"
                     [queries]="queries"
                     [queryModel]="queryModel"
                     [language]="languageMaster" enableShortcut="true">
@@ -97,7 +97,7 @@
                                     <sqx-content-list-header
                                         [field]="field"
                                         (queryChange)="search($event)"
-                                        [query]="contentsState.contentsQuery | async"
+                                        [query]="contentsState.query | async"
                                         [language]="language">
                                     </sqx-content-list-header>
                                 </th>
@@ -126,7 +126,7 @@
                 </ng-container>
 
                 <ng-container footer>
-                    <sqx-pager [pager]="contentsState.contentsPager | async" (pagerChange)="contentsState.setPager($event)"></sqx-pager>
+                    <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)"></sqx-pager>
                 </ng-container>
             </sqx-list-view>
         </ng-container>

@@ -43,7 +43,7 @@ module.exports = function (env) {
     const isTests = env && env.target === 'tests';
     const isTestCoverage = env && env.coverage;
     const isAnalyzing = isProduction && env.analyze;
-    const isAot = !isDevServer;
+    const isAot = !isDevServer && !isTests && !isTestCoverage;
 
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
 

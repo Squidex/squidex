@@ -49,7 +49,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
                 starsArray.push(i);
             }
 
-            this.next(s => ({ ...s, starsArray }));
+            this.next({ starsArray });
         }
     }
 
@@ -66,9 +66,9 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
     }
 
     public writeValue(obj: any) {
-        const value = Types.isNumber(obj) ? obj : 0;
+        const stars = Types.isNumber(obj) ? obj : 0;
 
-        this.next(s => ({ ...s, stars: value, value }));
+        this.next({ stars });
     }
 
     public setPreview(stars: number) {
@@ -76,7 +76,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
             return;
         }
 
-        this.next(s => ({ ...s, stars }));
+        this.next({ stars });
     }
 
     public stopPreview() {
@@ -93,7 +93,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
         }
 
         if (this.snapshot.value) {
-            this.next(s => ({ ...s, stars: -1, value: null }));
+            this.next({ stars: -1, value: null });
 
             this.callChange(null);
             this.callTouched();
@@ -108,7 +108,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
         }
 
         if (this.snapshot.value !== value) {
-            this.next(s => ({ ...s, stars: value, value }));
+            this.next({ stars: value, value });
 
             this.callChange(value);
             this.callTouched();
