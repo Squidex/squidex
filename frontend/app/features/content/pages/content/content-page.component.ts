@@ -105,21 +105,16 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         contentId: content?.id
                     };
 
-                    const autosaved = this.autoSaveService.get(this.autoSaveKey);
+                    const dataAutosaved = this.autoSaveService.fetch(this.autoSaveKey);
+                    const dataCloned = this.tempService.fetch();
 
-                    if (content) {
-                        this.loadContent(content.data, true);
-                    }
+                    this.loadContent(dataCloned || content?.data || {}, true);
 
-                    const clone = this.tempService.fetch();
-
-                    if (clone) {
-                        this.loadContent(clone, true);
-                    } else if (isNewContent && autosaved && this.contentForm.hasChanges(autosaved)) {
+                    if (isNewContent && dataAutosaved && this.contentForm.hasChanges(dataAutosaved)) {
                         this.dialogs.confirm('i18n:contents.unsavedChangesTitle', 'i18n:contents.unsavedChangesText')
                             .subscribe(shouldLoad => {
                                 if (shouldLoad) {
-                                    this.loadContent(autosaved, false);
+                                    this.loadContent(dataAutosaved, false);
                                 } else {
                                     this.autoSaveService.remove(this.autoSaveKey);
                                 }

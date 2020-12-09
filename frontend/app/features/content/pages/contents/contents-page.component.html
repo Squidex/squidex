@@ -126,7 +126,7 @@
                 </ng-container>
 
                 <ng-container footer>
-                    <sqx-pager [paging]="contentsState.paging | async" (pagerChange)="contentsState.page($event)"></sqx-pager>
+                    <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)"></sqx-pager>
                 </ng-container>
             </sqx-list-view>
         </ng-container>

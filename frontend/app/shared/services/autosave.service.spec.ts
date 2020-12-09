@@ -75,28 +75,36 @@ describe('AutoSaveService', () => {
         localStore.verify(x => x.set(It.isAnyString(), It.isAnyString()), Times.never());
     });
 
-    it('should get unsaved created content', () => {
+    it('should get unsaved created content and delete', () => {
         localStore.setup(x => x.get('autosave.1-2'))
             .returns(() => '{"text":"Hello"}');
 
-        const content = autoSaveService.get({ schemaId: '1', schemaVersion: new Version('2') });
+        const key = { schemaId: '1', schemaVersion: new Version('2') };
+
+        const content = autoSaveService.fetch(key);
 
         expect(content).toEqual({ text: 'Hello' });
+
+        localStore.verify(x => x.remove(It.isAnyString()), Times.once());
     });
 
-    it('should get unsaved edited content', () => {
+    it('should get unsaved edited content and remove', () => {
         localStore.setup(x => x.get('autosave.1-2.3'))
             .returns(() => '{"text":"Hello"}');
 
-        const content = autoSaveService.get({ schemaId: '1', schemaVersion: new Version('2'), contentId: '3' });
+        const key = { schemaId: '1', schemaVersion: new Version('2'), contentId: '3' };
+
+        const content = autoSaveService.fetch(key);
 
         expect(content).toEqual({ text: 'Hello' });
+
+        localStore.verify(x => x.remove(It.isAnyString()), Times.once());
     });
 
     it('should not get content if key is not defined', () => {
         autoSaveService.remove(null!);
 
-        const content = autoSaveService.get(null!);
+        const content = autoSaveService.fetch(null!);
 
         expect(content).toBeNull();
 

@@ -61,7 +61,7 @@
             </div>
 
             <ng-container footer>
-                <sqx-pager [paging]="contributorsState.paging | async" (pagerChange)="contributorsState.page($event)"></sqx-pager>
+                <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)"></sqx-pager>
             </ng-container>
         </sqx-list-view>
     </ng-container>

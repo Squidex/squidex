@@ -34,6 +34,8 @@ export class PagerComponent implements OnChanges {
     public canGoPrev = false;
     public canGoNext = false;
 
+    public translationInfo: any;
+
     public pageSizes = PAGE_SIZES;
 
     public ngOnChanges() {
@@ -53,6 +55,12 @@ export class PagerComponent implements OnChanges {
             this.canGoNext = false;
             this.canGoPrev = false;
         }
+
+        this.translationInfo = {
+            itemFirst: this.itemFirst,
+            itemLast: this.itemLast,
+            numberOfItems: total
+        };
     }
 
     public goPrev() {

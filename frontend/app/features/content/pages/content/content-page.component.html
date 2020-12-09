@@ -28,7 +28,7 @@
  
         <ng-container menu>
             <ng-container *ngIf="content; else noContent">
-                <ng-container *ngIf="selectedTab === 'i18n:contents.contentTab.editor'">
+                <ng-container *ngIf="selectedTab === 'i18n:contents.contentTab.editor'; else referenceHeader">
                     <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
 
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
@@ -60,15 +60,15 @@
                     </ng-container>
                 </ng-container>
                 
-                <ng-container *ngIf="selectedTab !== 'i18n:contents.contentTab.editor'">
+                <ng-template #referenceHeader>
                     <button type="button" class="btn btn-primary ml-1" (click)="publish()">
-                        {{ 'common.publish' | sqxTranslate }}
+                        {{ 'contents.publishAll' | sqxTranslate }}
                     </button>
 
                     <button type="button" class="btn btn-primary ml-1" (click)="validate()">
-                        {{ 'common.validate' | sqxTranslate }}
+                        {{ 'contents.validate' | sqxTranslate }}
                     </button>
-                </ng-container>
+                </ng-template>
             </ng-container>
 
             <ng-template #noContent>
@@ -87,7 +87,32 @@
         </ng-container>
 
         <ng-container content>
-            <ng-container *ngIf="selectedTab === 'i18n:contents.contentTab.editor'">
+            <ng-container *ngIf="content; else noContentEditor">
+                <ng-container [ngSwitch]="selectedTab">
+                    <ng-container *ngSwitchCase="'i18n:contents.contentTab.editor'">
+                        <sqx-content-editor
+                            [(language)]="language"
+                            [contentForm]="contentForm"
+                            [contentFormCompare]="contentFormCompare"
+                            [formContext]="formContext"
+                            [languages]="languages"
+                            [schema]="schema">
+                        </sqx-content-editor>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'i18n:contents.contentTab.references'">
+                        <sqx-content-references mode="references"
+                            [content]="content">
+                        </sqx-content-references>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'i18n:contents.contentTab.referencing'">
+                        <sqx-content-references mode="referencing"
+                            [content]="content">
+                        </sqx-content-references>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+
+            <ng-template #noContentEditor>
                 <sqx-content-editor
                     [(language)]="language"
                     [contentForm]="contentForm"
@@ -96,17 +121,7 @@
                     [languages]="languages"
                     [schema]="schema">
                 </sqx-content-editor>
-            </ng-container>
-            <ng-container *ngIf="selectedTab === 'i18n:contents.contentTab.references'">
-                <sqx-content-references mode="references"
-                    [content]="content">
-                </sqx-content-references>
-            </ng-container>
-            <ng-container *ngIf="selectedTab === 'i18n:contents.contentTab.referencing'">
-                <sqx-content-references mode="referencing"
-                    [content]="content">
-                </sqx-content-references>
-            </ng-container>
+            </ng-template>
         </ng-container>
 
         <ng-container sidebar>

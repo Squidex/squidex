@@ -5,7 +5,7 @@
         </select>
 
         <span class="page-info">
-            <span *ngIf="paging.count > 0" class="pagination-text">{{ 'common.pagerInfo' | sqxTranslate: paging }}</span>
+            <span *ngIf="paging.count > 0" class="pagination-text">{{ 'common.pagerInfo' | sqxTranslate: translationInfo }}</span>
     
             <button type="button" class="btn btn-text-secondary pagination-button" [disabled]="!canGoPrev" (click)="goPrev()">
                 <i class="icon-angle-left"></i>
