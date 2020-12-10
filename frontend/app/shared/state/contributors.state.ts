@@ -76,7 +76,7 @@ export class ContributorsState extends State<Snapshot> {
 
     public loadAndListen(synchronizer: StateSynchronizer) {
         synchronizer.mapTo(this)
-            .withString('query', 'q')
+            .withString('query')
             .withPaging('contributors', 10)
             .whenSynced(() => this.loadInternal(false))
             .build();

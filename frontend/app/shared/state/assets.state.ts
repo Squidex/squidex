@@ -126,8 +126,8 @@ export class AssetsState extends State<Snapshot> {
     public loadAndListen(synchronizer: StateSynchronizer) {
         synchronizer.mapTo(this)
             .withPaging('assets', 30)
-            .withString('parentId', 'parent')
-            .withStrings('tagsSelected', 'tags')
+            .withString('parentId')
+            .withStrings('tagsSelected')
             .withSynchronizer(QueryFullTextSynchronizer.INSTANCE)
             .whenSynced(() => this.loadInternal(false))
             .build();

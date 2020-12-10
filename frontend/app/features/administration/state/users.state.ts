@@ -87,7 +87,7 @@ export class UsersState extends State<Snapshot> {
         synchronizer.mapTo(this)
             .keep('selectedUser')
             .withPaging('users', 10)
-            .withString('query', 'q')
+            .withString('query')
             .whenSynced(() => this.loadInternal(false))
             .build();
     }

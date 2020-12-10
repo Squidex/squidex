@@ -53,7 +53,7 @@ export class RuleEventsState extends State<Snapshot> {
     public loadAndListen(route: Router2State) {
         route.mapTo(this)
             .withPaging('ruleEvents', 30)
-            .withString('ruleId', 'ruleId')
+            .withString('ruleId')
             .whenSynced(() => this.loadInternal(false))
             .build();
     }

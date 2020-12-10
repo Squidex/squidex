@@ -6,14 +6,14 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, ContentDto, ManualContentsState } from '@app/shared';
+import { AppLanguageDto, ContentDto, ManualContentsState, Router2State } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-references',
     styleUrls: ['./content-references.component.scss'],
     templateUrl: './content-references.component.html',
     providers: [
-        ManualContentsState
+        Router2State, ManualContentsState
     ]
 })
 export class ContentReferencesComponent implements OnChanges {
@@ -27,6 +27,7 @@ export class ContentReferencesComponent implements OnChanges {
     public mode: 'references' | 'referencing' = 'references';
 
     constructor(
+        public readonly contentsRoute: Router2State,
         public readonly contentsState: ManualContentsState
     ) {
     }
@@ -36,9 +37,9 @@ export class ContentReferencesComponent implements OnChanges {
             this.contentsState.schema = { name: this.content.schemaName };
 
             if (this.mode === 'references') {
-                this.contentsState.loadReference(this.content.id);
+                this.contentsState.loadReference(this.content.id, this.contentsRoute);
             } else {
-                this.contentsState.loadReferencing(this.content.id);
+                this.contentsState.loadReferencing(this.content.id, this.contentsRoute);
             }
         }
     }

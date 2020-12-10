@@ -127,22 +127,24 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public loadAndListen(synchronizer: StateSynchronizer) {
         synchronizer.mapTo(this)
             .keep('selectedContent')
+            .keep('reference')
+            .keep('referencing')
             .withPaging('contents', 10)
             .withSynchronizer(QuerySynchronizer.INSTANCE)
             .whenSynced(() => this.loadInternal(false))
             .build();
     }
 
-    public loadReference(contentId: string) {
-        this.resetState({ reference: contentId });
+    public loadReference(contentId: string, synchronizer: StateSynchronizer) {
+        this.resetState({ reference: contentId, referencing: undefined });
 
-        return this.loadInternal(false);
+        return this.loadAndListen(synchronizer);
     }
 
-    public loadReferencing(contentId: string) {
-        this.resetState({ referencing: contentId });
+    public loadReferencing(contentId: string, synchronizer: StateSynchronizer) {
+        this.resetState({ referencing: contentId, reference: undefined });
 
-        return this.loadInternal(false);
+        return this.loadAndListen(synchronizer);
     }
 
     public load(isReload = false): Observable<any> {
