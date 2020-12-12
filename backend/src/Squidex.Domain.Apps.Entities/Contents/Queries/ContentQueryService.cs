@@ -103,6 +103,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     contents = contents.SortSet(x => x.Id, q.Ids);
                 }
 
+                if (context.Permissions.Any(p => p.Id == Permissions.AppContentReadOwn))
+                {
+                    var claim = context.User.Claims.Where(p => p.Type == "sub").First().Value;
+                    var contentsList = contents.Where(c => c.CreatedBy.Identifier == claim).ToList();
+                    contents = ResultList.Create(contentsList.Count, contentsList);
+                }
+
                 return await TransformAsync(context, contents);
             }
         }
