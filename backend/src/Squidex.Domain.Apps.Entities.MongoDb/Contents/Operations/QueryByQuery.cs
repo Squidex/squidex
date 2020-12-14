@@ -10,7 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -274,6 +276,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             if (referenced != default)
             {
                 filters.Add(Filter.AnyEq(x => x.ReferencedIds, referenced));
+            }
+
+            if (query?.CreatedBy != null)
+            {
+                filters.Add(Filter.Eq(x => x.CreatedBy.Identifier, query.CreatedBy));
             }
 
             return Filter.And(filters);

@@ -92,6 +92,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
+            if (context.Permissions.Any(p => p.Id == Permissions.AppContentReadOwn))
+            {
+                q.CreatedBy = context.User.Claims.Where(p => p.Type == "sub").First().Value;
+            }
+
             using (Profiler.TraceMethod<ContentQueryService>())
             {
                 q = await queryParser.ParseAsync(context, q, schema);
@@ -101,13 +106,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
                     contents = contents.SortSet(x => x.Id, q.Ids);
-                }
-
-                if (context.Permissions.Any(p => p.Id == Permissions.AppContentReadOwn))
-                {
-                    var claim = context.User.Claims.Where(p => p.Type == "sub").First().Value;
-                    var contentsList = contents.Where(c => c.CreatedBy.Identifier == claim).ToList();
-                    contents = ResultList.Create(contentsList.Count, contentsList);
                 }
 
                 return await TransformAsync(context, contents);

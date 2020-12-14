@@ -31,6 +31,8 @@ namespace Squidex.Domain.Apps.Entities
 
         public ClrQuery Query { get; init; } = new ClrQuery();
 
+        public string? CreatedBy { get; set; }
+
         private Q()
         {
         }
