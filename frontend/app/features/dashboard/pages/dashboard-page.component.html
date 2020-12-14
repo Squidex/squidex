@@ -1,9 +1,9 @@
 <sqx-title message="i18n:dashboard.pageTitle"></sqx-title>
 
-<ng-container *ngIf="appsState.selectedApp | async; let app">
+<ng-container *ngIf="selectedApp | async; let app">
     <div class="dashboard" @fade="">
         <div class="dashboard-summary" *ngIf="!isScrolled" @fade="">
-            <h1 class="dashboard-title">{{ 'dashboard.welcomeTitle' | sqxTranslate: { user: authState.user?.displayName } }}</h1>
+            <h1 class="dashboard-title">{{ 'dashboard.welcomeTitle' | sqxTranslate: { user: user } }}</h1>
 
             <div class="subtext" [innerHTML]="'dashboard.welcomeText' | sqxTranslate: { app: app.displayName } | sqxMarkdown"></div>
         </div>
@@ -67,7 +67,9 @@
         </gridster>
 
         <div class="dashboard-settings">
-            <sqx-dashboard-config [app]="app" [needsAttention]="isScrolled" [config]="gridConfig" (configChange)="changeConfig($event)">
+            <sqx-dashboard-config [app]="app" [needsAttention]="isScrolled" 
+                [config]="gridConfig" 
+                (configChange)="changeConfig($event)">
             </sqx-dashboard-config>
         </div>
     </div>

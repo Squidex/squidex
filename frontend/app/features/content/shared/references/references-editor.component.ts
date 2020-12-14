@@ -42,6 +42,9 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
+    public formContext: any;
+
+    @Input()
     public allowDuplicates = true;
 
     public contentCreatorDialog = new DialogModel();

@@ -26,7 +26,14 @@ export class RuleEventsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.ruleEventsState.loadAndListen(this.ruleEventsRoute);
+        const initial =
+            this.ruleEventsRoute.mapTo(this.ruleEventsState)
+                .withPaging('rules', 30)
+                .withString('query')
+                .getInitial();
+
+        this.ruleEventsState.load(false, initial);
+        this.ruleEventsRoute.unlisten();
     }
 
     public reload() {

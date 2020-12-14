@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NavigationEnd, NavigationExtras, NavigationStart, Params, Router } from '@angular/router';
-import { LocalStoreService, MathHelper } from '@app/framework/internal';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { NavigationExtras, Params, Router } from '@angular/router';
+import { LocalStoreService } from '@app/framework/internal';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { State } from './../../state';
 import { PagingSynchronizer, QueryParams, Router2State, StringKeysSynchronizer, StringSynchronizer } from './router-2-state';
@@ -164,150 +163,50 @@ describe('Router2State', () => {
 
     describe('Implementation', () => {
         let localStore: IMock<LocalStoreService>;
-        let routerQueryParams: BehaviorSubject<Params>;
-        let routerEvents: Subject<any>;
+        let queryParams: QueryParams = {};
         let route: any;
         let router: IMock<Router>;
         let router2State: Router2State;
         let state: State<any>;
-        let invoked = 0;
 
         beforeEach(() => {
             localStore = Mock.ofType<LocalStoreService>();
 
-            routerEvents = new Subject<any>();
+            queryParams = {};
+
             router = Mock.ofType<Router>();
-            router.setup(x => x.events).returns(() => routerEvents);
+            route = {
+                snapshot: {
+                    queryParams
+                }
+            };
 
             state = new State<any>({});
 
-            routerQueryParams = new BehaviorSubject<Params>({});
-            route = { queryParams: routerQueryParams, id: MathHelper.guid() };
-
             router2State = new Router2State(route, router.object, localStore.object);
             router2State.mapTo(state)
-                .keep('keep')
                 .withString('state1')
                 .withStrings('state2')
-                .whenSynced(() => { invoked++; })
-                .build();
-
-            invoked = 0;
+                .listen();
         });
 
         afterEach(() => {
             router2State.ngOnDestroy();
         });
 
-        it('should unsubscribe from route and state', () => {
+        it('should unsubscribe from state', () => {
             router2State.ngOnDestroy();
 
             expect(state.changes['observers'].length).toEqual(0);
-            expect(route.queryParams.observers.length).toEqual(0);
-            expect(routerEvents.observers.length).toEqual(0);
         });
 
-        it('Should sync from route', () => {
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'squidex,cms'
-            });
+        it('Should get values from route', () => {
+            queryParams['state1'] = 'hello';
+            queryParams['state2'] = 'squidex,cms';
 
-            expect(state.snapshot.state1).toEqual('hello');
-            expect(state.snapshot.state2).toEqual({ squidex: true, cms: true });
-        });
+            const values = router2State.getInitial();
 
-        it('Should invoke callback after sync from route', () => {
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'squidex,cms'
-            });
-
-            expect(invoked).toEqual(1);
-        });
-
-        it('Should not sync again from route when nothing changed', () => {
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'squidex,cms'
-            });
-
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'squidex,cms'
-            });
-
-            expect(invoked).toEqual(1);
-        });
-
-        it('Should not sync again from route  when changed from null to undefined', () => {
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: null
-            });
-
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: undefined
-            });
-
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: null
-            });
-
-            expect(invoked).toEqual(1);
-        });
-
-        it('Should not sync again from route  when no state has changed', () => {
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'squidex,cms'
-            });
-
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'cms,squidex'
-            });
-
-            expect(invoked).toEqual(1);
-        });
-
-        it('Should not sync again from route when other key changed', () => {
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'squidex,cms'
-            });
-
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'squidex,cms',
-                state3: 'other'
-            });
-
-            expect(invoked).toEqual(1);
-        });
-
-        it('Should reset other values when synced from route', () => {
-            state.next({ other: 123 });
-
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'squidex,cms'
-            });
-
-            expect(state.snapshot.other).toBeUndefined();
-        });
-
-        it('Should keep configured values when synced from route', () => {
-            state.next({ keep: 123 });
-
-            routerQueryParams.next({
-                state1: 'hello',
-                state2: 'squidex,cms'
-            });
-
-            expect(state.snapshot.keep).toBe(123);
+            expect(values).toEqual({ state1: 'hello', state2: { squidex: true, cms: true } });
         });
 
         it('Should sync from state', () => {
@@ -325,60 +224,30 @@ describe('Router2State', () => {
             expect(routeExtras!.queryParamsHandling).toBe('merge');
             expect(routeExtras!.queryParams).toEqual({ state1: 'hello', state2: 'squidex,cms' });
 
-            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.once());
+            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.exactly(2));
         });
 
-        it('Should sync from state again when nothing has changed', () => {
-            state.next({
-                state1: 'hello',
-                state2: { squidex: true, cms: true }
-            });
-
-            state.next({
-                state1: 'hello',
-                state2: { squidex: true, cms: true }
-            });
-
-            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.once());
-
-            expect().nothing();
-        });
-
-        it('Should not sync from state when navigating', () => {
-            routerEvents.next(new NavigationStart(0, ''));
-
-            state.next({
-                state1: 'hello',
-                state2: { squidex: true, cms: true }
-            });
-
-            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.never());
-
-            expect().nothing();
-        });
-
-        it('Should sync from state delayed when navigating', () => {
+        it('Should not sync from state again when nothing has changed', () => {
             let routeExtras: NavigationExtras;
 
             router.setup(x => x.navigate([], It.isAny()))
                 .callback((_, extras) => { routeExtras = extras; });
 
-            routerEvents.next(new NavigationStart(0, ''));
+            state.next({
+                state1: 'hello',
+                state2: { squidex: true, cms: true }
+            });
 
             state.next({
                 state1: 'hello',
                 state2: { squidex: true, cms: true }
             });
 
-            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.never());
-
-            routerEvents.next(new NavigationEnd(0, '', ''));
-
             expect(routeExtras!.replaceUrl).toBeTrue();
             expect(routeExtras!.queryParamsHandling).toBe('merge');
             expect(routeExtras!.queryParams).toEqual({ state1: 'hello', state2: 'squidex,cms' });
 
-            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.once());
+            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.exactly(2));
         });
     });
 });

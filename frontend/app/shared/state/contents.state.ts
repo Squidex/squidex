@@ -6,13 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, getPagingInfo, ListState, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
+import { DialogService, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
-import { Query, QuerySynchronizer } from './query';
+import { Query } from './query';
 import { SchemasState } from './schemas.state';
 
 interface Snapshot extends ListState<Query> {
@@ -124,32 +124,21 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 }));
     }
 
-    public loadAndListen(synchronizer: StateSynchronizer) {
-        synchronizer.mapTo(this)
-            .keep('selectedContent')
-            .keep('reference')
-            .keep('referencing')
-            .withPaging('contents', 10)
-            .withSynchronizer(QuerySynchronizer.INSTANCE)
-            .whenSynced(() => this.loadInternal(false))
-            .build();
+    public loadReference(contentId: string, update: Partial<Snapshot> = {}) {
+        this.resetState({ reference: contentId, referencing: undefined, ...update });
+
+        return this.loadInternal(false);
     }
 
-    public loadReference(contentId: string, synchronizer: StateSynchronizer) {
-        this.resetState({ reference: contentId, referencing: undefined });
+    public loadReferencing(contentId: string, update: Partial<Snapshot> = {}) {
+        this.resetState({ referencing: contentId, reference: undefined, ...update });
 
-        return this.loadAndListen(synchronizer);
+        return this.loadInternal(false);
     }
 
-    public loadReferencing(contentId: string, synchronizer: StateSynchronizer) {
-        this.resetState({ referencing: contentId, reference: undefined });
-
-        return this.loadAndListen(synchronizer);
-    }
-
-    public load(isReload = false): Observable<any> {
+    public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ selectedContent: this.snapshot.selectedContent });
+            this.resetState({ selectedContent: this.snapshot.selectedContent, ...update });
         }
 
         return this.loadInternal(isReload);

@@ -8,9 +8,9 @@
 // tslint:disable: triple-equals
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppsState, ContentDto, ContentsState, fadeAnimation, HistoryEventDto, HistoryService, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState, switchSafe } from '@app/shared';
+import { AppsState, ContentDto, ContentsState, defined, fadeAnimation, HistoryEventDto, HistoryService, ModalModel, ResourceOwner, SchemasState, switchSafe } from '@app/shared';
 import { Observable, timer } from 'rxjs';
-import { filter, map, onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 import { ContentPageComponent } from './content-page.component';
 
@@ -25,8 +25,6 @@ import { ContentPageComponent } from './content-page.component';
 export class ContentHistoryPageComponent extends ResourceOwner implements OnInit {
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
-
-    public schema: SchemaDetailsDto;
 
     public content: ContentDto;
     public contentEvents: Observable<ReadonlyArray<HistoryEventDto>>;
@@ -46,43 +44,31 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
 
     public ngOnInit() {
         this.own(
-            this.schemasState.selectedSchema
-                .subscribe(schema => {
-                    if (schema) {
-                        this.schema = schema;
-                    }
-                }));
-
-        this.own(
-            this.contentsState.selectedContent
+            this.contentsState.selectedContent.pipe(defined())
                 .subscribe(content => {
-                    if (content) {
-                        this.content = content;
-                    }
+                    this.content = content;
                 }));
 
         this.contentEvents =
             this.contentsState.selectedContent.pipe(
-                filter(x => !!x),
-                map(content => `schemas.${this.schemasState.schemaId}.contents.${content?.id}`),
+                defined(),
+                map(content => `schemas.${this.schemasState.schemaId}.contents.${content.id}`),
                 switchSafe(channel => timer(0, 5000).pipe(map(() => channel))),
                 switchSafe(channel => this.historyService.getHistory(this.appsState.appName, channel)));
     }
 
     public changeStatus(status: string) {
         this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
-                filter(x => !!x),
-                switchMap(_ => this.dueTimeSelector.selectDueTime(status)),
-                switchMap(d => this.contentsState.changeManyStatus([this.content], status, d)),
-                onErrorResumeNext())
+                defined(),
+                switchSafe(_ => this.dueTimeSelector.selectDueTime(status)),
+                switchSafe(d => this.contentsState.changeManyStatus([this.content], status, d)))
             .subscribe();
     }
 
     public createDraft() {
         this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
-                filter(x => !!x),
-                switchMap(d => this.contentsState.createDraft(this.content)),
-                onErrorResumeNext())
+                defined(),
+                switchSafe(() => this.contentsState.createDraft(this.content)))
             .subscribe();
     }
 

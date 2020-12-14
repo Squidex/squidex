@@ -40,6 +40,8 @@ export class GraphQLPageComponent implements AfterViewInit {
     }
 
     private request(params: any) {
-        return this.graphQlService.query(this.appsState.appName, params).pipe(catchError(response => of(response.error))).toPromise();
+        return this.graphQlService.query(this.appsState.appName, params).pipe(
+                catchError(response => of(response.error)))
+            .toPromise();
     }
 }

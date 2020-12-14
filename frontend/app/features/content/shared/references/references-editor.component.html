@@ -37,6 +37,7 @@
 <ng-container *sqxModal="contentCreatorDialog">
     <sqx-content-creator
         (select)="select($event)"
+        [formContext]="formContext"
         [language]="language"
         [languages]="languages"
         [schemaIds]="schemaIds">

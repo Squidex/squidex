@@ -9,9 +9,9 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, fadeAnimation, LanguagesState, ModalModel, Queries, Query, QueryModel, queryModelFromSchema, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, TableFields, TempService, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, fadeAnimation, LanguagesState, ModalModel, Queries, Query, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
 import { combineLatest } from 'rxjs';
-import { distinctUntilChanged, onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -26,6 +26,9 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
     ]
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
+    @ViewChild('dueTimeSelector', { static: false })
+    public dueTimeSelector: DueTimeSelectorComponent;
+
     public schema: SchemaDetailsDto;
 
     public tableView: TableFields;
@@ -37,27 +40,31 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public selectedAll = false;
     public selectionCount = 0;
     public selectionCanDelete = false;
-
-    public nextStatuses: { [name: string]: string } = {};
+    public selectionStatuses: { [name: string]: string } = {};
 
     public language: AppLanguageDto;
-    public languageMaster: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    public queryModel: QueryModel;
-    public queries: Queries;
+    public queryModel =
+        combineLatest([
+            this.schemasState.selectedSchema.pipe(defined()),
+            this.languagesState.isoLanguages,
+            this.contentsState.statuses
+        ]).pipe(
+            map(values => queryModelFromSchema(values[0], values[1], values[2])));
 
-    @ViewChild('dueTimeSelector', { static: false })
-    public dueTimeSelector: DueTimeSelectorComponent;
+    public queries =
+        this.schemasState.selectedSchema.pipe(defined(),
+            map(schema => new Queries(this.uiState, `schemas.${schema.name}`)));
 
     constructor(
         public readonly contentsRoute: Router2State,
         public readonly contentsState: ContentsState,
+        public readonly languagesState: LanguagesState,
         private readonly appsState: AppsState,
         private readonly contributorsState: ContributorsState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly languagesState: LanguagesState,
         private readonly schemasState: SchemasState,
         private readonly tempService: TempService,
         private readonly uiState: UIState
@@ -71,26 +78,34 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         }
 
         this.own(
-            combineLatest([
-                this.schemasState.selectedSchema,
-                this.languagesState.languages,
-                this.contentsState.statuses
-            ]).subscribe(([schema, languages, statuses]) => {
-                this.queryModel = queryModelFromSchema(schema, languages.map(x => x.language), statuses);
-            }));
+            this.languagesState.isoMasterLanguage
+                .subscribe(language => {
+                    this.language = language;
+                }));
 
         this.own(
-            this.route.params.pipe(
-                    switchMap(() => this.schemasState.selectedSchema), distinctUntilChanged())
+            this.languagesState.isoLanguages
+                .subscribe(languages => {
+                    this.languages = languages;
+                }));
+
+        this.own(
+            getSchemaName(this.route).pipe(switchMap(() => this.schemasState.selectedSchema.pipe(defined(), take(1))))
                 .subscribe(schema => {
                     this.resetSelection();
 
                     this.schema = schema;
 
-                    this.updateQueries();
-                    this.updateTable();
+                    this.tableView = new TableFields(this.uiState, schema);
 
-                    this.contentsState.loadAndListen(this.contentsRoute);
+                    const initial =
+                        this.contentsRoute.mapTo(this.contentsState)
+                            .withPaging('contents', 10)
+                            .withSynchronizer(QuerySynchronizer.INSTANCE)
+                            .getInitial();
+
+                    this.contentsState.load(false, initial);
+                    this.contentsRoute.listen();
                 }));
 
         this.own(
@@ -98,26 +113,18 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(() => {
                     this.updateSelectionSummary();
                 }));
-
-        this.own(
-            this.languagesState.languagesDtos
-                .subscribe(languages => {
-                    this.languages = languages;
-                    this.language = this.languages.find(x => x.isMaster)!;
-                    this.languageMaster = this.language;
-                }));
     }
 
     public reload() {
         this.contentsState.load(true);
     }
 
-    public deleteSelected() {
-        this.contentsState.deleteMany(this.selectItems());
-    }
-
     public delete(content: ContentDto) {
         this.contentsState.deleteMany([content]);
+    }
+
+    public deleteSelected() {
+        this.contentsState.deleteMany(this.selectItems());
     }
 
     public changeStatus(content: ContentDto, status: string) {
@@ -137,8 +144,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 tap(() => {
                     this.resetSelection();
                 }),
-                switchMap(d => this.contentsState.changeManyStatus(contents, action, d)),
-                onErrorResumeNext())
+                switchSafe(d => this.contentsState.changeManyStatus(contents, action, d)))
             .subscribe();
     }
 
@@ -152,25 +158,18 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.search(query);
     }
 
-    private selectItems(predicate?: (content: ContentDto) => boolean) {
-        return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
-    }
-
     public isItemSelected(content: ContentDto): boolean {
         return this.selectedItems[content.id] === true;
     }
-    public selectLanguage(language: AppLanguageDto) {
-        this.language = language;
-    }
 
-    public selectItem(content: ContentDto, isSelected: boolean) {
-        this.selectedItems[content.id] = isSelected;
+    public resetSelection() {
+        this.selectedItems = {};
 
         this.updateSelectionSummary();
     }
 
-    private resetSelection() {
-        this.selectedItems = {};
+    public selectItem(content: ContentDto, isSelected: boolean) {
+        this.selectedItems[content.id] = isSelected;
 
         this.updateSelectionSummary();
     }
@@ -187,19 +186,15 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public trackByContent(_index: number, content: ContentDto): string {
-        return content.id;
-    }
-
     private updateSelectionSummary() {
         this.selectedAll = this.contentsState.snapshot.contents.length > 0;
         this.selectionCount = 0;
         this.selectionCanDelete = true;
-        this.nextStatuses = {};
+        this.selectionStatuses = {};
 
         for (const content of this.contentsState.snapshot.contents) {
             for (const info of content.statusUpdates) {
-                this.nextStatuses[info.status] = info.color;
+                this.selectionStatuses[info.status] = info.color;
             }
         }
 
@@ -207,10 +202,10 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
-                for (const action in this.nextStatuses) {
-                    if (this.nextStatuses.hasOwnProperty(action)) {
+                for (const action in this.selectionStatuses) {
+                    if (this.selectionStatuses.hasOwnProperty(action)) {
                         if (!content.statusUpdates.find(x => x.status === action)) {
-                            delete this.nextStatuses[action];
+                            delete this.selectionStatuses[action];
                         }
                     }
                 }
@@ -224,15 +219,15 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         }
     }
 
-    private updateQueries() {
-        if (this.schema) {
-            this.queries = new Queries(this.uiState, `schemas.${this.schema.name}`);
-        }
+    public trackByContent(_index: number, content: ContentDto): string {
+        return content.id;
     }
 
-    private updateTable() {
-        if (this.schema) {
-            this.tableView = new TableFields(this.uiState, this.schema);
-        }
+    private selectItems(predicate?: (content: ContentDto) => boolean) {
+        return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
     }
+}
+
+function getSchemaName(route: ActivatedRoute) {
+    return route.params.pipe(map(x => x['schemaName'] as string), distinctUntilChanged());
 }

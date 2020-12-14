@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
-import { DialogService, getPagingInfo, ListState, shareSubscribed, State, StateSynchronizer } from '@app/shared';
+import { DialogService, getPagingInfo, ListState, shareSubscribed, State } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { CreateUserDto, UpdateUserDto, UserDto, UsersService } from './../services/users.service';
@@ -83,18 +83,9 @@ export class UsersState extends State<Snapshot> {
         return this.usersService.getUser(id).pipe(catchError(() => of(null)));
     }
 
-    public loadAndListen(synchronizer: StateSynchronizer) {
-        synchronizer.mapTo(this)
-            .keep('selectedUser')
-            .withPaging('users', 10)
-            .withString('query')
-            .whenSynced(() => this.loadInternal(false))
-            .build();
-    }
-
-    public load(isReload = false): Observable<any> {
+    public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ selectedUser: this.snapshot.selectedUser });
+            this.resetState({ selectedUser: this.snapshot.selectedUser, ...update });
         }
 
         return this.loadInternal(isReload);

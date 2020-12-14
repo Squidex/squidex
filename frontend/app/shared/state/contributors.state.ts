@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, StateSynchronizer, Types, Version } from '@app/framework';
+import { DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from './../services/contributors.service';
@@ -74,14 +74,6 @@ export class ContributorsState extends State<Snapshot> {
         });
     }
 
-    public loadAndListen(synchronizer: StateSynchronizer) {
-        synchronizer.mapTo(this)
-            .withString('query')
-            .withPaging('contributors', 10)
-            .whenSynced(() => this.loadInternal(false))
-            .build();
-    }
-
     public loadIfNotLoaded(): Observable<any> {
         if (this.snapshot.isLoaded) {
             return EMPTY;
@@ -90,9 +82,9 @@ export class ContributorsState extends State<Snapshot> {
         return this.loadInternal(false);
     }
 
-    public load(isReload = false): Observable<any> {
+    public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ page: 0 });
+            this.resetState(update);
         }
 
         return this.loadInternal(isReload);

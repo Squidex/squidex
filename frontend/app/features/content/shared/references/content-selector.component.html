@@ -28,9 +28,7 @@
                 </div>
                     
                 <div class="col-auto pl-1" *ngIf="languages.length > 1">
-                    <sqx-language-selector class="languages-buttons"
-                        (selectedLanguageChange)="selectLanguage($event)" [languages]="languages">
-                    </sqx-language-selector>
+                    <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
                 </div>
             </ng-container>
         </div>
@@ -72,11 +70,11 @@
                         <table class="table table-items table-fixed" [style.minWidth]="schema.defaultReferenceFields | sqxContentListWidth" *ngIf="contentsState.contents | async; let contents" [sqxSyncWidth]="header">
                             <tbody *ngFor="let content of contents; trackBy: trackByContent"
                                 [sqxContentSelectorItem]="content"
+                                [language]="language"
                                 [schema]="schema"
                                 [selectable]="!isItemAlreadySelected(content)"
                                 [selected]="isItemSelected(content)"
-                                (selectedChange)="selectContent(content)"
-                                [language]="language">
+                                (selectedChange)="selectContent(content)">
                             </tbody>
                         </table>
                     </div>

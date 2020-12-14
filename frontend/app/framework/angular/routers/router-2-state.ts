@@ -9,7 +9,7 @@
 // tslint:disable: readonly-array
 
 import { Injectable, OnDestroy } from '@angular/core';
-import { ActivatedRoute, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { LocalStoreService, Types } from '@app/framework/internal';
 import { State } from '@app/framework/state';
 import { Subscription } from 'rxjs';
@@ -144,19 +144,15 @@ export interface StateSynchronizer {
 }
 
 export interface StateSynchronizerMap<T> {
-    keep(key: keyof T & string): this;
-
     withString(key: keyof T & string): this;
 
     withStrings(key: keyof T & string): this;
 
     withPaging(storeName: string, defaultSize: number): this;
 
-    whenSynced(action: () => void): this;
-
     withSynchronizer(synchronizer: RouteSynchronizer): this;
 
-    build(): void;
+    getInitial(): Partial<T>;
 }
 
 @Injectable()
@@ -170,13 +166,25 @@ export class Router2State implements OnDestroy, StateSynchronizer {
     ) {
     }
 
+    public getInitial() {
+        return this.mapper?.getInitial();
+    }
+
+    public listen() {
+        this.mapper?.listen();
+    }
+
+    public unlisten() {
+        this.mapper?.unlisten();
+    }
+
     public ngOnDestroy() {
-        this.mapper?.destroy();
+        this.unlisten();
     }
 
     public mapTo<T extends object>(state: State<T>) {
-        this.mapper?.destroy();
-        this.mapper = this.mapper || new Router2StateMap<T>(state, this.route, this.router, this.localStore);
+        this.mapper?.unlisten();
+        this.mapper = new Router2StateMap<T>(state, this.route, this.router, this.localStore);
 
         return this.mapper;
     }
@@ -184,15 +192,8 @@ export class Router2State implements OnDestroy, StateSynchronizer {
 
 export class Router2StateMap<T extends object> implements StateSynchronizerMap<T> {
     private readonly syncs: RouteSynchronizer[] = [];
-    private readonly keysToKeep: string[] = [];
-    private syncDone: (() => void)[] = [];
-    private lastSyncedQuery?: Params;
-    private lastSyncedState?: Partial<T>;
-    private subscriptionChanges: Subscription;
-    private subscriptionQueryParams: Subscription;
-    private subscriptionEvents: Subscription;
-    private isNavigating = false;
-    private pendingParams?: Params;
+    private lastSyncedQuery: QueryParams;
+    private stateSubscription: Subscription;
 
     constructor(
         private readonly state: State<T>,
@@ -202,49 +203,17 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
     ) {
     }
 
-    public build() {
-        this.subscriptionQueryParams =
-            this.route.queryParams
-                .subscribe(q =>  this.syncFromRoute(q));
+    public listen() {
+        this.stateSubscription = this.state.changes.subscribe(s => this.syncToRoute(s));
 
-        this.subscriptionChanges =
-            this.state.changes
-                .subscribe(s => this.syncToRoute(s));
-
-        this.subscriptionEvents =
-            this.router.events
-                .subscribe(event => {
-                    if (Types.is(event, NavigationStart)) {
-                        this.isNavigating = true;
-                    } else if (
-                        Types.is(event, NavigationEnd) ||
-                        Types.is(event, NavigationCancel) ||
-                        Types.is(event, NavigationError)) {
-                        this.isNavigating = false;
-
-                        if (this.pendingParams) {
-                            this.syncFromParams(this.pendingParams);
-                        }
-                    }
-                });
-
-        this.lastSyncedQuery = undefined;
-        this.lastSyncedState = undefined;
+        return this;
     }
 
-    public destroy() {
-        this.syncDone = [];
-
-        this.subscriptionQueryParams?.unsubscribe();
-        this.subscriptionChanges?.unsubscribe();
-        this.subscriptionEvents?.unsubscribe();
+    public unlisten() {
+        this.stateSubscription?.unsubscribe();
     }
 
     private syncToRoute(state: T) {
-        if (!isChanged(this.syncs, state, this.lastSyncedState)) {
-            return;
-        }
-
         const query: Params = {};
 
         for (const sync of this.syncs) {
@@ -255,35 +224,23 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
             }
         }
 
-        if (this.isNavigating) {
-            this.pendingParams = query;
-        } else {
-            this.syncFromParams(query);
-        }
-    }
-
-    private syncFromParams(query: Params) {
-        this.pendingParams = undefined;
-
-        if (!isChanged(this.syncs, query, this.lastSyncedQuery)) {
+        if (Types.equals(this.lastSyncedQuery, query)) {
             return;
         }
+
+        this.lastSyncedQuery = query;
 
         this.router.navigate([], {
             queryParams: query,
             queryParamsHandling: 'merge',
             replaceUrl: true
         });
-
-        this.lastSyncedQuery = query;
     }
 
-    private syncFromRoute(query: Params) {
-        if (!isChanged(this.syncs, query, this.lastSyncedQuery)) {
-            return;
-        }
-
+    public getInitial() {
         const update: Partial<T> = {};
+
+        const query = this.route.snapshot.queryParams;
 
         for (const sync of this.syncs) {
             const values = sync.parseFromRoute(query);
@@ -293,27 +250,7 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
             }
         }
 
-        for (const key of this.keysToKeep) {
-            update[key] = this.state.snapshot[key];
-        }
-
-        if (!isChanged(this.syncs, update, this.lastSyncedState)) {
-            return;
-        }
-
-        if (this.state.resetState(update)) {
-            for (const action of this.syncDone) {
-                action();
-            }
-        }
-
-        this.lastSyncedState = update;
-    }
-
-    public keep(key: keyof T & string) {
-        this.keysToKeep.push(key);
-
-        return this;
+        return update;
     }
 
     public withString(key: keyof T & string) {
@@ -333,37 +270,4 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
 
         return this;
     }
-
-    public whenSynced(action: () => void) {
-        this.syncDone.push(action);
-
-        return this;
-    }
-}
-
-function isChanged(syncs: ReadonlyArray<RouteSynchronizer>, next: object, prev?: object) {
-    if (!prev) {
-        return true;
-    }
-
-    for (const sync of syncs) {
-        for (const key of sync.keys) {
-            const lhs = next[key];
-            const rhs = prev[key];
-
-            if (isNullOrUndefined(lhs) && isNullOrUndefined(rhs)) {
-                continue;
-            }
-
-            if (!Types.equals(lhs, rhs)) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-function isNullOrUndefined(value: any) {
-    return Types.isNull(value) || Types.isUndefined(value);
 }

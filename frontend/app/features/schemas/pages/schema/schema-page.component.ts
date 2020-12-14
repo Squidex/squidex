@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { fadeAnimation, MessageBus, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { defined, fadeAnimation, MessageBus, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState } from '@app/shared';
 import { map } from 'rxjs/operators';
 import { SchemaCloning } from './../messages';
 
@@ -38,7 +38,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
 
     public ngOnInit() {
         this.own(
-            this.schemasState.selectedSchema
+            this.schemasState.selectedSchema.pipe(defined())
                 .subscribe(schema => {
                     this.schema = schema;
                 }));

@@ -6,7 +6,6 @@
  */
 
 import { Component } from '@angular/core';
-import { UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-cluster-area',
@@ -14,8 +13,4 @@ import { UIState } from '@app/shared';
     templateUrl: './cluster-page.component.html'
 })
 export class ClusterPageComponent {
-    constructor(
-        public readonly uiState: UIState
-    ) {
-    }
 }

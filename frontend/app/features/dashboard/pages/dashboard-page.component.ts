@@ -8,9 +8,8 @@
 // tslint:disable: readonly-array
 
 import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { AppsState, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, fadeAnimation, LocalStoreService, ResourceOwner, Settings, StorageUsagePerDateDto, UsagesService } from '@app/shared';
+import { AppsState, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, LocalStoreService, ResourceOwner, Settings, StorageUsagePerDateDto, switchSafe, UsagesService } from '@app/shared';
 import { GridsterComponent, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
-import { switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-dashboard-page',
@@ -24,6 +23,8 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     @ViewChild('grid')
     public grid: GridsterComponent;
 
+    public selectedApp = this.appsState.selectedApp.pipe(defined());
+
     public isStacked: boolean;
 
     public storageCurrent: CurrentStorageDto;
@@ -36,9 +37,11 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
 
     public isScrolled = false;
 
+    public user = this.authState.user?.displayName;
+
     constructor(
-        public readonly appsState: AppsState,
-        public readonly authState: AuthService,
+        private readonly appsState: AppsState,
+        private readonly authState: AuthService,
         private readonly localStore: LocalStoreService,
         private readonly renderer: Renderer2,
         private readonly usagesService: UsagesService,
@@ -54,22 +57,19 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
         const dateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
 
         this.own(
-            this.appsState.selectedApp.pipe(
-                    switchMap(app => this.usagesService.getTodayStorage(app.name)))
+            this.selectedApp.pipe(switchSafe(app => this.usagesService.getTodayStorage(app.name)))
                 .subscribe(dto => {
                     this.storageCurrent = dto;
                 }));
 
         this.own(
-            this.appsState.selectedApp.pipe(
-                    switchMap(app => this.usagesService.getStorageUsages(app.name, dateFrom, dateTo)))
+            this.selectedApp.pipe(switchSafe(app => this.usagesService.getStorageUsages(app.name, dateFrom, dateTo)))
                 .subscribe(dtos => {
                     this.storageUsage = dtos;
                 }));
 
         this.own(
-            this.appsState.selectedApp.pipe(
-                    switchMap(app => this.usagesService.getCallsUsages(app.name, dateFrom, dateTo)))
+            this.selectedApp.pipe(switchSafe(app => this.usagesService.getCallsUsages(app.name, dateFrom, dateTo)))
                 .subscribe(dto => {
                     this.callsUsage = dto;
                 }));

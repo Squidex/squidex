@@ -15,7 +15,7 @@
         <div class="row no-gutters">
             <div class="col-auto">          
                 <div *ngIf="schema && languages.length > 1">
-                    <sqx-language-selector class="languages-buttons"(selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+                    <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
                 </div>
             </div>
 
@@ -38,10 +38,10 @@
             <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
                 <sqx-content-section *ngFor="let section of contentForm.sections"
                     [(language)]="language"
-                    [isCompact]="true"
                     [form]="contentForm"
-                    [formContext]="contentFormContext"
+                    [formContext]="formContext"
                     [formSection]="section"
+                    [isCompact]="true"
                     [languages]="languages"
                     [schema]="schema">
                 </sqx-content-section>

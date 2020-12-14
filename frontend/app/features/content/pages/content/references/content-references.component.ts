@@ -5,13 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, ContentDto, ManualContentsState, Router2State } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { AppLanguageDto, ContentDto, ManualContentsState, QuerySynchronizer, Router2State } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-references',
     styleUrls: ['./content-references.component.scss'],
     templateUrl: './content-references.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         Router2State, ManualContentsState
     ]
@@ -36,11 +37,19 @@ export class ContentReferencesComponent implements OnChanges {
         if (changes['content'] || changes['mode']) {
             this.contentsState.schema = { name: this.content.schemaName };
 
+            const initial =
+                this.contentsRoute.mapTo(this.contentsState)
+                    .withPaging('contents', 10)
+                    .withSynchronizer(QuerySynchronizer.INSTANCE)
+                    .getInitial();
+
             if (this.mode === 'references') {
-                this.contentsState.loadReference(this.content.id, this.contentsRoute);
+                this.contentsState.loadReference(this.content.id, initial);
             } else {
-                this.contentsState.loadReferencing(this.content.id, this.contentsRoute);
+                this.contentsState.loadReferencing(this.content.id, initial);
             }
+
+            this.contentsRoute.listen();
         }
     }
 
