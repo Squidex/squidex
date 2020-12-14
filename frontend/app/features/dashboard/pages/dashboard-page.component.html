@@ -1,14 +1,14 @@
 <sqx-title message="i18n:dashboard.pageTitle"></sqx-title>
 
 <ng-container *ngIf="selectedApp | async; let app">
-    <div class="dashboard" @fade="">
-        <div class="dashboard-summary" *ngIf="!isScrolled" @fade="">
+    <div class="dashboard" @fade>
+        <div class="dashboard-summary" *ngIf="!isScrolled" @fade>
             <h1 class="dashboard-title">{{ 'dashboard.welcomeTitle' | sqxTranslate: { user: user } }}</h1>
 
             <div class="subtext" [innerHTML]="'dashboard.welcomeText' | sqxTranslate: { app: app.displayName } | sqxMarkdown"></div>
         </div>
 
-        <gridster [options]="gridOptions" #grid="">
+        <gridster [options]="gridOptions" #grid>
             <gridster-item [item]="item" *ngFor="let item of gridConfig">
                 <ng-container [ngSwitch]="item.type">
                     <ng-container *ngSwitchCase="'schemas'">
@@ -66,7 +66,7 @@
             </gridster-item>
         </gridster>
 
-        <div class="dashboard-settings">
+        <div class="dashboard-settings" *ngIf="grid">
             <sqx-dashboard-config [app]="app" [needsAttention]="isScrolled" 
                 [config]="gridConfig" 
                 (configChange)="changeConfig($event)">

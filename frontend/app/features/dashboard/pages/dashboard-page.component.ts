@@ -100,7 +100,7 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     public changeConfig(config: GridsterItem[]) {
         this.gridConfig = config;
 
-        this.grid.updateGrid();
+        this.grid?.updateGrid();
     }
 }
 
