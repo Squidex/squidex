@@ -23,7 +23,6 @@ interface State {
 
     // True when the submenu should be open.
     showSubmenu: boolean;
-
 }
 
 @Component({

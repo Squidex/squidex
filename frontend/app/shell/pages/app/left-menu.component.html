@@ -1,4 +1,4 @@
-<ul class="nav flex-column" *ngIf="appsState.selectedApp | async; let app">
+<ul class="nav flex-column">
     <li class="nav-item" *ngIf="!isSchemasHidden(app) && app.canReadSchemas">
         <a class="nav-link" routerLink="schemas" routerLinkActive="active">
             <i class="nav-icon icon-schemas"></i> <div class="nav-text">{{ 'common.schemas' | sqxTranslate }}</div>

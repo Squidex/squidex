@@ -9,16 +9,10 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
-import { filter, tap } from 'rxjs/operators';
+import { filter, map, tap } from 'rxjs/operators';
 import { ContentReferencesComponent } from './references/content-references.component';
-
-const TABS: ReadonlyArray<string> = [
-    'i18n:contents.contentTab.editor',
-    'i18n:contents.contentTab.references',
-    'i18n:contents.contentTab.referencing'
-];
 
 @Component({
     selector: 'sqx-content-page',
@@ -39,13 +33,11 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     public formContext: any;
 
+    public contentTab = this.route.queryParams.pipe(map(x => x['tab'] || 'editor'));
     public content?: ContentDto | null;
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
     public contentFormCompare: EditContentForm | null = null;
-
-    public selectableTabs = TABS;
-    public selectedTab = this.selectableTabs[0];
 
     public dropdown = new ModalModel();
 
@@ -66,8 +58,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
         this.formContext = {
             apiUrl: apiUrl.buildUrl('api'),
-            appId: appsState.snapshot.selectedApp!.id,
-            appName: appsState.snapshot.selectedApp!.name,
+            appId: contentsState.appId,
+            appName: appsState.appName,
             user: authService.user
         };
     }
@@ -76,14 +68,19 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.contentsState.loadIfNotLoaded();
 
         this.own(
-            this.languagesState.languagesDtos
-                .subscribe(languages => {
-                    this.languages = languages;
-                    this.language = this.languages.find(x => x.isMaster)!;
+            this.languagesState.isoMasterLanguage
+                .subscribe(language => {
+                    this.language = language;
                 }));
 
         this.own(
-            this.schemasState.selectedSchema
+            this.languagesState.isoLanguages
+                .subscribe(languages => {
+                    this.languages = languages;
+                }));
+
+        this.own(
+            this.schemasState.selectedSchema.pipe(defined())
                 .subscribe(schema => {
                     this.schema = schema;
 
@@ -137,10 +134,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }
             })
         );
-    }
-
-    public selectTab(tab: string) {
-        this.selectedTab = tab;
     }
 
     public validate() {

@@ -1,4 +1,4 @@
-<ng-container *ngIf="appsState.selectedAppOrNull | async; let app">
+<ng-container *ngIf="appsState.selectedApp | async; let app">
     <ng-container *ngIf="app.canUploadAssets">
         <ul class="nav navbar-nav align-items-center" *ngIf="assetUploader.uploads | async; let uploads" (sqxDropFile)="addFiles($event)">
             <li class="nav-item nav-icon dropdown">

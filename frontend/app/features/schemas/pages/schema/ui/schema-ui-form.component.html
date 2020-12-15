@@ -1,8 +1,14 @@
 <form class="inner-form" (ngSubmit)="saveSchema()">
     <div class="inner-header">
         <ul class="nav nav-tabs2">
-            <li class="nav-item" *ngFor="let tab of selectableTabs">
-                <a class="nav-link" [class.active]="selectedTab === tab" (click)="selectTab(tab)">{{tab | sqxTranslate}}</a>
+            <li class="nav-item">
+                <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">
+                    {{ 'i18n:schemas.listFields' | sqxTranslate }}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">
+                    {{ 'i18n:schemas.referenceFields' | sqxTranslate}}
+                </a>
             </li>
         </ul>
 
@@ -12,7 +18,7 @@
     </div>
 
     <div class="inner-main">
-        <sqx-field-list [class.hidden]="selectedTab !== 'i18n:schemas.listFields'"
+        <sqx-field-list [class.hidden]="selectedTab !== 0"
             [emptyText]="'schemas.listFieldsEmpty' | sqxTranslate"
             [schema]="schema"
             [fieldNames]="state.fieldsInLists"
@@ -20,7 +26,7 @@
             [withMetaFields]="true">
         </sqx-field-list>
 
-        <sqx-field-list [class.hidden]="selectedTab !== 'i18n:schemas.referenceFields'"
+        <sqx-field-list [class.hidden]="selectedTab !== 1"
             [emptyText]="'schemas.referenceFieldsEmpty' | sqxTranslate"
             [schema]="schema"
             [fieldNames]="state.fieldsInReferences"

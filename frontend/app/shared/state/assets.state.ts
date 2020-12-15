@@ -6,12 +6,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, StateSynchronizer } from '@app/framework';
+import { compareStrings, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State } from '@app/framework';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
 import { AppsState } from './apps.state';
-import { Query, QueryFullTextSynchronizer } from './query';
+import { Query } from './query';
 
 export type AssetPathItem = { id: string, folderName: string };
 
@@ -123,19 +123,9 @@ export class AssetsState extends State<Snapshot> {
         });
     }
 
-    public loadAndListen(synchronizer: StateSynchronizer) {
-        synchronizer.mapTo(this)
-            .withPaging('assets', 30)
-            .withString('parentId', 'parent')
-            .withStrings('tagsSelected', 'tags')
-            .withSynchronizer(QueryFullTextSynchronizer.INSTANCE)
-            .whenSynced(() => this.loadInternal(false))
-            .build();
-    }
-
-    public load(isReload = false): Observable<any> {
+    public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            this.resetState(update);
         }
 
         return this.loadInternal(isReload);

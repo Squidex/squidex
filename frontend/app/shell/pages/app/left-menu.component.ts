@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AppDto, AppsState, Settings } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { AppDto, Settings } from '@app/shared';
 
 @Component({
     selector: 'sqx-left-menu',
@@ -15,10 +15,8 @@ import { AppDto, AppsState, Settings } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LeftMenuComponent {
-    constructor(
-        public readonly appsState: AppsState
-    ) {
-    }
+    @Input()
+    public app: AppDto;
 
     public isAssetsHidden(app: AppDto) {
         return app.roleProperties[Settings.AppProperties.HIDE_ASSETS] === true;

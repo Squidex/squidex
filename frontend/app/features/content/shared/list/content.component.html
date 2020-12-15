@@ -37,7 +37,7 @@
                         [statusColor]="info.color">
                     </sqx-content-status>
                 </a>
-                <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="canClone">
+                <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="cloneable">
                     {{ 'common.clone' | sqxTranslate }}
                 </a>
                 

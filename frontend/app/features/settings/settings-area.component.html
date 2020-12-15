@@ -8,7 +8,7 @@
     </ng-container>
     
     <ng-container content>
-        <ul class="nav nav-panel nav-dark flex-column" *ngIf="appsState.selectedApp | async; let app">
+        <ul class="nav nav-panel nav-dark flex-column" *ngIf="selectedApp | async; let app">
             <li class="nav-item" *ngIf="app.canReadBackups">
                 <a class="nav-link" routerLink="backups" routerLinkActive="active">
                     {{ 'common.backups' | sqxTranslate }}

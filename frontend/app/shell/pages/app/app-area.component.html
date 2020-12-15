@@ -1,9 +1,11 @@
-<sqx-title [message]="appsState.appDisplayName"></sqx-title>
-
-<div class="sidebar">
-    <sqx-left-menu></sqx-left-menu>
-</div>
-
-<div sqxPanelContainer class="panel-container">
-    <router-outlet></router-outlet>
-</div>
+<ng-container *ngIf="selectedApp | async; let app">
+    <sqx-title [message]="app.displayName"></sqx-title>
+    
+    <div class="sidebar">
+        <sqx-left-menu [app]="app"></sqx-left-menu>
+    </div>
+    
+    <div sqxPanelContainer class="panel-container">
+        <router-outlet></router-outlet>
+    </div>
+</ng-container>

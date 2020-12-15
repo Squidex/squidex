@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, ContentDto, EditContentForm, LanguageDto, ManualContentsState, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, EditContentForm, LanguageDto, ManualContentsState, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator',
@@ -29,22 +29,20 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
 
+    @Input()
+    public formContext: any;
+
     public schema: SchemaDetailsDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
 
-    public contentFormContext: any;
     public contentForm: EditContentForm;
 
-    constructor(authService: AuthService,
-        public readonly appsState: AppsState,
-        public readonly apiUrl: ApiUrlConfig,
-        public readonly contentsState: ManualContentsState,
-        public readonly schemasState: SchemasState,
+    constructor(
+        private readonly contentsState: ManualContentsState,
+        private readonly schemasState: SchemasState,
         private readonly changeDetector: ChangeDetectorRef
     ) {
         super();
-
-        this.contentFormContext = { user: authService.user, apiUrl: apiUrl.buildUrl('api') };
     }
 
     public ngOnInit() {
@@ -68,7 +66,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
                     this.schema = schema;
 
                     this.contentsState.schema = schema;
-                    this.contentForm = new EditContentForm(this.languages, this.schema, this.contentFormContext.user);
+                    this.contentForm = new EditContentForm(this.languages, this.schema, this.formContext.user);
 
                     this.changeDetector.markForCheck();
                 }
@@ -108,7 +106,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
         if (publish) {
             return this.schema.canContentsCreateAndPublish;
         } else {
-            return this.schema.canContentsCreateAndPublish;
+            return this.schema.canContentsCreate;
         }
     }
 
@@ -118,9 +116,5 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
 
     public emitSelect(content: ContentDto) {
         this.select.emit([content]);
-    }
-
-    public selectLanguage(language: LanguageDto) {
-        this.language = language;
     }
 }

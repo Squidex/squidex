@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, defined, DialogService, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
+import { compareStrings, DialogService, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
@@ -37,20 +37,13 @@ interface Snapshot {
 export type SchemasList = ReadonlyArray<SchemaDto>;
 export type SchemaCategory = { name: string; schemas: SchemasList; upper: string; };
 
-function sameSchema(lhs: SchemaDetailsDto | null, rhs?: SchemaDetailsDto | null): boolean {
-    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version === rhs.version);
-}
-
 @Injectable()
 export class SchemasState extends State<Snapshot> {
     public categoryNames =
         this.project(x => x.categories);
 
-    public selectedSchemaOrNull =
-        this.project(x => x.selectedSchema, sameSchema);
-
     public selectedSchema =
-        this.selectedSchemaOrNull.pipe(defined());
+        this.project(x => x.selectedSchema);
 
     public schemas =
         this.project(x => x.schemas);

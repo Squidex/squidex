@@ -12,7 +12,7 @@ import { Observable, of } from 'rxjs';
 
 @Injectable()
 export class SearchSource implements AutocompleteSource {
-    public selectedAppOrNull = this.appsState.selectedAppOrNull;
+    public selectedApp = this.appsState.selectedApp;
 
     constructor(
         private readonly appsState: AppsState,

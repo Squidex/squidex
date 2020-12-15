@@ -58,8 +58,11 @@ export class LanguagesState extends State<Snapshot> {
     public languages =
         this.project(x => x.languages);
 
-    public languagesDtos =
+    public isoLanguages =
         this.project(x => x.languages.map(y => y.language));
+
+    public isoMasterLanguage =
+        this.projectFrom(this.isoLanguages, x => x.find(l => l.isMaster)!);
 
     public newLanguages =
         this.project(x => x.allLanguagesNew);
@@ -98,7 +101,9 @@ export class LanguagesState extends State<Snapshot> {
     private loadInternal(isReload: boolean): Observable<any> {
         this.next({ isLoading: true });
 
-        return forkJoin(this.getAllLanguages(), this.getAppLanguages()).pipe(
+        return forkJoin([
+                this.getAllLanguages(),
+                this.getAppLanguages()]).pipe(
             map(args => {
                 return { allLanguages: args[0], languages: args[1] };
             }),

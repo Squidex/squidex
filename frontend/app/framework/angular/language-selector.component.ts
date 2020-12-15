@@ -24,13 +24,13 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     public selectedLanguageChange = new EventEmitter<Language>();
 
     @Input()
-    public size: 'sm' | 'md' | 'lg' = 'md';
+    public selectedLanguage: Language;
 
     @Input()
     public languages: ReadonlyArray<Language> = [];
 
     @Input()
-    public selectedLanguage: Language;
+    public size: 'sm' | 'md' | 'lg' = 'md';
 
     public dropdown = new ModalModel();
 

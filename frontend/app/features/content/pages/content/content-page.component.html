@@ -18,9 +18,21 @@
             <ng-container *ngIf="content">
                 <sqx-title message="i18n:contents.editPageTitle"></sqx-title>
 
-                <ul class="nav nav-tabs2">
-                    <li class="nav-item" *ngFor="let tab of selectableTabs">
-                        <a class="nav-link" [class.active]="selectedTab === tab" (click)="selectTab(tab)">{{tab | sqxTranslate}}</a>
+                <ul class="nav nav-tabs2" *ngIf="contentTab | async; let tab">
+                    <li class="nav-item">
+                        <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'editor' }" [class.active]="tab === 'editor'">
+                            {{ 'i18n:contents.contentTab.editor' | sqxTranslate }}
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'references' }" [class.active]="tab === 'references'">
+                            {{ 'i18n:contents.contentTab.references' | sqxTranslate }}
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'referencing' }" [class.active]="tab === 'referencing'">
+                            {{ 'i18n:contents.contentTab.referencing' | sqxTranslate }}
+                        </a>
                     </li>
                 </ul>
             </ng-container>
@@ -28,7 +40,7 @@
  
         <ng-container menu>
             <ng-container *ngIf="content; else noContent">
-                <ng-container *ngIf="selectedTab === 'i18n:contents.contentTab.editor'; else referenceHeader">
+                <ng-container *ngIf="(contentTab | async) === 'fields'; else referenceHeader">
                     <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
 
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
@@ -88,8 +100,18 @@
 
         <ng-container content>
             <ng-container *ngIf="content; else noContentEditor">
-                <ng-container [ngSwitch]="selectedTab">
-                    <ng-container *ngSwitchCase="'i18n:contents.contentTab.editor'">
+                <ng-container [ngSwitch]="contentTab | async">
+                    <ng-container *ngSwitchCase="'references'">
+                        <sqx-content-references mode="references"
+                            [content]="content">
+                        </sqx-content-references>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'referencing'">
+                        <sqx-content-references mode="referencing"
+                            [content]="content">
+                        </sqx-content-references>
+                    </ng-container>
+                    <ng-container *ngSwitchDefault>
                         <sqx-content-editor
                             [(language)]="language"
                             [contentForm]="contentForm"
@@ -98,16 +120,6 @@
                             [languages]="languages"
                             [schema]="schema">
                         </sqx-content-editor>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'i18n:contents.contentTab.references'">
-                        <sqx-content-references mode="references"
-                            [content]="content">
-                        </sqx-content-references>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'i18n:contents.contentTab.referencing'">
-                        <sqx-content-references mode="referencing"
-                            [content]="content">
-                        </sqx-content-references>
                     </ng-container>
                 </ng-container>
             </ng-container>

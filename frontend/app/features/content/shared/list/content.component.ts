@@ -43,7 +43,7 @@ export class ContentComponent implements OnChanges {
     public listFields: ReadonlyArray<TableField>;
 
     @Input()
-    public canClone: boolean;
+    public cloneable: boolean;
 
     @Input()
     public link: any = null;

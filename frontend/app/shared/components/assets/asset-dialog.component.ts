@@ -15,18 +15,6 @@ import { map } from 'rxjs/operators';
 import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
-const TABS_IMAGE: ReadonlyArray<string> = [
-    'i18n:assets.tabMetadata',
-    'i18n:assets.tabImage',
-    'i18n:assets.tabFocusPoint',
-    'i18n:assets.tabHistory'
-];
-
-const TABS_DEFAULT: ReadonlyArray<string> = [
-    'i18n:assets.tabMetadata',
-    'i18n:assets.tabHistory'
-];
-
 @Component({
     selector: 'sqx-asset-dialog',
     styleUrls: ['./asset-dialog.component.scss'],
@@ -59,10 +47,13 @@ export class AssetDialogComponent implements OnChanges {
 
     public progress = 0;
 
-    public selectableTabs: ReadonlyArray<string>;
-    public selectedTab: string;
+    public selectedTab = 0;
 
     public annotateForm = new AnnotateAssetForm(this.formBuilder);
+
+    public get isImage() {
+        return this.asset.type === 'Image';
+    }
 
     constructor(
         private readonly appsState: AppsState,
@@ -77,21 +68,13 @@ export class AssetDialogComponent implements OnChanges {
     }
 
     public ngOnChanges() {
+        this.selectTab(0);
+
         this.isEditable = this.asset.canUpdate;
         this.isUploadable = this.asset.canUpload;
 
         this.annotateForm.load(this.asset);
         this.annotateForm.setEnabled(this.isEditable);
-
-        if (this.asset.type === 'Image') {
-            this.selectableTabs = TABS_IMAGE;
-        } else {
-            this.selectableTabs = TABS_DEFAULT;
-        }
-
-        if (this.selectableTabs.indexOf(this.selectedTab) < 0) {
-            this.selectTab(this.selectableTabs[0]);
-        }
 
         this.path =
             this.assetsService.getAssetFolders(this.appsState.appName, this.asset.parentId).pipe(
@@ -102,7 +85,7 @@ export class AssetDialogComponent implements OnChanges {
         this.assetsState.navigate(id);
     }
 
-    public selectTab(tab: string) {
+    public selectTab(tab: number) {
         this.selectedTab = tab;
     }
 

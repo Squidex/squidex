@@ -37,7 +37,8 @@
         <ng-container *ngSwitchCase="'number'">
             <input type="number" class="form-control"
                 [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)" />
+                (ngModelChange)="changeValue($event)"
+            />
         </ng-container>
         <ng-container *ngSwitchCase="'reference'">
             <sqx-references-dropdown [schemaId]="fieldModel.extra"

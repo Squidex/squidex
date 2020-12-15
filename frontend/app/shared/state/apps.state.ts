@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { defined, DialogService, shareSubscribed, State, Types } from '@app/framework';
+import { DialogService, shareSubscribed, State, Types } from '@app/framework';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { AppDto, AppsService, CreateAppDto, UpdateAppDto } from './../services/apps.service';
@@ -24,11 +24,8 @@ export class AppsState extends State<Snapshot> {
     public apps =
         this.project(s => s.apps);
 
-    public selectedAppOrNull =
-        this.project(s => s.selectedApp);
-
     public selectedApp =
-        this.selectedAppOrNull.pipe(defined());
+        this.project(s => s.selectedApp);
 
     public get appName() {
         return this.snapshot.selectedApp?.name || '';
@@ -36,10 +33,6 @@ export class AppsState extends State<Snapshot> {
 
     public get appId() {
         return this.snapshot.selectedApp?.id || '';
-    }
-
-    public get appDisplayName() {
-        return this.snapshot.selectedApp?.displayName || '';
     }
 
     constructor(
