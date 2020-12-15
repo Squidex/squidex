@@ -280,7 +280,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             if (query?.CreatedBy != null)
             {
-                filters.Add(Filter.Eq(x => x.CreatedBy.Identifier, query.CreatedBy));
+                filters.Add(Filter.Eq(x => x.CreatedBy, query.CreatedBy));
             }
 
             return Filter.And(filters);

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 using Squidex.Shared;
@@ -91,10 +92,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
+            var permissionReadOwn = Permissions.ForApp(Permissions.AppContentReadOwn, context.App.Name, schemaIdOrName);
 
-            if (context.Permissions.Any(p => p.Id == Permissions.AppContentReadOwn))
+            if (context.Permissions.Any(p => {
+                var template = p.Id;
+                var result = template.Replace("{app}", context.App.Name);
+                return result == permissionReadOwn.Id; }))
             {
-                q.CreatedBy = context.User.Claims.Where(p => p.Type == "sub").First().Value;
+                q.CreatedBy = context.User.Token();
             }
 
             using (Profiler.TraceMethod<ContentQueryService>())

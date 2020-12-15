@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Queries
             set { Take = value; }
         }
 
-        public string CreatedBy { get; set; }
+        public RefToken? CreatedBy { get; set; }
 
         public List<SortNode> Sort { get; set; } = new List<SortNode>();
 
