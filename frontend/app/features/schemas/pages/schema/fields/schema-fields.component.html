@@ -6,7 +6,7 @@
     </button>
 </div>
 
-<ng-container *ngIf="languageState.languagesDtos | async; let languages">
+<ng-container *ngIf="languageState.isoLanguages | async; let languages">
     <ng-container *ngIf="patternsState.patterns | async; let patterns">
         <div
             cdkDropList
