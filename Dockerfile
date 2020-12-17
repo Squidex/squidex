@@ -61,6 +61,10 @@ RUN cp -a build /build/
 #
 FROM mcr.microsoft.com/dotnet/aspnet:5.0.0-buster-slim
 
+# Curl for debugging and libc-dev for Protobuf
+RUN apt-get update \
+ && apt-get install -y curl libc-dev
+
 # Default AspNetCore directory
 WORKDIR /app
 
