@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     return UpdateSizeAsync(e.AppId.Id, GetDate(@event), e.FileSize, 0);
 
                 case AssetDeleted e:
-                    return UpdateSizeAsync(e.AppId.Id, GetDate(@event), e.DeletedSize, -1);
+                    return UpdateSizeAsync(e.AppId.Id, GetDate(@event), -e.DeletedSize, -1);
             }
 
             return Task.CompletedTask;
