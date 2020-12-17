@@ -51,6 +51,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                         Clean(Permissions.AppAssets),
                         Clean(Permissions.AppContents),
                         Clean(Permissions.AppPatterns),
+                        Clean(Permissions.AppClientsRead),
                         Clean(Permissions.AppRolesRead),
                         Clean(Permissions.AppRules),
                         Clean(Permissions.AppSchemas),
