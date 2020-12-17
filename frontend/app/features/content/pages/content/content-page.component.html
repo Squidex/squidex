@@ -40,47 +40,49 @@
  
         <ng-container menu>
             <ng-container *ngIf="content; else noContent">
-                <ng-container *ngIf="(contentTab | async) === 'fields'; else referenceHeader">
-                    <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
+                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
 
-                    <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
-
-                    <ng-container *ngIf="content?.canDelete">
-                        <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
-                            <i class="icon-dots"></i>
-                        </button>
-
-                        <ng-container *sqxModal="dropdown;closeAlways:true">
-                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
-                                <a class="dropdown-item dropdown-item-delete"
-                                    (sqxConfirmClick)="delete()"
-                                    confirmTitle="i18n:contents.deleteConfirmTitle"
-                                    confirmText="i18n:contents.deleteConfirmText"
-                                    confirmRememberKey="deleteContent">
-                                    {{ 'common.delete' | sqxTranslate }}
-                                </a>
-                            </div>
-                        </ng-container>
-                    </ng-container>
-
-                    <ng-container *ngIf="content?.canUpdate">
-                        <button type="submit" class="btn btn-primary ml-1" title="i18n:common.saveShortcut">
-                            {{ 'common.save' | sqxTranslate }}
+                <ng-container *ngIf="contentTab | async; let tab">
+                    <ng-container *ngIf="tab !== 'editor'">
+                        <button type="button" class="btn btn-primary ml-1" (click)="publish()">
+                            {{ 'contents.publishAll' | sqxTranslate }}
                         </button>
     
-                        <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                        <button type="button" class="btn btn-primary ml-1" (click)="validate()">
+                            {{ 'contents.validate' | sqxTranslate }}
+                        </button>
+                    </ng-container>
+
+                    <ng-container *ngIf="tab === 'editor'">
+                        <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
+
+                        <ng-container *ngIf="content?.canDelete">
+                            <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
+                                <i class="icon-dots"></i>
+                            </button>
+
+                            <ng-container *sqxModal="dropdown;closeAlways:true">
+                                <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
+                                    <a class="dropdown-item dropdown-item-delete"
+                                        (sqxConfirmClick)="delete()"
+                                        confirmTitle="i18n:contents.deleteConfirmTitle"
+                                        confirmText="i18n:contents.deleteConfirmText"
+                                        confirmRememberKey="deleteContent">
+                                        {{ 'common.delete' | sqxTranslate }}
+                                    </a>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+
+                        <ng-container *ngIf="content?.canUpdate">
+                            <button type="submit" class="btn btn-primary ml-1" title="i18n:common.saveShortcut">
+                                {{ 'common.save' | sqxTranslate }}
+                            </button>
+        
+                            <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                        </ng-container>
                     </ng-container>
                 </ng-container>
-                
-                <ng-template #referenceHeader>
-                    <button type="button" class="btn btn-primary ml-1" (click)="publish()">
-                        {{ 'contents.publishAll' | sqxTranslate }}
-                    </button>
-
-                    <button type="button" class="btn btn-primary ml-1" (click)="validate()">
-                        {{ 'contents.validate' | sqxTranslate }}
-                    </button>
-                </ng-template>
             </ng-container>
 
             <ng-template #noContent>

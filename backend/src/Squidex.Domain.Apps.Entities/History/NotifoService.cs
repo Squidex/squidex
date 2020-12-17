@@ -200,7 +200,12 @@ namespace Squidex.Domain.Apps.Entities.History
                     }
                 }
 
-                await client.Events.PostEventsAsync(options.AppId, new PublishManyRequestDto { Requests = requests });
+                var request = new PublishManyRequestDto
+                {
+                    Requests = requests
+                };
+
+                await client.Events.PostEventsAsync(options.AppId, request);
             }
 
             foreach (var @event in events)
@@ -220,10 +225,12 @@ namespace Squidex.Domain.Apps.Entities.History
 
                             try
                             {
-                                await client.Users.PostAllowedTopicAsync(options.AppId, userId, new AddAllowedTopicRequest
+                                var request = new AddAllowedTopicRequest
                                 {
                                     Prefix = GetAppPrefix(contributorAssigned)
-                                });
+                                };
+
+                                await client.Users.PostAllowedTopicAsync(options.AppId, userId, request);
                             }
                             catch (NotifoException ex) when (ex.StatusCode == 404)
                             {
