@@ -20,17 +20,17 @@
 
                 <ul class="nav nav-tabs2" *ngIf="contentTab | async; let tab">
                     <li class="nav-item">
-                        <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'editor' }" [class.active]="tab === 'editor'">
+                        <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'editor' }" [class.active]="tab === 'editor'">
                             {{ 'i18n:contents.contentTab.editor' | sqxTranslate }}
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'references' }" [class.active]="tab === 'references'">
+                        <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'references' }" [class.active]="tab === 'references'">
                             {{ 'i18n:contents.contentTab.references' | sqxTranslate }}
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'referencing' }" [class.active]="tab === 'referencing'">
+                        <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'referencing' }" [class.active]="tab === 'referencing'">
                             {{ 'i18n:contents.contentTab.referencing' | sqxTranslate }}
                         </a>
                     </li>
