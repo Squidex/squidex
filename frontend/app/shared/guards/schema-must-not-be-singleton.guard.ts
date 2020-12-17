@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { defined } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { SchemasState } from './../state/schemas.state';
@@ -22,6 +23,7 @@ export class SchemaMustNotBeSingletonGuard implements CanActivate {
     public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
         const result =
             this.schemasState.selectedSchema.pipe(
+                defined(),
                 take(1),
                 tap(schema => {
                     if (schema.isSingleton) {

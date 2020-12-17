@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { hasAnyLink, State, Types } from '@app/framework';
+import { defined, hasAnyLink, State, Types } from '@app/framework';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { UIService, UISettingsDto } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
@@ -95,9 +95,10 @@ export class UIState extends State<Snapshot> {
         this.loadResources();
         this.loadCommon();
 
-        appsState.selectedApp.subscribe(app => {
-            this.load(app.name);
-        });
+        appsState.selectedApp.pipe(defined())
+            .subscribe(app => {
+                this.load(app.name);
+            });
     }
 
     private load(app: string) {

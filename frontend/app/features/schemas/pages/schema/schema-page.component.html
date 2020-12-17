@@ -1,10 +1,32 @@
 <sqx-title [message]="schemasState.schemaName"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" showSidebar="true" noPadding="true">
+<sqx-panel desiredWidth="50rem" showSidebar="true" noPadding="true" *ngIf="schemaTab | async; let tab">
     <ng-container header>
         <ul class="nav nav-tabs2">
-            <li class="nav-item" *ngFor="let tab of selectableTabs">
-                <a class="nav-link" [class.active]="tab === selectedTab" (click)="selectTab(tab)">{{tab | sqxTranslate}}</a>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'fields' }" [class.active]="tab === 'fields'">
+                    {{ 'i18n:schemas.tabFields' | sqxTranslate }}
+                </a>
+            </li>
+            <li>
+                <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'ui' }" [class.active]="tab === 'ui'">
+                    {{ 'i18n:schemas.tabUI' | sqxTranslate }}
+                </a>
+            </li>
+            <li>
+                <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'scripts' }" [class.active]="tab === 'scripts'">
+                    {{ 'i18n:schemas.tabScripts' | sqxTranslate }}
+                </a>
+            </li>
+            <li>
+                <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'json' }" [class.active]="tab === 'json'">
+                    {{ 'i18n:schemas.tabJson' | sqxTranslate }}
+                </a>
+            </li>
+            <li>
+                <a class="nav-link" routerLink="./" [queryParams]="{ tab: 'more' }" [class.active]="tab === 'more'">
+                    {{ 'i18n:schemas.tabMore' | sqxTranslate }}
+                </a>
             </li>
         </ul>
     </ng-container>
@@ -57,25 +79,25 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container [ngSwitch]="selectedTab">
-            <ng-container *ngSwitchCase="'i18n:schemas.tabFields'">
-                <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
-            </ng-container>
-            <ng-container *ngSwitchCase="'i18n:schemas.tabUI'">
+        <ng-container [ngSwitch]="tab">
+            <ng-container *ngSwitchCase="'ui'">
                 <sqx-schema-ui-form [schema]="schema"></sqx-schema-ui-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'i18n:schemas.tabScripts'">
+            <ng-container *ngSwitchCase="'scripts'">
                 <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'i18n:schemas.tabJson'">
+            <ng-container *ngSwitchCase="'json'">
                 <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
             </ng-container>
-            <ng-container *ngSwitchCase="'i18n:schemas.tabMore'">
+            <ng-container *ngSwitchCase="'more'">
                 <div class="cards">
                     <sqx-schema-preview-urls-form [schema]="schema"> </sqx-schema-preview-urls-form>
                     <sqx-schema-field-rules-form [schema]="schema"> </sqx-schema-field-rules-form>
                     <sqx-schema-edit-form [schema]="schema"></sqx-schema-edit-form>
                 </div>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+                <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
             </ng-container>
         </ng-container>
     </ng-container>

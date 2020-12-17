@@ -6,7 +6,7 @@
  */
 
 import { Component } from '@angular/core';
-import { AppsState } from '@app/shared';
+import { AppsState, defined } from '@app/shared';
 
 @Component({
     selector: 'sqx-app-area',
@@ -14,8 +14,10 @@ import { AppsState } from '@app/shared';
     templateUrl: './app-area.component.html'
 })
 export class AppAreaComponent {
+    public selectedApp = this.appsState.selectedApp.pipe(defined());
+
     constructor(
-        public readonly appsState: AppsState
+        private readonly appsState: AppsState
     ) {
     }
 }

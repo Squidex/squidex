@@ -17,7 +17,6 @@ describe('ContributorsState', () => {
     const {
         app,
         appsState,
-        buildDummyStateSynchronizer,
         newVersion,
         version
     } = TestValues;
@@ -120,19 +119,6 @@ describe('ContributorsState', () => {
             expect(contributors!).toEqual(createContributors(4, 14).items);
             expect(contributorsState.snapshot.page).toEqual(0);
             expect(contributorsState.snapshot.pageSize).toEqual(10);
-        });
-
-        it('should load when synchronizer triggered', () => {
-            const { synchronizer, trigger } = buildDummyStateSynchronizer();
-
-            contributorsState.loadAndListen(synchronizer);
-
-            trigger();
-            trigger();
-
-            expect().nothing();
-
-            contributorsService.verify(x => x.getContributors(app), Times.exactly(2));
         });
 
         it('should show notification on load when reload is true', () => {

@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, getPagingInfo, ListState, Router2State, shareSubscribed, State } from '@app/framework';
+import { DialogService, getPagingInfo, ListState, shareSubscribed, State } from '@app/framework';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { RuleEventDto, RulesService } from './../services/rules.service';
@@ -45,22 +45,14 @@ export class RuleEventsState extends State<Snapshot> {
         super({
             ruleEvents: [],
             page: 0,
-            pageSize: 10,
+            pageSize: 30,
             total: 0
         });
     }
 
-    public loadAndListen(route: Router2State) {
-        route.mapTo(this)
-            .withPaging('ruleEvents', 30)
-            .withString('ruleId', 'ruleId')
-            .whenSynced(() => this.loadInternal(false))
-            .build();
-    }
-
-    public load(isReload = false): Observable<any> {
+    public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            this.resetState({ ruleId: this.snapshot.ruleId, ...update });
         }
 
         return this.loadInternal(isReload);

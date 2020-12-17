@@ -61,7 +61,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
                     this.updateModel();
                 }));
 
-        this.schemas = this.schemasState.snapshot.schemas;
+        this.schemas = this.schemasState.snapshot.schemas.filter(x => x.canReadContents);
 
         if (this.schemaIds && this.schemaIds.length > 0) {
             this.schemas = this.schemas.filter(x => this.schemaIds.indexOf(x.id) >= 0);
@@ -112,10 +112,6 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
 
     public emitSelect() {
         this.select.emit(Object.values(this.selectedItems));
-    }
-
-    public selectLanguage(language: LanguageDto) {
-        this.language = language;
     }
 
     public selectAll(isSelected: boolean) {
