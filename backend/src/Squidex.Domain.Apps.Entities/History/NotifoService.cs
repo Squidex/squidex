@@ -81,18 +81,19 @@ namespace Squidex.Domain.Apps.Entities.History
                 return;
             }
 
-            var settings = new NotificationSettingsDto();
-
-            settings[Providers.WebPush] = new NotificationSettingDto
+            var settings = new NotificationSettingsDto
             {
-                Send = true,
-                DelayInSeconds = null
-            };
+                [Providers.WebPush] = new NotificationSettingDto
+                {
+                    Send = true,
+                    DelayInSeconds = null
+                },
 
-            settings[Providers.Email] = new NotificationSettingDto
-            {
-                Send = true,
-                DelayInSeconds = 5 * 60
+                [Providers.Email] = new NotificationSettingDto
+                {
+                    Send = true,
+                    DelayInSeconds = 5 * 60
+                }
             };
 
             var userRequest = new UpsertUserDto
@@ -148,9 +149,10 @@ namespace Squidex.Domain.Apps.Entities.History
                     {
                         foreach (var userId in comment.Mentions!)
                         {
-                            var publishRequest = new PublishRequestDto();
-
-                            publishRequest.Topic = $"users/{userId}";
+                            var publishRequest = new PublishRequestDto
+                            {
+                                Topic = $"users/{userId}"
+                            };
 
                             publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
                             publishRequest.Preformatted = new NotificationFormattingDto();
