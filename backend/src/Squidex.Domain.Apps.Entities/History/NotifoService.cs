@@ -9,11 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Notifo.SDK;
-using Notifo.Services;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
@@ -25,7 +23,6 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
-using static Notifo.Services.Notifications;
 
 namespace Squidex.Domain.Apps.Entities.History
 {
@@ -36,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly IUrlGenerator urlGenerator;
         private readonly IUserResolver userResolver;
         private readonly IClock clock;
-        private NotificationsClient? client;
+        private INotifoClient? client;
 
         public NotifoService(IOptions<NotifoOptions> options, IUrlGenerator urlGenerator, IUserResolver userResolver, IClock clock)
         {
@@ -58,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.History
             if (options.IsConfigured())
             {
                 var builder =
-                    NotificationsClientBuilder.Create()
+                    NotifoClientBuilder.Create()
                         .SetApiKey(options.ApiKey);
 
                 if (!string.IsNullOrWhiteSpace(options.ApiUrl))
@@ -86,27 +83,25 @@ namespace Squidex.Domain.Apps.Entities.History
 
             var settings = new NotificationSettingsDto();
 
-            settings.Channels[Providers.WebPush] = new NotificationSettingDto
+            settings[Providers.WebPush] = new NotificationSettingDto
             {
                 Send = true,
                 DelayInSeconds = null
             };
 
-            settings.Channels[Providers.Email] = new NotificationSettingDto
+            settings[Providers.Email] = new NotificationSettingDto
             {
                 Send = true,
                 DelayInSeconds = 5 * 60
             };
 
-            var userRequest = new UpsertUserRequest
+            var userRequest = new UpsertUserDto
             {
-                AppId = options.AppId,
+                Id = user.Id,
                 FullName = user.DisplayName(),
                 PreferredLanguage = "en",
                 PreferredTimezone = null,
-                RequiresWhitelistedTopic = true,
                 Settings = settings,
-                UserId = user.Id
             };
 
             if (user.Email.IsEmail())
@@ -114,9 +109,15 @@ namespace Squidex.Domain.Apps.Entities.History
                 userRequest.EmailAddress = user.Email;
             }
 
-            var response = await client.UpsertUserAsync(userRequest);
+            var response = await client.Users.PostUsersAsync(options.AppId, new UpsertUsersDto
+            {
+                Requests = new List<UpsertUserDto>
+                {
+                    userRequest
+                }
+            });
 
-            await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.User.ApiKey);
+            await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.First().ApiKey);
         }
 
         public async Task HandleEventsAsync(IEnumerable<(Envelope<AppEvent> AppEvent, HistoryEvent? HistoryEvent)> events)
@@ -137,72 +138,67 @@ namespace Squidex.Domain.Apps.Entities.History
 
             if (publishedEvents.Any())
             {
-                using (var stream = client.PublishMany())
+                var requests = new List<PublishRequestDto>();
+
+                foreach (var @event in publishedEvents)
                 {
-                    foreach (var @event in publishedEvents)
+                    var payload = @event.AppEvent.Payload;
+
+                    if (payload is CommentCreated comment && IsComment(payload))
                     {
-                        var payload = @event.AppEvent.Payload;
-
-                        if (payload is CommentCreated comment && IsComment(payload))
+                        foreach (var userId in comment.Mentions!)
                         {
-                            foreach (var userId in comment.Mentions!)
+                            var publishRequest = new PublishRequestDto();
+
+                            publishRequest.Topic = $"users/{userId}";
+
+                            publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
+                            publishRequest.Preformatted = new NotificationFormattingDto();
+                            publishRequest.Preformatted.Subject["en"] = comment.Text;
+
+                            if (comment.Url?.IsAbsoluteUri == true)
                             {
-                                var publishRequest = new PublishRequest
-                                {
-                                    AppId = options.AppId
-                                };
-
-                                publishRequest.Topic = $"users/{userId}";
-
-                                publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
-                                publishRequest.Preformatted = new NotificationFormattingDto();
-                                publishRequest.Preformatted.Subject["en"] = comment.Text;
-
-                                if (comment.Url?.IsAbsoluteUri == true)
-                                {
-                                    publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
-                                }
-
-                                SetUser(comment, publishRequest);
-
-                                await stream.RequestStream.WriteAsync(publishRequest);
-                            }
-                        }
-                        else if (@event.HistoryEvent != null)
-                        {
-                            var historyEvent = @event.HistoryEvent;
-
-                            var publishRequest = new PublishRequest
-                            {
-                                AppId = options.AppId
-                            };
-
-                            foreach (var (key, value) in historyEvent.Parameters)
-                            {
-                                publishRequest.Properties.Add(key, value);
+                                publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
                             }
 
-                            publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
+                            SetUser(comment, publishRequest);
 
-                            if (payload is ContentEvent c && !(payload is ContentDeleted))
-                            {
-                                var url = urlGenerator.ContentUI(c.AppId, c.SchemaId, c.ContentId);
-
-                                publishRequest.Properties["SquidexUrl"] = url;
-                            }
-
-                            publishRequest.TemplateCode = @event.HistoryEvent.EventType;
-
-                            SetUser(payload, publishRequest);
-                            SetTopic(payload, publishRequest, historyEvent);
-
-                            await stream.RequestStream.WriteAsync(publishRequest);
+                            requests.Add(publishRequest);
                         }
                     }
+                    else if (@event.HistoryEvent != null)
+                    {
+                        var historyEvent = @event.HistoryEvent;
 
-                    await stream.RequestStream.CompleteAsync();
-                    await stream.ResponseAsync;
+                        var publishRequest = new PublishRequestDto
+                        {
+                            Properties = new EventProperties()
+                        };
+
+                        foreach (var (key, value) in historyEvent.Parameters)
+                        {
+                            publishRequest.Properties.Add(key, value);
+                        }
+
+                        publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
+
+                        if (payload is ContentEvent c && !(payload is ContentDeleted))
+                        {
+                            var url = urlGenerator.ContentUI(c.AppId, c.SchemaId, c.ContentId);
+
+                            publishRequest.Properties["SquidexUrl"] = url;
+                        }
+
+                        publishRequest.TemplateCode = @event.HistoryEvent.EventType;
+
+                        SetUser(payload, publishRequest);
+                        SetTopic(payload, publishRequest, historyEvent);
+
+                        requests.Add(publishRequest);
+                    }
                 }
+
+                await client.Events.PostEventsAsync(options.AppId, new PublishManyRequestDto { Requests = requests });
             }
 
             foreach (var @event in events)
@@ -211,20 +207,23 @@ namespace Squidex.Domain.Apps.Entities.History
                 {
                     case AppContributorAssigned contributorAssigned:
                         {
-                            var user = await userResolver.FindByIdAsync(contributorAssigned.ContributorId);
+                            var userId = contributorAssigned.ContributorId;
+
+                            var user = await userResolver.FindByIdAsync(userId);
 
                             if (user != null)
                             {
                                 await UpsertUserAsync(user);
                             }
 
-                            var request = BuildAllowedTopicRequest(contributorAssigned, contributorAssigned.ContributorId);
-
                             try
                             {
-                                await client.AddAllowedTopicAsync(request);
+                                await client.Users.PostAllowedTopicAsync(options.AppId, userId, new AddAllowedTopicRequest
+                                {
+                                    Prefix = GetAppPrefix(contributorAssigned)
+                                });
                             }
-                            catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+                            catch (NotifoException ex) when (ex.StatusCode == 404)
                             {
                                 break;
                             }
@@ -234,13 +233,15 @@ namespace Squidex.Domain.Apps.Entities.History
 
                     case AppContributorRemoved contributorRemoved:
                         {
-                            var request = BuildAllowedTopicRequest(contributorRemoved, contributorRemoved.ContributorId);
+                            var userId = contributorRemoved.ContributorId;
 
                             try
                             {
-                                await client.RemoveAllowedTopicAsync(request);
+                                var prefix = GetAppPrefix(contributorRemoved);
+
+                                await client.Users.DeleteAllowedTopicAsync(options.ApiKey, userId, prefix);
                             }
-                            catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+                            catch (NotifoException ex) when (ex.StatusCode == 404)
                             {
                                 break;
                             }
@@ -249,19 +250,6 @@ namespace Squidex.Domain.Apps.Entities.History
                         }
                 }
             }
-        }
-
-        private AllowedTopicRequest BuildAllowedTopicRequest(AppEvent @event, string contributorId)
-        {
-            var topicRequest = new AllowedTopicRequest
-            {
-                AppId = options.AppId
-            };
-
-            topicRequest.UserId = contributorId;
-            topicRequest.TopicPrefix = GetAppPrefix(@event);
-
-            return topicRequest;
         }
 
         private static bool IsTooOld(EnvelopeHeaders headers, Instant now)
@@ -274,7 +262,7 @@ namespace Squidex.Domain.Apps.Entities.History
             return appEvent is CommentCreated comment && comment.Mentions?.Length > 0;
         }
 
-        private static void SetUser(AppEvent appEvent, PublishRequest publishRequest)
+        private static void SetUser(AppEvent appEvent, PublishRequestDto publishRequest)
         {
             if (appEvent.Actor.IsSubject)
             {
@@ -282,7 +270,7 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        private static void SetTopic(AppEvent appEvent, PublishRequest publishRequest, HistoryEvent @event)
+        private static void SetTopic(AppEvent appEvent, PublishRequestDto publishRequest, HistoryEvent @event)
         {
             var topicPrefix = GetAppPrefix(appEvent);
             var topicSuffix = @event.Channel.Replace('.', '/').Trim();
