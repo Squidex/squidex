@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
-    public class AssetFolderDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
+    public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderDomainObject.State>
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly DomainId parentId = DomainId.NewGuid();

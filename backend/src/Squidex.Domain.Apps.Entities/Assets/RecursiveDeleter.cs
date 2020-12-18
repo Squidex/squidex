@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public string EventsFilter
         {
-            get { return "^assetFolder\\-"; }
+            get { return "^assetFolder-"; }
         }
 
         public RecursiveDeleter(

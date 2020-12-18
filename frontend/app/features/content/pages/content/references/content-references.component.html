@@ -1,15 +1,26 @@
 <sqx-list-view [isLoading]="contentsState.isLoading | async" table="true">
     <ng-container content>
-        <table class="table table-items table-fixed" *ngIf="contentsState.contents | async; let references">
-            <tbody *ngFor="let reference of references; trackBy: trackByContent"
-                [sqxReferenceItem]="reference"
+        <table class="table table-items table-fixed" *ngIf="contentsState.contents | async; let contents">
+            <tbody *ngFor="let content of contents; trackBy: trackByContent"
+                [sqxReferenceItem]="content"
                 [canRemove]="false"
-                [columns]="references | sqxContentsColumns"
+                [columns]="contents | sqxContentsColumns"
                 [isCompact]="false"
                 [isDisabled]="false"
                 [validations]="contentsState.validationResults | async"
                 [validityVisible]="true"
                 [language]="language">
+            </tbody>
+
+            <tbody *ngIf="(contentsState.isLoaded | async) && contents.length === 0">
+                <tr>
+                    <td class="table-items-row-empty" *ngIf="mode === 'references'">
+                        {{ 'i18n:contents.noReferences' | sqxTranslate }}
+                    </td>
+                    <td class="table-items-row-empty"  *ngIf="mode === 'referencing'">
+                        {{ 'i18n:contents.noReferencing' | sqxTranslate }}
+                    </td>
+                </tr>
             </tbody>
         </table>
     </ng-container>
