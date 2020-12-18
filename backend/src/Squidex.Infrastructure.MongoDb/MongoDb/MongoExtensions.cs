@@ -120,9 +120,9 @@ namespace Squidex.Infrastructure.MongoDb
 
                 if (existingVersion != null)
                 {
-                    var versionField = GetVersionField<T, TKey>();
+                    var field = Field.Of<T>(x => nameof(x.Version));
 
-                    throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
+                    throw new InconsistentStateException(existingVersion[field].AsInt64, oldVersion, ex);
                 }
                 else
                 {
@@ -156,21 +156,15 @@ namespace Squidex.Infrastructure.MongoDb
 
                 if (existingVersion != null)
                 {
-                    var versionField = GetVersionField<T, TKey>();
+                    var field = Field.Of<T>(x => nameof(x.Version));
 
-                    throw new InconsistentStateException(existingVersion[versionField].AsInt64, oldVersion, ex);
+                    throw new InconsistentStateException(existingVersion[field].AsInt64, oldVersion, ex);
                 }
                 else
                 {
                     throw new InconsistentStateException(EtagVersion.Any, oldVersion, ex);
                 }
             }
-        }
-
-        private static string GetVersionField<T, TKey>()
-            where T : IVersionedEntity<TKey> where TKey : notnull
-        {
-            return BsonClassMap.LookupClassMap(typeof(T)).GetMemberMap(nameof(IVersionedEntity<TKey>.Version)).ElementName;
         }
 
         public static async Task ForEachPipedAsync<T>(this IAsyncCursorSource<T> source, Func<T, Task> processor, CancellationToken cancellationToken = default)

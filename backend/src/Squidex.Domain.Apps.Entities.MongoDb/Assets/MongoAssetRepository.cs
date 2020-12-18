@@ -141,7 +141,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetEntities.Select(x => DomainId.Create(x[Fields.AssetId].AsString)).ToList();
+                var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
+
+                return assetEntities.Select(x => DomainId.Create(x[field].AsString)).ToList();
             }
         }
 
@@ -153,7 +155,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetEntities.Select(x => DomainId.Create(x[Fields.AssetId].AsString)).ToList();
+                var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
+
+                return assetEntities.Select(x => DomainId.Create(x[field].AsString)).ToList();
             }
         }
 
