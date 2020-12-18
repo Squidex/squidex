@@ -125,7 +125,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             protected sealed override IEnumerable<Task> GetScheduledTasks()
             {
-                bool lockTaken = false;
+                var lockTaken = false;
                 try
                 {
                     Monitor.TryEnter(tasks, ref lockTaken);

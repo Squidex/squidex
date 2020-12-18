@@ -7,19 +7,20 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Apps.Invitation;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
-using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Comments;
+using Squidex.Domain.Apps.Entities.Assets.DomainObject;
+using Squidex.Domain.Apps.Entities.Comments.DomainObject;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;

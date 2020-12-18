@@ -9,7 +9,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -18,14 +18,14 @@ using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public partial class MongoContentRepository : ISnapshotStore<ContentState, DomainId>
+    public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State, DomainId>
     {
-        Task ISnapshotStore<ContentState, DomainId>.ReadAllAsync(Func<ContentState, long, Task> callback, CancellationToken ct)
+        Task ISnapshotStore<ContentDomainObject.State, DomainId>.ReadAllAsync(Func<ContentDomainObject.State, long, Task> callback, CancellationToken ct)
         {
             throw new NotSupportedException();
         }
 
-        async Task ISnapshotStore<ContentState, DomainId>.ClearAsync()
+        async Task ISnapshotStore<ContentDomainObject.State, DomainId>.ClearAsync()
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentState, DomainId>.RemoveAsync(DomainId key)
+        async Task ISnapshotStore<ContentDomainObject.State, DomainId>.RemoveAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task<(ContentState Value, long Version)> ISnapshotStore<ContentState, DomainId>.ReadAsync(DomainId key)
+        async Task<(ContentDomainObject.State Value, long Version)> ISnapshotStore<ContentDomainObject.State, DomainId>.ReadAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -60,14 +60,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                     contentEntity.ParseData(schema.SchemaDef, converter);
 
-                    return (SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
+                    return (SimpleMapper.Map(contentEntity, new ContentDomainObject.State()), contentEntity.Version);
                 }
 
                 return (null!, EtagVersion.NotFound);
             }
         }
 
-        async Task ISnapshotStore<ContentState, DomainId>.WriteAsync(DomainId key, ContentState value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<ContentDomainObject.State, DomainId>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        private async Task UpsertOrDeletePublishedAsync(ContentState value, long oldVersion, long newVersion, ISchemaEntity schema)
+        private async Task UpsertOrDeletePublishedAsync(ContentDomainObject.State value, long oldVersion, long newVersion, ISchemaEntity schema)
         {
             if (value.Status == Status.Published && !value.IsDeleted)
             {
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionPublished.RemoveAsync(documentId);
         }
 
-        private async Task UpsertDraftContentAsync(ContentState value, long oldVersion, long newVersion, ISchemaEntity schema)
+        private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion, ISchemaEntity schema)
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity
             {
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collectionAll.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
-        private async Task UpsertPublishedContentAsync(ContentState value, long oldVersion, long newVersion, ISchemaEntity schema)
+        private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion, ISchemaEntity schema)
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity
             {

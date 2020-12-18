@@ -8,6 +8,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Xunit;

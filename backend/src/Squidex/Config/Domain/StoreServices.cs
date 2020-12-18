@@ -13,10 +13,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
-using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.History.Repositories;
@@ -107,13 +107,13 @@ namespace Squidex.Config.Domain
                         .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
-                        .As<IAssetRepository>().As<ISnapshotStore<AssetState, DomainId>>();
+                        .As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State, DomainId>>();
 
                     services.AddSingletonAs<MongoAssetFolderRepository>()
-                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderState, DomainId>>();
+                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State, DomainId>>();
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
-                        .As<IContentRepository>().As<ISnapshotStore<ContentState, DomainId>>();
+                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State, DomainId>>();
 
                     services.AddSingletonAs<MongoTextIndex>()
                         .AsOptional<ITextIndex>();

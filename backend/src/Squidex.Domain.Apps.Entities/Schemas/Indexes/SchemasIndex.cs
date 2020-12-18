@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;

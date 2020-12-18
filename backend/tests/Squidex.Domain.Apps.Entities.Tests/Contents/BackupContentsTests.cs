@@ -12,7 +12,7 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var rebuildContents = new HashSet<DomainId>();
 
-            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(A<IEnumerable<DomainId>>._, A<CancellationToken>._))
+            A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(A<IEnumerable<DomainId>>._, A<CancellationToken>._))
                 .Invokes((IEnumerable<DomainId> source, CancellationToken _) => rebuildContents.AddRange(source));
 
             await sut.RestoreAsync(context);

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -216,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (ids.Any())
             {
-                await rebuilder.InsertManyAsync<ContentDomainObject, ContentState>(ids);
+                await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids);
             }
         }
 

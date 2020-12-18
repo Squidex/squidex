@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations

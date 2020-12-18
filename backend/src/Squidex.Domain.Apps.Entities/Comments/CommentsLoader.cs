@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Domain.Apps.Entities.Comments.DomainObject;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Comments
