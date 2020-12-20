@@ -9,6 +9,7 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
@@ -198,7 +199,26 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Single(result, x => x.ContentId == id && x.Exception == null);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id)))
+            A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == null)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_change_content_status_with_due_time()
+        {
+            SetupContext(Permissions.AppContentsUpdate);
+
+            var time = Instant.FromDateTimeUtc(DateTime.UtcNow);
+
+            var (id, _, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateType.ChangeStatus, id: id, dueTime: time);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.ContentId == id && x.Exception == null);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time)))
                 .MustHaveHappened();
         }
 
@@ -298,14 +318,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return (context.PlainResult as BulkUpdateResult)!;
         }
 
-        private BulkUpdateContents BulkCommand(BulkUpdateType type, Query<IJsonValue>? query = null, DomainId? id = null, NamedContentData? data = null)
+        private BulkUpdateContents BulkCommand(BulkUpdateType type, Query<IJsonValue>? query = null,
+            DomainId? id = null, NamedContentData? data = null, Instant? dueTime = null)
         {
             return new BulkUpdateContents
             {
                 AppId = appId,
                 Jobs = new[]
                 {
-                    new BulkUpdateJob { Type = type, Query = query, Id = id, Data = data! }
+                    new BulkUpdateJob
+                    {
+                        Type = type,
+                        Id = id,
+                        Data = data!,
+                        DueTime = dueTime,
+                        Query = query,
+                    }
                 },
                 SchemaId = schemaId
             };

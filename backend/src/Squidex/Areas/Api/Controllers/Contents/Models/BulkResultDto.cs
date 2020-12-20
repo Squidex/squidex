@@ -20,9 +20,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public ErrorDto? Error { get; set; }
 
         /// <summary>
-        /// The id of the content when the import succeeds.
+        /// The id of the content that has been handled successfully or not.
         /// </summary>
-        public DomainId? ContentId { get; set; }
+        public DomainId ContentId { get; set; }
 
         public static BulkResultDto FromImportResult(BulkUpdateResultItem result, HttpContext httpContext)
         {

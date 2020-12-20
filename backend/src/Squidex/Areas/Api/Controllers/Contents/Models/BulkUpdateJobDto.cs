@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
@@ -35,6 +36,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The new status when the type is set to 'ChangeStatus'.
         /// </summary>
         public Status Status { get; set; }
+
+        /// <summary>
+        /// The due time.
+        /// </summary>
+        public Instant? DueTime { get; set; }
 
         /// <summary>
         /// The update type.

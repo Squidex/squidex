@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -18,6 +19,8 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
 #pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+#pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -25,6 +28,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContextProvider contextProvider;
+
+        private sealed record BulkTask(
+            ICommandBus Bus,
+            Context Context,
+            string Schema,
+            BulkUpdateJob Job,
+            BulkUpdateContents Command
+        )
+        {
+            public BulkUpdateResultItem Result { get; } = new BulkUpdateResultItem();
+        }
 
         public BulkUpdateCommandMiddleware(IContentQueryService contentQuery, IContextProvider contextProvider)
         {
@@ -41,107 +55,38 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 if (bulkUpdates.Jobs?.Length > 0)
                 {
-                    var requestContext = contextProvider.Context.WithoutContentEnrichment().WithUnpublished(true);
-                    var requestedSchema = bulkUpdates.SchemaId.Name;
-
-                    async Task PublishAsync<TCommand>(BulkUpdateJob job, TCommand command, string permissionId) where TCommand : ContentCommand
+                    var actionBlock = new ActionBlock<BulkTask>(async task =>
                     {
-                        SimpleMapper.Map(bulkUpdates, command);
-
-                        if (!string.IsNullOrWhiteSpace(job.Schema))
-                        {
-                            var schema = await contentQuery.GetSchemaOrThrowAsync(requestContext, job.Schema);
-
-                            command.SchemaId = schema.NamedId();
-                        }
-
-                        var permission = Permissions.ForApp(permissionId, command.AppId.Name, command.SchemaId.Name);
-
-                        if (!requestContext.Permissions.Allows(permission))
-                        {
-                            throw new DomainForbiddenException("Forbidden");
-                        }
-
-                        command.ExpectedVersion = job.ExpectedVersion;
-
-                        await context.CommandBus.PublishAsync(command);
-                    }
-
-                    var results = new BulkUpdateResultItem[bulkUpdates.Jobs.Length];
-
-                    var actionBlock = new ActionBlock<int>(async index =>
-                    {
-                        var job = bulkUpdates.Jobs[index];
-
-                        var result = new BulkUpdateResultItem();
-
                         try
                         {
-                            var id = await FindIdAsync(requestContext, requestedSchema, job);
-
-                            if (job.Type != BulkUpdateType.Upsert && (id == null || id == DomainId.Empty))
-                            {
-                                throw new DomainObjectNotFoundException("undefined");
-                            }
-
-                            result.ContentId = id;
-
-                            switch (job.Type)
-                            {
-                                case BulkUpdateType.Upsert:
-                                    {
-                                        var command = new UpsertContent { Data = job.Data! };
-
-                                        if (id != null && id != DomainId.Empty)
-                                        {
-                                            command.ContentId = id.Value;
-                                        }
-
-                                        result.ContentId = command.ContentId;
-
-                                        await PublishAsync(job, command, Permissions.AppContentsUpsert);
-                                        break;
-                                    }
-
-                                case BulkUpdateType.Validate:
-                                    {
-                                        var command = new ValidateContent { ContentId = id.Value };
-
-                                        await PublishAsync(job, command, Permissions.AppContentsRead);
-                                        break;
-                                    }
-
-                                case BulkUpdateType.ChangeStatus:
-                                    {
-                                        var command = new ChangeContentStatus { ContentId = id.Value, Status = job.Status };
-
-                                        await PublishAsync(job, command, Permissions.AppContentsUpdate);
-                                        break;
-                                    }
-
-                                case BulkUpdateType.Delete:
-                                    {
-                                        var command = new DeleteContent { ContentId = id.Value };
-
-                                        await PublishAsync(job, command, Permissions.AppContentsDelete);
-                                        break;
-                                    }
-                            }
+                            await ExecuteTaskAsync(task);
                         }
                         catch (Exception ex)
                         {
-                            result.Exception = ex;
+                            task.Result.Exception = ex;
                         }
-
-                        results[index] = result;
                     }, new ExecutionDataflowBlockOptions
                     {
                         MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
                     });
 
+                    var requestContext = contextProvider.Context.WithoutContentEnrichment().WithUnpublished(true);
+                    var requestedSchema = bulkUpdates.SchemaId.Name;
+
+                    var results = new List<BulkUpdateResultItem>(bulkUpdates.Jobs.Length);
+
                     for (var i = 0; i < bulkUpdates.Jobs.Length; i++)
                     {
-                        await actionBlock.SendAsync(i);
+                        var task = new BulkTask(
+                            context.CommandBus,
+                            requestContext,
+                            requestedSchema,
+                            bulkUpdates.Jobs[i],
+                            bulkUpdates);
+
+                        await actionBlock.SendAsync(task);
+
+                        results.Add(task.Result);
                     }
 
                     actionBlock.Complete();
@@ -161,15 +106,102 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<DomainId?> FindIdAsync(Context context, string schema, BulkUpdateJob job)
+        private async Task ExecuteTaskAsync(BulkTask task)
         {
-            var id = job.Id;
+            var job = task.Job;
 
-            if (id == null && job.Query != null)
+            var resolvedId = await FindIdAsync(task);
+
+            DomainId id;
+
+            if (resolvedId == null || resolvedId == DomainId.Empty)
             {
-                job.Query.Take = 1;
+                if (job.Type == BulkUpdateType.Upsert)
+                {
+                    id = DomainId.NewGuid();
+                }
+                else
+                {
+                    throw new DomainObjectNotFoundException("undefined");
+                }
+            }
+            else
+            {
+                id = resolvedId.Value;
+            }
 
-                var existing = await contentQuery.QueryAsync(context, schema, Q.Empty.WithJsonQuery(job.Query));
+            task.Result.ContentId = id;
+
+            switch (job.Type)
+            {
+                case BulkUpdateType.Upsert:
+                    {
+                        var command = new UpsertContent { Data = job.Data! };
+
+                        await PublishAsync(id, task, command, Permissions.AppContentsUpsert);
+                        break;
+                    }
+
+                case BulkUpdateType.Validate:
+                    {
+                        var command = new ValidateContent();
+
+                        await PublishAsync(id, task, command, Permissions.AppContentsRead);
+                        break;
+                    }
+
+                case BulkUpdateType.ChangeStatus:
+                    {
+                        var command = new ChangeContentStatus { Status = job.Status, DueTime = job.DueTime };
+
+                        await PublishAsync(id, task, command, Permissions.AppContentsUpdate);
+                        break;
+                    }
+
+                case BulkUpdateType.Delete:
+                    {
+                        var command = new DeleteContent();
+
+                        await PublishAsync(id, task, command, Permissions.AppContentsDelete);
+                        break;
+                    }
+            }
+        }
+
+        private async Task PublishAsync<TCommand>(DomainId id, BulkTask task, TCommand command, string permissionId) where TCommand : ContentCommand
+        {
+            SimpleMapper.Map(task.Command, command);
+
+            command.ContentId = id;
+
+            if (!string.IsNullOrWhiteSpace(task.Job.Schema))
+            {
+                var schema = await contentQuery.GetSchemaOrThrowAsync(task.Context, task.Schema);
+
+                command.SchemaId = schema.NamedId();
+            }
+
+            var permission = Permissions.ForApp(permissionId, command.AppId.Name, command.SchemaId.Name);
+
+            if (!task.Context.Permissions.Allows(permission))
+            {
+                throw new DomainForbiddenException("Forbidden");
+            }
+
+            command.ExpectedVersion = task.Command.ExpectedVersion;
+
+            await task.Bus.PublishAsync(command);
+        }
+
+        private async Task<DomainId?> FindIdAsync(BulkTask task)
+        {
+            var id = task.Job.Id;
+
+            if (id == null && task.Job.Query != null)
+            {
+                task.Job.Query.Take = 1;
+
+                var existing = await contentQuery.QueryAsync(task.Context, task.Schema, Q.Empty.WithJsonQuery(task.Job.Query));
 
                 if (existing.Total > 1)
                 {
