@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Logging;
 using Squidex.Config;
 using Squidex.Config.Startup;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Log;
 using Squidex.Shared;
@@ -62,7 +63,7 @@ namespace Squidex.Areas.IdentityServer.Config
                             {
                                 if (identityOptions.AdminRecreate)
                                 {
-                                    var permissions = user.Permissions().Add(Permissions.Admin);
+                                    var permissions = CreatePermissions(user.Permissions());
 
                                     var values = new UserValues
                                     {
@@ -75,11 +76,13 @@ namespace Squidex.Areas.IdentityServer.Config
                             }
                             else
                             {
+                                var permissions = CreatePermissions(PermissionSet.Empty);
+
                                 var values = new UserValues
                                 {
                                     Email = adminEmail,
                                     Password = adminPass,
-                                    Permissions = new PermissionSet(Permissions.Admin),
+                                    Permissions = permissions,
                                     DisplayName = adminEmail
                                 };
 
@@ -95,6 +98,18 @@ namespace Squidex.Areas.IdentityServer.Config
                     }
                 }
             }
+        }
+
+        private PermissionSet CreatePermissions(PermissionSet permissions)
+        {
+            permissions = permissions.Add(Permissions.Admin);
+
+            foreach (var app in identityOptions.AdminApps.OrEmpty())
+            {
+                permissions = permissions.Add(Permissions.ForApp(Permissions.AppAdmin, app));
+            }
+
+            return permissions;
         }
 
         private static bool IsEmpty(UserManager<IdentityUser> userManager)
