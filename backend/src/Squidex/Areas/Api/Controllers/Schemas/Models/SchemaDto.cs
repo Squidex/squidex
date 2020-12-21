@@ -103,6 +103,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 AddGetLink("contents", resources.Url<ContentsController>(x => nameof(x.GetContents), values));
             }
 
+            if (resources.CanReadOwnContent(Name))
+            {
+                AddGetLink("contents", resources.Url<ContentsController>(x => nameof(x.GetContents), values));
+            }
+
             if (resources.CanCreateContent(Name))
             {
                 AddPostLink("contents/create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));

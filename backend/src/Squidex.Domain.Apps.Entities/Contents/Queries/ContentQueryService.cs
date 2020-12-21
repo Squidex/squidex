@@ -93,11 +93,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
             var permissionReadOwn = Permissions.ForApp(Permissions.AppContentReadOwn, context.App.Name, schemaIdOrName);
+            var permissionRead = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schemaIdOrName);
 
-            if (context.Permissions.Any(p => {
-                var template = p.Id;
-                var result = template.Replace("{app}", context.App.Name);
-                return result == permissionReadOwn.Id; }))
+            if (context.Permissions.Allows(permissionReadOwn) && !context.Permissions.Allows(permissionRead))
             {
                 q.CreatedBy = context.User.Token();
             }
@@ -210,8 +208,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private static bool HasPermission(Context context, ISchemaEntity schema)
         {
-            var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schema.SchemaDef.Name);
+            var permissionReadOwn = Permissions.ForApp(Permissions.AppContentReadOwn, context.App.Name, schema.SchemaDef.Name);
+            if (context.Permissions.Contains(permissionReadOwn))
+            {
+                return context.Permissions.Allows(permissionReadOwn);
+            }
 
+            var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schema.SchemaDef.Name);
             return context.Permissions.Allows(permission);
         }
 

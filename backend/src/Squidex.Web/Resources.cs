@@ -22,6 +22,8 @@ namespace Squidex.Web
         // Contents
         public bool CanReadContent(string schema) => IsAllowedForSchema(P.AppContentsRead, schema);
 
+        public bool CanReadOwnContent(string schema) => IsAllowedForSchema(P.AppContentReadOwn, schema);
+
         public bool CanCreateContent(string schema) => IsAllowedForSchema(P.AppContentsCreate, schema);
 
         public bool CanCreateContentVersion(string schema) => IsAllowedForSchema(P.AppContentsVersionCreate, schema);
