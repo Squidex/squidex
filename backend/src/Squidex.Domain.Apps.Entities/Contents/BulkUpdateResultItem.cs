@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class BulkUpdateResultItem
     {
-        public DomainId ContentId { get; set; }
+        public DomainId? ContentId { get; set; }
 
         public Exception? Exception { get; set; }
     }

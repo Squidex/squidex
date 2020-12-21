@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The id of the content that has been handled successfully or not.
         /// </summary>
-        public DomainId ContentId { get; set; }
+        public DomainId? ContentId { get; set; }
 
         public static BulkResultDto FromImportResult(BulkUpdateResultItem result, HttpContext httpContext)
         {
