@@ -79,10 +79,13 @@ describe('DialogService', () => {
                 dialog.complete(confirmed);
             });
 
-            dialogService.confirm('MyTitle', 'MyText').subscribe(result => {
-                isNext = result;
-            }, undefined, () => {
-                isCompleted = true;
+            dialogService.confirm('MyTitle', 'MyText').subscribe({
+                next: result => {
+                    isNext = result;
+                },
+                complete: () => {
+                    isCompleted = true;
+                }
             });
 
             expect(isCompleted).toBeTruthy();
@@ -93,10 +96,10 @@ describe('DialogService', () => {
     });
 
     [
-        { confirmed: true, saved: 1 },
-        { confirmed: false, saved: 2 }
+        { confirmed: true,  saved: 1 },
+        { confirmed: false, saved: 0 }
     ].map(({ confirmed, saved }) => {
-        it(`should confirm dialog with '${confirmed}' and remember when remembered`, () => {
+        it(`should confirm dialog with '${confirmed}' and remember when remembered and confirmed`, () => {
             const dialogService = new DialogService(localStore.object);
 
             let isCompleted = false;
@@ -107,47 +110,53 @@ describe('DialogService', () => {
                 dialog.complete(confirmed);
             });
 
-            dialogService.confirm('MyTitle', 'MyText', 'MyKey').subscribe(result => {
-                isNext = result;
-            }, undefined, () => {
-                isCompleted = true;
+            dialogService.confirm('MyTitle', 'MyText', 'MyKey').subscribe({
+                next: result => {
+                    isNext = result;
+                },
+                complete: () => {
+                    isCompleted = true;
+                }
             });
 
             expect(isCompleted).toBeTruthy();
             expect(isNext!).toEqual(confirmed);
 
-            localStore.verify(x => x.setInt(`dialogs.confirm.MyKey`, saved), Times.once());
+            localStore.verify(x => x.setBoolean(`dialogs.confirm.MyKey`, It.isAny()), Times.exactly(saved));
         });
     });
 
     [
-        { confirmed: true, saved: 1 },
-        { confirmed: false, saved: 2 }
-    ].map(({ confirmed, saved }) => {
+        { confirmed: true,  saved: true,  render: 0 },
+        { confirmed: false, saved: false, render: 1 }
+    ].map(({ confirmed, saved, render }) => {
         it(`should confirm dialog with '${confirmed}' from local store when saved`, () => {
             const dialogService = new DialogService(localStore.object);
 
-            localStore.setup(x => x.getInt(`dialogs.confirm.MyKey`))
+            localStore.setup(x => x.getBoolean(`dialogs.confirm.MyKey`))
                 .returns(() => saved);
 
             let requestCount = 0;
 
             let isCompleted = false;
-            let isNext: boolean;
+            let isNext: boolean | undefined;
 
             dialogService.dialogs.subscribe(_ => {
                 requestCount++;
             });
 
-            dialogService.confirm('MyTitle', 'MyText', 'MyKey').subscribe(result => {
-                isNext = result;
-            }, undefined, () => {
-                isCompleted = true;
+            dialogService.confirm('MyTitle', 'MyText', 'MyKey').subscribe({
+                next: result => {
+                    isNext = result;
+                },
+                complete: () => {
+                    isCompleted = true;
+                }
             });
 
-            expect(isCompleted).toBeTruthy();
-            expect(isNext!).toEqual(confirmed);
-            expect(requestCount).toEqual(0);
+            expect(isCompleted).toEqual(confirmed);
+            expect(isNext).toEqual(confirmed ? true : undefined);
+            expect(requestCount).toEqual(render);
         });
     });
 

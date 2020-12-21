@@ -41,18 +41,18 @@ export class DialogRequest {
         if (rememberKey) {
             this.rememberKey = `dialogs.confirm.${rememberKey}`;
 
-            const isConfirmed = this.localStore.getInt(this.rememberKey);
+            const isConfirmed = this.localStore.getBoolean(this.rememberKey);
 
-            if (isConfirmed > 0) {
-                this.resultStream$.next(isConfirmed === 1);
+            if (isConfirmed) {
+                this.resultStream$.next(true);
                 this.resultStream$.complete();
             }
         }
     }
 
     public complete(confirmed: boolean) {
-        if (this.rememberKey && this.remember) {
-            this.localStore.setInt(this.rememberKey, confirmed ? 1 : 2);
+        if (this.rememberKey && this.remember && confirmed) {
+            this.localStore.setBoolean(this.rememberKey, true);
         }
 
         this.resultStream$.next(confirmed);

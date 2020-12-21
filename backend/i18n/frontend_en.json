@@ -297,7 +297,7 @@
   "common.queryOperators.ne": "is not equals to",
   "common.queryOperators.startsWith": "starts with",
   "common.refresh": "Refresh",
-  "common.remember": "Remember my decision",
+  "common.remember": "Don't ask again",
   "common.rename": "Rename",
   "common.requiredHint": "required",
   "common.reset": "Reset",
