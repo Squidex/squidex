@@ -9,6 +9,7 @@ using System;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
@@ -31,6 +32,8 @@ using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline.Robots;
+using Squidex.Text.Translations;
+using Squidex.Text.Translations.GoogleCloud;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 
@@ -120,15 +123,23 @@ namespace Squidex.Config.Domain
 
         public static void AddSquidexTranslation(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<DeepLTranslatorOptions>(
+            services.Configure<DeepLOptions>(
                 config.GetSection("translations:deepL"));
+            services.Configure<GoogleCloudTranslationOptions>(
+                config.GetSection("translations:googleCloud"));
             services.Configure<LanguagesOptions>(
                 config.GetSection("languages"));
 
             services.AddSingletonAs<LanguagesInitializer>()
                 .AsSelf();
 
-            services.AddSingletonAs<DeepLTranslator>()
+            services.AddSingletonAs(c => new DeepLTranslationService(c.GetRequiredService<IOptions<DeepLOptions>>().Value))
+                .As<ITranslationService>();
+
+            services.AddSingletonAs(c => new GoogleCloudTranslationService(c.GetRequiredService<IOptions<GoogleCloudTranslationOptions>>().Value))
+                .As<ITranslationService>();
+
+            services.AddSingletonAs<Translator>()
                 .As<ITranslator>();
         }
 
