@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     return await queryByQuery.QueryAsync(app, schemas, q);
                 }
 
-                throw new NotSupportedException();
+                return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     return await queryByQuery.QueryAsync(app, schema, q, scope);
                 }
 
-                throw new NotSupportedException();
+                return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 
