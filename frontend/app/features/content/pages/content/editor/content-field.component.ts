@@ -55,24 +55,14 @@ export class ContentFieldComponent implements OnChanges {
         return this.formModel.field.properties.isHalfWidth && !this.isCompact && !this.formCompare;
     }
 
+    public get isTranslatable() {
+        return this.formModel.field.properties.fieldType === 'String' && this.formModel.field.isLocalizable && this.languages.length > 1;
+    }
+
     public showAllControls = false;
 
     public isDifferent: Observable<boolean>;
     public isInvalid: Observable<boolean>;
-
-    public get canTranslate() {
-        if (this.languages.length <= 1) {
-            return false;
-        }
-
-        if (!this.formModel.field.isLocalizable) {
-            return false;
-        }
-
-        const properties = this.formModel.field.properties;
-
-        return Types.is(properties, StringFieldPropertiesDto) && (properties.editor === 'Input' || properties.editor === 'TextArea');
-    }
 
     constructor(
         private readonly appsState: AppsState,

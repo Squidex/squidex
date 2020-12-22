@@ -3,7 +3,7 @@
         <div class="table-items-row" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
             <div class="languages-container">
                 <div class="languages-buttons">
-                    <button *ngIf="canTranslate" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="i18n:contents.autotranslate">
+                    <button *ngIf="isTranslatable" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="i18n:contents.autotranslate">
                         <i class="icon-translate"></i>
                     </button>
     
