@@ -21,6 +21,10 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
+    /// <summary>
+    /// Updates and retrieves contents.
+    /// </summary>
+    [ApiExplorerSettings(GroupName = nameof(Contents))]
     public sealed class ContentsController : ApiController
     {
         private readonly IContentQueryService contentQuery;

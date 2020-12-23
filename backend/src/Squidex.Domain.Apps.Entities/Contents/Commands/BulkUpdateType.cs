@@ -11,7 +11,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
     {
         Upsert,
         ChangeStatus,
+        Create,
         Delete,
+        Patch,
+        Update,
         Validate
     }
 }

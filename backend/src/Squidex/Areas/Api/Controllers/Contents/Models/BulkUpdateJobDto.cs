@@ -53,6 +53,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public string? Schema { get; set; }
 
         /// <summary>
+        /// The number of expected items. Set it to a higher number to update multiple items when a query is defined.
+        /// </summary>
+        public long ExpectedCount { get; set; } = 1;
+
+        /// <summary>
         /// The expected version.
         /// </summary>
         public long ExpectedVersion { get; set; } = EtagVersion.Any;

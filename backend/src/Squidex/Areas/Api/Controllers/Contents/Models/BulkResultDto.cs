@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -20,6 +21,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public ErrorDto? Error { get; set; }
 
         /// <summary>
+        /// The index of the bulk job where the result belongs to. The order can change.
+        /// </summary>
+        public int JobIndex { get; set; }
+
+        /// <summary>
         /// The id of the content that has been handled successfully or not.
         /// </summary>
         public DomainId? ContentId { get; set; }
@@ -28,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         {
             var error = result.Exception?.ToErrorDto(httpContext).Error;
 
-            return new BulkResultDto { ContentId = result.ContentId, Error = error };
+            return SimpleMapper.Map(result, new BulkResultDto { Error = error });
         }
     }
 }

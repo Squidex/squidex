@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId == null && x.Exception is DomainObjectNotFoundException);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == null && x.Exception is DomainObjectNotFoundException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
                 .MustNotHaveHappened();
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId == null && x.Exception is DomainException);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == null && x.Exception is DomainException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
                 .MustNotHaveHappened();
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var requestContext = SetupContext(Permissions.AppContentsUpsert);
 
-            var (id, data, query) = CreateTestData(false);
+            var (id, data, query) = CreateTestData(true);
 
             A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
                 .Returns(ResultList.CreateFrom(1, CreateContent(id)));
@@ -107,10 +107,43 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_upsert_content_with_with_resolved_ids()
+        {
+            var requestContext = SetupContext(Permissions.AppContentsUpsert);
+
+            var (_, data, query) = CreateTestData(true);
+
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
+
+            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
+                .Returns(ResultList.CreateFrom(2,
+                    CreateContent(id1),
+                    CreateContent(id2)));
+
+            var command = BulkCommand(BulkUpdateType.Upsert, query: query, data: data);
+
+            command.Jobs![0].ExpectedCount = 2;
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id1 && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id2 && x.Exception == null);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id1)))
+                .MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id2)))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -125,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
@@ -143,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
@@ -161,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
@@ -179,11 +212,116 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId != default && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id)))
                 .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_create_content()
+        {
+            SetupContext(Permissions.AppContentsCreate);
+
+            var (id, data, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateType.Create, id: id, data: data);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception == null);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<CreateContent>.That.Matches(x => x.ContentId == id && x.Data == data)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_security_exception_when_user_has_no_permission_for_creating()
+        {
+            SetupContext(Permissions.AppContentsRead);
+
+            var (id, data, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateType.Create, id: id, data: data);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception is DomainForbiddenException);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_update_content()
+        {
+            SetupContext(Permissions.AppContentsUpdate);
+
+            var (id, data, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateType.Update, id: id, data: data);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception == null);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_security_exception_when_user_has_no_permission_for_updating()
+        {
+            SetupContext(Permissions.AppContentsRead);
+
+            var (id, data, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateType.Update, id: id, data: data);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception is DomainForbiddenException);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_patch_content()
+        {
+            SetupContext(Permissions.AppContentsUpdate);
+
+            var (id, data, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateType.Patch, id: id, data: data);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception == null);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                    A<PatchContent>.That.Matches(x => x.ContentId == id && x.Data == data)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_security_exception_when_user_has_no_permission_for_patching()
+        {
+            SetupContext(Permissions.AppContentsRead);
+
+            var (id, data, _) = CreateTestData(false);
+
+            var command = BulkCommand(BulkUpdateType.Delete, id: id, data: data);
+
+            var result = await PublishAsync(command);
+
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception is DomainForbiddenException);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -197,7 +335,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId == id && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == null)))
                 .MustHaveHappened();
@@ -216,7 +354,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId == id && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time)))
                 .MustHaveHappened();
@@ -233,7 +371,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId == id && x.Exception is DomainForbiddenException);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
                 .MustNotHaveHappened();
@@ -250,7 +388,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId == id && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<ValidateContent>.That.Matches(x => x.ContentId == id)))
@@ -268,7 +406,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId == id && x.Exception is DomainForbiddenException);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
                 .MustNotHaveHappened();
@@ -285,7 +423,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId == id && x.Exception == null);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
                     A<DeleteContent>.That.Matches(x => x.ContentId == id)))
@@ -303,7 +441,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await PublishAsync(command);
 
-            Assert.Single(result, x => x.ContentId == id && x.Exception is DomainForbiddenException);
+            Assert.Single(result, x => x.JobIndex == 0 && x.ContentId == id && x.Exception is DomainForbiddenException);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
                 .MustNotHaveHappened();

@@ -29,6 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public string? Schema { get; set; }
 
+        public long ExpectedCount { get; set; } = 1;
+
         public long ExpectedVersion { get; set; } = EtagVersion.Any;
     }
 }
