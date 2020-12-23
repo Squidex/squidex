@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
     public sealed class BulkResultDto
     {
         /// <summary>
-        /// The error when the import failed.
+        /// The error when the bulk job failed.
         /// </summary>
         public ErrorDto? Error { get; set; }
 
