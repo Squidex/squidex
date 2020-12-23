@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
@@ -105,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         {
             await sut.SendInviteAsync(assigner, user, appName);
 
-            A.CallTo(() => emailSender.SendAsync(user.Email, A<string>._, A<string>._))
+            A.CallTo(() => emailSender.SendAsync(user.Email, A<string>._, A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             MustLogWarning();
@@ -116,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         {
             await sut.SendInviteAsync(assigner, user, appName);
 
-            A.CallTo(() => emailSender.SendAsync(user.Email, A<string>._, A<string>._))
+            A.CallTo(() => emailSender.SendAsync(user.Email, A<string>._, A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             MustLogWarning();
@@ -127,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         {
             await sut.SendUsageAsync(user, appName, 100, 120);
 
-            A.CallTo(() => emailSender.SendAsync(user.Email, A<string>._, A<string>._))
+            A.CallTo(() => emailSender.SendAsync(user.Email, A<string>._, A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             MustLogWarning();
@@ -143,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
             await sut.SendInviteAsync(assigner, user, appName);
 
-            A.CallTo(() => emailSender.SendAsync(user.Email, "email-subject", "email-body"))
+            A.CallTo(() => emailSender.SendAsync(user.Email, "email-subject", "email-body", A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -154,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
             await sut.SendUsageAsync(user, appName, 100, 120);
 
-            A.CallTo(() => emailSender.SendAsync(user.Email, result, result))
+            A.CallTo(() => emailSender.SendAsync(user.Email, result, result, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -165,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
             await sut.SendInviteAsync(assigner, user, appName);
 
-            A.CallTo(() => emailSender.SendAsync(user.Email, result, result))
+            A.CallTo(() => emailSender.SendAsync(user.Email, result, result, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
