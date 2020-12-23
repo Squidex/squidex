@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Net;
-using System.Net.Mail;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using MailKit.Net.Smtp;
+using MimeKit;
+using MimeKit.Text;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
@@ -28,7 +27,6 @@ namespace Squidex.Extensions.Actions.Email
             var ruleJob = new EmailJob
             {
                 ServerHost = action.ServerHost,
-                ServerUseSsl = action.ServerUseSsl,
                 ServerPassword = action.ServerPassword,
                 ServerPort = action.ServerPort,
                 ServerUsername = await FormatAsync(action.ServerUsername, @event),
@@ -45,47 +43,31 @@ namespace Squidex.Extensions.Actions.Email
 
         protected override async Task<Result> ExecuteJobAsync(EmailJob job, CancellationToken ct = default)
         {
-            await CheckConnectionAsync(job, ct);
-
-            using (var client = new SmtpClient(job.ServerHost, job.ServerPort)
+            using (var smtpClient = new SmtpClient())
             {
-                Credentials = new NetworkCredential(
-                    job.ServerUsername,
-                    job.ServerPassword),
+                await smtpClient.ConnectAsync(job.ServerHost, job.ServerPort, cancellationToken: ct);
 
-                EnableSsl = job.ServerUseSsl
-            })
-            {
-                using (ct.Register(client.SendAsyncCancel))
+                await smtpClient.AuthenticateAsync(job.ServerUsername, job.ServerPassword, ct);
+
+                var smtpMessage = new MimeMessage();
+
+                smtpMessage.From.Add(MailboxAddress.Parse(
+                    job.MessageFrom));
+
+                smtpMessage.To.Add(MailboxAddress.Parse(
+                    job.MessageTo));
+
+                smtpMessage.Body = new TextPart(TextFormat.Html)
                 {
-                    await client.SendMailAsync(
-                        job.MessageFrom,
-                        job.MessageTo,
-                        job.MessageSubject,
-                        job.MessageBody,
-                        ct);
-                }
+                    Text = job.MessageBody
+                };
+
+                smtpMessage.Subject = job.MessageSubject;
+
+                await smtpClient.SendAsync(smtpMessage, ct);
             }
 
             return Result.Complete();
-        }
-
-        private static async Task CheckConnectionAsync(EmailJob job, CancellationToken ct)
-        {
-            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
-            {
-                var tcs = new TaskCompletionSource<IAsyncResult>();
-
-                socket.BeginConnect(job.ServerHost, job.ServerPort, tcs.SetResult, null);
-
-                using (ct.Register(() =>
-                {
-                    tcs.TrySetException(new OperationCanceledException($"Failed to establish a connection to {job.ServerHost}:{job.ServerPort}"));
-                }))
-                {
-                    await tcs.Task;
-                }
-            }
         }
     }
 
@@ -98,8 +80,6 @@ namespace Squidex.Extensions.Actions.Email
         public string ServerUsername { get; set; }
 
         public string ServerPassword { get; set; }
-
-        public bool ServerUseSsl { get; set; }
 
         public string MessageFrom { get; set; }
 
