@@ -268,13 +268,13 @@ function getLocalizationSettings() {
         const options = { locale: DateHelper.getFnsLocale() };
 
         for (let i = 0; i < 12; i++) {
-            const firstOfMonth = new Date(2020, i, 1);
+            const firstOfMonth = new Date(2020, i, 1, 12, 0, 0);
 
             localizedValues.months.push(format(firstOfMonth, 'LLLL', options));
         }
 
         for (let i = 1; i <= 7; i++) {
-            const weekDay = new Date(2020, 11, i);
+            const weekDay = new Date(2020, 10, i, 12, 0, 0);
 
             localizedValues.weekdays.push(format(weekDay, 'EEEE', options));
             localizedValues.weekdaysShort.push(format(weekDay, 'EEE', options));
