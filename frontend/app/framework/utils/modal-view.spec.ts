@@ -110,9 +110,10 @@ describe('ModalModel', () => {
 function checkValue(modal: Openable, expected: boolean) {
     let result: boolean;
 
-    modal.isOpen.subscribe(value => {
+    modal.isOpenChanges.subscribe(value => {
         result = value;
     }).unsubscribe();
 
     expect(result!).toBe(expected);
+    expect(modal.isOpen).toBe(expected);
 }

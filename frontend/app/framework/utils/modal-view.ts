@@ -8,14 +8,20 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface Openable {
-    isOpen: Observable<boolean>;
+    isOpenChanges: Observable<boolean>;
+
+    isOpen: boolean;
 }
 
 export class DialogModel implements Openable {
     private readonly isOpen$: BehaviorSubject<boolean>;
 
-    public get isOpen(): Observable<boolean> {
+    public get isOpenChanges(): Observable<boolean> {
         return this.isOpen$;
+    }
+
+    public get isOpen(): boolean {
+        return this.isOpen$.value;
     }
 
     constructor(isOpen = false) {
@@ -44,8 +50,12 @@ export class DialogModel implements Openable {
 export class ModalModel implements Openable {
     private readonly isOpen$: BehaviorSubject<boolean>;
 
-    public get isOpen(): Observable<boolean> {
+    public get isOpenChanges(): Observable<boolean> {
         return this.isOpen$;
+    }
+
+    public get isOpen(): boolean {
+        return this.isOpen$.value;
     }
 
     constructor(isOpen = false) {

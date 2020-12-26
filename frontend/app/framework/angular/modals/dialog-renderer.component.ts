@@ -40,7 +40,7 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
 
     public ngOnInit() {
         this.own(
-            this.dialogView.isOpen.subscribe(isOpen => {
+            this.dialogView.isOpenChanges.subscribe(isOpen => {
                 if (!isOpen) {
                     this.finishRequest(false);
                 }

@@ -25,6 +25,9 @@ interface State {
     // The selected suggested index.
     selectedIndex: number;
 
+    // The selected item.
+    selectedItem?: number;
+
     // The current search query.
     query?: RegExp;
 }
@@ -66,14 +69,11 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public queryInput = new FormControl();
 
-    public get selectedItem() {
-        return this.items[this.snapshot.selectedIndex];
-    }
-
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
             selectedIndex: -1,
-            suggestedItems: []
+            selectedItem: undefined,
+            suggestedItems: [],
         });
     }
 
@@ -202,19 +202,19 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     public selectIndex(selectedIndex: number, fromUserAction: boolean) {
+        const items = this.snapshot.suggestedItems || [];
+
+        if (selectedIndex < 0) {
+            selectedIndex = 0;
+        }
+
+        if (selectedIndex >= items.length) {
+            selectedIndex = items.length - 1;
+        }
+
+        const selectedItem = items[selectedIndex];
+
         if (fromUserAction) {
-            const items = this.snapshot.suggestedItems || [];
-
-            if (selectedIndex < 0) {
-                selectedIndex = 0;
-            }
-
-            if (selectedIndex >= items.length) {
-                selectedIndex = items.length - 1;
-            }
-
-            const selectedItem = items[selectedIndex];
-
             let selectedValue = selectedItem;
 
             if (this.valueProperty && this.valueProperty.length > 0 && selectedValue) {
@@ -229,7 +229,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
             }
         }
 
-        this.next({ selectedIndex });
+        this.next({ selectedIndex, selectedItem });
     }
 
     private getSelectedIndex(value: any) {

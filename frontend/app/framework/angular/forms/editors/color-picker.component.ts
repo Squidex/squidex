@@ -50,7 +50,7 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, { foreground: 'black' });
 
-        this.modal.isOpen.subscribe(open => {
+        this.modal.isOpenChanges.subscribe(open => {
             if (open) {
                 this.wasOpen = true;
             } else {

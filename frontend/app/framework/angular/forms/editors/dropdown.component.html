@@ -4,7 +4,7 @@
         autocorrect="off"
         autocapitalize="off">
     
-    <div class="control-dropdown-item" *ngIf="selectedItem">
+    <div class="control-dropdown-item" *ngIf="snapshot.selectedItem; let selectedItem">
         <span class="truncate" *ngIf="!templateSelection">{{selectedItem}}</span>
         
         <ng-template *ngIf="templateSelection" [sqxTemplateWrapper]="templateSelection" [item]="selectedItem"></ng-template>
