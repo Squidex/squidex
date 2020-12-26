@@ -73,7 +73,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         super(changeDetector, {
             selectedIndex: -1,
             selectedItem: undefined,
-            suggestedItems: [],
+            suggestedItems: []
         });
     }
 
