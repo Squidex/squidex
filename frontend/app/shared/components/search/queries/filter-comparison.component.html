@@ -64,12 +64,13 @@
                 <sqx-dropdown [items]="contributorsState.contributors | async"
                     valueProperty="token"
                     [ngModel]="filter.value"
-                    (ngModelChange)="changeValue($event)">
-                    <ng-template let-user="$implicit">
+                    (ngModelChange)="changeValue($event)"
+                    searchProperty="contributorName">
+                    <ng-template let-user="$implicit" let-context="context">
                         <span class="dropdown-user">
                             <img class="user-picture" [src]="user | sqxUserDtoPicture">
 
-                            <span class="user-name ">{{user.contributorName}}</span>
+                            <span class="user-name" [innerHTML]="user.contributorName | sqxHighlight:context"></span>
                         </span>
                     </ng-template>
                     <ng-template let-user="$implicit">

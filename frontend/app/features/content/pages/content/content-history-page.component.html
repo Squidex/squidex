@@ -21,7 +21,7 @@
 
         <div class="section mb-4" *ngIf="content.canDraftCreate || content.canDraftDelete">
             <ng-container *ngIf="!content.newStatus; else newVersion">
-                <button class="btn btn-success btn-block" (click)="createDraft() ">
+                <button class="btn btn-success btn-block" (click)="createDraft()">
                     {{ 'contents.draftNew' | sqxTranslate }}
                 </button>
             </ng-container>
