@@ -184,6 +184,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                     AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
                 }
 
+                if (resources.CanUpdateContentOwn(schema))
+                {
+                    AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
+                }
+
                 if (resources.CanUpdateContentPartial(schema))
                 {
                     AddPatchLink("patch", resources.Url<ContentsController>(x => nameof(x.PatchContent), values));

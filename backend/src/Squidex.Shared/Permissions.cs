@@ -138,9 +138,10 @@ namespace Squidex.Shared
 
         public const string AppContents = "squidex.apps.{app}.contents.{name}";
         public const string AppContentsRead = "squidex.apps.{app}.contents.{name}.read";
-        public const string AppContentReadOwn = "squidex.apps.{app}.contents.read.own";
+        public const string AppContentReadOwn = "squidex.apps.{app}.contents.{name}.read.own";
         public const string AppContentsCreate = "squidex.apps.{app}.contents.{name}.create";
         public const string AppContentsUpdate = "squidex.apps.{app}.contents.{name}.update";
+        public const string AppContentsUpdateOwn = "squidex.apps.{app}.contents.{name}.update.own";
         public const string AppContentsUpdatePartial = "squidex.apps.{app}.contents.{name}.update.partial";
         public const string AppContentsVersionCreate = "squidex.apps.{app}.contents.{name}.version.create";
         public const string AppContentsVersionDelete = "squidex.apps.{app}.contents.{name}.version.delete";

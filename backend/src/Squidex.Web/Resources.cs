@@ -34,6 +34,8 @@ namespace Squidex.Web
 
         public bool CanUpdateContent(string schema) => IsAllowedForSchema(P.AppContentsUpdate, schema);
 
+        public bool CanUpdateContentOwn(string schema) => IsAllowedForSchema(P.AppContentsUpdateOwn, schema);
+
         public bool CanUpdateContentPartial(string schema) => IsAllowedForSchema(P.AppContentsUpdatePartial, schema);
 
         // Schemas
