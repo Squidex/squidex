@@ -9,7 +9,7 @@
             </div>
             <div class="col-auto">
                 <ng-container *ngIf="canDelete || canUpdate">
-                    <button type="button" class="btn btn-sm btn-text-secondary ml-1" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
+                    <button type="button" class="btn btn-sm btn-text-secondary ml-1" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
     

@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" sqxStopClick [class.active]="dropdown.isOpen | async" #buttonOptions>
+        <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" sqxStopClick [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
             <i class="icon-dots"></i>
         </button>
 

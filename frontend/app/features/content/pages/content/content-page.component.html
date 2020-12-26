@@ -57,7 +57,7 @@
                         <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
 
                         <ng-container *ngIf="content?.canDelete">
-                            <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
+                            <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
                                 <i class="icon-dots"></i>
                             </button>
 
