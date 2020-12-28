@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using TestSuite.Model;
 
@@ -42,6 +43,8 @@ namespace TestSuite.Fixtures
                     await Contents.DeleteAsync(content);
                 }
             }).Wait();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

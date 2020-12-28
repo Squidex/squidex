@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
@@ -122,6 +124,109 @@ namespace TestSuite.ApiTests
                 var updated = await _.Contents.GetAsync(content.Id);
 
                 Assert.Equal(text, updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_content_with_scripting()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a content item with a value that triggers the schema.
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = -99 }, true);
+
+                Assert.True(content.Data.Number > 0);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_bulk_content_with_scripting()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create content with a value that triggers the schema.
+                var results = await _.Contents.BulkUpdateAsync(new BulkUpdate
+                {
+                    DoNotScript = false,
+                    Jobs = new List<BulkUpdateJob>
+                    {
+                        new BulkUpdateJob
+                        {
+                            Type = Squidex.ClientLibrary.BulkUpdateType.Upsert,
+                            Data = new
+                            {
+                                number = new
+                                {
+                                    iv = -99
+                                }
+                            }
+                        }
+                    },
+                    Publish = true
+                });
+
+
+                // STEP 2: Query content.
+                content = await _.Contents.GetAsync(results[0].ContentId);
+
+                Assert.True(content.Data.Number > 0);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_bulk_content_with_scripting_but_disabled()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create content with a value that triggers the schema.
+                var results = await _.Contents.BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs = new List<BulkUpdateJob>
+                    {
+                        new BulkUpdateJob
+                        {
+                            Type = Squidex.ClientLibrary.BulkUpdateType.Upsert,
+                            Data = new
+                            {
+                                number = new
+                                {
+                                    iv = -99
+                                }
+                            }
+                        }
+                    },
+                    Publish = true
+                });
+
+
+                // STEP 2: Query content.
+                content = await _.Contents.GetAsync(results[0].ContentId);
+
+                Assert.Equal(-99, content.Data.Number);
             }
             finally
             {
