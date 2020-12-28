@@ -114,6 +114,7 @@ export class BulkResultDto {
 
 export interface BulkUpdateDto {
     readonly jobs: ReadonlyArray<BulkUpdateJobDto>;
+    readonly doNotScript?: boolean;
     readonly checkReferrers?: boolean;
 }
 

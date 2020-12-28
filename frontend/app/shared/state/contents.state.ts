@@ -374,6 +374,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     private bulkMany(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean, job: Partial<BulkUpdateJobDto>): Observable<ReadonlyArray<BulkResultDto>> {
         const update = {
+            doNotScript: false,
             jobs: contents.map(x => ({
                 id: x.id,
                 schema: x.schemaName,
