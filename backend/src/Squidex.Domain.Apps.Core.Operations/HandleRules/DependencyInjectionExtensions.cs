@@ -14,9 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddRuleAction<TAction, THandler>(this IServiceCollection services) where THandler : class, IRuleActionHandler where TAction : RuleAction
         {
-            services.AddSingletonAs<THandler>()
-                .As<IRuleActionHandler>();
-
+            services.AddSingleton<IRuleActionHandler, THandler>();
             services.AddSingleton(new RuleActionRegistration(typeof(TAction)));
 
             return services;

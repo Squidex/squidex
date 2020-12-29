@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -26,14 +25,14 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.History
 {
-    public class NotifoService : IInitializable, IUserEventHandler
+    public class NotifoService : IUserEventHandler
     {
         private static readonly Duration MaxAge = Duration.FromHours(12);
         private readonly NotifoOptions options;
         private readonly IUrlGenerator urlGenerator;
         private readonly IUserResolver userResolver;
         private readonly IClock clock;
-        private INotifoClient? client;
+        private readonly INotifoClient? client;
 
         public NotifoService(IOptions<NotifoOptions> options, IUrlGenerator urlGenerator, IUserResolver userResolver, IClock clock)
         {
@@ -48,25 +47,20 @@ namespace Squidex.Domain.Apps.Entities.History
             this.userResolver = userResolver;
 
             this.clock = clock;
-        }
 
-        public Task InitializeAsync(CancellationToken ct = default)
-        {
-            if (options.IsConfigured())
+            if (options.Value.IsConfigured())
             {
                 var builder =
                     NotifoClientBuilder.Create()
-                        .SetApiKey(options.ApiKey);
+                        .SetApiKey(options.Value.ApiKey);
 
-                if (!string.IsNullOrWhiteSpace(options.ApiUrl))
+                if (!string.IsNullOrWhiteSpace(options.Value.ApiUrl))
                 {
-                    builder = builder.SetApiUrl(options.ApiUrl);
+                    builder = builder.SetApiUrl(options.Value.ApiUrl);
                 }
 
                 client = builder.Build();
             }
-
-            return Task.CompletedTask;
         }
 
         public void OnUserUpdated(IUser user)

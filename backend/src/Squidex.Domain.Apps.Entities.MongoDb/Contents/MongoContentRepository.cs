@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;

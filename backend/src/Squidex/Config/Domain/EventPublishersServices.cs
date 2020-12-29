@@ -8,7 +8,7 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure;
+using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
@@ -27,7 +27,9 @@ namespace Squidex.Config.Domain
 
                 if (string.IsNullOrWhiteSpace(eventPublisherType))
                 {
-                    throw new ConfigurationException($"Configure EventPublisher type with 'eventPublishers:{child.Key}:type'.");
+                    var error = new ConfigurationError("Value is required.", "eventPublishers:{child.Key}:type");
+
+                    throw new ConfigurationException(error);
                 }
 
                 var eventsFilter = child.GetValue<string>("eventsFilter");
@@ -40,14 +42,18 @@ namespace Squidex.Config.Domain
 
                     if (string.IsNullOrWhiteSpace(publisherConfig))
                     {
-                        throw new ConfigurationException($"Configure EventPublisher RabbitMq configuration with 'eventPublishers:{child.Key}:configuration'.");
+                        var error = new ConfigurationError("Value is required.", "eventPublishers:{child.Key}:configuration");
+
+                        throw new ConfigurationException(error);
                     }
 
                     var exchange = child.GetValue<string>("exchange");
 
                     if (string.IsNullOrWhiteSpace(exchange))
                     {
-                        throw new ConfigurationException($"Configure EventPublisher RabbitMq exchange with 'eventPublishers:{child.Key}:configuration'.");
+                        var error = new ConfigurationError("Value is required.", "eventPublishers:{child.Key}:exchange");
+
+                        throw new ConfigurationException(error);
                     }
 
                     var name = $"EventPublishers_{child.Key}";
@@ -60,7 +66,9 @@ namespace Squidex.Config.Domain
                 }
                 else
                 {
-                    throw new ConfigurationException($"Unsupported value '{child.Key}' for 'eventPublishers:{child.Key}:type', supported: RabbitMq.");
+                    var error = new ConfigurationError($"Unsupported value '{child.Key}", "eventPublishers:{child.Key}:type.");
+
+                    throw new ConfigurationException(error);
                 }
             }
         }

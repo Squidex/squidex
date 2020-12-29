@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             if (ContainsKey(id))
             {
-                throw new ArgumentException("Id already exists.", nameof(id));
+                return this;
             }
 
             var newClient = new AppClient(id, secret)

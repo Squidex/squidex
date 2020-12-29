@@ -14,8 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Squidex.Config;
-using Squidex.Config.Startup;
 using Squidex.Domain.Users;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Log;
@@ -24,20 +24,21 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
-    public sealed class CreateAdminHost : SafeHostedService
+    public sealed class CreateAdminInitializer : IInitializable
     {
         private readonly IServiceProvider serviceProvider;
         private readonly MyIdentityOptions identityOptions;
 
-        public CreateAdminHost(ISemanticLog log, IServiceProvider serviceProvider, IOptions<MyIdentityOptions> identityOptions)
-            : base(log)
+        public int Order => int.MaxValue;
+
+        public CreateAdminInitializer(IServiceProvider serviceProvider, IOptions<MyIdentityOptions> identityOptions)
         {
             this.serviceProvider = serviceProvider;
 
             this.identityOptions = identityOptions.Value;
         }
 
-        protected override async Task StartAsync(ISemanticLog log, CancellationToken ct)
+        public async Task InitializeAsync(CancellationToken ct)
         {
             IdentityModelEventSource.ShowPII = identityOptions.ShowPII;
 
@@ -91,6 +92,8 @@ namespace Squidex.Areas.IdentityServer.Config
                         }
                         catch (Exception ex)
                         {
+                            var log = serviceProvider.GetRequiredService<ISemanticLog>();
+
                             log.LogError(ex, w => w
                                 .WriteProperty("action", "createAdmin")
                                 .WriteProperty("status", "failed"));

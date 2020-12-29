@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
@@ -23,6 +24,8 @@ namespace Squidex.Config.Domain
         private readonly JsonSerializer jsonNetSerializer;
         private readonly IJsonSerializer jsonSerializer;
         private readonly RuleRegistry ruleRegistry;
+
+        public int Order => -1;
 
         public SerializationInitializer(JsonSerializer jsonNetSerializer, IJsonSerializer jsonSerializer, RuleRegistry ruleRegistry)
         {

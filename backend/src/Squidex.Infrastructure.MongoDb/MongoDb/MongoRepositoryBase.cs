@@ -10,6 +10,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Hosting;
+using Squidex.Hosting.Configuration;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
@@ -112,7 +114,9 @@ namespace Squidex.Infrastructure.MongoDb
             }
             catch (Exception ex)
             {
-                throw new ConfigurationException($"MongoDb connection failed to connect to database {Database.DatabaseNamespace.DatabaseName}", ex);
+                var error = new ConfigurationError($"MongoDb connection failed to connect to database {Database.DatabaseNamespace.DatabaseName}.");
+
+                throw new ConfigurationException(error, ex);
             }
         }
 

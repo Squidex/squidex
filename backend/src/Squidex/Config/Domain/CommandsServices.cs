@@ -32,8 +32,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexCommands(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<ReadonlyOptions>(
-                config.GetSection("mode"));
+            services.Configure<ReadonlyOptions>(config, "mode");
 
             services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();

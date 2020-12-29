@@ -74,7 +74,8 @@ namespace Squidex
         {
             app.UseCookiePolicy();
 
-            app.UseSquidexForwardingRules(config);
+            app.UseDefaultForwardRules();
+
             app.UseSquidexHealthCheck();
             app.UseSquidexRobotsTxt();
             app.UseSquidexTracking();

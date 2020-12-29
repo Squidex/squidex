@@ -10,7 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
+using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure.Net;
 
 namespace Squidex.Config.Orleans
@@ -37,7 +37,9 @@ namespace Squidex.Config.Orleans
 
             if (chosen == null)
             {
-                throw new ConfigurationException($"Hostname {addressOrHost} with family {family} is not a valid IP address or DNS name");
+                var error = new ConfigurationError($"Hostname {addressOrHost} with family {family} is not a valid IP address or DNS name");
+
+                throw new ConfigurationException(error);
             }
 
             return chosen;

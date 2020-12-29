@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Translations;
 using Squidex.Text.Translations;
 
 namespace Squidex.Areas.Api.Controllers.Translations.Models

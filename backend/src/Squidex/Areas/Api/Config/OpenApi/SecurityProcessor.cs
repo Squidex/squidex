@@ -7,9 +7,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Options;
 using NSwag;
 using NSwag.Generation.Processors.Security;
+using Squidex.Hosting;
 using Squidex.Pipeline.OpenApi;
 using Squidex.Web;
 
@@ -17,19 +17,19 @@ namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class SecurityProcessor : SecurityDefinitionAppender
     {
-        public SecurityProcessor(IOptions<UrlsOptions> urlOptions)
-            : base(Constants.SecurityDefinition, Enumerable.Empty<string>(), CreateOAuthSchema(urlOptions.Value))
+        public SecurityProcessor(IUrlGenerator urlGenerator)
+            : base(Constants.SecurityDefinition, Enumerable.Empty<string>(), CreateOAuthSchema(urlGenerator))
         {
         }
 
-        private static OpenApiSecurityScheme CreateOAuthSchema(UrlsOptions urlOptions)
+        private static OpenApiSecurityScheme CreateOAuthSchema(IUrlGenerator urlGenerator)
         {
             var security = new OpenApiSecurityScheme
             {
                 Type = OpenApiSecuritySchemeType.OAuth2
             };
 
-            var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token", false);
+            var tokenUrl = urlGenerator.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token", false);
 
             security.TokenUrl = tokenUrl;
 

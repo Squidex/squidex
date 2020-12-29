@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Translations.Models;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Text.Translations;
 using Squidex.Web;

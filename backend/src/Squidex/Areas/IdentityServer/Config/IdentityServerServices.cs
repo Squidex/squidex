@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Squidex.Domain.Users;
 using Squidex.Shared.Identity;
 using Squidex.Web;
@@ -27,15 +26,13 @@ namespace Squidex.Areas.IdentityServer.Config
     {
         public static void AddSquidexIdentityServer(this IServiceCollection services)
         {
-            services.AddSingletonAs<IConfigureOptions<KeyManagementOptions>>(s =>
+            services.Configure<KeyManagementOptions>((c, options) =>
             {
-                return new ConfigureOptions<KeyManagementOptions>(options =>
-                {
-                    options.XmlRepository = s.GetRequiredService<IXmlRepository>();
-                });
+                options.XmlRepository = c.GetRequiredService<IXmlRepository>();
             });
 
-            services.AddDataProtection().SetApplicationName("Squidex");
+            services.AddDataProtection()
+                .SetApplicationName("Squidex");
 
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddDefaultTokenProviders();
@@ -60,6 +57,9 @@ namespace Squidex.Areas.IdentityServer.Config
 
             services.AddSingletonAs<InMemoryResourcesStore>()
                 .As<IResourceStore>();
+
+            services.AddSingletonAs<CreateAdminInitializer>()
+                .AsSelf();
 
             services.AddIdentityServer(options =>
                 {

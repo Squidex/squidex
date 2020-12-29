@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
+using Squidex.Hosting;
+using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 
@@ -69,14 +71,18 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                 if (!currentConnection.IsOpen)
                 {
-                    throw new ConfigurationException($"RabbitMq event bus failed to connect to {connectionFactory.Endpoint}");
+                    var error = new ConfigurationError($"RabbitMq event bus failed to connect to {connectionFactory.Endpoint}.");
+
+                    throw new ConfigurationException(error);
                 }
 
                 return Task.CompletedTask;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw new ConfigurationException($"RabbitMq event bus failed to connect to {connectionFactory.Endpoint}", e);
+                var error = new ConfigurationError($"RabbitMq event bus failed to connect to {connectionFactory.Endpoint}.");
+
+                throw new ConfigurationException(error, ex);
             }
         }
 

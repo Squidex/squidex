@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Infrastructure.States;
 

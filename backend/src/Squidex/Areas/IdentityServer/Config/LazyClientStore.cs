@@ -18,6 +18,7 @@ using Squidex.Config;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Users;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
@@ -30,25 +31,15 @@ namespace Squidex.Areas.IdentityServer.Config
     public class LazyClientStore : IClientStore
     {
         private readonly IServiceProvider serviceProvider;
-        private readonly IAppProvider appProvider;
         private readonly Dictionary<string, Client> staticClients = new Dictionary<string, Client>(StringComparer.OrdinalIgnoreCase);
 
-        public LazyClientStore(
-            IServiceProvider serviceProvider,
-            IOptions<UrlsOptions> urlsOptions,
-            IOptions<MyIdentityOptions> identityOptions,
-            IAppProvider appProvider)
+        public LazyClientStore(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(identityOptions, nameof(identityOptions));
             Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(urlsOptions, nameof(urlsOptions));
 
             this.serviceProvider = serviceProvider;
 
-            this.appProvider = appProvider;
-
-            CreateStaticClients(urlsOptions, identityOptions);
+            CreateStaticClients();
         }
 
         public async Task<Client?> FindClientByIdAsync(string clientId)
@@ -61,6 +52,8 @@ namespace Squidex.Areas.IdentityServer.Config
             }
 
             var (appName, appClientId) = clientId.GetClientParts();
+
+            var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
 
             if (!string.IsNullOrWhiteSpace(appName) && !string.IsNullOrWhiteSpace(appClientId))
             {
@@ -136,15 +129,19 @@ namespace Squidex.Areas.IdentityServer.Config
             };
         }
 
-        private void CreateStaticClients(IOptions<UrlsOptions> urlsOptions, IOptions<MyIdentityOptions> identityOptions)
+        private void CreateStaticClients()
         {
-            foreach (var client in CreateStaticClients(urlsOptions.Value, identityOptions.Value))
+            var identityOptions = serviceProvider.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+
+            var urlGenerator = serviceProvider.GetRequiredService<IUrlGenerator>();
+
+            foreach (var client in CreateStaticClients(urlGenerator, identityOptions))
             {
                 staticClients[client.ClientId] = client;
             }
         }
 
-        private static IEnumerable<Client> CreateStaticClients(UrlsOptions urlsOptions, MyIdentityOptions identityOptions)
+        private static IEnumerable<Client> CreateStaticClients(IUrlGenerator urlGenerator, MyIdentityOptions identityOptions)
         {
             var frontendId = Constants.FrontendClient;
 
@@ -154,13 +151,13 @@ namespace Squidex.Areas.IdentityServer.Config
                 ClientName = frontendId,
                 RedirectUris = new List<string>
                 {
-                    urlsOptions.BuildUrl("login;"),
-                    urlsOptions.BuildUrl("client-callback-silent", false),
-                    urlsOptions.BuildUrl("client-callback-popup", false)
+                    urlGenerator.BuildUrl("login;"),
+                    urlGenerator.BuildUrl("client-callback-silent", false),
+                    urlGenerator.BuildUrl("client-callback-popup", false)
                 },
                 PostLogoutRedirectUris = new List<string>
                 {
-                    urlsOptions.BuildUrl("logout", false)
+                    urlGenerator.BuildUrl("logout", false)
                 },
                 AllowAccessTokensViaBrowser = true,
                 AllowedGrantTypes = GrantTypes.Implicit,
@@ -189,8 +186,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 },
                 RedirectUris = new List<string>
                 {
-                    urlsOptions.BuildUrl($"{Constants.PortalPrefix}/signin-internal", false),
-                    urlsOptions.BuildUrl($"{Constants.OrleansPrefix}/signin-internal", false)
+                    urlGenerator.BuildUrl($"{Constants.PortalPrefix}/signin-internal", false),
+                    urlGenerator.BuildUrl($"{Constants.OrleansPrefix}/signin-internal", false)
                 },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
                 AllowedGrantTypes = GrantTypes.ImplicitAndClientCredentials,

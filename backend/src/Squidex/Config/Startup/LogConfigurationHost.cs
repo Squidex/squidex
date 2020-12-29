@@ -11,21 +11,24 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Squidex.Log;
 
 namespace Squidex.Config.Startup
 {
-    public sealed class LogConfigurationHost : SafeHostedService
+    public sealed class LogConfigurationHost : IHostedService
     {
         private readonly IConfiguration configuration;
+        private readonly ISemanticLog log;
 
-        public LogConfigurationHost(ISemanticLog log, IConfiguration configuration)
-            : base(log)
+        public LogConfigurationHost(IConfiguration configuration, ISemanticLog log)
         {
             this.configuration = configuration;
+
+            this.log = log;
         }
 
-        protected override Task StartAsync(ISemanticLog log, CancellationToken ct)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             log.LogInformation(w => w
                 .WriteProperty("message", "Application started")
@@ -44,6 +47,11 @@ namespace Squidex.Config.Startup
                     }
                 }));
 
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
             return Task.CompletedTask;
         }
     }

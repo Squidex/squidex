@@ -35,11 +35,11 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_throw_exception_if_assigning_client_with_same_id()
+        public void Should_do_nothing_if_assigning_client_with_same_id()
         {
             var clients_1 = clients_0.Add("2", "my-secret");
 
-            Assert.Throws<ArgumentException>(() => clients_1.Add("2", "my-secret"));
+            Assert.Same(clients_0, clients_1);
         }
 
         [Fact]

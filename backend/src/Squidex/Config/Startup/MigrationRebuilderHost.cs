@@ -7,24 +7,28 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Migrations;
-using Squidex.Log;
 
 namespace Squidex.Config.Startup
 {
-    public sealed class MigrationRebuilderHost : SafeHostedService
+    public sealed class MigrationRebuilderHost : IHostedService
     {
         private readonly RebuildRunner rebuildRunner;
 
-        public MigrationRebuilderHost(RebuildRunner rebuildRunner, ISemanticLog log)
-            : base(log)
+        public MigrationRebuilderHost(RebuildRunner rebuildRunner)
         {
             this.rebuildRunner = rebuildRunner;
         }
 
-        protected override Task StartAsync(ISemanticLog log, CancellationToken ct)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            return rebuildRunner.RunAsync(ct);
+            return rebuildRunner.RunAsync(cancellationToken);
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

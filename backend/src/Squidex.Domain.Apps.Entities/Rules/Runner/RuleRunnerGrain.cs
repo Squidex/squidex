@@ -17,9 +17,11 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
+using TaskExtensions = Squidex.Infrastructure.Tasks.TaskExtensions;
+
+#pragma warning disable RECS0015 // If an extension method is called as static method convert it to method syntax
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
@@ -151,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
         private void Process(State job, CancellationToken ct)
         {
-            ProcessAsync(job, ct).Forget();
+            TaskExtensions.Forget(ProcessAsync(job, ct));
         }
 
         private async Task ProcessAsync(State currentState, CancellationToken ct)

@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -28,8 +29,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexAssets(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<AssetOptions>(
-                config.GetSection("assets"));
+            services.Configure<AssetOptions>(config, "assets");
 
             if (config.GetValue<bool>("assets:deleteRecursive"))
             {
@@ -162,7 +162,7 @@ namespace Squidex.Config.Domain
                 .As<IAssetThumbnailGenerator>();
 
             services.AddSingletonAs(c => new DelegateInitializer(
-                    c.GetRequiredService<IAssetStore>().GetType().FullName!,
+                    c.GetRequiredService<IAssetStore>().GetType().Name,
                     c.GetRequiredService<IAssetStore>().InitializeAsync))
                 .As<IInitializable>();
         }
