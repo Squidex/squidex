@@ -34,6 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             Guard.NotNull(replicatedCache, nameof(replicatedCache));
 
             this.grainFactory = grainFactory;
+
             this.replicatedCache = replicatedCache;
         }
 
