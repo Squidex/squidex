@@ -42,6 +42,8 @@ namespace Squidex.Infrastructure.Orleans
 
             await cluster.DeployAsync();
 
+            try
+            {
             var grain = cluster.GrainFactory.GetGrain<IAsyncLocalGrain>(SingleGrain.Id);
 
             var result1 = await grain.GetValueAsync();
@@ -55,6 +57,10 @@ namespace Squidex.Infrastructure.Orleans
             Assert.Equal(1, result1);
             Assert.Equal(1, result2);
             Assert.Equal(1, result3);
+            finally
+            {
+                await Task.WhenAny(Task.Delay(2000), cluster.StopAllSilosAsync());
+            }
         }
     }
 }

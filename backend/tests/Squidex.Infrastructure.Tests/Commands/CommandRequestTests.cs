@@ -65,21 +65,28 @@ namespace Squidex.Infrastructure.Commands
 
             await cluster.DeployAsync();
 
-            var culture = CultureInfo.GetCultureInfo("de");
-            var cultureUI = CultureInfo.GetCultureInfo("it");
+            try
+            {
+                var culture = CultureInfo.GetCultureInfo("de");
+                var cultureUI = CultureInfo.GetCultureInfo("it");
 
-            CultureInfo.CurrentCulture = culture;
-            CultureInfo.CurrentUICulture = cultureUI;
+                CultureInfo.CurrentCulture = culture;
+                CultureInfo.CurrentUICulture = cultureUI;
 
-            var grain = cluster.Client.GetGrain<IContextGrain>("Default");
+                var grain = cluster.Client.GetGrain<IContextGrain>("Default");
 
-            var request = CommandRequest.Create(null!);
+                var request = CommandRequest.Create(null!);
 
-            var cultureFromGrain = await grain.GetCultureAsync(request);
-            var cultureUIFromGrain = await grain.GetCultureUIAsync(request);
+                var cultureFromGrain = await grain.GetCultureAsync(request);
+                var cultureUIFromGrain = await grain.GetCultureUIAsync(request);
 
-            Assert.Equal(culture.Name, cultureFromGrain);
-            Assert.Equal(cultureUI.Name, cultureUIFromGrain);
+                Assert.Equal(culture.Name, cultureFromGrain);
+                Assert.Equal(cultureUI.Name, cultureUIFromGrain);
+            }
+            finally
+            {
+                await Task.WhenAny(Task.Delay(2000), cluster.StopAllSilosAsync());
+            }
         }
     }
 }
