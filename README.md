@@ -7,6 +7,7 @@ Squidex is an open source headless CMS and content management hub. In contrast t
 [![Discourse topics](https://img.shields.io/discourse/https/support.squidex.io/topics.svg)](https://support.squidex.io) 
 [![Build Status](https://build.squidex.io/api/badges/Squidex/squidex/status.svg)](https://build.squidex.io/Squidex/squidex)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSquidex%2Fsquidex.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSquidex%2Fsquidex?ref=badge_shield)
+![Docker Pulls](https://img.shields.io/docker/pulls/squidex/squidex)
 
 Read the docs at [https://docs.squidex.io/](https://docs.squidex.io/) (work in progress) or just check out the code and play around.
 
