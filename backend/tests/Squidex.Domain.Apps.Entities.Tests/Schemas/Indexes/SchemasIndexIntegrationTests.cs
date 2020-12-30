@@ -37,6 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         public class GrainEnvironment
         {
             private Schema schema = new Schema("my-schema");
+            private long version = EtagVersion.Empty;
 
             public IGrainFactory GrainFactory { get; } = A.Fake<IGrainFactory>();
 
@@ -63,9 +64,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                     .Returns(indexGrain);
             }
 
-            public void HandleCommand(AddField addField)
+            public void HandleCommand(AddField command)
             {
-                schema = schema.AddString(schema.Fields.Count + 1, addField.Name, Partitioning.Invariant);
+                version++;
+
+                schema = schema.AddString(schema.Fields.Count + 1, command.Name, Partitioning.Invariant);
             }
 
             public void VerifyGrainAccess(int count)
@@ -76,18 +79,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             private ISchemaEntity CreateEntity()
             {
-                var appEntity = A.Fake<ISchemaEntity>();
+                var schemaEntity = A.Fake<ISchemaEntity>();
 
-                A.CallTo(() => appEntity.Id)
+                A.CallTo(() => schemaEntity.Id)
                     .Returns(SchemaId.Id);
 
-                A.CallTo(() => appEntity.AppId)
+                A.CallTo(() => schemaEntity.AppId)
                     .Returns(AppId);
 
-                A.CallTo(() => appEntity.SchemaDef)
+                A.CallTo(() => schemaEntity.Version)
+                    .Returns(version);
+
+                A.CallTo(() => schemaEntity.SchemaDef)
                     .Returns(schema);
 
-                return appEntity;
+                return schemaEntity;
             }
         }
 

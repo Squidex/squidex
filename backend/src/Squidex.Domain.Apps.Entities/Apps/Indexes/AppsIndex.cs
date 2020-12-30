@@ -117,9 +117,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 if (canCache)
                 {
-                    if (replicatedCache.TryGetValue(GetCacheKey(name), out var cached))
+                    if (replicatedCache.TryGetValue(GetCacheKey(name), out var v) && v is IAppEntity cacheApp)
                     {
-                        return cached as IAppEntity;
+                        return cacheApp;
                     }
                 }
 
@@ -140,9 +140,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 if (canCache)
                 {
-                    if (replicatedCache.TryGetValue(GetCacheKey(appId), out var cached))
+                    if (replicatedCache.TryGetValue(GetCacheKey(appId), out var v) && v is IAppEntity cachedApp)
                     {
-                        return cached as IAppEntity;
+                        return cachedApp;
                     }
                 }
 

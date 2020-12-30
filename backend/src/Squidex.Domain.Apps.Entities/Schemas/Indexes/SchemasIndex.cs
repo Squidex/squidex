@@ -65,9 +65,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (canCache)
                 {
-                    if (replicatedCache.TryGetValue(cacheKey, out var cachedSchema))
+                    if (replicatedCache.TryGetValue(cacheKey, out var v) && v is ISchemaEntity cachedSchema)
                     {
-                        return cachedSchema as ISchemaEntity;
+                        return cachedSchema;
                     }
                 }
 
@@ -90,9 +90,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (canCache)
                 {
-                    if (replicatedCache.TryGetValue(cacheKey, out var cachedSchema))
+                    if (replicatedCache.TryGetValue(cacheKey, out var v) && v is ISchemaEntity cachedSchema)
                     {
-                        return cachedSchema as ISchemaEntity;
+                        return cachedSchema;
                     }
                 }
 

@@ -32,6 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         public class GrainEnvironment
         {
             private AppContributors contributors = AppContributors.Empty;
+            private long version = EtagVersion.Empty;
 
             public IGrainFactory GrainFactory { get; } = A.Fake<IGrainFactory>();
 
@@ -56,9 +57,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                     .Returns(indexGrain);
             }
 
-            public void HandleCommand(AssignContributor contributor)
+            public void HandleCommand(CreateApp command)
             {
-                contributors = contributors.Assign(contributor.ContributorId, Role.Developer);
+                version++;
+
+                contributors = contributors.Assign(command.Actor.Identifier, Role.Developer);
+            }
+
+            public void HandleCommand(AssignContributor command)
+            {
+                version++;
+
+                contributors = contributors.Assign(command.ContributorId, Role.Developer);
             }
 
             public void VerifyGrainAccess(int count)
@@ -76,6 +86,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 A.CallTo(() => appEntity.Name)
                     .Returns(AppId.Name);
+
+                A.CallTo(() => appEntity.Version)
+                    .Returns(version);
 
                 A.CallTo(() => appEntity.Contributors)
                     .Returns(new AppContributors(contributors.ToDictionary()));
@@ -108,23 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             try
             {
-                var indexes =
-                    cluster.Silos.OfType<InProcessSiloHandle>()
-                        .Select(x =>
-                        {
-                            var pubSub =
-                                shouldBreak ?
-                                    A.Fake<IPubSub>() :
-                                    x.SiloHost.Services.GetRequiredService<IPubSub>();
-
-                            var cache =
-                                new ReplicatedCache(
-                                    new MemoryCache(Options.Create(new MemoryCacheOptions())),
-                                    pubSub,
-                                    Options.Create(new ReplicatedCacheOptions { Enable = true }));
-
-                            return new AppsIndex(env.GrainFactory, cache);
-                        }).ToArray();
+                var indexes = GetIndexes(shouldBreak, env, cluster);
 
                 var appId = env.AppId;
 
@@ -175,6 +172,94 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 await Task.WhenAny(Task.Delay(2000), cluster.StopAllSilosAsync());
             }
+        }
+
+        [Theory]
+        [InlineData(3, false)]
+        public async Task Should_retrieve_new_app(short numSilos, bool shouldBreak)
+        {
+            var env = new GrainEnvironment();
+
+            var cluster =
+                new TestClusterBuilder(numSilos)
+                    .AddSiloBuilderConfigurator<Configurator>()
+                    .Build();
+
+            await cluster.DeployAsync();
+
+            try
+            {
+                var indexes = GetIndexes(shouldBreak, env, cluster);
+
+                var appId = env.AppId;
+
+                foreach (var index in indexes)
+                {
+                    Assert.Null(await index.GetAppAsync(appId.Id, true));
+                    Assert.Null(await index.GetAppByNameAsync(appId.Name, true));
+                }
+
+                var creatorId = Guid.NewGuid().ToString();
+                var creatorToken = new RefToken(RefTokenType.Subject, creatorId);
+                var createCommand = new CreateApp { Actor = creatorToken, AppId = appId.Id };
+
+                var commandContext = new CommandContext(createCommand, A.Fake<ICommandBus>());
+
+                var randomIndex = indexes[new Random().Next(3)];
+
+                await indexes[0].HandleAsync(commandContext, x =>
+                {
+                    if (x.Command is CreateApp command)
+                    {
+                        env.HandleCommand(command);
+                    }
+
+                    x.Complete(true);
+
+                    return Task.CompletedTask;
+                });
+
+                foreach (var index in indexes)
+                {
+                    var appById = await index.GetAppAsync(appId.Id, true);
+                    var appByName = await index.GetAppByNameAsync(appId.Name, true);
+
+                    if (index == randomIndex || !shouldBreak)
+                    {
+                        Assert.True(appById?.Contributors.ContainsKey(creatorId));
+                        Assert.True(appByName?.Contributors.ContainsKey(creatorId));
+                    }
+                    else
+                    {
+                        Assert.False(appById?.Contributors.ContainsKey(creatorId));
+                        Assert.False(appByName?.Contributors.ContainsKey(creatorId));
+                    }
+                }
+            }
+            finally
+            {
+                await Task.WhenAny(Task.Delay(2000), cluster.StopAllSilosAsync());
+            }
+        }
+
+        private static AppsIndex[] GetIndexes(bool shouldBreak, GrainEnvironment env, TestCluster cluster)
+        {
+            return cluster.Silos.OfType<InProcessSiloHandle>()
+                .Select(x =>
+                {
+                    var pubSub =
+                        shouldBreak ?
+                            A.Fake<IPubSub>() :
+                            x.SiloHost.Services.GetRequiredService<IPubSub>();
+
+                    var cache =
+                        new ReplicatedCache(
+                            new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                            pubSub,
+                            Options.Create(new ReplicatedCacheOptions { Enable = true }));
+
+                    return new AppsIndex(env.GrainFactory, cache);
+                }).ToArray();
         }
     }
 }
