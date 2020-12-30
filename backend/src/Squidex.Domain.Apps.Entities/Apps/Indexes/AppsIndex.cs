@@ -29,16 +29,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
         private readonly IGrainFactory grainFactory;
-        private readonly IReplicatedCache replicatedCache;
+        private readonly IReplicatedCache grainCache;
 
-        public AppsIndex(IGrainFactory grainFactory, IReplicatedCache replicatedCache)
+        public AppsIndex(IGrainFactory grainFactory, IReplicatedCache grainCache)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(replicatedCache, nameof(replicatedCache));
+            Guard.NotNull(grainCache, nameof(grainCache));
 
             this.grainFactory = grainFactory;
-
-            this.replicatedCache = replicatedCache;
+            this.grainCache = grainCache;
         }
 
         public async Task RebuildByContributorsAsync(DomainId appId, HashSet<string> contributors)
@@ -117,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 if (canCache)
                 {
-                    if (replicatedCache.TryGetValue(GetCacheKey(name), out var v) && v is IAppEntity cacheApp)
+                    if (grainCache.TryGetValue(GetCacheKey(name), out var v) && v is IAppEntity cacheApp)
                     {
                         return cacheApp;
                     }
@@ -140,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 if (canCache)
                 {
-                    if (replicatedCache.TryGetValue(GetCacheKey(appId), out var v) && v is IAppEntity cachedApp)
+                    if (grainCache.TryGetValue(GetCacheKey(appId), out var v) && v is IAppEntity cachedApp)
                     {
                         return cachedApp;
                     }
@@ -312,19 +311,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private static string GetCacheKey(DomainId id)
         {
-            return $"APPS_ID_{id}";
+            return $"{typeof(AppsIndex)}_Apps_Id_{id}";
         }
 
         private static string GetCacheKey(string name)
         {
-            return $"APPS_NAME_{name}";
+            return $"{typeof(AppsIndex)}_Apps_Name_{name}";
         }
 
         private Task CacheItAsync(IAppEntity app, bool publish)
         {
             return Task.WhenAll(
-                replicatedCache.AddAsync(GetCacheKey(app.Id), app, CacheDuration, publish),
-                replicatedCache.AddAsync(GetCacheKey(app.Name), app, CacheDuration, publish));
+                grainCache.AddAsync(GetCacheKey(app.Id), app, CacheDuration, publish),
+                grainCache.AddAsync(GetCacheKey(app.Name), app, CacheDuration, publish));
         }
     }
 }

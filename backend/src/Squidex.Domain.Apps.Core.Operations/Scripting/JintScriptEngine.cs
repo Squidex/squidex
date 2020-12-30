@@ -34,9 +34,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public TimeSpan TimeoutExecution { get; set; } = TimeSpan.FromMilliseconds(4000);
 
-        public JintScriptEngine(IMemoryCache memoryCache, IEnumerable<IJintExtension>? extensions = null)
+        public JintScriptEngine(IMemoryCache cache, IEnumerable<IJintExtension>? extensions = null)
         {
-            parser = new Parser(memoryCache);
+            parser = new Parser(cache);
 
             this.extensions = extensions?.ToArray() ?? Array.Empty<IJintExtension>();
         }

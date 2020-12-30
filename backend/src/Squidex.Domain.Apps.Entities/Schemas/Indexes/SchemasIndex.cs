@@ -26,16 +26,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
         private readonly IGrainFactory grainFactory;
-        private readonly IReplicatedCache replicatedCache;
+        private readonly IReplicatedCache grainCache;
 
-        public SchemasIndex(IGrainFactory grainFactory, IReplicatedCache replicatedCache)
+        public SchemasIndex(IGrainFactory grainFactory, IReplicatedCache grainCache)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(replicatedCache, nameof(replicatedCache));
+            Guard.NotNull(grainCache, nameof(grainCache));
 
             this.grainFactory = grainFactory;
-
-            this.replicatedCache = replicatedCache;
+            this.grainCache = grainCache;
         }
 
         public Task RebuildAsync(DomainId appId, Dictionary<string, DomainId> schemas)
@@ -65,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (canCache)
                 {
-                    if (replicatedCache.TryGetValue(cacheKey, out var v) && v is ISchemaEntity cachedSchema)
+                    if (grainCache.TryGetValue(cacheKey, out var v) && v is ISchemaEntity cachedSchema)
                     {
                         return cachedSchema;
                     }
@@ -90,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (canCache)
                 {
-                    if (replicatedCache.TryGetValue(cacheKey, out var v) && v is ISchemaEntity cachedSchema)
+                    if (grainCache.TryGetValue(cacheKey, out var v) && v is ISchemaEntity cachedSchema)
                     {
                         return cachedSchema;
                     }
@@ -214,19 +213,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private static string GetCacheKey(DomainId appId, string name)
         {
-            return $"SCHEMAS_NAME_{appId}_{name}";
+            return $"{typeof(SchemasIndex)}_Schemas_Name_{appId}_{name}";
         }
 
         private static string GetCacheKey(DomainId appId, DomainId id)
         {
-            return $"SCHEMAS_ID_{appId}_{id}";
+            return $"{typeof(SchemasIndex)}_Schemas_Id_{appId}_{id}";
         }
 
         private Task CacheItAsync(ISchemaEntity schema, bool publish)
         {
             return Task.WhenAll(
-                replicatedCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.Id), schema, CacheDuration, publish),
-                replicatedCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema, CacheDuration, publish));
+                grainCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.Id), schema, CacheDuration, publish),
+                grainCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema, CacheDuration, publish));
         }
     }
 }
