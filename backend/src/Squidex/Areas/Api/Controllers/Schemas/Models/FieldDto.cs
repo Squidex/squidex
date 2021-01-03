@@ -132,7 +132,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
                 if (Properties is ArrayFieldPropertiesDto)
                 {
-                    var parentValues = new { app = resources.App, name = schema, parentId = FieldId };
+                    var parentValues = new { values.app, values.name, parentId = FieldId };
 
                     AddPostLink("fields/add", resources.Url<SchemaFieldsController>(x => nameof(x.PostNestedField), parentValues));
 

@@ -70,7 +70,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             {
                 AddPostLink("create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));
 
-                AddPostLink("create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
+                var publishValues = new { values.app, values.name, publish = true };
+
+                AddPostLink("create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), publishValues));
             }
         }
     }

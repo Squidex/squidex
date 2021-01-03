@@ -137,7 +137,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
                 if (canRun && ruleRunnerService.CanRunFromSnapshots(rule))
                 {
-                    var snaphshotValues = new { app = resources.App, id = Id, fromSnapshots = true };
+                    var snaphshotValues = new { values.app, values.id, fromSnapshots = true };
 
                     AddPutLink("run/snapshots", resources.Url<RulesController>(x => nameof(x.PutRuleRun), snaphshotValues));
                 }

@@ -143,7 +143,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (app.Image != null)
             {
-                AddGetLink("image", resources.Url<AppsController>(x => nameof(x.GetImage), new { app = app.Name }));
+                AddGetLink("image", resources.Url<AppsController>(x => nameof(x.GetImage), values));
             }
 
             if (isContributor)
