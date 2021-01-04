@@ -28,10 +28,9 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CodeEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, FocusComponent, OnChanges {
-    private valueChanged = new Subject();
     private aceEditor: any;
-    private value: any;
-    private valueString: string;
+    private valueChanged = new Subject();
+    private value = '';
     private modelist: any;
 
     @ViewChild('editor', { static: false })
@@ -59,19 +58,16 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     public writeValue(obj: string) {
-        this.value = obj;
-
         if (this.valueMode === 'Json') {
-            this.value = obj;
-
             try {
-                this.valueString = JSON.stringify(obj);
+                this.value = JSON.stringify(obj, undefined, 4);
             } catch (e) {
-                this.valueString = '';
+                this.value = '';
             }
+        } else if (Types.isString(obj)) {
+            this.value = obj;
         } else {
-            this.value = Types.isString(obj) ? obj : '';
-            this.valueString = this.value;
+            this.value = '';
         }
 
         if (this.aceEditor) {
@@ -121,7 +117,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             this.aceEditor.setFontSize(14);
 
             this.setDisabledState(this.snapshot.isDisabled);
-            this.setValue(this.valueString);
+            this.setValue(this.value);
             this.setMode();
 
             this.aceEditor.on('blur', () => {
@@ -138,31 +134,30 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     private changeValue() {
-        let newValue: any = null;
-        let newValueString: string;
+        let newValue = this.aceEditor.getValue();
+        let newValueOut = newValue;
 
         if (this.valueMode === 'Json') {
             const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
 
             if (isValid) {
                 try {
-                    newValue = JSON.parse(this.aceEditor.getValue());
+                    newValueOut = JSON.parse(newValue);
                 } catch (e) {
-                    newValue = null;
+                    newValueOut = null;
+                    newValue = '';
                 }
+            } else {
+                newValueOut = null;
+                newValue = '';
             }
-
-            newValueString = JSON.stringify(newValue);
-        } else {
-            newValueString = newValue = this.aceEditor.getValue();
         }
 
-        if (this.valueString !== newValueString) {
-            this.callChange(newValue);
+        if (this.value !== newValue) {
+            this.callChange(newValueOut);
         }
 
         this.value = newValue;
-        this.valueString = newValueString;
     }
 
     private setMode() {
@@ -178,7 +173,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     private setValue(value: string) {
-        this.aceEditor.setValue(value || '');
+        this.aceEditor.setValue(value);
         this.aceEditor.clearSelection();
     }
 }
