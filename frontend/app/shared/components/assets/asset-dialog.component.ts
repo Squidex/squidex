@@ -12,6 +12,7 @@ import { AssetsService } from '@app/shared/services/assets.service';
 import { AssetPathItem, ROOT_ITEM } from '@app/shared/state/assets.state';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AssetTextEditorComponent } from './asset-text-editor.component';
 import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
@@ -39,6 +40,9 @@ export class AssetDialogComponent implements OnChanges {
     @ViewChildren(ImageFocusPointComponent)
     public imageFocus: QueryList<ImageFocusPointComponent>;
 
+    @ViewChildren(AssetTextEditorComponent)
+    public textEditor: QueryList<AssetTextEditorComponent>;
+
     public path: Observable<ReadonlyArray<AssetPathItem>>;
 
     public isEditable = false;
@@ -57,6 +61,10 @@ export class AssetDialogComponent implements OnChanges {
 
     public get isVideo() {
         return this.asset.type === 'Video';
+    }
+
+    public get isDocumentLikely() {
+        return this.asset.type === 'Unknown' && this.asset.fileSize < 100_000;
     }
 
     constructor(
@@ -106,7 +114,19 @@ export class AssetDialogComponent implements OnChanges {
             return;
         }
 
-        this.imageCropper.first.toFile().then(file => {
+        this.uploadEdited(this.imageCropper.first.toFile());
+    }
+
+    public saveText() {
+        if (!this.isUploadable) {
+            return;
+        }
+
+        this.uploadEdited(this.textEditor.first.toFile());
+    }
+
+    public uploadEdited(fileChange: Promise<Blob | null>) {
+        fileChange.then(file => {
             if (file) {
                 this.setProgress(0);
 

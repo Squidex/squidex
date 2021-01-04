@@ -18,12 +18,17 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" (click)="selectTab(3)" [class.active]="selectedTab === 3" *ngIf="isVideo || (asset | sqxPreviewable)">
+                    <a class="nav-link" (click)="selectTab(3)" [class.active]="selectedTab === 3" *ngIf="isDocumentLikely">
+                        {{ 'assets.tabTextEditor' | sqxTranslate }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" (click)="selectTab(4)" [class.active]="selectedTab === 4" *ngIf="isVideo || (asset | sqxPreviewable)">
                         {{ 'assets.tabPreview' | sqxTranslate }}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" (click)="selectTab(4)" [class.active]="selectedTab === 4">
+                    <a class="nav-link" (click)="selectTab(5)" [class.active]="selectedTab === 5">
                         {{ 'assets.tabHistory' | sqxTranslate }}
                     </a>
                 </li>
@@ -42,6 +47,11 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="2">
                     <button type="button" class="btn btn-primary ml-auto mr-4" (click)="setFocusPoint()" [class.invisible]="!isEditable">
+                        {{ 'common.save' | sqxTranslate }}
+                    </button>
+                </ng-container>
+                <ng-container *ngSwitchCase="3">
+                    <button type="button" class="btn btn-primary ml-auto mr-4" (click)="saveText()" [class.invisible]="!isEditable">
                         {{ 'common.save' | sqxTranslate }}
                     </button>
                 </ng-container>
@@ -162,10 +172,10 @@
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="1">
-                    <div class="image">
+                    <div class="editor">
                         <sqx-image-editor [imageSource]="asset | sqxAssetPreviewUrl"></sqx-image-editor>
                         
-                        <div class="image-progress" *ngIf="progress > 0">
+                        <div class="editor-progress" *ngIf="progress > 0">
                             <sqx-progress-bar
                                 [value]="progress"
                                 [strokeWidth]="2" 
@@ -176,10 +186,10 @@
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="2">
-                    <div>
+                    <div class="editor">
                         <sqx-image-focus-point [imageSource]="asset | sqxAssetPreviewUrl" [focusPoint]="asset.metadata"></sqx-image-focus-point>
                         
-                        <div class="image-progress" *ngIf="progress > 0">
+                        <div class="editor-progress" *ngIf="progress > 0">
                             <sqx-progress-bar
                                 [value]="progress"
                                 [strokeWidth]="2" 
@@ -190,6 +200,20 @@
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="3">
+                    <div class="editor">
+                        <sqx-asset-text-editor [fileSource]="asset | sqxAssetPreviewUrl" [fileName]="asset.fileName" [mimeType]="asset.mimeType"></sqx-asset-text-editor>
+                        
+                        <div class="editor-progress" *ngIf="progress > 0">
+                            <sqx-progress-bar
+                                [value]="progress"
+                                [strokeWidth]="2" 
+                                [trailColor]="'transparent'"
+                                [trailWidth]="0">
+                            </sqx-progress-bar>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="4">
                     <ng-container *ngIf="asset | sqxPreviewable; else video">
                         <ngx-doc-viewer [url]="asset | sqxAssetPreviewUrl" [style]="{}" viewer="google" style="width:100%;height:50vh;"></ngx-doc-viewer>
                     </ng-container>
@@ -198,7 +222,7 @@
                         <sqx-video-player [source]="asset | sqxAssetPreviewUrl" [mimeType]="asset.mimeType"></sqx-video-player>
                     </ng-template>
                 </ng-container>
-                <ng-container *ngSwitchCase="4">
+                <ng-container *ngSwitchCase="5">
                     <sqx-asset-history [asset]="asset"></sqx-asset-history>
                 </ng-container>
             </ng-container>

@@ -225,8 +225,9 @@ module.exports = function (env) {
                   { from: './node_modules/tinymce/tinymce.min.js', to: 'dependencies/tinymce' },
 
                   { from: './node_modules/ace-builds/src-min/ace.js', to: 'dependencies/ace/ace.js' },
-                  { from: './node_modules/ace-builds/src-min/mode-*.js', to: 'dependencies/ace' },
-                  { from: './node_modules/ace-builds/src-min/worker-*.js', to: 'dependencies/ace' },
+                  { from: './node_modules/ace-builds/src-min/mode-*.js', to: 'dependencies/ace/[name].[ext]' },
+                  { from: './node_modules/ace-builds/src-min/worker-*.js', to: 'dependencies/ace/[name].[ext]' },
+                  { from: './node_modules/ace-builds/src-min/ext-modelist.js', to: 'dependencies/ace/ext/modelist.js' },
 
                   { from: './node_modules/video.js/dist/video.min.js', to: 'dependencies/videojs' },
                   { from: './node_modules/video.js/dist/video-js.min.css', to: 'dependencies/videojs' },

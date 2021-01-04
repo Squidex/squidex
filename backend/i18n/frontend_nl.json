@@ -103,6 +103,7 @@
   "assets.tabImage": "Afbeelding",
   "assets.tabMetadata": "Metadata",
   "assets.tabPreview": "Preview",
+  "assets.tabTextEditor": "Text Editor",
   "assets.updated": "Asset is bijgewerkt.",
   "assets.updateFailed": "Bijwerken van item is mislukt. Laad opnieuw.",
   "assets.updateFolderFailed": "Bijwerken van de map is mislukt. Laad opnieuw.",

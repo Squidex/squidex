@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ResourceLoaderService, StatefulControlComponent, Types } from '@app/framework/internal';
 import { Subject } from 'rxjs';
@@ -27,10 +27,12 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CodeEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, FocusComponent {
+export class CodeEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, FocusComponent, OnChanges {
     private valueChanged = new Subject();
     private aceEditor: any;
-    private value: string;
+    private value: any;
+    private valueString: string;
+    private modelist: any;
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
@@ -42,6 +44,12 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public mode = 'ace/mode/javascript';
 
     @Input()
+    public filePath: string;
+
+    @Input()
+    public valueMode: 'String' | 'Json' = 'String';
+
+    @Input()
     public height = 0;
 
     constructor(changeDetector: ChangeDetectorRef,
@@ -51,7 +59,20 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     public writeValue(obj: string) {
-        this.value = Types.isString(obj) ? obj : '';
+        this.value = obj;
+
+        if (this.valueMode === 'Json') {
+            this.value = obj;
+
+            try {
+                this.valueString = JSON.stringify(obj);
+            } catch (e) {
+                this.valueString = '';
+            }
+        } else {
+            this.value = Types.isString(obj) ? obj : '';
+            this.valueString = this.value;
+        }
 
         if (this.aceEditor) {
             this.setValue(this.value);
@@ -72,6 +93,12 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
         }
     }
 
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['filePath'] || changes['mode']) {
+            this.setMode();
+        }
+    }
+
     public ngAfterViewInit() {
         this.valueChanged.pipe(debounceTime(500))
             .subscribe(() => {
@@ -82,14 +109,20 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             this.editor.nativeElement.style.height = `${this.height}px`;
         }
 
-        this.resourceLoader.loadLocalScript('dependencies/ace/ace.js').then(() => {
+        Promise.all([
+            this.resourceLoader.loadLocalScript('dependencies/ace/ace.js'),
+            this.resourceLoader.loadLocalScript('dependencies/ace/ext/modelist.js')
+        ]).then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
-            this.aceEditor.getSession().setMode(this.mode);
+            this.modelist = ace.require('ace/ext/modelist');
+
             this.aceEditor.setReadOnly(this.snapshot.isDisabled);
             this.aceEditor.setFontSize(14);
 
-            this.setValue(this.value);
+            this.setDisabledState(this.snapshot.isDisabled);
+            this.setValue(this.valueString);
+            this.setMode();
 
             this.aceEditor.on('blur', () => {
                 this.changeValue();
@@ -105,13 +138,43 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     private changeValue() {
-        const newValue = this.aceEditor.getValue();
+        let newValue: any = null;
+        let newValueString: string;
 
-        if (this.value !== newValue) {
+        if (this.valueMode === 'Json') {
+            const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
+
+            if (isValid) {
+                try {
+                    newValue = JSON.parse(this.aceEditor.getValue());
+                } catch (e) {
+                    newValue = null;
+                }
+            }
+
+            newValueString = JSON.stringify(newValue);
+        } else {
+            newValueString = newValue = this.aceEditor.getValue();
+        }
+
+        if (this.valueString !== newValueString) {
             this.callChange(newValue);
         }
 
         this.value = newValue;
+        this.valueString = newValueString;
+    }
+
+    private setMode() {
+        if (this.aceEditor) {
+            if (this.filePath && this.modelist) {
+                const mode = this.modelist.getModeForPath(this.filePath).mode;
+
+                this.aceEditor.getSession().setMode(mode);
+            } else {
+                this.aceEditor.getSession().setMode(this.mode);
+            }
+        }
     }
 
     private setValue(value: string) {

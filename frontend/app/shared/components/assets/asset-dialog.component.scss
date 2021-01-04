@@ -2,7 +2,7 @@
     position: relative;
 }
 
-.image {
+.editor {
     & {
         @include absolute(0, 0, 0, 0);
     }
