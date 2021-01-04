@@ -25,10 +25,10 @@ interface State {
 })
 export class ArrayItemComponent extends StatefulComponent<State> implements OnChanges {
     @Output()
-    public remove = new EventEmitter();
+    public itemRemove = new EventEmitter();
 
     @Output()
-    public move = new EventEmitter<number>();
+    public itemMove = new EventEmitter<number>();
 
     @Output()
     public clone = new EventEmitter();
@@ -113,19 +113,19 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     }
 
     public moveTop() {
-        this.move.emit(0);
+        this.itemMove.emit(0);
     }
 
     public moveUp() {
-        this.move.emit(this.index - 1);
+        this.itemMove.emit(this.index - 1);
     }
 
     public moveDown() {
-        this.move.emit(this.index + 1);
+        this.itemMove.emit(this.index + 1);
     }
 
     public moveBottom() {
-        this.move.emit(99999);
+        this.itemMove.emit(99999);
     }
 
     public reset() {
