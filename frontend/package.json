@@ -47,6 +47,7 @@
     "mersenne-twister": "1.1.0",
     "mousetrap": "1.6.5",
     "ngx-color-picker": "10.1.0",
+    "ngx-doc-viewer": "^1.4.0",
     "oidc-client": "1.10.1",
     "pikaday": "1.8.2",
     "progressbar.js": "1.1.0",

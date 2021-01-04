@@ -59,7 +59,6 @@ export class AssetPreviewUrlPipe implements PipeTransform {
 })
 export class FileIconPipe implements PipeTransform {
     public transform(asset: { mimeType: string, fileType: string }): string {
-
         let mimeIcon: string;
 
         const mimeParts = asset.mimeType.split('/');
@@ -74,6 +73,16 @@ export class FileIconPipe implements PipeTransform {
     }
 }
 
+@Pipe({
+    name: 'sqxPreviewable',
+    pure: true
+})
+export class PreviewableType implements PipeTransform {
+    public transform(asset: { fileSize: number, fileType: string }): boolean {
+        return PREVIEW_TYPES.indexOf(asset.fileType) >= 0 && asset.fileSize < 25_000_000;
+    }
+}
+
 const KNOWN_TYPES: ReadonlyArray<string> = [
     'doc',
     'docx',
@@ -83,4 +92,26 @@ const KNOWN_TYPES: ReadonlyArray<string> = [
     'video',
     'xls',
     'xlsx'
+];
+
+const PREVIEW_TYPES: ReadonlyArray<string> = [
+    'ai',
+    'doc',
+    'docx',
+    'dxf',
+    'eps',
+    'pages',
+    'pdf',
+    'ppt',
+    'pptx',
+    'ps',
+    'psd',
+    'rar',
+    'svg',
+    'tiff',
+    'ttf',
+    'xls',
+    'xlsx',
+    'xps',
+    'zip'
 ];

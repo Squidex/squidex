@@ -102,6 +102,7 @@
   "assets.tabHistory": "History",
   "assets.tabImage": "Image",
   "assets.tabMetadata": "Metadata",
+  "assets.tabPreview": "Preview",
   "assets.updated": "Asset has been updated.",
   "assets.updateFailed": "Failed to update asset. Please reload.",
   "assets.updateFolderFailed": "Failed to update asset folder. Please reload.",

@@ -55,6 +55,10 @@ export class AssetDialogComponent implements OnChanges {
         return this.asset.type === 'Image';
     }
 
+    public get isVideo() {
+        return this.asset.type === 'Video';
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly assetsState: AssetsState,

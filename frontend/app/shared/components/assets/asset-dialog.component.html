@@ -18,7 +18,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" (click)="selectTab(3)" [class.active]="selectedTab === 3">
+                    <a class="nav-link" (click)="selectTab(3)" [class.active]="selectedTab === 3" *ngIf="isVideo || (asset | sqxPreviewable)">
+                        {{ 'assets.tabPreview' | sqxTranslate }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" (click)="selectTab(4)" [class.active]="selectedTab === 4">
                         {{ 'assets.tabHistory' | sqxTranslate }}
                     </a>
                 </li>
@@ -185,6 +190,15 @@
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="3">
+                    <ng-container *ngIf="asset | sqxPreviewable; else video">
+                        <ngx-doc-viewer [url]="asset | sqxAssetPreviewUrl" [style]="{}" viewer="google" style="width:100%;height:50vh;"></ngx-doc-viewer>
+                    </ng-container>
+
+                    <ng-template #video>
+                        <sqx-video-player [source]="asset | sqxAssetPreviewUrl" [mimeType]="asset.mimeType"></sqx-video-player>
+                    </ng-template>
+                </ng-container>
+                <ng-container *ngSwitchCase="4">
                     <sqx-asset-history [asset]="asset"></sqx-asset-history>
                 </ng-container>
             </ng-container>

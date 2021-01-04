@@ -59,7 +59,7 @@ export class ImageCropperComponent implements AfterViewInit, OnDestroy, OnChange
 
     public rotate(value: number) {
         if (this.cropper) {
-            this.cropper.rotate(-90);
+            this.cropper.rotate(value);
 
             const canvasData = this.cropper.getCanvasData();
             const containerData = this.cropper.getContainerData();

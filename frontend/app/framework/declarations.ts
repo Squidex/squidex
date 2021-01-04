@@ -76,5 +76,6 @@ export * from './angular/sync-width.directive';
 export * from './angular/tab-router-link.directive';
 export * from './angular/template-wrapper.directive';
 export * from './angular/title.component';
+export * from './angular/video-player.component';
 export * from './internal';
 export * from './state';

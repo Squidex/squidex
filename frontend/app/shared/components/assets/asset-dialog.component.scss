@@ -49,3 +49,12 @@
         box-shadow: none;
     }
 }
+
+sqx-video-player {
+    @include absolute(0, 0, 0, 0);
+    height: auto !important;
+}
+
+ngx-doc-viewer {
+    @include absolute(0, 0, 0, 0);
+}
