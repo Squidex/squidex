@@ -35,6 +35,13 @@ namespace Squidex.Infrastructure.MongoDb
             return await collections.AnyAsync();
         }
 
+        public static Task<bool> AnyAsync<T>(this IMongoCollection<T> collection)
+        {
+            var find = collection.Find(new BsonDocument()).Limit(1);
+
+            return find.AnyAsync();
+        }
+
         public static async Task<bool> InsertOneIfNotExistsAsync<T>(this IMongoCollection<T> collection, T document, CancellationToken ct = default)
         {
             try

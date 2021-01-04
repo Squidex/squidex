@@ -81,11 +81,16 @@ export class StringSynchronizer implements RouteSynchronizer {
     }
 
     constructor(
-        private readonly key: string
+        private readonly key: string,
+        private readonly fallback?: string
     ) {
     }
 
     public parseFromRoute(params: QueryParams) {
+        if (!params.hasOwnProperty(this.key)) {
+            return { [this.key]: this.fallback };
+        }
+
         const value = params[this.key];
 
         return { [this.key]: value };
@@ -255,6 +260,10 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
 
     public withString(key: keyof T & string) {
         return this.withSynchronizer(new StringSynchronizer(key));
+    }
+
+    public withStringOr(key: keyof T & string, fallback: string) {
+        return this.withSynchronizer(new StringSynchronizer(key, fallback));
     }
 
     public withStrings(key: keyof T & string) {

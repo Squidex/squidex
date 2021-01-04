@@ -13,7 +13,7 @@ import { PagingSynchronizer, QueryParams, Router2State, StringKeysSynchronizer, 
 
 describe('Router2State', () => {
     describe('Strings', () => {
-        const synchronizer = new StringSynchronizer('key');
+        const synchronizer = new StringSynchronizer('key', 'fallback');
 
         it('should parse from state', () => {
             const value = 'my-string';
@@ -37,6 +37,22 @@ describe('Router2State', () => {
             const value = synchronizer.parseFromRoute(params);
 
             expect(value).toEqual({ key: 'my-string' });
+        });
+
+        it('should not get fallback from route if empty', () => {
+            const params: QueryParams = { key: '' };
+
+            const value = synchronizer.parseFromRoute(params);
+
+            expect(value).toEqual({ key: '' });
+        });
+
+        it('should get fallback from route if not found', () => {
+            const params: QueryParams = { other: 'my-string' };
+
+            const value = synchronizer.parseFromRoute(params);
+
+            expect(value).toEqual({ key: 'fallback' });
         });
     });
 

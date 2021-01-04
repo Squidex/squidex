@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { AssetsState, DialogModel, LocalStoreService, Queries, Query, QueryFullTextSynchronizer, ResourceOwner, Router2State, UIState } from '@app/shared';
+import { AssetsState, DialogModel, LocalStoreService, MathHelper, Queries, Query, QueryFullTextSynchronizer, ResourceOwner, Router2State, UIState } from '@app/shared';
 import { Settings } from '@app/shared/state/settings';
 
 @Component({
@@ -39,7 +39,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         const initial =
             this.assetsRoute.mapTo(this.assetsState)
                 .withPaging('assets', 30)
-                .withString('parentId')
+                .withStringOr('parentId', MathHelper.EMPTY_GUID)
                 .withStrings('tagsSelected')
                 .withSynchronizer(QueryFullTextSynchronizer.INSTANCE)
                 .getInitial();

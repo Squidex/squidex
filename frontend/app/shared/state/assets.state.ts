@@ -134,36 +134,18 @@ export class AssetsState extends State<Snapshot> {
     private loadInternal(isReload: boolean): Observable<any> {
         this.next({ isLoading: true });
 
-        const { page, pageSize, query, tagsSelected } =  this.snapshot;
-
-        const q: any = { take: pageSize, skip: pageSize * page };
-
-        const hasQuery = !!query?.fullText || Object.keys(tagsSelected).length > 0;
-
-        if (hasQuery) {
-            if (query) {
-                q.query = query;
-            }
-
-            const searchTags = Object.keys(this.snapshot.tagsSelected);
-
-            if (searchTags.length > 0) {
-                q.tags = searchTags;
-            }
-        } else {
-            q.parentId = this.snapshot.parentId;
-        }
+        const query = createQuery(this.snapshot);
 
         const assets$ =
-            this.assetsService.getAssets(this.appName, q);
+            this.assetsService.getAssets(this.appName, query);
 
         const assetFolders$ =
-            !hasQuery ?
+            query.parentId ?
                 this.assetsService.getAssetFolders(this.appName, this.snapshot.parentId) :
                 of(EMPTY_FOLDERS);
 
         const tags$ =
-            !hasQuery || !this.snapshot.isLoadedOnce ?
+            query.parentId || !this.snapshot.isLoadedOnce ?
                 this.assetsService.getTags(this.appName) :
                 of(this.snapshot.tagsAvailable);
 
@@ -447,6 +429,35 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
     }
 
     return { tagsAvailable, tagsSelected };
+}
+
+function createQuery(snapshot: Snapshot) {
+    const {
+        page,
+        pageSize,
+        query,
+        tagsSelected
+    } =  snapshot;
+
+    const result: any = { take: pageSize, skip: pageSize * page };
+
+    const hasQuery = !!query?.fullText || Object.keys(tagsSelected).length > 0;
+
+    if (hasQuery) {
+        if (query) {
+            result.query = query;
+        }
+
+        const searchTags = Object.keys(snapshot.tagsSelected);
+
+        if (searchTags.length > 0) {
+            result.tags = searchTags;
+        }
+    } else {
+        result.parentId = snapshot.parentId;
+    }
+
+    return result;
 }
 
 function getParent(path: ReadonlyArray<AssetPathItem>) {
