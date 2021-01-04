@@ -57,4 +57,5 @@ sqx-video-player {
 
 ngx-doc-viewer {
     @include absolute(0, 0, 0, 0);
+    height: auto !important;
 }
