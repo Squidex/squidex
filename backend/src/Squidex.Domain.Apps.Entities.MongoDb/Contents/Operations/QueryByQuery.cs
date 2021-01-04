@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     throw new NotSupportedException();
                 }
 
-                var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), fullTextIds, query, q.Reference);
+                var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), fullTextIds, query, q.Reference, q.CreatedBy);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems = FindContentsAsync(query, filter);
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     }
                 }
 
-                var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), fullTextIds, query, q.Reference);
+                var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), fullTextIds, query, q.Reference, q.CreatedBy);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems = FindContentsAsync(query, filter);
@@ -249,7 +249,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Filter.And(filters);
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds, ICollection<DomainId>? ids, ClrQuery? query, DomainId referenced)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds, ICollection<DomainId>? ids, ClrQuery? query, DomainId referenced, RefToken? createdBy)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -278,9 +278,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 filters.Add(Filter.AnyEq(x => x.ReferencedIds, referenced));
             }
 
-            if (query?.CreatedBy != null)
+            if (createdBy != null)
             {
-                filters.Add(Filter.Eq(x => x.CreatedBy, query.CreatedBy));
+                filters.Add(Filter.Eq(x => x.CreatedBy, createdBy));
             }
 
             return Filter.And(filters);

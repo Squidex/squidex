@@ -88,11 +88,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 {
                     query.Take = options.DefaultPageSize;
                 }
-
-                if (q.CreatedBy != null)
-                {
-                    query.CreatedBy = q.CreatedBy;
-                }
                 else if (query.Take > options.MaxResults)
                 {
                     query.Take = options.MaxResults;

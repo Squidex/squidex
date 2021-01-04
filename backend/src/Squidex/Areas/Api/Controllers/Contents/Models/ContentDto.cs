@@ -179,11 +179,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (content.CanUpdate)
             {
-                if (resources.CanUpdateContent(schema))
-                {
-                    AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
-                }
-
                 if (resources.CanUpdateContentOwn(schema))
                 {
                     AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));

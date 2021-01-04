@@ -24,8 +24,6 @@ namespace Squidex.Infrastructure.Queries
             set { Take = value; }
         }
 
-        public RefToken? CreatedBy { get; set; }
-
         public List<SortNode> Sort { get; set; } = new List<SortNode>();
 
         public HashSet<string> GetAllFields()
