@@ -51,7 +51,7 @@
 					<sqx-geolocation-editor [formControl]="editorControl"></sqx-geolocation-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Json'">
-					<sqx-json-editor height="350" [formControl]="editorControl"></sqx-json-editor>
+					<sqx-code-editor height="350" [formControl]="editorControl" valueMode="Json"></sqx-code-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Number'">
 					<ng-container [ngSwitch]="field.rawProperties.editor">

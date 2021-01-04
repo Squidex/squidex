@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Threading;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -15,20 +14,15 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class DomainIdSerializer : SerializerBase<DomainId>, IBsonPolymorphicSerializer, IRepresentationConfigurable<DomainIdSerializer>
     {
-        private static int isRegistered;
-
         public static void Register()
         {
-            if (Interlocked.Increment(ref isRegistered) == 1)
+            try
             {
-                try
-                {
-                    BsonSerializer.RegisterSerializer(new DomainIdSerializer());
-                }
-                catch (BsonSerializationException)
-                {
-                    return;
-                }
+                BsonSerializer.RegisterSerializer(new DomainIdSerializer());
+            }
+            catch (BsonSerializationException)
+            {
+                return;
             }
         }
 
