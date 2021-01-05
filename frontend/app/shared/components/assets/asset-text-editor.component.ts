@@ -6,20 +6,15 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { StatefulComponent } from '@app/framework';
-
-interface Snapshot {
-    // The text to edit.
-    text?: string;
-}
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 
 @Component({
     selector: 'sqx-asset-text-editor',
     styleUrls: ['./asset-text-editor.component.scss'],
-    templateUrl: './asset-text-editor.component.html'
+    templateUrl: './asset-text-editor.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetTextEditorComponent extends StatefulComponent<Snapshot> implements OnInit {
+export class AssetTextEditorComponent implements OnInit {
     @Input()
     public fileSource: string;
 
@@ -29,22 +24,26 @@ export class AssetTextEditorComponent extends StatefulComponent<Snapshot> implem
     @Input()
     public mimeType: string;
 
-    constructor(changeDetector: ChangeDetectorRef,
+    public text = '';
+
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly httpClient: HttpClient
     ) {
-        super(changeDetector, {});
     }
 
     public ngOnInit() {
         this.httpClient.get(this.fileSource, { responseType: 'text' })
             .subscribe(text => {
-                this.next({ text });
+                this.text = text;
+
+                this.changeDetector.detectChanges();
             });
     }
 
     public toFile(): Promise<Blob | null> {
         return new Promise<Blob | null>(resolve => {
-            const blob = new Blob([this.snapshot.text || ''], {
+            const blob = new Blob([this.text || ''], {
                 type: this.mimeType
             });
 
