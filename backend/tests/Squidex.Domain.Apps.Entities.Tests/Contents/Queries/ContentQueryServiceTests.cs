@@ -223,6 +223,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [InlineData(1, 1, SearchScope.All)]
         [InlineData(0, 1, SearchScope.All)]
         [InlineData(0, 0, SearchScope.Published)]
+        public async Task QueryAll_should_return_own_user_contents(int isFrontend, int unpublished, SearchScope scope)
+        {
+            var ctx =
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
+                    .WithUnpublished(unpublished == 1);
+
+            var content = CreateOwnContent(contentId, ctx.User.Token());
+
+            var q = Q.Empty.WithReference(DomainId.NewGuid());
+            q.CreatedBy = ctx.User.Token();
+
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, q, scope))
+                .Returns(ResultList.CreateFrom(5, content));
+
+            var result = await sut.QueryAsync(ctx, schemaId.Name, q);
+
+            Assert.Equal(contentData, result[0].Data);
+            Assert.Equal(contentId, result[0].Id);
+
+            Assert.Equal(5, result.Total);
+        }
+
+        [Theory]
+        [InlineData(1, 0, SearchScope.All)]
+        [InlineData(1, 1, SearchScope.All)]
+        [InlineData(0, 1, SearchScope.All)]
+        [InlineData(0, 0, SearchScope.Published)]
         public async Task QueryAll_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
             var ctx =
@@ -280,6 +307,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 Data = contentData,
                 SchemaId = schemaId,
                 Status = Status.Published
+            };
+
+            return content;
+        }
+
+        private IContentEntity CreateOwnContent(DomainId id, RefToken? refToken)
+        {
+            var content = new ContentEntity
+            {
+                Id = id,
+                Data = contentData,
+                SchemaId = schemaId,
+                Status = Status.Published,
+                CreatedBy = refToken
             };
 
             return content;
