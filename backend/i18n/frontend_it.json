@@ -839,7 +839,7 @@
   "search.advancedTour": "Fai clic su questa icona per visualizzare il menu della ricerca avanzata!",
   "search.customQuery": "Query personalizzata",
   "search.fullTextTour": "Cerca contenuti utilizzando la ricerca testuale su tutti i campi e le lingue!",
-  "search.help": "Ulteriori informazioni sui filtri su [Documentazione](https://https://docs.squidex.io/04-guides/02-api.html).",
+  "search.help": "Ulteriori informazioni sui filtri su [Documentazione](https://docs.squidex.io/04-guides/02-api.html).",
   "search.myQueries": "Le mie query",
   "search.nameQuery": "Dai un nome alla query",
   "search.queriesEmpty": "Ricerca per {types} e utilizza l'icona <i class=\"icon-star-empty\"></i> nella ricerca per salvare la query per tutti i collaboratori.",
