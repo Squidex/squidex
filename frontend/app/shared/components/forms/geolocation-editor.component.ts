@@ -180,9 +180,9 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
             .then(() => {
                 this.map = L.map(this.editor.nativeElement).fitWorld();
 
-                L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+                L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png',
                     {
-                        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                        attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
                     }).addTo(this.map);
 
                 this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.js')
