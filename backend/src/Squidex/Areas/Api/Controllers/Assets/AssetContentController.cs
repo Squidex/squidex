@@ -124,7 +124,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (asset != null && queries.Version > EtagVersion.Any && asset.Version != queries.Version)
             {
-                asset = await assetLoader.GetAsync(App.Id, asset.Id, queries.Version);
+                asset = await assetLoader.GetAsync(asset.AppId.Id, asset.Id, queries.Version);
             }
 
             if (asset == null)

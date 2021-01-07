@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Squidex.Hosting;
 using Squidex.Web;
 
@@ -49,7 +50,7 @@ namespace Squidex.Config.Authentication
                 });
             }
 
-            authBuilder.Services.Configure<OpenIdConnectOptions>((c, options) =>
+            authBuilder.Services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>>(c => new PostConfigureOptions<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
                 if (!string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl))
                 {
@@ -69,7 +70,9 @@ namespace Squidex.Config.Authentication
                 options.Scope.Add(Constants.ProfileScope);
                 options.Scope.Add(Constants.RoleScope);
                 options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            });
+            }));
+
+            authBuilder.AddOpenIdConnect();
 
             authBuilder.AddPolicyScheme(Constants.ApiSecurityScheme, Constants.ApiSecurityScheme, options =>
             {
