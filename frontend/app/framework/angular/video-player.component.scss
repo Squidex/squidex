@@ -2,6 +2,8 @@
     .video-js {
         &.vjs-fluid {
             height: 100%;
+            padding: 0;
+            position: static;
         }
     }
 }
