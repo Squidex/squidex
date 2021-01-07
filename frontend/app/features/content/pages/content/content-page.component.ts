@@ -105,7 +105,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     const dataAutosaved = this.autoSaveService.fetch(this.autoSaveKey);
                     const dataCloned = this.tempService.fetch();
 
-                    this.loadContent(dataCloned || content?.data || {}, true);
+                    if (dataCloned || content) {
+                        this.loadContent(dataCloned || content?.data || {}, true);
+                    }
 
                     if (isNewContent && dataAutosaved && this.contentForm.hasChanges(dataAutosaved)) {
                         this.dialogs.confirm('i18n:contents.unsavedChangesTitle', 'i18n:contents.unsavedChangesText')
