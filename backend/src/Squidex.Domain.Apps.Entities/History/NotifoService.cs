@@ -79,13 +79,13 @@ namespace Squidex.Domain.Apps.Entities.History
             {
                 [Providers.WebPush] = new NotificationSettingDto
                 {
-                    Send = true,
+                    Send = NotificationSend.Send,
                     DelayInSeconds = null
                 },
 
                 [Providers.Email] = new NotificationSettingDto
                 {
-                    Send = true,
+                    Send = NotificationSend.Send,
                     DelayInSeconds = 5 * 60
                 }
             };
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
             if (publishedEvents.Any())
             {
-                var requests = new List<PublishRequestDto>();
+                var requests = new List<PublishDto>();
 
                 foreach (var @event in publishedEvents)
                 {
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.History
                     {
                         foreach (var userId in comment.Mentions!)
                         {
-                            var publishRequest = new PublishRequestDto
+                            var publishRequest = new PublishDto
                             {
                                 Topic = $"users/{userId}"
                             };
@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.History
                     {
                         var historyEvent = @event.HistoryEvent;
 
-                        var publishRequest = new PublishRequestDto
+                        var publishRequest = new PublishDto
                         {
                             Properties = new EventProperties()
                         };
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.History
                     }
                 }
 
-                var request = new PublishManyRequestDto
+                var request = new PublishManyDto
                 {
                     Requests = requests
                 };
@@ -219,7 +219,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
                             try
                             {
-                                var request = new AddAllowedTopicRequest
+                                var request = new AddAllowedTopicDto
                                 {
                                     Prefix = GetAppPrefix(contributorAssigned)
                                 };
@@ -265,7 +265,7 @@ namespace Squidex.Domain.Apps.Entities.History
             return appEvent is CommentCreated comment && comment.Mentions?.Length > 0;
         }
 
-        private static void SetUser(AppEvent appEvent, PublishRequestDto publishRequest)
+        private static void SetUser(AppEvent appEvent, PublishDto publishRequest)
         {
             if (appEvent.Actor.IsSubject)
             {
@@ -273,7 +273,7 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        private static void SetTopic(AppEvent appEvent, PublishRequestDto publishRequest, HistoryEvent @event)
+        private static void SetTopic(AppEvent appEvent, PublishDto publishRequest, HistoryEvent @event)
         {
             var topicPrefix = GetAppPrefix(appEvent);
             var topicSuffix = @event.Channel.Replace('.', '/').Trim();
