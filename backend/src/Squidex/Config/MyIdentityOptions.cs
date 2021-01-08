@@ -59,6 +59,8 @@ namespace Squidex.Config
 
         public Dictionary<string, string[]> OidcRoleMapping { get; set; }
 
+        public string OidcOnSignoutRedirectUrl { get; set; }
+
         public bool AdminRecreate { get; set; }
 
         public bool AllowPasswordAuth { get; set; }

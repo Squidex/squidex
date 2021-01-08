@@ -40,5 +40,19 @@ namespace Squidex.Config.Authentication
 
             return base.TokenValidated(context);
         }
+
+        public override Task RedirectToIdentityProviderForSignOut(RedirectContext context)
+        {
+            if (!string.IsNullOrEmpty(options.OidcOnSignoutRedirectUrl))
+            {
+                var logoutUri = options.OidcOnSignoutRedirectUrl;
+                context.Response.Redirect(logoutUri);
+                context.HandleResponse();
+
+                return Task.CompletedTask;
+            }
+
+            return base.RedirectToIdentityProviderForSignOut(context);
+        }
     }
 }
