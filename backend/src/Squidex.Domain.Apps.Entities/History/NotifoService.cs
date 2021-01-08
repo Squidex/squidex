@@ -131,11 +131,11 @@ namespace Squidex.Domain.Apps.Entities.History
                 .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null)
                 .ToList();
 
-            if (publishedEvents.Any())
+            foreach (var batch in publishedEvents.Batch(50))
             {
                 var requests = new List<PublishDto>();
 
-                foreach (var @event in publishedEvents)
+                foreach (var @event in batch)
                 {
                     var payload = @event.AppEvent.Payload;
 

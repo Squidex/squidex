@@ -16,6 +16,38 @@ namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static IEnumerable<IEnumerable<TSource>> Batch<TSource>(this IEnumerable<TSource> source, int size)
+        {
+            TSource[]? bucket = null;
+
+            var bucketIndex = 0;
+
+            foreach (var item in source)
+            {
+                if (bucket == null)
+                {
+                    bucket = new TSource[size];
+                }
+
+                bucket[bucketIndex++] = item;
+
+                if (bucketIndex != size)
+                {
+                    continue;
+                }
+
+                yield return bucket;
+
+                bucket = null;
+                bucketIndex = 0;
+            }
+
+            if (bucket != null && bucketIndex > 0)
+            {
+                yield return bucket.Take(bucketIndex);
+            }
+        }
+
         public static async Task<List<T>> ToListAsync<T>(this IAsyncEnumerable<T> source)
         {
             var result = new List<T>();
