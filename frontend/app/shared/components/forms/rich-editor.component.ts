@@ -148,6 +148,8 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
 
                     if (!hasFileDropped) {
                         self.onValueChanged();
+                    } else {
+                        return false;
                     }
                 });
 
