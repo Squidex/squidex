@@ -39,15 +39,18 @@ namespace Squidex.Config.Authentication
             else
             {
                 authBuilder.AddLocalApi();
-                authBuilder.Services.AddOptions<LocalApiAuthenticationOptions>()
+
+                authBuilder.Services.AddOptions<LocalApiAuthenticationOptions>(IdentityServerConstants.LocalApi.PolicyName)
                     .Configure<IUrlGenerator>((options, urlGenerator) =>
                     {
                         options.ClaimsIssuer = urlGenerator.BuildUrl(Constants.IdentityServerPrefix, false);
+
                         options.ExpectedScope = Constants.ApiScope;
                     });
             }
 
             authBuilder.AddOpenIdConnect();
+
             authBuilder.Services.AddOptions<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme)
                 .Configure<IUrlGenerator>((options, urlGenerator) =>
                 {
