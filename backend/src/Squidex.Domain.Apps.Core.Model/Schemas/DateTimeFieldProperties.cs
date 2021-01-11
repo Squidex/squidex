@@ -24,14 +24,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public DateTimeFieldEditor Editor { get; set; }
 
-        public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
+        public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {
-            return visitor.Visit(this);
+            return visitor.Visit(this, args);
         }
 
-        public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
+        public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
         {
-            return visitor.Visit((IField<DateTimeFieldProperties>)field);
+            return visitor.Visit((IField<DateTimeFieldProperties>)field, args);
         }
 
         public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)

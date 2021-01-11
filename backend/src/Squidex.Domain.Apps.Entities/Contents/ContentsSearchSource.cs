@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     var value = GetValue(content.ReferenceData, field) ?? GetValue(content.Data, field);
 
-                    var formatted = StringFormatter.Format(value, field);
+                    var formatted = StringFormatter.Format(field, value);
 
                     if (!string.IsNullOrWhiteSpace(formatted))
                     {

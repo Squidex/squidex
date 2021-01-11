@@ -10,37 +10,44 @@ using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumerable<IValidator>>
+    internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumerable<IValidator>, DefaultFieldValueValidatorsFactory.Args>
     {
-        private readonly ValidatorContext context;
-        private readonly ValidatorFactory createFieldValidator;
+        private static readonly DefaultFieldValueValidatorsFactory Instance = new DefaultFieldValueValidatorsFactory();
 
-        private DefaultFieldValueValidatorsFactory(ValidatorContext context, ValidatorFactory createFieldValidator)
+        public struct Args
         {
-            this.context = context;
-            this.createFieldValidator = createFieldValidator;
+            public readonly ValidatorContext Context;
+
+            public readonly ValidatorFactory Factory;
+
+            public Args(ValidatorContext context, ValidatorFactory factory)
+            {
+                Context = context;
+
+                Factory = factory;
+            }
+        }
+
+        private DefaultFieldValueValidatorsFactory()
+        {
         }
 
         public static IEnumerable<IValidator> CreateValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(field, nameof(field));
+            var args = new Args(context, createFieldValidator);
 
-            var visitor = new DefaultFieldValueValidatorsFactory(context, createFieldValidator);
-
-            return field.Accept(visitor);
+            return field.Accept(Instance, args);
         }
 
-        public IEnumerable<IValidator> Visit(IArrayField field)
+        public IEnumerable<IValidator> Visit(IArrayField field, Args args)
         {
             var properties = field.Properties;
 
-            var isRequired = IsRequired(properties);
+            var isRequired = IsRequired(properties, args.Context);
 
             if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
@@ -51,22 +58,22 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             foreach (var nestedField in field.Fields)
             {
-                nestedValidators[nestedField.Name] = (false, createFieldValidator(nestedField));
+                nestedValidators[nestedField.Name] = (false, args.Factory(nestedField));
             }
 
             yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedValidators, false, "field"));
         }
 
-        public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field, Args args)
         {
             yield break;
         }
 
-        public IEnumerable<IValidator> Visit(IField<BooleanFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<BooleanFieldProperties> field, Args args)
         {
             var properties = field.Properties;
 
-            var isRequired = IsRequired(properties);
+            var isRequired = IsRequired(properties, args.Context);
 
             if (isRequired)
             {
@@ -74,11 +81,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public IEnumerable<IValidator> Visit(IField<DateTimeFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<DateTimeFieldProperties> field, Args args)
         {
             var properties = field.Properties;
 
-            var isRequired = IsRequired(properties);
+            var isRequired = IsRequired(properties, args.Context);
 
             if (isRequired)
             {
@@ -91,11 +98,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public IEnumerable<IValidator> Visit(IField<GeolocationFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<GeolocationFieldProperties> field, Args args)
         {
             var properties = field.Properties;
 
-            var isRequired = IsRequired(properties);
+            var isRequired = IsRequired(properties, args.Context);
 
             if (isRequired)
             {
@@ -103,11 +110,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public IEnumerable<IValidator> Visit(IField<JsonFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<JsonFieldProperties> field, Args args)
         {
             var properties = field.Properties;
 
-            var isRequired = IsRequired(properties);
+            var isRequired = IsRequired(properties, args.Context);
 
             if (isRequired)
             {
@@ -115,11 +122,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public IEnumerable<IValidator> Visit(IField<NumberFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<NumberFieldProperties> field, Args args)
         {
             var properties = field.Properties;
 
-            var isRequired = IsRequired(properties);
+            var isRequired = IsRequired(properties, args.Context);
 
             if (isRequired)
             {
@@ -137,16 +144,16 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public IEnumerable<IValidator> Visit(IField<ReferencesFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<ReferencesFieldProperties> field, Args args)
         {
             yield break;
         }
 
-        public IEnumerable<IValidator> Visit(IField<StringFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<StringFieldProperties> field, Args args)
         {
             var properties = field.Properties;
 
-            var isRequired = IsRequired(properties);
+            var isRequired = IsRequired(properties, args.Context);
 
             if (isRequired)
             {
@@ -193,11 +200,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public IEnumerable<IValidator> Visit(IField<TagsFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<TagsFieldProperties> field, Args args)
         {
             var properties = field.Properties;
 
-            var isRequired = IsRequired(properties);
+            var isRequired = IsRequired(properties, args.Context);
 
             if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
             {
@@ -212,7 +219,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             yield return new CollectionItemValidator(new RequiredStringValidator(true));
         }
 
-        public IEnumerable<IValidator> Visit(IField<UIFieldProperties> field)
+        public IEnumerable<IValidator> Visit(IField<UIFieldProperties> field, Args args)
         {
             if (field is INestedField)
             {
@@ -220,7 +227,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        private bool IsRequired(FieldProperties properties)
+        private static bool IsRequired(FieldProperties properties, ValidatorContext context)
         {
             var isRequired = properties.IsRequired;
 

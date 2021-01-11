@@ -12,14 +12,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public UIFieldEditor Editor { get; set; }
 
-        public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
+        public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {
-            return visitor.Visit(this);
+            return visitor.Visit(this, args);
         }
 
-        public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
+        public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
         {
-            return visitor.Visit((IField<UIFieldProperties>)field);
+            return visitor.Visit((IField<UIFieldProperties>)field, args);
         }
 
         public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)

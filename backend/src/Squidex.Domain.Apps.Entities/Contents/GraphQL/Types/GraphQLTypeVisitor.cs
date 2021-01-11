@@ -18,81 +18,92 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public delegate object ValueResolver(IJsonValue value, IResolveFieldContext context);
 
-    public sealed class QueryGraphTypeVisitor : IFieldVisitor<(IGraphType?, ValueResolver?, QueryArguments?)>
+    internal sealed class GraphQLTypeVisitor : IFieldVisitor<(IGraphType?, ValueResolver?, QueryArguments?), GraphQLTypeVisitor.Args>
     {
         private static readonly ValueResolver NoopResolver = (value, c) => value;
         private readonly Dictionary<DomainId, ContentGraphType> schemaTypes;
-        private readonly ISchemaEntity schema;
-        private readonly IGraphModel model;
         private readonly IGraphType assetListType;
-        private readonly string fieldName;
+        private readonly IGraphModel model;
 
-        public QueryGraphTypeVisitor(ISchemaEntity schema,
-            Dictionary<DomainId, ContentGraphType> schemaTypes,
-            IGraphModel model,
-            IGraphType assetListType,
-            string fieldName)
+        public readonly struct Args
         {
-            this.model = model;
-            this.assetListType = assetListType;
-            this.schema = schema;
-            this.schemaTypes = schemaTypes;
-            this.fieldName = fieldName;
+            public readonly ISchemaEntity Schema;
+
+            public readonly string SchemaField;
+
+            public Args(ISchemaEntity schema, string fieldName)
+            {
+                Schema = schema;
+                SchemaField = fieldName;
+            }
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IArrayField field)
+        public GraphQLTypeVisitor(
+            Dictionary<DomainId, ContentGraphType> schemaTypes,
+            IGraphModel model,
+            IGraphType assetListType)
         {
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedGraphType(model, schema, field, fieldName)));
+            this.assetListType = assetListType;
+            this.model = model;
+            this.schemaTypes = schemaTypes;
+        }
+
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IArrayField field, Args args)
+        {
+            var schemaFieldType =
+                new ListGraphType(
+                    new NonNullGraphType(
+                        new NestedGraphType(model, args.Schema, field, args.SchemaField)));
 
             return (schemaFieldType, NoopResolver, null);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field, Args args)
         {
             return ResolveAssets();
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<BooleanFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<BooleanFieldProperties> field, Args args)
         {
             return ResolveDefault(AllTypes.NoopBoolean);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<DateTimeFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<DateTimeFieldProperties> field, Args args)
         {
             return ResolveDefault(AllTypes.NoopDate);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<GeolocationFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<GeolocationFieldProperties> field, Args args)
         {
             return ResolveDefault(AllTypes.NoopGeolocation);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<NumberFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<NumberFieldProperties> field, Args args)
         {
             return ResolveDefault(AllTypes.NoopFloat);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<ReferencesFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            return ResolveReferences(field);
+            return ResolveReferences(field, args);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<StringFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<StringFieldProperties> field, Args args)
         {
             return ResolveDefault(AllTypes.NoopString);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<TagsFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<TagsFieldProperties> field, Args args)
         {
             return ResolveDefault(AllTypes.NoopTags);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<UIFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<UIFieldProperties> field, Args args)
         {
             return (null, null, null);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<JsonFieldProperties> field)
+        public (IGraphType?, ValueResolver?, QueryArguments?) Visit(IField<JsonFieldProperties> field, Args args)
         {
             return (AllTypes.NoopJson, ContentActions.Json.Resolver, ContentActions.Json.Arguments);
         }
@@ -114,13 +125,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return (assetListType, resolver, null);
         }
 
-        private (IGraphType?, ValueResolver?, QueryArguments?) ResolveReferences(IField<ReferencesFieldProperties> field)
+        private (IGraphType?, ValueResolver?, QueryArguments?) ResolveReferences(IField<ReferencesFieldProperties> field, Args args)
         {
             IGraphType contentType = schemaTypes.GetOrDefault(field.Properties.SingleId());
 
             if (contentType == null)
             {
-                var union = new ContentUnionGraphType(fieldName, schemaTypes, field.Properties.SchemaIds);
+                var union = new ContentUnionGraphType(args.SchemaField, schemaTypes, field.Properties.SchemaIds);
 
                 if (!union.PossibleTypes.Any())
                 {

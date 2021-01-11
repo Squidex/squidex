@@ -30,6 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly IObjectGraphType assetType;
         private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
+        private readonly GraphQLTypeVisitor graphQLTypeVisitor;
         private readonly ISemanticLog log;
 
         public bool CanGenerateAssetSourceUrl { get; }
@@ -53,6 +54,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             assetType = new AssetGraphType(this);
             assetListType = new ListGraphType(new NonNullGraphType(assetType));
+
+            graphQLTypeVisitor = new GraphQLTypeVisitor(contentTypes, this, assetListType);
 
             var allSchemas = schemas.Where(x => x.SchemaDef.IsPublished).ToList();
 
@@ -120,12 +123,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public IGraphType? GetInputGraphType(ISchemaEntity schema, IField field, string fieldName)
         {
-            return field.Accept(new InputFieldVisitor(schema, this, fieldName));
+            return InputFieldVisitor.Build(field, this, schema, fieldName);
         }
 
         public (IGraphType?, ValueResolver?, QueryArguments?) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
         {
-            return field.Accept(new QueryGraphTypeVisitor(schema, contentTypes, this, assetListType, fieldName));
+            return field.Accept(graphQLTypeVisitor, new GraphQLTypeVisitor.Args(schema, fieldName));
         }
 
         public IGraphType GetAssetType()

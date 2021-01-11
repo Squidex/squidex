@@ -12,87 +12,99 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
-    public sealed class ReferencesCleaner : IFieldVisitor<IJsonValue>
+    internal sealed class ReferencesCleaner : IFieldVisitor<IJsonValue, ReferencesCleaner.Args>
     {
-        private readonly HashSet<DomainId> validIds;
-        private IJsonValue value;
+        private static readonly ReferencesCleaner Instance = new ReferencesCleaner();
 
-        public ReferencesCleaner(HashSet<DomainId> validIds)
+        public readonly struct Args
         {
-            Guard.NotNull(validIds, nameof(validIds));
+            public readonly IJsonValue Value;
 
-            this.validIds = validIds;
+            public readonly HashSet<DomainId> ValidIds;
+
+            public Args(IJsonValue value, HashSet<DomainId> validIds)
+            {
+                Value = value;
+
+                ValidIds = validIds;
+            }
         }
 
-        public void SetValue(IJsonValue newValue)
+        private ReferencesCleaner()
         {
-            value = newValue;
         }
 
-        public IJsonValue Visit(IField<AssetsFieldProperties> field)
+        public static IJsonValue Cleanup(IField field, IJsonValue? value, HashSet<DomainId> validIds)
         {
-            return CleanIds();
+            var args = new Args(value ?? JsonValue.Null, validIds);
+
+            return field.Accept(Instance, args);
         }
 
-        public IJsonValue Visit(IField<ReferencesFieldProperties> field)
+        public IJsonValue Visit(IField<AssetsFieldProperties> field, Args args)
         {
-            return CleanIds();
+            return CleanIds(args);
         }
 
-        public IJsonValue Visit(IField<BooleanFieldProperties> field)
+        public IJsonValue Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            return value;
+            return CleanIds(args);
         }
 
-        public IJsonValue Visit(IField<DateTimeFieldProperties> field)
+        public IJsonValue Visit(IField<BooleanFieldProperties> field, Args args)
         {
-            return value;
+            return args.Value;
         }
 
-        public IJsonValue Visit(IField<GeolocationFieldProperties> field)
+        public IJsonValue Visit(IField<DateTimeFieldProperties> field, Args args)
         {
-            return value;
+            return args.Value;
         }
 
-        public IJsonValue Visit(IField<JsonFieldProperties> field)
+        public IJsonValue Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            return value;
+            return args.Value;
         }
 
-        public IJsonValue Visit(IField<NumberFieldProperties> field)
+        public IJsonValue Visit(IField<JsonFieldProperties> field, Args args)
         {
-            return value;
+            return args.Value;
         }
 
-        public IJsonValue Visit(IField<StringFieldProperties> field)
+        public IJsonValue Visit(IField<NumberFieldProperties> field, Args args)
         {
-            return value;
+            return args.Value;
         }
 
-        public IJsonValue Visit(IField<TagsFieldProperties> field)
+        public IJsonValue Visit(IField<StringFieldProperties> field, Args args)
         {
-            return value;
+            return args.Value;
         }
 
-        public IJsonValue Visit(IField<UIFieldProperties> field)
+        public IJsonValue Visit(IField<TagsFieldProperties> field, Args args)
         {
-            return value;
+            return args.Value;
         }
 
-        public IJsonValue Visit(IArrayField field)
+        public IJsonValue Visit(IField<UIFieldProperties> field, Args args)
         {
-            return value;
+            return args.Value;
         }
 
-        private IJsonValue CleanIds()
+        public IJsonValue Visit(IArrayField field, Args args)
         {
-            if (value is JsonArray array)
+            return args.Value;
+        }
+
+        private static IJsonValue CleanIds(Args args)
+        {
+            if (args.Value is JsonArray array)
             {
                 var result = array;
 
                 for (var i = 0; i < result.Count; i++)
                 {
-                    if (!IsValidReference(result[i]))
+                    if (!IsValidReference(result[i], args))
                     {
                         if (ReferenceEquals(result, array))
                         {
@@ -107,12 +119,12 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 return result;
             }
 
-            return value;
+            return args.Value;
         }
 
-        private bool IsValidReference(IJsonValue item)
+        private static bool IsValidReference(IJsonValue item, Args args)
         {
-            return item is JsonString s && validIds.Contains(DomainId.Create(s.Value));
+            return item is JsonString s && args.ValidIds.Contains(DomainId.Create(s.Value));
         }
     }
 }

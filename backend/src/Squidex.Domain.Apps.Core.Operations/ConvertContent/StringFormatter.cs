@@ -11,16 +11,25 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public sealed class StringFormatter : IFieldVisitor<string>
+    public sealed class StringFormatter : IFieldPropertiesVisitor<string, StringFormatter.Args>
     {
-        private readonly IJsonValue value;
+        private static readonly StringFormatter Instance = new StringFormatter();
 
-        private StringFormatter(IJsonValue value)
+        public readonly struct Args
         {
-            this.value = value;
+            public readonly IJsonValue Value;
+
+            public Args(IJsonValue value)
+            {
+                Value = value;
+            }
         }
 
-        public static string Format(IJsonValue? value, IField field)
+        private StringFormatter()
+        {
+        }
+
+        public static string Format(IField field, IJsonValue? value)
         {
             Guard.NotNull(field, nameof(field));
 
@@ -29,22 +38,24 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 return string.Empty;
             }
 
-            return field.Accept(new StringFormatter(value));
+            var args = new Args(value ?? JsonValue.Null);
+
+            return field.RawProperties.Accept(Instance, args);
         }
 
-        public string Visit(IArrayField field)
+        public string Visit(ArrayFieldProperties properties, Args args)
         {
-            return FormatArray("Item", "Items");
+            return FormatArray(args.Value, "Item", "Items");
         }
 
-        public string Visit(IField<AssetsFieldProperties> field)
+        public string Visit(AssetsFieldProperties properties, Args args)
         {
-            return FormatArray("Asset", "Assets");
+            return FormatArray(args.Value, "Asset", "Assets");
         }
 
-        public string Visit(IField<BooleanFieldProperties> field)
+        public string Visit(BooleanFieldProperties properties, Args args)
         {
-            if (value is JsonBoolean boolean && boolean.Value)
+            if (args.Value is JsonBoolean boolean && boolean.Value)
             {
                 return "Yes";
             }
@@ -54,14 +65,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             }
         }
 
-        public string Visit(IField<DateTimeFieldProperties> field)
+        public string Visit(DateTimeFieldProperties properties, Args args)
         {
-            return value.ToString();
+            return args.Value.ToString();
         }
 
-        public string Visit(IField<GeolocationFieldProperties> field)
+        public string Visit(GeolocationFieldProperties properties, Args args)
         {
-            if (value is JsonObject obj && obj.TryGetValue("latitude", out var lat) && obj.TryGetValue("longitude", out var lon))
+            if (args.Value is JsonObject jsonObject &&
+                jsonObject.TryGetValue("latitude", out var lat) &&
+                jsonObject.TryGetValue("longitude", out var lon))
             {
                 return $"{lat}, {lon}";
             }
@@ -71,36 +84,36 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             }
         }
 
-        public string Visit(IField<JsonFieldProperties> field)
+        public string Visit(JsonFieldProperties properties, Args args)
         {
             return "<Json />";
         }
 
-        public string Visit(IField<NumberFieldProperties> field)
+        public string Visit(NumberFieldProperties properties, Args args)
         {
-            return value.ToString();
+            return args.Value.ToString();
         }
 
-        public string Visit(IField<ReferencesFieldProperties> field)
+        public string Visit(ReferencesFieldProperties properties, Args args)
         {
-            return FormatArray("Reference", "References");
+            return FormatArray(args.Value, "Reference", "References");
         }
 
-        public string Visit(IField<StringFieldProperties> field)
+        public string Visit(StringFieldProperties properties, Args args)
         {
-            if (field.Properties.Editor == StringFieldEditor.StockPhoto)
+            if (properties.Editor == StringFieldEditor.StockPhoto)
             {
                 return "[Photo]";
             }
             else
             {
-                return value.ToString();
+                return args.Value.ToString();
             }
         }
 
-        public string Visit(IField<TagsFieldProperties> field)
+        public string Visit(TagsFieldProperties properties, Args args)
         {
-            if (value is JsonArray array)
+            if (args.Value is JsonArray array)
             {
                 return string.Join(", ", array);
             }
@@ -110,12 +123,12 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             }
         }
 
-        public string Visit(IField<UIFieldProperties> field)
+        public string Visit(UIFieldProperties properties, Args args)
         {
             return string.Empty;
         }
 
-        private string FormatArray(string singularName, string pluralName)
+        private static string FormatArray(IJsonValue value, string singularName, string pluralName)
         {
             if (value is JsonArray array)
             {

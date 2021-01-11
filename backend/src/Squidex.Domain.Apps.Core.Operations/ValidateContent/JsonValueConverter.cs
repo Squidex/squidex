@@ -16,43 +16,55 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonError? Error)>
+    public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonError? Error), JsonValueConverter.Args>
     {
-        private readonly IJsonValue value;
+        private static readonly JsonValueConverter Instance = new JsonValueConverter();
 
-        private JsonValueConverter(IJsonValue value)
+        public readonly struct Args
         {
-            this.value = value;
+            public readonly IJsonValue Value;
+
+            public Args(IJsonValue value)
+            {
+                Value = value;
+            }
         }
 
-        public static (object? Result, JsonError? Error) ConvertValue(IField field, IJsonValue json)
+        private JsonValueConverter()
         {
-            return field.Accept(new JsonValueConverter(json));
         }
 
-        public (object? Result, JsonError? Error) Visit(IArrayField field)
+        public static (object? Result, JsonError? Error) ConvertValue(IField field, IJsonValue value)
         {
-            return ConvertToObjectList();
+            Guard.NotNull(field, nameof(field));
+            Guard.NotNull(value, nameof(value));
+
+            return field.Accept(Instance, new Args(value));
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<AssetsFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IArrayField field, Args args)
         {
-            return ConvertToIdList();
+            return ConvertToObjectList(args.Value);
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<ReferencesFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<AssetsFieldProperties> field, Args args)
         {
-            return ConvertToIdList();
+            return ConvertToIdList(args.Value);
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<TagsFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            return ConvertToStringList();
+            return ConvertToIdList(args.Value);
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<BooleanFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<TagsFieldProperties> field, Args args)
         {
-            if (value is JsonBoolean b)
+            return ConvertToStringList(args.Value);
+        }
+
+        public (object? Result, JsonError? Error) Visit(IField<BooleanFieldProperties> field, Args args)
+        {
+            if (args.Value is JsonBoolean b)
             {
                 return (b.Value, null);
             }
@@ -60,9 +72,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidBoolean")));
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<NumberFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<NumberFieldProperties> field, Args args)
         {
-            if (value is JsonNumber n)
+            if (args.Value is JsonNumber n)
             {
                 return (n.Value, null);
             }
@@ -70,9 +82,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidNumber")));
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<StringFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<StringFieldProperties> field, Args args)
         {
-            if (value is JsonString s)
+            if (args.Value is JsonString s)
             {
                 return (s.Value, null);
             }
@@ -80,16 +92,16 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidString")));
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<UIFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<UIFieldProperties> field, Args args)
         {
-            return (value, null);
+            return (args.Value, null);
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<DateTimeFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<DateTimeFieldProperties> field, Args args)
         {
-            if (value.Type == JsonValueType.String)
+            if (args.Value.Type == JsonValueType.String)
             {
-                var parseResult = InstantPattern.General.Parse(value.ToString());
+                var parseResult = InstantPattern.General.Parse(args.Value.ToString());
 
                 if (!parseResult.Success)
                 {
@@ -102,9 +114,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidString")));
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            if (value is JsonObject geolocation)
+            if (args.Value is JsonObject geolocation)
             {
                 foreach (var propertyName in geolocation.Keys)
                 {
@@ -143,18 +155,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     return (null, new JsonError(T.Get("contents.invalidGeolocation")));
                 }
 
-                return (value, null);
+                return (args.Value, null);
             }
 
             return (null, new JsonError(T.Get("contents.invalidGeolocation")));
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field)
+        public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field, Args args)
         {
-            return (value, null);
+            return (args.Value, null);
         }
 
-        private (object? Result, JsonError? Error) ConvertToIdList()
+        private static (object? Result, JsonError? Error) ConvertToIdList(IJsonValue value)
         {
             if (value is JsonArray array)
             {
@@ -178,7 +190,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError("Invalid json type, expected array of strings."));
         }
 
-        private (object? Result, JsonError? Error) ConvertToStringList()
+        private static (object? Result, JsonError? Error) ConvertToStringList(IJsonValue value)
         {
             if (value is JsonArray array)
             {
@@ -206,7 +218,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidArrayOfStrings")));
         }
 
-        private (object? Result, JsonError? Error) ConvertToObjectList()
+        private static (object? Result, JsonError? Error) ConvertToObjectList(IJsonValue value)
         {
             if (value is JsonArray array)
             {

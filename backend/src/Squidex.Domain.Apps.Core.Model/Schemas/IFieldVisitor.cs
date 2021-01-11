@@ -7,28 +7,28 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public interface IFieldVisitor<out T>
+    public interface IFieldVisitor<out T, in TArgs>
     {
-        T Visit(IArrayField field);
+        T Visit(IArrayField field, TArgs args);
 
-        T Visit(IField<AssetsFieldProperties> field);
+        T Visit(IField<AssetsFieldProperties> field, TArgs args);
 
-        T Visit(IField<BooleanFieldProperties> field);
+        T Visit(IField<BooleanFieldProperties> field, TArgs args);
 
-        T Visit(IField<DateTimeFieldProperties> field);
+        T Visit(IField<DateTimeFieldProperties> field, TArgs args);
 
-        T Visit(IField<GeolocationFieldProperties> field);
+        T Visit(IField<GeolocationFieldProperties> field, TArgs args);
 
-        T Visit(IField<JsonFieldProperties> field);
+        T Visit(IField<JsonFieldProperties> field, TArgs args);
 
-        T Visit(IField<NumberFieldProperties> field);
+        T Visit(IField<NumberFieldProperties> field, TArgs args);
 
-        T Visit(IField<ReferencesFieldProperties> field);
+        T Visit(IField<ReferencesFieldProperties> field, TArgs args);
 
-        T Visit(IField<StringFieldProperties> field);
+        T Visit(IField<StringFieldProperties> field, TArgs args);
 
-        T Visit(IField<TagsFieldProperties> field);
+        T Visit(IField<TagsFieldProperties> field, TArgs args);
 
-        T Visit(IField<UIFieldProperties> field);
+        T Visit(IField<UIFieldProperties> field, TArgs args);
     }
 }
