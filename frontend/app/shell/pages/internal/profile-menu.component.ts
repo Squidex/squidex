@@ -63,12 +63,11 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
                         const profileEmail = user.email;
                         const profileDisplayName = user.displayName;
 
-                        this.next(s => ({
-                            ...s,
+                        this.next({
                             profileId,
                             profileEmail,
                             profileDisplayName
-                        }));
+                        });
                     }
                 }));
     }

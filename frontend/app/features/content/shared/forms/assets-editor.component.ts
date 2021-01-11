@@ -153,8 +153,8 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
 
     public removeLoadingAsset(file: File) {
         this.next(s => ({
-            ...s, assetFiles:
-            s.assetFiles.removed(file)
+            ...s,
+            assetFiles: s.assetFiles.removed(file)
         }));
     }
 

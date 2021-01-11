@@ -90,7 +90,7 @@ export class UIState extends State<Snapshot> {
         super({
             settings: {},
             settingsCommon: {}
-        });
+        }, 'Setting');
 
         this.loadResources();
         this.loadCommon();
@@ -107,36 +107,35 @@ export class UIState extends State<Snapshot> {
             settings: s.settingsCommon,
             settingsShared: undefined,
             settingsUser: undefined
-        }));
+        }), 'Loading Done');
 
         this.uiService.getSharedSettings(app)
             .subscribe(payload => {
-                this.next(s => updateSettings(s, { settingsShared: payload }));
+                this.next(s => updateSettings(s, { settingsShared: payload }), 'Loading Shared Success');
             });
 
         this.uiService.getUserSettings(app)
             .subscribe(payload => {
-                this.next(s => updateSettings(s, { settingsUser: payload }));
+                this.next(s => updateSettings(s, { settingsUser: payload }), 'Loading User Success');
             });
     }
 
     private loadCommon() {
         this.uiService.getCommonSettings()
             .subscribe(payload => {
-                this.next(s => updateSettings(s, { settingsCommon: payload }));
+                this.next(s => updateSettings(s, { settingsCommon: payload }), 'Loading Common Done');
             });
     }
 
     private loadResources() {
         this.usersService.getResources()
             .subscribe(payload => {
-                this.next(s => ({
-                    ...s,
+                this.next({
                     canReadEvents: hasAnyLink(payload, 'admin/events'),
                     canReadUsers: hasAnyLink(payload, 'admin/users'),
                     canRestore: hasAnyLink(payload, 'admin/restore'),
                     canUseOrleans: hasAnyLink(payload, 'admin/orleans')
-                }));
+                }, 'Loading Resources Done');
             });
     }
 
@@ -156,7 +155,7 @@ export class UIState extends State<Snapshot> {
 
             current[key] = value;
 
-            this.next(s => updateSettings(s, { settingsUser: root }));
+            this.next(s => updateSettings(s, { settingsUser: root }), 'Set User');
         }
     }
 
@@ -168,7 +167,7 @@ export class UIState extends State<Snapshot> {
 
             current[key] = value;
 
-            this.next(s => updateSettings(s, { settingsShared: root }));
+            this.next(s => updateSettings(s, { settingsShared: root }), 'Set Shared');
         }
     }
 
@@ -184,7 +183,7 @@ export class UIState extends State<Snapshot> {
 
             delete current[key];
 
-            this.next(s => updateSettings(s, { settingsUser: root }));
+            this.next(s => updateSettings(s, { settingsUser: root }), 'Removed User');
 
             return true;
         }
@@ -200,7 +199,7 @@ export class UIState extends State<Snapshot> {
 
             delete current[key];
 
-            this.next(s => updateSettings(s, { settingsShared: root }));
+            this.next(s => updateSettings(s, { settingsShared: root }), 'Removed Shared');
 
             return true;
         }

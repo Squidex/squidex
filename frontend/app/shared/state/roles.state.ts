@@ -50,19 +50,19 @@ export class RolesState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rolesService: RolesService
     ) {
-        super({ roles: [], version: Version.EMPTY });
+        super({ roles: [], version: Version.EMPTY }, 'Roles');
     }
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            this.resetState('Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Success');
 
         return this.rolesService.getRoles(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -73,7 +73,7 @@ export class RolesState extends State<Snapshot> {
                 this.replaceRoles(payload, version);
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -111,7 +111,7 @@ export class RolesState extends State<Snapshot> {
             isLoading: false,
             roles,
             version
-        });
+        }, 'Loading Success / Updated');
     }
 
     private get appName() {

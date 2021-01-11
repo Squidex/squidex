@@ -87,19 +87,19 @@ export class LanguagesState extends State<Snapshot> {
             allLanguagesNew: [],
             languages: [],
             version: Version.EMPTY
-        });
+        }, 'Languages');
     }
 
     public load(isReload = false): Observable<any> {
         if (isReload) {
-            this.resetState();
+            this.resetState('Loading Success');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         return forkJoin([
                 this.getAllLanguages(),
@@ -117,7 +117,7 @@ export class LanguagesState extends State<Snapshot> {
                 this.replaceLanguages(languages.payload, languages.version, sorted);
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -162,7 +162,7 @@ export class LanguagesState extends State<Snapshot> {
                 languages: languages.map(x => this.createLanguage(x, languages)),
                 version
             };
-        });
+        }, 'Loading Success / Updated');
     }
 
     private get appName() {

@@ -71,7 +71,7 @@ export class ContributorsState extends State<Snapshot> {
             pageSize: 10,
             total: 0,
             version: Version.EMPTY
-        });
+        }, 'Contributors');
     }
 
     public loadIfNotLoaded(): Observable<any> {
@@ -84,14 +84,14 @@ export class ContributorsState extends State<Snapshot> {
 
     public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState(update);
+            this.resetState(update, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         return this.contributorsService.getContributors(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -102,17 +102,17 @@ export class ContributorsState extends State<Snapshot> {
                 this.replaceContributors(version, payload);
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
 
     public page(paging: { page: number, pageSize: number }) {
-        this.next(paging);
+        this.next(paging, 'Results Paged');
     }
 
     public search(query: string) {
-        this.next({ query });
+        this.next({ query }, 'Results Filtered');
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
@@ -147,7 +147,7 @@ export class ContributorsState extends State<Snapshot> {
             maxContributors,
             total: items.length,
             version
-        });
+        }, 'Loading Success / Updated');
     }
 
     private get appName() {

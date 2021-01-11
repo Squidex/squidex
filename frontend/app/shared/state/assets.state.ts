@@ -52,8 +52,7 @@ interface Snapshot extends ListState<Query> {
     canCreateFolders?: boolean;
 }
 
-@Injectable()
-export class AssetsState extends State<Snapshot> {
+export abstract class AssetsStateBase extends State<Snapshot> {
     public tagsUnsorted =
         this.project(x => x.tagsAvailable);
 
@@ -105,7 +104,7 @@ export class AssetsState extends State<Snapshot> {
     public canCreateFolders =
         this.project(x => x.canCreateFolders === true);
 
-    constructor(
+    constructor(name: string,
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
         private readonly dialogs: DialogService
@@ -120,19 +119,19 @@ export class AssetsState extends State<Snapshot> {
             tagsAvailable: {},
             tagsSelected: {},
             total: 0
-        });
+        }, name);
     }
 
     public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState(update);
+            this.resetState(update, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         const query = createQuery(this.snapshot);
 
@@ -161,8 +160,7 @@ export class AssetsState extends State<Snapshot> {
 
                 const { items: assets, total } = assetsResult;
 
-                this.next(s => ({
-                    ...s,
+                this.next({
                     assets,
                     folders: foldersResult.items,
                     canCreate: assetsResult.canCreate,
@@ -173,10 +171,10 @@ export class AssetsState extends State<Snapshot> {
                     path,
                     tagsAvailable,
                     total
-                }));
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -192,7 +190,7 @@ export class AssetsState extends State<Snapshot> {
             const tags = updateTags(s, asset);
 
             return { ...s, assets, total: s.total + 1, ...tags };
-        });
+        }, 'Asset Created');
     }
 
     public createAssetFolder(folderName: string) {
@@ -206,7 +204,7 @@ export class AssetsState extends State<Snapshot> {
                     const folders = [...s.folders, folder].sortedByString(x => x.folderName);
 
                     return { ...s, folders };
-                });
+                }, 'Folder Created');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -220,7 +218,7 @@ export class AssetsState extends State<Snapshot> {
                     const assets = s.assets.replaceBy('id', updated);
 
                     return { ...s, assets, ...tags };
-                });
+                }, 'Asset Updated');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -232,7 +230,7 @@ export class AssetsState extends State<Snapshot> {
                     const folders = s.folders.replaceBy('id', updated);
 
                     return { ...s, folders };
-                });
+                }, 'Folder Updated');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -246,7 +244,7 @@ export class AssetsState extends State<Snapshot> {
             const assets = s.assets.filter(x => x.id !== asset.id);
 
             return { ...s, assets };
-        });
+        }, 'Asset Moving Started');
 
         return this.assetsService.putAssetItemParent(this.appName, asset, { parentId }, asset.version).pipe(
             catchError(error => {
@@ -254,7 +252,7 @@ export class AssetsState extends State<Snapshot> {
                     const assets = [asset, ...s.assets];
 
                     return { ...s, assets };
-                });
+                }, 'Asset Moving Failed');
 
                 return throwError(error);
             }),
@@ -270,7 +268,7 @@ export class AssetsState extends State<Snapshot> {
             const folders = s.folders.filter(x => x.id !== folder.id);
 
             return { ...s, folders };
-        });
+        }, 'Folder Moving Started');
 
         return this.assetsService.putAssetItemParent(this.appName, folder, { parentId }, folder.version).pipe(
             catchError(error => {
@@ -278,7 +276,7 @@ export class AssetsState extends State<Snapshot> {
                     const folders = [...s.folders, folder].sortedByString(x => x.folderName);
 
                     return { ...s, folders };
-                });
+                }, 'Folder Moving Done');
 
                 return throwError(error);
             }),
@@ -313,7 +311,7 @@ export class AssetsState extends State<Snapshot> {
                     const tags = updateTags(s, undefined, asset);
 
                     return { ...s, assets, total: s.total - 1, ...tags };
-                });
+                }, 'Asset Deleted');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -325,19 +323,23 @@ export class AssetsState extends State<Snapshot> {
                     const folders = s.folders.filter(x => x.id !== folder.id);
 
                     return { ...s, folders };
-                });
+                }, 'Folder Deleted');
             }),
             shareSubscribed(this.dialogs));
     }
 
     public navigate(parentId: string) {
-        this.next({ parentId, query: undefined, tagsSelected: {} });
+        if (!this.next({ parentId, query: undefined, tagsSelected: {} }, 'Loading Navigated')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }
 
     public page(paging: { page: number, pageSize: number }) {
-        this.next(paging);
+        if (!this.next(paging, 'Loading Paged')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }
@@ -373,19 +375,19 @@ export class AssetsState extends State<Snapshot> {
     }
 
     private searchInternal(query?: Query | null, tags?: TagsSelected) {
-        this.next(s => {
-            const newState = { ...s, page: 0 };
+        const update: Partial<Snapshot> = { page: 0 };
 
-            if (query !== null) {
-                newState.query = query;
-            }
+        if (query !== null) {
+            update.query = query;
+        }
 
-            if (tags) {
-                newState.tagsSelected = tags;
-            }
+        if (tags) {
+            update.tagsSelected = tags;
+        }
 
-            return newState;
-        });
+        if (!this.next(update, 'Loading Searched')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }
@@ -473,4 +475,19 @@ function getSortedTags(tags: { [name: string]: number }) {
 }
 
 @Injectable()
-export class AssetsDialogState extends AssetsState { }
+export class AssetsState extends AssetsStateBase {
+    constructor(
+        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService
+    ) {
+        super('Assets', appsState, assetsService, dialogs);
+    }
+}
+
+@Injectable()
+export class ComponentAssetsState extends AssetsStateBase {
+    constructor(
+        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService
+    ) {
+        super('Component Assets', appsState, assetsService, dialogs);
+    }
+}

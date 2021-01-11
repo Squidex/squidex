@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
 import { DialogService, getPagingInfo, ListState, shareSubscribed, State } from '@app/shared';
-import { Observable, of } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { CreateUserDto, UpdateUserDto, UserDto, UsersService } from './../services/users.service';
 
@@ -58,13 +58,13 @@ export class UsersState extends State<Snapshot> {
             page: 0,
             pageSize: 10,
             total: 0
-        });
+        }, 'Users');
     }
 
     public select(id: string | null): Observable<UserDto | null> {
         return this.loadUser(id).pipe(
             tap(selectedUser => {
-                this.next({ selectedUser });
+                this.next({ selectedUser }, 'Selected');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -85,14 +85,14 @@ export class UsersState extends State<Snapshot> {
 
     public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ selectedUser: this.snapshot.selectedUser, ...update });
+            this.resetState({ selectedUser: this.snapshot.selectedUser, ...update }, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         const { page, pageSize, query } = this.snapshot;
 
@@ -120,10 +120,10 @@ export class UsersState extends State<Snapshot> {
                         selectedUser,
                         total
                     };
-                });
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -135,7 +135,7 @@ export class UsersState extends State<Snapshot> {
                     const users = [created, ...s.users].slice(0, s.pageSize);
 
                     return { ...s, users, total: s.total + 1 };
-                });
+                }, 'Created');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -164,14 +164,18 @@ export class UsersState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public search(query: string): Observable<UsersResult> {
-        this.next({ query, page: 0 });
+    public search(query: string) {
+        if (!this.next({ query, page: 0 }, 'Loading Search')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }
 
     public page(paging: { page: number, pageSize: number }) {
-        this.next(paging);
+        if (!this.next(paging, 'Loading Paged')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }
@@ -186,6 +190,6 @@ export class UsersState extends State<Snapshot> {
                 users.find(x => x.id === user.id);
 
             return { ...s, users, selectedUser };
-        });
+        }, 'Updated');
     }
 }
