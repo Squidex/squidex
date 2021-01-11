@@ -225,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [InlineData(0, 0, SearchScope.Published)]
         public async Task QueryAll_should_return_q_with_createdby(int isFrontend, int unpublished, SearchScope scope)
         {
-            var ctx = CreateContextWithOwnReadPermission(isFrontend: isFrontend == 1, allowSchema: true)
+            var ctx = CreateContextWithOwnReadPermission(isFrontend: false, allowSchema: true)
                     .WithUnpublished(unpublished == 1);
 
             var content = CreateContent(contentId);
@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [InlineData(0, 0, SearchScope.Published)]
         public async Task QueryAll_should_return_q_createdby_with_null(int isFrontend, int unpublished, SearchScope scope)
         {
-            var ctx = CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
+            var ctx = CreateContext(isFrontend: false, allowSchema: true)
                     .WithUnpublished(unpublished == 1);
 
             var content = CreateContent(contentId);
