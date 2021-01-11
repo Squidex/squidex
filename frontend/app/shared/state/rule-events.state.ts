@@ -47,19 +47,19 @@ export class RuleEventsState extends State<Snapshot> {
             page: 0,
             pageSize: 30,
             total: 0
-        });
+        }, 'Rule Events');
     }
 
     public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ ruleId: this.snapshot.ruleId, ...update });
+            this.resetState({ ruleId: this.snapshot.ruleId, ...update }, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         const { page, pageSize, ruleId } = this.snapshot;
 
@@ -72,18 +72,15 @@ export class RuleEventsState extends State<Snapshot> {
                     this.dialogs.notifyInfo('i18n:rules.ruleEvents.reloaded');
                 }
 
-                return this.next(s => {
-                    return {
-                        ...s,
-                        isLoaded: true,
-                        isLoading: false,
-                        ruleEvents,
-                        total
-                    };
-                });
+                return this.next({
+                    isLoaded: true,
+                    isLoading: false,
+                    ruleEvents,
+                    total
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -103,23 +100,23 @@ export class RuleEventsState extends State<Snapshot> {
                     const ruleEvents = s.ruleEvents.replaceBy('id', setCancelled(event));
 
                     return { ...s, ruleEvents, isLoaded: true };
-                });
+                }, 'Cancel');
             }),
             shareSubscribed(this.dialogs));
     }
 
     public filterByRule(ruleId?: string) {
-        if (ruleId === this.snapshot.ruleId) {
+        if (!this.next({ page: 0, ruleId }, 'Loading Rule')) {
             return EMPTY;
         }
-
-        this.next({ page: 0, ruleId });
 
         return this.loadInternal(false);
     }
 
     public page(paging: { page: number, pageSize: number }) {
-        this.next(paging);
+        if (!this.next(paging, 'Loading Paged')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }

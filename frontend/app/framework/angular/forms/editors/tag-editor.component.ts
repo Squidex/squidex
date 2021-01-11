@@ -156,11 +156,10 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                         }
                     }))
                 .subscribe(items => {
-                    this.next(s => ({
-                        ...s,
+                    this.next({
                         suggestedIndex: -1,
                         suggestedItems: items || []
-                    }));
+                    });
                 }));
     }
 

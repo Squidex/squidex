@@ -50,19 +50,19 @@ export class PatternsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly patternsService: PatternsService
     ) {
-        super({ patterns: [], version: Version.EMPTY });
+        super({ patterns: [], version: Version.EMPTY }, 'Patterns');
     }
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            this.resetState('Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         return this.patternsService.getPatterns(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -73,7 +73,7 @@ export class PatternsState extends State<Snapshot> {
                 this.replacePatterns(payload, version);
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareMapSubscribed(this.dialogs, x => x.payload));
     }
@@ -110,7 +110,7 @@ export class PatternsState extends State<Snapshot> {
             isLoading: false,
             patterns,
             version, canCreate
-        });
+        }, 'Loading Success / Updated');
     }
 
     private get appName() {

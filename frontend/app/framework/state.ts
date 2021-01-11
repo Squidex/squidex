@@ -100,8 +100,11 @@ export interface ListState<TQuery = any> {
     query?: TQuery;
 }
 
+const devToolsExtension = window['__REDUX_DEVTOOLS_EXTENSION__'];
+
 export class State<T extends {}> {
     private readonly state: BehaviorSubject<Readonly<T>>;
+    private readonly devTools?: any;
 
     public get changes(): Observable<Readonly<T>> {
         return this.state;
@@ -127,20 +130,34 @@ export class State<T extends {}> {
     }
 
     constructor(
-        private readonly initialState: Readonly<T>
+        private readonly initialState: Readonly<T>,
+        private readonly debugName?: string
     ) {
         this.state = new BehaviorSubject(initialState);
+
+        if (debugName && devToolsExtension) {
+            const name = `[Squidex] ${debugName}`;
+
+            this.devTools = devToolsExtension.connect({ name, features: {} });
+            this.devTools.init(initialState);
+        }
     }
 
-    public resetState(update?: ((v: T) => Readonly<T>) | Partial<T>) {
-        return this.updateState(this.initialState, update);
+    public resetState(action: string): boolean;
+
+    public resetState(update?: ((v: T) => Readonly<T>) | Partial<T> | string, action = 'Reset') {
+        if (Types.isString(update)) {
+            return this.updateState(this.initialState, {}, update);
+        } else {
+            return this.updateState(this.initialState, update, action);
+        }
     }
 
-    public next(update: ((v: T) => Readonly<T>) | Partial<T>) {
-        return this.updateState(this.state.value, update);
+    public next(update: ((v: T) => Readonly<T>) | Partial<T>, action = 'Update') {
+        return this.updateState(this.state.value, update, action);
     }
 
-    private updateState(state: T, update?: ((v: T) => Readonly<T>) | Partial<T>) {
+    private updateState(state: T, update?: ((v: T) => Readonly<T>) | Partial<T>, action?: string) {
         let newState = state;
 
         if (update) {
@@ -167,6 +184,12 @@ export class State<T extends {}> {
         }
 
         if (isChanged) {
+            if (action && this.devTools) {
+                const name = `[${this.debugName}] ${action}`;
+
+                this.devTools?.send(name, newState);
+            }
+
             this.state.next(newState);
         }
 

@@ -86,7 +86,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.appsState.appId;
     }
 
-    constructor(
+    constructor(name: string,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
@@ -97,7 +97,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             pageSize: 10,
             total: 0,
             validationResults: {}
-        });
+        }, name);
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -107,7 +107,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     const contents = content ? s.contents.replaceBy('id', content) : s.contents;
 
                     return { ...s, selectedContent: content, contents };
-                });
+                }, 'Selected');
             }));
     }
 
@@ -138,7 +138,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ selectedContent: this.snapshot.selectedContent, ...update });
+            this.resetState({ selectedContent: this.snapshot.selectedContent, ...update }, 'Loading Intial');
         }
 
         return this.loadInternal(isReload);
@@ -161,7 +161,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Done');
 
         const { page, pageSize, query, reference, referencing } = this.snapshot;
 
@@ -207,10 +207,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         statuses,
                         total
                     };
-                });
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }));
     }
 
@@ -228,7 +228,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     const contents = [payload, ...s.contents].slice(s.pageSize);
 
                     return { ...s, contents, total: s.total + 1 };
-                });
+                }, 'Created');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -246,7 +246,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     }
 
                     return { ...s, validationResults };
-                });
+                }, 'Validated');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -304,13 +304,17 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public search(query?: Query): Observable<any> {
-        this.next({ query, page: 0 });
+        if (!this.next({ query, page: 0 }, 'Loading Searched')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }
 
     public page(paging: { page: number, pageSize: number }) {
-        this.next(paging);
+        if (!this.next(paging, 'Loading Done')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }
@@ -331,7 +335,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         s.selectedContent;
 
                 return { ...s, contents, selectedContent };
-            });
+            }, 'Updated');
         }
     }
 
@@ -396,7 +400,7 @@ export class ContentsState extends ContentsStateBase {
     constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
         private readonly schemasState: SchemasState
     ) {
-        super(appsState, contentsService, dialogs);
+        super('Contents', appsState, contentsService, dialogs);
     }
 
     public get schemaName() {
@@ -405,13 +409,13 @@ export class ContentsState extends ContentsStateBase {
 }
 
 @Injectable()
-export class ManualContentsState extends ContentsStateBase {
+export class ComponentContentsState extends ContentsStateBase {
     public schema: { name: string };
 
     constructor(
         appsState: AppsState, contentsService: ContentsService, dialogs: DialogService
     ) {
-        super(appsState, contentsService, dialogs);
+        super('Components Contents', appsState, contentsService, dialogs);
     }
 
     public get schemaName() {

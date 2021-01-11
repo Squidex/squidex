@@ -126,12 +126,11 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                         }
                     }))
                 .subscribe(items => {
-                    this.next(s => ({
-                        ...s,
+                    this.next({
                         suggestedIndex: -1,
                         suggestedItems: items || [],
                         isSearching: false
-                    }));
+                    });
                 }));
     }
 

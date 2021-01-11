@@ -76,15 +76,13 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: [], categories: [] });
+        super({ schemas: [], categories: [] }, 'Schemas');
     }
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
         return this.loadSchema(idOrName).pipe(
             tap(selectedSchema => {
-                this.next(s => {
-                    return { ...s, selectedSchema };
-                });
+                this.next({ selectedSchema }, 'Selected');
             }));
     }
 
@@ -107,7 +105,7 @@ export class SchemasState extends State<Snapshot> {
                     const schemas = s.schemas.replaceBy('id', schema);
 
                     return { ...s, schemas };
-                });
+                }, 'Loading Schema Done');
             }),
             catchError(() => of(null)));
     }
@@ -125,7 +123,7 @@ export class SchemasState extends State<Snapshot> {
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         return this.schemasService.getSchemas(this.appName).pipe(
             tap(({ items, canCreate }) => {
@@ -140,10 +138,10 @@ export class SchemasState extends State<Snapshot> {
                     isLoaded: true,
                     isLoading: true,
                     schemas
-                });
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -155,7 +153,7 @@ export class SchemasState extends State<Snapshot> {
                     const schemas = [...s.schemas, created].sortedByString(x => x.displayName);
 
                     return { ...s, schemas };
-                });
+                }, 'Created');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -172,7 +170,7 @@ export class SchemasState extends State<Snapshot> {
                         null;
 
                     return { ...s, schemas, selectedSchema };
-                });
+                }, 'Deleted');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -182,7 +180,7 @@ export class SchemasState extends State<Snapshot> {
             const categories = [...s.categories, name];
 
             return { ...s, categories };
-        });
+        }, 'Category Added');
     }
 
     public removeCategory(name: string) {
@@ -190,7 +188,7 @@ export class SchemasState extends State<Snapshot> {
             const categories = s.categories.removed(name);
 
             return { ...s, categories };
-        });
+        }, 'Category Removed');
     }
 
     public publish(schema: SchemaDto): Observable<SchemaDto> {
@@ -355,7 +353,7 @@ export class SchemasState extends State<Snapshot> {
                     s.selectedSchema;
 
                 return { ...s, schemas, selectedSchema };
-            });
+            }, 'Updated');
         } else {
             if (updateText) {
                 this.dialogs.notifyInfo('i18n:common.nothingChanged');

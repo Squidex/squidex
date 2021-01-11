@@ -6,14 +6,14 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AppLanguageDto, ContentDto, EditContentForm, LanguageDto, ManualContentsState, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, LanguageDto, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
     providers: [
-        ManualContentsState
+        ComponentContentsState
     ]
 })
 export class ContentCreatorComponent extends ResourceOwner implements OnInit {
@@ -38,7 +38,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     public contentForm: EditContentForm;
 
     constructor(
-        private readonly contentsState: ManualContentsState,
+        private readonly contentsState: ComponentContentsState,
         private readonly schemasState: SchemasState,
         private readonly changeDetector: ChangeDetectorRef
     ) {

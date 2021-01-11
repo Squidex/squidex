@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, ContentDto, ManualContentsState, QuerySynchronizer, Router2State } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-references',
@@ -14,7 +14,7 @@ import { AppLanguageDto, ContentDto, ManualContentsState, QuerySynchronizer, Rou
     templateUrl: './content-references.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
-        Router2State, ManualContentsState
+        Router2State, ComponentContentsState
     ]
 })
 export class ContentReferencesComponent implements OnChanges {
@@ -29,7 +29,7 @@ export class ContentReferencesComponent implements OnChanges {
 
     constructor(
         public readonly contentsRoute: Router2State,
-        public readonly contentsState: ManualContentsState
+        public readonly contentsState: ComponentContentsState
     ) {
     }
 

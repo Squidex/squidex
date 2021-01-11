@@ -55,14 +55,14 @@ export class ClientsState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            this.resetState('Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         return this.clientsService.getClients(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -73,7 +73,7 @@ export class ClientsState extends State<Snapshot> {
                 this.replaceClients(payload, version);
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -111,7 +111,7 @@ export class ClientsState extends State<Snapshot> {
             isLoaded: true,
             isLoading: false,
             version
-        });
+        }, 'Loading Success / Updated');
     }
 
     private get appName() {

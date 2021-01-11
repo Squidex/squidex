@@ -39,7 +39,7 @@ export class AppsState extends State<Snapshot> {
         private readonly appsService: AppsService,
         private readonly dialogs: DialogService
     ) {
-        super({ apps: [], selectedApp: null });
+        super({ apps: [], selectedApp: null }, 'Apps');
     }
 
     public reloadSelected() {
@@ -50,9 +50,7 @@ export class AppsState extends State<Snapshot> {
     public select(name: string | null): Observable<AppDto | null> {
         return this.loadApp(name, true).pipe(
             tap(selectedApp => {
-                this.next(s => {
-                    return { ...s, selectedApp };
-                });
+                this.next({ selectedApp }, 'Selected');
             }));
     }
 
@@ -79,9 +77,7 @@ export class AppsState extends State<Snapshot> {
     public load(): Observable<any> {
         return this.appsService.getApps().pipe(
             tap(apps => {
-                this.next(s => {
-                    return { ...s, apps };
-                });
+                this.next({ apps }, 'Loaded');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -93,7 +89,7 @@ export class AppsState extends State<Snapshot> {
                     const apps = [...s.apps, created].sortedByString(x => x.displayName);
 
                     return { ...s, apps };
-                });
+                }, 'Created');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -151,7 +147,7 @@ export class AppsState extends State<Snapshot> {
                 s.selectedApp;
 
             return { ...s, apps, selectedApp };
-        });
+        }, 'Deleted');
     }
 
     private replaceApp(updated: AppDto, app: AppDto) {
@@ -165,6 +161,6 @@ export class AppsState extends State<Snapshot> {
                 s.selectedApp;
 
             return { ...s, apps, selectedApp };
-        });
+        }, 'Updated');
     }
 }
