@@ -12,6 +12,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -117,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         private static void SetupJson()
         {
-            var jsonSerializer = JsonSerializer.Create(JsonHelper.DefaultSettings());
+            var jsonSerializer = JsonSerializer.Create(TestUtils.DefaultSerializerSettings);
 
             BsonJsonConvention.Register(jsonSerializer);
         }

@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using GeoJSON.Net.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core.Apps.Json;
@@ -30,7 +31,9 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
     {
         public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
 
-        public static IJsonSerializer CreateSerializer(TypeNameHandling typeNameHandling = TypeNameHandling.Auto)
+        public static readonly JsonSerializerSettings DefaultSerializerSettings = CreateSerializerSettings();
+
+        public static JsonSerializerSettings CreateSerializerSettings(TypeNameHandling typeNameHandling = TypeNameHandling.Auto)
         {
             var typeNameRegistry =
                 new TypeNameRegistry()
@@ -51,6 +54,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new DomainIdConverter(),
                     new EnvelopeHeadersConverter(),
                     new FilterConverter(),
+                    new GeoJsonConverter(),
                     new InstantConverter(),
                     new JsonValueConverter(),
                     new LanguageConverter(),
@@ -72,6 +76,13 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
 
                 TypeNameHandling = typeNameHandling
             };
+
+            return serializerSettings;
+        }
+
+        public static IJsonSerializer CreateSerializer(TypeNameHandling typeNameHandling = TypeNameHandling.Auto)
+        {
+            var serializerSettings = CreateSerializerSettings(typeNameHandling);
 
             return new NewtonsoftJsonSerializer(serializerSettings);
         }

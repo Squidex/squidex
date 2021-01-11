@@ -124,22 +124,22 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            try
+            if (args.Value is JsonObject geoObject)
             {
-                using (var stream = new MemoryStream())
+                try
                 {
-                    args.JsonSerializer.Serialize(args.Value, stream);
+                    using (var stream = new MemoryStream())
+                    {
+                        args.JsonSerializer.Serialize(args.Value, stream, true);
 
-                    stream.Position = 0;
+                        stream.Position = 0;
 
-                    var geoJson = args.JsonSerializer.Deserialize<IGeoJSONObject>(stream);
+                        var geoJson = args.JsonSerializer.Deserialize<IGeoJSONObject>(stream);
 
-                    return (geoJson, null);
+                        return (geoJson, null);
+                    }
                 }
-            }
-            catch
-            {
-                if (args.Value is JsonObject geoObject)
+                catch
                 {
                     if (geoObject.TryGetValue("latitude", out var latValue) && latValue is JsonNumber latNumber)
                     {
@@ -173,9 +173,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                     return (position, null);
                 }
-
-                return (null, new JsonError(T.Get("contents.invalidGeolocation")));
             }
+
+            return (null, new JsonError(T.Get("contents.invalidGeolocation")));
         }
 
         public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field, Args args)

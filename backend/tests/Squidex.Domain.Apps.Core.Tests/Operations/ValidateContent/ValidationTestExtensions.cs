@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
@@ -127,6 +128,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             ValidationAction action = ValidationAction.Upsert)
         {
             var context = new ValidationContext(
+                TestUtils.DefaultSerializer,
                 AppId,
                 SchemaId,
                 schema ?? new Schema(SchemaId.Name),

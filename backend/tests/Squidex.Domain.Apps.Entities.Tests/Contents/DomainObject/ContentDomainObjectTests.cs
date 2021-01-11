@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -107,10 +108,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var validators = Enumerable.Repeat(new DefaultValidatorsFactory(), 1);
 
-            var context = new ContentOperationContext(appProvider,
+            var context = new ContentOperationContext(
+                appProvider,
                 validators,
                 contentWorkflow,
                 contentRepository,
+                TestUtils.DefaultSerializer,
                 scriptEngine, A.Fake<ISemanticLog>());
 
             sut = new ContentDomainObject(Store, A.Dummy<ISemanticLog>(), context);
