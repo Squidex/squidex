@@ -143,7 +143,7 @@ export class State<T extends {}> {
         }
     }
 
-    public resetState(action: string): boolean;
+    public resetState(action?: string): boolean;
 
     public resetState(update?: ((v: T) => Readonly<T>) | Partial<T> | string, action = 'Reset') {
         if (Types.isString(update)) {
