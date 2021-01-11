@@ -223,26 +223,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [InlineData(1, 1, SearchScope.All)]
         [InlineData(0, 1, SearchScope.All)]
         [InlineData(0, 0, SearchScope.Published)]
-        public async Task QueryAll_should_return_own_user_contents(int isFrontend, int unpublished, SearchScope scope)
+        public async Task QueryAll_should_return_q_with_createdby(int isFrontend, int unpublished, SearchScope scope)
         {
-            var ctx =
-                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
+            var ctx = CreateContextWithOwnReadPermission(isFrontend: isFrontend == 1, allowSchema: true)
                     .WithUnpublished(unpublished == 1);
 
-            var content = CreateOwnContent(contentId, ctx.User.Token());
+            var content = CreateContent(contentId);
 
             var q = Q.Empty.WithReference(DomainId.NewGuid());
-            q.CreatedBy = ctx.User.Token();
 
             A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, q, scope))
-                .Returns(ResultList.CreateFrom(5, content));
+              .Returns(ResultList.CreateFrom(5, content));
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, q);
 
-            Assert.Equal(contentData, result[0].Data);
-            Assert.Equal(contentId, result[0].Id);
-
-            Assert.Equal(5, result.Total);
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<Q>.That.Matches(x => x.CreatedBy == ctx.User.Token()), scope))
+                .MustHaveHappened();
         }
 
         [Theory]
@@ -292,6 +288,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             if (allowSchema)
             {
                 var permission = Permissions.ForApp(Permissions.AppContentsRead, appId.Name, schemaId.Name).Id;
+
+                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+            }
+
+            return new Context(claimsPrincipal, Mocks.App(appId));
+        }
+
+        private Context CreateContextWithOwnReadPermission(bool isFrontend, bool allowSchema)
+        {
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            if (isFrontend)
+            {
+                claimsIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
+            }
+
+            if (allowSchema)
+            {
+                var permission = Permissions.ForApp(Permissions.AppContentReadOwn, appId.Name, schemaId.Name).Id;
 
                 claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
             }
