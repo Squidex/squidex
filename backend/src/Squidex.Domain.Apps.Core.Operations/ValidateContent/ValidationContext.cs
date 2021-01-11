@@ -9,6 +9,7 @@ using System;
 using System.Collections.Immutable;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -16,17 +17,21 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         public ImmutableQueue<string> Path { get; private set; } = ImmutableQueue<string>.Empty;
 
+        public IJsonSerializer JsonSerializer { get; private set; }
+
         public DomainId ContentId { get; }
 
         public bool IsOptional { get; private set; }
 
         public ValidationContext(
+            IJsonSerializer jsonSerializer,
             NamedId<DomainId> appId,
             NamedId<DomainId> schemaId,
             Schema schema,
             DomainId contentId)
             : base(appId, schemaId, schema)
         {
+            JsonSerializer = jsonSerializer;
             ContentId = contentId;
         }
 
