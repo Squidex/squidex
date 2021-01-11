@@ -92,9 +92,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
+            var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schemaIdOrName);
             var permissionReadOwn = Permissions.ForApp(Permissions.AppContentReadOwn, context.App.Name, schemaIdOrName);
 
-            if (context.Permissions.Allows(permissionReadOwn))
+            if (!context.Permissions.Allows(permission) && context.Permissions.Allows(permissionReadOwn))
             {
                 q.CreatedBy = context.User.Token();
             }
