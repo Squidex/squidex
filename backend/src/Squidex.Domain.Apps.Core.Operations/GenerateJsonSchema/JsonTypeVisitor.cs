@@ -13,25 +13,42 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public delegate JsonSchema SchemaResolver(string name, JsonSchema schema);
 
-    public sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?>
+    internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonTypeVisitor.Args>
     {
-        private readonly SchemaResolver schemaResolver;
-        private readonly bool withHiddenFields;
+        private static readonly JsonTypeVisitor Instance = new JsonTypeVisitor();
 
-        public JsonTypeVisitor(SchemaResolver schemaResolver, bool withHiddenFields)
+        public readonly struct Args
         {
-            this.schemaResolver = schemaResolver;
+            public readonly SchemaResolver SchemaResolver;
 
-            this.withHiddenFields = withHiddenFields;
+            public readonly bool WithHiddenFields;
+
+            public Args(SchemaResolver schemaResolver, bool withHiddenFields)
+            {
+                SchemaResolver = schemaResolver;
+
+                WithHiddenFields = withHiddenFields;
+            }
         }
 
-        public JsonSchemaProperty? Visit(IArrayField field)
+        private JsonTypeVisitor()
+        {
+        }
+
+        public static JsonSchemaProperty? BuildProperty(IField field, SchemaResolver schemaResolver, bool withHiddenFields)
+        {
+            var args = new Args(schemaResolver, withHiddenFields);
+
+            return field.Accept(Instance, args);
+        }
+
+        public JsonSchemaProperty? Visit(IArrayField field, Args args)
         {
             var itemSchema = SchemaBuilder.Object();
 
-            foreach (var nestedField in field.Fields.ForApi(withHiddenFields))
+            foreach (var nestedField in field.Fields.ForApi(args.WithHiddenFields))
             {
-                var nestedProperty = nestedField.Accept(this);
+                var nestedProperty = nestedField.Accept(this, args);
 
                 if (nestedProperty != null)
                 {
@@ -45,24 +62,24 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return SchemaBuilder.ArrayProperty(itemSchema);
         }
 
-        public JsonSchemaProperty? Visit(IField<AssetsFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<AssetsFieldProperties> field, Args args)
         {
-            var itemSchema = schemaResolver("AssetItem", SchemaBuilder.String());
+            var itemSchema = args.SchemaResolver("AssetItem", SchemaBuilder.String());
 
             return SchemaBuilder.ArrayProperty(itemSchema);
         }
 
-        public JsonSchemaProperty? Visit(IField<BooleanFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<BooleanFieldProperties> field, Args args)
         {
             return SchemaBuilder.BooleanProperty();
         }
 
-        public JsonSchemaProperty? Visit(IField<DateTimeFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<DateTimeFieldProperties> field, Args args)
         {
             return SchemaBuilder.DateTimeProperty();
         }
 
-        public JsonSchemaProperty? Visit(IField<GeolocationFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
             var geolocationSchema = SchemaBuilder.Object();
 
@@ -80,17 +97,17 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 Minimum = -180
             }.SetRequired(true));
 
-            var reference = schemaResolver("GeolocationDto", geolocationSchema);
+            var reference = args.SchemaResolver("GeolocationDto", geolocationSchema);
 
             return SchemaBuilder.ObjectProperty(reference);
         }
 
-        public JsonSchemaProperty? Visit(IField<JsonFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<JsonFieldProperties> field, Args args)
         {
             return SchemaBuilder.JsonProperty();
         }
 
-        public JsonSchemaProperty? Visit(IField<NumberFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<NumberFieldProperties> field, Args args)
         {
             var property = SchemaBuilder.NumberProperty();
 
@@ -107,14 +124,14 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return property;
         }
 
-        public JsonSchemaProperty? Visit(IField<ReferencesFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            var itemSchema = schemaResolver("ReferenceItem", SchemaBuilder.String());
+            var itemSchema = args.SchemaResolver("ReferenceItem", SchemaBuilder.String());
 
             return SchemaBuilder.ArrayProperty(itemSchema);
         }
 
-        public JsonSchemaProperty? Visit(IField<StringFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<StringFieldProperties> field, Args args)
         {
             var property = SchemaBuilder.StringProperty();
 
@@ -135,14 +152,14 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return property;
         }
 
-        public JsonSchemaProperty? Visit(IField<TagsFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<TagsFieldProperties> field, Args args)
         {
-            var itemSchema = schemaResolver("ReferenceItem", SchemaBuilder.String());
+            var itemSchema = args.SchemaResolver("ReferenceItem", SchemaBuilder.String());
 
             return SchemaBuilder.ArrayProperty(itemSchema);
         }
 
-        public JsonSchemaProperty? Visit(IField<UIFieldProperties> field)
+        public JsonSchemaProperty? Visit(IField<UIFieldProperties> field, Args args)
         {
             return null;
         }

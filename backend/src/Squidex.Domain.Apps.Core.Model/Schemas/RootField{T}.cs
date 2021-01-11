@@ -65,9 +65,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return typedProperties;
         }
 
-        public override TResult Accept<TResult>(IFieldVisitor<TResult> visitor)
+        public override TResult Accept<TResult, TArgs>(IFieldVisitor<TResult, TArgs> visitor, TArgs args)
         {
-            return properties.Accept(visitor, this);
+            return properties.Accept(visitor, this, args);
         }
     }
 }

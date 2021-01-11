@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             var sb = new StringBuilder();
 
             var index = 0;
+
             foreach (var property in path)
             {
                 if (index == 0)

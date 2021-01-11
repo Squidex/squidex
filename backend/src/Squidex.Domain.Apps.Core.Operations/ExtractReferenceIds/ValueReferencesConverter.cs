@@ -21,8 +21,6 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 return ValueConverters.Noop;
             }
 
-            var cleaner = new ReferencesCleaner(validIds);
-
             return (value, field, parent) =>
             {
                 if (value.Type == JsonValueType.Null)
@@ -30,9 +28,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                     return value;
                 }
 
-                cleaner.SetValue(value);
-
-                return field.Accept(cleaner);
+                return ReferencesCleaner.Cleanup(field, value, validIds);
             };
         }
     }

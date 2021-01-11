@@ -9,12 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 {
-    public sealed class FieldPropertiesValidator : IFieldPropertiesVisitor<IEnumerable<ValidationError>>
+    public sealed class FieldPropertiesValidator : IFieldPropertiesVisitor<IEnumerable<ValidationError>, None>
     {
         private static readonly FieldPropertiesValidator Instance = new FieldPropertiesValidator();
 
@@ -26,14 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         {
             if (properties != null)
             {
-                foreach (var error in properties.Accept(Instance))
+                foreach (var error in properties.Accept(Instance, None.Value))
                 {
                     yield return error;
                 }
             }
         }
 
-        public IEnumerable<ValidationError> Visit(ArrayFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(ArrayFieldProperties properties, None args)
         {
             if (IsMaxGreaterThanMin(properties.MaxItems, properties.MinItems))
             {
@@ -43,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(AssetsFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(AssetsFieldProperties properties, None args)
         {
             if (IsMaxGreaterThanMin(properties.MaxItems, properties.MinItems))
             {
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(BooleanFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(BooleanFieldProperties properties, None args)
         {
             if (!properties.Editor.IsEnumValue())
             {
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(DateTimeFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(DateTimeFieldProperties properties, None args)
         {
             if (!properties.Editor.IsEnumValue())
             {
@@ -122,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(GeolocationFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(GeolocationFieldProperties properties, None args)
         {
             if (!properties.Editor.IsEnumValue())
             {
@@ -131,12 +132,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(JsonFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(JsonFieldProperties properties, None args)
         {
             yield break;
         }
 
-        public IEnumerable<ValidationError> Visit(NumberFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(NumberFieldProperties properties, None args)
         {
             if (!properties.Editor.IsEnumValue())
             {
@@ -165,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(ReferencesFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(ReferencesFieldProperties properties, None args)
         {
             if (!properties.Editor.IsEnumValue())
             {
@@ -188,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(StringFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(StringFieldProperties properties, None args)
         {
             if (!properties.Editor.IsEnumValue())
             {
@@ -243,7 +244,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(TagsFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(TagsFieldProperties properties, None args)
         {
             if (!properties.Editor.IsEnumValue())
             {
@@ -265,7 +266,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(UIFieldProperties properties)
+        public IEnumerable<ValidationError> Visit(UIFieldProperties properties, None args)
         {
             if (!properties.Editor.IsEnumValue())
             {

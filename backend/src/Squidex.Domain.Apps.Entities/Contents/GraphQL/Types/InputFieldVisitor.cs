@@ -12,72 +12,93 @@ using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class InputFieldVisitor : IFieldVisitor<IGraphType?>
+    public sealed class InputFieldVisitor : IFieldVisitor<IGraphType?, InputFieldVisitor.Args>
     {
-        private readonly ISchemaEntity schema;
-        private readonly IGraphModel model;
-        private readonly string fieldName;
+        private static readonly InputFieldVisitor Instance = new InputFieldVisitor();
 
-        public InputFieldVisitor(ISchemaEntity schema, IGraphModel model, string fieldName)
+        public readonly struct Args
         {
-            this.model = model;
-            this.schema = schema;
-            this.fieldName = fieldName;
+            public readonly IGraphModel Model;
+
+            public readonly ISchemaEntity Schema;
+
+            public readonly string SchemaField;
+
+            public Args(IGraphModel model, ISchemaEntity schema, string fieldName)
+            {
+                Model = model;
+                Schema = schema;
+                SchemaField = fieldName;
+            }
         }
 
-        public IGraphType? Visit(IArrayField field)
+        private InputFieldVisitor()
         {
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedInputGraphType(model, schema, field, fieldName)));
+        }
+
+        public static IGraphType? Build(IField field, IGraphModel model, ISchemaEntity schema, string fieldName)
+        {
+            var args = new Args(model, schema, fieldName);
+
+            return field.Accept(Instance, args);
+        }
+
+        public IGraphType? Visit(IArrayField field, Args args)
+        {
+            var schemaFieldType =
+                new ListGraphType(
+                    new NonNullGraphType(
+                        new NestedInputGraphType(args.Model, args.Schema, field, args.SchemaField)));
 
             return schemaFieldType;
         }
 
-        public IGraphType? Visit(IField<AssetsFieldProperties> field)
+        public IGraphType? Visit(IField<AssetsFieldProperties> field, Args args)
         {
             return AllTypes.References;
         }
 
-        public IGraphType? Visit(IField<BooleanFieldProperties> field)
+        public IGraphType? Visit(IField<BooleanFieldProperties> field, Args args)
         {
             return AllTypes.Boolean;
         }
 
-        public IGraphType? Visit(IField<DateTimeFieldProperties> field)
+        public IGraphType? Visit(IField<DateTimeFieldProperties> field, Args args)
         {
             return AllTypes.Date;
         }
 
-        public IGraphType? Visit(IField<GeolocationFieldProperties> field)
+        public IGraphType? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
             return GeolocationInputGraphType.Nullable;
         }
 
-        public IGraphType? Visit(IField<JsonFieldProperties> field)
+        public IGraphType? Visit(IField<JsonFieldProperties> field, Args args)
         {
             return AllTypes.Json;
         }
 
-        public IGraphType? Visit(IField<NumberFieldProperties> field)
+        public IGraphType? Visit(IField<NumberFieldProperties> field, Args args)
         {
             return AllTypes.Float;
         }
 
-        public IGraphType? Visit(IField<ReferencesFieldProperties> field)
+        public IGraphType? Visit(IField<ReferencesFieldProperties> field, Args args)
         {
             return AllTypes.Json;
         }
 
-        public IGraphType? Visit(IField<StringFieldProperties> field)
+        public IGraphType? Visit(IField<StringFieldProperties> field, Args args)
         {
             return AllTypes.String;
         }
 
-        public IGraphType? Visit(IField<TagsFieldProperties> field)
+        public IGraphType? Visit(IField<TagsFieldProperties> field, Args args)
         {
             return AllTypes.Tags;
         }
 
-        public IGraphType? Visit(IField<UIFieldProperties> field)
+        public IGraphType? Visit(IField<UIFieldProperties> field, Args args)
         {
             return null;
         }

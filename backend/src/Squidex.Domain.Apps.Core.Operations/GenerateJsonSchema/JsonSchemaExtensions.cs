@@ -21,7 +21,6 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             var schemaName = schema.Name.ToPascalCase();
 
-            var jsonTypeVisitor = new JsonTypeVisitor(schemaResolver, withHidden);
             var jsonSchema = SchemaBuilder.Object();
 
             foreach (var field in schema.Fields.ForApi(withHidden))
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 foreach (var partitionKey in partitioning.AllKeys)
                 {
-                    var partitionItemProperty = field.Accept(jsonTypeVisitor);
+                    var partitionItemProperty = JsonTypeVisitor.BuildProperty(field, schemaResolver, withHidden);
 
                     if (partitionItemProperty != null)
                     {

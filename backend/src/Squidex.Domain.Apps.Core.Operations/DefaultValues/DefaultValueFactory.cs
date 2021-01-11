@@ -13,104 +13,116 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.DefaultValues
 {
-    public sealed class DefaultValueFactory : IFieldVisitor<IJsonValue>
+    public sealed class DefaultValueFactory : IFieldPropertiesVisitor<IJsonValue, DefaultValueFactory.Args>
     {
-        private readonly Instant now;
-        private readonly string partition;
+        private static readonly DefaultValueFactory Instance = new DefaultValueFactory();
 
-        private DefaultValueFactory(Instant now, string partition)
+        public readonly struct Args
         {
-            this.now = now;
-            this.partition = partition;
+            public readonly Instant Now;
+
+            public readonly string Partition;
+
+            public Args(Instant now, string partition)
+            {
+                Now = now;
+
+                Partition = partition;
+            }
+        }
+
+        private DefaultValueFactory()
+        {
         }
 
         public static IJsonValue CreateDefaultValue(IField field, Instant now, string partition)
         {
             Guard.NotNull(field, nameof(field));
+            Guard.NotNull(partition, nameof(partition));
 
-            return field.Accept(new DefaultValueFactory(now, partition));
+            return field.RawProperties.Accept(Instance, new Args(now, partition));
         }
 
-        public IJsonValue Visit(IArrayField field)
+        public IJsonValue Visit(ArrayFieldProperties properties, Args args)
         {
             return JsonValue.Array();
         }
 
-        public IJsonValue Visit(IField<AssetsFieldProperties> field)
+        public IJsonValue Visit(AssetsFieldProperties properties, Args args)
         {
-            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return Array(value);
         }
 
-        public IJsonValue Visit(IField<BooleanFieldProperties> field)
+        public IJsonValue Visit(BooleanFieldProperties properties, Args args)
         {
-            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return JsonValue.Create(value);
         }
 
-        public IJsonValue Visit(IField<GeolocationFieldProperties> field)
+        public IJsonValue Visit(GeolocationFieldProperties properties, Args args)
         {
             return JsonValue.Null;
         }
 
-        public IJsonValue Visit(IField<JsonFieldProperties> field)
+        public IJsonValue Visit(JsonFieldProperties properties, Args args)
         {
             return JsonValue.Null;
         }
 
-        public IJsonValue Visit(IField<NumberFieldProperties> field)
+        public IJsonValue Visit(NumberFieldProperties properties, Args args)
         {
-            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return JsonValue.Create(value);
         }
 
-        public IJsonValue Visit(IField<ReferencesFieldProperties> field)
+        public IJsonValue Visit(ReferencesFieldProperties properties, Args args)
         {
-            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return Array(value);
         }
 
-        public IJsonValue Visit(IField<StringFieldProperties> field)
+        public IJsonValue Visit(StringFieldProperties properties, Args args)
         {
-            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return JsonValue.Create(value);
         }
 
-        public IJsonValue Visit(IField<TagsFieldProperties> field)
+        public IJsonValue Visit(TagsFieldProperties properties, Args args)
         {
-            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return Array(value);
         }
 
-        public IJsonValue Visit(IField<UIFieldProperties> field)
+        public IJsonValue Visit(UIFieldProperties properties, Args args)
         {
             return JsonValue.Null;
         }
 
-        public IJsonValue Visit(IField<DateTimeFieldProperties> field)
+        public IJsonValue Visit(DateTimeFieldProperties properties, Args args)
         {
-            if (field.Properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Now)
+            if (properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Now)
             {
-                return JsonValue.Create(now);
+                return JsonValue.Create(args.Now);
             }
 
-            if (field.Properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Today)
+            if (properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Today)
             {
-                return JsonValue.Create($"{now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}T00:00:00Z");
+                return JsonValue.Create($"{args.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}T00:00:00Z");
             }
 
-            var value = GetDefaultValue(field.Properties.DefaultValue, field.Properties.DefaultValues);
+            var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return JsonValue.Create(value);
         }
 
-        private T GetDefaultValue<T>(T value, LocalizedValue<T>? values)
+        private static T GetDefaultValue<T>(T value, LocalizedValue<T>? values, string partition)
         {
             if (values != null && values.TryGetValue(partition, out var @default))
             {

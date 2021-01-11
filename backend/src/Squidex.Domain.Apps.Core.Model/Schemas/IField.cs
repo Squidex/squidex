@@ -15,6 +15,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         FieldProperties RawProperties { get; }
 
-        T Accept<T>(IFieldVisitor<T> visitor);
+        T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, TArgs args);
     }
 }

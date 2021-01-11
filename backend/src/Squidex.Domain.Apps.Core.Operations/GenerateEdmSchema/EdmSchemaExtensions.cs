@@ -33,8 +33,6 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
             var (edmType, _) = typeFactory("Data");
 
-            var visitor = new EdmTypeVisitor(typeFactory);
-
             foreach (var field in schema.FieldsByName.Values)
             {
                 if (!field.IsForApi(withHidden))
@@ -42,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
                     continue;
                 }
 
-                var fieldEdmType = field.Accept(visitor);
+                var fieldEdmType = EdmTypeVisitor.BuildType(field, typeFactory);
 
                 if (fieldEdmType == null)
                 {

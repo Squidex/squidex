@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             });
         }
 
-        public abstract T Accept<T>(IFieldVisitor<T> visitor);
+        public abstract T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, TArgs args);
 
         public abstract NestedField Update(FieldProperties newProperties);
     }

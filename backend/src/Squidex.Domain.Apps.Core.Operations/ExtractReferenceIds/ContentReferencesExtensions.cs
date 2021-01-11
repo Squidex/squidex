@@ -20,57 +20,52 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var extractor = new ReferencesExtractor(new HashSet<DomainId>(), referencesPerField);
+            var result = new HashSet<DomainId>();
 
-            AddReferencedIds(source, schema.Fields, extractor);
+            AddReferencedIds(source, schema.Fields, result, referencesPerField);
 
-            return extractor.Result;
+            return result;
         }
 
         public static void AddReferencedIds(this NamedContentData source, Schema schema, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var extractor = new ReferencesExtractor(result, referencesPerField);
-
-            AddReferencedIds(source, schema.Fields, extractor);
+            AddReferencedIds(source, schema.Fields, result, referencesPerField);
         }
 
         public static void AddReferencedIds(this NamedContentData source, IEnumerable<IField> fields, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(fields, nameof(fields));
+            Guard.NotNull(result, nameof(result));
 
-            var extractor = new ReferencesExtractor(result, referencesPerField);
-
-            AddReferencedIds(source, fields, extractor);
+            foreach (var field in fields)
+            {
+                AddReferencedIds(source, result, referencesPerField, field);
+            }
         }
 
         public static void AddReferencedIds(this NamedContentData source, IField field, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(field, nameof(field));
+            Guard.NotNull(result, nameof(result));
 
-            var extractor = new ReferencesExtractor(result, referencesPerField);
-
-            AddReferencedIds(source, field, extractor);
-        }
-
-        private static void AddReferencedIds(NamedContentData source, IEnumerable<IField> fields, ReferencesExtractor extractor)
-        {
-            foreach (var field in fields)
+            if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
             {
-                AddReferencedIds(source, field, extractor);
+                foreach (var partitionValue in fieldData)
+                {
+                    ReferencesExtractor.Extract(field, partitionValue.Value, result, referencesPerField);
+                }
             }
         }
 
-        private static void AddReferencedIds(NamedContentData source, IField field, ReferencesExtractor extractor)
+        private static void AddReferencedIds(NamedContentData source, HashSet<DomainId> result, int referencesPerField, IField field)
         {
             if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
             {
                 foreach (var partitionValue in fieldData)
                 {
-                    extractor.SetValue(partitionValue.Value);
-
-                    field.Accept(extractor);
+                    ReferencesExtractor.Extract(field, partitionValue.Value, result, referencesPerField);
                 }
             }
         }
@@ -81,11 +76,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             if (value != null)
             {
-                var extractor = new ReferencesExtractor(result, referencesPerField);
-
-                extractor.SetValue(value);
-
-                field.Accept(extractor);
+                ReferencesExtractor.Extract(field, value, result, referencesPerField);
             }
 
             return result;
