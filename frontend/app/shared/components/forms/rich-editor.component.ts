@@ -17,13 +17,6 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true
 };
 
-const ImageTypes: ReadonlyArray<any> = [
-    'image/jpeg',
-    'image/png',
-    'image/jpg',
-    'image/gif'
-];
-
 @Component({
     selector: 'sqx-rich-editor',
     styleUrls: ['./rich-editor.component.scss'],
@@ -138,7 +131,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                         for (let i = 0; i < event.clipboardData.items.length; i++) {
                             const file = event.clipboardData.items[i].getAsFile();
 
-                            if (file && ImageTypes.indexOf(file.type) >= 0) {
+                            if (file) {
                                 self.uploadFile(file);
 
                                 hasFileDropped = true;
@@ -160,7 +153,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                         for (let i = 0; i < event.dataTransfer.files.length; i++) {
                             const file = event.dataTransfer.files.item(i);
 
-                            if (file && ImageTypes.indexOf(file.type) >= 0) {
+                            if (file) {
                                 self.uploadFile(file);
 
                                 hasFileDropped = true;
@@ -219,23 +212,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     public insertAssets(assets: ReadonlyArray<AssetDto>) {
-        let content = '';
-
-        for (const asset of assets) {
-            const name = asset.fileNameWithoutExtension;
-
-            switch (asset.type) {
-                case 'Image':
-                    content += `<img src="${asset.fullUrl(this.apiUrl)}" alt="${name}" />`;
-                    break;
-                case 'Video':
-                    content += `<video src="${asset.fullUrl(this.apiUrl)}" />`;
-                    break;
-                default:
-                    content += `<a href="${asset.fullUrl(this.apiUrl)}" alt="${name}">${name}</a>`;
-                    break;
-            }
-        }
+        const content = this.buildMarkups(assets);
 
         if (content.length > 0) {
             this.tinyEditor.execCommand('mceInsertContent', false, content);
@@ -264,19 +241,35 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    const name = asset.fileNameWithoutExtension;
-
-                    if (asset.type === 'Video') {
-                        replaceText(`<video src="${asset.fullUrl(this.apiUrl)}" />`);
-                    } else {
-                        replaceText(`<img src="${asset.fullUrl(this.apiUrl)}" alt="${name}" />`);
-                    }
+                        replaceText(this.buildMarkup(asset));
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {
                     replaceText('FAILED');
                 }
             });
+    }
+
+    private buildMarkups(assets: readonly AssetDto[]) {
+        let content = '';
+
+        for (const asset of assets) {
+            content += this.buildMarkup(asset);
+        }
+
+        return content;
+    }
+
+    private buildMarkup(asset: AssetDto) {
+        const name = asset.fileNameWithoutExtension;
+
+        if (asset.type === 'Image' || asset.mimeType === 'image/svg+xml' || asset.fileName.endsWith('.svg')) {
+            return `<img src="${asset.fullUrl(this.apiUrl)}" alt="${name}" />`;
+        } else if (asset.type === 'Video') {
+            return `<video src="${asset.fullUrl(this.apiUrl)}" />`;
+        } else {
+            return `<a href="${asset.fullUrl(this.apiUrl)}" alt="${name}">${name}</a>`;
+        }
     }
 }
 
