@@ -20,32 +20,32 @@ export module Keys {
     }
 
     export function isDelete(event: KeyboardEvent) {
-        const key = event.key || event.keyCode;
+        const key = event.key?.toUpperCase() || event.keyCode;
 
-        return key === 'Delete' || key === DELETE;
+        return key === 'DELETE' || key === DELETE;
     }
 
     export function isEnter(event: KeyboardEvent) {
-        const key = event.key || event.keyCode;
+        const key = event.key?.toUpperCase() || event.keyCode;
 
         return key === 'ENTER' || key === ENTER;
     }
 
     export function isDown(event: KeyboardEvent) {
-        const key = event.key || event.keyCode;
+        const key = event.key?.toUpperCase() || event.keyCode;
 
-        return key === 'ArrowDown' || key === DOWN;
+        return key === 'ARROWDOWN' || key === DOWN;
     }
 
     export function isUp(event: KeyboardEvent) {
-        const key = event.key || event.keyCode;
+        const key = event.key?.toUpperCase() || event.keyCode;
 
-        return key === 'ArrowUp' || key === UP;
+        return key === 'ARROWUP' || key === UP;
     }
 
     export function isEscape(event: KeyboardEvent) {
-        const key = event.key || event.keyCode;
+        const key = event.key?.toUpperCase() || event.keyCode;
 
-        return key === 'Escape' || key === 'Esc' || key === UP;
+        return key === 'ESCAPE' || key === 'ESC' || key === UP;
     }
  }

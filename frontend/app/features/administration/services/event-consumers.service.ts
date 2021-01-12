@@ -57,7 +57,7 @@ export class EventConsumersService {
 
         return this.http.get<{ items: any[] } & Resource>(url).pipe(
             map(({ items, _links }) => {
-                const eventConsumers = items.map(item => parseEventConsumer(item));
+                const eventConsumers = items.map(parseEventConsumer);
 
                 return new EventConsumersDto(eventConsumers, _links);
             }),

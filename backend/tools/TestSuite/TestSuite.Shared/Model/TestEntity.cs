@@ -39,6 +39,14 @@ namespace TestSuite.Model
                         }
                     }
                 },
+                Scripts = new SchemaScriptsDto
+                {
+                    Create = $@"
+                        if (ctx.data.{TestEntityData.NumberField}.iv === -99) {{
+                            ctx.data.{TestEntityData.NumberField}.iv = incrementCounter('my');
+                            replace();
+                        }}"
+                },
                 IsPublished = true
             });
 

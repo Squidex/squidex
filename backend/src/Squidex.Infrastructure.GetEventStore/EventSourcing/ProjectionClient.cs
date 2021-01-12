@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
 using EventStore.ClientAPI.Projections;
+using Squidex.Hosting.Configuration;
 using Squidex.Text;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -102,7 +103,9 @@ namespace Squidex.Infrastructure.EventSourcing
             }
             catch (Exception ex)
             {
-                throw new ConfigurationException($"Cannot connect to event store projections: {projectionHost}.", ex);
+                var error = new ConfigurationError($"GetEventStore cannot connect to event store projections: {projectionHost}.");
+
+                throw new ConfigurationException(error, ex);
             }
         }
 

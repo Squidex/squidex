@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { fadeAnimation, ModalModel } from '@app/framework/internal';
 
-export interface Language { iso2Code: string; englishName: string; isMasterLanguage: true; }
+export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean; }
 
 @Component({
     selector: 'sqx-language-selector',
@@ -24,13 +24,13 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     public selectedLanguageChange = new EventEmitter<Language>();
 
     @Input()
-    public size: 'sm' | 'md' | 'lg' = 'md';
+    public selectedLanguage: Language;
 
     @Input()
     public languages: ReadonlyArray<Language> = [];
 
     @Input()
-    public selectedLanguage: Language;
+    public size: 'sm' | 'md' | 'lg' = 'md';
 
     public dropdown = new ModalModel();
 

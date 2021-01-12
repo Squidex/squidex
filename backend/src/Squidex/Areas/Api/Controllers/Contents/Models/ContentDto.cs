@@ -177,17 +177,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 AddDeleteLink("delete", resources.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }
 
-            if (content.CanUpdate)
+            if (content.CanUpdate && resources.CanUpdateContent(schema))
             {
                 if (resources.CanUpdateContentOwn(schema))
                 {
                     AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
                 }
 
-                if (resources.CanUpdateContentPartial(schema))
-                {
-                    AddPatchLink("patch", resources.Url<ContentsController>(x => nameof(x.PatchContent), values));
-                }
+                AddPatchLink("patch", resources.Url<ContentsController>(x => nameof(x.PatchContent), values));
             }
 
             return this;

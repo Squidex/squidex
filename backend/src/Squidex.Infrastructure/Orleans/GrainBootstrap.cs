@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Runtime;
+using Squidex.Hosting;
 
 namespace Squidex.Infrastructure.Orleans
 {
@@ -16,6 +17,8 @@ namespace Squidex.Infrastructure.Orleans
     {
         private const int NumTries = 10;
         private readonly IGrainFactory grainFactory;
+
+        public string Name => typeof(T).Name;
 
         public GrainBootstrap(IGrainFactory grainFactory)
         {
@@ -45,11 +48,6 @@ namespace Squidex.Infrastructure.Orleans
                     }
                 }
             }
-        }
-
-        public override string ToString()
-        {
-            return typeof(T).ToString();
         }
     }
 }

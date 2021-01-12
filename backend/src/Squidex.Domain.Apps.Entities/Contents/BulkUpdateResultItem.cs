@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         public DomainId? ContentId { get; set; }
 
+        public int JobIndex { get; set; }
+
         public Exception? Exception { get; set; }
     }
 }

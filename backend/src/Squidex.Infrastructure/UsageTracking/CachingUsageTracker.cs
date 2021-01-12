@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             Guard.NotNull(key, nameof(key));
 
-            var cacheKey = string.Join("$", "Usage", nameof(GetForMonthAsync), key, date, category);
+            var cacheKey = $"{typeof(CachingUsageTracker)}_UsageForMonth_{key}_{date}_{category}";
 
             return cache.GetOrCreateAsync(cacheKey, entry =>
             {
@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             Guard.NotNull(key, nameof(key));
 
-            var cacheKey = string.Join("$", "Usage", nameof(GetAsync), key, fromDate, toDate, category);
+            var cacheKey = $"{typeof(CachingUsageTracker)}_Usage_{key}_{fromDate}_{toDate}_{category}";
 
             return cache.GetOrCreateAsync(cacheKey, entry =>
             {

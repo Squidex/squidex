@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -21,5 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         Task<IEnrichedContentEntity> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any);
 
         Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName);
+
+        Task<ISchemaEntity?> GetSchemaAsync(Context context, string schemaIdOrName);
     }
 }

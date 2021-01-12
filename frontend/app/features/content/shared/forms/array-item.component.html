@@ -23,10 +23,10 @@
                 <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="moveBottom()" title="i18n:contents.arrayMoveBottom">
                     <i class="icon-caret-bottom"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="!isCollapsed" (click)="expand()" title="i18n:contents.arrayExpandItem">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="!snapshot.isCollapsed" (click)="expand()" title="i18n:contents.arrayExpandItem">
                     <i class="icon-plus-square"></i>
                 </button>
-                <button type="button" class="btn btn-text-secondary" [class.hidden]="isCollapsed" (click)="collapse()" title="i18n:contents.arrayCollapseItem">
+                <button type="button" class="btn btn-text-secondary" [class.hidden]="snapshot.isCollapsed" (click)="collapse()" title="i18n:contents.arrayCollapseItem">
                     <i class="icon-minus-square"></i>
                 </button>
             </div>
@@ -35,14 +35,14 @@
                     <i class="icon-clone"></i>
                 </button>
         
-                <button type="button" class="btn btn-text-danger" [disabled]="isDisabled" (click)="remove.emit()">
+                <button type="button" class="btn btn-text-danger" [disabled]="isDisabled" (click)="itemRemove.emit()">
                     <i class="icon-bin2"></i>
                 </button>
             </div>
         </div>
     </div>
     
-    <div class="card-body" [class.hidden]="isCollapsed">
+    <div class="card-body" [class.hidden]="snapshot.isCollapsed">
         <div class="form-group" *ngFor="let section of formModel.sections">
             <sqx-array-section
                 [canUnset]="canUnset"

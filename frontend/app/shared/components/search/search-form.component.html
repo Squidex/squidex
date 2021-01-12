@@ -44,7 +44,10 @@
         
         <ng-container content>
             <div class="form-horizontal">
-                <sqx-query [model]="queryModel" [query]="query" (queryChange)="changeQuery($event)" [language]="language">
+                <sqx-query [model]="queryModel" 
+                    [query]="query" 
+                    (queryChange)="changeQuery($event)"
+                    [language]="language">
                 </sqx-query>
 
                 <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown"></div>

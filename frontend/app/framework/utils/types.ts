@@ -53,15 +53,15 @@ export module Types {
     }
 
     export function isArrayOfNumber(value: any): value is Array<number> {
-        return isArrayOf(value, v => isNumber(v));
+        return isArrayOf(value, isNumber);
     }
 
     export function isArrayOfObject(value: any): value is Array<Object> {
-        return isArrayOf(value, v => isObject(v));
+        return isArrayOf(value, isObject);
     }
 
     export function isArrayOfString(value: any): value is Array<string> {
-        return isArrayOf(value, v => isString(v));
+        return isArrayOf(value, isString);
     }
 
     export function isArrayOf(value: any, validator: (v: any) => boolean): boolean {

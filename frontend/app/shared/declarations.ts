@@ -11,6 +11,7 @@ export * from './components/assets/asset-folder-dialog.component';
 export * from './components/assets/asset-folder.component';
 export * from './components/assets/asset-history.component';
 export * from './components/assets/asset-path.component';
+export * from './components/assets/asset-text-editor.component';
 export * from './components/assets/asset-uploader.component';
 export * from './components/assets/asset.component';
 export * from './components/assets/assets-list.component';

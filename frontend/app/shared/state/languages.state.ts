@@ -58,8 +58,11 @@ export class LanguagesState extends State<Snapshot> {
     public languages =
         this.project(x => x.languages);
 
-    public languagesDtos =
+    public isoLanguages =
         this.project(x => x.languages.map(y => y.language));
+
+    public isoMasterLanguage =
+        this.projectFrom(this.isoLanguages, x => x.find(l => l.isMaster)!);
 
     public newLanguages =
         this.project(x => x.allLanguagesNew);
@@ -84,21 +87,23 @@ export class LanguagesState extends State<Snapshot> {
             allLanguagesNew: [],
             languages: [],
             version: Version.EMPTY
-        });
+        }, 'Languages');
     }
 
     public load(isReload = false): Observable<any> {
         if (isReload) {
-            this.resetState();
+            this.resetState('Loading Success');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
-        return forkJoin(this.getAllLanguages(), this.getAppLanguages()).pipe(
+        return forkJoin([
+                this.getAllLanguages(),
+                this.getAppLanguages()]).pipe(
             map(args => {
                 return { allLanguages: args[0], languages: args[1] };
             }),
@@ -112,7 +117,7 @@ export class LanguagesState extends State<Snapshot> {
                 this.replaceLanguages(languages.payload, languages.version, sorted);
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -149,15 +154,15 @@ export class LanguagesState extends State<Snapshot> {
 
             return {
                 ...s,
-                allLanguages: allLanguages,
+                allLanguages,
                 allLanguagesNew: allLanguages.filter(x => !languages.find(l => l.iso2Code === x.iso2Code)),
                 canCreate,
                 isLoaded: true,
                 isLoading: false,
                 languages: languages.map(x => this.createLanguage(x, languages)),
-                version: version
+                version
             };
-        });
+        }, 'Loading Success / Updated');
     }
 
     private get appName() {

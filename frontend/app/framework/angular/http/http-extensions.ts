@@ -86,6 +86,10 @@ export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
     }));
 
 export function parseError(response: HttpErrorResponse, fallback: string) {
+    if (!response) {
+        return response;
+    }
+
     if (Types.is(response, ErrorDto)) {
         return response;
     }

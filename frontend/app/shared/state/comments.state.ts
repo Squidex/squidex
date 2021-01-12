@@ -40,7 +40,7 @@ export class CommentsState extends State<Snapshot> {
         private readonly orderDescending = false,
         initialVersion = -1
     ) {
-        super({ comments: [], version: new Version(initialVersion.toString()) });
+        super({ comments: [], version: new Version(initialVersion.toString()) }, 'Comments');
     }
 
     public load(silent = false): Observable<any> {
@@ -68,7 +68,7 @@ export class CommentsState extends State<Snapshot> {
                     }
 
                     return { ...s, comments, isLoaded: true, version: payload.version };
-                });
+                }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs, { silent }));
     }
@@ -80,7 +80,7 @@ export class CommentsState extends State<Snapshot> {
                     const comments = [...s.comments, created];
 
                     return { ...s, comments };
-                });
+                }, 'Created');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -92,7 +92,7 @@ export class CommentsState extends State<Snapshot> {
                     const comments = s.comments.removeBy('id', comment);
 
                     return { ...s, comments };
-                });
+                }, 'Deleted');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -105,7 +105,7 @@ export class CommentsState extends State<Snapshot> {
                     const comments = s.comments.replaceBy('id', updated);
 
                     return { ...s, comments };
-                });
+                }, 'Updated');
             }),
             shareSubscribed(this.dialogs));
     }

@@ -98,7 +98,7 @@ export class AppsService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                const apps = body.map(item => parseApp(item));
+                const apps = body.map(parseApp);
 
                 return apps;
             }),

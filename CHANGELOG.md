@@ -1,5 +1,37 @@
 # Changelog
 
+## 5.4.0 - 2020-12-28
+
+### Features
+
+* **API**: Update to Net5.
+* **API**: Migrate to new Notifo API.
+* **Contents**: More default values for other field types like references and assets.
+* **Contents**: Optimize DB calls.
+* **Contents**: Optionally validate during publish operation.
+* **Contents**: Ensure that sorting is always consistent.
+* **Contents**: Check referrers before unpulishing a content item.
+* **Contents**: More support for bulk actions.
+* **Contents**: Update multiple content items in a bulk operation.
+* **Rules**: Run rules from snapshots.
+* **Translation**: Also support Google Translate.
+* **UI**: Update to Angular 11.
+* **UI**: Rich dropdown for users when creating content filters.
+* **UI**: Quick links to asset folder in asset overview.
+* **UI**: Show asset path in asset dialog.
+* **UI**: Localize datepicker.
+* **UI**: News views to show all references contents and referencing content items for a single content.
+* **UI**: Allow to translate all string fields.
+
+### Bugfixes
+
+* **Assets**: Fixes parent id (folder id) after migration from 4.X.
+* **Assets**: Fixed a bug in usage tracking of asset downloads that was causing it to never decrease.
+* **Contents**: GraphQL fallback handling when schema is called `content`.
+* **Rules**: Fix rerun logic.
+* **Hosting**: Fixes a few problems around hosting and header forwarding (e.g. `X-Proto-For`).
+* **UI**: Several drag and drop bugfixes for angular CDK.
+
 ## 5.3.0 - 2020-10-30
 
 ### Breaking changes

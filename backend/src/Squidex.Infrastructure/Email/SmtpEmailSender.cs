@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Net.Mail;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
+using MimeKit;
+using MimeKit.Text;
 
 namespace Squidex.Infrastructure.Email
 {
@@ -23,56 +22,42 @@ namespace Squidex.Infrastructure.Email
         private readonly SmtpOptions options;
         private readonly ObjectPool<SmtpClient> clientPool;
 
-        internal sealed class SmtpClientPolicy : PooledObjectPolicy<SmtpClient>
-        {
-            private readonly SmtpOptions options;
-
-            public SmtpClientPolicy(SmtpOptions options)
-            {
-                this.options = options;
-            }
-
-            public override SmtpClient Create()
-            {
-                return new SmtpClient(options.Server, options.Port)
-                {
-                    Credentials = new NetworkCredential(
-                        options.Username,
-                        options.Password),
-
-                    EnableSsl = options.EnableSsl,
-
-                    Timeout = options.Timeout
-                };
-            }
-
-            public override bool Return(SmtpClient obj)
-            {
-                return true;
-            }
-        }
-
         public SmtpEmailSender(IOptions<SmtpOptions> options)
         {
             Guard.NotNull(options, nameof(options));
 
             this.options = options.Value;
 
-            clientPool = new DefaultObjectPoolProvider().Create(new SmtpClientPolicy(options.Value));
+            clientPool = new DefaultObjectPoolProvider().Create(new DefaultPooledObjectPolicy<SmtpClient>());
         }
 
-        public async Task SendAsync(string recipient, string subject, string body)
+        public async Task SendAsync(string recipient, string subject, string body, CancellationToken ct = default)
         {
             var smtpClient = clientPool.Get();
             try
             {
-                using (var cts = new CancellationTokenSource(options.Timeout))
+                using (var timeout = new CancellationTokenSource(options.Timeout))
                 {
-                    await CheckConnectionAsync(cts.Token);
-
-                    using (cts.Token.Register(smtpClient.SendAsyncCancel))
+                    using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct, timeout.Token))
                     {
-                        await smtpClient.SendMailAsync(options.Sender, recipient, subject, body);
+                        await EnsureConnectedAsync(smtpClient, combined.Token);
+
+                        var smtpMessage = new MimeMessage();
+
+                        smtpMessage.From.Add(MailboxAddress.Parse(
+                            options.Sender));
+
+                        smtpMessage.To.Add(MailboxAddress.Parse(
+                            recipient));
+
+                        smtpMessage.Body = new TextPart(TextFormat.Html)
+                        {
+                            Text = body
+                        };
+
+                        smtpMessage.Subject = subject;
+
+                        await smtpClient.SendAsync(smtpMessage, ct);
                     }
                 }
             }
@@ -82,21 +67,16 @@ namespace Squidex.Infrastructure.Email
             }
         }
 
-        private async Task CheckConnectionAsync(CancellationToken ct)
+        private async Task EnsureConnectedAsync(SmtpClient smtpClient, CancellationToken ct)
         {
-            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            if (!smtpClient.IsConnected)
             {
-                var tcs = new TaskCompletionSource<IAsyncResult>();
+                await smtpClient.ConnectAsync(options.Server, options.Port, cancellationToken: ct);
+            }
 
-                socket.BeginConnect(options.Server, options.Port, tcs.SetResult, null);
-
-                using (ct.Register(() =>
-                {
-                    tcs.TrySetException(new OperationCanceledException($"Failed to establish a connection to {options.Server}:{options.Port}"));
-                }))
-                {
-                    await tcs.Task;
-                }
+            if (!smtpClient.IsAuthenticated)
+            {
+                await smtpClient.AuthenticateAsync(options.Username, options.Password, ct);
             }
         }
     }

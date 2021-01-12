@@ -7,26 +7,14 @@
 
 using System;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.UsageTracking
 {
-    public sealed class ApiStats
+    public sealed record ApiStats(
+        DateTime Date,
+        long TotalCalls, double AverageElapsedMs,
+        long TotalBytes)
     {
-        public DateTime Date { get; }
-
-        public long TotalCalls { get; }
-
-        public long TotalBytes { get; }
-
-        public double AverageElapsedMs { get; }
-
-        public ApiStats(DateTime date, long totalCalls, double averageElapsedMs, long totalBytes)
-        {
-            Date = date;
-
-            TotalCalls = totalCalls;
-            TotalBytes = totalBytes;
-
-            AverageElapsedMs = averageElapsedMs;
-        }
     }
 }

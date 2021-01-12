@@ -17,13 +17,6 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true
 };
 
-const ImageTypes: ReadonlyArray<any> = [
-    'image/jpeg',
-    'image/png',
-    'image/jpg',
-    'image/gif'
-];
-
 @Component({
     selector: 'sqx-rich-editor',
     styleUrls: ['./rich-editor.component.scss'],
@@ -33,10 +26,9 @@ const ImageTypes: ReadonlyArray<any> = [
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RichEditorComponent extends StatefulControlComponent<undefined, string> implements AfterViewInit, OnDestroy {
+export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
     private value: string;
-    private isDisabled = false;
 
     @Output()
     public assetPluginClick = new EventEmitter<any>();
@@ -52,7 +44,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         private readonly resourceLoader: ResourceLoaderService,
         private readonly localizer: LocalizerService
     ) {
-        super(changeDetector, undefined);
+        super(changeDetector, {});
     }
 
     public ngOnDestroy() {
@@ -85,7 +77,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     private showSelector = () => {
-        if (this.isDisabled) {
+        if (this.snapshot.isDisabled) {
             return;
         }
 
@@ -139,7 +131,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                         for (let i = 0; i < event.clipboardData.items.length; i++) {
                             const file = event.clipboardData.items[i].getAsFile();
 
-                            if (file && ImageTypes.indexOf(file.type) >= 0) {
+                            if (file) {
                                 self.uploadFile(file);
 
                                 hasFileDropped = true;
@@ -149,6 +141,8 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
 
                     if (!hasFileDropped) {
                         self.onValueChanged();
+                    } else {
+                        return false;
                     }
                 });
 
@@ -159,7 +153,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                         for (let i = 0; i < event.dataTransfer.files.length; i++) {
                             const file = event.dataTransfer.files.item(i);
 
-                            if (file && ImageTypes.indexOf(file.type) >= 0) {
+                            if (file) {
                                 self.uploadFile(file);
 
                                 hasFileDropped = true;
@@ -202,7 +196,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
+        super.setDisabledState(isDisabled);
 
         if (this.tinyEditor && this.tinyEditor.initialized) {
             this.setReadOnly();
@@ -214,27 +208,11 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     }
 
     private setReadOnly() {
-        this.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
+        this.tinyEditor.setMode(this.snapshot.isDisabled ? 'readonly' : 'design');
     }
 
     public insertAssets(assets: ReadonlyArray<AssetDto>) {
-        let content = '';
-
-        for (const asset of assets) {
-            const name = asset.fileNameWithoutExtension;
-
-            switch (asset.type) {
-                case 'Image':
-                    content += `<img src="${asset.fullUrl(this.apiUrl)}" alt="${name}" />`;
-                    break;
-                case 'Video':
-                    content += `<video src="${asset.fullUrl(this.apiUrl)}" />`;
-                    break;
-                default:
-                    content += `<a href="${asset.fullUrl(this.apiUrl)}" alt="${name}">${name}</a>`;
-                    break;
-            }
-        }
+        const content = this.buildMarkups(assets);
 
         if (content.length > 0) {
             this.tinyEditor.execCommand('mceInsertContent', false, content);
@@ -263,19 +241,35 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    const name = asset.fileNameWithoutExtension;
-
-                    if (asset.type === 'Video') {
-                        replaceText(`<video src="${asset.fullUrl(this.apiUrl)}" />`);
-                    } else {
-                        replaceText(`<img src="${asset.fullUrl(this.apiUrl)}" alt="${name}" />`);
-                    }
+                        replaceText(this.buildMarkup(asset));
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {
                     replaceText('FAILED');
                 }
             });
+    }
+
+    private buildMarkups(assets: readonly AssetDto[]) {
+        let content = '';
+
+        for (const asset of assets) {
+            content += this.buildMarkup(asset);
+        }
+
+        return content;
+    }
+
+    private buildMarkup(asset: AssetDto) {
+        const name = asset.fileNameWithoutExtension;
+
+        if (asset.type === 'Image' || asset.mimeType === 'image/svg+xml' || asset.fileName.endsWith('.svg')) {
+            return `<img src="${asset.fullUrl(this.apiUrl)}" alt="${name}" />`;
+        } else if (asset.type === 'Video') {
+            return `<video src="${asset.fullUrl(this.apiUrl)}" />`;
+        } else {
+            return `<a href="${asset.fullUrl(this.apiUrl)}" alt="${name}">${name}</a>`;
+        }
     }
 }
 

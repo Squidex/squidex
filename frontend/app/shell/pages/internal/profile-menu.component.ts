@@ -20,6 +20,9 @@ interface State {
 
     // The url to the user profile.
     profileUrl: string;
+
+    // True when the submenu should be open.
+    showSubmenu: boolean;
 }
 
 @Component({
@@ -34,8 +37,6 @@ interface State {
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
     public modalMenu = new ModalModel();
 
-    public showSubmenu = false;
-
     public language = this.uiOptions.get('more.culture');
     public languages = UILanguages.ALL;
 
@@ -48,7 +49,8 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
             profileDisplayName: '',
             profileEmail: '',
             profileId: '',
-            profileUrl: apiUrl.buildUrl('/identity-server/account/profile')
+            profileUrl: apiUrl.buildUrl('/identity-server/account/profile'),
+            showSubmenu: false
         });
     }
 
@@ -61,11 +63,11 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
                         const profileEmail = user.email;
                         const profileDisplayName = user.displayName;
 
-                        this.next(s => ({ ...s,
+                        this.next({
                             profileId,
                             profileEmail,
                             profileDisplayName
-                        }));
+                        });
                     }
                 }));
     }
@@ -78,7 +80,10 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     }
 
     public toggle() {
-        this.showSubmenu = !this.showSubmenu;
+        this.next(s => ({
+            ...s,
+            showSubmenu: !s.showSubmenu
+        }));
     }
 
     public logout() {

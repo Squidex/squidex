@@ -50,8 +50,7 @@ namespace Squidex.Extensions.Samples.AssetStore
             {
                 services.AddSingleton<IStartupFilter>(this);
 
-                services.AddSingletonAs<MemoryAssetStore>()
-                    .As<IAssetStore>();
+                services.AddSingleton<IAssetStore, MemoryAssetStore>();
             }
         }
     }

@@ -41,7 +41,7 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpen | async" #buttonOptions>
+                    <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
 

@@ -19,6 +19,8 @@ namespace Squidex.Config
 
         public string AdminPassword { get; set; }
 
+        public string[] AdminApps { get; set; }
+
         public string AdminClientId { get; set; }
 
         public string AdminClientSecret { get; set; }

@@ -94,7 +94,7 @@ export module ValidatorsEx {
                     }
                 } else {
                     if (isNaN(value) || value < min || value > max) {
-                        return { between: { min: min, max: max, actual: value }};
+                        return { between: { min, max, actual: value }};
                     }
                 }
 

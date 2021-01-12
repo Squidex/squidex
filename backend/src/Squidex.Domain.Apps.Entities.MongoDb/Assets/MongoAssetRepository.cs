@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 
@@ -89,13 +88,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 {
                     if (q.Ids != null && q.Ids.Count > 0)
                     {
+                        var filter = BuildFilter(appId, q.Ids.ToHashSet());
+
                         var assetEntities =
-                            await Collection.Find(BuildFilter(appId, q.Ids.ToHashSet())).SortByDescending(x => x.LastModified)
+                            await Collection.Find(filter).SortByDescending(x => x.LastModified)
                                 .QueryLimit(q.Query)
                                 .QuerySkip(q.Query)
                                 .ToListAsync();
+                        long assetTotal = assetEntities.Count;
 
-                        return ResultList.Create(assetEntities.Count, assetEntities.OfType<IAssetEntity>());
+                        if (assetTotal >= q.Query.Take || q.Query.Skip > 0)
+                        {
+                            assetTotal = await Collection.Find(filter).CountDocumentsAsync();
+                        }
+
+                        return ResultList.Create(assetTotal, assetEntities.OfType<IAssetEntity>());
                     }
                     else
                     {
@@ -103,17 +110,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                         var filter = query.BuildFilter(appId, parentId);
 
-                        var assetCount = Collection.Find(filter).CountDocumentsAsync();
-                        var assetItems =
-                            Collection.Find(filter)
+                        var assetEntities =
+                            await Collection.Find(filter)
                                 .QueryLimit(query)
                                 .QuerySkip(query)
                                 .QuerySort(query)
                                 .ToListAsync();
+                        long assetTotal = assetEntities.Count;
 
-                        var (items, total) = await AsyncHelper.WhenAll(assetItems, assetCount);
+                        if (assetTotal >= q.Query.Take || q.Query.Skip > 0)
+                        {
+                            assetTotal = await Collection.Find(filter).CountDocumentsAsync();
+                        }
 
-                        return ResultList.Create<IAssetEntity>(total, items);
+                        return ResultList.Create<IAssetEntity>(assetTotal, assetEntities);
                     }
                 }
                 catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
@@ -131,7 +141,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetEntities.Select(x => DomainId.Create(x[Fields.AssetId].AsString)).ToList();
+                var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
+
+                return assetEntities.Select(x => DomainId.Create(x[field].AsString)).ToList();
             }
         }
 
@@ -140,10 +152,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntities =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.DocumentId)
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetEntities.Select(x => DomainId.Create(x[Fields.AssetId].AsString)).ToList();
+                var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
+
+                return assetEntities.Select(x => DomainId.Create(x[field].AsString)).ToList();
             }
         }
 

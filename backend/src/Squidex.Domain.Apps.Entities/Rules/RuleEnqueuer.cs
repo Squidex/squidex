@@ -82,7 +82,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
         {
-            return cache.GetOrCreateAsync(appId, entry =>
+            var cacheKey = $"{typeof(RuleEnqueuer)}_Rules_{appId}";
+
+            return cache.GetOrCreateAsync(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 

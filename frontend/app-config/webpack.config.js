@@ -1,6 +1,4 @@
-const webpack = require('webpack'),
-         path = require('path'),
-           fs = require('fs');
+const webpack = require('webpack'), path = require('path');
 
 const appRoot = path.resolve(__dirname, '..');
 
@@ -34,7 +32,7 @@ const plugins = {
     // https://www.npmjs.com/package/@angular-devkit/build-optimizer
     BuildOptimizerWebpackPlugin: require('@angular-devkit/build-optimizer').BuildOptimizerWebpackPlugin,
     // https://webpack.js.org/plugins/copy-webpack-plugin/
-    CopyPlugin : require('copy-webpack-plugin')
+    CopyPlugin: require('copy-webpack-plugin')
 };
 
 module.exports = function (env) {
@@ -43,7 +41,7 @@ module.exports = function (env) {
     const isTests = env && env.target === 'tests';
     const isTestCoverage = env && env.coverage;
     const isAnalyzing = isProduction && env.analyze;
-    const isAot = !isDevServer;
+    const isAot = !isDevServer && !isTests && !isTestCoverage;
 
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
 
@@ -155,7 +153,7 @@ module.exports = function (env) {
                 }, {
                     loader: 'postcss-loader'
                 }, {
-                    loader: 'sass-loader', 
+                    loader: 'sass-loader',
                     options: {
                         additionalData: `
                             @import '_vars';
@@ -210,30 +208,34 @@ module.exports = function (env) {
             }),
             new plugins.CopyPlugin({
                 patterns: [
-                  { from: './node_modules/simplemde/dist', to: 'dependencies/simplemde' },
+                    { from: './node_modules/simplemde/dist', to: 'dependencies/simplemde' },
 
-                  { from: './node_modules/tinymce/icons/default/icons.min.js', to: 'dependencies/tinymce/icons/default/icons.min.js' },
-                  { from: './node_modules/tinymce/plugins/advlist', to: 'dependencies/tinymce/plugins/advlist' },
-                  { from: './node_modules/tinymce/plugins/code', to: 'dependencies/tinymce/plugins/code' },
-                  { from: './node_modules/tinymce/plugins/image', to: 'dependencies/tinymce/plugins/image' },
-                  { from: './node_modules/tinymce/plugins/link', to: 'dependencies/tinymce/plugins/link' },
-                  { from: './node_modules/tinymce/plugins/lists', to: 'dependencies/tinymce/plugins/lists' },
-                  { from: './node_modules/tinymce/plugins/media', to: 'dependencies/tinymce/plugins/media' },
-                  { from: './node_modules/tinymce/plugins/paste', to: 'dependencies/tinymce/plugins/paste' },
-                  { from: './node_modules/tinymce/skins', to: 'dependencies/tinymce/skins' },
-                  { from: './node_modules/tinymce/themes/silver', to: 'dependencies/tinymce/themes/silver' },
-                  { from: './node_modules/tinymce/tinymce.min.js', to: 'dependencies/tinymce/tinymce.min.js' },
+                    { from: './node_modules/tinymce/icons/default/icons.min.js', to: 'dependencies/tinymce/icons/default' },
+                    { from: './node_modules/tinymce/plugins/advlist', to: 'dependencies/tinymce/plugins/advlist' },
+                    { from: './node_modules/tinymce/plugins/code', to: 'dependencies/tinymce/plugins/code' },
+                    { from: './node_modules/tinymce/plugins/image', to: 'dependencies/tinymce/plugins/image' },
+                    { from: './node_modules/tinymce/plugins/link', to: 'dependencies/tinymce/plugins/link' },
+                    { from: './node_modules/tinymce/plugins/lists', to: 'dependencies/tinymce/plugins/lists' },
+                    { from: './node_modules/tinymce/plugins/media', to: 'dependencies/tinymce/plugins/media' },
+                    { from: './node_modules/tinymce/plugins/paste', to: 'dependencies/tinymce/plugins/paste' },
+                    { from: './node_modules/tinymce/skins', to: 'dependencies/tinymce/skins' },
+                    { from: './node_modules/tinymce/themes/silver', to: 'dependencies/tinymce/themes/silver' },
+                    { from: './node_modules/tinymce/tinymce.min.js', to: 'dependencies/tinymce' },
 
-                  { from: './node_modules/ace-builds/src-min/ace.js', to: 'dependencies/ace/ace.js' },
-                  { from: './node_modules/ace-builds/src-min/mode-javascript.js', to: 'dependencies/ace/mode-javascript.js' },
-                  { from: './node_modules/ace-builds/src-min/worker-javascript.js', to: 'dependencies/ace/worker-javascript.js' },
+                    { from: './node_modules/ace-builds/src-min/ace.js', to: 'dependencies/ace/ace.js' },
+                    { from: './node_modules/ace-builds/src-min/mode-*.js', to: 'dependencies/ace/[name].[ext]' },
+                    { from: './node_modules/ace-builds/src-min/worker-*.js', to: 'dependencies/ace/[name].[ext]' },
+                    { from: './node_modules/ace-builds/src-min/ext-modelist.js', to: 'dependencies/ace/ext/modelist.js' },
 
-                  { from: './node_modules/font-awesome/css/font-awesome.min.css', to: 'dependencies/font-awesome/css/font-awesome.min.css' },
-                  { from: './node_modules/font-awesome/fonts', to: 'dependencies/font-awesome/fonts' },
+                    { from: './node_modules/video.js/dist/video.min.js', to: 'dependencies/videojs' },
+                    { from: './node_modules/video.js/dist/video-js.min.css', to: 'dependencies/videojs' },
 
-                  { from: './node_modules/vis-network/standalone/umd/vis-network.min.js', to: 'dependencies/vis-network.min.js' },
+                    { from: './node_modules/font-awesome/css/font-awesome.min.css', to: 'dependencies/font-awesome/css' },
+                    { from: './node_modules/font-awesome/fonts', to: 'dependencies/font-awesome/fonts' },
+
+                    { from: './node_modules/vis-network/standalone/umd/vis-network.min.js', to: 'dependencies' },
                 ],
-              }),
+            }),
         ],
 
         devServer: {
@@ -253,7 +255,7 @@ module.exports = function (env) {
         config.entry = {
             'shims': './app/shims.ts',
             'style': './app/style.js',
-              'app': './app/app.ts'
+            'app': './app/app.ts'
         };
 
         if (isProduction) {
@@ -304,9 +306,9 @@ module.exports = function (env) {
         config.plugins.push(
             new plugins.HtmlWebpackPlugin({
                 filename: 'theme.html',
-                hash: true, 
+                hash: true,
                 chunks: ['style'],
-                chunksSortMode: 'none', 
+                chunksSortMode: 'none',
                 template: 'app/_theme.html'
             })
         );
@@ -363,7 +365,7 @@ module.exports = function (env) {
         };
 
         config.plugins.push(new plugins.BuildOptimizerWebpackPlugin());
-        
+
         config.module.rules.push({
             test: /\.js$/,
             use: [{

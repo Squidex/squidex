@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -34,6 +32,9 @@ namespace Squidex.Config.Web
             var translator = new ResourcesLocalizer(Texts.ResourceManager);
 
             T.Setup(translator);
+
+            services.AddDefaultWebServices(config);
+            services.AddDefaultForwardRules();
 
             services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
                 .AsSelf();
@@ -102,29 +103,6 @@ namespace Squidex.Config.Web
             .AddRazorRuntimeCompilation()
             .AddSquidexPlugins(config)
             .AddSquidexSerializers();
-
-            var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
-
-            var host = urlsOptions.BuildHost();
-
-            if (urlsOptions.EnforceHost)
-            {
-                services.AddHostFiltering(options =>
-                {
-                    options.AllowEmptyHosts = true;
-                    options.AllowedHosts.Add(host.Host);
-
-                    options.IncludeFailureMessage = false;
-                });
-            }
-
-            if (urlsOptions.EnforceHTTPS && !string.Equals(host.Host, "localhost", StringComparison.OrdinalIgnoreCase))
-            {
-                services.AddHttpsRedirection(options =>
-                {
-                    options.HttpsPort = urlsOptions.HttpsPort;
-                });
-            }
         }
     }
 }

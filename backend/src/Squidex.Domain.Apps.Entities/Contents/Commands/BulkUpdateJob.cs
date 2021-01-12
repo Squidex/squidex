@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -18,10 +19,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public DomainId? Id { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public Status Status { get; set; }
 
-        public Status? Status { get; set; }
+        public Instant? DueTime { get; set; }
 
         public BulkUpdateType Type { get; set; }
+
+        public NamedContentData? Data { get; set; }
+
+        public string? Schema { get; set; }
+
+        public long ExpectedCount { get; set; } = 1;
+
+        public long ExpectedVersion { get; set; } = EtagVersion.Any;
     }
 }

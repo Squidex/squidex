@@ -13,6 +13,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb
 {
@@ -81,6 +82,11 @@ namespace Migrations.Migrations.MongoDb
 
             var collectionOld = database.GetCollection<BsonDocument>(collectionNameOld);
             var collectionNew = database.GetCollection<BsonDocument>(collectionNameNew);
+
+            if (!await collectionOld.AnyAsync())
+            {
+                return;
+            }
 
             await collectionNew.DeleteManyAsync(new BsonDocument());
 

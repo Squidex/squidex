@@ -1,0 +1,33 @@
+<ng-container *ngIf="!(formSection.hiddenChanges | async) || formCompare">
+    <div class="header" *ngIf="formSection.separator; let separator">
+        <div class="row no-gutters">
+            <div class="col-auto">
+                <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
+                    <i [class.icon-caret-right]="snapshot.isCollapsed" [class.icon-caret-down]="!snapshot.isCollapsed"></i> 
+                </button>
+            </div>
+            <div class="col">
+                <h3>{{separator!.displayName}}</h3>
+
+                <sqx-form-hint *ngIf="separator!.properties.hints?.length > 0">
+                    {{separator!.properties.hints}}
+                </sqx-form-hint>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<div class="row small-gutters" [class.hidden]="snapshot.isCollapsed && !formCompare">
+    <sqx-content-field *ngFor="let field of formSection.fields; trackBy: trackByField"
+        (languageChange)="languageChange.emit($event)"
+        [isCompact]="isCompact"
+        [form]="form"
+        [formCompare]="formCompare"
+        [formContext]="formContext"
+        [formModel]="field"
+        [formModelCompare]="getFieldFormCompare(field)"
+        [language]="language"
+        [languages]="languages"
+        [schema]="schema">
+    </sqx-content-field>
+</div>

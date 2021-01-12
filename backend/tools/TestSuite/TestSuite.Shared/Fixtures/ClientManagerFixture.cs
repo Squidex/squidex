@@ -31,6 +31,7 @@ namespace TestSuite.Fixtures
 
         public virtual void Dispose()
         {
+            GC.SuppressFinalize(this);
         }
     }
 }

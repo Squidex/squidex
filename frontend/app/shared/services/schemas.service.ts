@@ -719,7 +719,7 @@ function parseSchemas(response: any) {
 }
 
 function parseSchemaWithDetails(response: any) {
-    const fields = response.fields.map((item: any) => parseField(item));
+    const fields = response.fields.map(parseField);
 
     return new SchemaDetailsDto(response._links,
         response.id,

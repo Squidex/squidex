@@ -12,7 +12,7 @@ import { Observable, of } from 'rxjs';
 
 @Injectable()
 export class SearchSource implements AutocompleteSource {
-    public selectedAppOrNull = this.appsState.selectedAppOrNull;
+    public selectedApp = this.appsState.selectedApp;
 
     constructor(
         private readonly appsState: AppsState,
@@ -41,8 +41,6 @@ export class SearchSource implements AutocompleteSource {
 export class SearchMenuComponent {
     @ViewChild(AutocompleteComponent, { static: false })
     public searchControl: AutocompleteComponent;
-
-    public selection: SearchResultDto;
 
     constructor(
         private readonly router: Router,

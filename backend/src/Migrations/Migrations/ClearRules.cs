@@ -7,7 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Rules.State;
+using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 
@@ -24,7 +24,7 @@ namespace Migrations.Migrations
 
         public Task UpdateAsync()
         {
-            return store.ClearSnapshotsAsync<Guid, RuleState>();
+            return store.ClearSnapshotsAsync<Guid, RuleDomainObject.State>();
         }
     }
 }

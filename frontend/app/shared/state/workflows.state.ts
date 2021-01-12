@@ -54,12 +54,12 @@ export class WorkflowsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly workflowsService: WorkflowsService
     ) {
-        super({ errors: [], workflows: [], version: Version.EMPTY });
+        super({ errors: [], workflows: [], version: Version.EMPTY }, 'Workflows');
     }
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            this.resetState('Loading Initial');
         }
 
         return this.loadInternal(isReload);
@@ -77,7 +77,7 @@ export class WorkflowsState extends State<Snapshot> {
                 this.replaceWorkflows(payload, version);
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -118,7 +118,7 @@ export class WorkflowsState extends State<Snapshot> {
             isLoading: false,
             version,
             workflows
-        });
+        }, 'Loading Success / Updated');
     }
 
     private get appName() {

@@ -54,10 +54,12 @@ export class UserForm extends Form<FormGroup, UpdateUserDto, UserDto> {
     protected transformLoad(user: Partial<UserDto>) {
         const permissions = user.permissions?.join('\n') || '';
 
-        return { ...user, permissions: permissions };
+        return { ...user, permissions };
     }
 
     protected transformSubmit(value: any) {
-        return { ...value, permissions: value['permissions'].split('\n').filter((x: any) => !!x) };
+        const permissions = value['permissions'].split('\n').filter((x: any) => !!x);
+
+        return { ...value, permissions };
     }
 }

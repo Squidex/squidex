@@ -170,6 +170,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName)
         {
+            var schema = await GetSchemaAsync(context, schemaIdOrName);
+
+            if (schema == null)
+            {
+                throw new DomainObjectNotFoundException(schemaIdOrName);
+            }
+
+            return schema;
+        }
+
+        public async Task<ISchemaEntity?> GetSchemaAsync(Context context, string schemaIdOrName)
+        {
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNullOrEmpty(schemaIdOrName, nameof(schemaIdOrName));
+
             ISchemaEntity? schema = null;
 
             var canCache = !context.IsFrontendClient;
@@ -186,12 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache);
             }
 
-            if (schema == null)
-            {
-                throw new DomainObjectNotFoundException(schemaIdOrName);
-            }
-
-            if (!HasPermission(context, schema))
+            if (schema != null && !HasPermission(context, schema))
             {
                 throw new DomainForbiddenException(T.Get("schemas.noPermission"));
             }

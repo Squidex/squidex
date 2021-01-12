@@ -29,23 +29,26 @@
                         </div>
                     </ng-container>
                     <ng-container *ngIf="contributorsState.canCreate | async">
-                        <sqx-contributor-add-form [roles]="roles">
+                        <sqx-contributor-add-form
+                            [roles]="roles">
                         </sqx-contributor-add-form>
+
+                        <div class="import-hint">
+                            <sqx-form-hint class="text-right">
+                                {{ 'contributors.importHintg' | sqxTranslate }} <a class="force" (click)="importDialog.show()">{{ 'contributors.importButton' | sqxTranslate }}</a>
+                            </sqx-form-hint>
+                        </div>
                     </ng-container>
-                    <div class="import-hint">
-                        <sqx-form-hint class="text-right">
-                            {{ 'contributors.importHintg' | sqxTranslate }} <a class="force" (click)="importDialog.show()">{{ 'contributors.importButton' | sqxTranslate }}</a>
-                        </sqx-form-hint>
-                    </div>
                 </ng-container>
             </ng-container>
 
             <div content>
-                <ng-container *ngIf="contributorsState.contributorsPaged | async; let contributors">
+                <ng-container *ngIf="contributorsState.contributorsFiltered | async; let contributors">
                     <ng-container *ngIf="rolesState.roles | async; let roles">                        
                         <ng-container *ngIf="contributors.length > 0; else noContributors">
                             <table class="table table-items table-fixed">
-                                <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor" [sqxContributor]="contributor" [search]="contributorsState.queryRegex | async" [roles]="roles">
+                                <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor" [sqxContributor]="contributor" 
+                                    [search]="contributorsState.queryRegex | async" [roles]="roles">
                                 </tbody>
                             </table>
                         </ng-container>
@@ -60,7 +63,7 @@
             </div>
 
             <ng-container footer>
-                <sqx-pager [pager]="contributorsState.contributorsPager | async" (pagerChange)="contributorsState.setPager($event)"></sqx-pager>
+                <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)"></sqx-pager>
             </ng-container>
         </sqx-list-view>
     </ng-container>
@@ -79,7 +82,8 @@
 </sqx-panel>
 
 <ng-container *sqxModal="importDialog">
-    <sqx-import-contributors-dialog [roles]="rolesState.roles | async" (close)="importDialog.hide()">
+    <sqx-import-contributors-dialog [roles]="rolesState.roles | async" 
+        (close)="importDialog.hide()">
     </sqx-import-contributors-dialog>
 </ng-container>
 

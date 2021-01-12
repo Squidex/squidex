@@ -6,7 +6,12 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
-import { fadeAnimation } from '@app/framework/internal';
+import { fadeAnimation, StatefulComponent } from '@app/framework/internal';
+
+interface State {
+    // True when loading.
+    isLoading: boolean;
+}
 
 @Component({
     selector: 'sqx-list-view',
@@ -17,9 +22,8 @@ import { fadeAnimation } from '@app/framework/internal';
     ],
     changeDetection: ChangeDetectionStrategy.Default
 })
-export class ListViewComponent implements AfterViewInit {
+export class ListViewComponent extends StatefulComponent<State> implements AfterViewInit {
     private timer: any;
-    private isLoadingValue = false;
 
     @ViewChild('headerElement', { static: false })
     public headerElement: ElementRef<ParentNode>;
@@ -47,26 +51,24 @@ export class ListViewComponent implements AfterViewInit {
         clearTimeout(this.timer);
 
         if (value) {
-            this.isLoadingValue = value;
-
-            this.changeDetector.markForCheck();
+            this.next({ isLoading: value });
         } else {
             this.timer = setTimeout(() => {
-                this.isLoadingValue = value;
-
-                this.changeDetector.markForCheck();
+                this.next({ isLoading: value });
             }, 250);
         }
     }
 
     public get isLoading() {
-        return this.isLoadingValue;
+        return this.snapshot.isLoading;
     }
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2
     ) {
+        super(changeDetector, {
+            isLoading: false
+        });
     }
 
     public ngAfterViewInit() {

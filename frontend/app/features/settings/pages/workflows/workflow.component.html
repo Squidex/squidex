@@ -33,10 +33,14 @@
         <div class="table-items-row-details-tabs clearfix">
             <ul class="nav nav-tabs2">
                 <li class="nav-item">
-                    <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">{{ 'workflows.tabEdit' | sqxTranslate }}</a>
+                    <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">
+                        {{ 'workflows.tabEdit' | sqxTranslate }}
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">{{ 'workflows.tabVisualize' | sqxTranslate }}</a>
+                    <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">
+                        {{ 'workflows.tabVisualize' | sqxTranslate }}
+                    </a>
                 </li>
             </ul>
 

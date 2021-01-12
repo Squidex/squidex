@@ -6,16 +6,21 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Translations;
+using Squidex.Shared;
 
-#pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+#pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -23,6 +28,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContextProvider contextProvider;
+
+        private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command)
+        {
+        }
+
+        private sealed record BulkTask(
+            ICommandBus Bus,
+            Context Context,
+            string Schema,
+            int JobIndex,
+            BulkUpdateJob Job,
+            BulkUpdateContents Command,
+            ConcurrentBag<BulkUpdateResultItem> Results
+        )
+        {
+        }
 
         public BulkUpdateCommandMiddleware(IContentQueryService contentQuery, IContextProvider contextProvider)
         {
@@ -39,91 +60,48 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 if (bulkUpdates.Jobs?.Length > 0)
                 {
+                    var executionOptions = new ExecutionDataflowBlockOptions
+                    {
+                        MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
+                    };
+
+                    var createCommandsBlock = new TransformManyBlock<BulkTask, BulkTaskCommand>(async task =>
+                    {
+                        return await CreateCommandsAsync(task);
+                    }, executionOptions);
+
+                    var executeCommandBlock = new ActionBlock<BulkTaskCommand>(async command =>
+                    {
+                        await ExecuteCommandAsync(command);
+                    }, executionOptions);
+
+                    createCommandsBlock.LinkTo(executeCommandBlock, new DataflowLinkOptions
+                    {
+                        PropagateCompletion = true
+                    });
+
                     var requestContext = contextProvider.Context.WithoutContentEnrichment().WithUnpublished(true);
                     var requestedSchema = bulkUpdates.SchemaId.Name;
 
-                    var results = new BulkUpdateResultItem[bulkUpdates.Jobs.Length];
-
-                    var actionBlock = new ActionBlock<int>(async index =>
-                    {
-                        var job = bulkUpdates.Jobs[index];
-
-                        var result = new BulkUpdateResultItem();
-
-                        try
-                        {
-                            var id = await FindIdAsync(requestContext, requestedSchema, job);
-
-                            result.ContentId = id;
-
-                            switch (job.Type)
-                            {
-                                case BulkUpdateType.Upsert:
-                                    {
-                                        var command = SimpleMapper.Map(bulkUpdates, new UpsertContent { Data = job.Data });
-
-                                        if (id != null && id != DomainId.Empty)
-                                        {
-                                            command.ContentId = id.Value;
-                                        }
-
-                                        result.ContentId = command.ContentId;
-
-                                        await context.CommandBus.PublishAsync(command);
-                                        break;
-                                    }
-
-                                case BulkUpdateType.ChangeStatus:
-                                    {
-                                        if (id == null || id == DomainId.Empty)
-                                        {
-                                            throw new DomainObjectNotFoundException("undefined");
-                                        }
-
-                                        var command = SimpleMapper.Map(bulkUpdates, new ChangeContentStatus { ContentId = id.Value });
-
-                                        if (job.Status != null)
-                                        {
-                                            command.Status = job.Status.Value;
-                                        }
-
-                                        await context.CommandBus.PublishAsync(command);
-                                        break;
-                                    }
-
-                                case BulkUpdateType.Delete:
-                                    {
-                                        if (id == null || id == DomainId.Empty)
-                                        {
-                                            throw new DomainObjectNotFoundException("undefined");
-                                        }
-
-                                        var command = SimpleMapper.Map(bulkUpdates, new DeleteContent { ContentId = id.Value });
-
-                                        await context.CommandBus.PublishAsync(command);
-                                        break;
-                                    }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            result.Exception = ex;
-                        }
-
-                        results[index] = result;
-                    }, new ExecutionDataflowBlockOptions
-                    {
-                        MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
-                    });
+                    var results = new ConcurrentBag<BulkUpdateResultItem>();
 
                     for (var i = 0; i < bulkUpdates.Jobs.Length; i++)
                     {
-                        await actionBlock.SendAsync(i);
+                        var task = new BulkTask(
+                            context.CommandBus,
+                            requestContext,
+                            requestedSchema,
+                            i,
+                            bulkUpdates.Jobs[i],
+                            bulkUpdates,
+                            results);
+
+                        await createCommandsBlock.SendAsync(task);
                     }
 
-                    actionBlock.Complete();
+                    createCommandsBlock.Complete();
 
-                    await actionBlock.Completion;
+                    await executeCommandBlock.Completion;
 
                     context.Complete(new BulkUpdateResult(results));
                 }
@@ -138,25 +116,191 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<DomainId?> FindIdAsync(Context context, string schema, BulkUpdateJob job)
+        private static async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
         {
-            var id = job.Id;
+            var (task, id, command) = bulkCommand;
 
-            if (id == null && job.Query != null)
+            Exception? exception = null;
+            try
             {
-                job.Query.Take = 1;
+                await task.Bus.PublishAsync(command);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
 
-                var existing = await contentQuery.QueryAsync(context, schema, Q.Empty.WithJsonQuery(job.Query));
+            task.Results.Add(new BulkUpdateResultItem
+            {
+                ContentId = id,
+                JobIndex = task.JobIndex,
+                Exception = exception,
+            });
+        }
 
-                if (existing.Total > 1)
+        private async Task<IEnumerable<BulkTaskCommand>> CreateCommandsAsync(BulkTask task)
+        {
+            var commands = new List<BulkTaskCommand>();
+
+            try
+            {
+                var resolvedIds = await FindIdAsync(task);
+
+                if (resolvedIds.Length == 0)
+                {
+                    throw new DomainObjectNotFoundException("undefined");
+                }
+
+                foreach (var id in resolvedIds)
+                {
+                    try
+                    {
+                        var command = await CreateCommandAsync(id, task);
+
+                        commands.Add(new BulkTaskCommand(task, id, command));
+                    }
+                    catch (Exception ex)
+                    {
+                        task.Results.Add(new BulkUpdateResultItem
+                        {
+                            ContentId = id,
+                            JobIndex = task.JobIndex,
+                            Exception = ex,
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                task.Results.Add(new BulkUpdateResultItem
+                {
+                    JobIndex = task.JobIndex,
+                    Exception = ex,
+                });
+            }
+
+            return commands;
+        }
+
+        private async Task<ICommand> CreateCommandAsync(DomainId id, BulkTask task)
+        {
+            var job = task.Job;
+
+            switch (job.Type)
+            {
+                case BulkUpdateType.Create:
+                    {
+                        var command = new CreateContent { Data = job.Data! };
+
+                        await EnrichAsync(id, task, command, Permissions.AppContentsCreate);
+                        return command;
+                    }
+
+                case BulkUpdateType.Update:
+                    {
+                        var command = new UpdateContent { Data = job.Data! };
+
+                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdate);
+                        return command;
+                    }
+
+                case BulkUpdateType.Upsert:
+                    {
+                        var command = new UpsertContent { Data = job.Data! };
+
+                        await EnrichAsync(id, task, command, Permissions.AppContentsUpsert);
+                        return command;
+                    }
+
+                case BulkUpdateType.Patch:
+                    {
+                        var command = new PatchContent { Data = job.Data! };
+
+                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdate);
+                        return command;
+                    }
+
+                case BulkUpdateType.Validate:
+                    {
+                        var command = new ValidateContent();
+
+                        await EnrichAsync(id, task, command, Permissions.AppContentsRead);
+                        return command;
+                    }
+
+                case BulkUpdateType.ChangeStatus:
+                    {
+                        var command = new ChangeContentStatus { Status = job.Status, DueTime = job.DueTime };
+
+                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdate);
+                        return command;
+                    }
+
+                case BulkUpdateType.Delete:
+                    {
+                        var command = new DeleteContent();
+
+                        await EnrichAsync(id, task, command, Permissions.AppContentsDelete);
+                        return command;
+                    }
+
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        private async Task EnrichAsync<TCommand>(DomainId id, BulkTask task, TCommand command, string permissionId) where TCommand : ContentCommand
+        {
+            SimpleMapper.Map(task.Command, command);
+
+            command.ContentId = id;
+
+            if (!string.IsNullOrWhiteSpace(task.Job.Schema))
+            {
+                var schema = await contentQuery.GetSchemaOrThrowAsync(task.Context, task.Schema);
+
+                command.SchemaId = schema.NamedId();
+            }
+
+            var permission = Permissions.ForApp(permissionId, command.AppId.Name, command.SchemaId.Name);
+
+            if (!task.Context.Permissions.Allows(permission))
+            {
+                throw new DomainForbiddenException("Forbidden");
+            }
+
+            command.ExpectedVersion = task.Command.ExpectedVersion;
+        }
+
+        private async Task<DomainId[]> FindIdAsync(BulkTask task)
+        {
+            var id = task.Job.Id;
+
+            if (id != null)
+            {
+                return new[] { id.Value };
+            }
+
+            if (task.Job.Query != null)
+            {
+                task.Job.Query.Take = task.Job.ExpectedCount;
+
+                var existing = await contentQuery.QueryAsync(task.Context, task.Schema, Q.Empty.WithJsonQuery(task.Job.Query));
+
+                if (existing.Total > task.Job.ExpectedCount)
                 {
                     throw new DomainException(T.Get("contents.bulkInsertQueryNotUnique"));
                 }
 
-                id = existing.FirstOrDefault()?.Id;
+                return existing.Select(x => x.Id).ToArray();
             }
 
-            return id;
+            if (task.Job.Type == BulkUpdateType.Create || task.Job.Type == BulkUpdateType.Upsert)
+            {
+                return new[] { DomainId.NewGuid() };
+            }
+
+            return Array.Empty<DomainId>();
         }
     }
 }

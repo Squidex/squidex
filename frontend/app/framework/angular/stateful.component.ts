@@ -92,7 +92,9 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
     }
 }
 
-export abstract class StatefulControlComponent<T, TValue> extends StatefulComponent<T & { isDisabled: boolean }> implements ControlValueAccessor {
+type Disabled = { isDisabled: boolean };
+
+export abstract class StatefulControlComponent<T extends object, TValue> extends StatefulComponent<Disabled & T> implements ControlValueAccessor {
     private fnChanged = (v: any) => { /* NOOP */ };
     private fnTouched = () => { /* NOOP */ };
 
@@ -117,7 +119,7 @@ export abstract class StatefulControlComponent<T, TValue> extends StatefulCompon
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.next(s => ({ ...s, isDisabled }));
+        this.next({ isDisabled } as any);
     }
 
     public abstract writeValue(obj: any): void;

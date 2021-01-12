@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             IEventConsumer consumer = sut;
 
-            Assert.Equal("^assetFolder\\-", consumer.EventsFilter);
+            Assert.Equal("^assetFolder-", consumer.EventsFilter);
         }
 
         [Fact]

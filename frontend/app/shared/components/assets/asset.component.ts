@@ -6,7 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
-import { AssetDto, AssetsState, AssetUploaderState, DialogModel, DialogService, Types, UploadCanceled } from '@app/shared/internal';
+import { AssetDto, AssetsState, AssetUploaderState, DialogModel, DialogService, StatefulComponent, Types, UploadCanceled } from '@app/shared/internal';
+
+interface State {
+    // The download progress.
+    progress: number;
+}
 
 @Component({
     selector: 'sqx-asset',
@@ -14,7 +19,7 @@ import { AssetDto, AssetsState, AssetUploaderState, DialogModel, DialogService, 
     templateUrl: './asset.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetComponent implements OnInit {
+export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Output()
     public load = new EventEmitter<AssetDto>();
 
@@ -63,15 +68,15 @@ export class AssetComponent implements OnInit {
     @Input()
     public allTags: ReadonlyArray<string>;
 
-    public progress = 0;
-
     public editDialog = new DialogModel();
 
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly assetUploader: AssetUploaderState,
-        private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService
     ) {
+        super(changeDetector, {
+            progress: 0
+        });
     }
 
     public ngOnInit() {
@@ -141,12 +146,10 @@ export class AssetComponent implements OnInit {
     public setAsset(asset: AssetDto) {
         this.asset = asset;
 
-        this.changeDetector.markForCheck();
+        this.detectChanges();
     }
 
     public setProgress(progress: number) {
-        this.progress = progress;
-
-        this.changeDetector.markForCheck();
+        this.next({ progress });
     }
 }

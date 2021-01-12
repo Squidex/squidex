@@ -50,7 +50,7 @@ export class AssetUploaderState extends State<Snapshot> {
         private readonly assetsService: AssetsService,
         private readonly dialogs: DialogService
     ) {
-        super({ uploads: [] });
+        super({ uploads: [] }, 'AssetUploader');
     }
 
     public stopUpload(upload: Upload) {
@@ -60,7 +60,7 @@ export class AssetUploaderState extends State<Snapshot> {
             const uploads = s.uploads.removeBy('id', upload);
 
             return { ...s, uploads };
-        });
+        }, 'Stopped');
     }
 
     public uploadFile(file: File, target?: AssetsState): Observable<UploadResult> {
@@ -125,7 +125,7 @@ export class AssetUploaderState extends State<Snapshot> {
                 const uploads = s.uploads.removeBy('id', upload);
 
                 return { ...s, uploads };
-            });
+            }, 'Upload Done');
 
         }, 10000);
 
@@ -139,7 +139,7 @@ export class AssetUploaderState extends State<Snapshot> {
             const uploads = s.uploads.replaceBy('id', upload);
 
             return { ...s, uploads };
-        });
+        }, 'Updated');
 
         return upload;
     }
@@ -149,7 +149,7 @@ export class AssetUploaderState extends State<Snapshot> {
             const uploads = [upload, ...s.uploads];
 
             return { ...s, uploads };
-        });
+        }, 'Upload Started');
     }
 
     private get appName() {

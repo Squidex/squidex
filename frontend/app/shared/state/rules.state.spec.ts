@@ -166,7 +166,7 @@ describe('RulesState', () => {
 
         it('should not update rule when triggered', () => {
             rulesService.setup(x => x.triggerRule(app, rule1))
-                .returns(() => of()).verifiable();
+                .returns(of).verifiable();
 
             rulesState.trigger(rule1).subscribe();
 
@@ -177,7 +177,7 @@ describe('RulesState', () => {
 
         it('should not update rule when rurunningn', () => {
             rulesService.setup(x => x.runRule(app, rule1))
-                .returns(() => of()).verifiable();
+                .returns(of).verifiable();
 
             rulesState.run(rule1).subscribe();
 
@@ -188,7 +188,7 @@ describe('RulesState', () => {
 
         it('should not update rule when running from snapshots', () => {
             rulesService.setup(x => x.runRuleFromSnapshots(app, rule1))
-                .returns(() => of()).verifiable();
+                .returns(of).verifiable();
 
             rulesState.runFromSnapshots(rule1).subscribe();
 
@@ -221,7 +221,7 @@ describe('RulesState', () => {
 
         it('should invoke rule service when run is cancelled', () => {
             rulesService.setup(x => x.runCancel(app))
-                .returns(() => of()).verifiable();
+                .returns(of).verifiable();
 
             rulesState.runCancel().subscribe();
 

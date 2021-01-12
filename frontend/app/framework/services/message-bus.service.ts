@@ -10,7 +10,10 @@ import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
 interface Message {
+    // The target.
     channel: string;
+
+    // The message payload.
     data: any;
 }
 
@@ -22,10 +25,10 @@ export const MessageBusFactory = () => {
 export class MessageBus {
     private message$ = new Subject<Message>();
 
-    public emit<T>(message: T): void {
-        const channel = ((<any>message)['constructor']).name;
+    public emit<T>(data: T): void {
+        const channel = ((<any>data)['constructor']).name;
 
-        this.message$.next({ channel: channel, data: message });
+        this.message$.next({ channel, data });
     }
 
     public of<T>(messageType: { new(...args: ReadonlyArray<any>): T }): Observable<T> {

@@ -16,18 +16,21 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true
 };
 
+const NO_EMIT = { emitEvent: false };
+
 interface State {
     // The suggested item.
     suggestedItems: ReadonlyArray<any>;
 
     // The selected suggested index.
-    selectedIndex: number;
+    suggestedIndex: number;
+
+    // The selected item.
+    selectedItem?: number;
 
     // The current search query.
     query?: RegExp;
 }
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-dropdown',
@@ -66,13 +69,10 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public queryInput = new FormControl();
 
-    public get selectedItem() {
-        return this.items[this.snapshot.selectedIndex];
-    }
-
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            selectedIndex: -1,
+            selectedItem: undefined,
+            suggestedIndex: -1,
             suggestedItems: []
         });
     }
@@ -98,12 +98,10 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
                         }
                     }))
                 .subscribe(({ query, items }) => {
-                    this.next(s => ({
-                        ...s,
-                        suggestedIndex: 0,
+                    this.next({
                         suggestedItems: items || [],
                         query
-                    }));
+                    });
                 }));
     }
 
@@ -113,11 +111,10 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
             this.resetSearch();
 
-            this.next(s => ({
-                ...s,
+            this.next({
                 suggestedIndex: this.getSelectedIndex(this.value),
                 suggestedItems: this.items || []
-            }));
+            });
         }
     }
 
@@ -159,7 +156,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
             this.selectNextIndex();
             return false;
         } else if (Keys.isEnter(event)) {
-            this.selectIndexAndClose(this.snapshot.selectedIndex);
+            this.selectIndexAndClose(this.snapshot.suggestedIndex);
             return false;
         } else if (Keys.isEscape(event) && this.dropdown.isOpen) {
             this.close();
@@ -194,27 +191,27 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     public selectPrevIndex() {
-        this.selectIndex(this.snapshot.selectedIndex - 1, true);
+        this.selectIndex(this.snapshot.suggestedIndex - 1, true);
     }
 
     public selectNextIndex() {
-        this.selectIndex(this.snapshot.selectedIndex + 1, true);
+        this.selectIndex(this.snapshot.suggestedIndex + 1, true);
     }
 
-    public selectIndex(selectedIndex: number, fromUserAction: boolean) {
+    public selectIndex(suggestedIndex: number, fromUserAction: boolean) {
+        const items = this.snapshot.suggestedItems || [];
+
+        if (suggestedIndex < 0) {
+            suggestedIndex = 0;
+        }
+
+        if (suggestedIndex >= items.length) {
+            suggestedIndex = items.length - 1;
+        }
+
+        const selectedItem = items[suggestedIndex];
+
         if (fromUserAction) {
-            const items = this.snapshot.suggestedItems || [];
-
-            if (selectedIndex < 0) {
-                selectedIndex = 0;
-            }
-
-            if (selectedIndex >= items.length) {
-                selectedIndex = items.length - 1;
-            }
-
-            const selectedItem = items[selectedIndex];
-
             let selectedValue = selectedItem;
 
             if (this.valueProperty && this.valueProperty.length > 0 && selectedValue) {
@@ -229,7 +226,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
             }
         }
 
-        this.next(s => ({ ...s, selectedIndex }));
+        this.next({ suggestedIndex, selectedItem });
     }
 
     private getSelectedIndex(value: any) {

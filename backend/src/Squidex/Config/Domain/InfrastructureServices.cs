@@ -9,6 +9,7 @@ using System;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
@@ -28,9 +29,10 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline.Robots;
+using Squidex.Text.Translations;
+using Squidex.Text.Translations.GoogleCloud;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 
@@ -40,12 +42,9 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexInfrastructure(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<UrlsOptions>(
-                config.GetSection("urls"));
-            services.Configure<ExposedConfiguration>(
-                config.GetSection("exposedConfiguration"));
-            services.Configure<ReplicatedCacheOptions>(
-                config.GetSection("caching:replicated"));
+            services.Configure<ExposedConfiguration>(config, "exposedConfiguration");
+
+            services.Configure<ReplicatedCacheOptions>(config, "caching:replicated");
 
             services.AddReplicatedCache();
             services.AddAsyncLocalCache();
@@ -100,8 +99,7 @@ namespace Squidex.Config.Domain
 
         public static void AddSquidexUsageTracking(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<UsageOptions>(
-                config.GetSection("usage"));
+            services.Configure<UsageOptions>(config, "usage");
 
             services.AddSingletonAs(c => new CachingUsageTracker(
                     c.GetRequiredService<BackgroundUsageTracker>(),
@@ -120,28 +118,34 @@ namespace Squidex.Config.Domain
 
         public static void AddSquidexTranslation(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<DeepLTranslatorOptions>(
-                config.GetSection("translations:deepL"));
-            services.Configure<LanguagesOptions>(
-                config.GetSection("languages"));
+            services.Configure<GoogleCloudTranslationOptions>(config, "translations:googleCloud");
+
+            services.Configure<DeepLOptions>(config, "translations:deepL");
+
+            services.Configure<LanguagesOptions>(config, "languages");
 
             services.AddSingletonAs<LanguagesInitializer>()
                 .AsSelf();
 
-            services.AddSingletonAs<DeepLTranslator>()
+            services.AddSingletonAs(c => new DeepLTranslationService(c.GetRequiredService<IOptions<DeepLOptions>>().Value))
+                .As<ITranslationService>();
+
+            services.AddSingletonAs(c => new GoogleCloudTranslationService(c.GetRequiredService<IOptions<GoogleCloudTranslationOptions>>().Value))
+                .As<ITranslationService>();
+
+            services.AddSingletonAs<Translator>()
                 .As<ITranslator>();
         }
 
         public static void AddSquidexControllerServices(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<RobotsTxtOptions>(
-                config.GetSection("robots"));
-            services.Configure<CachingOptions>(
-                config.GetSection("caching"));
-            services.Configure<MyUIOptions>(
-                config.GetSection("ui"));
-            services.Configure<MyNewsOptions>(
-                config.GetSection("news"));
+            services.Configure<RobotsTxtOptions>(config, "robots");
+
+            services.Configure<CachingOptions>(config, "caching");
+
+            services.Configure<MyUIOptions>(config, "ui");
+
+            services.Configure<MyNewsOptions>(config, "news");
 
             services.AddSingletonAs<FeaturesService>()
                 .AsSelf();

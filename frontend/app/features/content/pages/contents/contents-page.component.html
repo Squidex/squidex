@@ -8,7 +8,7 @@
     <ng-container menu>
         <div class="row no-gutters pl-1">
             <div class="col-auto ml-8">
-                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{contentsState.schemaId}}/contents"></sqx-notifo>
+                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.id}}/contents"></sqx-notifo>
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
@@ -19,14 +19,15 @@
             <div class="col pl-1">
                 <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                     (queryChange)="search($event)"
-                    [query]="contentsState.contentsQuery | async"
-                    [queries]="queries"
-                    [queryModel]="queryModel"
-                    [language]="languageMaster" enableShortcut="true">
+                    [query]="contentsState.query | async"
+                    [queries]="queries | async"
+                    [queryModel]="queryModel | async"
+                    [language]="languagesState.isoMasterLanguage | async"
+                    enableShortcut="true">
                 </sqx-search-form>
             </div>
             <div class="col-auto pl-1" *ngIf="languages.length > 1">
-                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+                <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
             </div>
             <div class="col-auto pl-1">
                 <button type="button" class="btn btn-success" #newButton routerLink="new" title="i18n:contents.createContentTooltip" [disabled]="(contentsState.canCreateAny | async) === false">
@@ -45,10 +46,10 @@
                     <div class="selection" *ngIf="selectionCount > 0">
                         {{ 'contents.selectionCount' | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
             
-                        <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of nextStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
+                        <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of selectionStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
                             <sqx-content-status layout="text"
                                 [status]="status"
-                                [statusColor]="nextStatuses[status]">
+                                [statusColor]="selectionStatuses[status]">
                             </sqx-content-status>
                         </button>
                         
@@ -97,7 +98,7 @@
                                     <sqx-content-list-header
                                         [field]="field"
                                         (queryChange)="search($event)"
-                                        [query]="contentsState.contentsQuery | async"
+                                        [query]="contentsState.query | async"
                                         [language]="language">
                                     </sqx-content-list-header>
                                 </th>
@@ -115,8 +116,8 @@
                                 [selected]="isItemSelected(content)"
                                 (selectedChange)="selectItem(content, $event)"
                                 (statusChange)="changeStatus(content, $event)"
+                                [cloneable]="contentsState.snapshot.canCreate"
                                 (clone)="clone(content)"
-                                [canClone]="contentsState.snapshot.canCreate"
                                 [language]="language"
                                 [link]="[content.id, 'history']"
                                 [listFields]="listFields">
@@ -126,7 +127,7 @@
                 </ng-container>
 
                 <ng-container footer>
-                    <sqx-pager [pager]="contentsState.contentsPager | async" (pagerChange)="contentsState.setPager($event)"></sqx-pager>
+                    <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)"></sqx-pager>
                 </ng-container>
             </sqx-list-view>
         </ng-container>

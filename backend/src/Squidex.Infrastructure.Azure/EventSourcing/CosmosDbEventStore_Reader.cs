@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Hosting;
 using Squidex.Log;
 
 namespace Squidex.Infrastructure.EventSourcing

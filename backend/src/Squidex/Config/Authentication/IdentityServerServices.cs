@@ -7,11 +7,14 @@
 
 using IdentityServer4;
 using IdentityServer4.AccessTokenValidation;
+using IdentityServer4.Hosting.LocalApiAuthentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Hosting;
 using Squidex.Web;
 
 namespace Squidex.Config.Authentication
@@ -20,25 +23,14 @@ namespace Squidex.Config.Authentication
     {
         public static AuthenticationBuilder AddSquidexIdentityServerAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration config)
         {
-            var apiAuthorityUrl = identityOptions.AuthorityUrl;
-
-            var useCustomAuthorityUrl = !string.IsNullOrWhiteSpace(apiAuthorityUrl);
-
-            if (!useCustomAuthorityUrl)
-            {
-                var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
-
-                apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityServerPrefix);
-            }
-
-            var apiScope = Constants.ApiScope;
+            var useCustomAuthorityUrl = !string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl);
 
             if (useCustomAuthorityUrl)
             {
                 authBuilder.AddIdentityServerAuthentication(options =>
                 {
-                    options.Authority = apiAuthorityUrl;
-                    options.ApiName = apiScope;
+                    options.Authority = identityOptions.AuthorityUrl;
+                    options.ApiName = Constants.ApiScope;
                     options.ApiSecret = null;
                     options.RequireHttpsMetadata = identityOptions.RequiresHttps;
                     options.SupportedTokens = SupportedTokens.Jwt;
@@ -46,29 +38,41 @@ namespace Squidex.Config.Authentication
             }
             else
             {
-                var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
+                authBuilder.AddLocalApi();
 
-                authBuilder.AddLocalApi(options =>
-                {
-                    options.ClaimsIssuer = urlsOptions.BuildUrl("/identity-server", false);
+                authBuilder.Services.AddOptions<LocalApiAuthenticationOptions>(IdentityServerConstants.LocalApi.PolicyName)
+                    .Configure<IUrlGenerator>((options, urlGenerator) =>
+                    {
+                        options.ClaimsIssuer = urlGenerator.BuildUrl(Constants.IdentityServerPrefix, false);
 
-                    options.ExpectedScope = apiScope;
-                });
+                        options.ExpectedScope = Constants.ApiScope;
+                    });
             }
 
-            authBuilder.AddOpenIdConnect(options =>
-            {
-                options.Authority = apiAuthorityUrl;
-                options.ClientId = Constants.InternalClientId;
-                options.ClientSecret = Constants.InternalClientSecret;
-                options.CallbackPath = "/signin-internal";
-                options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                options.SaveTokens = true;
-                options.Scope.Add(Constants.PermissionsScope);
-                options.Scope.Add(Constants.ProfileScope);
-                options.Scope.Add(Constants.RoleScope);
-                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            });
+            authBuilder.AddOpenIdConnect();
+
+            authBuilder.Services.AddOptions<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme)
+                .Configure<IUrlGenerator>((options, urlGenerator) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl))
+                    {
+                        options.Authority = identityOptions.AuthorityUrl;
+                    }
+                    else
+                    {
+                        options.Authority = urlGenerator.BuildUrl(Constants.IdentityServerPrefix, false);
+                    }
+
+                    options.ClientId = Constants.InternalClientId;
+                    options.ClientSecret = Constants.InternalClientSecret;
+                    options.CallbackPath = "/signin-internal";
+                    options.RequireHttpsMetadata = identityOptions.RequiresHttps;
+                    options.SaveTokens = true;
+                    options.Scope.Add(Constants.PermissionsScope);
+                    options.Scope.Add(Constants.ProfileScope);
+                    options.Scope.Add(Constants.RoleScope);
+                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                });
 
             authBuilder.AddPolicyScheme(Constants.ApiSecurityScheme, Constants.ApiSecurityScheme, options =>
             {

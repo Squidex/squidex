@@ -6,11 +6,16 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldArrayItemForm, FieldArrayItemValueForm, FieldFormatter, FieldSection, invalid$, NestedFieldDto, value$ } from '@app/shared';
+import { AppLanguageDto, EditContentForm, FieldArrayItemForm, FieldArrayItemValueForm, FieldFormatter, FieldSection, invalid$, NestedFieldDto, StatefulComponent, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ArraySectionComponent } from './array-section.component';
 import { FieldEditorComponent } from './field-editor.component';
+
+interface State {
+    // The when the section is collapsed.
+    isCollapsed: boolean;
+}
 
 @Component({
     selector: 'sqx-array-item',
@@ -18,12 +23,12 @@ import { FieldEditorComponent } from './field-editor.component';
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArrayItemComponent implements OnChanges {
+export class ArrayItemComponent extends StatefulComponent<State> implements OnChanges {
     @Output()
-    public remove = new EventEmitter();
+    public itemRemove = new EventEmitter();
 
     @Output()
-    public move = new EventEmitter<number>();
+    public itemMove = new EventEmitter<number>();
 
     @Output()
     public clone = new EventEmitter();
@@ -66,9 +71,11 @@ export class ArrayItemComponent implements OnChanges {
 
     public title: Observable<string>;
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef
+    constructor(changeDetector: ChangeDetectorRef
     ) {
+        super(changeDetector, {
+            isCollapsed: false
+        });
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -98,31 +105,27 @@ export class ArrayItemComponent implements OnChanges {
     }
 
     public collapse() {
-        this.isCollapsed = true;
-
-        this.changeDetector.markForCheck();
+        this.next({ isCollapsed: true });
     }
 
     public expand() {
-        this.isCollapsed = false;
-
-        this.changeDetector.markForCheck();
+        this.next({ isCollapsed: false });
     }
 
     public moveTop() {
-        this.move.emit(0);
+        this.itemMove.emit(0);
     }
 
     public moveUp() {
-        this.move.emit(this.index - 1);
+        this.itemMove.emit(this.index - 1);
     }
 
     public moveDown() {
-        this.move.emit(this.index + 1);
+        this.itemMove.emit(this.index + 1);
     }
 
     public moveBottom() {
-        this.move.emit(99999);
+        this.itemMove.emit(99999);
     }
 
     public reset() {

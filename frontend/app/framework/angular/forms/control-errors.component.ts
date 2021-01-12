@@ -28,7 +28,7 @@ interface State {
 export class ControlErrorsComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
     private displayFieldName: string;
     private control: AbstractControl;
-    private originalMarkAsTouched: any;
+    private controlOriginalMarkAsTouched: any;
 
     @Input()
     public for: string | AbstractControl;
@@ -95,12 +95,12 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
                             this.createMessages();
                         }));
 
-                this.originalMarkAsTouched = this.control.markAsTouched;
+                this.controlOriginalMarkAsTouched = this.control.markAsTouched;
 
                 const self = this;
 
                 this.control['markAsTouched'] = function () {
-                    self.originalMarkAsTouched.apply(this, arguments);
+                    self.controlOriginalMarkAsTouched.apply(this, arguments);
 
                     self.createMessages();
                 };
@@ -111,13 +111,13 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     }
 
     private unsetCustomMarkAsTouchedFunction() {
-        if (this.control && this.originalMarkAsTouched) {
-            this.control['markAsTouched'] = this.originalMarkAsTouched;
+        if (this.control && this.controlOriginalMarkAsTouched) {
+            this.control['markAsTouched'] = this.controlOriginalMarkAsTouched;
         }
     }
 
     private createMessages() {
-        const errors: string[] = [];
+        const errorMessages: string[] = [];
 
         if (this.control && this.control.invalid && this.isTouched && this.control.errors) {
             for (const key in <any>this.control.errors) {
@@ -125,18 +125,16 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
                     const message = formatError(this.localizer, this.displayFieldName, key, this.control.errors[key], this.control.value);
 
                     if (Types.isString(message)) {
-                        errors.push(message);
+                        errorMessages.push(message);
                     } else if (Types.isArray(message)) {
                         for (const error of message) {
-                            errors.push(error);
+                            errorMessages.push(error);
                         }
                     }
                 }
             }
         }
 
-        if (errors.length !== this.snapshot.errorMessages.length || errors.length > 0) {
-            this.next(s => ({ ...s, errorMessages: errors }));
-        }
+        this.next({ errorMessages });
     }
 }

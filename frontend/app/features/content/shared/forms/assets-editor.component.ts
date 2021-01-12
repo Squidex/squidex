@@ -46,8 +46,6 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
-    public isCompact = false;
-
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
@@ -99,16 +97,19 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     }
 
     public setCompact(isCompact: boolean) {
-        this.next(s => ({ ...s, isCompact: isCompact }));
+        this.next({ isCompact });
     }
 
     public setAssets(assets: ReadonlyArray<AssetDto>) {
-        this.next(s => ({ ...s, assets }));
+        this.next({ assets });
     }
 
     public addFiles(files: ReadonlyArray<File>) {
         for (const file of files) {
-            this.next(s => ({ ...s, assetFiles: [file, ...s.assetFiles] }));
+            this.next(s => ({
+                ...s,
+                assetFiles: [file, ...s.assetFiles]
+            }));
         }
     }
 
@@ -151,11 +152,14 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     }
 
     public removeLoadingAsset(file: File) {
-        this.next(s => ({ ...s, assetFiles: s.assetFiles.removed(file) }));
+        this.next(s => ({
+            ...s,
+            assetFiles: s.assetFiles.removed(file)
+        }));
     }
 
     public changeView(isListView: boolean) {
-        this.next(s => ({ ...s, isListView }));
+        this.next({ isListView });
 
         this.localStore.setBoolean('squidex.assets.list-view', isListView);
     }

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
+using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Log;

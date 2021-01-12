@@ -17,7 +17,7 @@ export class AutoSaveService {
     ) {
     }
 
-    public get(key: AutoSaveKey): object | null {
+    public fetch(key: AutoSaveKey): object | null {
         if (!key) {
             return null;
         }
@@ -25,6 +25,8 @@ export class AutoSaveService {
         const value = this.localStore.get(getKey(key));
 
         if (value) {
+            this.remove(key);
+
             return JSON.parse(value);
         }
 

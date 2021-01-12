@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Microsoft.Extensions.Options;
 using NSwag;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
+using Squidex.Hosting;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.OpenApi
@@ -24,9 +24,9 @@ namespace Squidex.Areas.Api.Config.OpenApi
             Url = "https://docs.squidex.io"
         };
 
-        public CommonProcessor(ExposedValues exposedValues, IOptions<UrlsOptions> urlOptions)
+        public CommonProcessor(ExposedValues exposedValues, IUrlGenerator urlGenerator)
         {
-            logoUrl = urlOptions.Value.BuildUrl("images/logo-white.png", false);
+            logoUrl = urlGenerator.BuildUrl("images/logo-white.png", false);
 
             if (!exposedValues.TryGetValue("version", out version!) || version == null)
             {

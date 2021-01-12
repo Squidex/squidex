@@ -1,4 +1,3 @@
-import { Params } from '@angular/router';
 /*
  * Squidex Headless CMS
  *
@@ -6,7 +5,7 @@ import { Params } from '@angular/router';
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Query } from '@app/shared/internal';
+import { Query, QueryParams } from '@app/shared/internal';
 import { equalsQuery, QueryFullTextSynchronizer, QuerySynchronizer } from './query';
 
 describe('equalsQuery', () => {
@@ -59,50 +58,50 @@ describe('equalsQuery', () => {
 describe('QueryFullTextSynchronizer', () => {
     const synchronizer = new QueryFullTextSynchronizer();
 
-    it('should write full text to route', () => {
-        const params: Params = {};
-
+    it('should parse from state', () => {
         const value = { fullText: 'my-query' };
 
-        synchronizer.writeValue(value, params);
+        const query = synchronizer.parseFromState({ query: value });
 
-        expect(params).toEqual({ query: 'my-query' });
+        expect(query).toEqual({ query: 'my-query' });
     });
 
-    it('Should write undefined when not a query', () => {
-        const params: Params = {};
-
+    it('should parse from state as undefined when not a query', () => {
         const value = 123;
 
-        synchronizer.writeValue(value, params);
+        const query = synchronizer.parseFromState({ query: value });
 
-        expect(params).toEqual({ query: undefined });
+        expect(query).toBeUndefined();
     });
 
-    it('Should write undefined query has no full text', () => {
-        const params: Params = {};
+    it('should parse from state as undefined when no full text', () => {
+        const value = { fullText: undefined };
 
+        const query = synchronizer.parseFromState({ query: value });
+
+        expect(query).toBeUndefined();
+    });
+
+    it('should parse from state as undefined when empty full text', () => {
         const value = { fullText: '' };
 
-        synchronizer.writeValue(value, params);
+        const query = synchronizer.parseFromState({ query: value });
 
-        expect(params).toEqual({ query: undefined });
+        expect(query).toBeUndefined();
     });
 
     it('should get query from route', () => {
-        const params: Params = {
-            query: 'my-query'
-        };
+        const params: QueryParams = { query: 'my-query' };
 
-        const value = synchronizer.getValue(params);
+        const value = synchronizer.parseFromRoute(params);
 
-        expect(value).toEqual({ fullText: 'my-query' });
+        expect(value).toEqual({ query: { fullText: 'my-query' } });
     });
 
     it('should get query as undefined from route', () => {
-        const params: Params = {};
+        const params: QueryParams = {};
 
-        const value = synchronizer.getValue(params);
+        const value = synchronizer.parseFromRoute(params);
 
         expect(value).toBeUndefined();
     });
@@ -111,50 +110,41 @@ describe('QueryFullTextSynchronizer', () => {
 describe('QuerySynchronizer', () => {
     const synchronizer = new QuerySynchronizer();
 
-    it('should write query to route', () => {
-        const params: Params = {};
-
+    it('should parse from state', () => {
         const value = { filter: 'my-filter' };
 
-        synchronizer.writeValue(value, params);
+        const query = synchronizer.parseFromState({ query: value });
 
-        expect(params).toEqual({ query: '{"filter":"my-filter","sort":[]}' });
+        expect(query).toEqual({ query: '{"filter":"my-filter","sort":[]}' });
     });
-
-    it('Should write undefined when not a query', () => {
-        const params: Params = {};
-
+    it('should parse from state as undefined when not a query', () => {
         const value = 123;
 
-        synchronizer.writeValue(value, params);
+        const query = synchronizer.parseFromState({ query: value });
 
-        expect(params).toEqual({ query: undefined });
+        expect(query).toBeUndefined();
     });
 
     it('should get query from route', () => {
-        const params: Params = {
-            query: '{"filter":"my-filter"}'
-        };
+        const params: QueryParams = { query: '{"filter":"my-filter"}' };
 
-        const value = synchronizer.getValue(params) as any;
+        const value = synchronizer.parseFromRoute(params) as any;
 
-        expect(value).toEqual({ filter: 'my-filter' });
+        expect(value).toEqual({ query: { filter: 'my-filter' } });
     });
 
     it('should get query full text from route', () => {
-        const params: Params = {
-            query: 'my-query'
-        };
+        const params: QueryParams = { query: 'my-query' };
 
-        const value = synchronizer.getValue(params);
+        const value = synchronizer.parseFromRoute(params);
 
-        expect(value).toEqual({ fullText: 'my-query' });
+        expect(value).toEqual({ query: { fullText: 'my-query' } });
     });
 
     it('should get query as undefined from route', () => {
-        const params: Params = {};
+        const params: QueryParams = {};
 
-        const value = synchronizer.getValue(params);
+        const value = synchronizer.parseFromRoute(params);
 
         expect(value).toBeUndefined();
     });

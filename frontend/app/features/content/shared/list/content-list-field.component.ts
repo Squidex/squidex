@@ -5,9 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ContentDto, getContentValue, LanguageDto, MetaFields, RootFieldDto, TableField, Types } from '@app/shared';
+import { ContentDto, FieldValue, getContentValue, LanguageDto, MetaFields, RootFieldDto, StatefulComponent, TableField, Types } from '@app/shared';
+
+interface State {
+    // The formatted value.
+    formatted: FieldValue;
+}
 
 @Component({
     selector: 'sqx-content-list-field',
@@ -15,7 +20,7 @@ import { ContentDto, getContentValue, LanguageDto, MetaFields, RootFieldDto, Tab
     templateUrl: './content-list-field.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentListFieldComponent implements OnChanges {
+export class ContentListFieldComponent extends StatefulComponent<State> implements OnChanges {
     @Input()
     public field: TableField;
 
@@ -31,7 +36,11 @@ export class ContentListFieldComponent implements OnChanges {
     @Input()
     public language: LanguageDto;
 
-    public value: any;
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector, {
+            formatted: ''
+        });
+    }
 
     public ngOnChanges() {
         this.reset();
@@ -49,7 +58,7 @@ export class ContentListFieldComponent implements OnChanges {
                 }
             }
 
-            this.value = formatted;
+            this.next({ formatted });
         }
     }
 

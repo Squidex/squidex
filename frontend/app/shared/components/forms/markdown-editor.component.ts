@@ -197,23 +197,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     public insertAssets(assets: ReadonlyArray<AssetDto>) {
-        let content = '';
-
-        for (const asset of assets) {
-            const name = asset.fileNameWithoutExtension;
-
-            switch (asset.type) {
-                case 'Image':
-                    content += `![${name}](${asset.fullUrl(this.apiUrl)} '${name}')`;
-                    break;
-                case 'Video':
-                    content += `[${name}](${asset.fullUrl(this.apiUrl)}')`;
-                    break;
-                default:
-                    content += `[${name}](${asset.fullUrl(this.apiUrl)}')`;
-                    break;
-            }
-        }
+        const content = this.buildMarkups(assets);
 
         if (content.length > 0) {
             this.simplemde.codemirror.replaceSelection(content);
@@ -259,9 +243,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    const name = asset.fileNameWithoutExtension;
-
-                    replaceText(`![${name}](${asset.fullUrl(this.apiUrl)} '${name}')`);
+                    replaceText(this.buildMarkup(asset));
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {
@@ -279,6 +261,28 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
 
         this.renderer.appendChild(target, this.inner.nativeElement);
 
-        this.next(s => ({ ...s, isFullscreen }));
+        this.next({ isFullscreen });
+    }
+
+    private buildMarkups(assets: readonly AssetDto[]) {
+        let content = '';
+
+        for (const asset of assets) {
+            content += this.buildMarkup(asset);
+        }
+
+        return content;
+    }
+
+    private buildMarkup(asset: AssetDto) {
+        const name = asset.fileNameWithoutExtension;
+
+        if (asset.type === 'Image' || asset.mimeType === 'image/svg+xml' || asset.fileName.endsWith('.svg')) {
+            return `![${name}](${asset.fullUrl(this.apiUrl)} '${name}')`;
+        } else if (asset.type === 'Video') {
+            return `[${name}](${asset.fullUrl(this.apiUrl)}')`;
+        } else {
+            return `[${name}](${asset.fullUrl(this.apiUrl)}')`;
+        }
     }
 }

@@ -18,9 +18,6 @@ interface State {
     // The content items to show.
     contentItems: ReadonlyArray<ContentDto>;
 
-    // The maximum number of columns.
-    columns: number;
-
     // True, when width less than 600 pixels.
     isCompact?: boolean;
 }
@@ -45,6 +42,9 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
+    public formContext: any;
+
+    @Input()
     public allowDuplicates = true;
 
     public contentCreatorDialog = new DialogModel();
@@ -54,7 +54,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService
     ) {
-        super(changeDetector, { contentItems: [], columns: 0 });
+        super(changeDetector, { contentItems: [] });
     }
 
     public writeValue(obj: any) {
@@ -79,13 +79,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     }
 
     public setContentItems(contentItems: ReadonlyArray<ContentDto>) {
-        let columns = 1;
-
-        for (const content of contentItems) {
-            columns = Math.max(columns, content.referenceFields.length);
-        }
-
-        this.next(s => ({ ...s, contentItems, columns }));
+        this.next({ contentItems });
     }
 
     public select(contents: ReadonlyArray<ContentDto>) {
@@ -128,7 +122,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     }
 
     public setCompact(isCompact: boolean) {
-        this.next(s => ({ ...s, isCompact }));
+        this.next({ isCompact });
     }
 
     public trackByContent(_index: number, content: ContentDto) {

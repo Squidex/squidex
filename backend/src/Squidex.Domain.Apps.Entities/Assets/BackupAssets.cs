@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -101,12 +101,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (assetIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetDomainObject, AssetState>(assetIds);
+                await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds);
             }
 
             if (assetFolderIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderState>(assetFolderIds);
+                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(assetFolderIds);
             }
         }
 

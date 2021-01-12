@@ -6,7 +6,7 @@
  */
 
 import { ErrorDto } from '@app/framework';
-import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, Pager, versioned } from '@app/shared/internal';
+import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, versioned } from '@app/shared/internal';
 import { EMPTY, of, throwError } from 'rxjs';
 import { catchError, onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -17,7 +17,6 @@ describe('ContributorsState', () => {
     const {
         app,
         appsState,
-        buildDummyStateSynchronizer,
         newVersion,
         version
     } = TestValues;
@@ -53,9 +52,9 @@ describe('ContributorsState', () => {
             contributorsState.load().subscribe();
 
             expect(contributorsState.snapshot.contributors).toEqual(oldContributors.items);
-            expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 0, 10));
             expect(contributorsState.snapshot.isLoaded).toBeTruthy();
             expect(contributorsState.snapshot.isLoading).toBeFalsy();
+            expect(contributorsState.snapshot.total).toEqual(20);
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(version);
 
@@ -83,26 +82,28 @@ describe('ContributorsState', () => {
 
             let contributors: ReadonlyArray<ContributorDto>;
 
-            contributorsState.contributorsPaged.subscribe(result => {
+            contributorsState.contributorsFiltered.subscribe(result => {
                 contributors = result;
             });
 
             expect(contributors!).toEqual(oldContributors.items.slice(0, 10));
-            expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 0, 10));
+            expect(contributorsState.snapshot.page).toEqual(0);
+            expect(contributorsState.snapshot.pageSize).toEqual(10);
         });
 
         it('should show with new pagination when paging', () => {
             contributorsState.load().subscribe();
-            contributorsState.setPager(new Pager(20, 1, 10));
+            contributorsState.page({ page: 1, pageSize: 10 });
 
             let contributors: ReadonlyArray<ContributorDto>;
 
-            contributorsState.contributorsPaged.subscribe(result => {
+            contributorsState.contributorsFiltered.subscribe(result => {
                 contributors = result;
             });
 
             expect(contributors!).toEqual(oldContributors.items.slice(10, 20));
-            expect(contributorsState.snapshot.contributorsPager).toEqual(new Pager(20, 1, 10));
+            expect(contributorsState.snapshot.page).toEqual(1);
+            expect(contributorsState.snapshot.pageSize).toEqual(10);
         });
 
         it('should show filtered contributors when searching', () => {
@@ -111,25 +112,13 @@ describe('ContributorsState', () => {
 
             let contributors: ReadonlyArray<ContributorDto>;
 
-            contributorsState.contributorsPaged.subscribe(result => {
+            contributorsState.contributorsFiltered.subscribe(result => {
                 contributors = result;
             });
 
             expect(contributors!).toEqual(createContributors(4, 14).items);
-            expect(contributorsState.snapshot.contributorsPager.page).toEqual(0);
-        });
-
-        it('should load when synchronizer triggered', () => {
-            const { synchronizer, trigger } = buildDummyStateSynchronizer();
-
-            contributorsState.loadAndListen(synchronizer);
-
-            trigger();
-            trigger();
-
-            expect().nothing();
-
-            contributorsService.verify(x => x.getContributors(app), Times.exactly(2));
+            expect(contributorsState.snapshot.page).toEqual(0);
+            expect(contributorsState.snapshot.pageSize).toEqual(10);
         });
 
         it('should show notification on load when reload is true', () => {

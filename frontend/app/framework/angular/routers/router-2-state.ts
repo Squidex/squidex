@@ -5,21 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: forin
 // tslint:disable: readonly-array
 
 import { Injectable, OnDestroy } from '@angular/core';
-import { ActivatedRoute, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Params, Router } from '@angular/router';
-import { LocalStoreService, Pager, Types } from '@app/framework/internal';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { LocalStoreService, Types } from '@app/framework/internal';
 import { State } from '@app/framework/state';
 import { Subscription } from 'rxjs';
 
-export interface RouteSynchronizer {
-    getValue(params: Params): any;
+export type QueryParams = { [name: string]: string };
 
-    writeValue(state: any, params: Params): void;
+export interface RouteSynchronizer {
+    readonly keys: ReadonlyArray<string>;
+
+    parseFromRoute(query: QueryParams): object | undefined;
+
+    parseFromState(state: any): QueryParams | undefined;
 }
 
-export class PagerSynchronizer implements RouteSynchronizer {
+export class PagingSynchronizer implements RouteSynchronizer {
+    public readonly keys = ['page', 'pageSize'];
+
     constructor(
         private readonly localStore: LocalStoreService,
         private readonly storeName: string,
@@ -27,10 +34,10 @@ export class PagerSynchronizer implements RouteSynchronizer {
     ) {
     }
 
-    public getValue(params: Params) {
+    public parseFromRoute(query: QueryParams) {
         let pageSize = 0;
 
-        const pageSizeValue = params['take'];
+        const pageSizeValue = query['pageSize'];
 
         if (Types.isString(pageSizeValue)) {
             pageSize = parseInt(pageSizeValue, 10);
@@ -44,62 +51,72 @@ export class PagerSynchronizer implements RouteSynchronizer {
             pageSize = this.defaultSize;
         }
 
-        let page = parseInt(params['page'], 10);
+        let page = parseInt(query['page'], 10);
 
         if (page <= 0 || isNaN(page)) {
             page = 0;
         }
 
-        return new Pager(0, page, pageSize, true);
+        return { page, pageSize };
     }
 
-    public writeValue(state: any, params: Params) {
-        params['page'] = undefined;
-        params['take'] = undefined;
+    public parseFromState(state: any) {
+        let page = undefined;
 
-        if (Types.is(state, Pager)) {
-            if (state.page > 0) {
-                params['page'] = state.page.toString();
-            }
+        const pageSize: number = state.pageSize;
 
-            if (state.pageSize > 0) {
-                params['take'] = state.pageSize.toString();
-
-                this.localStore.setInt(`${this.storeName}.pageSize`, state.pageSize);
-            }
+        if (state.page > 0) {
+            page = state.page.toString();
         }
+
+        this.localStore.setInt(`${this.storeName}.pageSize`, pageSize);
+
+        return { page, pageSize: pageSize.toString() };
     }
 }
 
 export class StringSynchronizer implements RouteSynchronizer {
+    public get keys() {
+        return [this.key];
+    }
+
     constructor(
-        private readonly name: string
+        private readonly key: string,
+        private readonly fallback?: string
     ) {
     }
 
-    public getValue(params: Params) {
-        const value = params[this.name];
+    public parseFromRoute(params: QueryParams) {
+        if (!params.hasOwnProperty(this.key)) {
+            return { [this.key]: this.fallback };
+        }
 
-        return value;
+        const value = params[this.key];
+
+        return { [this.key]: value };
     }
 
-    public writeValue(state: any, params: Params) {
-        params[this.name] = undefined;
+    public parseFromState(state: any) {
+        const value = state[this.key];
 
-        if (Types.isString(state)) {
-            params[this.name] = state;
+        if (Types.isString(value)) {
+            return { [this.key]: value };
         }
     }
 }
 
 export class StringKeysSynchronizer implements RouteSynchronizer {
+    public get keys() {
+        return [this.key];
+    }
+
     constructor(
-        private readonly name: string
+        private readonly key: string
     ) {
     }
 
-    public getValue(params: Params) {
-        const value = params[this.name];
+    public parseFromRoute(query: QueryParams) {
+        const value = query[this.key];
 
         const result: { [key: string]: boolean } = {};
 
@@ -111,17 +128,17 @@ export class StringKeysSynchronizer implements RouteSynchronizer {
             }
         }
 
-        return result;
+        return { [this.key]: result };
     }
 
-    public writeValue(state: any, params: Params) {
-        params[this.name] = undefined;
+    public parseFromState(state: any) {
+        const value = state[this.key];
 
-        if (Types.isObject(state)) {
-            const value = Object.keys(state).join(',');
+        if (Types.isObject(value)) {
+            const items = Object.keys(value).join(',');
 
-            if (value.length > 0) {
-                params[this.name] = value;
+            if (items.length > 0) {
+                return { [this.key]: items };
             }
         }
     }
@@ -132,19 +149,15 @@ export interface StateSynchronizer {
 }
 
 export interface StateSynchronizerMap<T> {
-    keep(key: keyof T & string): this;
+    withString(key: keyof T & string): this;
 
-    withString(key: keyof T & string, urlName: string): this;
+    withStrings(key: keyof T & string): this;
 
-    withStrings(key: keyof T & string, urlName: string): this;
+    withPaging(storeName: string, defaultSize: number): this;
 
-    withPager(key: keyof T & string, storeName: string, defaultSize: number): this;
+    withSynchronizer(synchronizer: RouteSynchronizer): this;
 
-    whenSynced(action: () => void): this;
-
-    withSynchronizer(key: keyof T & string, synchronizer: RouteSynchronizer): this;
-
-    build(): void;
+    getInitial(): Partial<T>;
 }
 
 @Injectable()
@@ -158,28 +171,34 @@ export class Router2State implements OnDestroy, StateSynchronizer {
     ) {
     }
 
+    public getInitial() {
+        return this.mapper?.getInitial();
+    }
+
+    public listen() {
+        this.mapper?.listen();
+    }
+
+    public unlisten() {
+        this.mapper?.unlisten();
+    }
+
     public ngOnDestroy() {
-        this.mapper?.destroy();
+        this.unlisten();
     }
 
     public mapTo<T extends object>(state: State<T>) {
-        this.mapper?.destroy();
-        this.mapper = this.mapper || new Router2StateMap<T>(state, this.route, this.router, this.localStore);
+        this.mapper?.unlisten();
+        this.mapper = new Router2StateMap<T>(state, this.route, this.router, this.localStore);
 
         return this.mapper;
     }
 }
 
 export class Router2StateMap<T extends object> implements StateSynchronizerMap<T> {
-    private readonly syncs: { [field: string]: { synchronizer: RouteSynchronizer, value: any } } = {};
-    private readonly keysToKeep: string[] = [];
-    private syncDone: (() => void)[] = [];
-    private lastSyncedParams: Params | undefined;
-    private subscriptionChanges: Subscription;
-    private subscriptionQueryParams: Subscription;
-    private subscriptionEvents: Subscription;
-    private isNavigating = false;
-    private pendingParams?: Params;
+    private readonly syncs: RouteSynchronizer[] = [];
+    private lastSyncedQuery: QueryParams;
+    private stateSubscription: Subscription;
 
     constructor(
         private readonly state: State<T>,
@@ -189,166 +208,75 @@ export class Router2StateMap<T extends object> implements StateSynchronizerMap<T
     ) {
     }
 
-    public build() {
-        this.subscriptionQueryParams =
-            this.route.queryParams
-                .subscribe(q =>  this.syncFromRoute(q));
+    public listen() {
+        this.stateSubscription = this.state.changes.subscribe(s => this.syncToRoute(s));
 
-        this.subscriptionChanges =
-            this.state.changes
-                .subscribe(s => this.syncToRoute(s));
-
-        this.subscriptionEvents =
-            this.router.events
-                .subscribe(event => {
-                    if (Types.is(event, NavigationStart)) {
-                        this.isNavigating = true;
-                    } else if (
-                        Types.is(event, NavigationEnd) ||
-                        Types.is(event, NavigationCancel) ||
-                        Types.is(event, NavigationError)) {
-                        this.isNavigating = false;
-
-                        if (this.pendingParams) {
-                            this.syncFromParams(this.pendingParams);
-                        }
-                    }
-                });
+        return this;
     }
 
-    public destroy() {
-        this.syncDone = [];
-
-        this.subscriptionQueryParams?.unsubscribe();
-        this.subscriptionChanges?.unsubscribe();
-        this.subscriptionEvents?.unsubscribe();
+    public unlisten() {
+        this.stateSubscription?.unsubscribe();
     }
 
     private syncToRoute(state: T) {
-        let isChanged = false;
+        const query: Params = {};
 
-        for (const key in this.syncs) {
-            if (this.syncs.hasOwnProperty(key)) {
-                const target = this.syncs[key];
+        for (const sync of this.syncs) {
+            const values = sync.parseFromState(state);
 
-                const value = state[key];
-
-                if (value !== target.value) {
-                    target.value = value;
-
-                    isChanged = true;
-                }
+            for (const key of sync.keys) {
+                query[key] = values?.[key];
             }
         }
 
-        if (!isChanged) {
+        if (Types.equals(this.lastSyncedQuery, query)) {
             return;
         }
 
-        const query: Params = {};
-
-        for (const key in this.syncs) {
-            if (this.syncs.hasOwnProperty(key)) {
-                const { synchronizer, value } = this.syncs[key];
-
-                synchronizer.writeValue(value, query);
-            }
-        }
-
-        if (this.isNavigating) {
-            this.pendingParams = query;
-        } else {
-            this.syncFromParams(query);
-        }
-    }
-
-    private syncFromParams(query: Params) {
-        this.pendingParams = undefined;
+        this.lastSyncedQuery = query;
 
         this.router.navigate([], {
             queryParams: query,
             queryParamsHandling: 'merge',
             replaceUrl: true
         });
-
-        this.lastSyncedParams = cleanupParams(query);
     }
 
-    private syncFromRoute(query: Params) {
-        query = cleanupParams(query);
-
-        if (Types.equals(this.lastSyncedParams, query)) {
-            return;
-        }
-
+    public getInitial() {
         const update: Partial<T> = {};
 
-        for (const key in this.syncs) {
-            if (this.syncs.hasOwnProperty(key)) {
-                const target = this.syncs[key];
+        const query = this.route.snapshot.queryParams;
 
-                const value = target.synchronizer.getValue(query);
+        for (const sync of this.syncs) {
+            const values = sync.parseFromRoute(query);
 
-                if (value) {
-                    update[key] = value;
-                }
+            for (const key of sync.keys) {
+                update[key] = values?.[key];
             }
         }
 
-        for (const key of this.keysToKeep) {
-            update[key] = this.state.snapshot[key];
-        }
-
-        if (this.state.resetState(update)) {
-            for (const action of this.syncDone) {
-                action();
-            }
-        }
+        return update;
     }
 
-    public keep(key: keyof T & string) {
-        this.keysToKeep.push(key);
+    public withString(key: keyof T & string) {
+        return this.withSynchronizer(new StringSynchronizer(key));
+    }
+
+    public withStringOr(key: keyof T & string, fallback: string) {
+        return this.withSynchronizer(new StringSynchronizer(key, fallback));
+    }
+
+    public withStrings(key: keyof T & string) {
+        return this.withSynchronizer(new StringKeysSynchronizer(key));
+    }
+
+    public withPaging(storeName: string, defaultSize = 10) {
+        return this.withSynchronizer(new PagingSynchronizer(this.localStore, storeName, defaultSize));
+    }
+
+    public withSynchronizer(synchronizer: RouteSynchronizer) {
+        this.syncs.push(synchronizer);
 
         return this;
     }
-
-    public withString(key: keyof T & string, urlName: string) {
-        return this.withSynchronizer(key, new StringSynchronizer(urlName));
-    }
-
-    public withStrings(key: keyof T & string, urlName: string) {
-        return this.withSynchronizer(key, new StringKeysSynchronizer(urlName));
-    }
-
-    public withPager(key: keyof T & string, storeName: string, defaultSize = 10) {
-        return this.withSynchronizer(key, new PagerSynchronizer(this.localStore, storeName, defaultSize));
-    }
-
-    public whenSynced(action: () => void) {
-        this.syncDone.push(action);
-
-        return this;
-    }
-
-    public withSynchronizer(key: keyof T & string, synchronizer: RouteSynchronizer) {
-        const previous = this.syncs[key];
-
-        this.syncs[key] = { synchronizer, value: previous?.value };
-
-        return this;
-    }
-}
-
-function cleanupParams(query: Params) {
-    for (const key in query) {
-        if (query.hasOwnProperty(key)) {
-            const value = query[key];
-
-            if (Types.isNull(value) || Types.isUndefined(value)) {
-                delete query[key];
-            }
-        }
-    }
-
-    return query;
 }

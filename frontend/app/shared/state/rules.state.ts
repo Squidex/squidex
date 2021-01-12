@@ -68,19 +68,19 @@ export class RulesState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rulesService: RulesService
     ) {
-        super({ rules: [] });
+        super({ rules: [] }, 'Rules');
     }
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            this.resetState('Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         return this.rulesService.getRules(this.appName).pipe(
             tap(({ items: rules, runningRuleId, canCancelRun, canCreate, canReadEvents }) => {
@@ -96,10 +96,10 @@ export class RulesState extends State<Snapshot> {
                     isLoading: false,
                     runningRuleId,
                     rules
-                });
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -111,7 +111,7 @@ export class RulesState extends State<Snapshot> {
                     const rules = [...s.rules, created];
 
                     return { ...s, rules };
-                });
+                }, 'Created');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -123,7 +123,7 @@ export class RulesState extends State<Snapshot> {
                     const rules = s.rules.removeBy('id', rule);
 
                     return { ...s, rules };
-                });
+                }, 'Deleted');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -205,7 +205,7 @@ export class RulesState extends State<Snapshot> {
             const rules = s.rules.replaceBy('id', rule);
 
             return { ...s, rules };
-        });
+        }, 'Updated');
     }
 
     private get appName() {

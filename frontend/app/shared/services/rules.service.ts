@@ -255,7 +255,7 @@ export class RulesService {
 
         return this.http.get<{ items: [] } & Resource & { runningRuleId?: string }>(url).pipe(
             map(({ items, _links, runningRuleId }) => {
-                const rules = items.map(item => parseRule(item));
+                const rules = items.map(parseRule);
 
                 return new RulesDto(rules, _links, runningRuleId);
             }),

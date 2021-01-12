@@ -10,11 +10,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.UsageTracking;
@@ -34,16 +34,16 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IDataProtector dataProtector;
-        private readonly UrlsOptions urlsOptions;
+        private readonly IUrlGenerator urlGenerator;
 
         public UsagesController(
             ICommandBus commandBus,
+            IDataProtectionProvider dataProtection,
             IApiUsageTracker usageTracker,
             IAppLogStore appLogStore,
             IAppPlansProvider appPlansProvider,
             IAssetUsageTracker assetStatsRepository,
-            IDataProtectionProvider dataProtection,
-            IOptions<UrlsOptions> urlsOptions)
+            IUrlGenerator urlGenerator)
             : base(commandBus)
         {
             this.usageTracker = usageTracker;
@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             this.appLogStore = appLogStore;
             this.appPlansProvider = appPlansProvider;
             this.assetStatsRepository = assetStatsRepository;
-            this.urlsOptions = urlsOptions.Value;
+            this.urlGenerator = urlGenerator;
 
             dataProtector = dataProtection.CreateProtector("LogToken");
         }
@@ -73,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         {
             var token = dataProtector.Protect(App.Id.ToString());
 
-            var url = urlsOptions.BuildUrl($"/api/apps/log/{token}/");
+            var url = urlGenerator.BuildUrl($"/api/apps/log/{token}/");
 
             var response = new LogDownloadDto { DownloadUrl = url };
 

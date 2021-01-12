@@ -348,7 +348,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             script = null!;
 
-            var comparer = StringComparison.OrdinalIgnoreCase;
+            const StringComparison comparer = StringComparison.OrdinalIgnoreCase;
 
             if (text.StartsWith(ScriptPrefix, comparer) && text.EndsWith(ScriptSuffix, comparer))
             {
@@ -366,7 +366,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             script = null!;
 
-            var comparer = StringComparison.OrdinalIgnoreCase;
+            const StringComparison comparer = StringComparison.OrdinalIgnoreCase;
 
             if (text.StartsWith(TemplatePrefix, comparer) && text.EndsWith(TemplateSuffix, comparer))
             {

@@ -6,14 +6,14 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ApiUrlConfig, AppsState, ContentDto, LanguageDto, ManualContentsState, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-selector',
     styleUrls: ['./content-selector.component.scss'],
     templateUrl: './content-selector.component.html',
     providers: [
-        ManualContentsState
+        ComponentContentsState
     ]
 })
 export class ContentSelectorComponent extends ResourceOwner implements OnInit {
@@ -47,7 +47,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     constructor(
         public readonly appsState: AppsState,
         public readonly apiUrl: ApiUrlConfig,
-        public readonly contentsState: ManualContentsState,
+        public readonly contentsState: ComponentContentsState,
         public readonly schemasState: SchemasState,
         private readonly changeDetector: ChangeDetectorRef
     ) {
@@ -61,7 +61,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
                     this.updateModel();
                 }));
 
-        this.schemas = this.schemasState.snapshot.schemas;
+        this.schemas = this.schemasState.snapshot.schemas.filter(x => x.canReadContents);
 
         if (this.schemaIds && this.schemaIds.length > 0) {
             this.schemas = this.schemas.filter(x => this.schemaIds.indexOf(x.id) >= 0);
@@ -112,10 +112,6 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
 
     public emitSelect() {
         this.select.emit(Object.values(this.selectedItems));
-    }
-
-    public selectLanguage(language: LanguageDto) {
-        this.language = language;
     }
 
     public selectAll(isSelected: boolean) {

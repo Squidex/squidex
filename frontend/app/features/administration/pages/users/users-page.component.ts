@@ -28,12 +28,19 @@ export class UsersPageComponent extends ResourceOwner implements OnInit {
         super();
 
         this.own(
-            this.usersState.usersQuery
+            this.usersState.query
                 .subscribe(q => this.usersFilter.setValue(q || '')));
     }
 
     public ngOnInit() {
-        this.usersState.loadAndListen(this.usersRoute);
+        const initial =
+            this.usersRoute.mapTo(this.usersState)
+                .withPaging('users', 10)
+                .withString('query')
+                .getInitial();
+
+        this.usersState.load(false, initial);
+        this.usersRoute.listen();
     }
 
     public reload() {
@@ -44,7 +51,7 @@ export class UsersPageComponent extends ResourceOwner implements OnInit {
         this.usersState.search(this.usersFilter.value);
     }
 
-    public trackByUser(_ndex: number, user: UserDto) {
+    public trackByUser(_index: number, user: UserDto) {
         return user.id;
     }
 }

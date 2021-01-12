@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { defined, DialogService, shareSubscribed, State, Types } from '@app/framework';
+import { DialogService, shareSubscribed, State, Types } from '@app/framework';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { AppDto, AppsService, CreateAppDto, UpdateAppDto } from './../services/apps.service';
@@ -24,11 +24,8 @@ export class AppsState extends State<Snapshot> {
     public apps =
         this.project(s => s.apps);
 
-    public selectedAppOrNull =
-        this.project(s => s.selectedApp);
-
     public selectedApp =
-        this.selectedAppOrNull.pipe(defined());
+        this.project(s => s.selectedApp);
 
     public get appName() {
         return this.snapshot.selectedApp?.name || '';
@@ -38,15 +35,11 @@ export class AppsState extends State<Snapshot> {
         return this.snapshot.selectedApp?.id || '';
     }
 
-    public get appDisplayName() {
-        return this.snapshot.selectedApp?.displayName || '';
-    }
-
     constructor(
         private readonly appsService: AppsService,
         private readonly dialogs: DialogService
     ) {
-        super({ apps: [], selectedApp: null });
+        super({ apps: [], selectedApp: null }, 'Apps');
     }
 
     public reloadSelected() {
@@ -57,9 +50,7 @@ export class AppsState extends State<Snapshot> {
     public select(name: string | null): Observable<AppDto | null> {
         return this.loadApp(name, true).pipe(
             tap(selectedApp => {
-                this.next(s => {
-                    return { ...s, selectedApp };
-                });
+                this.next({ selectedApp }, 'Selected');
             }));
     }
 
@@ -86,9 +77,7 @@ export class AppsState extends State<Snapshot> {
     public load(): Observable<any> {
         return this.appsService.getApps().pipe(
             tap(apps => {
-                this.next(s => {
-                    return { ...s, apps };
-                });
+                this.next({ apps }, 'Loaded');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -100,7 +89,7 @@ export class AppsState extends State<Snapshot> {
                     const apps = [...s.apps, created].sortedByString(x => x.displayName);
 
                     return { ...s, apps };
-                });
+                }, 'Created');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -158,7 +147,7 @@ export class AppsState extends State<Snapshot> {
                 s.selectedApp;
 
             return { ...s, apps, selectedApp };
-        });
+        }, 'Deleted');
     }
 
     private replaceApp(updated: AppDto, app: AppDto) {
@@ -172,6 +161,6 @@ export class AppsState extends State<Snapshot> {
                 s.selectedApp;
 
             return { ...s, apps, selectedApp };
-        });
+        }, 'Updated');
     }
 }

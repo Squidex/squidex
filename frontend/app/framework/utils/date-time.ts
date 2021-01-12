@@ -197,7 +197,7 @@ export class DateTime {
         let result = this.value.toISOString();
 
         if (withoutMilliseconds) {
-            result = result.slice(0, 19) + 'Z';
+            result = `${result.slice(0, 19)}Z`;
         }
 
         return result;

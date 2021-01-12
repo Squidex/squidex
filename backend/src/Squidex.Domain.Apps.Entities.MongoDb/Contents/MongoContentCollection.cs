@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     return await queryByQuery.QueryAsync(app, schemas, q);
                 }
 
-                throw new NotSupportedException();
+                return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                if (q.Ids != null && q.Ids.Count > 0l)
+                if (q.Ids != null && q.Ids.Count > 0)
                 {
                     return await queryByIds.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q);
                 }
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     return await queryByQuery.QueryAsync(app, schema, q, scope);
                 }
 
-                throw new NotSupportedException();
+                return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 

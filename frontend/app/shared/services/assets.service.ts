@@ -238,7 +238,7 @@ export class AssetsService {
 
             return this.http.post<{ total: number, items: any[], folders: any[] } & Resource>(url, body).pipe(
                 map(({ total, items, _links }) => {
-                    const assets = items.map(item => parseAsset(item));
+                    const assets = items.map(parseAsset);
 
                     return new AssetsDto(total, assets, _links);
                 }),
@@ -248,7 +248,7 @@ export class AssetsService {
 
             return this.http.get<{ total: number, items: any[], folders: any[] } & Resource>(url).pipe(
                 map(({ total, items, _links }) => {
-                    const assets = items.map(item => parseAsset(item));
+                    const assets = items.map(parseAsset);
 
                     return new AssetsDto(total, assets, _links);
                 }),
@@ -261,8 +261,8 @@ export class AssetsService {
 
         return this.http.get<{ total: number, items: any[], folders: any[], path: any[] } & Resource>(url).pipe(
             map(({ total, items, path, _links }) => {
-                const assetFolders = items.map(item => parseAssetFolder(item));
-                const assetPath = path.map(item => parseAssetFolder(item));
+                const assetFolders = items.map(parseAssetFolder);
+                const assetPath = path.map(parseAssetFolder);
 
                 return new AssetFoldersDto(total, assetFolders, assetPath, _links);
             }),
@@ -411,7 +411,7 @@ export class AssetsService {
     public deleteAssetItem(appName: string, asset: Resource, checkReferrers: boolean, version: Version): Observable<Versioned<any>> {
         const link = asset._links['delete'];
 
-        const url = this.apiUrl.buildUrl(link.href) + `?checkReferrers=${checkReferrers}`;
+        const url = `${this.apiUrl.buildUrl(link.href)}?checkReferrers=${checkReferrers}`;
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
             tap(() => {

@@ -292,7 +292,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content to fetch.</param>
         /// <returns>
-        /// 200 => Content validation result returned.
+        /// 204 => Content is valid.
+        /// 400 => Content not valid.
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>
@@ -300,19 +301,15 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/validity")]
-        [ProducesResponseType(typeof(ValidationResultDto), 200)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentValidity(string app, string name, DomainId id)
         {
             var command = new ValidateContent { ContentId = id };
 
-            var context = await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(command);
 
-            var result = context.Result<ValidationResult>();
-            var response = ValidationResultDto.FromResult(result);
-
-            return Ok(response);
+            return NoContent();
         }
 
         /// <summary>
@@ -520,7 +517,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsUpsert)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, DomainId id, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {

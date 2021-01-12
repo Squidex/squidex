@@ -12,7 +12,7 @@
             <sqx-iframe-editor [url]="field.properties.editorUrl"
                 [context]="formContext"
                 [formControl]="editorControl"
-                [formValue]="form?.value | async"
+                [formValue]="form.valueChanges | async"
                 [language]="language?.iso2Code">
             </sqx-iframe-editor>
 		</ng-container>
@@ -51,7 +51,7 @@
 					<sqx-geolocation-editor [formControl]="editorControl"></sqx-geolocation-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Json'">
-					<sqx-json-editor height="350" [formControl]="editorControl"></sqx-json-editor>
+					<sqx-code-editor height="350" [formControl]="editorControl" valueMode="Json"></sqx-code-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Number'">
 					<ng-container [ngSwitch]="field.rawProperties.editor">
@@ -83,6 +83,7 @@
                             <sqx-references-editor
                                 [formControl]="editorControl" 
                                 [allowDuplicates]="field.rawProperties.allowDuplicated"
+                                [formContext]="formContext"
                                 [language]="language"
                                 [languages]="languages"
                                 [schemaIds]="field.rawProperties.schemaIds">
@@ -175,8 +176,12 @@
 		</ng-template>
     </div>
 
-    <div *ngIf="canUnset" class="unset" title="Unset value">
-        <button type="button" class="btn btn-sm btn-secondary" [disabled]="isEmpty | async" (click)="unset()">
+    <div *ngIf="canUnset" class="unset" title="i18n:contents.unsetValue">
+        <button type="button" class="btn btn-sm btn-text-secondary force" [disabled]="isEmpty | async" 
+            (sqxConfirmClick)="unset()"
+            confirmTitle="i18n:contents.unsetValueConfirmTitle"
+            confirmText="i18n:contents.unsetValueConfirmText"
+            confirmRememberKey="unsetValue">
             <i class="icon-close"></i>
         </button>
     </div>

@@ -113,22 +113,38 @@ namespace Squidex.Infrastructure.Orleans
         [Fact, Trait("Category", "Dependencies")]
         public async Task Simple_grain_tests()
         {
-            var cluster =
-                new TestClusterBuilder(1)
-                    .AddSiloBuilderConfigurator<Configurator>()
-                    .Build();
+            var (cluster, grain) = await GetGrainAsync();
 
-            await cluster.DeployAsync();
+            try
+            {
+                var ex = await Assert.ThrowsAsync<OrleansWrapperException>(() => grain.ThrowCustomAsync());
 
-            var grain = cluster.GrainFactory.GetGrain<IExceptionGrain>(SingleGrain.Id);
-
-            var ex = await Assert.ThrowsAsync<OrleansWrapperException>(() => grain.ThrowCustomAsync());
-
-            Assert.Equal(typeof(InvalidException), ex.ExceptionType);
+                Assert.Equal(typeof(InvalidException), ex.ExceptionType);
+            }
+            finally
+            {
+                await Task.WhenAny(Task.Delay(2000), cluster.StopAllSilosAsync());
+            }
         }
 
         [Fact, Trait("Category", "Dependencies")]
         public async Task Simple_grain_tests_with_mongo_exception()
+        {
+            var (cluster, grain) = await GetGrainAsync();
+
+            try
+            {
+                var ex = await Assert.ThrowsAsync<OrleansWrapperException>(() => grain.ThrowMongoAsync());
+
+                Assert.Equal(typeof(MongoWriteException), ex.ExceptionType);
+            }
+            finally
+            {
+                await Task.WhenAny(Task.Delay(2000), cluster.StopAllSilosAsync());
+            }
+        }
+
+        private static async Task<(TestCluster, IExceptionGrain)> GetGrainAsync()
         {
             var cluster =
                 new TestClusterBuilder(1)
@@ -137,11 +153,7 @@ namespace Squidex.Infrastructure.Orleans
 
             await cluster.DeployAsync();
 
-            var grain = cluster.GrainFactory.GetGrain<IExceptionGrain>(SingleGrain.Id);
-
-            var ex = await Assert.ThrowsAsync<OrleansWrapperException>(() => grain.ThrowMongoAsync());
-
-            Assert.Equal(typeof(MongoWriteException), ex.ExceptionType);
+            return (cluster, cluster.GrainFactory.GetGrain<IExceptionGrain>(SingleGrain.Id));
         }
     }
 }

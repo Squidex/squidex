@@ -178,7 +178,7 @@ describe('RolesService', () => {
 
 export function createRoles(...ids: ReadonlyArray<number>): RolesPayload {
     return {
-        items: ids.map(id => createRole(id)),
+        items: ids.map(createRole),
         _links: {
             create: { method: 'POST', href: '/roles' }
         },

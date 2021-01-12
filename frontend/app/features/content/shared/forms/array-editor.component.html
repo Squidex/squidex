@@ -9,7 +9,6 @@
                 cdkDrag
                 cdkDragLockAxis="y">
                 <sqx-array-item
-                    (remove)="removeItem(i)"
                     [canUnset]="canUnset"
                     [form]="form"
                     [formContext]="formContext"
@@ -20,7 +19,9 @@
                     [isLast]="isLast"
                     [language]="language"
                     [languages]="languages"
-                    (clone)="addItem(itemForm)" (move)="move(itemForm, $event)" >
+                    (clone)="addItem(itemForm)"
+                    (itemRemove)="removeItem(i)"
+                    (itemMove)="move(itemForm, $event)" >
                     <i cdkDragHandle class="icon-drag2"></i>
                 </sqx-array-item>
             </div>

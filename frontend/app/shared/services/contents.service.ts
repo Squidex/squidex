@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: no-shadowed-variable
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
+import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { encodeQuery, Query } from './../state/query';
@@ -59,6 +61,10 @@ export class ContentDto {
     public readonly canDraftCreate: boolean;
     public readonly canUpdate: boolean;
 
+    public get canPublish() {
+        return this.statusUpdates.find(x => x.status === 'Published');
+    }
+
     constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly status: string,
@@ -84,8 +90,41 @@ export class ContentDto {
         this.canDraftDelete = hasAnyLink(links, 'draft/delete');
         this.canUpdate = hasAnyLink(links, 'update');
 
-        this.statusUpdates = Object.keys(links).filter(x => x.startsWith('status/')).map(x => ({ status: x.substr(7), color: links[x].metadata! }));
+        const updates: StatusInfo[] = [];
+
+        for (const link in links) {
+            if (link.startsWith('status/')) {
+                const status = link.substr(7);
+
+                updates.push({ status, color: links[link].metadata! });
+            }
+        }
+
+        this.statusUpdates = updates;
     }
+}
+
+export class BulkResultDto {
+    constructor(
+        public readonly contentId: string,
+        public readonly error?: ErrorDto
+    ) {
+    }
+}
+
+export interface BulkUpdateDto {
+    readonly jobs: ReadonlyArray<BulkUpdateJobDto>;
+    readonly doNotScript?: boolean;
+    readonly checkReferrers?: boolean;
+}
+
+export interface BulkUpdateJobDto {
+    readonly id: string;
+    readonly type: 'Upsert' | 'ChangeStatus' | 'Delete' | 'Validate';
+    readonly status?: string;
+    readonly schema?: string;
+    readonly dueTime?: string | null;
+    readonly expectedVersion?: number;
 }
 
 export interface ContentQueryDto {
@@ -106,43 +145,9 @@ export class ContentsService {
     }
 
     public getContents(appName: string, schemaName: string, q?: ContentQueryDto): Observable<ContentsDto> {
-        const { ids, maxLength, query, skip, take } = q || {};
+        const { ids, maxLength } = q || {};
 
-        const queryParts: string[] = [];
-        const queryOdataParts: string[] = [];
-
-        let queryObj: Query | undefined;
-
-        if (ids && ids.length > 0) {
-            queryParts.push(`ids=${ids.join(',')}`);
-        } else {
-
-            if (query && query.fullText && query.fullText.indexOf('$') >= 0) {
-                queryOdataParts.push(`${query.fullText.trim()}`);
-
-                if (take && take > 0) {
-                    queryOdataParts.push(`$top=${take}`);
-                }
-
-                if (skip && skip > 0) {
-                    queryOdataParts.push(`$skip=${skip}`);
-                }
-            } else {
-                queryObj = { ...query };
-
-                if (take && take > 0) {
-                    queryObj.take = take;
-                }
-
-                if (skip && skip > 0) {
-                    queryObj.skip = skip;
-                }
-
-                queryParts.push(`q=${encodeQuery(queryObj)}`);
-            }
-        }
-
-        const fullQuery = [...queryParts, ...queryOdataParts].join('&');
+        const { fullQuery, queryOdataParts, queryObj } = buildQuery(q);
 
         if (fullQuery.length > (maxLength || 2000)) {
             const body: any = {};
@@ -161,7 +166,7 @@ export class ContentsService {
 
             return this.http.post<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url, body).pipe(
                 map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(x => parseContent(x));
+                    const contents = items.map(parseContent);
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
@@ -171,7 +176,7 @@ export class ContentsService {
 
             return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
                 map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(x => parseContent(x));
+                    const contents = items.map(parseContent);
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
@@ -189,7 +194,7 @@ export class ContentsService {
 
             return this.http.post<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url, body).pipe(
                 map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(x => parseContent(x));
+                    const contents = items.map(parseContent);
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
@@ -200,7 +205,7 @@ export class ContentsService {
 
             return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
                 map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(x => parseContent(x));
+                    const contents = items.map(parseContent);
 
                     return new ContentsDto(statuses, total, contents, _links);
                 }),
@@ -216,6 +221,34 @@ export class ContentsService {
                 return parseContent(payload.body);
             }),
             pretifyError('i18n:contents.loadContentFailed'));
+    }
+
+    public getContentReferences(appName: string, schemaName: string, id: string, q?: ContentQueryDto): Observable<ContentsDto> {
+        const { fullQuery } = buildQuery(q);
+
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/references?${fullQuery}`);
+
+        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
+            map(({ total, items, statuses, _links }) => {
+                const contents = items.map(parseContent);
+
+                return new ContentsDto(statuses, total, contents, _links);
+            }),
+            pretifyError('i18n:contents.loadFailed'));
+    }
+
+    public getContentReferencing(appName: string, schemaName: string, id: string, q?: ContentQueryDto): Observable<ContentsDto> {
+        const { fullQuery } = buildQuery(q);
+
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/referencing?${fullQuery}`);
+
+        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
+            map(({ total, items, statuses, _links }) => {
+                const contents = items.map(parseContent);
+
+                return new ContentsDto(statuses, total, contents, _links);
+            }),
+            pretifyError('i18n:contents.loadFailed'));
     }
 
     public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
@@ -301,32 +334,59 @@ export class ContentsService {
             pretifyError('i18n:contents.deleteVersionFailed'));
     }
 
-    public putStatus(appName: string, resource: Resource, status: string, checkReferrers: boolean, dueTime: string | null, version: Version): Observable<ContentDto> {
-        const link = resource._links[`status/${status}`];
+    public bulkUpdate(appName: string, schemaName: string, dto: BulkUpdateDto): Observable<ReadonlyArray<BulkResultDto>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/bulk`);
 
-        const url = this.apiUrl.buildUrl(link.href);
-
-        return HTTP.requestVersioned(this.http, link.method, url, version, { status, dueTime, checkReferrers }).pipe(
-            map(({ payload }) => {
-                return parseContent(payload.body);
+        return this.http.post<any[]>(url, dto).pipe(
+            map(body => {
+                return body.map(x => new BulkResultDto(x.contentId, parseError(x.error)));
             }),
-            tap(() => {
-                this.analytics.trackEvent('Content', 'Archived', appName);
-            }),
-            pretifyError(`Failed to ${status} content. Please reload.`));
-    }
-
-    public deleteContent(appName: string, resource: Resource, checkReferrers: boolean, version: Version): Observable<Versioned<any>> {
-        const link = resource._links['delete'];
-
-        const url = this.apiUrl.buildUrl(link.href) + `?checkReferrers=${checkReferrers}`;
-
-        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
             tap(() => {
                 this.analytics.trackEvent('Content', 'Deleted', appName);
             }),
-            pretifyError('i18n:contents.deleteFailed'));
+            pretifyError('i18n:contents.bulkFailed'));
     }
+}
+
+function buildQuery(q?: ContentQueryDto) {
+    const { ids, query, skip, take } = q || {};
+
+    const queryParts: string[] = [];
+    const queryOdataParts: string[] = [];
+
+    let queryObj: Query | undefined;
+
+    if (ids && ids.length > 0) {
+        queryParts.push(`ids=${ids.join(',')}`);
+    } else {
+
+        if (query && query.fullText && query.fullText.indexOf('$') >= 0) {
+            queryOdataParts.push(`${query.fullText.trim()}`);
+
+            if (take && take > 0) {
+                queryOdataParts.push(`$top=${take}`);
+            }
+
+            if (skip && skip > 0) {
+                queryOdataParts.push(`$skip=${skip}`);
+            }
+        } else {
+            queryObj = { ...query };
+
+            if (take && take > 0) {
+                queryObj.take = take;
+            }
+
+            if (skip && skip > 0) {
+                queryObj.skip = skip;
+            }
+
+            queryParts.push(`q=${encodeQuery(queryObj)}`);
+        }
+    }
+
+    const fullQuery = [...queryParts, ...queryOdataParts].join('&');
+    return { fullQuery, queryOdataParts, queryObj };
 }
 
 function parseContent(response: any) {
@@ -343,7 +403,7 @@ function parseContent(response: any) {
         response.schemaName,
         response.schemaDisplayName,
         response.referenceData,
-        response.referenceFields.map((item: any) => parseField(item)),
+        response.referenceFields.map(parseField),
         new Version(response.version.toString()));
 }
 
@@ -357,4 +417,15 @@ function parseScheduleJob(response: any) {
         response.scheduledBy,
         response.color,
         DateTime.parseISO(response.dueTime));
+}
+
+function parseError(response: any) {
+    if (!response) {
+        return undefined;
+    }
+
+    return new ErrorDto(
+        response.statusCode,
+        response.message,
+        response.details);
 }

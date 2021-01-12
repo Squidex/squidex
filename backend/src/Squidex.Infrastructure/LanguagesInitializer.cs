@@ -8,6 +8,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Squidex.Hosting;
 
 namespace Squidex.Infrastructure
 {

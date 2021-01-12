@@ -7,8 +7,7 @@
 
 // tslint:disable: readonly-array
 
-import { Params } from '@angular/router';
-import { RouteSynchronizer, Types } from '@app/framework';
+import { QueryParams, RouteSynchronizer, Types } from '@app/framework';
 import { StatusInfo } from './../services/contents.service';
 import { LanguageDto } from './../services/languages.service';
 import { MetaFields, SchemaDetailsDto } from './../services/schemas.service';
@@ -122,19 +121,21 @@ const DEFAULT_QUERY = {
 export class QueryFullTextSynchronizer implements RouteSynchronizer {
     public static readonly INSTANCE = new QueryFullTextSynchronizer();
 
-    public getValue(params: Params) {
+    public readonly keys = ['query'];
+
+    public parseFromRoute(params: QueryParams) {
         const query = params['query'];
 
         if (Types.isString(query)) {
-            return { fullText: query };
+            return { query: { fullText: query } };
         }
     }
 
-    public writeValue(state: any, params: Params) {
-        params['query'] = undefined;
+    public parseFromState(state: any) {
+        const value = state['query'];
 
-        if (Types.isObject(state) && Types.isString(state.fullText) && state.fullText.length > 0) {
-            params['query'] = state.fullText;
+        if (Types.isObject(value) && Types.isString(value.fullText) && value.fullText.length > 0) {
+            return { query: value.fullText };
         }
     }
 }
@@ -142,19 +143,21 @@ export class QueryFullTextSynchronizer implements RouteSynchronizer {
 export class QuerySynchronizer implements RouteSynchronizer {
     public static readonly INSTANCE = new QuerySynchronizer();
 
-    public getValue(params: Params) {
+    public readonly keys = ['query'];
+
+    public parseFromRoute(params: QueryParams) {
         const query = params['query'];
 
         if (Types.isString(query)) {
-            return deserializeQuery(query);
+            return { query: deserializeQuery(query) };
         }
     }
 
-    public writeValue(state: any, params: Params) {
-        params['query'] = undefined;
+    public parseFromState(state: any) {
+        const value = state['query'];
 
-        if (Types.isObject(state)) {
-            params['query'] = serializeQuery(state);
+        if (Types.isObject(value)) {
+            return { query: serializeQuery(value) };
         }
     }
 }

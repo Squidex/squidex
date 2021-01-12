@@ -170,7 +170,7 @@ steps:
     image: plugins/github-release
     settings:
       api_key:
-        from_secret: github_apikey
+        from_secret: NUGET_KEY
       files:
         - /release/binaries.zip
     volumes:
@@ -195,16 +195,6 @@ steps:
         - success
       event:
         - tag
-
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_webhook
-    when:
-      status:
-        - failure
-        - success
       
 volumes:
   - name: build
@@ -217,3 +207,15 @@ volumes:
   - name: docker2
     host:
       path: /var/lib/docker
+---
+kind: secret
+name: NUGET_KEY
+data: 7MOgaTTaiCYWGeilp5nJK2JRbGOY6u4IvbcAJ1FXStXlgYFXQMRJZaXMf2F1q5lIwTOEBZVgtnP+DvJvy/dKYjiEg97rPvqPkhI=
+---
+kind: secret
+name: DOCKER_USERNAME
+data: BRJUSatZx7X0MCxVq1QboS2DBeye7jnPoeuDi7ejkPDq8EDrrCVT9D2DuQ==
+---
+kind: secret
+name: DOCKER_PASSWORD
+data: 2JITndCjHwdCyJ/m/onZNnUlXxIJ5FhECC+gnY3klV9PIQYIyLwQ

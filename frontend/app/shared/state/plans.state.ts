@@ -76,19 +76,19 @@ export class PlansState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly plansService: PlansService
     ) {
-        super({ plans: [], version: Version.EMPTY });
+        super({ plans: [], version: Version.EMPTY }, 'Plans');
     }
 
     public load(isReload = false, overridePlanId?: string): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            this.resetState('Loading Initial');
         }
 
         return this.loadInternal(isReload, overridePlanId);
     }
 
     private loadInternal(isReload: boolean, overridePlanId?: string): Observable<any> {
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Started');
 
         return this.plansService.getPlans(this.appName).pipe(
             tap(({ version, payload }) => {
@@ -104,12 +104,12 @@ export class PlansState extends State<Snapshot> {
                     isLoaded: true,
                     isLoading: false,
                     isOwner: !payload.planOwner || payload.planOwner === this.userId,
-                    plans: plans,
+                    plans,
                     version
-                });
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -124,7 +124,7 @@ export class PlansState extends State<Snapshot> {
                         const plans = s.plans.map(x => this.createPlan(x.plan, planId));
 
                         return { ...s, plans, isOwner: true, version };
-                    });
+                    }, 'Change');
                 }
             }),
             shareSubscribed(this.dialogs));

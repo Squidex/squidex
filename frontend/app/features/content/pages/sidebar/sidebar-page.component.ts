@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiUrlConfig, ResourceOwner, Types } from '@app/framework/internal';
+import { ApiUrlConfig, defined, ResourceOwner, Types } from '@app/framework/internal';
 import { AppsState, AuthService, ContentsState, SchemasState } from '@app/shared';
 import { combineLatest } from 'rxjs';
 
@@ -44,7 +44,7 @@ export class SidebarPageComponent extends ResourceOwner implements AfterViewInit
     public ngAfterViewInit() {
         this.own(
             combineLatest([
-                this.schemasState.selectedSchema,
+                this.schemasState.selectedSchema.pipe(defined()),
                 this.contentsState.selectedContent
             ]).subscribe(([schema, content]) => {
                 const url =
@@ -79,7 +79,7 @@ export class SidebarPageComponent extends ResourceOwner implements AfterViewInit
                     } else if (type === 'resize') {
                         const { height } = event.data;
 
-                        this.iframe.nativeElement.height = height + 'px';
+                        this.iframe.nativeElement.height = `${height}px`;
                     } else if (type === 'navigate') {
                         const { url } = event.data;
 

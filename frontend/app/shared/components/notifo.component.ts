@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
-import { Pager, ResourceLoaderService, UIOptions } from '@app/framework';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { ResourceLoaderService, UIOptions } from '@app/framework';
 import { AuthService } from '@app/shared/internal';
 
 @Component({
@@ -18,9 +18,6 @@ import { AuthService } from '@app/shared/internal';
 export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     private readonly notifoApiUrl: string;
     private readonly notifoApiKey: string | undefined;
-
-    @Output()
-    public pagerChange = new EventEmitter<Pager>();
 
     @Input()
     public topic: string;

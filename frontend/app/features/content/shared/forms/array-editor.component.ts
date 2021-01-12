@@ -83,7 +83,7 @@ export class ArrayEditorComponent implements OnChanges {
         this.reset();
     }
 
-    public move(index: number, item: FieldArrayItemForm) {
+    public move(item: FieldArrayItemForm, index: number) {
         this.formModel.move(index, item);
 
         this.reset();

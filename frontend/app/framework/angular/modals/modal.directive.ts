@@ -110,7 +110,7 @@ export class ModalDirective implements OnDestroy {
         if (isModel(value)) {
             this.currentModel = value;
 
-            this.eventsModel.own(value.isOpen.subscribe(isOpen => this.update(isOpen)));
+            this.eventsModel.own(value.isOpenChanges.subscribe(isOpen => this.update(isOpen)));
         } else {
             this.update(value === true);
         }

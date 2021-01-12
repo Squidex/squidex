@@ -39,7 +39,7 @@ export class ApiUrlConfig {
 
     constructor(value: string) {
         if (value.indexOf('/', value.length - 1) < 0) {
-            value = value + '/';
+            value = `${value}/`;
         }
 
         this.value = value;

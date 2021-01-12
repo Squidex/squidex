@@ -4,7 +4,7 @@
         autocorrect="off"
         autocapitalize="off">
     
-    <div class="control-dropdown-item" *ngIf="selectedItem">
+    <div class="control-dropdown-item" *ngIf="snapshot.selectedItem; let selectedItem">
         <span class="truncate" *ngIf="!templateSelection">{{selectedItem}}</span>
         
         <ng-template *ngIf="templateSelection" [sqxTemplateWrapper]="templateSelection" [item]="selectedItem"></ng-template>
@@ -20,10 +20,10 @@
 
             <div class="control-dropdown-items" #container>
                 <div *ngFor="let item of snapshot.suggestedItems; let i = index;" class="control-dropdown-item control-dropdown-item-selectable"
-                    [class.active]="i === snapshot.selectedIndex"
+                    [class.active]="i === snapshot.suggestedIndex"
                     [class.separated]="separated" 
                     (mousedown)="selectIndexAndClose(i)" 
-                    [sqxScrollActive]="i === snapshot.selectedIndex"
+                    [sqxScrollActive]="i === snapshot.suggestedIndex"
                     [sqxScrollContainer]="container">
                     <ng-container *ngIf="!templateItem">{{item}}</ng-container>
                     

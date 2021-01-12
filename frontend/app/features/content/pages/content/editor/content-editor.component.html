@@ -1,0 +1,24 @@
+
+<sqx-list-view>
+    <ng-container topHeader>
+        <div class="panel-alert panel-alert-danger" *ngIf="contentVersion">
+            <div class="float-right">
+                <a class="force" (click)="loadLatest.emit()">{{ 'contents.viewLatest' | sqxTranslate }}</a>
+            </div>
+
+            <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline"></div>
+        </div>
+    </ng-container>
+
+    <div content>
+        <sqx-content-section *ngFor="let section of contentForm.sections; trackBy: trackBySection"
+            [(language)]="language"
+            [form]="contentForm"
+            [formCompare]="contentFormCompare"
+            [formContext]="formContext"
+            [formSection]="section"
+            [languages]="languages"
+            [schema]="schema">
+        </sqx-content-section>
+    </div>
+</sqx-list-view>

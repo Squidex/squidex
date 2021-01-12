@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public sealed class EventEnricher : IEventEnricher
     {
-        private static readonly TimeSpan UserCacheDuration = TimeSpan.FromMinutes(10);
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly IMemoryCache userCache;
         private readonly IUserResolver userResolver;
 
@@ -56,11 +56,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private Task<IUser?> FindUserAsync(RefToken actor)
         {
-            var key = $"EventEnrichers_Users_{actor.Identifier}";
+            var cacheKey = $"{typeof(EventEnricher)}_Users_{actor.Identifier}";
 
-            return userCache.GetOrCreateAsync(key, async x =>
+            return userCache.GetOrCreateAsync(cacheKey, async x =>
             {
-                x.AbsoluteExpirationRelativeToNow = UserCacheDuration;
+                x.AbsoluteExpirationRelativeToNow = CacheDuration;
 
                 IUser? user;
                 try

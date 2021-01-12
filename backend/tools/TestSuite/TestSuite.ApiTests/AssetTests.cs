@@ -178,6 +178,16 @@ namespace TestSuite.ApiTests
                 // Should return 403 when not authenticated.
                 Assert.Contains("403", ex.Message);
             }
+
+
+            // STEP 6: Download asset without key and version.
+            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+            {
+                var ex = await Assert.ThrowsAsync<HttpRequestException>(() => _.DownloadAsync(asset_1, 0));
+
+                // Should return 403 when not authenticated.
+                Assert.Contains("403", ex.Message);
+            }
         }
 
         [Fact]

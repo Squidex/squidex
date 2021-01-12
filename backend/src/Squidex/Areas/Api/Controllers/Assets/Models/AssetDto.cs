@@ -203,13 +203,19 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             if (!string.IsNullOrWhiteSpace(response.Slug))
             {
-                response.AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id, more = response.Slug }));
+                var idValues = new { app, idOrSlug = response.Id, more = response.Slug };
 
-                response.AddGetLink("content/slug", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Slug }));
+                response.AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
+
+                var slugValues = new { app, idOrSlug = response.Slug };
+
+                response.AddGetLink("content/slug", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), slugValues));
             }
             else
             {
-                response.AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id }));
+                var idValues = new { app, idOrSlug = response.Id };
+
+                response.AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
             }
 
             return response;

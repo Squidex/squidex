@@ -2,10 +2,10 @@
     <div class="form-inline">
         <div class="form-group mr-1">
             <div *ngIf="!isCompact && isDateTimeMode && shouldShowDateTimeModeButton">
-                <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(false)" *ngIf="isLocalMode">
+                <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(false)" *ngIf="snapshot.isLocal">
                     {{ 'common.dateTimeEditor.local' | sqxTranslate }}
                 </button>
-                <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(true)" *ngIf="!isLocalMode">
+                <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(true)" *ngIf="!snapshot.isLocal">
                     {{ 'common.dateTimeEditor.utc' | sqxTranslate }}
                 </button>
             </div>

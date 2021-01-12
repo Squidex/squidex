@@ -22,7 +22,7 @@
     </td>
     
     <td class="cell-actions cell-actions-left" sqxStopClick>
-        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
+        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
             <i class="icon-dots"></i>
         </button>
 
@@ -37,7 +37,7 @@
                         [statusColor]="info.color">
                     </sqx-content-status>
                 </a>
-                <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="canClone">
+                <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="cloneable">
                     {{ 'common.clone' | sqxTranslate }}
                 </a>
                 

@@ -6,39 +6,33 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, Pager, shareSubscribed, State, StateSynchronizer, Types, Version, Versioned } from '@app/framework';
-import { EMPTY, forkJoin, Observable, of } from 'rxjs';
+import { DialogService, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
+import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
-import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
-import { SchemaDto } from './../services/schemas.service';
+import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
-import { Query, QuerySynchronizer } from './query';
+import { Query } from './query';
 import { SchemasState } from './schemas.state';
 
-type Updated = { content: ContentDto, error?: ErrorDto };
-
-interface Snapshot {
-    // The current comments.
+interface Snapshot extends ListState<Query> {
+    // The current contents.
     contents: ReadonlyArray<ContentDto>;
 
-    // The pagination information.
-    contentsPager: Pager;
+    // The referencing content id.
+    referencing?: string;
 
-    // The query to filter and sort contents.
-    contentsQuery?: Query;
-
-    // Indicates if the contents are loaded.
-    isLoaded?: boolean;
-
-    // Indicates if the contents are loading.
-    isLoading?: boolean;
+    // The reference content id.
+    reference?: string;
 
     // The statuses.
     statuses?: ReadonlyArray<StatusInfo>;
 
     // The selected content.
     selectedContent?: ContentDto | null;
+
+    // The validation results.
+    validationResults: { [id: string]: boolean };
 
     // Indicates if the user can create a content.
     canCreate?: boolean;
@@ -54,11 +48,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public contents =
         this.project(x => x.contents);
 
-    public contentsPager =
-        this.project(x => x.contentsPager);
+    public paging =
+        this.project(x => getPagingInfo(x, x.contents.length));
 
-    public contentsQuery =
-        this.project(x => x.contentsQuery);
+    public query =
+        this.project(x => x.query);
+
+    public validationResults =
+        this.project(x => x.validationResults);
 
     public isLoaded =
         this.project(x => x.isLoaded === true);
@@ -79,7 +76,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         this.project(x => x.statuses);
 
     public statusQueries =
-        this.projectFrom(this.statuses, x => buildStatusQueries(x));
+        this.projectFrom(this.statuses, buildStatusQueries);
 
     public get appName() {
         return this.appsState.appName;
@@ -89,15 +86,18 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.appsState.appId;
     }
 
-    constructor(
+    constructor(name: string,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
         super({
             contents: [],
-            contentsPager: new Pager(0)
-        });
+            page: 0,
+            pageSize: 10,
+            total: 0,
+            validationResults: {}
+        }, name);
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -107,7 +107,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     const contents = content ? s.contents.replaceBy('id', content) : s.contents;
 
                     return { ...s, selectedContent: content, contents };
-                });
+                }, 'Selected');
             }));
     }
 
@@ -124,18 +124,21 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 }));
     }
 
-    public loadAndListen(synchronizer: StateSynchronizer) {
-        synchronizer.mapTo(this)
-            .keep('selectedContent')
-            .withPager('contentsPager', 'contents', 10)
-            .withSynchronizer('contentsQuery', QuerySynchronizer.INSTANCE)
-            .whenSynced(() => this.loadInternal(false))
-            .build();
+    public loadReference(contentId: string, update: Partial<Snapshot> = {}) {
+        this.resetState({ reference: contentId, referencing: undefined, ...update });
+
+        return this.loadInternal(false);
     }
 
-    public load(isReload = false): Observable<any> {
+    public loadReferencing(contentId: string, update: Partial<Snapshot> = {}) {
+        this.resetState({ referencing: contentId, reference: undefined, ...update });
+
+        return this.loadInternal(false);
+    }
+
+    public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ selectedContent: this.snapshot.selectedContent });
+            this.resetState({ selectedContent: this.snapshot.selectedContent, ...update }, 'Loading Intial');
         }
 
         return this.loadInternal(isReload);
@@ -158,26 +161,33 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        this.next({ isLoading: true });
+        this.next({ isLoading: true }, 'Loading Done');
 
-        const query: any = {
-             take: this.snapshot.contentsPager.pageSize,
-             skip: this.snapshot.contentsPager.skip
-        };
+        const { page, pageSize, query, reference, referencing } = this.snapshot;
 
-        if (this.snapshot.contentsQuery) {
-            query.query = this.snapshot.contentsQuery;
+        const q: any = { take: pageSize, skip: pageSize * page };
+
+        if (query) {
+            q.query = query;
         }
 
-        return this.contentsService.getContents(this.appName, this.schemaName, query).pipe(
+        let content$: Observable<ContentsDto>;
+
+        if (referencing) {
+            content$ = this.contentsService.getContentReferencing(this.appName, this.schemaName, referencing, q);
+        } else if (reference) {
+            content$ = this.contentsService.getContentReferences(this.appName, this.schemaName, reference, q);
+        } else {
+            content$ = this.contentsService.getContents(this.appName, this.schemaName, q);
+        }
+
+        return content$.pipe(
             tap(({ total, items: contents, canCreate, canCreateAndPublish, statuses }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:contents.reloaded');
                 }
 
                 return this.next(s => {
-                    const contentsPager = s.contentsPager.setCount(total);
-
                     statuses = s.statuses || statuses;
 
                     let selectedContent = s.selectedContent;
@@ -186,20 +196,21 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         selectedContent = contents.find(x => x.id === selectedContent!.id) || selectedContent;
                     }
 
-                    return { ...s,
+                    return {
+                        ...s,
                         canCreate,
                         canCreateAndPublish,
-                        contents,
-                        contentsPager,
                         isLoaded: true,
                         isLoading: false,
+                        contents,
                         selectedContent,
-                        statuses
+                        statuses,
+                        total
                     };
-                });
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }));
     }
 
@@ -214,114 +225,51 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.dialogs.notifyInfo('i18n:contents.created');
 
                 return this.next(s => {
-                    const contents = [payload, ...s.contents];
-                    const contentsPager = s.contentsPager.incrementCount();
+                    const contents = [payload, ...s.contents].slice(s.pageSize);
 
-                    return { ...s, contents, contentsPager };
-                });
-            }),
-            shareSubscribed(this.dialogs, {silent: true}));
-    }
-
-    public changeManyStatus(contentsToChange: ReadonlyArray<ContentDto>, status: string, dueTime: string | null): Observable<any> {
-        return this.changeManyStatusCore(contentsToChange, status, true, dueTime).pipe(
-            switchMap(results => {
-                const referenced = results.filter(x => x.error?.statusCode === 400).map(x => x.content);
-
-                if (referenced.length > 0) {
-                    return this.dialogs.confirm(
-                        'i18n:contents.unpublishReferrerConfirmTitle',
-                        'i18n:contents.unpublishReferrerConfirmText',
-                        'unpublishReferencngContent'
-                    ).pipe(
-                        switchMap(confirmed => {
-                            if (confirmed) {
-                                return this.changeManyStatusCore(referenced, status, false, dueTime);
-                            } else {
-                                return of([]);
-                            }
-                        })
-                    );
-                } else {
-                    return of(results);
-                }
-            }),
-            tap(results => {
-                const errors = results.filter(x => !!x.error);
-
-                if (errors.length > 0) {
-                    const errror = errors[0].error!;
-
-                    if (errors.length === contentsToChange.length) {
-                        throw errror;
-                    } else {
-                        this.dialogs.notifyError(errror);
-                    }
-                }
-
-                this.next(s => {
-                    let contents = s.contents;
-
-                    for (const updated of results.filter(x => !x.error).map(x => x.content)) {
-                        contents = contents.replaceBy('id', updated);
-                    }
-
-                    return { ...s, contents };
-                });
-            }),
-            shareSubscribed(this.dialogs));
-    }
-
-    public deleteMany(contentsToDelete: ReadonlyArray<ContentDto>) {
-        return this.deleteManyCore(contentsToDelete, true).pipe(
-            switchMap(results => {
-                const referenced = results.filter(x => x.error?.statusCode === 400).map(x => x.content);
-
-                if (referenced.length > 0) {
-                    return this.dialogs.confirm(
-                        'i18n:contents.deleteReferrerConfirmTitle',
-                        'i18n:contents.deleteReferrerConfirmText',
-                        'deleteReferencingContent'
-                    ).pipe(
-                        switchMap(confirmed => {
-                            if (confirmed) {
-                                return this.deleteManyCore(referenced, false);
-                            } else {
-                                return of([]);
-                            }
-                        })
-                    );
-                } else {
-                    return of(results);
-                }
-            }),
-            tap(results => {
-                const errors = results.filter(x => !!x.error);
-
-                if (errors.length > 0) {
-                    const errror = errors[0].error!;
-
-                    if (errors.length === contentsToDelete.length) {
-                        throw errror;
-                    } else {
-                        this.dialogs.notifyError(errror);
-                    }
-                }
-
-                this.next(s => {
-                    let contents = s.contents;
-                    let contentsPager = s.contentsPager;
-
-                    for (const content of results.filter(x => !x.error).map(x => x.content)) {
-                        contents = contents.filter(x => x.id !== content.id);
-                        contentsPager = contentsPager.decrementCount();
-                    }
-
-                    return { ...s, contents, contentsPager };
-                });
+                    return { ...s, contents, total: s.total + 1 };
+                }, 'Created');
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
+
+    public validate(contents: ReadonlyArray<ContentDto>): Observable<any> {
+        const job: Partial<BulkUpdateJobDto> = { type: 'Validate' };
+
+        return this.bulkMany(contents, false, job).pipe(
+            tap(results => {
+                return this.next(s => {
+                    const validationResults = { ...s.validationResults || {} };
+
+                    for (const result of results) {
+                        validationResults[result.contentId] = !result.error;
+                    }
+
+                    return { ...s, validationResults };
+                }, 'Validated');
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
+    }
+
+    public changeManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime?: string | null): Observable<any> {
+        const job: Partial<BulkUpdateJobDto> = { type: 'ChangeStatus', status, dueTime };
+
+        return this.bulkWithRetry(contents, job,
+                'i18n:contents.unpublishReferrerConfirmTitle',
+                'i18n:contents.unpublishReferrerConfirmText',
+                'unpublishReferencngContent').pipe(
+            switchMap(() => this.loadInternalCore(false)), shareSubscribed(this.dialogs));
+    }
+
+    public deleteMany(contents: ReadonlyArray<ContentDto>) {
+        const job: Partial<BulkUpdateJobDto> = { type: 'Delete' };
+
+        return this.bulkWithRetry(contents, job,
+                'i18n:contents.deleteReferrerConfirmTitle',
+                'i18n:contents.deleteReferrerConfirmText',
+                'deleteReferencngContent').pipe(
+            switchMap(() => this.loadInternalCore(false)), shareSubscribed(this.dialogs));
+}
 
     public update(content: ContentDto, request: any): Observable<ContentDto> {
         return this.contentsService.putContent(this.appName, content, request, content.version).pipe(
@@ -355,14 +303,18 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public search(contentsQuery?: Query): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: s.contentsPager.reset(), contentsQuery }));
+    public search(query?: Query): Observable<any> {
+        if (!this.next({ query, page: 0 }, 'Loading Searched')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }
 
-    public setPager(contentsPager: Pager) {
-        this.next(s => ({ ...s, contentsPager }));
+    public page(paging: { page: number, pageSize: number }) {
+        if (!this.next(paging, 'Loading Done')) {
+            return EMPTY;
+        }
 
         return this.loadInternal(false);
     }
@@ -378,36 +330,67 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 const selectedContent =
                     s.selectedContent &&
-                    s.selectedContent.id === content.id ?
-                    content :
-                    s.selectedContent;
+                        s.selectedContent.id === content.id ?
+                        content :
+                        s.selectedContent;
 
                 return { ...s, contents, selectedContent };
-            });
+            }, 'Updated');
         }
     }
 
-    private deleteManyCore(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean): Observable<ReadonlyArray<Updated>> {
-        return forkJoin(
-            contents.map(c => this.deleteCore(c, checkReferrers)));
+    private bulkWithRetry(contents: ReadonlyArray<ContentDto>, job: Partial<BulkUpdateJobDto>, confirmTitle: string, confirmText: string, confirmKey: string): Observable<ReadonlyArray<BulkResultDto>> {
+        return this.bulkMany(contents, true, job).pipe(
+            switchMap(results => {
+                const failed = contents.filter(x => results.find(r => r.contentId === x.id)?.error?.statusCode === 400);
+
+                if (failed.length > 0) {
+                    return this.dialogs.confirm(confirmTitle, confirmText, confirmKey).pipe(
+                        switchMap(confirmed => {
+                            if (confirmed) {
+                                return this.bulkMany(failed, false, job);
+                            } else {
+                                return of([]);
+                            }
+                        }),
+                        map(results2 => {
+                            return [...results, ...results2];
+                        })
+                    );
+                } else {
+                    return of(results);
+                }
+            }),
+            tap(results => {
+                const errors = results.filter(x => !!x.error);
+
+                if (errors.length > 0) {
+                    const errror = errors[0].error!;
+
+                    if (errors.length >= contents.length) {
+                        throw errror;
+                    } else {
+                        this.dialogs.notifyError(errror);
+                    }
+                }
+            }));
     }
 
-    private changeManyStatusCore(contents: ReadonlyArray<ContentDto>, status: string, checkReferrers: boolean, dueTime: string | null): Observable<ReadonlyArray<Updated>> {
-        return forkJoin(
-            contents.map(c => this.changeStatusCore(c, status, checkReferrers, dueTime)));
-    }
+    private bulkMany(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean, job: Partial<BulkUpdateJobDto>): Observable<ReadonlyArray<BulkResultDto>> {
+        const update = {
+            doNotScript: false,
+            jobs: contents.map(x => ({
+                id: x.id,
+                schema: x.schemaName,
+                status: undefined,
+                expectedVersion: parseInt(x.version.value, 10),
+                ...job
+            })),
+            checkReferrers
+        };
 
-    private deleteCore(content: ContentDto, checkReferrers: boolean): Observable<Updated> {
-        return this.contentsService.deleteContent(this.appName, content, checkReferrers, content.version).pipe(
-            map(() => ({ content })), catchError(error => of({ content, error })));
+        return this.contentsService.bulkUpdate(this.appName, this.schemaName, update as any);
     }
-
-    private changeStatusCore(content: ContentDto, status: string, checkReferrers: boolean, dueTime: string | null): Observable<Updated> {
-        return this.contentsService.putStatus(this.appName, content, status, checkReferrers, dueTime, content.version).pipe(
-            map(x => ({ content: x })), catchError(error => of({ content, error })));
-    }
-
-    public abstract get schemaId(): string;
 
     public abstract get schemaName(): string;
 }
@@ -417,11 +400,7 @@ export class ContentsState extends ContentsStateBase {
     constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
         private readonly schemasState: SchemasState
     ) {
-        super(appsState, contentsService, dialogs);
-    }
-
-    public get schemaId() {
-        return this.schemasState.schemaId;
+        super('Contents', appsState, contentsService, dialogs);
     }
 
     public get schemaName() {
@@ -430,17 +409,13 @@ export class ContentsState extends ContentsStateBase {
 }
 
 @Injectable()
-export class ManualContentsState extends ContentsStateBase {
-    public schema: SchemaDto;
+export class ComponentContentsState extends ContentsStateBase {
+    public schema: { name: string };
 
     constructor(
         appsState: AppsState, contentsService: ContentsService, dialogs: DialogService
     ) {
-        super(appsState, contentsService, dialogs);
-    }
-
-    public get schemaId() {
-        return this.schema.id;
+        super('Components Contents', appsState, contentsService, dialogs);
     }
 
     public get schemaName() {
@@ -449,7 +424,7 @@ export class ManualContentsState extends ContentsStateBase {
 }
 
 function buildStatusQueries(statuses: ReadonlyArray<StatusInfo> | undefined): ReadonlyArray<SavedQuery> {
-    return statuses?.map(s => buildStatusQuery(s)) || [];
+    return statuses?.map(buildStatusQuery) || [];
 }
 
 function buildStatusQuery(s: StatusInfo) {

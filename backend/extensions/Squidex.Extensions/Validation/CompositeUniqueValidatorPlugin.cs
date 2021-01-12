@@ -16,8 +16,7 @@ namespace Squidex.Extensions.Validation
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            services.AddSingletonAs<CompositeUniqueValidatorFactory>()
-                .As<IValidatorsFactory>();
+            services.AddSingleton<IValidatorsFactory, CompositeUniqueValidatorFactory>();
         }
     }
 }

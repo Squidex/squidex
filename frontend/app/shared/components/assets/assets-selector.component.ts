@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { AssetDto, AssetsState, LocalStoreService, Query, Settings, StatefulComponent } from '@app/shared/internal';
+import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings, StatefulComponent } from '@app/shared/internal';
 
 interface State {
     // The selected assets.
@@ -23,6 +23,9 @@ interface State {
     selector: 'sqx-assets-selector',
     styleUrls: ['./assets-selector.component.scss'],
     templateUrl: './assets-selector.component.html',
+    providers: [
+        ComponentAssetsState
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsSelectorComponent extends StatefulComponent<State> implements OnInit {
@@ -30,7 +33,7 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     public select = new EventEmitter<ReadonlyArray<AssetDto>>();
 
     constructor(changeDector: ChangeDetectorRef,
-        public readonly assetsState: AssetsState,
+        public readonly assetsState: ComponentAssetsState,
         public readonly localStore: LocalStoreService
     ) {
         super(changeDector, {
@@ -81,7 +84,7 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     }
 
     public changeView(isListView: boolean) {
-        this.next(s => ({ ...s, isListView }));
+        this.next({ isListView });
 
         this.localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
     }

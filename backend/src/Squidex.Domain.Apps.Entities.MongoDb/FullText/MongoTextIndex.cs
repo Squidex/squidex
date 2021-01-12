@@ -132,10 +132,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                         Filter.In(x => x.SchemaId, filter.SchemaIds),
                         Filter_ByScope(scope),
                         Filter.Text(queryText, "none")))
-                    .Only(x => x.ContentId).Limit(limit)
+                    .Limit(limit).Only(x => x.ContentId)
                     .ToListAsync();
 
-            return bySchema.Select(x => DomainId.Create(x["_ci"].AsString)).Distinct().ToList();
+            var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
+
+            return bySchema.Select(x => DomainId.Create(x[field].AsString)).Distinct().ToList();
         }
 
         private async Task<List<DomainId>> SearchByAppAsync(string queryText, IAppEntity app, SearchScope scope, int limit)
@@ -147,10 +149,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                         Filter.Exists(x => x.SchemaId),
                         Filter_ByScope(scope),
                         Filter.Text(queryText, "none")))
-                    .Only(x => x.ContentId).Limit(limit)
+                    .Limit(limit).Only(x => x.ContentId)
                     .ToListAsync();
 
-            return bySchema.Select(x => DomainId.Create(x["_ci"].AsString)).Distinct().ToList();
+            var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
+
+            return bySchema.Select(x => DomainId.Create(x[field].AsString)).Distinct().ToList();
         }
 
         private static FilterDefinition<MongoTextIndexEntity> Filter_ByScope(SearchScope scope)

@@ -6,17 +6,14 @@
  */
 
 import { UserDto, UsersDto, UsersService } from '@app/features/administration/internal';
-import { DialogService, Pager } from '@app/shared';
+import { DialogService } from '@app/shared';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { TestValues } from './../../../shared/state/_test-helpers';
 import { createUser } from './../services/users.service.spec';
 import { UsersState } from './users.state';
 
 describe('UsersState', () => {
-    const { buildDummyStateSynchronizer } = TestValues;
-
     const user1 = createUser(1);
     const user2 = createUser(2);
 
@@ -46,10 +43,10 @@ describe('UsersState', () => {
 
             usersState.load().subscribe();
 
+            expect(usersState.snapshot.users).toEqual([user1, user2]);
             expect(usersState.snapshot.isLoaded).toBeTruthy();
             expect(usersState.snapshot.isLoading).toBeFalsy();
-            expect(usersState.snapshot.users).toEqual([user1, user2]);
-            expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
+            expect(usersState.snapshot.total).toEqual(200);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
@@ -97,7 +94,7 @@ describe('UsersState', () => {
             usersService.setup(x => x.getUsers(10, 10, undefined))
                 .returns(() => of(new UsersDto(200, []))).verifiable();
 
-            usersState.setPager(new Pager(200, 1, 10)).subscribe();
+            usersState.page({ page: 1, pageSize: 10 }).subscribe();
 
             expect().nothing();
         });
@@ -108,21 +105,7 @@ describe('UsersState', () => {
 
             usersState.search('my-query').subscribe();
 
-            expect(usersState.snapshot.usersQuery).toEqual('my-query');
-        });
-
-        it('should load when synchronizer triggered', () => {
-            const { synchronizer, trigger } = buildDummyStateSynchronizer();
-
-            usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable(Times.exactly(2));
-
-            usersState.loadAndListen(synchronizer);
-
-            trigger();
-            trigger();
-
-            expect().nothing();
+            expect(usersState.snapshot.query).toEqual('my-query');
         });
     });
 
@@ -239,7 +222,23 @@ describe('UsersState', () => {
             usersState.create(request).subscribe();
 
             expect(usersState.snapshot.users).toEqual([newUser, user1, user2]);
-            expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);
+            expect(usersState.snapshot.total).toBe(201);
+        });
+
+        it('should truncate users when page size reached', () => {
+            const request = { ...newUser, password: 'password' };
+
+            usersService.setup(x => x.getUsers(2, 0, undefined))
+                .returns(() => of(new UsersDto(200, [user1, user2]))).verifiable();
+
+            usersService.setup(x => x.postUser(request))
+                .returns(() => of(newUser)).verifiable();
+
+            usersState.page({ page: 0, pageSize: 2 }).subscribe();
+            usersState.create(request).subscribe();
+
+            expect(usersState.snapshot.users).toEqual([newUser, user1]);
+            expect(usersState.snapshot.total).toBe(201);
         });
     });
 });

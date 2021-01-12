@@ -17,7 +17,6 @@ using TestSuite.Model;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
-#pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
 namespace TestSuite.ApiTests
 {
@@ -345,7 +344,7 @@ namespace TestSuite.ApiTests
             public int Number { get; set; }
         }
 
-        private void AssertItems(ContentsResult<TestEntity, TestEntityData> entities, int total, int[] expected)
+        private static void AssertItems(ContentsResult<TestEntity, TestEntityData> entities, int total, int[] expected)
         {
             Assert.Equal(total, entities.Total);
             Assert.Equal(expected, entities.Items.Select(x => x.Data.Number).ToArray());

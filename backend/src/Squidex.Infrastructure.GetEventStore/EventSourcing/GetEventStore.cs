@@ -12,6 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
+using Squidex.Hosting;
+using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure.Json;
 using Squidex.Log;
 
@@ -48,7 +50,9 @@ namespace Squidex.Infrastructure.EventSourcing
             }
             catch (Exception ex)
             {
-                throw new ConfigurationException("Cannot connect to event store.", ex);
+                var error = new ConfigurationError("GetEventStore cannot connect to event store.");
+
+                throw new ConfigurationException(error, ex);
             }
 
             await projectionClient.ConnectAsync();

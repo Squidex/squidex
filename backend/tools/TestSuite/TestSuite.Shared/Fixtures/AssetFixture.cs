@@ -17,13 +17,18 @@ namespace TestSuite.Fixtures
     {
         public IAssetsClient Assets => Squidex.Assets;
 
-        public async Task<MemoryStream> DownloadAsync(AssetDto asset)
+        public async Task<MemoryStream> DownloadAsync(AssetDto asset, int? version = null)
         {
             var temp = new MemoryStream();
 
             using (var client = new HttpClient())
             {
                 var url = $"{ServerUrl}{asset._links["content"].Href}";
+
+                if (version > 0)
+                {
+                    url += $"?version={version}";
+                }
 
                 var response = await client.GetAsync(url);
 

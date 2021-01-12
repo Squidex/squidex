@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic

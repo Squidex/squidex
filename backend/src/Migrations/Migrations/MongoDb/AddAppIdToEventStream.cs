@@ -54,21 +54,21 @@ namespace Migrations.Migrations.MongoDb
 
                     if (TryGetAppId(document, out var appId))
                     {
-                        var indexOfType = eventStream.IndexOf('-');
-                        var indexOfId = indexOfType + 1;
-
-                        var indexOfOldId = eventStream.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
-
-                        if (indexOfOldId > 0)
-                        {
-                            indexOfId = indexOfOldId + 2;
-                        }
-
-                        var domainType = eventStream.Substring(0, indexOfType);
-                        var domainId = eventStream[indexOfId..];
-
                         if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
                         {
+                            var indexOfType = eventStream.IndexOf('-');
+                            var indexOfId = indexOfType + 1;
+
+                            var indexOfOldId = eventStream.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
+
+                            if (indexOfOldId > 0)
+                            {
+                                indexOfId = indexOfOldId + 2;
+                            }
+
+                            var domainType = eventStream.Substring(0, indexOfType);
+                            var domainId = eventStream[indexOfId..];
+
                             var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();
                             var newStreamName = $"{domainType}-{newDomainId}";
 

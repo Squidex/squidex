@@ -66,7 +66,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     await Collection.Find(filter).Only(x => x.Id)
                         .ToListAsync();
 
-                return assetFolderEntities.Select(x => DomainId.Create(x[Fields.AssetFolderId].AsString)).ToList();
+                var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
+
+                return assetFolderEntities.Select(x => DomainId.Create(x[field].AsString)).ToList();
             }
         }
 

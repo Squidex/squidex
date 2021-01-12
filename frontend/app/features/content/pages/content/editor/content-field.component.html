@@ -1,0 +1,89 @@
+<div class="row no-gutters" [class.compare]="formModelCompare">
+    <div [class.col-12]="!formModelCompare" [class.col-6]="formModelCompare">
+        <div class="table-items-row" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
+            <div class="languages-container">
+                <div class="languages-buttons">
+                    <button *ngIf="isTranslatable" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="i18n:contents.autotranslate">
+                        <i class="icon-translate"></i>
+                    </button>
+    
+                    <sqx-field-languages 
+                        [field]="formModel.field"
+                        (languageChange)="languageChange.emit($event)"
+                        [language]="language"
+                        [languages]="languages"
+                        [showAllControls]="showAllControls"
+                        (showAllControlsChange)="changeShowAllControls($event)">
+                    </sqx-field-languages>
+                </div>
+            </div>
+            
+            <ng-container *ngIf="showAllControls; else singleControl">
+                <div class="form-group" *ngFor="let language of languages">
+                    <sqx-field-editor
+                        [canUnset]="true"
+                        [form]="form"
+                        [formContext]="formContext"
+                        [formModel]="formModel.get(language)"
+                        [language]="language"
+                        [languages]="languages"
+                        [displaySuffix]="prefix(language)">
+                    </sqx-field-editor>
+                </div>
+            </ng-container>
+        
+            <ng-template #singleControl>
+                <sqx-field-editor
+                    [canUnset]="true"
+                    [form]="form"
+                    [formContext]="formContext"
+                    [formModel]="getControl()"
+                    [language]="language"
+                    [languages]="languages">
+                </sqx-field-editor>
+            </ng-template>
+        </div>
+    </div>
+
+    <div class="col-6 col-right" *ngIf="formModelCompare && formCompare">
+        <button type="button" class="btn btn-primary btn-sm field-copy" (click)="copy()" *ngIf="isDifferent | async">
+            <i class="icon-arrow_back"></i>
+        </button>
+
+        <div class="table-items-row" *ngIf="!(formModelCompare!.hiddenChanges | async)">
+            <div class="languages-container">
+                <div class="languages-buttons-compare">
+                    <sqx-field-languages
+                        [field]="formModelCompare!.field"
+                        (languageChange)="languageChange.emit($event)"
+                        [language]="language"
+                        [languages]="languages"
+                        [showAllControls]="showAllControls"
+                        (showAllControlsChange)="changeShowAllControls($event)">
+                    </sqx-field-languages>
+                </div>
+            </div>
+
+            <ng-container *ngIf="showAllControls; else singleControlCompare">
+                <div class="form-group" *ngFor="let language of languages">
+                    <sqx-field-editor
+                        [form]="formCompare"
+                        [formContext]="formContext"
+                        [formModel]="formModelCompare.get(language)"
+                        [language]="language"
+                        [languages]="languages"
+                        [displaySuffix]="prefix(language)">
+                    </sqx-field-editor>
+                </div>
+            </ng-container>
+        
+            <ng-template #singleControlCompare>
+                <sqx-field-editor
+                    [formModel]="getControlCompare()"
+                    [language]="language"
+                    [languages]="languages">
+                </sqx-field-editor>
+            </ng-template>
+        </div>
+    </div>
+</div>

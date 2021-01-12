@@ -20,8 +20,8 @@ import { PanelContainerDirective } from './panel-container.directive';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnInit {
-    private styleWidth: string;
-    private renderWidthField = 0;
+    private widthPrevious: string;
+    private widthToRender = 0;
     private isViewInitField = false;
 
     @Output()
@@ -83,7 +83,7 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
     }
 
     public get renderWidth() {
-        return this.renderWidthField;
+        return this.widthToRender;
     }
 
     public get isViewInit() {
@@ -117,8 +117,8 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
     }
 
     public measure(size: string) {
-        if (this.styleWidth !== size && this.isViewInitField) {
-            this.styleWidth = size;
+        if (this.widthPrevious !== size && this.isViewInitField) {
+            this.widthPrevious = size;
 
             const element = this.panel.nativeElement;
 
@@ -126,7 +126,7 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
                 this.renderer.setStyle(element, 'width', size);
                 this.renderer.setStyle(element, 'minWidth', this.minWidth);
 
-                this.renderWidthField = element.offsetWidth;
+                this.widthToRender = element.offsetWidth;
             }
         }
     }

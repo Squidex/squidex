@@ -40,7 +40,7 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
 
     public ngOnInit() {
         this.own(
-            this.dialogView.isOpen.subscribe(isOpen => {
+            this.dialogView.isOpenChanges.subscribe(isOpen => {
                 if (!isOpen) {
                     this.finishRequest(false);
                 }
@@ -67,16 +67,16 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
 
                     this.dialogView.show();
 
-                    this.next(s => ({ ...s, dialogRequest }));
+                    this.next({ dialogRequest });
                 }));
 
         this.own(
             this.dialogs.tooltips
                 .subscribe(tooltip => {
                     if (tooltip.text) {
-                        this.next(s => ({ ...s, tooltip }));
+                        this.next({ tooltip });
                     } else if (!this.snapshot.tooltip || tooltip.target === this.snapshot.tooltip.target) {
-                        this.next(s => ({ ...s, tooltip: null }));
+                        this.next({ tooltip: null });
                     }
                 }));
     }
@@ -94,14 +94,15 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
     }
 
     private finishRequest(value: boolean) {
-        this.next(s => {
-            s.dialogRequest?.complete(value);
+        this.snapshot.dialogRequest?.complete(value);
 
-            return { ...s, dialogRequest: null };
-        });
+        this.next({ dialogRequest: null });
     }
 
     public close(notification: Notification) {
-        this.next(s => ({ ...s, notifications: s.notifications.filter(n => notification !== n) }));
+        this.next(s => ({
+            ...s,
+            notifications: s.notifications.filter(n => notification !== n)
+        }));
     }
 }

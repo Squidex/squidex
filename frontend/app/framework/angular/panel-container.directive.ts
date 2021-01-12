@@ -81,7 +81,7 @@ export class PanelContainerDirective implements AfterViewInit {
             if (panel.desiredWidth === '*') {
                 const layoutWidth = (this.containerWidth - currentSize) / panelsWidthSpread;
 
-                panel.measure(layoutWidth + 'px');
+                panel.measure(`${layoutWidth}px`);
 
                 currentSize += panel.renderWidth;
             }
@@ -91,7 +91,7 @@ export class PanelContainerDirective implements AfterViewInit {
         let currentLayer = panels.length * 10;
 
         for (const panel of panels) {
-            panel.arrange(currentPosition + 'px', currentLayer.toString());
+            panel.arrange(`${currentPosition}px`, currentLayer.toString());
 
             currentPosition += panel.renderWidth;
             currentLayer -= 10;

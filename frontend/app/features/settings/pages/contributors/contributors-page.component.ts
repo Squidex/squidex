@@ -29,7 +29,14 @@ export class ContributorsPageComponent implements OnInit {
     public ngOnInit() {
         this.rolesState.load();
 
-        this.contributorsState.loadAndListen(this.contributorsRoute);
+        const initial =
+            this.contributorsRoute.mapTo(this.contributorsState)
+                .withPaging('contributors', 10)
+                .withString('query')
+                .getInitial();
+
+        this.contributorsState.load(false, initial);
+        this.contributorsRoute.unlisten();
     }
 
     public reload() {

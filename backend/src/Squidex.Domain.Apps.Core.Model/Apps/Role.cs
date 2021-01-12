@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Core.Apps
             P.AppComments,
             P.AppContributorsRead,
             P.AppHistory,
-            P.AppHistory,
             P.AppLanguagesRead,
             P.AppPatternsRead,
             P.AppPing,

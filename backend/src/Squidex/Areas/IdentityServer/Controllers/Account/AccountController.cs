@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Domain.Users;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
@@ -41,7 +42,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserFactory userFactory;
         private readonly IUserEvents userEvents;
-        private readonly UrlsOptions urlsOptions;
+        private readonly IUrlGenerator urlGenerator;
         private readonly MyIdentityOptions identityOptions;
         private readonly ISemanticLog log;
         private readonly IIdentityServerInteractionService interactions;
@@ -51,7 +52,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             UserManager<IdentityUser> userManager,
             IUserFactory userFactory,
             IUserEvents userEvents,
-            IOptions<UrlsOptions> urlsOptions,
+            IUrlGenerator urlGenerator,
             IOptions<MyIdentityOptions> identityOptions,
             ISemanticLog log,
             IIdentityServerInteractionService interactions)
@@ -59,7 +60,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             this.identityOptions = identityOptions.Value;
             this.interactions = interactions;
             this.signInManager = signInManager;
-            this.urlsOptions = urlsOptions.Value;
+            this.urlGenerator = urlGenerator;
             this.userEvents = userEvents;
             this.userFactory = userFactory;
             this.userManager = userManager;
@@ -406,7 +407,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         private IActionResult RedirectToReturnUrl(string? returnUrl)
         {
-            if (urlsOptions.IsAllowedHost(returnUrl) || interactions.IsValidReturnUrl(returnUrl))
+            if (urlGenerator.IsAllowedHost(returnUrl) || interactions.IsValidReturnUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }

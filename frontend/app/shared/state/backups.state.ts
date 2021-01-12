@@ -50,12 +50,12 @@ export class BackupsState extends State<Snapshot> {
         private readonly backupsService: BackupsService,
         private readonly dialogs: DialogService
     ) {
-        super({ backups: [] });
+        super({ backups: [] }, 'Backups');
     }
 
     public load(isReload = false, silent = false): Observable<any> {
         if (isReload && !silent) {
-            this.resetState();
+            this.resetState('Loading Initial');
         }
 
         return this.loadInternal(isReload, silent);
@@ -63,7 +63,7 @@ export class BackupsState extends State<Snapshot> {
 
     private loadInternal(isReload: boolean, silent: boolean): Observable<any> {
         if (!silent) {
-            this.next({ isLoading: true });
+            this.next({ isLoading: true }, 'Loading Started');
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
@@ -77,10 +77,10 @@ export class BackupsState extends State<Snapshot> {
                     canCreate,
                     isLoaded: true,
                     isLoading: false
-                });
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs, { silent }));
     }

@@ -6,7 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { AppDto, ContentsService, fadeAnimation, Types } from '@app/shared';
+import { AppDto, ContentsService, fadeAnimation, StatefulComponent, Types } from '@app/shared';
+
+interface State {
+    // The number of items.
+    itemCount: number;
+}
 
 @Component({
     selector: 'sqx-content-summary-card',
@@ -17,19 +22,19 @@ import { AppDto, ContentsService, fadeAnimation, Types } from '@app/shared';
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentSummaryCardComponent implements OnInit {
+export class ContentSummaryCardComponent extends StatefulComponent<State> implements OnInit {
     @Input()
     public app: AppDto;
 
     @Input()
     public options: any;
 
-    public itemCount = 0;
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly contentsService: ContentsService
     ) {
+        super(changeDetector, {
+            itemCount: 0
+        });
     }
 
     public ngOnInit() {
@@ -46,13 +51,11 @@ export class ContentSummaryCardComponent implements OnInit {
         query.take = 0;
 
         this.contentsService.getContents(this.app.name, this.options.schema, { query })
-            .subscribe(dto => {
-                this.itemCount = dto.total;
-
-                this.changeDetector.detectChanges();
+            .subscribe(({ total: itemCount }) => {
+                this.next({ itemCount });
             },
             () => {
-                this.itemCount = 0;
+                this.next({ itemCount: 0 });
             });
     }
 }

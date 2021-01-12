@@ -18,7 +18,7 @@ namespace Migrations
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 23;
+        private const int CurrentVersion = 24;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -74,7 +74,8 @@ namespace Migrations
                 }
 
                 // Version 12: Introduce roles.
-                if (version < 12)
+                // Version 24: Improve a naming in the languages config.
+                if (version < 24)
                 {
                     yield return serviceProvider.GetRequiredService<RebuildApps>();
                 }

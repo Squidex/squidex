@@ -7,24 +7,28 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Log;
 
 namespace Squidex.Config.Startup
 {
-    public sealed class MigratorHost : SafeHostedService
+    public sealed class MigratorHost : IHostedService
     {
         private readonly Migrator migrator;
 
-        public MigratorHost(Migrator migrator, ISemanticLog log)
-            : base(log)
+        public MigratorHost(Migrator migrator)
         {
             this.migrator = migrator;
         }
 
-        protected override Task StartAsync(ISemanticLog log, CancellationToken ct)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            return migrator.MigrateAsync(ct);
+            return migrator.MigrateAsync(cancellationToken);
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

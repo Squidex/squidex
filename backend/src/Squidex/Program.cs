@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Squidex.Areas.IdentityServer.Config;
 using Squidex.Config.Domain;
 using Squidex.Config.Orleans;
 using Squidex.Config.Startup;
@@ -39,10 +38,7 @@ namespace Squidex
                     services.AddHostedService<LogConfigurationHost>();
 
                     // Step 1: Initialize all services.
-                    services.AddHostedService<InitializerHost>();
-
-                    // Step 2: Create admin user.
-                    services.AddHostedService<CreateAdminHost>();
+                    services.AddInitializer();
                 })
                 .UseOrleans((context, builder) =>
                 {
@@ -58,7 +54,7 @@ namespace Squidex
                     services.AddHostedService<MigrationRebuilderHost>();
 
                     // Step 6: Start background processes.
-                    services.AddHostedService<BackgroundHost>();
+                    services.AddBackgroundProcesses();
                 })
                 .ConfigureWebHostDefaults(builder =>
                 {

@@ -39,12 +39,12 @@ export class EventConsumersState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly eventConsumersService: EventConsumersService
     ) {
-        super({ eventConsumers: [] });
+        super({ eventConsumers: [] }, 'EventConsumers');
     }
 
     public load(isReload = false, silent = false): Observable<any> {
         if (isReload && !silent) {
-            this.resetState();
+            this.resetState('Loading Initial');
         }
 
         return this.loadInternal(isReload, silent);
@@ -52,7 +52,7 @@ export class EventConsumersState extends State<Snapshot> {
 
     private loadInternal(isReload: boolean, silent: boolean): Observable<any> {
         if (!silent) {
-            this.next({ isLoading: true });
+            this.next({ isLoading: true }, 'Loading Started');
         }
 
         return this.eventConsumersService.getEventConsumers().pipe(
@@ -65,10 +65,10 @@ export class EventConsumersState extends State<Snapshot> {
                     eventConsumers,
                     isLoaded: true,
                     isLoading: false
-                });
+                }, 'Loading Success');
             }),
             finalize(() => {
-                this.next({ isLoading: false });
+                this.next({ isLoading: false }, 'Loading Done');
             }),
             shareSubscribed(this.dialogs, { silent }));
     }
@@ -102,6 +102,6 @@ export class EventConsumersState extends State<Snapshot> {
             const eventConsumers = s.eventConsumers.replaceBy('name', eventConsumer);
 
             return { ...s, eventConsumers };
-        });
+        }, 'Updated');
     }
 }

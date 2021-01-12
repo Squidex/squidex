@@ -20,6 +20,11 @@ export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 
 const NO_EMIT = { emitEvent: false };
 
+interface State {
+    // True when the editor is in local mode.
+    isLocal: boolean;
+}
+
 @Component({
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
@@ -29,7 +34,7 @@ const NO_EMIT = { emitEvent: false };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DateTimeEditorComponent extends StatefulControlComponent<{}, string | null> implements OnInit, AfterViewInit, FocusComponent {
+export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements OnInit, AfterViewInit, FocusComponent {
     private readonly hideDateButtonsSettings: boolean;
     private readonly hideDateTimeModeButtonSetting: boolean;
     private picker: any;
@@ -63,8 +68,6 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     public timeControl = new FormControl();
     public dateControl = new FormControl();
 
-    public isLocalMode = true;
-
     public get shouldShowDateButtons() {
         return !this.hideDateButtonsSettings && !this.hideDateButtons;
     }
@@ -82,7 +85,9 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     }
 
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions) {
-        super(changeDetector, {});
+        super(changeDetector, {
+            isLocal: false
+        });
 
         this.hideDateButtonsSettings = !!uiOptions.get('hideDateButtons');
         this.hideDateTimeModeButtonSetting = !!uiOptions.get('hideDateTimeModeButton');
@@ -199,7 +204,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         if (this.isDateTimeMode && this.timeControl.value) {
             const combined = `${this.dateControl.value}T${this.timeControl.value}`;
 
-            return DateTime.tryParseISO(combined, !this.isLocalMode);
+            return DateTime.tryParseISO(combined, !this.snapshot.isLocal);
         }
 
         return DateTime.tryParseISO(this.dateControl.value);
@@ -209,7 +214,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         this.suppressEvents = true;
 
         if (this.dateTime && this.isDateTimeMode) {
-            if (this.isLocalMode) {
+            if (this.snapshot.isLocal) {
                 this.timeControl.setValue(this.dateTime.toStringFormat('HH:mm:ss'), NO_EMIT);
             } else {
                 this.timeControl.setValue(this.dateTime.toStringFormatUTC('HH:mm:ss'), NO_EMIT);
@@ -221,7 +226,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         if (this.dateTime && this.picker) {
             let dateString: string;
 
-            if (this.isDateTimeMode && this.isLocalMode) {
+            if (this.isDateTimeMode && this.snapshot.isLocal) {
                 dateString = this.dateTime.toStringFormat('yyyy-MM-dd');
 
                 this.picker.setDate(DateHelper.getLocalDate(this.dateTime.raw), true);
@@ -239,14 +244,14 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         this.suppressEvents = false;
     }
 
-    public setLocalMode(isLocalMode: boolean) {
-        this.isLocalMode = isLocalMode;
+    public setLocalMode(isLocal: boolean) {
+        this.next({ isLocal });
 
         this.updateControls();
     }
 
     public setCompact(isCompact: boolean) {
-        this.next(s => ({ ...s, isCompact }));
+        this.isCompact = isCompact;
     }
 }
 
@@ -263,13 +268,13 @@ function getLocalizationSettings() {
         const options = { locale: DateHelper.getFnsLocale() };
 
         for (let i = 0; i < 12; i++) {
-            const firstOfMonth = new Date(2020, i, 1);
+            const firstOfMonth = new Date(2020, i, 1, 12, 0, 0);
 
             localizedValues.months.push(format(firstOfMonth, 'LLLL', options));
         }
 
         for (let i = 1; i <= 7; i++) {
-            const weekDay = new Date(2020, 11, i);
+            const weekDay = new Date(2020, 10, i, 12, 0, 0);
 
             localizedValues.weekdays.push(format(weekDay, 'EEEE', options));
             localizedValues.weekdaysShort.push(format(weekDay, 'EEE', options));

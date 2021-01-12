@@ -17,8 +17,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexHealthChecks(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<GCHealthCheckOptions>(
-                config.GetSection("healthz:gc"));
+            services.Configure<GCHealthCheckOptions>(config, "healthz:gc");
 
             services.AddHealthChecks()
                 .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })

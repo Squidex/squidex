@@ -24,7 +24,7 @@ export class EventConsumerComponent {
     public eventConsumer: EventConsumerDto;
 
     constructor(
-        public readonly eventConsumersState: EventConsumersState
+        private readonly eventConsumersState: EventConsumersState
     ) {
     }
 
