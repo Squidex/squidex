@@ -294,7 +294,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
             else
             {
-                var email = externalLogin.Principal.FindFirst(ClaimTypes.Email)?.Value!;
+                var email = externalLogin.Principal.TryFindEmail();
 
                 user = await userManager.FindByEmailWithClaimsAsync(email);
 
