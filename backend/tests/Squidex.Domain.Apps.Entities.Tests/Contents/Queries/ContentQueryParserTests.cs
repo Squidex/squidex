@@ -10,6 +10,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -42,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            sut = new ContentQueryParser(cache, JsonHelper.DefaultSerializer, options);
+            sut = new ContentQueryParser(cache, TestUtils.DefaultSerializer, options);
         }
 
         [Fact]

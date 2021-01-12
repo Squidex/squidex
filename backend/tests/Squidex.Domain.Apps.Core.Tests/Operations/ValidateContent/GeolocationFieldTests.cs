@@ -38,15 +38,29 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_geolocation_is_valid()
+        public async Task Should_not_add_error_if_geolocation_is_valid_geojson()
         {
             var sut = Field(new GeolocationFieldProperties());
 
             var geolocation = JsonValue.Object()
-                .Add("latitude", 0)
-                .Add("longitude", 0);
+                .Add("coordinates",
+                    JsonValue.Array(
+                        JsonValue.Create(12),
+                        JsonValue.Create(45)
+                    ))
+                .Add("type", "Point");
 
             await sut.ValidateAsync(geolocation, errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_geolocation_is_valid()
+        {
+            var sut = Field(new GeolocationFieldProperties());
+
+            await sut.ValidateAsync(CreateValue(0, 0), errors);
 
             Assert.Empty(errors);
         }
@@ -56,11 +70,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 
-            var geolocation = JsonValue.Object()
-                .Add("latitude", 200)
-                .Add("longitude", 0);
-
-            await sut.ValidateAsync(geolocation, errors);
+            await sut.ValidateAsync(CreateValue(200, 0), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Latitude must be between -90 and 90." });
@@ -71,30 +81,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 
-            var geolocation = JsonValue.Object()
-                .Add("latitude", 0)
-                .Add("longitude", 200);
-
-            await sut.ValidateAsync(geolocation, errors);
+            await sut.ValidateAsync(CreateValue(0, 200), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Longitude must be between -180 and 180." });
-        }
-
-        [Fact]
-        public async Task Should_add_error_if_geolocation_has_too_many_properties()
-        {
-            var sut = Field(new GeolocationFieldProperties { IsRequired = true });
-
-            var geolocation = JsonValue.Object()
-                .Add("invalid", 0)
-                .Add("latitude", 0)
-                .Add("longitude", 0);
-
-            await sut.ValidateAsync(geolocation, errors);
-
-            errors.Should().BeEquivalentTo(
-                new[] { "Geolocation can only have latitude and longitude property." });
         }
 
         [Fact]
@@ -106,6 +96,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
+        }
+
+        private static JsonObject CreateValue(double lat, double lon)
+        {
+            return JsonValue.Object().Add("latitude", lat).Add("longitude", lon);
         }
 
         private static RootField<GeolocationFieldProperties> Field(GeolocationFieldProperties properties)

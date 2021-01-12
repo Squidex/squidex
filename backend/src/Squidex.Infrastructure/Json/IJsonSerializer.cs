@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Json
     {
         string Serialize<T>(T value, bool intented = false);
 
-        void Serialize<T>(T value, Stream stream);
+        void Serialize<T>(T value, Stream stream, bool leaveOpen = false);
 
         T Deserialize<T>(string value, Type? actualType = null);
 

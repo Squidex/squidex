@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Validation;
 using Squidex.Log;
 
@@ -40,6 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private readonly IEnumerable<IValidatorsFactory> validators;
         private readonly IContentWorkflow contentWorkflow;
         private readonly IContentRepository contentRepository;
+        private readonly IJsonSerializer jsonSerializer;
         private ISchemaEntity schema;
         private IAppEntity app;
         private ContentCommand command;
@@ -54,6 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             IEnumerable<IValidatorsFactory> validators,
             IContentWorkflow contentWorkflow,
             IContentRepository contentRepository,
+            IJsonSerializer jsonSerializer,
             IScriptEngine scriptEngine,
             ISemanticLog log)
         {
@@ -61,6 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Guard.NotDefault(validators, nameof(validators));
             Guard.NotDefault(contentWorkflow, nameof(contentWorkflow));
             Guard.NotDefault(contentRepository, nameof(contentRepository));
+            Guard.NotDefault(jsonSerializer, nameof(jsonSerializer));
             Guard.NotDefault(scriptEngine, nameof(scriptEngine));
             Guard.NotDefault(log, nameof(log));
 
@@ -68,6 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             this.validators = validators;
             this.contentWorkflow = contentWorkflow;
             this.contentRepository = contentRepository;
+            this.jsonSerializer = jsonSerializer;
             this.scriptEngine = scriptEngine;
 
             this.log = log;
@@ -98,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             this.schema = schema;
 
-            validationContext = new ValidationContext(appId, schemaId, schema.SchemaDef, command.ContentId).Optimized(optimized);
+            validationContext = new ValidationContext(jsonSerializer, appId, schemaId, schema.SchemaDef, command.ContentId).Optimized(optimized);
         }
 
         public Task<Status> GetInitialStatusAsync()

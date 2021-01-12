@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
@@ -30,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var options = Options.Create(new AssetOptions { DefaultPageSize = 30 });
 
-            sut = new AssetQueryParser(JsonHelper.DefaultSerializer, tagService, options);
+            sut = new AssetQueryParser(TestUtils.DefaultSerializer, tagService, options);
         }
 
         [Fact]

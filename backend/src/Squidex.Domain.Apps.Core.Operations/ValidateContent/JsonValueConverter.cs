@@ -5,11 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
+using System.IO;
+using GeoJSON.Net;
+using GeoJSON.Net.Geometry;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -23,10 +26,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         public readonly struct Args
         {
             public readonly IJsonValue Value;
+            public readonly IJsonSerializer JsonSerializer;
 
-            public Args(IJsonValue value)
+            public Args(IJsonValue value, IJsonSerializer jsonSerializer)
             {
                 Value = value;
+
+                JsonSerializer = jsonSerializer;
             }
         }
 
@@ -34,12 +40,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
         }
 
-        public static (object? Result, JsonError? Error) ConvertValue(IField field, IJsonValue value)
+        public static (object? Result, JsonError? Error) ConvertValue(IField field, IJsonValue value, IJsonSerializer jsonSerializer)
         {
             Guard.NotNull(field, nameof(field));
             Guard.NotNull(value, nameof(value));
 
-            return field.Accept(Instance, new Args(value));
+            var args = new Args(value, jsonSerializer);
+
+            return field.Accept(Instance, args);
         }
 
         public (object? Result, JsonError? Error) Visit(IArrayField field, Args args)
@@ -116,46 +124,55 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            if (args.Value is JsonObject geolocation)
+            if (args.Value is JsonObject geoObject)
             {
-                foreach (var propertyName in geolocation.Keys)
+                try
                 {
-                    if (!string.Equals(propertyName, "latitude", StringComparison.OrdinalIgnoreCase) &&
-                        !string.Equals(propertyName, "longitude", StringComparison.OrdinalIgnoreCase))
+                    using (var stream = new MemoryStream())
                     {
-                        return (null, new JsonError(T.Get("contents.invalidGeolocationMoreProperties")));
+                        args.JsonSerializer.Serialize(args.Value, stream, true);
+
+                        stream.Position = 0;
+
+                        var geoJson = args.JsonSerializer.Deserialize<IGeoJSONObject>(stream);
+
+                        return (geoJson, null);
                     }
                 }
-
-                if (geolocation.TryGetValue("latitude", out var latValue) && latValue is JsonNumber latNumber)
+                catch
                 {
-                    var lat = latNumber.Value;
-
-                    if (!lat.IsBetween(-90, 90))
+                    if (geoObject.TryGetValue("latitude", out var latValue) && latValue is JsonNumber latNumber)
                     {
-                        return (null, new JsonError(T.Get("contents.invalidGeolocationLatitude")));
+                        var lat = latNumber.Value;
+
+                        if (!lat.IsBetween(-90, 90))
+                        {
+                            return (null, new JsonError(T.Get("contents.invalidGeolocationLatitude")));
+                        }
                     }
-                }
-                else
-                {
-                    return (null, new JsonError(T.Get("contents.invalidGeolocation")));
-                }
-
-                if (geolocation.TryGetValue("longitude", out var lonValue) && lonValue is JsonNumber lonNumber)
-                {
-                    var lon = lonNumber.Value;
-
-                    if (!lon.IsBetween(-180, 180))
+                    else
                     {
-                        return (null, new JsonError(T.Get("contents.invalidGeolocationLongitude")));
+                        return (null, new JsonError(T.Get("contents.invalidGeolocation")));
                     }
-                }
-                else
-                {
-                    return (null, new JsonError(T.Get("contents.invalidGeolocation")));
-                }
 
-                return (args.Value, null);
+                    if (geoObject.TryGetValue("longitude", out var lonValue) && lonValue is JsonNumber lonNumber)
+                    {
+                        var lon = lonNumber.Value;
+
+                        if (!lon.IsBetween(-180, 180))
+                        {
+                            return (null, new JsonError(T.Get("contents.invalidGeolocationLongitude")));
+                        }
+                    }
+                    else
+                    {
+                        return (null, new JsonError(T.Get("contents.invalidGeolocation")));
+                    }
+
+                    var position = new Position(latNumber.Value, lonNumber.Value);
+
+                    return (position, null);
+                }
             }
 
             return (null, new JsonError(T.Get("contents.invalidGeolocation")));

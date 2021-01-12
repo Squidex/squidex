@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -63,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                     mongoDatabase,
                     CreateAppProvider(),
                     CreateTextIndexer(),
-                    JsonHelper.DefaultSerializer);
+                    TestUtils.DefaultSerializer);
 
             Task.Run(async () =>
             {
@@ -161,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         private static void SetupJson()
         {
-            var jsonSerializer = JsonSerializer.Create(JsonHelper.DefaultSettings());
+            var jsonSerializer = JsonSerializer.Create(TestUtils.DefaultSerializerSettings);
 
             BsonJsonConvention.Register(jsonSerializer);
         }

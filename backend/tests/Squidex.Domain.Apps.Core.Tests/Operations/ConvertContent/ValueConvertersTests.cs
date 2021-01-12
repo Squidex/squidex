@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Create("invalid");
 
-            var result = ValueConverters.ExcludeChangedTypes(source, numberField);
+            var result = ValueConverters.ExcludeChangedTypes(TestUtils.DefaultSerializer)(source, numberField);
 
             Assert.Null(result);
         }

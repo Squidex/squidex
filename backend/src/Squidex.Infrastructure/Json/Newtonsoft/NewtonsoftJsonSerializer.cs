@@ -30,9 +30,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             return JsonConvert.SerializeObject(value, intented ? Formatting.Indented : Formatting.None, settings);
         }
 
-        public void Serialize<T>(T value, Stream stream)
+        public void Serialize<T>(T value, Stream stream, bool leaveOpen = false)
         {
-            using (var writer = new StreamWriter(stream))
+            using (var writer = new StreamWriter(stream, leaveOpen: leaveOpen))
             {
                 serializer.Serialize(writer, value);
 

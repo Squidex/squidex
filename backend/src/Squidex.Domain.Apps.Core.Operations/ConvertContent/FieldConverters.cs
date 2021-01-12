@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
@@ -28,32 +29,35 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return field.IsForApi() ? data : null;
         };
 
-        public static readonly FieldConverter ExcludeChangedTypes = (data, field) =>
+        public static FieldConverter ExcludeChangedTypes(IJsonSerializer jsonSerializer)
         {
-            foreach (var value in data.Values)
+            return (data, field) =>
             {
-                if (value.Type == JsonValueType.Null)
+                foreach (var value in data.Values)
                 {
-                    continue;
-                }
+                    if (value.Type == JsonValueType.Null)
+                    {
+                        continue;
+                    }
 
-                try
-                {
-                    var (_, error) = JsonValueConverter.ConvertValue(field, value);
+                    try
+                    {
+                        var (_, error) = JsonValueConverter.ConvertValue(field, value, jsonSerializer);
 
-                    if (error != null)
+                        if (error != null)
+                        {
+                            return null;
+                        }
+                    }
+                    catch
                     {
                         return null;
                     }
                 }
-                catch
-                {
-                    return null;
-                }
-            }
 
-            return data;
-        };
+                return data;
+            };
+        }
 
         public static FieldConverter ResolveInvariant(LanguagesConfig languages)
         {

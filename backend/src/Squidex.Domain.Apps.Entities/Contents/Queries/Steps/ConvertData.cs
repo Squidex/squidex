@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
@@ -24,16 +25,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         private readonly IUrlGenerator urlGenerator;
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
+        private readonly FieldConverter excludedChangedField;
+        private readonly FieldConverter excludedChangedValue;
+        private readonly FieldConverter excludedHiddenField;
+        private readonly FieldConverter excludedHiddenValue;
 
-        public ConvertData(IUrlGenerator urlGenerator, IAssetRepository assetRepository, IContentRepository contentRepository)
+        public ConvertData(IUrlGenerator urlGenerator, IJsonSerializer jsonSerializer,
+            IAssetRepository assetRepository, IContentRepository contentRepository)
         {
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
             Guard.NotNull(assetRepository, nameof(assetRepository));
             Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.urlGenerator = urlGenerator;
             this.assetRepository = assetRepository;
             this.contentRepository = contentRepository;
+
+            excludedChangedField = FieldConverters.ExcludeChangedTypes(jsonSerializer);
+            excludedChangedValue = FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeChangedTypes(jsonSerializer)));
+
+            excludedHiddenField = FieldConverters.ExcludeHidden;
+            excludedHiddenValue = FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeHidden));
         }
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
@@ -102,12 +115,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             if (!context.IsFrontendClient)
             {
-                yield return FieldConverters.ExcludeHidden;
-                yield return FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeHidden));
+                yield return excludedHiddenField;
+                yield return excludedHiddenValue;
             }
 
-            yield return FieldConverters.ExcludeChangedTypes;
-            yield return FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeChangedTypes));
+            yield return excludedChangedField;
+            yield return excludedChangedValue;
 
             if (cleanReferences != null)
             {

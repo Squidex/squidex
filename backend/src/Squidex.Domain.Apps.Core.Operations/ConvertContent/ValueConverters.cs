@@ -28,29 +28,32 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return field.IsForApi() ? value : null;
         };
 
-        public static readonly ValueConverter ExcludeChangedTypes = (value, field, parent) =>
+        public static ValueConverter ExcludeChangedTypes(IJsonSerializer jsonSerializer)
         {
-            if (value.Type == JsonValueType.Null)
+            return (value, field, parent) =>
             {
-                return value;
-            }
+                if (value.Type == JsonValueType.Null)
+                {
+                    return value;
+                }
 
-            try
-            {
-                var (_, error) = JsonValueConverter.ConvertValue(field, value);
+                try
+                {
+                    var (_, error) = JsonValueConverter.ConvertValue(field, value, jsonSerializer);
 
-                if (error != null)
+                    if (error != null)
+                    {
+                        return null;
+                    }
+                }
+                catch
                 {
                     return null;
                 }
-            }
-            catch
-            {
-                return null;
-            }
 
-            return value;
-        };
+                return value;
+            };
+        }
 
         public static ValueConverter DecodeJson(IJsonSerializer jsonSerializer)
         {
