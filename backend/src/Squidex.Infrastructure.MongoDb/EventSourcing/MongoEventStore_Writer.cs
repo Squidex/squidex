@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         await Collection.InsertOneAsync(commit);
 
-                        if (!IsReplicaSet)
+                        if (!CanUseChangeStreams)
                         {
                             notifier.NotifyEventsStored(streamName);
                         }

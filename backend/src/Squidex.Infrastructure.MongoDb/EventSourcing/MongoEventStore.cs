@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -32,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing
             get { return Collection; }
         }
 
-        public bool IsReplicaSet { get; private set; }
+        public bool CanUseChangeStreams { get; private set; }
 
         public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
             : base(database)
@@ -77,7 +78,10 @@ namespace Squidex.Infrastructure.EventSourcing
                     })
             }, ct);
 
-            IsReplicaSet = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
+            var clusterVersion = await Database.GetVersionAsync();
+            var clustered = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
+
+            CanUseChangeStreams = clustered && clusterVersion >= new Version("4.0");
         }
     }
 }
