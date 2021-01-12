@@ -219,13 +219,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Theory]
-        [InlineData(1, 0, SearchScope.All)]
-        [InlineData(1, 1, SearchScope.All)]
         [InlineData(0, 1, SearchScope.All)]
         [InlineData(0, 0, SearchScope.Published)]
         public async Task QueryAll_should_return_q_with_createdby(int isFrontend, int unpublished, SearchScope scope)
         {
-            var ctx = CreateContextWithOwnReadPermission(isFrontend: false, allowSchema: true)
+            var ctx = CreateContextWithOwnReadPermission(isFrontend: isFrontend == 0, allowSchema: true)
                     .WithUnpublished(unpublished == 1);
 
             var content = CreateContent(contentId);
@@ -242,13 +240,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Theory]
-        [InlineData(1, 0, SearchScope.All)]
-        [InlineData(1, 1, SearchScope.All)]
         [InlineData(0, 1, SearchScope.All)]
         [InlineData(0, 0, SearchScope.Published)]
         public async Task QueryAll_should_return_q_createdby_with_null(int isFrontend, int unpublished, SearchScope scope)
         {
-            var ctx = CreateContext(isFrontend: false, allowSchema: true)
+            var ctx = CreateContext(isFrontend: isFrontend == 0, allowSchema: true)
                     .WithUnpublished(unpublished == 1);
 
             var content = CreateContent(contentId);
@@ -351,7 +347,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return content;
         }
 
-        private IContentEntity CreateOwnContent(DomainId id, RefToken? refToken)
+        private IContentEntity CreateOwnContent(DomainId id, RefToken refToken)
         {
             var content = new ContentEntity
             {
