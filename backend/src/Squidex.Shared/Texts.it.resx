@@ -463,9 +463,6 @@
   <data name="contents.invalidGeolocationLongitude" xml:space="preserve">
     <value>La longitude deve essere tra -180 and 180.</value>
   </data>
-  <data name="contents.invalidGeolocationMoreProperties" xml:space="preserve">
-    <value>E' possibile impostare la geolocalizzazione solo impostando latitudine e longitudine.</value>
-  </data>
   <data name="contents.invalidNumber" xml:space="preserve">
     <value>Errore nel json,, atteso un number.</value>
   </data>
@@ -594,6 +591,9 @@
   </data>
   <data name="contents.validation.pattern" xml:space="preserve">
     <value>Deve seguire il pattern.</value>
+  </data>
+  <data name="contents.validation.reference" xml:space="preserve">
+    <value>Geolocation can only have latitude and longitude property.</value>
   </data>
   <data name="contents.validation.referenceNotFound" xml:space="preserve">
     <value>Contiene un collegamento '{id}' non valido.</value>

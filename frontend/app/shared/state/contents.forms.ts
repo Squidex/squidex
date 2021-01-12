@@ -7,8 +7,8 @@
 
 // tslint:disable: readonly-array
 
-import { FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { Form, Types, valueAll$ } from '@app/framework';
+import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { Form, Types, UndefinableFormArray, valueAll$ } from '@app/framework';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime, onErrorResumeNext } from 'rxjs/operators';
 import { AppLanguageDto } from './../services/app-languages.service';
@@ -314,7 +314,7 @@ export class FieldValueForm extends AbstractContentForm<RootFieldDto, FormContro
     }
 }
 
-export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray> {
+export class FieldArrayForm extends AbstractContentForm<RootFieldDto, UndefinableFormArray> {
     private readonly item$ = new BehaviorSubject<ReadonlyArray<FieldArrayItemForm>>([]);
 
     public get itemChanges(): Observable<ReadonlyArray<FieldArrayItemForm>> {
@@ -347,6 +347,20 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
         this.items = [...this.items, child];
 
         this.form.push(child.form);
+    }
+
+    public unset() {
+        this.items = [];
+
+        super.unset();
+
+        this.form.clear();
+    }
+
+    public reset() {
+        this.items = [];
+
+        this.form.clear();
     }
 
     public removeItemAt(index: number) {
@@ -393,7 +407,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
     private static buildControl(field: RootFieldDto, isOptional: boolean) {
         const validators = FieldsValidators.create(field, isOptional);
 
-        return new FormArray([], validators);
+        return new UndefinableFormArray([], validators);
     }
 }
 

@@ -164,6 +164,10 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         this.updateCustomState(context, state);
     }
 
+    public unset() {
+        this.form.setValue(undefined);
+    }
+
     protected updateCustomState(_context: RuleContext, _state: AbstractContentFormState) {
         return;
     }

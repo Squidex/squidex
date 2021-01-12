@@ -126,7 +126,6 @@
   "contents.invalidGeolocation": "Errore nel json, atteso un object latitudine/longitudine.",
   "contents.invalidGeolocationLatitude": "La latitudine deve essere tra -90 and 90.",
   "contents.invalidGeolocationLongitude": "La longitude deve essere tra -180 and 180.",
-  "contents.invalidGeolocationMoreProperties": "E' possibile impostare la geolocalizzazione solo impostando latitudine e longitudine.",
   "contents.invalidNumber": "Errore nel json,, atteso un number.",
   "contents.invalidString": "Errore nel json, atteso una string.",
   "contents.listReferences": "{count} Collegamenti(s)",

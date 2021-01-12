@@ -463,9 +463,6 @@
   <data name="contents.invalidGeolocationLongitude" xml:space="preserve">
     <value>Lengtegraad moet tussen -180 en 180 liggen.</value>
   </data>
-  <data name="contents.invalidGeolocationMoreProperties" xml:space="preserve">
-    <value>Geolocatie kan alleen de eigenschap lengte- en breedtegraad hebben.</value>
-  </data>
   <data name="contents.invalidNumber" xml:space="preserve">
     <value>Ongeldig json-type, verwacht aantal.</value>
   </data>
@@ -594,6 +591,9 @@
   </data>
   <data name="contents.validation.pattern" xml:space="preserve">
     <value>Moet het patroon volgen.</value>
+  </data>
+  <data name="contents.validation.reference" xml:space="preserve">
+    <value>Geolocation can only have latitude and longitude property.</value>
   </data>
   <data name="contents.validation.referenceNotFound" xml:space="preserve">
     <value>Bevat ongeldige referentie '{id}'.</value>
