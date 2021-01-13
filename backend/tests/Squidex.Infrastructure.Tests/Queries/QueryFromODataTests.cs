@@ -255,8 +255,8 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("properties/nested/geo")]
         public void Should_parse_filter_when_type_is_geograph(string field)
         {
-            var i = _Q($"$filter=geo.distance({field}, geography'POINT(10 20)') lt 30.0");
-            var o = _C($"Filter: {field} < Radius(20, 10, 30)");
+            var i = _Q($"$filter=geo.distance({field}, geography'POINT(20 10)') lt 30.0");
+            var o = _C($"Filter: {field} < Radius(10, 20, 30)");
 
             Assert.Equal(o, i);
         }

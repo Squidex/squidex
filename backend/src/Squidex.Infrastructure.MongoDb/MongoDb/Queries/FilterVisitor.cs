@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Infrastructure.MongoDb.Queries
 {
-    public sealed class FilterVisitor<T> : FilterNodeVisitor<FilterDefinition<T>, ClrValue>
+    public sealed class FilterVisitor<T> : FilterNodeVisitor<FilterDefinition<T>, ClrValue, None>
     {
         private static readonly FilterDefinitionBuilder<T> Filter = Builders<T>.Filter;
         private static readonly FilterVisitor<T> Instance = new FilterVisitor<T>();
@@ -25,27 +25,27 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 
         public static FilterDefinition<T> Visit(FilterNode<ClrValue> node)
         {
-            return node.Accept(Instance);
+            return node.Accept(Instance, None.Value);
         }
 
-        public override FilterDefinition<T> Visit(NegateFilter<ClrValue> nodeIn)
+        public override FilterDefinition<T> Visit(NegateFilter<ClrValue> nodeIn, None args)
         {
-            return Filter.Not(nodeIn.Filter.Accept(this));
+            return Filter.Not(nodeIn.Filter.Accept(this, args));
         }
 
-        public override FilterDefinition<T> Visit(LogicalFilter<ClrValue> nodeIn)
+        public override FilterDefinition<T> Visit(LogicalFilter<ClrValue> nodeIn, None args)
         {
             if (nodeIn.Type == LogicalFilterType.And)
             {
-                return Filter.And(nodeIn.Filters.Select(x => x.Accept(this)));
+                return Filter.And(nodeIn.Filters.Select(x => x.Accept(this, args)));
             }
             else
             {
-                return Filter.Or(nodeIn.Filters.Select(x => x.Accept(this)));
+                return Filter.Or(nodeIn.Filters.Select(x => x.Accept(this, args)));
             }
         }
 
-        public override FilterDefinition<T> Visit(CompareFilter<ClrValue> nodeIn)
+        public override FilterDefinition<T> Visit(CompareFilter<ClrValue> nodeIn, None args)
         {
             var propertyName = nodeIn.Path.ToString();
 

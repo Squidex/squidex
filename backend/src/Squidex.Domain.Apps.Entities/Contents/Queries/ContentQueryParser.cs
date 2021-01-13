@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 var query = ParseQuery(context, q, schema);
 
-                await TransformFullTextAsync(query, context, schema);
+                await TransformFilterAsync(query, context, schema);
 
                 WithSorting(query);
                 WithPaging(query);
@@ -76,8 +76,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private async Task TransformFullTextAsync(ClrQuery query, Context context, ISchemaEntity? schema)
+        private async Task TransformFilterAsync(ClrQuery query, Context context, ISchemaEntity? schema)
         {
+            if (query.Filter != null && schema != null)
+            {
+                query.Filter = await GeoQueryTransformer.TransformAsync(query.Filter, context, schema, textIndex);
+            }
+
             if (!string.IsNullOrWhiteSpace(query.FullText))
             {
                 if (schema == null)
@@ -88,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 var textQuery = new TextQuery(query.FullText, TextFilter.ShouldHaveSchemas(schema.Id));
 
                 var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope());
-                var fullTextFilter = ClrFilter.Eq("id", "NONE");
+                var fullTextFilter = ClrFilter.Eq("id", "__notfound__");
 
                 if (fullTextIds?.Any() == true)
                 {

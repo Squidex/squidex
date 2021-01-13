@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class Optimizer<TValue> : TransformVisitor<TValue>
+    public sealed class Optimizer<TValue> : TransformVisitor<TValue, None>
     {
         private static readonly Optimizer<TValue> Instance = new Optimizer<TValue>();
 
@@ -19,16 +19,16 @@ namespace Squidex.Infrastructure.Queries
 
         public static FilterNode<TValue>? Optimize(FilterNode<TValue> source)
         {
-            return source?.Accept(Instance);
+            return source?.Accept(Instance, None.Value);
         }
 
-        public override FilterNode<TValue>? Visit(LogicalFilter<TValue> nodeIn)
+        public override FilterNode<TValue>? Visit(LogicalFilter<TValue> nodeIn, None args)
         {
             var pruned = new List<FilterNode<TValue>>(nodeIn.Filters.Count);
 
             foreach (var filter in nodeIn.Filters)
             {
-                var transformed = filter.Accept(this);
+                var transformed = filter.Accept(this, None.Value);
 
                 if (transformed != null)
                 {
@@ -49,9 +49,9 @@ namespace Squidex.Infrastructure.Queries
             return nodeIn with { Filters = pruned };
         }
 
-        public override FilterNode<TValue>? Visit(NegateFilter<TValue> nodeIn)
+        public override FilterNode<TValue>? Visit(NegateFilter<TValue> nodeIn, None args)
         {
-            var pruned = nodeIn.Filter.Accept(this);
+            var pruned = nodeIn.Filter.Accept(this, None.Value);
 
             if (pruned == null)
             {
@@ -69,6 +69,11 @@ namespace Squidex.Infrastructure.Queries
                 {
                     return comparison with { Operator = CompareOperator.Equals };
                 }
+            }
+
+            if (ReferenceEquals(pruned, nodeIn.Filter))
+            {
+                return nodeIn;
             }
 
             return new NegateFilter<TValue>(pruned);

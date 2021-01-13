@@ -14,19 +14,36 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class AdaptionVisitor : TransformVisitor<ClrValue>
+    internal sealed class AdaptionVisitor : TransformVisitor<ClrValue, AdaptionVisitor.Args>
     {
-        private readonly Func<PropertyPath, PropertyPath> pathConverter;
-        private readonly DomainId appId;
+        private static readonly AdaptionVisitor Instance = new AdaptionVisitor();
 
-        public AdaptionVisitor(Func<PropertyPath, PropertyPath> pathConverter, DomainId appId)
+        public struct Args
         {
-            this.pathConverter = pathConverter;
+            public readonly Func<PropertyPath, PropertyPath> PathConverter;
 
-            this.appId = appId;
+            public readonly DomainId AppId;
+
+            public Args(Func<PropertyPath, PropertyPath> pathConverter, DomainId appId)
+            {
+                PathConverter = pathConverter;
+
+                AppId = appId;
+            }
         }
 
-        public override FilterNode<ClrValue> Visit(CompareFilter<ClrValue> nodeIn)
+        private AdaptionVisitor()
+        {
+        }
+
+        public static FilterNode<ClrValue>? Adapt(FilterNode<ClrValue> filter, Func<PropertyPath, PropertyPath> pathConverter, DomainId appId)
+        {
+            var args = new Args(pathConverter, appId);
+
+            return filter.Accept(Instance, args);
+        }
+
+        public override FilterNode<ClrValue> Visit(CompareFilter<ClrValue> nodeIn, Args args)
         {
             var result = nodeIn;
 
@@ -40,24 +57,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
                 if (clrValue is List<string> idList)
                 {
-                    value = idList.Select(x => DomainId.Combine(appId, DomainId.Create(x)).ToString()).ToList();
+                    value = idList.Select(x => DomainId.Combine(args.AppId, DomainId.Create(x)).ToString()).ToList();
                 }
                 else if (clrValue is string id)
                 {
-                    value = DomainId.Combine(appId, DomainId.Create(id)).ToString();
+                    value = DomainId.Combine(args.AppId, DomainId.Create(id)).ToString();
                 }
                 else if (clrValue is List<Guid> guidIdList)
                 {
-                    value = guidIdList.Select(x => DomainId.Combine(appId, DomainId.Create(x)).ToString()).ToList();
+                    value = guidIdList.Select(x => DomainId.Combine(args.AppId, DomainId.Create(x)).ToString()).ToList();
                 }
                 else if (clrValue is Guid guidId)
                 {
-                    value = DomainId.Combine(appId, DomainId.Create(guidId)).ToString();
+                    value = DomainId.Combine(args.AppId, DomainId.Create(guidId)).ToString();
                 }
             }
             else
             {
-                path = pathConverter(path);
+                path = args.PathConverter(path);
 
                 if (clrValue is List<Guid> guidList)
                 {

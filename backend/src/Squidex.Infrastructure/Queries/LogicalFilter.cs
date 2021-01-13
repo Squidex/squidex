@@ -21,9 +21,9 @@ namespace Squidex.Infrastructure.Queries
             }
         }
 
-        public override T Accept<T>(FilterNodeVisitor<T, TValue> visitor)
+        public override T Accept<T, TArgs>(FilterNodeVisitor<T, TValue, TArgs> visitor, TArgs args)
         {
-            return visitor.Visit(this);
+            return visitor.Visit(this, args);
         }
 
         public override string ToString()

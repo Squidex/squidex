@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             if (query.Filter != null)
             {
-                query.Filter = query.Filter.Accept(new AdaptionVisitor(pathConverter, appId));
+                query.Filter = AdaptionVisitor.Adapt(query.Filter, pathConverter, appId);
             }
 
             query.Sort = query.Sort.Select(x => new SortNode(pathConverter(x.Path), x.Order)).ToList();
@@ -93,11 +93,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return query;
         }
 
-        public static FilterNode<ClrValue>? AdjustToModel(this FilterNode<ClrValue> filterNode, DomainId appId, Schema schema)
+        public static FilterNode<ClrValue>? AdjustToModel(this FilterNode<ClrValue> filter, DomainId appId, Schema schema)
         {
             var pathConverter = Path(schema);
 
-            return filterNode.Accept(new AdaptionVisitor(pathConverter, appId));
+            return AdaptionVisitor.Adapt(filter, pathConverter, appId);
         }
     }
 }
