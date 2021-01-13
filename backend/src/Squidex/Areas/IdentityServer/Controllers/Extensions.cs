@@ -23,7 +23,7 @@ namespace Squidex.Areas.IdentityServer.Controllers
         {
             var externalLogin = await signInManager.GetExternalLoginInfoAsync(expectedXsrf);
 
-            var email = externalLogin.Principal.TryFindEmail();
+            var email = externalLogin.Principal.GetEmail();
 
             if (string.IsNullOrWhiteSpace(email))
             {

@@ -294,7 +294,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
             else
             {
-                var email = externalLogin.Principal.TryFindEmail();
+                var email = externalLogin.Principal.GetEmail();
+
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    throw new DomainException("User has no exposed email address.");
+                }
 
                 user = await userManager.FindByEmailWithClaimsAsync(email);
 

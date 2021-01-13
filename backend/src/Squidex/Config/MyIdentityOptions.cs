@@ -51,15 +51,15 @@ namespace Squidex.Config
 
         public string OidcRoleClaimType { get; set; }
 
-        public string[] OidcScopes { get; set; }
-
         public string OidcResponseType { get; set; }
+
+        public string OidcOnSignoutRedirectUrl { get; set; }
+
+        public string[] OidcScopes { get; set; }
 
         public bool OidcGetClaimsFromUserInfoEndpoint { get; set; }
 
         public Dictionary<string, string[]> OidcRoleMapping { get; set; }
-
-        public string OidcOnSignoutRedirectUrl { get; set; }
 
         public bool AdminRecreate { get; set; }
 
