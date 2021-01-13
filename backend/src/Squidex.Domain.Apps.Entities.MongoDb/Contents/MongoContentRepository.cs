@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Hosting;
@@ -37,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             StatusSerializer.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, ITextIndex indexer, IJsonSerializer serializer)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(serializer, nameof(serializer));
@@ -48,11 +47,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             collectionAll =
                 new MongoContentCollection(
-                    "States_Contents_All2", database, appProvider, indexer, converter);
+                    "States_Contents_All2", database, appProvider, converter);
 
             collectionPublished =
                 new MongoContentCollection(
-                    "States_Contents_Published2", database, appProvider, indexer, converter);
+                    "States_Contents_Published2", database, appProvider, converter);
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)
@@ -82,11 +81,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schema, q, scope);
+                return collectionAll.QueryAsync(app, schema, q);
             }
             else
             {
-                return collectionPublished.QueryAsync(app, schema, q, scope);
+                return collectionPublished.QueryAsync(app, schema, q);
             }
         }
 

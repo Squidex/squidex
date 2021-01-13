@@ -8,7 +8,6 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using GeoJSON.Net.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core.Apps.Json;
@@ -54,7 +53,6 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new DomainIdConverter(),
                     new EnvelopeHeadersConverter(),
                     new FilterConverter(),
-                    new GeoJsonConverter(),
                     new InstantConverter(),
                     new JsonValueConverter(),
                     new LanguageConverter(),

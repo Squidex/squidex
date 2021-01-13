@@ -5,21 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
+
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface ITextIndex
+    public sealed record GeoQuery(DomainId SchemaId, string Field, double Latitude, double Longitude, double Radius)
     {
-        Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope);
-
-        Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope);
-
-        Task ClearAsync();
-
-        Task ExecuteAsync(params IndexCommand[] commands);
     }
 }

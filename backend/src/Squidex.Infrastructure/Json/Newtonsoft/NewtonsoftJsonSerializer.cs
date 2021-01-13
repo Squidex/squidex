@@ -53,9 +53,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
         }
 
-        public T Deserialize<T>(Stream stream, Type? actualType = null)
+        public T Deserialize<T>(Stream stream, Type? actualType = null, bool leaveOpen = false)
         {
-            using (var textReader = new StreamReader(stream))
+            using (var textReader = new StreamReader(stream, leaveOpen: leaveOpen))
             {
                 actualType ??= typeof(T);
 

@@ -7,29 +7,12 @@
 
 using System.Collections.Generic;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class CompareFilter<TValue> : FilterNode<TValue>
+    public sealed record CompareFilter<TValue>(PropertyPath Path, CompareOperator Operator, TValue Value) : FilterNode<TValue>
     {
-        public PropertyPath Path { get; }
-
-        public CompareOperator Operator { get; }
-
-        public TValue Value { get; }
-
-        public CompareFilter(PropertyPath path, CompareOperator @operator, TValue value)
-        {
-            Guard.NotNull(path, nameof(path));
-            Guard.NotNull(value, nameof(value));
-            Guard.Enum(@operator, nameof(@operator));
-
-            Path = path;
-
-            Operator = @operator;
-
-            Value = value;
-        }
-
         public override void AddFields(HashSet<string> fields)
         {
             fields.Add(Path.ToString());

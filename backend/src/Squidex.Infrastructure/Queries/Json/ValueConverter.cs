@@ -11,6 +11,7 @@ using System.Linq;
 using NJsonSchema;
 using NodaTime;
 using NodaTime.Text;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.Queries.Json
@@ -116,6 +117,16 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
+                case JsonObjectType.Object when schema.Format == GeoJson.Format:
+                    {
+                        if (TryParseGeoJson(errors, path, value, out var temp))
+                        {
+                            result = temp;
+                        }
+
+                        break;
+                    }
+
                 default:
                     {
                         errors.Add($"Unsupported type {schema.Type} for {path}.");
@@ -139,6 +150,25 @@ namespace Squidex.Infrastructure.Queries.Json
             }
 
             return items;
+        }
+
+        private static bool TryParseGeoJson(List<string> errors, PropertyPath path, IJsonValue value, out FilterSphere result)
+        {
+            result = default!;
+
+            if (value is JsonObject geoObject &&
+                geoObject.TryGetValue<JsonNumber>("latitude", out var lat) &&
+                geoObject.TryGetValue<JsonNumber>("longitude", out var lon) &&
+                geoObject.TryGetValue<JsonNumber>("distance", out var distance))
+            {
+                result = new FilterSphere(lat.Value, lon.Value, distance.Value);
+
+                return true;
+            }
+
+            errors.Add($"Expected Object(geo-json) for path '{path}', but got {value.Type}.");
+
+            return false;
         }
 
         private static bool TryParseBoolean(List<string> errors, PropertyPath path, IJsonValue value, out bool result)

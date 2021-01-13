@@ -46,49 +46,70 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.options = options.Value;
         }
 
-        public virtual async ValueTask<Q> ParseQueryAsync(Context context, Q q)
+        public virtual async Task<Q> ParseQueryAsync(Context context, Q q)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(q, nameof(q));
 
             using (Profiler.TraceMethod<AssetQueryParser>())
             {
-                var query = q.Query;
+                var query = ParseQuery(q);
 
-                if (!string.IsNullOrWhiteSpace(q?.JsonQueryString))
-                {
-                    query = ParseJson(q.JsonQueryString);
-                }
-                else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
-                {
-                    query = ParseOData(q.ODataQuery);
-                }
+                await TransformTagAsync(context, query);
 
-                if (query.Filter != null)
-                {
-                    query.Filter = await FilterTagTransformer.TransformAsync(query.Filter, context.App.Id, tagService);
-                }
-
-                if (query.Sort.Count == 0)
-                {
-                    query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
-                }
-
-                if (!query.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
-                {
-                    query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
-                }
-
-                if (query.Take == long.MaxValue)
-                {
-                    query.Take = options.DefaultPageSize;
-                }
-                else if (query.Take > options.MaxResults)
-                {
-                    query.Take = options.MaxResults;
-                }
+                WithSorting(query);
+                WithPaging(query);
 
                 return q!.WithQuery(query);
+            }
+        }
+
+        private ClrQuery ParseQuery(Q q)
+        {
+            var query = q.Query;
+
+            if (!string.IsNullOrWhiteSpace(q?.JsonQueryString))
+            {
+                query = ParseJson(q.JsonQueryString);
+            }
+            else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+            {
+                query = ParseOData(q.ODataQuery);
+            }
+
+            return query;
+        }
+
+        private void WithPaging(ClrQuery query)
+        {
+            if (query.Take == long.MaxValue)
+            {
+                query.Take = options.DefaultPageSize;
+            }
+            else if (query.Take > options.MaxResults)
+            {
+                query.Take = options.MaxResults;
+            }
+        }
+
+        private static void WithSorting(ClrQuery query)
+        {
+            if (query.Sort.Count == 0)
+            {
+                query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
+            }
+
+            if (!query.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
+            {
+                query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
+            }
+        }
+
+        private async Task TransformTagAsync(Context context, ClrQuery query)
+        {
+            if (query.Filter != null)
+            {
+                query.Filter = await FilterTagTransformer.TransformAsync(query.Filter, context.App.Id, tagService);
             }
         }
 

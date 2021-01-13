@@ -38,18 +38,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextIndexerTests_Elastic()
         {
-            SupportssQuerySyntax = true;
+            SupportsQuerySyntax = true;
         }
 
         [Fact]
         public async Task Should_index_localized_content_without_stop_words_and_retrieve()
         {
             await TestCombinations(
-                Create(ids1[0], "de", "and und"),
-                Create(ids2[0], "en", "and und"),
+                CreateText(ids1[0], "de", "and und"),
+                CreateText(ids2[0], "en", "and und"),
 
-                Search(expected: ids1, text: "and"),
-                Search(expected: ids2, text: "und")
+                SearchText(expected: ids1, text: "and"),
+                SearchText(expected: ids2, text: "und")
             );
         }
 
@@ -57,9 +57,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public async Task Should_index_cjk_content_and_retrieve()
         {
             await TestCombinations(
-                Create(ids1[0], "zh", "東京大学"),
+                CreateText(ids1[0], "zh", "東京大学"),
 
-                Search(expected: ids1, text: "東京")
+                SearchText(expected: ids1, text: "東京")
             );
         }
     }

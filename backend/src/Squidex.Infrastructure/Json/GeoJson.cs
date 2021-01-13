@@ -5,19 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Squidex.Infrastructure;
-
-namespace Squidex.Domain.Apps.Entities.Contents.Text
+namespace Squidex.Infrastructure.Json
 {
-    public sealed class UpsertIndexEntry : IndexCommand
+    public static class GeoJson
     {
-        public Dictionary<string, string> Texts { get; set; }
-
-        public bool ServeAll { get; set; }
-
-        public bool ServePublished { get; set; }
-
-        public DomainId ContentId { get; set; }
+        public const string Format = "geo-json";
     }
 }

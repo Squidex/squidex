@@ -6,11 +6,13 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -23,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentQueryParserTests
     {
+        private readonly ITextIndex textIndex = A.Fake<ITextIndex>();
         private readonly ISchemaEntity schema;
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -43,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            sut = new ContentQueryParser(cache, TestUtils.DefaultSerializer, options);
+            sut = new ContentQueryParser(cache, TestUtils.DefaultSerializer, textIndex, options);
         }
 
         [Fact]
@@ -51,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithODataQuery("$filter=invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema));
         }
 
         [Fact]
@@ -59,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithJsonQuery("invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema));
         }
 
         [Fact]

@@ -73,8 +73,8 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         public string Visit(GeolocationFieldProperties properties, Args args)
         {
             if (args.Value is JsonObject jsonObject &&
-                jsonObject.TryGetValue("latitude", out var lat) &&
-                jsonObject.TryGetValue("longitude", out var lon))
+                jsonObject.TryGetValue<JsonNumber>("latitude", out var lat) &&
+                jsonObject.TryGetValue<JsonNumber>("longitude", out var lon))
             {
                 return $"{lat}, {lon}";
             }

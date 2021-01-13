@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
 
         public override FilterNode<TValue>? Visit(CompareFilter<TValue> nodeIn)
         {
-            return new CompareFilter<TValue>(nodeIn.Path.ToFirstPascalCase(), nodeIn.Operator, nodeIn.Value);
+            return nodeIn with { Path = nodeIn.Path.ToFirstPascalCase() };
         }
     }
 }

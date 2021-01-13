@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public JsonValueType Type
         {
-            get { return JsonValueType.Array; }
+            get { return JsonValueType.Object; }
         }
 
         public JsonObject()
@@ -96,6 +96,20 @@ namespace Squidex.Infrastructure.Json.Objects
         public bool TryGetValue(string key, [MaybeNullWhen(false)] out IJsonValue value)
         {
             return inner.TryGetValue(key, out value!);
+        }
+
+        public bool TryGetValue<T>(string key, [MaybeNullWhen(false)] out T value) where T : class, IJsonValue
+        {
+            if (inner.TryGetValue(key, out var temp) && temp is T typed)
+            {
+                value = typed;
+                return true;
+            }
+            else
+            {
+                value = null!;
+                return false;
+            }
         }
 
         public IEnumerator<KeyValuePair<string, IJsonValue>> GetEnumerator()

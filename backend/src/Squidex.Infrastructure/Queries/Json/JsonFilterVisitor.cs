@@ -60,7 +60,14 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 if (!isValidOperator)
                 {
-                    errors.Add($"{nodeIn.Operator} is not a valid operator for type {property.Type} at {nodeIn.Path}.");
+                    var name = property.Type.ToString();
+
+                    if (!string.IsNullOrWhiteSpace(property.Format))
+                    {
+                        name = $"{name}({property.Format})";
+                    }
+
+                    errors.Add($"'{nodeIn.Operator}' is not a valid operator for type {name} at '{nodeIn.Path}'.");
                 }
 
                 var value = ValueConverter.Convert(property, nodeIn.Value, nodeIn.Path, errors);

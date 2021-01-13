@@ -49,6 +49,16 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_convert_comparison_with_radius()
+        {
+            var json = new { path = "property", op = "lt", value = new { latitude = 10, longitude = 20 } };
+
+            var filter = SerializeAndDeserialize(json);
+
+            Assert.Equal("property < {\"latitude\":10, \"longitude\":20}", filter.ToString());
+        }
+
+        [Fact]
         public void Should_convert_comparison_in()
         {
             var json = new { path = "property", op = "in", value = new[] { 12, 13 } };

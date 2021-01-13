@@ -5,27 +5,26 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using Squidex.Infrastructure;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed record NegateFilter<TValue>(FilterNode<TValue> Filter) : FilterNode<TValue>
+    public sealed record TextQuery(string? Text, TextFilter? Filter)
     {
-        public override void AddFields(HashSet<string> fields)
+    }
+
+    public sealed record TextFilter(DomainId[]? SchemaIds, bool Must)
+    {
+        public static TextFilter MustHaveSchemas(params DomainId[] schemaIds)
         {
-            Filter.AddFields(fields);
+            return new TextFilter(schemaIds, true);
         }
 
-        public override T Accept<T>(FilterNodeVisitor<T, TValue> visitor)
+        public static TextFilter ShouldHaveSchemas(params DomainId[] schemaIds)
         {
-            return visitor.Visit(this);
-        }
-
-        public override string ToString()
-        {
-            return $"!({Filter})";
+            return new TextFilter(schemaIds, false);
         }
     }
 }

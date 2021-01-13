@@ -56,7 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return result;
             }
 
-            var ids = await contentTextIndexer.SearchAsync($"{query}~", context.App, searchFilter, context.Scope());
+            var textQuery = new TextQuery($"{query}~", searchFilter);
+
+            var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope());
 
             if (ids == null || ids.Count == 0)
             {
@@ -79,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result;
         }
 
-        private async Task<SearchFilter?> CreateSearchFilterAsync(Context context)
+        private async Task<TextFilter?> CreateSearchFilterAsync(Context context)
         {
             var allowedSchemas = new List<DomainId>();
 
@@ -98,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return null;
             }
 
-            return SearchFilter.MustHaveSchemas(allowedSchemas.ToArray());
+            return TextFilter.MustHaveSchemas(allowedSchemas.ToArray());
         }
 
         private static bool HasPermission(Context context, string schemaName)

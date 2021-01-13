@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.Queries
                 return null;
             }
 
-            return new LogicalFilter<TValue>(nodeIn.Type, pruned);
+            return nodeIn with { Filters = pruned };
         }
 
         public override FilterNode<TValue>? Visit(NegateFilter<TValue> nodeIn)
@@ -62,12 +62,12 @@ namespace Squidex.Infrastructure.Queries
             {
                 if (comparison.Operator == CompareOperator.Equals)
                 {
-                    return new CompareFilter<TValue>(comparison.Path, CompareOperator.NotEquals, comparison.Value);
+                    return comparison with { Operator = CompareOperator.NotEquals };
                 }
 
                 if (comparison.Operator == CompareOperator.NotEquals)
                 {
-                    return new CompareFilter<TValue>(comparison.Path, CompareOperator.Equals, comparison.Value);
+                    return comparison with { Operator = CompareOperator.Equals };
                 }
             }
 

@@ -18,6 +18,6 @@ namespace Squidex.Infrastructure.Json
 
         T Deserialize<T>(string value, Type? actualType = null);
 
-        T Deserialize<T>(Stream stream, Type? actualType = null);
+        T Deserialize<T>(Stream stream, Type? actualType = null, bool leaveOpen = false);
     }
 }

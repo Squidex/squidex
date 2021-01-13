@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using GeoJSON.Net;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
@@ -17,6 +19,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         [BsonId]
         [BsonElement]
         [BsonRepresentation(BsonType.String)]
+        public string Id { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public string DocId { get; set; }
 
         [BsonRequired]
@@ -45,5 +51,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         [BsonIgnoreIfNull]
         [BsonElement("t")]
         public List<MongoTextIndexEntityText> Texts { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement("f")]
+        public string GeoField { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement("g")]
+        [BsonJson]
+        public GeoJSONObject GeoObject { get; set; }
     }
 }

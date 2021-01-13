@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithODataQuery("$filter=invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query));
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithJsonQuery("invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query));
         }
 
         [Fact]

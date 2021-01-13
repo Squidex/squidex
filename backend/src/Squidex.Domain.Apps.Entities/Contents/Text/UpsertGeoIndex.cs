@@ -6,20 +6,17 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Apps;
+using GeoJSON.Net;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public interface ITextIndex
+    public sealed class UpsertGeoIndex : UpdateIndexEntry
     {
-        Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope);
+        public Dictionary<string, GeoJSONObject>? GeoObjects { get; set; }
 
-        Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope);
+        public DomainId ContentId { get; set; }
 
-        Task ClearAsync();
-
-        Task ExecuteAsync(params IndexCommand[] commands);
+        public bool IsNew { get; set; }
     }
 }

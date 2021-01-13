@@ -7,24 +7,12 @@
 
 using System.Collections.Generic;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class LogicalFilter<TValue> : FilterNode<TValue>
+    public sealed record LogicalFilter<TValue>(LogicalFilterType Type, IReadOnlyList<FilterNode<TValue>> Filters) : FilterNode<TValue>
     {
-        public IReadOnlyList<FilterNode<TValue>> Filters { get; }
-
-        public LogicalFilterType Type { get; }
-
-        public LogicalFilter(LogicalFilterType type, IReadOnlyList<FilterNode<TValue>> filters)
-        {
-            Guard.NotNull(filters, nameof(filters));
-            Guard.Enum(type, nameof(type));
-
-            Filters = filters;
-
-            Type = type;
-        }
-
         public override void AddFields(HashSet<string> fields)
         {
             foreach (var filter in Filters)

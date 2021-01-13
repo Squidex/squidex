@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentIndex.SearchAsync(A<string>._, ctx.App, A<SearchFilter>._, A<SearchScope>._))
+            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>._, A<SearchScope>._))
                 .MustNotHaveHappened();
         }
 
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var ctx = ContextWithPermissions(schemaId1, schemaId2);
 
-            A.CallTo(() => contentIndex.SearchAsync("query~", ctx.App, A<SearchFilter>._, ctx.Scope()))
+            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ctx.Scope()))
                 .Returns(new List<DomainId>());
 
             var result = await sut.SearchAsync("query", ctx);
@@ -186,11 +186,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ctx = ContextWithPermissions(schemaId1, schemaId2);
 
-            var searchFilter = SearchFilter.MustHaveSchemas(schemaId1.Id, schemaId2.Id);
-
             var ids = new List<DomainId> { content.Id };
 
-            A.CallTo(() => contentIndex.SearchAsync("query~", ctx.App, A<SearchFilter>.That.IsEqualTo(searchFilter), ctx.Scope()))
+            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~" && x.Filter != null), ctx.Scope()))
                 .Returns(ids);
 
             A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>.That.HasIds(ids)))

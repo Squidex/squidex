@@ -134,18 +134,16 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                         stream.Position = 0;
 
-                        var geoJson = args.JsonSerializer.Deserialize<IGeoJSONObject>(stream);
+                        var geoJson = args.JsonSerializer.Deserialize<GeoJSONObject>(stream);
 
                         return (geoJson, null);
                     }
                 }
                 catch
                 {
-                    if (geoObject.TryGetValue("latitude", out var latValue) && latValue is JsonNumber latNumber)
+                    if (geoObject.TryGetValue<JsonNumber>("latitude", out var lat))
                     {
-                        var lat = latNumber.Value;
-
-                        if (!lat.IsBetween(-90, 90))
+                        if (!lat.Value.IsBetween(-90, 90))
                         {
                             return (null, new JsonError(T.Get("contents.invalidGeolocationLatitude")));
                         }
@@ -155,11 +153,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                         return (null, new JsonError(T.Get("contents.invalidGeolocation")));
                     }
 
-                    if (geoObject.TryGetValue("longitude", out var lonValue) && lonValue is JsonNumber lonNumber)
+                    if (geoObject.TryGetValue<JsonNumber>("longitude", out var lon))
                     {
-                        var lon = lonNumber.Value;
-
-                        if (!lon.IsBetween(-180, 180))
+                        if (!lon.Value.IsBetween(-180, 180))
                         {
                             return (null, new JsonError(T.Get("contents.invalidGeolocationLongitude")));
                         }
@@ -169,7 +165,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                         return (null, new JsonError(T.Get("contents.invalidGeolocation")));
                     }
 
-                    var position = new Position(latNumber.Value, lonNumber.Value);
+                    var position = new Position(lat.Value, lon.Value);
 
                     return (position, null);
                 }
