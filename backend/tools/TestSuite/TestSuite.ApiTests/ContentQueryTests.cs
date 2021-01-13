@@ -30,6 +30,22 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_query_newly_created_schema()
+        {
+            for (var i = 0; i < 20; i++)
+            {
+                var schemaName = $"schema-{Guid.NewGuid()}";
+
+                await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
+
+                var contentClient = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
+                var contentItems = await contentClient.GetAsync();
+
+                Assert.Equal(0, contentItems.Total);
+            }
+        }
+
+        [Fact]
         public async Task Should_query_by_ids()
         {
             var items = await _.Contents.GetAsync(new ContentQuery { OrderBy = "data/number/iv asc" });
