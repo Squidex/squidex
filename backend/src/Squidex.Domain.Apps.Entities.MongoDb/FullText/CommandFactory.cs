@@ -25,11 +25,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 case DeleteIndexEntry delete:
                     DeleteEntry(delete, writes);
                     break;
-                case UpsertTextIndex upsert:
+                case UpsertIndexEntry upsert:
                     UpsertEntry(upsert, writes);
-                    break;
-                case UpsertGeoIndex upsertGeo:
-                    UpsertEntry(upsertGeo, writes);
                     break;
                 case UpdateIndexEntry update:
                     UpdateEntry(update, writes);
@@ -37,17 +34,39 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             }
         }
 
-        private static void UpsertEntry(UpsertGeoIndex upsert, List<WriteModel<MongoTextIndexEntity>> writes)
+        private static void UpsertEntry(UpsertIndexEntry upsert, List<WriteModel<MongoTextIndexEntity>> writes)
         {
-            if (!upsert.IsNew)
-            {
-                writes.Add(
-                    new DeleteOneModel<MongoTextIndexEntity>(
-                        Filter.Eq(x => x.DocId, upsert.DocId)));
-            }
+            writes.Add(
+                new UpdateOneModel<MongoTextIndexEntity>(
+                    Filter.And(
+                        Filter.Eq(x => x.DocId, upsert.DocId),
+                        Filter.Exists(x => x.GeoField, false),
+                        Filter.Exists(x => x.GeoObject, false)),
+                    Update
+                        .Set(x => x.ServeAll, upsert.ServeAll)
+                        .Set(x => x.ServePublished, upsert.ServePublished)
+                        .Set(x => x.Texts, upsert.Texts?.Values.Select(MongoTextIndexEntityText.FromText).ToList())
+                        .SetOnInsert(x => x.Id, Guid.NewGuid().ToString())
+                        .SetOnInsert(x => x.DocId, upsert.DocId)
+                        .SetOnInsert(x => x.AppId, upsert.AppId.Id)
+                        .SetOnInsert(x => x.ContentId, upsert.ContentId)
+                        .SetOnInsert(x => x.SchemaId, upsert.SchemaId.Id))
+                {
+                    IsUpsert = true
+                });
 
             if (upsert.GeoObjects?.Any() == true)
             {
+                if (!upsert.IsNew)
+                {
+                    writes.Add(
+                        new DeleteOneModel<MongoTextIndexEntity>(
+                            Filter.And(
+                                Filter.Eq(x => x.DocId, upsert.DocId),
+                                Filter.Exists(x => x.GeoField),
+                                Filter.Exists(x => x.GeoObject))));
+                }
+
                 foreach (var (field, geoObject) in upsert.GeoObjects)
                 {
                     writes.Add(
@@ -66,25 +85,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                             }));
                 }
             }
-        }
-
-        private static void UpsertEntry(UpsertTextIndex upsert, List<WriteModel<MongoTextIndexEntity>> writes)
-        {
-            writes.Add(
-                new UpdateOneModel<MongoTextIndexEntity>(
-                    Filter.Eq(x => x.DocId, upsert.DocId),
-                    Update
-                        .Set(x => x.ServeAll, upsert.ServeAll)
-                        .Set(x => x.ServePublished, upsert.ServePublished)
-                        .Set(x => x.Texts, upsert.Texts?.Values.Select(MongoTextIndexEntityText.FromText).ToList())
-                        .SetOnInsert(x => x.Id, Guid.NewGuid().ToString())
-                        .SetOnInsert(x => x.DocId, upsert.DocId)
-                        .SetOnInsert(x => x.AppId, upsert.AppId.Id)
-                        .SetOnInsert(x => x.ContentId, upsert.ContentId)
-                        .SetOnInsert(x => x.SchemaId, upsert.SchemaId.Id))
-                {
-                    IsUpsert = true
-                });
         }
 
         private static void UpdateEntry(UpdateIndexEntry update, List<WriteModel<MongoTextIndexEntity>> writes)

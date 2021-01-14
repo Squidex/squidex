@@ -53,11 +53,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         public List<MongoTextIndexEntityText> Texts { get; set; }
 
         [BsonIgnoreIfNull]
-        [BsonElement("f")]
+        [BsonElement("gf")]
         public string GeoField { get; set; }
 
         [BsonIgnoreIfNull]
-        [BsonElement("g")]
+        [BsonElement("go")]
         [BsonJson]
         public GeoJSONObject GeoObject { get; set; }
     }

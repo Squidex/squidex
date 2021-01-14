@@ -123,37 +123,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 state.GenerateDocIdCurrent();
 
-                var texts = data.ToTexts();
-
-                if (texts != null)
-                {
-                    Index(@event,
-                        new UpsertTextIndex
-                        {
-                            ContentId = @event.ContentId,
-                            DocId = state.DocIdCurrent,
-                            ServeAll = true,
-                            ServePublished = false,
-                            Texts = texts,
-                            IsNew = true
-                        });
-                }
-
-                var geo = data.ToGeo(jsonSerializer);
-
-                if (geo != null)
-                {
-                    Index(@event,
-                        new UpsertGeoIndex
-                        {
-                            ContentId = @event.ContentId,
-                            DocId = state.DocIdCurrent,
-                            ServeAll = true,
-                            ServePublished = false,
-                            GeoObjects = geo,
-                            IsNew = true
-                        });
-                }
+                Index(@event,
+                    new UpsertIndexEntry
+                    {
+                        ContentId = @event.ContentId,
+                        DocId = state.DocIdCurrent,
+                        GeoObjects = data.ToGeo(jsonSerializer),
+                        ServeAll = true,
+                        ServePublished = false,
+                        Texts = data.ToTexts(),
+                        IsNew = true
+                    });
 
                 states[state.UniqueContentId] = state;
 
@@ -201,23 +181,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     if (state.DocIdNew != null)
                     {
                         Index(@event,
-                            new UpsertTextIndex
+                            new UpsertIndexEntry
                             {
                                 ContentId = @event.ContentId,
                                 DocId = state.DocIdNew,
+                                GeoObjects = data.ToGeo(jsonSerializer),
                                 ServeAll = true,
                                 ServePublished = false,
                                 Texts = data.ToTexts()
-                            });
-
-                        Index(@event,
-                            new UpsertGeoIndex
-                            {
-                                ContentId = @event.ContentId,
-                                DocId = state.DocIdNew,
-                                ServeAll = true,
-                                ServePublished = false,
-                                GeoObjects = data.ToGeo(jsonSerializer)
                             });
 
                         Index(@event,
@@ -233,10 +204,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         var isPublished = state.DocIdCurrent == state.DocIdForPublished;
 
                         Index(@event,
-                            new UpsertTextIndex
+                            new UpsertIndexEntry
                             {
                                 ContentId = @event.ContentId,
                                 DocId = state.DocIdCurrent,
+                                GeoObjects = data.ToGeo(jsonSerializer),
                                 ServeAll = true,
                                 ServePublished = isPublished,
                                 Texts = data.ToTexts()
@@ -346,7 +318,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 if (command is UpdateIndexEntry update &&
                     commands.TryGetValue(command.DocId, out var existing) &&
-                    existing is UpsertTextIndex upsert)
+                    existing is UpsertIndexEntry upsert)
                 {
                     upsert.ServeAll = update.ServeAll;
                     upsert.ServePublished = update.ServePublished;

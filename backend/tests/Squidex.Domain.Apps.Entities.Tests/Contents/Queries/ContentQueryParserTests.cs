@@ -110,21 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_parse_json_query_and_enrich_with_defaults()
         {
-            var query = Q.Empty.WithJsonQuery(Json("{ 'filter': { 'path': 'data.firstName.iv', 'op': 'eq', 'value': 'ABC' } }"));
-
-            var q = await sut.ParseAsync(requestContext, query, schema);
-
-            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
-        }
-
-        [Fact]
-        public async Task Should_convert_json_query_and_enrich_with_defaults()
-        {
-            var query = Q.Empty.WithJsonQuery(
-                new Query<IJsonValue>
-                {
-                    Filter = new CompareFilter<IJsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC"))
-                });
+            var query = Q.Empty.WithJsonQuery("{ \"filter\": { \"path\": \"data.firstName.iv\", \"op\": \"eq\", \"value\": \"ABC\" } }");
 
             var q = await sut.ParseAsync(requestContext, query, schema);
 
@@ -278,9 +264,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal("Skip: 20; Take: 200; Sort: id Descending", q.Query.ToString());
         }
 
-        private static string Json(string text)
+        [Fact]
+        public async Task Should_convert_json_query_and_enrich_with_defaults()
         {
-            return text.Replace('\'', '"');
+            var query = Q.Empty.WithJsonQuery(
+                new Query<IJsonValue>
+                {
+                    Filter = new CompareFilter<IJsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC"))
+                });
+
+            var q = await sut.ParseAsync(requestContext, query, schema);
+
+            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
     }
 }

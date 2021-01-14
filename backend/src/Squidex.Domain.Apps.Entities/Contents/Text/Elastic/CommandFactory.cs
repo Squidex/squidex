@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
         {
             switch (command)
             {
-                case UpsertTextIndex upsert:
+                case UpsertIndexEntry upsert:
                     UpsertEntry(upsert, args, indexName);
                     break;
                 case UpdateIndexEntry update:
@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             }
         }
 
-        private static void UpsertEntry(UpsertTextIndex upsert, List<object> args, string indexName)
+        private static void UpsertEntry(UpsertIndexEntry upsert, List<object> args, string indexName)
         {
             args.Add(new
             {

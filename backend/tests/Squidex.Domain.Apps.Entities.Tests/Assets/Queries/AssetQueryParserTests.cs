@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_parse_json_query_and_enrich_with_defaults()
         {
-            var query = Q.Empty.WithJsonQuery(Json("{ 'filter': { 'path': 'fileName', 'op': 'eq', 'value': 'ABC' } }"));
+            var query = Q.Empty.WithJsonQuery("{ \"filter\": { \"path\": \"fileName\", \"op\": \"eq\", \"value\": \"ABC\" } }");
 
             var q = await sut.ParseQueryAsync(requestContext, query);
 
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_parse_json_full_text_query_and_enrich_with_defaults()
         {
-            var query = Q.Empty.WithJsonQuery(Json("{ 'fullText': 'Hello' }"));
+            var query = Q.Empty.WithJsonQuery("{ \"fullText\": \"Hello\" }");
 
             var q = await sut.ParseQueryAsync(requestContext, query);
 
@@ -157,11 +157,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>._, A<HashSet<string>>._))
                 .MustNotHaveHappened();
-        }
-
-        private static string Json(string text)
-        {
-            return text.Replace('\'', '"');
         }
     }
 }
