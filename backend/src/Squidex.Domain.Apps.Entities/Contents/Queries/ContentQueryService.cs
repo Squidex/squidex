@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedContentEntity> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = -1)
+        public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = -1)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (content == null || content.SchemaId.Id != schema.Id)
                 {
-                    throw new DomainObjectNotFoundException(id.ToString());
+                    return null;
                 }
 
                 return await TransformAsync(context, content);
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contentRepository.FindContentAsync(context.App, schema, id, context.Scope());
         }
 
-        private Task<IContentEntity> FindByVersionAsync(Context context, DomainId id, long version)
+        private Task<IContentEntity?> FindByVersionAsync(Context context, DomainId id, long version)
         {
             return contentVersionLoader.GetAsync(context.App.Id, id, version);
         }

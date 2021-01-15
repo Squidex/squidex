@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query);
 
-        Task<IEnrichedContentEntity> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any);
+        Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any);
 
         Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName);
 
