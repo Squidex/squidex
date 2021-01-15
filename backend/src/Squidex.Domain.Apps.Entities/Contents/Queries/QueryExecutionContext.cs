@@ -40,6 +40,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.context = context;
         }
 
+        public virtual Task<IEnrichedContentEntity?> FindContentAsync(string schemaIdOrName, DomainId id, long version)
+        {
+            return contentQuery.FindAsync(context, schemaIdOrName, id, version);
+        }
+
         public virtual async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
         {
             var asset = cachedAssets.GetOrDefault(id);

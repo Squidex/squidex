@@ -280,6 +280,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var content = await contentQuery.FindAsync(Context, name, id);
 
+            if (content == null)
+            {
+                return NotFound();
+            }
+
             var response = ContentDto.FromContent(content, Resources);
 
             return Ok(response);
@@ -395,6 +400,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         public async Task<IActionResult> GetContentVersion(string app, string name, DomainId id, int version)
         {
             var content = await contentQuery.FindAsync(Context, name, id, version);
+
+            if (content == null)
+            {
+                return NotFound();
+            }
 
             var response = ContentDto.FromContent(content, Resources);
 

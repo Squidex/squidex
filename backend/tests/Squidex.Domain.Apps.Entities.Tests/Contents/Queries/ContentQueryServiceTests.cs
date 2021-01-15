@@ -119,14 +119,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task FindContentAsync_should_throw_404_if_not_found()
+        public async Task FindContentAsync_should_return_null_if_not_found()
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
             A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, A<SearchScope>._))
                 .Returns<IContentEntity?>(null);
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindAsync(ctx, schemaId.Name, contentId));
+            Assert.Null(await sut.FindAsync(ctx, schemaId.Name, contentId));
         }
 
         [Theory]

@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_null_single_asset()
+        public async Task Should_return_null_single_asset_when_not_found()
         {
             var assetId = DomainId.NewGuid();
 
@@ -332,7 +332,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_null_single_content()
+        public async Task Should_return_null_single_content_when_not_found()
         {
             var contentId = DomainId.NewGuid();
 
@@ -374,6 +374,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIds(contentId)))
                 .Returns(ResultList.CreateFrom(1, content));
+
+            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = TestContent.Response(content)
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_return_single_content_when_finding_content_with_version()
+        {
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(appId, schemaId, contentId, DomainId.Empty, DomainId.Empty);
+
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"", version: 3) {
+                    <FIELDS>
+                  }
+                }".Replace("<FIELDS>", TestContent.AllFields).Replace("<ID>", contentId.ToString());
+
+            A.CallTo(() => contentQuery.FindAsync(MatchsContentContext(), schemaId.Id.ToString(), contentId, 3))
+                .Returns(content);
 
             var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
 
