@@ -183,9 +183,9 @@ namespace Squidex.Infrastructure.Queries
 
         private static FilterNode<IJsonValue> SerializeAndDeserialize<T>(T value)
         {
-            var json = JsonHelper.DefaultSerializer.Serialize(value, true);
+            var json = TestUtils.DefaultSerializer.Serialize(value, true);
 
-            return JsonHelper.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
+            return TestUtils.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
         }
     }
 }

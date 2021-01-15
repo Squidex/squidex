@@ -56,7 +56,8 @@ namespace Squidex.Config.Domain
                 new StatusConverter(),
                 new StringEnumConverter(),
                 new WorkflowsConverter(),
-                new WorkflowStepConverter());
+                new WorkflowStepConverter(),
+                new WriteonlyGeoJsonConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
 

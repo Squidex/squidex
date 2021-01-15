@@ -539,18 +539,18 @@ namespace Squidex.Infrastructure.Queries
 
         private static string? ConvertFilter<T>(T value, List<string> errors)
         {
-            var json = JsonHelper.DefaultSerializer.Serialize(value, true);
+            var json = TestUtils.DefaultSerializer.Serialize(value, true);
 
-            var jsonFilter = JsonHelper.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
+            var jsonFilter = TestUtils.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
 
             return JsonFilterVisitor.Parse(jsonFilter, Schema, errors)?.ToString();
         }
 
         private static string? ConvertQuery<T>(T value)
         {
-            var json = JsonHelper.DefaultSerializer.Serialize(value, true);
+            var json = TestUtils.DefaultSerializer.Serialize(value, true);
 
-            var jsonFilter = Schema.Parse(json, JsonHelper.DefaultSerializer);
+            var jsonFilter = Schema.Parse(json, TestUtils.DefaultSerializer);
 
             return jsonFilter.ToString();
         }

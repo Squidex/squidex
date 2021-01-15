@@ -21,9 +21,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public CosmosDbEventStoreFixture()
         {
-            client = new DocumentClient(new Uri(EmulatorUri), EmulatorKey, JsonHelper.DefaultSettings());
+            client = new DocumentClient(new Uri(EmulatorUri), EmulatorKey, TestUtils.DefaultSettings());
 
-            EventStore = new CosmosDbEventStore(client, EmulatorKey, "Test", JsonHelper.DefaultSettings());
+            EventStore = new CosmosDbEventStore(client, EmulatorKey, "Test", TestUtils.DefaultSettings());
             EventStore.InitializeAsync().Wait();
         }
 

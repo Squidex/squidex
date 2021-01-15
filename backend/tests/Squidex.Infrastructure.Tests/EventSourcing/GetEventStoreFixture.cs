@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             connection = EventStoreConnection.Create("ConnectTo=tcp://admin:changeit@localhost:1113; HeartBeatTimeout=500; MaxReconnections=-1");
 
-            EventStore = new GetEventStore(connection, JsonHelper.DefaultSerializer, "test", "localhost");
+            EventStore = new GetEventStore(connection, TestUtils.DefaultSerializer, "test", "localhost");
             EventStore.InitializeAsync().Wait();
         }
 

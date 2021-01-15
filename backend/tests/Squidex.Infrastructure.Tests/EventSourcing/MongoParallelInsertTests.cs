@@ -216,7 +216,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent), "My");
 
-            eventDataFormatter = new DefaultEventDataFormatter(typeNameRegistry, JsonHelper.DefaultSerializer);
+            eventDataFormatter = new DefaultEventDataFormatter(typeNameRegistry, TestUtils.DefaultSerializer);
         }
 
         [Fact]

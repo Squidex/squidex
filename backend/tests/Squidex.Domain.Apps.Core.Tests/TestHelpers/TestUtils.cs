@@ -70,7 +70,8 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new StatusConverter(),
                     new StringEnumConverter(),
                     new WorkflowsConverter(),
-                    new WorkflowStepConverter()),
+                    new WorkflowStepConverter(),
+                    new WriteonlyGeoJsonConverter()),
 
                 TypeNameHandling = typeNameHandling
             };
