@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     .Map(typeof(MyEvent), "Event")
                     .Map(typeof(MyOldEvent), "OldEvent");
 
-            sut = new DefaultEventDataFormatter(typeNameRegistry, JsonHelper.CreateSerializer(typeNameRegistry));
+            sut = new DefaultEventDataFormatter(typeNameRegistry, TestUtils.CreateSerializer(typeNameRegistry));
         }
 
         [Fact]

@@ -12,6 +12,7 @@ using System.Reflection;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
@@ -78,13 +79,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             };
         }
 
-        public static ClrQuery AdjustToModel(this ClrQuery query, Schema? schema)
+        public static ClrQuery AdjustToModel(this ClrQuery query, DomainId appId, Schema? schema)
         {
             var pathConverter = Path(schema);
 
             if (query.Filter != null)
             {
-                query.Filter = query.Filter.Accept(new AdaptionVisitor(pathConverter));
+                query.Filter = AdaptionVisitor.Adapt(query.Filter, pathConverter, appId);
             }
 
             query.Sort = query.Sort.Select(x => new SortNode(pathConverter(x.Path), x.Order)).ToList();
@@ -92,11 +93,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return query;
         }
 
-        public static FilterNode<ClrValue>? AdjustToModel(this FilterNode<ClrValue> filterNode, Schema schema)
+        public static FilterNode<ClrValue>? AdjustToModel(this FilterNode<ClrValue> filter, DomainId appId, Schema schema)
         {
             var pathConverter = Path(schema);
 
-            return filterNode.Accept(new AdaptionVisitor(pathConverter));
+            return AdaptionVisitor.Adapt(filter, pathConverter, appId);
         }
     }
 }

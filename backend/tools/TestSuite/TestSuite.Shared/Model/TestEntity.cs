@@ -15,6 +15,8 @@ namespace TestSuite.Model
 {
     public sealed class TestEntity : Content<TestEntityData>
     {
+        public const int ScriptTrigger = -99;
+
         public static async Task<SchemaDetailsDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
         {
             var schema = await schemas.PostSchemaAsync(appName, new CreateSchemaDto
@@ -37,12 +39,20 @@ namespace TestSuite.Model
                         {
                             IsRequired = false
                         }
+                    },
+                    new UpsertSchemaFieldDto
+                    {
+                        Name = TestEntityData.GeoField,
+                        Properties = new GeolocationFieldPropertiesDto
+                        {
+                            IsRequired = false
+                        }
                     }
                 },
                 Scripts = new SchemaScriptsDto
                 {
                     Create = $@"
-                        if (ctx.data.{TestEntityData.NumberField}.iv === -99) {{
+                        if (ctx.data.{TestEntityData.NumberField}.iv === {ScriptTrigger}) {{
                             ctx.data.{TestEntityData.NumberField}.iv = incrementCounter('my');
                             replace();
                         }}"
@@ -60,10 +70,15 @@ namespace TestSuite.Model
 
         public static readonly string NumberField = nameof(Number).ToLowerInvariant();
 
+        public static readonly string GeoField = nameof(Geo).ToLowerInvariant();
+
         [JsonConverter(typeof(InvariantConverter))]
         public int Number { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
         public string String { get; set; }
+
+        [JsonConverter(typeof(InvariantConverter))]
+        public object Geo { get; set; }
     }
 }

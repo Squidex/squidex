@@ -14,11 +14,11 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public class QueryODataConversionTests
+    public class QueryFromODataTests
     {
         private static readonly IEdmModel EdmModel;
 
-        static QueryODataConversionTests()
+        static QueryFromODataTests()
         {
             var entityType = new EdmEntityType("Squidex", "Users");
 
@@ -37,6 +37,8 @@ namespace Squidex.Infrastructure.Queries
             entityType.AddStructuralProperty("incomeCentsNullable", EdmPrimitiveTypeKind.Int64, true);
             entityType.AddStructuralProperty("incomeMio", EdmPrimitiveTypeKind.Double, false);
             entityType.AddStructuralProperty("incomeMioNullable", EdmPrimitiveTypeKind.Double, true);
+            entityType.AddStructuralProperty("geo", EdmPrimitiveTypeKind.GeographyPoint, false);
+            entityType.AddStructuralProperty("geoNullable", EdmPrimitiveTypeKind.GeographyPoint, true);
             entityType.AddStructuralProperty("age", EdmPrimitiveTypeKind.Int32, false);
             entityType.AddStructuralProperty("ageNullable", EdmPrimitiveTypeKind.Int32, true);
             entityType.AddStructuralProperty("properties", new EdmComplexTypeReference(new EdmComplexType("Squidex", "Properties", null, false, true), true));
@@ -242,6 +244,19 @@ namespace Squidex.Infrastructure.Queries
         {
             var i = _Q($"$filter={field} eq 5634474356.1233");
             var o = _C($"Filter: {field} == 5634474356.1233");
+
+            Assert.Equal(o, i);
+        }
+
+        [Theory]
+        [InlineData("geo")]
+        [InlineData("geoNullable")]
+        [InlineData("properties/geo")]
+        [InlineData("properties/nested/geo")]
+        public void Should_parse_filter_when_type_is_geograph(string field)
+        {
+            var i = _Q($"$filter=geo.distance({field}, geography'POINT(10 20)') lt 30.0");
+            var o = _C($"Filter: {field} < Radius(10, 20, 30)");
 
             Assert.Equal(o, i);
         }

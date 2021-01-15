@@ -5,20 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Json
 {
-    public enum ClrValueType
+    public static class GeoJson
     {
-        Boolean,
-        Dynamic,
-        Guid,
-        Double,
-        Instant,
-        Int32,
-        Int64,
-        Single,
-        Sphere,
-        String,
-        Null
+        public const string Format = "geo-json";
     }
 }

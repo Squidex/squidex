@@ -36,6 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
     {
         private static readonly IBsonSerializerRegistry Registry = BsonSerializer.SerializerRegistry;
         private static readonly IBsonSerializer<MongoContentEntity> Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
+        private readonly DomainId appId = DomainId.NewGuid();
         private readonly Schema schemaDef;
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
@@ -91,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = Guid.NewGuid();
 
             var i = _F(ClrFilter.Eq("id", id));
-            var o = _C($"{{ 'id' : '{id}' }}");
+            var o = _C($"{{ '_id' : '{appId}--{id}' }}");
 
             Assert.Equal(o, i);
         }
@@ -102,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = DomainId.NewGuid().ToString();
 
             var i = _F(ClrFilter.Eq("id", id));
-            var o = _C($"{{ 'id' : '{id}' }}");
+            var o = _C($"{{ '_id' : '{appId}--{id}' }}");
 
             Assert.Equal(o, i);
         }
@@ -113,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = Guid.NewGuid();
 
             var i = _F(ClrFilter.In("id", new List<Guid> { id }));
-            var o = _C($"{{ 'id' : {{ '$in' : ['{id}'] }} }}");
+            var o = _C($"{{ '_id' : {{ '$in' : ['{appId}--{id}'] }} }}");
 
             Assert.Equal(o, i);
         }
@@ -124,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var id = DomainId.NewGuid().ToString();
 
             var i = _F(ClrFilter.In("id", new List<string> { id }));
-            var o = _C($"{{ 'id' : {{ '$in' : ['{id}'] }} }}");
+            var o = _C($"{{ '_id' : {{ '$in' : ['{appId}--{id}'] }} }}");
 
             Assert.Equal(o, i);
         }
@@ -319,7 +320,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                     i = sortDefinition.Render(Serializer, Registry).ToString();
                 });
 
-            cursor.QuerySort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel(schemaDef));
+            cursor.QuerySort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel(appId, schemaDef));
 
             return i;
         }
@@ -327,7 +328,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         private string _Q(ClrQuery query)
         {
             var rendered =
-                query.AdjustToModel(schemaDef).BuildFilter<MongoContentEntity>().Filter!
+                query.AdjustToModel(appId, schemaDef).BuildFilter<MongoContentEntity>().Filter!
                     .Render(Serializer, Registry).ToString();
 
             return rendered;

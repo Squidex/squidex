@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using Microsoft.OData.UriParser;
+using Microsoft.Spatial;
 
 namespace Squidex.Infrastructure.Queries.OData
 {
@@ -95,19 +96,40 @@ namespace Squidex.Infrastructure.Queries.OData
 
             if (nodeIn.Left is SingleValueFunctionCallNode functionNode)
             {
-                var regexFilter = Visit(functionNode);
-
-                var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
-
-                if (value.ValueType == ClrValueType.Boolean && value.Value is bool booleanRight)
+                if (string.Equals(functionNode.Name, "geo.distance", StringComparison.OrdinalIgnoreCase) && nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
                 {
-                    if ((nodeIn.OperatorKind == BinaryOperatorKind.Equal && !booleanRight) ||
-                        (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual && booleanRight))
+                    var valueDistance = (double)ConstantWithTypeVisitor.Visit(nodeIn.Right).Value!;
+
+                    if (functionNode.Parameters.ElementAt(1) is not ConstantNode constantNode)
                     {
-                        regexFilter = ClrFilter.Not(regexFilter);
+                        throw new NotSupportedException();
                     }
 
-                    return regexFilter;
+                    if (constantNode.Value is not GeographyPoint geographyPoint)
+                    {
+                        throw new NotSupportedException();
+                    }
+
+                    var property = PropertyPathVisitor.Visit(functionNode.Parameters.ElementAt(0));
+
+                    return ClrFilter.Lt(property, new FilterSphere(geographyPoint.Longitude, geographyPoint.Latitude, valueDistance));
+                }
+                else
+                {
+                    var regexFilter = Visit(functionNode);
+
+                    var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+
+                    if (value.ValueType == ClrValueType.Boolean && value.Value is bool booleanRight)
+                    {
+                        if ((nodeIn.OperatorKind == BinaryOperatorKind.Equal && !booleanRight) ||
+                            (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual && booleanRight))
+                        {
+                            regexFilter = ClrFilter.Not(regexFilter);
+                        }
+
+                        return regexFilter;
+                    }
                 }
             }
             else

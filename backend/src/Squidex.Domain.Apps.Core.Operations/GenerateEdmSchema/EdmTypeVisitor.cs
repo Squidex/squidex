@@ -79,12 +79,12 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
         public IEdmTypeReference? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            return null;
+            return CreateGeographyPoint(field);
         }
 
         public IEdmTypeReference? Visit(IField<JsonFieldProperties> field, Args args)
         {
-            return new EdmComplexTypeReference(JsonType, !field.RawProperties.IsRequired);
+            return CreateJson(field);
         }
 
         public IEdmTypeReference? Visit(IField<NumberFieldProperties> field, Args args)
@@ -115,6 +115,16 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
         private static IEdmTypeReference CreatePrimitive(EdmPrimitiveTypeKind kind, IField field)
         {
             return EdmCoreModel.Instance.GetPrimitive(kind, !field.RawProperties.IsRequired);
+        }
+
+        private static IEdmTypeReference CreateGeographyPoint(IField<GeolocationFieldProperties> field)
+        {
+            return EdmCoreModel.Instance.GetSpatial(EdmPrimitiveTypeKind.GeographyPoint, !field.RawProperties.IsRequired);
+        }
+
+        private static IEdmTypeReference CreateJson(IField<JsonFieldProperties> field)
+        {
+            return new EdmComplexTypeReference(JsonType, !field.RawProperties.IsRequired);
         }
     }
 }

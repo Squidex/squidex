@@ -5,20 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries
+using GeoJSON.Net.Converters;
+
+namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public enum ClrValueType
+    public sealed class WriteonlyGeoJsonConverter : GeoJsonConverter
     {
-        Boolean,
-        Dynamic,
-        Guid,
-        Double,
-        Instant,
-        Int32,
-        Int64,
-        Single,
-        Sphere,
-        String,
-        Null
+        public override bool CanWrite => false;
     }
 }

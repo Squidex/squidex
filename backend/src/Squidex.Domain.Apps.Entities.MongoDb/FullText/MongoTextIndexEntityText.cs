@@ -18,5 +18,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         [BsonIgnoreIfNull]
         [BsonElement("language")]
         public string Language { get; set; } = "none";
+
+        public static MongoTextIndexEntityText FromText(string text)
+        {
+            return new MongoTextIndexEntityText { Text = text };
+        }
     }
 }

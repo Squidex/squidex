@@ -12,26 +12,19 @@ using System.Globalization;
 using System.Linq;
 using NodaTime;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class ClrValue
+    public sealed record ClrValue(object? Value, ClrValueType ValueType, bool IsList)
     {
         private static readonly Func<object?, string> ToStringDelegate = ToString;
 
         public static readonly ClrValue Null = new ClrValue(null, ClrValueType.Null, false);
 
-        public object? Value { get; }
-
-        public ClrValueType ValueType { get; }
-
-        public bool IsList { get; }
-
-        private ClrValue(object? value, ClrValueType valueType, bool isList)
+        public static implicit operator ClrValue(FilterSphere value)
         {
-            Value = value;
-            ValueType = valueType;
-
-            IsList = isList;
+            return new ClrValue(value, ClrValueType.Sphere, false);
         }
 
         public static implicit operator ClrValue(Instant value)

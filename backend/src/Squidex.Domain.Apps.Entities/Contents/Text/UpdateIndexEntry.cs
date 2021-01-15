@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class UpdateIndexEntry : IndexCommand
+    public class UpdateIndexEntry : IndexCommand
     {
         public bool ServeAll { get; set; }
 

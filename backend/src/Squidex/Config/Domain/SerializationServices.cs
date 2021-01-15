@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GeoJSON.Net.Converters;
 using Microsoft.Extensions.DependencyInjection;
 using Migrations;
 using Newtonsoft.Json;
@@ -41,7 +40,6 @@ namespace Squidex.Config.Domain
                 new EnvelopeHeadersConverter(),
                 new FilterConverter(),
                 new InstantConverter(),
-                new GeoJsonConverter(),
                 new JsonValueConverter(),
                 new LanguageConverter(),
                 new LanguagesConfigConverter(),
@@ -58,7 +56,8 @@ namespace Squidex.Config.Domain
                 new StatusConverter(),
                 new StringEnumConverter(),
                 new WorkflowsConverter(),
-                new WorkflowStepConverter());
+                new WorkflowStepConverter(),
+                new WriteonlyGeoJsonConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
 

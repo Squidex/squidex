@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_deserialize_integer()
         {
-            var serialized = JsonHelper.Deserialize<IJsonValue>(123);
+            var serialized = TestUtils.Deserialize<IJsonValue>(123);
 
             Assert.Equal(JsonValue.Create(123), serialized);
         }

@@ -9,9 +9,9 @@ using System.Collections.Generic;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public abstract class FilterNode<TValue>
+    public abstract record FilterNode<TValue>
     {
-        public abstract T Accept<T>(FilterNodeVisitor<T, TValue> visitor);
+        public abstract T Accept<T, TArgs>(FilterNodeVisitor<T, TValue, TArgs> visitor, TArgs args);
 
         public abstract void AddFields(HashSet<string> fields);
 

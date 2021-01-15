@@ -11,19 +11,19 @@ using System;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public abstract class FilterNodeVisitor<T, TValue>
+    public abstract class FilterNodeVisitor<T, TValue, TArgs>
     {
-        public virtual T Visit(CompareFilter<TValue> nodeIn)
+        public virtual T Visit(CompareFilter<TValue> nodeIn, TArgs args)
         {
             throw new NotImplementedException();
         }
 
-        public virtual T Visit(LogicalFilter<TValue> nodeIn)
+        public virtual T Visit(LogicalFilter<TValue> nodeIn, TArgs args)
         {
             throw new NotImplementedException();
         }
 
-        public virtual T Visit(NegateFilter<TValue> nodeIn)
+        public virtual T Visit(NegateFilter<TValue> nodeIn, TArgs args)
         {
             throw new NotImplementedException();
         }

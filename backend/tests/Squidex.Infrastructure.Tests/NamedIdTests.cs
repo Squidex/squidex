@@ -117,19 +117,19 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_throw_exception_if_string_id_is_not_valid()
         {
-            Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<string>>("123"));
+            Assert.ThrowsAny<Exception>(() => TestUtils.Deserialize<NamedId<string>>("123"));
         }
 
         [Fact]
         public void Should_throw_exception_if_long_id_is_not_valid()
         {
-            Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<long>>("invalid-long,name"));
+            Assert.ThrowsAny<Exception>(() => TestUtils.Deserialize<NamedId<long>>("invalid-long,name"));
         }
 
         [Fact]
         public void Should_throw_exception_if_guid_id_is_not_valid()
         {
-            Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<Guid>>("invalid-guid,name"));
+            Assert.ThrowsAny<Exception>(() => TestUtils.Deserialize<NamedId<Guid>>("invalid-guid,name"));
         }
     }
 }

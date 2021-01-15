@@ -55,18 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
             foreach (var command in commands)
             {
-                switch (command)
-                {
-                    case UpsertIndexEntry upsert:
-                        Upsert(upsert, args);
-                        break;
-                    case UpdateIndexEntry update:
-                        Update(update, args);
-                        break;
-                    case DeleteIndexEntry delete:
-                        Delete(delete, args);
-                        break;
-                }
+                CommandFactory.CreateCommands(command, args, indexName);
             }
 
             if (args.Count > 0)
@@ -85,68 +74,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             }
         }
 
-        private void Upsert(UpsertIndexEntry upsert, List<object> args)
+        public Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope)
         {
-            args.Add(new
-            {
-                index = new
-                {
-                    _id = upsert.DocId,
-                    _index = indexName,
-                }
-            });
-
-            args.Add(new
-            {
-                appId = upsert.AppId.Id.ToString(),
-                appName = upsert.AppId.Name,
-                contentId = upsert.ContentId.ToString(),
-                schemaId = upsert.SchemaId.Id.ToString(),
-                schemaName = upsert.SchemaId.Name,
-                serveAll = upsert.ServeAll,
-                servePublished = upsert.ServePublished,
-                texts = upsert.Texts
-            });
+            return Task.FromResult<List<DomainId>?>(null);
         }
 
-        private void Update(UpdateIndexEntry update, List<object> args)
+        public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope)
         {
-            args.Add(new
-            {
-                update = new
-                {
-                    _id = update.DocId,
-                    _index = indexName,
-                }
-            });
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(query, nameof(query));
 
-            args.Add(new
-            {
-                doc = new
-                {
-                    serveAll = update.ServeAll,
-                    servePublished = update.ServePublished
-                }
-            });
-        }
+            var queryText = query.Text;
 
-        private void Delete(DeleteIndexEntry delete, List<object> args)
-        {
-            args.Add(new
-            {
-                delete = new
-                {
-                    _id = delete.DocId,
-                    _index = indexName,
-                }
-            });
-        }
-
-        public async Task<List<DomainId>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
-        {
             if (string.IsNullOrWhiteSpace(queryText))
             {
-                return new List<DomainId>();
+                return null;
             }
 
             var isFuzzy = queryText.EndsWith("~", StringComparison.OrdinalIgnoreCase);
@@ -172,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
             var serveField = GetServeField(scope);
 
-            var query = new
+            var elasticQuery = new
             {
                 query = new
                 {
@@ -203,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                                     {
                                         field
                                     },
-                                    query = queryText
+                                    query = query.Text
                                 }
                             }
                         },
@@ -217,27 +159,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 size = 2000
             };
 
-            if (filter?.SchemaIds.Count > 0)
+            if (query.Filter?.SchemaIds?.Length > 0)
             {
                 var bySchema = new
                 {
                     terms = new Dictionary<string, object>
                     {
-                        ["schemaId.keyword"] = filter.SchemaIds.Select(x => x.ToString()).ToArray()
+                        ["schemaId.keyword"] = query.Filter.SchemaIds.Select(x => x.ToString()).ToArray()
                     }
                 };
 
-                if (filter.Must)
+                if (query.Filter.Must)
                 {
-                    query.query.@bool.must.Add(bySchema);
+                    elasticQuery.query.@bool.must.Add(bySchema);
                 }
                 else
                 {
-                    query.query.@bool.should.Add(bySchema);
+                    elasticQuery.query.@bool.should.Add(bySchema);
                 }
             }
 
-            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(query));
+            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(elasticQuery));
 
             if (!result.Success)
             {

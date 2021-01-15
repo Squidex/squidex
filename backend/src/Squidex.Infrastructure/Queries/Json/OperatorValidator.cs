@@ -7,6 +7,7 @@
 
 using System.Linq;
 using NJsonSchema;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Infrastructure.Queries.Json
 {
@@ -49,6 +50,10 @@ namespace Squidex.Infrastructure.Queries.Json
             CompareOperator.In,
             CompareOperator.NotEquals
         };
+        private static readonly CompareOperator[] GeoOperators =
+        {
+            CompareOperator.LessThan
+        };
 
         public static bool IsAllowedOperator(JsonSchema schema, CompareOperator compareOperator)
         {
@@ -59,12 +64,15 @@ namespace Squidex.Infrastructure.Queries.Json
                 case JsonObjectType.Boolean:
                     return BooleanOperators.Contains(compareOperator);
                 case JsonObjectType.Integer:
+                    return NumberOperators.Contains(compareOperator);
                 case JsonObjectType.Number:
                     return NumberOperators.Contains(compareOperator);
                 case JsonObjectType.String:
                     return StringOperators.Contains(compareOperator);
                 case JsonObjectType.Array:
                     return ArrayOperators.Contains(compareOperator);
+                case JsonObjectType.Object when schema.Format == GeoJson.Format:
+                    return GeoOperators.Contains(compareOperator);
             }
 
             return false;

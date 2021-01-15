@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -15,7 +14,6 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
@@ -26,7 +24,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryByQuery : OperationBase
     {
-        private readonly ITextIndex indexer;
         private readonly IAppProvider appProvider;
 
         [BsonIgnoreExtraElements]
@@ -39,11 +36,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public MongoContentEntity[] Joined { get; set; }
         }
 
-        public QueryByQuery(DataConverter dataConverter, ITextIndex indexer, IAppProvider appProvider)
+        public QueryByQuery(DataConverter dataConverter, IAppProvider appProvider)
             : base(dataConverter)
         {
-            this.indexer = indexer;
-
             this.appProvider = appProvider;
         }
 
@@ -81,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     return new List<(DomainId SchemaId, DomainId Id, Status Status)>();
                 }
 
-                var filter = BuildFilter(appId, schemaId, filterNode.AdjustToModel(schema.SchemaDef));
+                var filter = BuildFilter(appId, schemaId, filterNode.AdjustToModel(appId, schema.SchemaDef));
 
                 var contentItems = await Collection.FindStatusAsync(filter);
 
@@ -104,16 +99,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                var query = q.Query.AdjustToModel(null);
+                var query = q.Query.AdjustToModel(app.Id, null);
 
-                List<DomainId>? fullTextIds = null;
-
-                if (!string.IsNullOrWhiteSpace(query.FullText))
-                {
-                    throw new NotSupportedException();
-                }
-
-                var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), fullTextIds, query, q.Reference);
+                var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference);
 
                 var contentEntities = await FindContentsAsync(query, filter);
                 var contentTotal = (long)contentEntities.Count;
@@ -145,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q, SearchScope scope)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
@@ -153,23 +141,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                var query = q.Query.AdjustToModel(schema.SchemaDef);
+                var query = q.Query.AdjustToModel(app.Id, schema.SchemaDef);
 
-                List<DomainId>? fullTextIds = null;
-
-                if (!string.IsNullOrWhiteSpace(query.FullText))
-                {
-                    var searchFilter = SearchFilter.ShouldHaveSchemas(schema.Id);
-
-                    fullTextIds = await indexer.SearchAsync(query.FullText, app, searchFilter, scope);
-
-                    if (fullTextIds?.Count == 0)
-                    {
-                        return ResultList.CreateFrom<IContentEntity>(0);
-                    }
-                }
-
-                var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), fullTextIds, query, q.Reference);
+                var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), query, q.Reference);
 
                 var contentEntities = await FindContentsAsync(query, filter);
                 var contentTotal = (long)contentEntities.Count;
@@ -255,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Filter.And(filters);
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds, ICollection<DomainId>? ids, ClrQuery? query, DomainId referenced)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds,  ClrQuery? query, DomainId referenced)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -263,16 +237,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 Filter.In(x => x.IndexedSchemaId, schemaIds),
                 Filter.Ne(x => x.IsDeleted, true)
             };
-
-            if (ids != null && ids.Count > 0)
-            {
-                var documentIds = ids.Select(x => DomainId.Combine(appId, x)).ToList();
-
-                filters.Add(
-                    Filter.Or(
-                        Filter.AnyIn(x => x.ReferencedIds, documentIds),
-                        Filter.In(x => x.DocumentId, documentIds)));
-            }
 
             if (query?.Filter != null)
             {
