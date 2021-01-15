@@ -73,6 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 @event.Payload.AssetId,
                 @event.Headers.EventStreamNumber());
 
+            if (asset == null)
+            {
+                throw new DomainObjectNotFoundException(@event.Payload.AssetId.ToString());
+            }
+
             SimpleMapper.Map(asset, result);
 
             result.AssetType = asset.Type;

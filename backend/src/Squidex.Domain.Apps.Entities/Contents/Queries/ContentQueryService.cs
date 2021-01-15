@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contentRepository.FindContentAsync(context.App, schema, id, context.Scope());
         }
 
-        private Task<IContentEntity> FindByVersionAsync(Context context, DomainId id, long version)
+        private Task<IContentEntity?> FindByVersionAsync(Context context, DomainId id, long version)
         {
             return contentVersionLoader.GetAsync(context.App.Id, id, version);
         }
