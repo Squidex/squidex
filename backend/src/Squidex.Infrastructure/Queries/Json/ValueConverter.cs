@@ -33,6 +33,16 @@ namespace Squidex.Infrastructure.Queries.Json
 
             switch (GetType(schema))
             {
+                case JsonObjectType.None when schema.Reference?.Format == GeoJson.Format:
+                    {
+                        if (TryParseGeoJson(errors, path, value, out var temp))
+                        {
+                            result = temp;
+                        }
+
+                        break;
+                    }
+
                 case JsonObjectType.None:
                     {
                         if (value is JsonArray jsonArray)
@@ -117,7 +127,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case JsonObjectType.Object when schema.Format == GeoJson.Format:
+                case JsonObjectType.Object when schema.Format == GeoJson.Format || schema.Reference?.Format == GeoJson.Format:
                     {
                         if (TryParseGeoJson(errors, path, value, out var temp))
                         {
@@ -161,7 +171,7 @@ namespace Squidex.Infrastructure.Queries.Json
                 geoObject.TryGetValue<JsonNumber>("longitude", out var lon) &&
                 geoObject.TryGetValue<JsonNumber>("distance", out var distance))
             {
-                result = new FilterSphere(lat.Value, lon.Value, distance.Value);
+                result = new FilterSphere(lon.Value, lat.Value, distance.Value);
 
                 return true;
             }

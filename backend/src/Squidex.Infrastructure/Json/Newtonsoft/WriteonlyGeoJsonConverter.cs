@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+using GeoJSON.Net.Converters;
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public sealed record FilterSphere(double Longitude, double Latitude, double Radius)
+    public sealed class WriteonlyGeoJsonConverter : GeoJsonConverter
     {
-        public override string ToString()
-        {
-            return $"Radius({Longitude}, {Latitude}, {Radius})";
-        }
+        public override bool CanWrite => false;
     }
 }

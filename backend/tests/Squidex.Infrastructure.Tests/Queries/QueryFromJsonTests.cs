@@ -90,6 +90,14 @@ namespace Squidex.Infrastructure.Queries
                 Type = JsonObjectType.String
             };
 
+            Schema.Properties["geoRef"] = new JsonSchemaProperty
+            {
+                Reference = new JsonSchema
+                {
+                    Format = GeoJson.Format
+                },
+            };
+
             Schema.Properties["stringArray"] = new JsonSchemaProperty
             {
                 Item = new JsonSchema
@@ -235,14 +243,21 @@ namespace Squidex.Infrastructure.Queries
         {
             public static IEnumerable<object[]> ValidTests()
             {
-                var value = new { latitude = 10, longitude = 20, distance = 30 };
+                var value = new { longitude = 10, latitude = 20, distance = 30 };
 
-                return BuildFlatTests("geo", x => x == "lt", value, $"Radius({value.latitude}, {value.longitude}, {value.distance})");
+                return BuildFlatTests("geo", x => x == "lt", value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
+            }
+
+            public static IEnumerable<object[]> ValidRefTests()
+            {
+                var value = new { longitude = 10, latitude = 20, distance = 30 };
+
+                return BuildFlatTests("geoRef", x => x == "lt", value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
             }
 
             public static IEnumerable<object[]> InvalidTests()
             {
-                var value = new { latitude = 10, longitude = 20, distance = 30 };
+                var value = new { longitude = 10, latitude = 20, distance = 30 };
 
                 return BuildInvalidOperatorTests("geo", x => x == "lt", value);
             }
@@ -250,6 +265,15 @@ namespace Squidex.Infrastructure.Queries
             [Theory]
             [MemberData(nameof(ValidTests))]
             public void Should_parse_filter(string field, string op, object value, string expected)
+            {
+                var json = new { path = field, op, value };
+
+                AssertFilter(json, expected);
+            }
+
+            [Theory]
+            [MemberData(nameof(ValidRefTests))]
+            public void Should_parse_filter_with_reference(string field, string op, object value, string expected)
             {
                 var json = new { path = field, op, value };
 

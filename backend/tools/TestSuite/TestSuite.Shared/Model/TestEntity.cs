@@ -37,6 +37,14 @@ namespace TestSuite.Model
                         {
                             IsRequired = false
                         }
+                    },
+                    new UpsertSchemaFieldDto
+                    {
+                        Name = TestEntityData.GeoField,
+                        Properties = new GeolocationFieldPropertiesDto
+                        {
+                            IsRequired = false
+                        }
                     }
                 },
                 Scripts = new SchemaScriptsDto
@@ -60,10 +68,15 @@ namespace TestSuite.Model
 
         public static readonly string NumberField = nameof(Number).ToLowerInvariant();
 
+        public static readonly string GeoField = nameof(Geo).ToLowerInvariant();
+
         [JsonConverter(typeof(InvariantConverter))]
         public int Number { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
         public string String { get; set; }
+
+        [JsonConverter(typeof(InvariantConverter))]
+        public object Geo { get; set; }
     }
 }

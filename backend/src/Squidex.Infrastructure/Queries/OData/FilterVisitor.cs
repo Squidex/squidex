@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure.Queries.OData
 
                     var property = PropertyPathVisitor.Visit(functionNode.Parameters.ElementAt(0));
 
-                    return ClrFilter.Lt(property, new FilterSphere(geographyPoint.Latitude, geographyPoint.Longitude, valueDistance));
+                    return ClrFilter.Lt(property, new FilterSphere(geographyPoint.Longitude, geographyPoint.Latitude, valueDistance));
                 }
                 else
                 {

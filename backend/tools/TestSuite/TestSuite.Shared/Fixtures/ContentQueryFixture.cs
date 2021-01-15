@@ -29,6 +29,29 @@ namespace TestSuite.Fixtures
                 {
                     await Contents.CreateAsync(new TestEntityData { Number = i }, true);
                 }
+
+                await Contents.CreateAsync(new TestEntityData
+                {
+                    String = "Hello World"
+                }, true);
+
+                await Contents.CreateAsync(new TestEntityData
+                {
+                    Geo = new
+                    {
+                        longitude = 10,
+                        latitude = 20
+                    }
+                }, true);
+
+                await Contents.CreateAsync(new TestEntityData
+                {
+                    Geo = new
+                    {
+                        type = "Point",
+                        coordinates = new[] { 30, 40 },
+                    }
+                }, true);
             }).Wait();
         }
 

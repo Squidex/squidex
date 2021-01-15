@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                         return (null, new JsonError(T.Get("contents.invalidGeolocation")));
                     }
 
-                    var position = new Position(lat.Value, lon.Value);
+                    var position = new Point(new Position(lat.Value, lon.Value));
 
                     return (position, null);
                 }
