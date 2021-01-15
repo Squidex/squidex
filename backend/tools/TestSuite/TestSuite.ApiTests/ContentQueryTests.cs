@@ -21,11 +21,11 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
-    public class ContentQueryTests : IClassFixture<ContentQueryFixture>
+    public class ContentQueryTests : IClassFixture<ContentQueryFixture1to10>
     {
-        public ContentQueryFixture _ { get; }
+        public ContentQueryFixture1to10 _ { get; }
 
-        public ContentQueryTests(ContentQueryFixture fixture)
+        public ContentQueryTests(ContentQueryFixture1to10 fixture)
         {
             _ = fixture;
         }
@@ -220,11 +220,12 @@ namespace TestSuite.ApiTests
 
                 var items = await _.Contents.GetAsync(new ContentQuery
                 {
-                    Search = "hello"
+                    Search = "1"
                 });
 
                 if (items.Items.Any())
                 {
+                    AssertItems(items, 1, new[] { 1 });
                     return;
                 }
             }
@@ -244,12 +245,13 @@ namespace TestSuite.ApiTests
                 {
                     JsonQuery = new
                     {
-                        text = "Hello"
+                        fullText = "2"
                     }
                 });
 
                 if (items.Items.Any())
                 {
+                    AssertItems(items, 1, new[] { 2 });
                     return;
                 }
             }
@@ -267,11 +269,12 @@ namespace TestSuite.ApiTests
 
                 var items = await _.Contents.GetAsync(new ContentQuery
                 {
-                    Filter = "geo.distance(data/geo/iv, geography'POINT(10 20)') lt 1000"
+                    Filter = "geo.distance(data/geo/iv, geography'POINT(3 3)') lt 1000"
                 });
 
                 if (items.Items.Any())
                 {
+                    AssertItems(items, 1, new[] { 3 });
                     return;
                 }
             }
@@ -297,8 +300,8 @@ namespace TestSuite.ApiTests
                             op = "lt",
                             value = new
                             {
-                                longitude = 10,
-                                latitude = 20,
+                                longitude = 3,
+                                latitude = 3,
                                 distance = 1000
                             }
                         }
@@ -307,6 +310,7 @@ namespace TestSuite.ApiTests
 
                 if (items.Items.Any())
                 {
+                    AssertItems(items, 1, new[] { 3 });
                     return;
                 }
             }
@@ -324,11 +328,12 @@ namespace TestSuite.ApiTests
 
                 var items = await _.Contents.GetAsync(new ContentQuery
                 {
-                    Filter = "geo.distance(data/geo/iv, geography'POINT(10 20)') lt 30.0"
+                    Filter = "geo.distance(data/geo/iv, geography'POINT(4 4)') lt 1000"
                 });
 
                 if (items.Items.Any())
                 {
+                    AssertItems(items, 1, new[] { 4 });
                     return;
                 }
             }
@@ -354,8 +359,8 @@ namespace TestSuite.ApiTests
                             op = "lt",
                             value = new
                             {
-                                longitude = 30,
-                                latitude = 40,
+                                longitude = 4,
+                                latitude = 4,
                                 distance = 1000
                             }
                         }
@@ -364,6 +369,7 @@ namespace TestSuite.ApiTests
 
                 if (items.Items.Any())
                 {
+                    AssertItems(items, 1, new[] { 4 });
                     return;
                 }
             }

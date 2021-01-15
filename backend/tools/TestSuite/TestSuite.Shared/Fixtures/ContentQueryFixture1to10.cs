@@ -11,14 +11,14 @@ using TestSuite.Model;
 
 namespace TestSuite.Fixtures
 {
-    public class ContentQueryFixture : ContentFixture
+    public class ContentQueryFixture1to10 : ContentFixture
     {
-        public ContentQueryFixture()
+        public ContentQueryFixture1to10()
             : this("my-reads")
         {
         }
 
-        protected ContentQueryFixture(string schemaName = "my-schema")
+        protected ContentQueryFixture1to10(string schemaName = "my-schema")
             : base(schemaName)
         {
             Task.Run(async () =>
@@ -27,31 +27,19 @@ namespace TestSuite.Fixtures
 
                 for (var i = 10; i > 0; i--)
                 {
-                    await Contents.CreateAsync(new TestEntityData { Number = i }, true);
+                    var data = new TestEntityData { Number = i, String = i.ToString() };
+
+                    if (i % 2 == 0)
+                    {
+                        data.Geo = new { type = "Point", coordinates = new[] { i, i } };
+                    }
+                    else
+                    {
+                        data.Geo = new { longitude = i, latitude = i };
+                    }
+
+                    await Contents.CreateAsync(data, true);
                 }
-
-                await Contents.CreateAsync(new TestEntityData
-                {
-                    String = "Hello World"
-                }, true);
-
-                await Contents.CreateAsync(new TestEntityData
-                {
-                    Geo = new
-                    {
-                        longitude = 10,
-                        latitude = 20
-                    }
-                }, true);
-
-                await Contents.CreateAsync(new TestEntityData
-                {
-                    Geo = new
-                    {
-                        type = "Point",
-                        coordinates = new[] { 30, 40 },
-                    }
-                }, true);
             }).Wait();
         }
 

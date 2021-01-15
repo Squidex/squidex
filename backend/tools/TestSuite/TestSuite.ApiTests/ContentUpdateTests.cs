@@ -166,12 +166,12 @@ namespace TestSuite.ApiTests
                     {
                         new BulkUpdateJob
                         {
-                            Type = Squidex.ClientLibrary.BulkUpdateType.Upsert,
+                            Type = BulkUpdateType.Upsert,
                             Data = new
                             {
                                 number = new
                                 {
-                                    iv = -99
+                                    iv = TestEntity.ScriptTrigger
                                 }
                             }
                         }
@@ -207,12 +207,12 @@ namespace TestSuite.ApiTests
                     {
                         new BulkUpdateJob
                         {
-                            Type = Squidex.ClientLibrary.BulkUpdateType.Upsert,
+                            Type = BulkUpdateType.Upsert,
                             Data = new
                             {
                                 number = new
                                 {
-                                    iv = -99
+                                    iv = TestEntity.ScriptTrigger
                                 }
                             }
                         }

@@ -15,6 +15,8 @@ namespace TestSuite.Model
 {
     public sealed class TestEntity : Content<TestEntityData>
     {
+        public const int ScriptTrigger = -99;
+
         public static async Task<SchemaDetailsDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
         {
             var schema = await schemas.PostSchemaAsync(appName, new CreateSchemaDto
@@ -50,7 +52,7 @@ namespace TestSuite.Model
                 Scripts = new SchemaScriptsDto
                 {
                     Create = $@"
-                        if (ctx.data.{TestEntityData.NumberField}.iv === -99) {{
+                        if (ctx.data.{TestEntityData.NumberField}.iv === {ScriptTrigger}) {{
                             ctx.data.{TestEntityData.NumberField}.iv = incrementCounter('my');
                             replace();
                         }}"
