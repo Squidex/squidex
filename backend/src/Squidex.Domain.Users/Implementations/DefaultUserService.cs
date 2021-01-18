@@ -206,7 +206,7 @@ namespace Squidex.Domain.Users.Implementations
                 }
                 catch (Exception ex2)
                 {
-                    log.LogError(ex, w => w
+                    log.LogError(ex2, w => w
                         .WriteProperty("action", "CleanupUser")
                         .WriteProperty("status", "Failed"));
                 }
