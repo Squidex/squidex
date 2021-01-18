@@ -192,7 +192,11 @@ namespace Squidex.Domain.Users.Implementations
             }
             catch (Exception)
             {
-                await userManager.DeleteAsync(user);
+                if (userFactory.IsId(user.Id))
+                {
+                    await userManager.DeleteAsync(user);
+                }
+
                 throw;
             }
 

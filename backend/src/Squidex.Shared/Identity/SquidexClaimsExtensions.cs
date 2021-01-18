@@ -15,6 +15,8 @@ namespace Squidex.Shared.Identity
 {
     public static class SquidexClaimsExtensions
     {
+        private const string ClientPrefix = "client_";
+
         public static PermissionSet Permissions(this IEnumerable<Claim> user)
         {
             return new PermissionSet(user.GetClaims(SquidexClaimTypes.Permissions).Select(x => new Permission(x.Value)));
@@ -77,9 +79,13 @@ namespace Squidex.Shared.Identity
 
         public static IEnumerable<Claim> GetSquidexClaims(this IEnumerable<Claim> user)
         {
+            const string prefix = "urn:squidex:";
+
             foreach (var claim in user)
             {
-                if (claim.Type.StartsWith(SquidexClaimTypes.Prefix, StringComparison.OrdinalIgnoreCase))
+                var type = GetType(claim);
+
+                if (type.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 {
                     yield return claim;
                 }
@@ -90,9 +96,11 @@ namespace Squidex.Shared.Identity
         {
             foreach (var claim in user)
             {
-                if (claim.Type.StartsWith(SquidexClaimTypes.CustomPrefix, StringComparison.OrdinalIgnoreCase))
+                var type = GetType(claim);
+
+                if (type.StartsWith(SquidexClaimTypes.CustomPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    var name = claim.Type[(SquidexClaimTypes.CustomPrefix.Length + 1)..];
+                    var name = type[(SquidexClaimTypes.CustomPrefix.Length + 1)..].ToString();
 
                     yield return (name, claim.Value);
                 }
@@ -123,9 +131,29 @@ namespace Squidex.Shared.Identity
             return user.GetClaims(type).FirstOrDefault()?.Value;
         }
 
-        private static IEnumerable<Claim> GetClaims(this IEnumerable<Claim> user, string type)
+        private static IEnumerable<Claim> GetClaims(this IEnumerable<Claim> user, string request)
         {
-            return user.Where(x => string.Equals(x.Type, type, StringComparison.Ordinal));
+            foreach (var claim in user)
+            {
+                var type = GetType(claim);
+
+                if (type.Equals(request, StringComparison.OrdinalIgnoreCase))
+                {
+                    yield return claim;
+                }
+            }
+        }
+
+        private static ReadOnlySpan<char> GetType(Claim claim)
+        {
+            var type = claim.Type.AsSpan();
+
+            if (type.StartsWith(ClientPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                type = type[ClientPrefix.Length..];
+            }
+
+            return type;
         }
     }
 }
