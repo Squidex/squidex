@@ -50,7 +50,7 @@ namespace Squidex.Domain.Users.Implementations
                 {
                 }
 
-                var found = await userService.FindByEmailAsync(email);
+                var found = await FindByIdOrEmailAsync(email);
 
                 return (found, false);
             }

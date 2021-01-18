@@ -169,6 +169,11 @@ namespace Squidex.Domain.Users.Implementations
 
                 values ??= new UserValues();
 
+                if (string.IsNullOrWhiteSpace(values.DisplayName))
+                {
+                    values.DisplayName = email;
+                }
+
                 if (isFirst)
                 {
                     var permissions = values.Permissions?.ToIds().ToList() ?? new List<string>();
@@ -192,9 +197,18 @@ namespace Squidex.Domain.Users.Implementations
             }
             catch (Exception)
             {
-                if (userFactory.IsId(user.Id))
+                try
                 {
-                    await userManager.DeleteAsync(user);
+                    if (userFactory.IsId(user.Id))
+                    {
+                        await userManager.DeleteAsync(user);
+                    }
+                }
+                catch (Exception ex2)
+                {
+                    log.LogError(ex, w => w
+                        .WriteProperty("action", "CleanupUser")
+                        .WriteProperty("status", "Failed"));
                 }
 
                 throw;
@@ -359,6 +373,11 @@ namespace Squidex.Domain.Users.Implementations
         private async Task<IUser> ResolveAsync(IdentityUser user)
         {
             var claims = await userManager.GetClaimsAsync(user);
+
+            if (!claims.Any(x => string.Equals(x.Type, SquidexClaimTypes.DisplayName, StringComparison.OrdinalIgnoreCase)))
+            {
+                claims.Add(new Claim(SquidexClaimTypes.DisplayName, user.Email));
+            }
 
             return new UserWithClaims(user, claims.ToList());
         }
