@@ -18,7 +18,7 @@ using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Users.Implementations
+namespace Squidex.Domain.Users
 {
     public sealed class DefaultUserService : IUserService
     {
@@ -98,22 +98,18 @@ namespace Squidex.Domain.Users.Implementations
             return ResultList.Create(userTotal, resolved);
         }
 
-        public async Task<IList<UserLoginInfo>> GetLoginsAsync(string id)
+        public Task<IList<UserLoginInfo>> GetLoginsAsync(IUser user)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNull(user, nameof(user));
 
-            var user = await GetUserAsync(id);
-
-            return await userManager.GetLoginsAsync(user);
+            return userManager.GetLoginsAsync((IdentityUser)user.Identity);
         }
 
-        public async Task<bool> GetHasPasswordAsync(string id)
+        public Task<bool> HasPasswordAsync(IUser user)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNull(user, nameof(user));
 
-            var user = await GetUserAsync(id);
-
-            return await userManager.HasPasswordAsync(user);
+            return userManager.HasPasswordAsync((IdentityUser)user.Identity);
         }
 
         public async Task<IUser?> FindByLoginAsync(string provider, string key)
@@ -159,12 +155,12 @@ namespace Squidex.Domain.Users.Implementations
         {
             Guard.NotNullOrEmpty(email, nameof(email));
 
+            var isFirst = !userManager.Users.Any();
+
             var user = userFactory.Create(email);
 
             try
             {
-                var isFirst = !userManager.Users.Any();
-
                 await userManager.CreateAsync(user).Throw(log);
 
                 values ??= new UserValues();
@@ -192,7 +188,7 @@ namespace Squidex.Domain.Users.Implementations
 
                 if (!isFirst && lockAutomatically)
                 {
-                    await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
+                    await userManager.SetLockoutEndDateAsync(user, LockoutDate()).Throw(log);
                 }
             }
             catch (Exception)
@@ -221,7 +217,7 @@ namespace Squidex.Domain.Users.Implementations
                 @events.OnUserRegistered(resolved);
             }
 
-            if (resolved.Claims.HasConsent())
+            if (HasConsentGiven(values, null!))
             {
                 foreach (var @events in userEvents)
                 {
@@ -258,8 +254,6 @@ namespace Squidex.Domain.Users.Implementations
 
             var oldUser = await ResolveAsync(user);
 
-            var withoutConsent = !oldUser.Claims.HasConsent();
-
             if (!string.IsNullOrWhiteSpace(values.Email) && values.Email != user.Email)
             {
                 await userManager.SetEmailAsync(user, values.Email).Throw(log);
@@ -270,7 +264,11 @@ namespace Squidex.Domain.Users.Implementations
 
             if (!string.IsNullOrWhiteSpace(values.Password))
             {
-                await userManager.RemovePasswordAsync(user).Throw(log);
+                if (await userManager.HasPasswordAsync(user))
+                {
+                    await userManager.RemovePasswordAsync(user).Throw(log);
+                }
+
                 await userManager.AddPasswordAsync(user, values.Password).Throw(log);
             }
 
@@ -281,7 +279,7 @@ namespace Squidex.Domain.Users.Implementations
                 @events.OnUserUpdated(resolved);
             }
 
-            if (resolved.Claims.HasConsent() && !withoutConsent)
+            if (HasConsentGiven(values, oldUser))
             {
                 foreach (var @events in userEvents)
                 {
@@ -296,7 +294,7 @@ namespace Squidex.Domain.Users.Implementations
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            return ForUserAsync(id, user => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)).Throw(log));
+            return ForUserAsync(id, user => userManager.SetLockoutEndDateAsync(user, LockoutDate()).Throw(log));
         }
 
         public Task<IUser> UnlockAsync(string id)
@@ -328,7 +326,7 @@ namespace Squidex.Domain.Users.Implementations
 
             var resolved = await ResolveAsync(user);
 
-            await userManager.DeleteAsync(user);
+            await userManager.DeleteAsync(user).Throw(log);
 
             foreach (var @events in userEvents)
             {
@@ -390,6 +388,21 @@ namespace Squidex.Domain.Users.Implementations
             }
 
             return await ResolveAsync(user);
+        }
+
+        private static bool HasConsentGiven(UserValues values, IUser? oldUser)
+        {
+            if (values.Consent == true && oldUser?.Claims.HasConsent() != true)
+            {
+                return true;
+            }
+
+            return values.ConsentForEmails == true && oldUser?.Claims.HasConsentForEmails() != true;
+        }
+
+        private static DateTimeOffset LockoutDate()
+        {
+            return DateTimeOffset.UtcNow.AddYears(100);
         }
     }
 }

@@ -16,7 +16,7 @@ using Squidex.Shared.Users;
 
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
 
-namespace Squidex.Domain.Users.Implementations
+namespace Squidex.Domain.Users
 {
     public sealed class DefaultUserResolver : IUserResolver
     {

@@ -10,7 +10,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Users.Implementations;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 using Xunit;

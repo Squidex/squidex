@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Users;
-using Squidex.Domain.Users.Implementations;
 using Squidex.Shared.Identity;
 using Squidex.Web;
 using Squidex.Web.Pipeline;

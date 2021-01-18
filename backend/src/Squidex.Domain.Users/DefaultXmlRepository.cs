@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.DataProtection.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Users.Implementations
+namespace Squidex.Domain.Users
 {
     public sealed class DefaultXmlRepository : IXmlRepository
     {

@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Domain.Users.Implementations;
 using Squidex.Infrastructure.States;
 using Xunit;
 

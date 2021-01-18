@@ -22,9 +22,9 @@ namespace Squidex.Domain.Users
 
         string GetUserId(ClaimsPrincipal user);
 
-        Task<IList<UserLoginInfo>> GetLoginsAsync(string id);
+        Task<IList<UserLoginInfo>> GetLoginsAsync(IUser user);
 
-        Task<bool> GetHasPasswordAsync(string id);
+        Task<bool> HasPasswordAsync(IUser user);
 
         Task<bool> IsEmptyAsync();
 

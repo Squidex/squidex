@@ -8,7 +8,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Users;
-using Squidex.Domain.Users.Implementations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Config.Authentication

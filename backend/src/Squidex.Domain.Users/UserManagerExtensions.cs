@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Validation;
 using Squidex.Log;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Domain.Users.Implementations
+namespace Squidex.Domain.Users
 {
     internal static class UserManagerExtensions
     {

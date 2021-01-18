@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Assets;
-using Squidex.Domain.Users.Implementations;
 using Xunit;
 
 namespace Squidex.Domain.Users

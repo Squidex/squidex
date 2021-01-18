@@ -225,8 +225,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
             var (providers, hasPassword, logins) = await AsyncHelper.WhenAll(
                 signInManager.GetExternalProvidersAsync(),
-                userService.GetHasPasswordAsync(user.Id),
-                userService.GetLoginsAsync(user.Id));
+                userService.HasPasswordAsync(user),
+                userService.GetLoginsAsync(user));
 
             var result = new ProfileVM
             {

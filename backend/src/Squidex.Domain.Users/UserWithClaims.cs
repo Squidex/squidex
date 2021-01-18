@@ -7,13 +7,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Users.Implementations
+namespace Squidex.Domain.Users
 {
     internal sealed class UserWithClaims : IUser
     {

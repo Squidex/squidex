@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Users.Implementations
+namespace Squidex.Domain.Users
 {
     public sealed class DefaultUserPictureStore : IUserPictureStore
     {
