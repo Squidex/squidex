@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
@@ -42,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/patterns/")]
-        [ProducesResponseType(typeof(PatternsDto), 200)]
+        [ProducesResponseType(typeof(PatternsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppPatternsRead)]
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
@@ -94,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/patterns/{id}/")]
-        [ProducesResponseType(typeof(PatternsDto), 200)]
+        [ProducesResponseType(typeof(PatternsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutPattern(string app, DomainId id, [FromBody] UpdatePatternDto request)
@@ -120,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/patterns/{id}/")]
-        [ProducesResponseType(typeof(PatternsDto), 200)]
+        [ProducesResponseType(typeof(PatternsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppPatternsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeletePattern(string app, DomainId id)

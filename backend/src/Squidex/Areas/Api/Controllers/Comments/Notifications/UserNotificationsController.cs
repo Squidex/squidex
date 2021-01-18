@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Comments.Models;
@@ -47,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
         /// </returns>
         [HttpGet]
         [Route("users/{userId}/notifications")]
-        [ProducesResponseType(typeof(CommentsDto), 200)]
+        [ProducesResponseType(typeof(CommentsDto), StatusCodes.Status200OK)]
         [ApiPermission]
         public async Task<IActionResult> GetNotifications(DomainId userId, [FromQuery] long version = EtagVersion.Any)
         {

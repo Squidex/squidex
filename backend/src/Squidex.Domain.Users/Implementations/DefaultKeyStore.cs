@@ -15,7 +15,7 @@ using IdentityServer4.Stores;
 using Microsoft.IdentityModel.Tokens;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users.Implementations
 {
     public sealed class DefaultKeyStore : ISigningCredentialStore, IValidationKeysStore
     {

@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users.Implementations
 {
     public sealed class PwnedPasswordValidator : IPasswordValidator<IdentityUser>
     {

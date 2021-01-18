@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
@@ -36,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Languages
         /// </returns>
         [HttpGet]
         [Route("languages/")]
-        [ProducesResponseType(typeof(LanguageDto[]), 200)]
+        [ProducesResponseType(typeof(LanguageDto[]), StatusCodes.Status200OK)]
         [ApiPermission]
         public IActionResult GetLanguages()
         {

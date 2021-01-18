@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users.Implementations
 {
     public sealed class UserClaimsPrincipalFactoryWithEmail : UserClaimsPrincipalFactory<IdentityUser, IdentityRole>
     {

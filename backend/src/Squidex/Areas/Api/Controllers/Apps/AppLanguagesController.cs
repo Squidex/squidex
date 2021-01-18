@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
@@ -40,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/languages/")]
-        [ProducesResponseType(typeof(AppLanguagesDto), 200)]
+        [ProducesResponseType(typeof(AppLanguagesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppLanguagesRead)]
         [ApiCosts(0)]
         public IActionResult GetLanguages(string app)
@@ -92,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/languages/{language}/")]
-        [ProducesResponseType(typeof(AppLanguagesDto), 200)]
+        [ProducesResponseType(typeof(AppLanguagesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppLanguagesUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutLanguage(string app, string language, [FromBody] UpdateLanguageDto request)
@@ -116,7 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/languages/{language}/")]
-        [ProducesResponseType(typeof(AppLanguagesDto), 200)]
+        [ProducesResponseType(typeof(AppLanguagesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppLanguagesDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteLanguage(string app, string language)

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
+using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Text;
 
@@ -161,7 +162,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             if (@event is EnrichedUserEventBase userEvent)
             {
-                return userEvent.User?.DisplayName();
+                return userEvent.User?.Claims.DisplayName();
             }
 
             return null;
@@ -191,7 +192,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             if (@event is EnrichedCommentEvent commentEvent)
             {
-                return commentEvent.MentionedUser.DisplayName();
+                return commentEvent.MentionedUser.Claims.DisplayName();
             }
 
             return null;

@@ -7,19 +7,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users.Implementations
 {
-    public sealed class UserWithClaims : IUser
+    internal sealed class UserWithClaims : IUser
     {
         public IdentityUser Identity { get; }
-
-        public List<Claim> Claims { get; }
 
         public string Id
         {
@@ -36,19 +34,15 @@ namespace Squidex.Domain.Users
             get { return Identity.LockoutEnd > DateTime.UtcNow; }
         }
 
-        IReadOnlyList<Claim> IUser.Claims
-        {
-            get { return Claims; }
-        }
+        public IReadOnlyList<Claim> Claims { get; }
 
-        public UserWithClaims(IdentityUser user, IEnumerable<Claim> claims)
-        {
-            Guard.NotNull(user, nameof(user));
-            Guard.NotNull(claims, nameof(claims));
+        object IUser.Identity => Identity;
 
+        public UserWithClaims(IdentityUser user, IReadOnlyList<Claim> claims)
+        {
             Identity = user;
 
-            Claims = claims.ToList();
+            Claims = claims;
         }
     }
 }

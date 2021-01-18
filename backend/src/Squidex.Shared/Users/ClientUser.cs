@@ -18,19 +18,6 @@ namespace Squidex.Shared.Users
         private readonly RefToken token;
         private readonly List<Claim> claims;
 
-        public ClientUser(RefToken token)
-        {
-            Guard.NotNull(token, nameof(token));
-
-            this.token = token;
-
-            claims = new List<Claim>
-            {
-                new Claim(OpenIdClaims.ClientId, token.Identifier),
-                new Claim(SquidexClaimTypes.DisplayName, token.ToString())
-            };
-        }
-
         public string Id
         {
             get { return token.Identifier; }
@@ -49,6 +36,21 @@ namespace Squidex.Shared.Users
         public IReadOnlyList<Claim> Claims
         {
             get { return claims; }
+        }
+
+        public object Identity => throw new System.NotImplementedException();
+
+        public ClientUser(RefToken token)
+        {
+            Guard.NotNull(token, nameof(token));
+
+            this.token = token;
+
+            claims = new List<Claim>
+            {
+                new Claim(OpenIdClaims.ClientId, token.Identifier),
+                new Claim(SquidexClaimTypes.DisplayName, token.ToString())
+            };
         }
     }
 }

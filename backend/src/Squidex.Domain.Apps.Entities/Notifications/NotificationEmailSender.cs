@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
 using Squidex.Log;
+using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Notifications
@@ -86,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
             var vars = new TemplatesVars { Assigner = assigner, AppName = appName };
 
-            if (user.HasConsent())
+            if (user.Claims.HasConsent())
             {
                 return SendEmailAsync("ExistingUser",
                     texts.ExistingUserSubject,
@@ -152,13 +153,13 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             if (vars.Assigner != null)
             {
                 text = text.Replace("$ASSIGNER_EMAIL", vars.Assigner.Email);
-                text = text.Replace("$ASSIGNER_NAME", vars.Assigner.DisplayName());
+                text = text.Replace("$ASSIGNER_NAME", vars.Assigner.Claims.DisplayName());
             }
 
             if (vars.User != null)
             {
                 text = text.Replace("$USER_EMAIL", vars.User.Email);
-                text = text.Replace("$USER_NAME", vars.User.DisplayName());
+                text = text.Replace("$USER_NAME", vars.User.Claims.DisplayName());
             }
 
             if (vars.ApiCallsLimit != null)

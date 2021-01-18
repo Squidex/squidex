@@ -10,14 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
 
-namespace Squidex.Domain.Users
+namespace Squidex.Domain.Users.Implementations
 {
     public sealed class DefaultUserResolver : IUserResolver
     {
@@ -34,35 +33,26 @@ namespace Squidex.Domain.Users
         {
             Guard.NotNullOrEmpty(email, nameof(email));
 
-            var created = false;
-
             using (var scope = serviceProvider.CreateScope())
             {
-                var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
                 try
                 {
-                    var user = userFactory.Create(email);
-
-                    var result = await userManager.CreateAsync(user);
-
-                    if (result.Succeeded)
+                    var user = await userService.CreateAsync(new UserValues
                     {
-                        created = true;
+                        Email = email, Invited = invited
+                    });
 
-                        var values = new UserValues { DisplayName = email, Invited = invited };
-
-                        await userManager.UpdateAsync(user, values);
-                    }
+                    return (user, true);
                 }
                 catch
                 {
                 }
 
-                var found = await userManager.FindByEmailWithClaimsAsync(email);
+                var found = await userService.FindByEmailAsync(email);
 
-                return (found, created);
+                return (found, false);
             }
         }
 
@@ -74,7 +64,7 @@ namespace Squidex.Domain.Users
 
             using (var scope = serviceProvider.CreateScope())
             {
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
                 var values = new UserValues
                 {
@@ -84,7 +74,7 @@ namespace Squidex.Domain.Users
                     }
                 };
 
-                await userManager.UpdateAsync(id, values);
+                await userService.UpdateAsync(id, values);
             }
         }
 
@@ -94,9 +84,9 @@ namespace Squidex.Domain.Users
 
             using (var scope = serviceProvider.CreateScope())
             {
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                return await userManager.FindByIdWithClaimsAsync(id);
+                return await userService.FindByIdAsync(id);
             }
         }
 
@@ -106,16 +96,15 @@ namespace Squidex.Domain.Users
 
             using (var scope = serviceProvider.CreateScope())
             {
-                var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                if (userFactory.IsId(idOrEmail))
+                if (idOrEmail.Contains("@"))
                 {
-                    return await userManager.FindByIdWithClaimsAsync(idOrEmail);
+                    return await userService.FindByEmailAsync(idOrEmail);
                 }
                 else
                 {
-                    return await userManager.FindByEmailWithClaimsAsync(idOrEmail);
+                    return await userService.FindByIdAsync(idOrEmail);
                 }
             }
         }
@@ -124,11 +113,11 @@ namespace Squidex.Domain.Users
         {
             using (var scope = serviceProvider.CreateScope())
             {
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var result = await userManager.QueryByEmailAsync(null);
+                var result = await userService.QueryAsync(take: int.MaxValue);
 
-                return result.OfType<IUser>().ToList();
+                return result.ToList();
             }
         }
 
@@ -138,11 +127,11 @@ namespace Squidex.Domain.Users
 
             using (var scope = serviceProvider.CreateScope())
             {
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var result = await userManager.QueryByEmailAsync(email);
+                var result = await userService.QueryAsync(email);
 
-                return result.OfType<IUser>().ToList();
+                return result.ToList();
             }
         }
 
@@ -152,12 +141,9 @@ namespace Squidex.Domain.Users
 
             using (var scope = serviceProvider.CreateScope())
             {
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-                var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                ids = ids.Where(x => userFactory.IsId(x)).ToArray();
-
-                var result = await userManager.QueryByIdsAync(ids);
+                var result = await userService.QueryAsync(ids);
 
                 return result.OfType<IUser>().ToDictionary(x => x.Id);
             }

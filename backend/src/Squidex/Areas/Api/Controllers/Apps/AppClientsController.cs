@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
@@ -41,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/clients/")]
-        [ProducesResponseType(typeof(ClientsDto), 200)]
+        [ProducesResponseType(typeof(ClientsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppClientsRead)]
         [ApiCosts(0)]
         public IActionResult GetClients(string app)
@@ -100,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/clients/{id}/")]
-        [ProducesResponseType(typeof(ClientsDto), 200)]
+        [ProducesResponseType(typeof(ClientsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppClientsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutClient(string app, string id, [FromBody] UpdateClientDto request)
@@ -126,7 +127,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/clients/{id}/")]
-        [ProducesResponseType(typeof(ClientsDto), 200)]
+        [ProducesResponseType(typeof(ClientsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppClientsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteClient(string app, string id)

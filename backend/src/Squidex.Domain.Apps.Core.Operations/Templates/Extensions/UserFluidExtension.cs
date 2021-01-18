@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using Fluid;
 using Fluid.Values;
+using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.Templates.Extensions
@@ -26,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
                     case "email":
                         return new StringValue(user.Email);
                     case "name":
-                        return new StringValue(user.DisplayName());
+                        return new StringValue(user.Claims.DisplayName());
                     default:
                         {
                             var claim = user.Claims.FirstOrDefault(x => string.Equals(name, x.Type, StringComparison.OrdinalIgnoreCase));

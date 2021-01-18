@@ -22,7 +22,7 @@ namespace Squidex.Config.Authentication
 
             if (!string.IsNullOrWhiteSpace(nameClaim))
             {
-                context.Identity.SetDisplayName(nameClaim);
+                context.Identity.AddClaim(new Claim(SquidexClaimTypes.DisplayName, nameClaim));
             }
 
             if (string.IsNullOrWhiteSpace(context.Identity.FindFirst(ClaimTypes.Email)?.Value))

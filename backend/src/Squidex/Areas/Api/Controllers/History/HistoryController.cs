@@ -7,6 +7,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.History.Models;
 using Squidex.Domain.Apps.Entities.History;
@@ -41,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.History
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/history/")]
-        [ProducesResponseType(typeof(HistoryEventDto), 200)]
+        [ProducesResponseType(typeof(HistoryEventDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppHistory)]
         [ApiCosts(0.1)]
         public async Task<IActionResult> GetHistory(string app, string channel)

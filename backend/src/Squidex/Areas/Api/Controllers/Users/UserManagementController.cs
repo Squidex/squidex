@@ -6,13 +6,12 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Web;
@@ -22,29 +21,23 @@ namespace Squidex.Areas.Api.Controllers.Users
     [ApiModelValidation(true)]
     public sealed class UserManagementController : ApiController
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly IUserFactory userFactory;
-        private readonly IUserEvents userEvents;
+        private readonly IUserService userService;
 
-        public UserManagementController(ICommandBus commandBus, UserManager<IdentityUser> userManager, IUserFactory userFactory, IUserEvents userEvents)
+        public UserManagementController(ICommandBus commandBus, IUserService userService)
             : base(commandBus)
         {
-            this.userManager = userManager;
-            this.userFactory = userFactory;
-            this.userEvents = userEvents;
+            this.userService = userService;
         }
 
         [HttpGet]
         [Route("user-management/")]
-        [ProducesResponseType(typeof(UsersDto), 200)]
+        [ProducesResponseType(typeof(UsersDto), StatusCodes.Status200OK)]
         [ApiPermission(Permissions.AdminUsersRead)]
         public async Task<IActionResult> GetUsers([FromQuery] string? query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
-            var (items, total) = await AsyncHelper.WhenAll(
-                userManager.QueryByEmailAsync(query, take, skip),
-                userManager.CountByEmailAsync(query));
+            var users = await userService.QueryAsync(query, take, skip);
 
-            var response = UsersDto.FromResults(items, total, Resources);
+            var response = UsersDto.FromResults(users, users.Total, Resources);
 
             return Ok(response);
         }
@@ -55,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersRead)]
         public async Task<IActionResult> GetUser(string id)
         {
-            var user = await userManager.FindByIdWithClaimsAsync(id);
+            var user = await userService.FindByIdAsync(id);
 
             if (user == null)
             {
@@ -73,9 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
-            var user = await userManager.CreateAsync(userFactory, request.ToValues());
-
-            userEvents.OnUserRegistered(user);
+            var user = await userService.CreateAsync(request.ToValues());
 
             var response = UserDto.FromUser(user, Resources);
 
@@ -88,9 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersUpdate)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
-            var user = await userManager.UpdateAsync(id, request.ToValues());
-
-            userEvents.OnUserUpdated(user);
+            var user = await userService.UpdateAsync(id, request.ToValues());
 
             var response = UserDto.FromUser(user, Resources);
 
@@ -108,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 throw new DomainForbiddenException(T.Get("users.lockYourselfError"));
             }
 
-            var user = await userManager.LockAsync(id);
+            var user = await userService.LockAsync(id);
 
             var response = UserDto.FromUser(user, Resources);
 
@@ -126,11 +115,27 @@ namespace Squidex.Areas.Api.Controllers.Users
                 throw new DomainForbiddenException(T.Get("users.unlockYourselfError"));
             }
 
-            var user = await userManager.UnlockAsync(id);
+            var user = await userService.UnlockAsync(id);
 
             var response = UserDto.FromUser(user, Resources);
 
             return Ok(response);
+        }
+
+        [HttpDelete]
+        [Route("user-management/{id}/")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ApiPermission(Permissions.AdminUsersUnlock)]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            if (this.IsUser(id))
+            {
+                throw new DomainForbiddenException(T.Get("users.deleteYourselfError"));
+            }
+
+            await userService.DeleteAsync(id);
+
+            return NoContent();
         }
     }
 }

@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
@@ -47,8 +48,8 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 
         public static UserDto FromUser(IUser user, Resources resources)
         {
-            var userPermssions = user.Permissions().ToIds();
-            var userName = user.DisplayName()!;
+            var userPermssions = user.Claims.Permissions().ToIds();
+            var userName = user.Claims.DisplayName()!;
 
             var result = SimpleMapper.Map(user, new UserDto { DisplayName = userName, Permissions = userPermssions });
 
