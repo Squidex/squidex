@@ -72,7 +72,7 @@ namespace Squidex.Shared.Identity
 
         public static bool HasClaimValue(this IEnumerable<Claim> user, string type, string value)
         {
-            return user.GetClaims(type).Any(x => !string.Equals(x.Value, value, StringComparison.OrdinalIgnoreCase));
+            return user.GetClaims(type).Any(x => string.Equals(x.Value, value, StringComparison.OrdinalIgnoreCase));
         }
 
         public static IEnumerable<Claim> GetSquidexClaims(this IEnumerable<Claim> user)

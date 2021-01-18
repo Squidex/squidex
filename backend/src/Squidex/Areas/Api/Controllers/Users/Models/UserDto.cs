@@ -80,6 +80,8 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
                 {
                     AddPutLink("unlock", resources.Url<UserManagementController>(c => nameof(c.UnlockUser), values));
                 }
+
+                AddDeleteLink("delete", resources.Url<UserManagementController>(x => nameof(x.DeleteUser), values));
             }
 
             if (resources.CanUpdateUser)

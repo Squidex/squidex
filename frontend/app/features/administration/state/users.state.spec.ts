@@ -225,6 +225,16 @@ describe('UsersState', () => {
             expect(usersState.snapshot.total).toBe(201);
         });
 
+        it('should remove user from snapshot when delete', () => {
+            usersService.setup(x => x.deleteUser(user1))
+                .returns(() => of(newUser)).verifiable();
+
+            usersState.delete(user1).subscribe();
+
+            expect(usersState.snapshot.users).toEqual([user2]);
+            expect(usersState.snapshot.total).toBe(199);
+        });
+
         it('should truncate users when page size reached', () => {
             const request = { ...newUser, password: 'password' };
 

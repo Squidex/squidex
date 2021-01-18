@@ -52,7 +52,7 @@ namespace Squidex.Domain.Users
 
             var user = A.Fake<IUser>();
 
-            A.CallTo(() => userService.CreateAsync(A<UserValues>.That.Matches(x => x.Email == email && x.Invited == true)))
+            A.CallTo(() => userService.CreateAsync(email, A<UserValues>.That.Matches(x => x.Invited == true), false))
                 .Returns(user);
 
             var result = await sut.CreateUserIfNotExistsAsync(email, true);
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Users
 
             var user = A.Fake<IUser>();
 
-            A.CallTo(() => userService.CreateAsync(A<UserValues>.That.Matches(x => x.Email == email)))
+            A.CallTo(() => userService.CreateAsync(email, A<UserValues>._, false))
                 .Throws(new InvalidOperationException());
 
             A.CallTo(() => userService.FindByEmailAsync(email))

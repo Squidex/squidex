@@ -39,9 +39,9 @@ namespace Squidex.Domain.Users.Implementations
 
                 try
                 {
-                    var user = await userService.CreateAsync(new UserValues
+                    var user = await userService.CreateAsync(email, new UserValues
                     {
-                        Email = email, Invited = invited
+                        Invited = invited
                     });
 
                     return (user, true);

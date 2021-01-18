@@ -78,13 +78,12 @@ namespace Squidex.Areas.IdentityServer.Config
 
                                 var values = new UserValues
                                 {
-                                    Email = adminEmail,
                                     Password = adminPass,
                                     Permissions = permissions,
                                     DisplayName = adminEmail
                                 };
 
-                                await userService.CreateAsync(values);
+                                await userService.CreateAsync(adminEmail, values);
                             }
                         }
                         catch (Exception ex)

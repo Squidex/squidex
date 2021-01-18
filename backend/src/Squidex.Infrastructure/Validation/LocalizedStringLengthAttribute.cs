@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Validation
             var min = MinimumLength;
             var max = MaximumLength;
 
-            var args = new { property, min, max };
+            var args = new { name = property, min, max };
 
             if (min > 0)
             {

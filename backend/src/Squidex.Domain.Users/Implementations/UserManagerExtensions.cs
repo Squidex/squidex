@@ -9,17 +9,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Log;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Users.Implementations
 {
     internal static class UserManagerExtensions
     {
-        public static async Task Throw(this Task<IdentityResult> task)
+        public static async Task Throw(this Task<IdentityResult> task, ISemanticLog log)
         {
             var result = await task;
 
@@ -37,6 +39,22 @@ namespace Squidex.Domain.Users.Implementations
 
             if (!result.Succeeded)
             {
+                var errorMessageBuilder = new StringBuilder();
+
+                foreach (var error in result.Errors)
+                {
+                    errorMessageBuilder.Append(error.Code);
+                    errorMessageBuilder.Append(": ");
+                    errorMessageBuilder.AppendLine(error.Description);
+                }
+
+                var errorMessage = errorMessageBuilder.ToString();
+
+                log.LogError(errorMessage, (ctx, w) => w
+                    .WriteProperty("action", "IdentityOperation")
+                    .WriteProperty("status", "Failed")
+                    .WriteProperty("message", ctx));
+
                 throw new ValidationException(result.Errors.Select(x => new ValidationError(Localize(x))).ToList());
             }
         }

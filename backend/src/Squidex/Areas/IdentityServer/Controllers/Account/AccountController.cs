@@ -286,19 +286,22 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                     throw new DomainException("User has no exposed email address.");
                 }
 
-                user = await userService.FindByIdAsync(email);
+                user = await userService.FindByEmailAsync(email);
 
                 if (user != null)
                 {
-                    await userService.AddLoginAsync(user.Id, externalLogin);
-                    await userService.UpdateAsync(user.Id, CreateUserValues(externalLogin, email, user: user));
+                    var update = CreateUserValues(externalLogin, email, user: user);
+
+                    await userService.UpdateAsync(user.Id, update);
                 }
                 else
                 {
-                    user = await userService.CreateAsync(CreateUserValues(externalLogin, email));
+                    var update = CreateUserValues(externalLogin, email);
 
-                    await userService.AddLoginAsync(user.Id, externalLogin);
+                    user = await userService.CreateAsync(email, update, identityOptions.LockAutomatically);
                 }
+
+                await userService.AddLoginAsync(user.Id, externalLogin);
 
                 var (success, locked) = await LoginAsync(externalLogin);
 

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Users;
 using Squidex.Domain.Users.Implementations;
 using Squidex.Shared.Identity;
 using Squidex.Web;
@@ -42,6 +43,9 @@ namespace Squidex.Areas.IdentityServer.Config
 
             services.AddSingletonAs<DefaultKeyStore>()
                 .As<ISigningCredentialStore>().As<IValidationKeysStore>();
+
+            services.AddScopedAs<DefaultUserService>()
+                .As<IUserService>();
 
             services.AddSingletonAs<PwnedPasswordValidator>()
                 .As<IPasswordValidator<IdentityUser>>();

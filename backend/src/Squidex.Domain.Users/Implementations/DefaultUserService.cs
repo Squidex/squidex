@@ -12,6 +12,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
+using Squidex.Log;
+using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -22,13 +25,21 @@ namespace Squidex.Domain.Users.Implementations
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserFactory userFactory;
         private readonly IEnumerable<IUserEvents> userEvents;
+        private readonly ISemanticLog log;
 
         public DefaultUserService(UserManager<IdentityUser> userManager, IUserFactory userFactory,
-            IEnumerable<IUserEvents> userEvents)
+            IEnumerable<IUserEvents> userEvents, ISemanticLog log)
         {
+            Guard.NotNull(userManager, nameof(userManager));
+            Guard.NotNull(userFactory, nameof(userFactory));
+            Guard.NotNull(userEvents, nameof(userEvents));
+            Guard.NotNull(log, nameof(log));
+
             this.userManager = userManager;
             this.userFactory = userFactory;
             this.userEvents = userEvents;
+
+            this.log = log;
         }
 
         public async Task<bool> IsEmptyAsync()
@@ -40,11 +51,15 @@ namespace Squidex.Domain.Users.Implementations
 
         public string GetUserId(ClaimsPrincipal user)
         {
+            Guard.NotNull(user, nameof(user));
+
             return userManager.GetUserId(user);
         }
 
         public async Task<IResultList<IUser>> QueryAsync(IEnumerable<string> ids)
         {
+            Guard.NotNull(ids, nameof(ids));
+
             ids = ids.Where(userFactory.IsId);
 
             if (!ids.Any())
@@ -85,6 +100,8 @@ namespace Squidex.Domain.Users.Implementations
 
         public async Task<IList<UserLoginInfo>> GetLoginsAsync(string id)
         {
+            Guard.NotNullOrEmpty(id, nameof(id));
+
             var user = await GetUserAsync(id);
 
             return await userManager.GetLoginsAsync(user);
@@ -92,6 +109,8 @@ namespace Squidex.Domain.Users.Implementations
 
         public async Task<bool> GetHasPasswordAsync(string id)
         {
+            Guard.NotNullOrEmpty(id, nameof(id));
+
             var user = await GetUserAsync(id);
 
             return await userManager.HasPasswordAsync(user);
@@ -99,6 +118,8 @@ namespace Squidex.Domain.Users.Implementations
 
         public async Task<IUser?> FindByLoginAsync(string provider, string key)
         {
+            Guard.NotNullOrEmpty(provider, nameof(provider));
+
             var user = await userManager.FindByLoginAsync(provider, key);
 
             return await ResolveOptionalAsync(user);
@@ -106,6 +127,8 @@ namespace Squidex.Domain.Users.Implementations
 
         public async Task<IUser?> FindByEmailAsync(string email)
         {
+            Guard.NotNullOrEmpty(email, nameof(email));
+
             var user = await userManager.FindByEmailAsync(email);
 
             return await ResolveOptionalAsync(user);
@@ -113,6 +136,8 @@ namespace Squidex.Domain.Users.Implementations
 
         public async Task<IUser?> GetAsync(ClaimsPrincipal principal)
         {
+            Guard.NotNull(principal, nameof(principal));
+
             var user = await userManager.GetUserAsync(principal);
 
             return await ResolveOptionalAsync(user);
@@ -130,21 +155,37 @@ namespace Squidex.Domain.Users.Implementations
             return await ResolveOptionalAsync(user);
         }
 
-        public async Task<IUser> CreateAsync(UserValues values)
+        public async Task<IUser> CreateAsync(string email, UserValues? values = null, bool lockAutomatically = false)
         {
-            var user = userFactory.Create(values.Email!);
+            Guard.NotNullOrEmpty(email, nameof(email));
+
+            var user = userFactory.Create(email);
 
             try
             {
-                await userManager.CreateAsync(user).Throw();
-                await userManager.SyncClaims(user, values).Throw();
+                var isFirst = !userManager.Users.Any();
+
+                await userManager.CreateAsync(user).Throw(log);
+
+                values ??= new UserValues();
+
+                if (isFirst)
+                {
+                    var permissions = values.Permissions?.ToIds().ToList() ?? new List<string>();
+
+                    permissions.Add(Permissions.Admin);
+
+                    values.Permissions = new PermissionSet(permissions);
+                }
+
+                await userManager.SyncClaims(user, values).Throw(log);
 
                 if (!string.IsNullOrWhiteSpace(values.Password))
                 {
-                    await userManager.AddPasswordAsync(user, values.Password).Throw();
+                    await userManager.AddPasswordAsync(user, values.Password).Throw(log);
                 }
 
-                if (userManager.Users.Count() == 1)
+                if (!isFirst && lockAutomatically)
                 {
                     await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
                 }
@@ -175,21 +216,26 @@ namespace Squidex.Domain.Users.Implementations
 
         public Task<IUser> SetPasswordAsync(string id, string password, string? oldPassword)
         {
+            Guard.NotNullOrEmpty(id, nameof(id));
+
             return ForUserAsync(id, async user =>
             {
                 if (await userManager.HasPasswordAsync(user))
                 {
-                    await userManager.ChangePasswordAsync(user, oldPassword!, password).Throw();
+                    await userManager.ChangePasswordAsync(user, oldPassword!, password).Throw(log);
                 }
                 else
                 {
-                    await userManager.AddPasswordAsync(user, password).Throw();
+                    await userManager.AddPasswordAsync(user, password).Throw(log);
                 }
             });
         }
 
         public async Task<IUser> UpdateAsync(string id, UserValues values)
         {
+            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNull(values, nameof(values));
+
             var user = await GetUserAsync(id);
 
             var oldUser = await ResolveAsync(user);
@@ -198,16 +244,16 @@ namespace Squidex.Domain.Users.Implementations
 
             if (!string.IsNullOrWhiteSpace(values.Email) && values.Email != user.Email)
             {
-                await userManager.SetEmailAsync(user, values.Email).Throw();
-                await userManager.SetUserNameAsync(user, values.Email).Throw();
+                await userManager.SetEmailAsync(user, values.Email).Throw(log);
+                await userManager.SetUserNameAsync(user, values.Email).Throw(log);
             }
 
-            await userManager.SyncClaims(user, values).Throw();
+            await userManager.SyncClaims(user, values).Throw(log);
 
             if (!string.IsNullOrWhiteSpace(values.Password))
             {
-                await userManager.RemovePasswordAsync(user).Throw();
-                await userManager.AddPasswordAsync(user, values.Password).Throw();
+                await userManager.RemovePasswordAsync(user).Throw(log);
+                await userManager.AddPasswordAsync(user, values.Password).Throw(log);
             }
 
             var resolved = await ResolveAsync(user);
@@ -230,26 +276,36 @@ namespace Squidex.Domain.Users.Implementations
 
         public Task<IUser> LockAsync(string id)
         {
-            return ForUserAsync(id, user => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)).Throw());
+            Guard.NotNullOrEmpty(id, nameof(id));
+
+            return ForUserAsync(id, user => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)).Throw(log));
         }
 
         public Task<IUser> UnlockAsync(string id)
         {
-            return ForUserAsync(id, user => userManager.SetLockoutEndDateAsync(user, null).Throw());
+            Guard.NotNullOrEmpty(id, nameof(id));
+
+            return ForUserAsync(id, user => userManager.SetLockoutEndDateAsync(user, null).Throw(log));
         }
 
         public Task<IUser> AddLoginAsync(string id, ExternalLoginInfo externalLogin)
         {
-            return ForUserAsync(id, user => userManager.AddLoginAsync(user, externalLogin).Throw());
+            Guard.NotNullOrEmpty(id, nameof(id));
+
+            return ForUserAsync(id, user => userManager.AddLoginAsync(user, externalLogin).Throw(log));
         }
 
         public Task<IUser> RemoveLoginAsync(string id, string loginProvider, string providerKey)
         {
-            return ForUserAsync(id, user => userManager.RemoveLoginAsync(user, loginProvider, providerKey).Throw());
+            Guard.NotNullOrEmpty(id, nameof(id));
+
+            return ForUserAsync(id, user => userManager.RemoveLoginAsync(user, loginProvider, providerKey).Throw(log));
         }
 
         public async Task DeleteAsync(string id)
         {
+            Guard.NotNullOrEmpty(id, nameof(id));
+
             var user = await GetUserAsync(id);
 
             var resolved = await ResolveAsync(user);

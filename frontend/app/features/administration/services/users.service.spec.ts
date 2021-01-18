@@ -202,6 +202,29 @@ describe('UsersService', () => {
         expect(user!).toEqual(createUser(12));
     }));
 
+    it('should make delete request to delete user',
+        inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: 'api/user-management/123' }
+            }
+        };
+
+        let user: UserDto;
+
+        userManagementService.deleteUser(resource).subscribe(result => {
+            user = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/user-management/123');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+    }));
+
     function userResponse(id: number) {
         return {
             id: `${id}`,

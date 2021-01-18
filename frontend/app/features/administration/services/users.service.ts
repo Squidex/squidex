@@ -23,6 +23,7 @@ export class UserDto {
     public readonly canLock: boolean;
     public readonly canUnlock: boolean;
     public readonly canUpdate: boolean;
+    public readonly canDelete: boolean;
 
     constructor(links: ResourceLinks,
         public readonly id: string,
@@ -36,6 +37,7 @@ export class UserDto {
         this.canLock = hasAnyLink(links, 'lock');
         this.canUnlock = hasAnyLink(links, 'unlock');
         this.canUpdate = hasAnyLink(links, 'update');
+        this.canDelete = hasAnyLink(links, 'delete');
     }
 }
 
@@ -114,7 +116,7 @@ export class UsersService {
             map(body => {
                 return parseUser(body);
             }),
-            pretifyError('i18n:users.loadFailed'));
+            pretifyError('i18n:users.lockFailed'));
     }
 
     public unlockUser(user: Resource): Observable<UserDto> {
@@ -126,7 +128,16 @@ export class UsersService {
             map(body => {
                 return parseUser(body);
             }),
-            pretifyError('i18n:users.loadFailed'));
+            pretifyError('i18n:users.unlockFailed'));
+    }
+
+    public deleteUser(user: Resource): Observable<any> {
+        const link = user._links['delete'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
+            pretifyError('i18n:users.deleteFailed'));
     }
 }
 

@@ -28,7 +28,7 @@ namespace Squidex.Domain.Users
 
         Task<bool> IsEmptyAsync();
 
-        Task<IUser> CreateAsync(UserValues values);
+        Task<IUser> CreateAsync(string email, UserValues? values = null, bool lockAutomatically = false);
 
         Task<IUser?> GetAsync(ClaimsPrincipal principal);
 

@@ -66,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
-            var user = await userService.CreateAsync(request.ToValues());
+            var user = await userService.CreateAsync(request.Email, request.ToValues());
 
             var response = UserDto.FromUser(user, Resources);
 

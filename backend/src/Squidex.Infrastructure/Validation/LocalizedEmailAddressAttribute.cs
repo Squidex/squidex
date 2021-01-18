@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Validation
         {
             var property = T.Get($"common.{name.ToCamelCase()}", name);
 
-            return T.Get("annotations_EmailAddress", base.FormatErrorMessage(name), new { property });
+            return T.Get("annotations_EmailAddress", base.FormatErrorMessage(name), new { name = property });
         }
     }
 }
