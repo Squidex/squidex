@@ -33,7 +33,7 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userFactory.IsId(A<string>._))
                 .Returns(true);
 
-            A.CallTo(userManager).WithReturnType<IdentityResult>()
+            A.CallTo(userManager).WithReturnType<Task<IdentityResult>>()
                 .Returns(IdentityResult.Success);
 
             sut = new DefaultUserService(userManager, userFactory, Enumerable.Repeat(userEvents, 1), A.Fake<ISemanticLog>());
@@ -324,12 +324,6 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userManager.HasPasswordAsync(identity))
                 .Returns(true);
 
-            A.CallTo(() => userManager.RemovePasswordAsync(identity))
-                .Returns(IdentityResult.Success);
-
-            A.CallTo(() => userManager.AddPasswordAsync(identity, update.Password))
-                .Returns(IdentityResult.Success);
-
             await sut.UpdateAsync(identity.Id, update);
 
             A.CallTo(() => userManager.RemovePasswordAsync(identity))
@@ -348,12 +342,6 @@ namespace Squidex.Domain.Users
             };
 
             var identity = CreateIdentity(found: true);
-
-            A.CallTo(() => userManager.SetEmailAsync(identity, update.Email))
-                .Returns(IdentityResult.Success);
-
-            A.CallTo(() => userManager.SetUserNameAsync(identity, update.Email))
-                .Returns(IdentityResult.Success);
 
             await sut.UpdateAsync(identity.Id, update);
 
@@ -374,9 +362,6 @@ namespace Squidex.Domain.Users
 
             var identity = CreateIdentity(found: true);
 
-            A.CallTo(() => userManager.AddClaimsAsync(identity, A<IEnumerable<Claim>>._))
-                .Returns(IdentityResult.Success);
-
             await sut.UpdateAsync(identity.Id, update);
 
             A.CallTo<Task<IdentityResult>>(() => userManager.AddClaimsAsync(identity, HasClaim(SquidexClaimTypes.Consent)))
@@ -395,9 +380,6 @@ namespace Squidex.Domain.Users
             };
 
             var identity = CreateIdentity(found: true);
-
-            A.CallTo(() => userManager.AddClaimsAsync(identity, A<IEnumerable<Claim>>._))
-                .Returns(IdentityResult.Success);
 
             await sut.UpdateAsync(identity.Id, update);
 
@@ -423,10 +405,7 @@ namespace Squidex.Domain.Users
         {
             var password = "password";
 
-            var identity = CreateIdentity(found: true);
-
-            A.CallTo(() => userManager.AddPasswordAsync(identity, password))
-                .Returns(IdentityResult.Success);
+            var identity = CreateIdentity(found: true);;
 
             await sut.SetPasswordAsync(identity.Id, password, null);
 
@@ -443,9 +422,6 @@ namespace Squidex.Domain.Users
 
             A.CallTo(() => userManager.HasPasswordAsync(identity))
                 .Returns(true);
-
-            A.CallTo(() => userManager.ChangePasswordAsync(identity, "old", password))
-                .Returns(IdentityResult.Success);
 
             await sut.SetPasswordAsync(identity.Id, password, "old");
 
@@ -469,9 +445,6 @@ namespace Squidex.Domain.Users
             var login = A.Fake<ExternalLoginInfo>();
 
             var identity = CreateIdentity(found: true);
-
-            A.CallTo(() => userManager.AddLoginAsync(identity, login))
-                .Returns(IdentityResult.Success);
 
             await sut.AddLoginAsync(identity.Id, login);
 
@@ -498,9 +471,6 @@ namespace Squidex.Domain.Users
 
             var identity = CreateIdentity(found: true);
 
-            A.CallTo(() => userManager.RemoveLoginAsync(identity, provider, providerKey))
-                .Returns(IdentityResult.Success);
-
             await sut.RemoveLoginAsync(identity.Id, provider, providerKey);
 
             A.CallTo(() => userManager.RemoveLoginAsync(identity, provider, providerKey))
@@ -520,9 +490,6 @@ namespace Squidex.Domain.Users
         {
             var identity = CreateIdentity(found: true);
 
-            A.CallTo(() => userManager.SetLockoutEndDateAsync(identity, A<DateTimeOffset>._))
-                .Returns(IdentityResult.Success);
-
             await sut.LockAsync(identity.Id);
 
             A.CallTo<Task<IdentityResult>>(() => userManager.SetLockoutEndDateAsync(identity, InFuture()))
@@ -541,9 +508,6 @@ namespace Squidex.Domain.Users
         public async Task Unlock_should_succeeed_if_found()
         {
             var identity = CreateIdentity(found: true);
-
-            A.CallTo(() => userManager.SetLockoutEndDateAsync(identity, null))
-                .Returns(IdentityResult.Success);
 
             await sut.UnlockAsync(identity.Id);
 
@@ -566,9 +530,6 @@ namespace Squidex.Domain.Users
         public async Task Delete_should_succeed_if_found()
         {
             var identity = CreateIdentity(found: true);
-
-            A.CallTo(() => userManager.DeleteAsync(identity))
-                .Returns(IdentityResult.Success);
 
             await sut.DeleteAsync(identity.Id);
 
@@ -617,18 +578,6 @@ namespace Squidex.Domain.Users
 
             A.CallTo(() => userFactory.Create(identity.Email))
                 .Returns(identity);
-
-            A.CallTo(() => userManager.CreateAsync(identity))
-                .Returns(IdentityResult.Success);
-
-            A.CallTo(() => userManager.AddClaimsAsync(identity, A<IEnumerable<Claim>>._))
-                .Returns(IdentityResult.Success);
-
-            A.CallTo(() => userManager.AddPasswordAsync(identity, values.Password))
-                .Returns(IdentityResult.Success);
-
-            A.CallTo(() => userManager.SetLockoutEndDateAsync(identity, A<DateTimeOffset>._))
-                .Returns(IdentityResult.Success);
         }
 
         private static IEnumerable<Claim> HasClaim(string claim)
