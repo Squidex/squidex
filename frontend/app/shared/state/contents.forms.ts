@@ -310,7 +310,7 @@ export class FieldValueForm extends AbstractContentForm<RootFieldDto, FormContro
             validators.push(remoteValidator);
         }
 
-        return new FormControl(value, { validators });
+        return new FormControl({ value, disabled: false }, { validators });
     }
 }
 
