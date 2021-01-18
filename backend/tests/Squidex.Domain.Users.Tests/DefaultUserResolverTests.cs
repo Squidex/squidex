@@ -48,7 +48,7 @@ namespace Squidex.Domain.Users
         [Fact]
         public async Task Should_create_user_and_return_true_when_created()
         {
-            var email = "email";
+            var email = "123@email.com";
 
             var user = A.Fake<IUser>();
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Users
         [Fact]
         public async Task Should_create_user_and_return_false_when_exception_thrown()
         {
-            var email = "email";
+            var email = "123@email.com";
 
             var user = A.Fake<IUser>();
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Users
         [Fact]
         public async Task Should_resolve_user_by_email()
         {
-            var id = "hello@squidex.io";
+            var id = "123@email.com";
 
             var user = A.Fake<IUser>();
 
