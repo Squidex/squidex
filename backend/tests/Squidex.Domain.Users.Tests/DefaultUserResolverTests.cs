@@ -112,7 +112,7 @@ namespace Squidex.Domain.Users
 
             var user = A.Fake<IUser>();
 
-            A.CallTo(() => userService.FindByEmailAsync(id))
+            A.CallTo(() => userService.FindByIdAsync(id))
                 .Returns(user);
 
             var result = await sut.FindByIdOrEmailAsync(id);

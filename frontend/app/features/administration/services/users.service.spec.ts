@@ -211,15 +211,11 @@ describe('UsersService', () => {
             }
         };
 
-        let user: UserDto;
-
-        userManagementService.deleteUser(resource).subscribe(result => {
-            user = result;
-        });
+        userManagementService.deleteUser(resource).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/user-management/123');
 
-        expect(req.request.method).toEqual('PUT');
+        expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({});
