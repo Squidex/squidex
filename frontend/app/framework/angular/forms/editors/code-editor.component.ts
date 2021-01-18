@@ -59,10 +59,14 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
 
     public writeValue(obj: string) {
         if (this.valueMode === 'Json') {
-            try {
-                this.value = JSON.stringify(obj, undefined, 4);
-            } catch (e) {
+            if (obj === null) {
                 this.value = '';
+            } else {
+                try {
+                    this.value = JSON.stringify(obj, undefined, 4);
+                } catch (e) {
+                    this.value = '';
+                }
             }
         } else if (Types.isString(obj)) {
             this.value = obj;
@@ -134,30 +138,30 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     private changeValue() {
-        let newValue = this.aceEditor.getValue();
-        let newValueOut = newValue;
+        let newValueText = this.aceEditor.getValue();
+        let newValueOut = newValueText;
 
         if (this.valueMode === 'Json') {
             const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
 
             if (isValid) {
                 try {
-                    newValueOut = JSON.parse(newValue);
+                    newValueOut = JSON.parse(newValueText);
                 } catch (e) {
                     newValueOut = null;
-                    newValue = '';
+                    newValueText = '';
                 }
             } else {
                 newValueOut = null;
-                newValue = '';
+                newValueText = '';
             }
         }
 
-        if (this.value !== newValue) {
+        if (this.value !== newValueText) {
             this.callChange(newValueOut);
         }
 
-        this.value = newValue;
+        this.value = newValueText;
     }
 
     private setMode() {
