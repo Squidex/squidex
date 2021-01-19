@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
-using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Web;
 
@@ -29,9 +28,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<UsageGate>()
                 .AsSelf();
-
-            services.AddSingletonAs<UserEvents>()
-                .AsOptional<IUserEvents>();
         }
     }
 }

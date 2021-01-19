@@ -32,4 +32,8 @@ export class UserComponent {
     public unlock() {
         this.usersState.unlock(this.user);
     }
+
+    public delete() {
+        this.usersState.delete(this.user);
+    }
 }

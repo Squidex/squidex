@@ -7,6 +7,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Search.Models;
 using Squidex.Domain.Apps.Entities.Search;
@@ -41,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Search
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/search/")]
-        [ProducesResponseType(typeof(SearchResultDto[]), 200)]
+        [ProducesResponseType(typeof(SearchResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSearch)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetSearchResults(string app, [FromQuery] string? query = null)

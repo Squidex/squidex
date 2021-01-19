@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
@@ -49,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             if (users.TryGetValue(ContributorId, out var user))
             {
-                ContributorName = user.DisplayName()!;
+                ContributorName = user.Claims.DisplayName()!;
                 ContributorEmail = user.Email;
             }
             else

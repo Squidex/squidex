@@ -7,6 +7,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
@@ -149,7 +150,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids)
@@ -178,7 +179,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] ContentsIdsQueryDto query)
@@ -209,7 +210,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string? ids = null, [FromQuery] string? q = null)
@@ -241,7 +242,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/query")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentsPost(string app, string name, [FromBody] QueryDto query)
@@ -273,7 +274,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/")]
-        [ProducesResponseType(typeof(ContentDto), 200)]
+        [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, DomainId id)
@@ -333,7 +334,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/references")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetReferences(string app, string name, DomainId id, [FromQuery] string? q = null)
@@ -364,7 +365,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/referencing")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         public async Task<IActionResult> GetReferencing(string app, string name, DomainId id, [FromQuery] string? q = null)
@@ -462,7 +463,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/import")]
-        [ProducesResponseType(typeof(BulkResultDto[]), 200)]
+        [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(5)]
         public async Task<IActionResult> PostContents(string app, string name, [FromBody] ImportContentsDto request)
@@ -493,7 +494,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/bulk")]
-        [ProducesResponseType(typeof(BulkResultDto[]), 200)]
+        [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContents)]
         [ApiCosts(5)]
         public async Task<IActionResult> BulkContents(string app, string name, [FromBody] BulkUpdateDto request)
@@ -526,7 +527,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/{id}/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpsert)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, DomainId id, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
@@ -555,7 +556,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, DomainId id, [FromBody] NamedContentData request)
@@ -584,7 +585,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPatch]
         [Route("content/{app}/{name}/{id}/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, DomainId id, [FromBody] NamedContentData request)
@@ -613,7 +614,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/status/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContentStatus(string app, string name, DomainId id, ChangeStatusDto request)
@@ -640,7 +641,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/{id}/draft/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsVersionCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> CreateDraft(string app, string name, DomainId id)
@@ -667,7 +668,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpDelete]
         [Route("content/{app}/{name}/{id}/draft/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteVersion(string app, string name, DomainId id)

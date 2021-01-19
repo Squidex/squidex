@@ -21,7 +21,7 @@ namespace Squidex.Config.Domain
                 config.GetSection("notifo"));
 
             services.AddSingletonAs<NotifoService>()
-                .AsSelf().As<IUserEventHandler>();
+                .AsSelf().As<IUserEvents>();
 
             services.AddSingletonAs<HistoryService>()
                 .As<IEventConsumer>().As<IHistoryService>();

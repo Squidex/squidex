@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Validation
             var min = Minimum;
             var max = Maximum;
 
-            return T.Get("annotations_Range", base.FormatErrorMessage(name), new { property, min, max });
+            return T.Get("annotations_Range", base.FormatErrorMessage(name), new { name = property, min, max });
         }
     }
 }

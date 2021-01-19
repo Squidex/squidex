@@ -43,6 +43,9 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddSingletonAs<DefaultKeyStore>()
                 .As<ISigningCredentialStore>().As<IValidationKeysStore>();
 
+            services.AddScopedAs<DefaultUserService>()
+                .As<IUserService>();
+
             services.AddSingletonAs<PwnedPasswordValidator>()
                 .As<IPasswordValidator<IdentityUser>>();
 
