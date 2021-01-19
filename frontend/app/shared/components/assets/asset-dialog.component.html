@@ -92,7 +92,7 @@
 
                             <div class="row no-gutters">
                                 <div class="col">
-                                    <input readonly class="form-control" name="url" id="url" value="{{asset | sqxAssetUrl:asset.fileVersion:false}}" #inputUrl>
+                                    <input readonly class="form-control" name="url" id="url" value="{{asset | sqxAssetUrl:asset.version:false}}" #inputUrl>
                                 </div>
                                 <div class="col-auto">
                                     <button type="button" class="btn btn-text" [sqxCopy]="inputUrl">
