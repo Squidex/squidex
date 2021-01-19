@@ -25,7 +25,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.History
 {
-    public class NotifoService : IUserEventHandler
+    public class NotifoService : IUserEvents
     {
         private static readonly Duration MaxAge = Duration.FromHours(12);
         private readonly NotifoOptions options;
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.History
             var userRequest = new UpsertUserDto
             {
                 Id = user.Id,
-                FullName = user.DisplayName(),
+                FullName = user.Claims.DisplayName(),
                 PreferredLanguage = "en",
                 PreferredTimezone = null,
                 Settings = settings,

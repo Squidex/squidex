@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Validation
 
             var other = T.Get($"common.{OtherProperty.ToCamelCase()}", OtherProperty);
 
-            return T.Get("annotations_Compare", base.FormatErrorMessage(name), new { property, other });
+            return T.Get("annotations_Compare", base.FormatErrorMessage(name), new { name = property, other });
         }
     }
 }

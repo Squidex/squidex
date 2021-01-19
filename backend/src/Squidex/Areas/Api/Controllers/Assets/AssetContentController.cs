@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
@@ -67,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpGet]
         [Route("assets/{app}/{idOrSlug}/{*more}")]
-        [ProducesResponseType(typeof(FileResult), 200)]
+        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
         [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]
@@ -94,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpGet]
         [Route("assets/{id}/")]
-        [ProducesResponseType(typeof(FileResult), 200)]
+        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
         [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]

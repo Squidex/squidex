@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities
 
             User = user;
 
-            Permissions = User.Permissions();
+            Permissions = User.Claims.Permissions();
 
             IsFrontendClient = User.IsInClient(DefaultClients.Frontend);
         }

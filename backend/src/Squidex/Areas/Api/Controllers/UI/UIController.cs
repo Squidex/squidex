@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI.Models;
@@ -42,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         /// </returns>
         [HttpGet]
         [Route("ui/settings/")]
-        [ProducesResponseType(typeof(UISettingsDto), 200)]
+        [ProducesResponseType(typeof(UISettingsDto), StatusCodes.Status200OK)]
         [ApiPermission]
         public IActionResult GetSettings()
         {
@@ -64,7 +65,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/ui/settings/")]
-        [ProducesResponseType(typeof(Dictionary<string, string>), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
         [ApiPermission]
         public async Task<IActionResult> GetSettings(string app)
         {
@@ -83,7 +84,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/ui/settings/me")]
-        [ProducesResponseType(typeof(Dictionary<string, string>), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
         [ApiPermission]
         public async Task<IActionResult> GetUserSettings(string app)
         {

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
@@ -42,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/roles/")]
-        [ProducesResponseType(typeof(RolesDto), 200)]
+        [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppRolesRead)]
         [ApiCosts(0)]
         public IActionResult GetRoles(string app)
@@ -67,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/roles/permissions")]
-        [ProducesResponseType(typeof(string[]), 200)]
+        [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppRolesRead)]
         [ApiCosts(0)]
         public IActionResult GetPermissions(string app)
@@ -119,7 +120,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/roles/{roleName}/")]
-        [ProducesResponseType(typeof(RolesDto), 200)]
+        [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppRolesUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutRole(string app, string roleName, [FromBody] UpdateRoleDto request)
@@ -143,7 +144,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/roles/{roleName}/")]
-        [ProducesResponseType(typeof(RolesDto), 200)]
+        [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppRolesDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteRole(string app, string roleName)

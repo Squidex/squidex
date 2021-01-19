@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpGet]
         [Route("apps/")]
-        [ProducesResponseType(typeof(AppDto[]), 200)]
+        [ProducesResponseType(typeof(AppDto[]), StatusCodes.Status200OK)]
         [ApiPermission]
         [ApiCosts(0)]
         public async Task<IActionResult> GetApps()
@@ -102,7 +102,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpGet]
         [Route("apps/{app}")]
-        [ProducesResponseType(typeof(AppDto), 200)]
+        [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
         [ApiPermission]
         [ApiCosts(0)]
         public IActionResult GetApp(string app)
@@ -158,7 +158,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/")]
-        [ProducesResponseType(typeof(AppDto), 200)]
+        [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUpdate)]
         [ApiCosts(0)]
         public async Task<IActionResult> UpdateApp(string app, [FromBody] UpdateAppDto request)
@@ -180,7 +180,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/image")]
-        [ProducesResponseType(typeof(AppDto), 200)]
+        [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUpdateImage)]
         [ApiCosts(0)]
         public async Task<IActionResult> UploadImage(string app, IFormFile file)
@@ -200,7 +200,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/image")]
-        [ProducesResponseType(typeof(FileResult), 200)]
+        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
         [AllowAnonymous]
         [ApiCosts(0)]
         public IActionResult GetImage(string app)
@@ -271,7 +271,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/image")]
-        [ProducesResponseType(typeof(AppDto), 200)]
+        [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUpdateImage)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteImage(string app)

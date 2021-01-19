@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Comments.Models;
@@ -47,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/comments/{commentsId}")]
-        [ProducesResponseType(typeof(CommentsDto), 200)]
+        [ProducesResponseType(typeof(CommentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppCommentsRead)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetComments(string app, DomainId commentsId, [FromQuery] long version = EtagVersion.Any)

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Plans.Models;
@@ -44,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/plans/")]
-        [ProducesResponseType(typeof(AppPlansDto), 200)]
+        [ProducesResponseType(typeof(AppPlansDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppPlansRead)]
         [ApiCosts(0)]
         public IActionResult GetPlans(string app)
@@ -73,7 +74,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/plan/")]
-        [ProducesResponseType(typeof(PlanChangedDto), 200)]
+        [ProducesResponseType(typeof(PlanChangedDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppPlansChange)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutPlan(string app, [FromBody] ChangePlanDto request)

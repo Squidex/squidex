@@ -12,11 +12,13 @@ namespace Squidex.Shared.Users
 {
     public interface IUser
     {
+        bool IsLocked { get; }
+
         string Id { get; }
 
         string Email { get; }
 
-        bool IsLocked { get; }
+        object Identity { get; }
 
         IReadOnlyList<Claim> Claims { get; }
     }

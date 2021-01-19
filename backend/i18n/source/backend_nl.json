@@ -126,7 +126,6 @@
   "contents.invalidGeolocation": "Ongeldig json-type, verwacht object voor lengte- / breedtegraad.",
   "contents.invalidGeolocationLatitude": "Breedtegraad moet tussen -90 en 90 zijn.",
   "contents.invalidGeolocationLongitude": "Lengtegraad moet tussen -180 en 180 liggen.",
-  "contents.invalidGeolocationMoreProperties": "Geolocatie kan alleen de eigenschap lengte- en breedtegraad hebben.",
   "contents.invalidNumber": "Ongeldig json-type, verwacht aantal.",
   "contents.invalidString": "Ongeldig json-type, verwachte string.",
   "contents.listReferences": "{count} referentie (s)",

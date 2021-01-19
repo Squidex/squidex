@@ -463,9 +463,6 @@
   <data name="contents.invalidGeolocationLongitude" xml:space="preserve">
     <value>Longitude must be between -180 and 180.</value>
   </data>
-  <data name="contents.invalidGeolocationMoreProperties" xml:space="preserve">
-    <value>Geolocation can only have latitude and longitude property.</value>
-  </data>
   <data name="contents.invalidNumber" xml:space="preserve">
     <value>Invalid json type, expected number.</value>
   </data>
@@ -930,6 +927,9 @@
   </data>
   <data name="users.consent.title" xml:space="preserve">
     <value>Consent</value>
+  </data>
+  <data name="users.deleteYourselfError" xml:space="preserve">
+    <value>You cannot delete yourself.</value>
   </data>
   <data name="users.error.headline" xml:space="preserve">
     <value>Operation failed</value>

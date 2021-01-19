@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
@@ -50,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/contributors/")]
-        [ProducesResponseType(typeof(ContributorsDto), 200)]
+        [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContributorsRead)]
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
@@ -99,7 +100,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/contributors/me/")]
-        [ProducesResponseType(typeof(ContributorsDto), 200)]
+        [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
         [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteMyself(string app)
@@ -122,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/contributors/{id}/")]
-        [ProducesResponseType(typeof(ContributorsDto), 200)]
+        [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContributorsRevoke)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContributor(string app, string id)

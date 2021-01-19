@@ -382,7 +382,7 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     }
 
     public visitJson(_: JsonFieldPropertiesDto): any {
-        return undefined;
+        return null;
     }
 
     public visitNumber(properties: NumberFieldPropertiesDto): any {
