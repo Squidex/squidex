@@ -255,7 +255,7 @@ module.exports = function (env) {
         config.entry = {
             'shims': './app/shims.ts',
             'style': './app/style.js',
-            'app': './app/app.ts'
+              'app': './app/app.ts'
         };
 
         if (isProduction) {
