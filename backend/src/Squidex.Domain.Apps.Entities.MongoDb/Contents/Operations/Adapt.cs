@@ -47,14 +47,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     var rootEdmName = result[1].UnescapeEdmField();
                     var rootField = schema.FieldsByName[rootEdmName];
 
-                    result[1] = rootField.Id.ToString();
+                    result[1] = rootField.Name;
 
                     if (rootField is IArrayField arrayField && result.Count > 3)
                     {
                         var nestedEdmName = result[3].UnescapeEdmField();
                         var nestedField = arrayField.FieldsByName[nestedEdmName];
 
-                        result[3] = nestedField.Id.ToString();
+                        result[3] = nestedField.Name;
                     }
                 }
 

@@ -14,9 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
     public static class Converters
     {
-        public static NamedContentData ToNamedContentData(this IDictionary<string, object> source, IComplexGraphType type)
+        public static ContentData ToContentData(this IDictionary<string, object> source, IComplexGraphType type)
         {
-            var result = new NamedContentData();
+            var result = new ContentData();
 
             foreach (var field in type.Fields)
             {

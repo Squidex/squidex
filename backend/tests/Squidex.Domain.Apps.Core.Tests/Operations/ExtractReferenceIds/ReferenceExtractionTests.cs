@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var id2 = DomainId.NewGuid();
 
             var input =
-                new NamedContentData()
+                new ContentData()
                     .AddField("assets",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Array(id1.ToString(), id2.ToString())));
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var id2 = DomainId.NewGuid();
 
             var input =
-                new NamedContentData()
+                new ContentData()
                     .AddField("assets",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Array(id1.ToString(), id2.ToString())));
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var id2 = DomainId.NewGuid();
 
             var source =
-                new NamedContentData()
+                new ContentData()
                     .AddField("references",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Array(id1, id2)))
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                                         .Add("nested", JsonValue.Array(id1, id2)))));
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("references",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Array(id2)))
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var converter = FieldConverters.ForValues(cleaner, cleanNested);
 
-            var actual = source.ConvertName2Name(schema, converter);
+            var actual = source.Convert(schema, converter);
 
             Assert.Equal(expected, actual);
         }

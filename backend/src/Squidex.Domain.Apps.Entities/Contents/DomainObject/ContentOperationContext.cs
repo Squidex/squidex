@@ -111,14 +111,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return contentWorkflow.GetInitialStatusAsync(schema);
         }
 
-        public Task GenerateDefaultValuesAsync(NamedContentData data)
+        public Task GenerateDefaultValuesAsync(ContentData data)
         {
             data.GenerateDefaultValues(schema.SchemaDef, Partition());
 
             return Task.CompletedTask;
         }
 
-        public async Task ValidateInputAsync(NamedContentData data, bool publish)
+        public async Task ValidateInputAsync(ContentData data, bool publish)
         {
             var validator =
                 new ContentValidator(Partition(),
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             CheckErrors(validator);
         }
 
-        public async Task ValidateInputPartialAsync(NamedContentData data)
+        public async Task ValidateInputPartialAsync(ContentData data)
         {
             var validator =
                 new ContentValidator(Partition(),
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             CheckErrors(validator);
         }
 
-        public async Task ValidateContentAsync(NamedContentData data)
+        public async Task ValidateContentAsync(ContentData data)
         {
             var validator =
                 new ContentValidator(Partition(),
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             CheckErrors(validator);
         }
 
-        public async Task ValidateContentAndInputAsync(NamedContentData data)
+        public async Task ValidateContentAndInputAsync(ContentData data)
         {
             var validator =
                 new ContentValidator(Partition(),
@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             CheckErrors(validator);
         }
 
-        public Task ValidateOnPublishAsync(NamedContentData data)
+        public Task ValidateOnPublishAsync(ContentData data)
         {
             if (!schema.SchemaDef.Properties.ValidateOnPublish)
             {
@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return !string.IsNullOrWhiteSpace(GetScript(script));
         }
 
-        public async Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptVars context)
+        public async Task<ContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptVars context)
         {
             Enrich(context);
 

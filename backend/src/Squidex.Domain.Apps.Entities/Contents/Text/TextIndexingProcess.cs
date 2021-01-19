@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
             }
 
-            private void Create(ContentEvent @event, NamedContentData data)
+            private void Create(ContentEvent @event, ContentData data)
             {
                 var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
 
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
             }
 
-            private void Update(ContentEvent @event, NamedContentData data)
+            private void Update(ContentEvent @event, ContentData data)
             {
                 var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
 

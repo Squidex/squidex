@@ -6,14 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ExtractReferenceIds;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
@@ -22,8 +18,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     [BsonIgnoreExtraElements]
     public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<DomainId>
     {
-        private NamedContentData data;
-
         [BsonId]
         [BsonElement("_id")]
         public DomainId DocumentId { get; set; }
@@ -63,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonIgnoreIfNull]
         [BsonElement("do")]
         [BsonJson]
-        public IdContentData DataByIds { get; set; }
+        public ContentData Data { get; set; }
 
         [BsonIgnoreIfNull]
         [BsonElement("sa")]
@@ -97,27 +91,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonElement("mb")]
         public RefToken LastModifiedBy { get; set; }
 
-        [BsonIgnore]
-        public NamedContentData Data
-        {
-            get { return data; }
-        }
-
         public DomainId UniqueId
         {
             get { return DocumentId; }
-        }
-
-        public void LoadData(NamedContentData data, Schema schema, DataConverter converter)
-        {
-            ReferencedIds = data.GetReferencedIds(schema).ToHashSet();
-
-            DataByIds = converter.ToMongoModel(data, schema);
-        }
-
-        public void ParseData(Schema schema, DataConverter converter)
-        {
-            data = converter.FromMongoModel(DataByIds, schema);
         }
     }
 }

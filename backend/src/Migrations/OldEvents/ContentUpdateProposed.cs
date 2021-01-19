@@ -18,7 +18,7 @@ namespace Migrations.OldEvents
     [Obsolete("New Event introduced")]
     public sealed class ContentUpdateProposed : ContentEvent, IMigrated<IEvent>
     {
-        public NamedContentData Data { get; set; }
+        public ContentData Data { get; set; }
 
         public IEvent Migrate()
         {

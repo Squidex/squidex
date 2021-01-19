@@ -71,14 +71,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public async Task<NamedContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default)
+        public async Task<ContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default)
         {
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(TimeoutExecution))
             {
-                var tcs = new TaskCompletionSource<NamedContentData>();
+                var tcs = new TaskCompletionSource<ContentData>();
 
                 using (cts.Token.Register(() => tcs.TrySetCanceled()))
                 {

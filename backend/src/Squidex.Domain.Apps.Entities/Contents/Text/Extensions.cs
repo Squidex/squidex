@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private static readonly ObjectPool<MemoryStream> MemoryStreamPool =
             new DefaultObjectPool<MemoryStream>(new DefaultPooledObjectPolicy<MemoryStream>());
 
-        public static Dictionary<string, GeoJSONObject>? ToGeo(this NamedContentData data, IJsonSerializer jsonSerializer)
+        public static Dictionary<string, GeoJSONObject>? ToGeo(this ContentData data, IJsonSerializer jsonSerializer)
         {
             Dictionary<string, GeoJSONObject>? result = null;
 
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return null;
         }
 
-        public static Dictionary<string, string>? ToTexts(this NamedContentData data)
+        public static Dictionary<string, string>? ToTexts(this ContentData data)
         {
             Dictionary<string, string>? result = null;
 

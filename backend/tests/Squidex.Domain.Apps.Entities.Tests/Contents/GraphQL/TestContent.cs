@@ -68,12 +68,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             }";
 
-        public static IEnrichedContentEntity Create(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId id, DomainId refId, DomainId assetId, NamedContentData? data = null)
+        public static IEnrichedContentEntity Create(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId id, DomainId refId, DomainId assetId, ContentData? data = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
             data ??=
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
                             .AddValue("de", "value"))
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var now = SystemClock.Instance.GetCurrentInstant();
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField(field,
                         new ContentFieldData()
                             .AddValue("iv", value));

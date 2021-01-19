@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             var fieldName = field.Name;
 
-            return new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>?>(c =>
+            return new FuncFieldResolver<ContentData, IReadOnlyDictionary<string, IJsonValue>?>(c =>
             {
                 return c.Source?.GetOrDefault(fieldName);
             });

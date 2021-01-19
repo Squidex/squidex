@@ -264,7 +264,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
         }
 
-        private async Task<object> UpdateAsync(ContentUpdateCommand command, Func<NamedContentData, NamedContentData> newDataFunc, bool partial)
+        private async Task<object> UpdateAsync(ContentUpdateCommand command, Func<ContentData, ContentData> newDataFunc, bool partial)
         {
             var currentData = Snapshot.Data;
 
@@ -337,7 +337,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Raise(command, new ContentDraftDeleted());
         }
 
-        public void Update(ContentCommand command, NamedContentData data)
+        public void Update(ContentCommand command, ContentData data)
         {
             Raise(command, new ContentUpdated { Data = data });
         }

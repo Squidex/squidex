@@ -61,8 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var contentRepository =
                 new MongoContentRepository(
                     mongoDatabase,
-                    CreateAppProvider(),
-                    TestUtils.DefaultSerializer);
+                    CreateAppProvider());
 
             Task.Run(async () =>
             {
@@ -103,11 +102,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                                 for (var i = 0; i < numValues; i++)
                                 {
                                     var data =
-                                        new IdContentData()
-                                            .AddField(1,
+                                        new ContentData()
+                                            .AddField("field1",
                                                 new ContentFieldData()
                                                     .AddJsonValue(JsonValue.Create(i)))
-                                            .AddField(2,
+                                            .AddField("field2",
                                                 new ContentFieldData()
                                                     .AddJsonValue(JsonValue.Create(Lorem.Paragraph(200, 20))));
 
@@ -115,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                                     {
                                         DocumentId = DomainId.NewGuid(),
                                         AppId = appId,
-                                        DataByIds = data,
+                                        Data = data,
                                         IndexedAppId = appId.Id,
                                         IndexedSchemaId = schemaId.Id,
                                         IsDeleted = false,

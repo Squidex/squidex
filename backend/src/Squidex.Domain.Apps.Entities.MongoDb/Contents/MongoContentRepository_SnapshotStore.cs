@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
@@ -51,15 +50,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 if (contentEntity != null)
                 {
-                    var schema = await GetSchemaAsync(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
-
-                    if (schema == null)
-                    {
-                        return (null!, EtagVersion.NotFound);
-                    }
-
-                    contentEntity.ParseData(schema.SchemaDef, converter);
-
                     return (SimpleMapper.Map(contentEntity, new ContentDomainObject.State()), contentEntity.Version);
                 }
 
@@ -76,25 +66,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     return;
                 }
 
-                var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
-
-                if (schema == null)
-                {
-                    return;
-                }
-
-                var saveDraft = UpsertDraftContentAsync(value, oldVersion, newVersion, schema);
-                var savePublic = UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, schema);
-
-                await Task.WhenAll(saveDraft, savePublic);
+                await Task.WhenAll(
+                    UpsertDraftContentAsync(value, oldVersion, newVersion),
+                    UpsertOrDeletePublishedAsync(value, oldVersion, newVersion));
             }
         }
 
-        private async Task UpsertOrDeletePublishedAsync(ContentDomainObject.State value, long oldVersion, long newVersion, ISchemaEntity schema)
+        private async Task UpsertOrDeletePublishedAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
             if (value.Status == Status.Published && !value.IsDeleted)
             {
-                await UpsertPublishedContentAsync(value, oldVersion, newVersion, schema);
+                await UpsertPublishedContentAsync(value, oldVersion, newVersion);
             }
             else
             {
@@ -109,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionPublished.RemoveAsync(documentId);
         }
 
-        private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion, ISchemaEntity schema)
+        private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity
             {
@@ -123,12 +105,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             content.ScheduleJob = value.ScheduleJob;
             content.NewStatus = value.NewStatus;
 
-            content.LoadData(value.Data, schema.SchemaDef, converter);
-
             await collectionAll.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
-        private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion, ISchemaEntity schema)
+        private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity
             {
@@ -142,16 +122,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             content.ScheduleJob = null;
             content.NewStatus = null;
 
-            content.LoadData(value.CurrentVersion.Data, schema.SchemaDef, converter);
-
             await collectionPublished.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
-        }
-
-        private async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId schemaId)
-        {
-            var schema = await appProvider.GetSchemaAsync(appId, schemaId, true);
-
-            return schema;
         }
     }
 }

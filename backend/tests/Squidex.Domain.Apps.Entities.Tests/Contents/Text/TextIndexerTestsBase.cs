@@ -338,17 +338,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Op(id, new ContentDraftCreated { MigratedData = data });
         }
 
-        private static NamedContentData TextData(string language, string text)
+        private static ContentData TextData(string language, string text)
         {
-            return new NamedContentData()
+            return new ContentData()
                 .AddField("text",
                     new ContentFieldData()
                         .AddValue(language, text));
         }
 
-        private static NamedContentData GeoData(string field, double latitude, double longitude)
+        private static ContentData GeoData(string field, double latitude, double longitude)
         {
-            return new NamedContentData()
+            return new ContentData()
                 .AddField(field,
                     new ContentFieldData()
                         .AddValue("iv", JsonValue.Object().Add("latitude", latitude).Add("longitude", longitude)));

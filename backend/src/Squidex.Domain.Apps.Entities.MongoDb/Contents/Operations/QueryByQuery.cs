@@ -36,8 +36,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public MongoContentEntity[] Joined { get; set; }
         }
 
-        public QueryByQuery(DataConverter dataConverter, IAppProvider appProvider)
-            : base(dataConverter)
+        public QueryByQuery(IAppProvider appProvider)
         {
             this.appProvider = appProvider;
         }
@@ -112,13 +111,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     {
                         contentTotal = await Collection.Find(filter).CountDocumentsAsync();
                     }
-
-                    var contentSchemas = schemas.ToDictionary(x => x.Id);
-
-                    foreach (var entity in contentEntities)
-                    {
-                        entity.ParseData(contentSchemas[entity.IndexedSchemaId].SchemaDef, DataConverter);
-                    }
                 }
 
                 return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
@@ -153,11 +145,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
                     {
                         contentTotal = await Collection.Find(filter).CountDocumentsAsync();
-                    }
-
-                    foreach (var entity in contentEntities)
-                    {
-                        entity.ParseData(schema.SchemaDef, DataConverter);
                     }
                 }
 

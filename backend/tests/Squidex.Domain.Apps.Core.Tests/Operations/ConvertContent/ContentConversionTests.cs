@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
@@ -36,53 +35,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_convert_name_to_id()
-        {
-            var input =
-                new NamedContentData()
-                    .AddField("field1",
-                        new ContentFieldData()
-                            .AddValue("en", "EN"))
-                    .AddField("field2",
-                        new ContentFieldData()
-                            .AddValue("iv", 1))
-                    .AddField("array",
-                        new ContentFieldData()
-                            .AddValue("iv",
-                                JsonValue.Array(
-                                    JsonValue.Object()
-                                        .Add("nested1", 100)
-                                        .Add("nested2", 200)
-                                        .Add("invalid", 300))))
-                    .AddField("invalid",
-                        new ContentFieldData()
-                            .AddValue("iv", 2));
-
-            var hideRoot = FieldConverters.ExcludeHidden;
-            var hideNested = FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeHidden));
-
-            var actual = input.ConvertName2IdCloned(schema, hideRoot, hideNested);
-
-            var expected =
-                new IdContentData()
-                    .AddField(1,
-                        new ContentFieldData()
-                            .AddValue("en", "EN"))
-                    .AddField(7,
-                        new ContentFieldData()
-                            .AddValue("iv",
-                                JsonValue.Array(
-                                    JsonValue.Object()
-                                        .Add("72", 200))));
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
         public void Should_convert_name_to_name()
         {
             var input =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("en", "EN"))
@@ -93,56 +49,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
-            var actual = input.ConvertName2Name(schema, (data, field) => field.Name == "field2" ? null : data);
+            var actual = input.Convert(schema, (data, field) => field.Name == "field2" ? null : data);
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("en", "EN"));
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_convert_id_to_name()
-        {
-            var input =
-                new IdContentData()
-                    .AddField(1,
-                        new ContentFieldData()
-                            .AddValue("en", "EN"))
-                    .AddField(2,
-                        new ContentFieldData()
-                            .AddValue("iv", 1))
-                    .AddField(7,
-                        new ContentFieldData()
-                            .AddValue("iv",
-                                JsonValue.Array(
-                                    JsonValue.Object()
-                                        .Add("71", 100)
-                                        .Add("72", 200)
-                                        .Add("799", 300))))
-                    .AddField(99,
-                        new ContentFieldData()
-                            .AddValue("iv", 2));
-
-            var hideRoot = FieldConverters.ExcludeHidden;
-            var hideNested = FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeHidden));
-
-            var actual = input.ConvertId2Name(schema, hideRoot, hideNested);
-
-            var expected =
-                new NamedContentData()
-                    .AddField("field1",
-                        new ContentFieldData()
-                            .AddValue("en", "EN"))
-                    .AddField("array",
-                        new ContentFieldData()
-                            .AddValue("iv",
-                                JsonValue.Array(
-                                    JsonValue.Object()
-                                        .Add("nested2", 200))));
 
             Assert.Equal(expected, actual);
         }

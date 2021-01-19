@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public BulkUpdateType Type { get; set; }
 
-        public NamedContentData? Data { get; set; }
+        public ContentData? Data { get; set; }
 
         public string? Schema { get; set; }
 

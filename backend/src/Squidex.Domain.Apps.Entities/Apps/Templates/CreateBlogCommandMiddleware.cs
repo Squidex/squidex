@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 SchemaId = postsId,
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("title",
                             new ContentFieldData()
                                 .AddValue("My first post with Squidex"))
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 SchemaId = pagesId,
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("title",
                             new ContentFieldData()
                                 .AddValue("About Me"))

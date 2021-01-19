@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
             Assert.Equal(
-                new NamedContentData()
+                new ContentData()
                     .AddField("asset1",
                         new ContentFieldData()
                             .AddValue("iv", JsonValue.Array($"url/to/{img1.Id}", img1.FileName)))
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 contents[0].ReferenceData);
 
             Assert.Equal(
-                new NamedContentData()
+                new ContentData()
                     .AddField("asset1",
                         new ContentFieldData()
                             .AddValue("iv", JsonValue.Array(doc1.FileName)))
@@ -221,7 +221,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return new ContentEntity
             {
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("asset1",
                             new ContentFieldData()
                                 .AddJsonValue("iv", JsonValue.Array(assets1.Select(x => x.ToString()).ToArray())))

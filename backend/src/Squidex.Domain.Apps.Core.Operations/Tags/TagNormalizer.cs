@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Tags
 {
     public static class TagNormalizer
     {
-        public static async Task NormalizeAsync(this ITagService tagService, DomainId appId, DomainId schemaId, Schema schema, NamedContentData newData, NamedContentData? oldData)
+        public static async Task NormalizeAsync(this ITagService tagService, DomainId appId, DomainId schemaId, Schema schema, ContentData newData, ContentData? oldData)
         {
             Guard.NotNull(tagService, nameof(tagService));
             Guard.NotNull(schema, nameof(schema));
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Tags
             }
         }
 
-        public static async Task DenormalizeAsync(this ITagService tagService, DomainId appId, DomainId schemaId, Schema schema, params NamedContentData[] datas)
+        public static async Task DenormalizeAsync(this ITagService tagService, DomainId appId, DomainId schemaId, Schema schema, params ContentData[] datas)
         {
             Guard.NotNull(tagService, nameof(tagService));
             Guard.NotNull(schema, nameof(schema));
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Tags
             }
         }
 
-        private static void GetValues(Schema schema, HashSet<string> values, List<JsonArray> arrays, params NamedContentData[] datas)
+        private static void GetValues(Schema schema, HashSet<string> values, List<JsonArray> arrays, params ContentData[] datas)
         {
             foreach (var field in schema.Fields)
             {

@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The reference data for the frontend UI.
         /// </summary>
-        public NamedContentData? ReferenceData { get; set; }
+        public ContentData? ReferenceData { get; set; }
 
         /// <summary>
         /// The date and time when the content item has been created.

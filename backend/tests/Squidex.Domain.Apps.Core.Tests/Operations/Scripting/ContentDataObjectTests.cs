@@ -19,10 +19,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_update_data_when_setting_field()
         {
-            var original = new NamedContentData();
+            var original = new ContentData();
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
@@ -35,10 +35,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_update_data_when_setting_lazy_field()
         {
-            var original = new NamedContentData();
+            var original = new ContentData();
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
@@ -51,10 +51,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_update_data_defining_property_for_content()
         {
-            var original = new NamedContentData();
+            var original = new ContentData();
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_throw_exception_when_assigning_non_object_as_field()
         {
-            var original = new NamedContentData();
+            var original = new ContentData();
 
             Assert.Throws<JavaScriptException>(() => ExecuteScript(original, @"data.number = 1"));
         }
@@ -76,12 +76,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_update_data_when_deleting_field()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
 
-            var expected = new NamedContentData();
+            var expected = new ContentData();
 
             var result = ExecuteScript(original, @"delete data.number");
 
@@ -92,13 +92,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_update_data_when_setting_field_value_with_string()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("string",
                         new ContentFieldData()
                             .AddValue("iv", "1"));
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("string",
                         new ContentFieldData()
                             .AddValue("iv", "1new"));
@@ -112,13 +112,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_update_data_when_setting_field_value_with_number()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddValue("iv", 3.0));
@@ -132,13 +132,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_update_data_when_setting_field_value_with_boolean()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("boolean",
                         new ContentFieldData()
                             .AddValue("iv", false));
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("boolean",
                         new ContentFieldData()
                             .AddValue("iv", true));
@@ -152,13 +152,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_update_data_when_setting_field_value_with_array()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Array(1.0, 2.0)));
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Array(1.0, 4.0, 5.0)));
@@ -172,13 +172,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_update_data_when_setting_field_value_with_object()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Object().Add("lat", 1.0)));
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Object().Add("lat", 1.0).Add("lon", 4.0)));
@@ -192,12 +192,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_throw_when_defining_property_for_field()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData());
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("number",
                         new ContentFieldData()
                             .AddValue("iv", 1.0));
@@ -211,13 +211,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_update_data_when_deleting_field_value()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("string",
                         new ContentFieldData()
                             .AddValue("iv", "hello"));
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("string",
                         new ContentFieldData());
 
@@ -230,7 +230,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_be_able_to_iterate_over_fields()
         {
             var content =
-                new NamedContentData()
+                new ContentData()
                     .AddField("f1",
                         new ContentFieldData()
                             .AddValue("v11", "1")
@@ -262,7 +262,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_throw_exceptions_when_changing_objects()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("obj",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Object().Add("readonly", 1)));
@@ -275,7 +275,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public void Should_not_throw_exceptions_when_changing_arrays()
         {
             var original =
-                new NamedContentData()
+                new ContentData()
                     .AddField("obj",
                         new ContentFieldData()
                             .AddJsonValue(JsonValue.Array()));
@@ -286,10 +286,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_null_propagate_unknown_fields()
         {
-            ExecuteScript(new NamedContentData(), @"data.string.iv = 'hello'");
+            ExecuteScript(new ContentData(), @"data.string.iv = 'hello'");
         }
 
-        private static NamedContentData ExecuteScript(NamedContentData original, string script)
+        private static ContentData ExecuteScript(ContentData original, string script)
         {
             var engine = new Engine(o => o.Strict());
 

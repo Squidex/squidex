@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The data of the content when type is set to 'Upsert', 'Create', 'Update' or 'Patch.
         /// </summary>
-        public NamedContentData? Data { get; set; }
+        public ContentData? Data { get; set; }
 
         /// <summary>
         /// The new status when the type is set to 'ChangeStatus'.

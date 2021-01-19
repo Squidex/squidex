@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 var segment = path[i];
 
-                if (current is NamedContentData data)
+                if (current is ContentData data)
                 {
                     if (!data.TryGetValue(segment, out var temp) || temp == null)
                     {

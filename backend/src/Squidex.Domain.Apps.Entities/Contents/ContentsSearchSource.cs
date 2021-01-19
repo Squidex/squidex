@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var sb = new StringBuilder();
 
-            IJsonValue? GetValue(NamedContentData? data, RootField field)
+            IJsonValue? GetValue(ContentData? data, RootField field)
             {
                 if (data != null && data.TryGetValue(field.Name, out var fieldValue) && fieldValue != null)
                 {

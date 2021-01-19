@@ -57,15 +57,15 @@ namespace Squidex.Domain.Apps.Core.Scripting
             set => SetValue(value);
         }
 
-        public NamedContentData? Data
+        public ContentData? Data
         {
-            get => GetValue<NamedContentData?>();
+            get => GetValue<ContentData?>();
             set => SetValue(value);
         }
 
-        public NamedContentData? DataOld
+        public ContentData? DataOld
         {
-            get => GetValue<NamedContentData?>();
+            get => GetValue<ContentData?>();
             set
             {
                 SetValue(value, "oldData");
