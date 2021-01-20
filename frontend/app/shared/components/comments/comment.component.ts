@@ -85,7 +85,7 @@ export class CommentComponent extends StatefulComponent<State> implements OnChan
     }
 
     public updateWhenEnter(event: KeyboardEvent) {
-        if (event.keyCode === Keys.ENTER && !event.altKey && !event.shiftKey && !event.defaultPrevented) {
+        if (Keys.isEnter(event) && !event.altKey && !event.shiftKey && !event.defaultPrevented) {
             event.preventDefault();
             event.stopImmediatePropagation();
             event.stopPropagation();
