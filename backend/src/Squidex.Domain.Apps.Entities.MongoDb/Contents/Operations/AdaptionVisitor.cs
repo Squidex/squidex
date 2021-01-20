@@ -20,14 +20,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public struct Args
         {
-            public readonly Func<PropertyPath, PropertyPath> PathConverter;
-
             public readonly DomainId AppId;
 
-            public Args(Func<PropertyPath, PropertyPath> pathConverter, DomainId appId)
+            public Args(DomainId appId)
             {
-                PathConverter = pathConverter;
-
                 AppId = appId;
             }
         }
@@ -36,9 +32,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
         }
 
-        public static FilterNode<ClrValue>? Adapt(FilterNode<ClrValue> filter, Func<PropertyPath, PropertyPath> pathConverter, DomainId appId)
+        public static FilterNode<ClrValue>? AdaptFilter(FilterNode<ClrValue> filter, DomainId appId)
         {
-            var args = new Args(pathConverter, appId);
+            var args = new Args(appId);
 
             return filter.Accept(Instance, args);
         }
@@ -74,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
             else
             {
-                path = args.PathConverter(path);
+                path = Adapt.MapPath(path);
 
                 if (clrValue is List<Guid> guidList)
                 {

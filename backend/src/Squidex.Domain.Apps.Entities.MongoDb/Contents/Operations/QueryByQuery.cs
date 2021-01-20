@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     return new List<(DomainId SchemaId, DomainId Id, Status Status)>();
                 }
 
-                var filter = BuildFilter(appId, schemaId, filterNode.AdjustToModel(appId, schema.SchemaDef));
+                var filter = BuildFilter(appId, schemaId, filterNode.AdjustToModel(appId));
 
                 var contentItems = await Collection.FindStatusAsync(filter);
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                var query = q.Query.AdjustToModel(app.Id, null);
+                var query = q.Query.AdjustToModel(app.Id);
 
                 var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference);
 
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                var query = q.Query.AdjustToModel(app.Id, schema.SchemaDef);
+                var query = q.Query.AdjustToModel(app.Id);
 
                 var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), query, q.Reference);
 

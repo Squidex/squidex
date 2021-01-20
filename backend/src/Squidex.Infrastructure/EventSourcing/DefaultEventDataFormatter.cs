@@ -47,19 +47,19 @@ namespace Squidex.Infrastructure.EventSourcing
             var eventData = storedEvent.Data;
 
             var payloadType = typeNameRegistry.GetType(eventData.Type);
-            var payloadObj = serializer.Deserialize<IEvent>(eventData.Payload, payloadType);
+            var payloadValue = serializer.Deserialize<IEvent>(eventData.Payload, payloadType);
 
-            if (payloadObj is IMigrated<IEvent> migratedEvent)
+            if (payloadValue is IMigrated<IEvent> migratedEvent)
             {
-                payloadObj = migratedEvent.Migrate();
+                payloadValue = migratedEvent.Migrate();
 
-                if (ReferenceEquals(migratedEvent, payloadObj))
+                if (ReferenceEquals(migratedEvent, payloadValue))
                 {
                     Debug.WriteLine("Migration should return new event.");
                 }
             }
 
-            var envelope = new Envelope<IEvent>(payloadObj, eventData.Headers);
+            var envelope = new Envelope<IEvent>(payloadValue, eventData.Headers);
 
             envelope.SetEventPosition(storedEvent.EventPosition);
             envelope.SetEventStreamNumber(storedEvent.EventStreamNumber);

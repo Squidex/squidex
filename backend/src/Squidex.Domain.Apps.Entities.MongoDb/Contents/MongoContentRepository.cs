@@ -38,11 +38,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             collectionAll =
                 new MongoContentCollection(
-                    "States_Contents_All2", database, appProvider);
+                    "States_Contents_All3", database, appProvider);
 
             collectionPublished =
                 new MongoContentCollection(
-                    "States_Contents_Published2", database, appProvider);
+                    "States_Contents_Published3", database, appProvider);
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)
