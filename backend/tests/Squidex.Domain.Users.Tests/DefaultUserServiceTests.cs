@@ -405,7 +405,7 @@ namespace Squidex.Domain.Users
         {
             var password = "password";
 
-            var identity = CreateIdentity(found: true);;
+            var identity = CreateIdentity(found: true);
 
             await sut.SetPasswordAsync(identity.Id, password, null);
 
