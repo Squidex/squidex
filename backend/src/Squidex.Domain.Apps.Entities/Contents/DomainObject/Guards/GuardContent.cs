@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using NodaTime;
@@ -15,6 +16,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
@@ -154,6 +156,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 {
                     throw new DomainException(T.Get("contents.referenced"));
                 }
+            }
+
+            var appName = schema.AppId.Name;
+            var schemaId = schema.Id.ToString();
+            var permissionDeleteOwn = Permissions.ForApp(Permissions.AppContentsDeleteOwn, appName, schemaId);
+            var refTokenVal = command.User.Claims.Where(x => x.Type == "sub").Select(x => x.Value).FirstOrDefault();
+
+            bool allowPermission = command.User.Claims.Where(x => x.Type == "urn:squidex:permissions" && x.Value == "squidex.apps.testapp.contents.*.delete.own").Any();
+
+            if (allowPermission)
+            {
+                if (content.CreatedBy.Identifier != refTokenVal)
+                    throw new DomainException("You don't have permission to delete this content");
             }
         }
 

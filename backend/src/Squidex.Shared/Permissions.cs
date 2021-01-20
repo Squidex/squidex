@@ -146,6 +146,7 @@ namespace Squidex.Shared
         public const string AppContentsVersionCreate = "squidex.apps.{app}.contents.{name}.version.create";
         public const string AppContentsVersionDelete = "squidex.apps.{app}.contents.{name}.version.delete";
         public const string AppContentsDelete = "squidex.apps.{app}.contents.{name}.delete";
+        public const string AppContentsDeleteOwn = "squidex.apps.{app}.contents.{name}.delete.own";
 
         static Permissions()
         {
