@@ -274,13 +274,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        const key = event.keyCode;
-
-        if (key === Keys.COMMA) {
-            if (this.selectValue(this.addInput.value)) {
-                return false;
-            }
-        } else if (key === Keys.DELETE) {
+        if (Keys.isComma(event)) {
+            return !this.selectValue(this.addInput.value);
+        } else if (Keys.isDelete(event)) {
             const value = <string>this.addInput.value;
 
             if (!value || value.length === 0) {
@@ -288,13 +284,16 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
                 return false;
             }
-        } else if (key === Keys.UP) {
+        } else if (Keys.isEscape(event) && this.suggestionsModal.isOpen) {
+            this.suggestionsModal.hide();
+            return false;
+        }  else if (Keys.isUp(event)) {
             this.selectPrevIndex();
             return false;
-        } else if (key === Keys.DOWN) {
+        } else if (Keys.isDown(event)) {
             this.selectNextIndex();
             return false;
-        } else if (key === Keys.ENTER) {
+        } else if (Keys.isEnter(event)) {
             if (this.snapshot.suggestedIndex >= 0) {
                 if (this.selectValue(this.snapshot.suggestedItems[this.snapshot.suggestedIndex])) {
                     return false;

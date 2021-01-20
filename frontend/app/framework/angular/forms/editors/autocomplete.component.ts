@@ -135,22 +135,17 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        switch (event.keyCode) {
-            case Keys.UP:
-                this.up();
-                return false;
-            case Keys.DOWN:
-                this.down();
-                return false;
-            case Keys.ESCAPE:
-                this.resetForm();
-                this.reset();
-                return false;
-            case Keys.ENTER:
-                if (this.snapshot.suggestedItems.length > 0 && this.selectItem()) {
-                    return false;
-                }
-                break;
+        if (Keys.isEscape(event)) {
+            this.resetForm();
+            this.reset();
+        } else if (Keys.isUp(event)) {
+            this.selectPrevIndex();
+            return false;
+        } else if (Keys.isDown(event)) {
+            this.selectNextIndex();
+            return false;
+        } else if (Keys.isEnter(event)) {
+            return !(this.snapshot.suggestedItems.length > 0 && this.selectItem());
         }
 
         return true;
@@ -250,11 +245,11 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         this.next({ suggestedIndex });
     }
 
-    private up() {
+    private selectPrevIndex() {
         this.selectIndex(this.snapshot.suggestedIndex - 1);
     }
 
-    private down() {
+    private selectNextIndex() {
         this.selectIndex(this.snapshot.suggestedIndex + 1);
     }
 
