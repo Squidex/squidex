@@ -14,9 +14,11 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
@@ -158,17 +160,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 }
             }
 
-            var appName = schema.AppId.Name;
-            var schemaId = schema.Id.ToString();
-            var permissionDeleteOwn = Permissions.ForApp(Permissions.AppContentsDeleteOwn, appName, schemaId);
-            var refTokenVal = command.User.Claims.Where(x => x.Type == "sub").Select(x => x.Value).FirstOrDefault();
-
-            bool allowPermission = command.User.Claims.Where(x => x.Type == "urn:squidex:permissions" && x.Value == "squidex.apps.testapp.contents.*.delete.own").Any();
-
-            if (allowPermission)
+            if (!HasPermission(content, command, Permissions.AppContentsDelete) && !content.CreatedBy.Equals(command.Actor))
             {
-                if (content.CreatedBy.Identifier != refTokenVal)
-                    throw new DomainException("You don't have permission to delete this content");
+                throw new DomainForbiddenException(T.Get("You don't have permission to delete this content"));
             }
         }
 
@@ -188,6 +182,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             {
                 throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
             }
+        }
+
+        private static bool HasPermission(IContentEntity content, ContentCommand command, string permission)
+        {
+            var permissionDeleteOwn = Permissions.ForApp(permission, content.AppId.Name, content.SchemaId.Name);
+            var result = command.User.Permissions().Allows(permissionDeleteOwn);
+
+            return result;
         }
     }
 }
