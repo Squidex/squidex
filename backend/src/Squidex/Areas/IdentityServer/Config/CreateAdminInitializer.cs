@@ -55,7 +55,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     {
                         try
                         {
-                            var user = await userService.FindByIdAsync(adminEmail);
+                            var user = await userService.FindByEmailAsync(adminEmail);
 
                             if (user != null)
                             {
@@ -113,7 +113,7 @@ namespace Squidex.Areas.IdentityServer.Config
 
         private static async Task<bool> IsEmptyAsync(IUserService userService)
         {
-            var users = await userService.QueryAsync(take: 0);
+            var users = await userService.QueryAsync(take: 1);
 
             return users.Total == 0;
         }

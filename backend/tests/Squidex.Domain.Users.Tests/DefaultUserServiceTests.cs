@@ -175,7 +175,7 @@ namespace Squidex.Domain.Users
                 Email = identity.Email
             };
 
-            SetupCreation(identity, values, 1);
+            SetupCreation(identity, 1);
 
             await sut.CreateAsync(values.Email, values);
 
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Users
                 Consent = true,
             };
 
-            SetupCreation(identity, values, 1);
+            SetupCreation(identity, 1);
 
             await sut.CreateAsync(identity.Email, values);
 
@@ -223,7 +223,7 @@ namespace Squidex.Domain.Users
                 Consent = true,
             };
 
-            SetupCreation(identity, values, 0);
+            SetupCreation(identity, 0);
 
             await sut.CreateAsync(identity.Email, values);
 
@@ -241,7 +241,7 @@ namespace Squidex.Domain.Users
                 Consent = true,
             };
 
-            SetupCreation(identity, values, 0);
+            SetupCreation(identity, 0);
 
             await sut.CreateAsync(identity.Email, values, true);
 
@@ -259,7 +259,7 @@ namespace Squidex.Domain.Users
                 Consent = true,
             };
 
-            SetupCreation(identity, values, 1);
+            SetupCreation(identity, 1);
 
             await sut.CreateAsync(identity.Email, values, true);
 
@@ -277,7 +277,7 @@ namespace Squidex.Domain.Users
                 Password = "password"
             };
 
-            SetupCreation(identity, values, 1);
+            SetupCreation(identity, 1);
 
             await sut.CreateAsync(identity.Email, values, false);
 
@@ -564,7 +564,7 @@ namespace Squidex.Domain.Users
             return identity;
         }
 
-        private void SetupCreation(IdentityUser identity, UserValues values, int numCurrentUsers)
+        private void SetupCreation(IdentityUser identity, int numCurrentUsers)
         {
             var users = new List<IdentityUser>();
 
