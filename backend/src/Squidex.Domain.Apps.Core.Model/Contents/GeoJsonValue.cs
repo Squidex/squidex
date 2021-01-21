@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
                         stream.Position = 0;
 
-                        geoJSON = serializer.Deserialize<GeoJSONObject>(stream);
+                        geoJSON = serializer.Deserialize<GeoJSONObject>(stream, null, leaveOpen: true);
 
                         return GeoJsonParseResult.Success;
                     }

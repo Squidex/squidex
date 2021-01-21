@@ -125,6 +125,11 @@ namespace Squidex.Domain.Apps.Core.Contents
             return this.DictionaryHashCode();
         }
 
+        public override string ToString()
+        {
+            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value}"))}}}";
+        }
+
         public ContentData Clone()
         {
             var clone = new ContentData(Count);

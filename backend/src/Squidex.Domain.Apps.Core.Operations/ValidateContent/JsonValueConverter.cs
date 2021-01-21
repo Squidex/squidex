@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 case GeoJsonParseResult.InvalidLatitude:
                     return (null, new JsonError(T.Get("contents.invalidGeolocationLatitude")));
                 case GeoJsonParseResult.InvalidLongitude:
-                    return (null, new JsonError(T.Get("contents.invalidGeolocation")));
+                    return (null, new JsonError(T.Get("contents.invalidGeolocationLongitude")));
                 case GeoJsonParseResult.InvalidValue:
                     return (null, new JsonError(T.Get("contents.invalidGeolocation")));
                 default:
@@ -173,9 +173,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                 foreach (var item in array)
                 {
-                    if (item is JsonNull)
+                    if (item is JsonString s && !string.IsNullOrWhiteSpace(s.Value))
                     {
-                        result.Add(null);
+                        result.Add(s.Value);
                     }
                     else
                     {
