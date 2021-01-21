@@ -76,6 +76,9 @@ namespace Squidex.Domain.Users
 
         public async Task<IResultList<IUser>> QueryAsync(string? query, int take, int skip)
         {
+            Guard.GreaterThan(take, 0, nameof(take));
+            Guard.GreaterEquals(skip, 0, nameof(skip));
+
             IQueryable<IdentityUser> QueryUsers(string? email = null)
             {
                 var result = userManager.Users;

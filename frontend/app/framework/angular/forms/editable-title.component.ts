@@ -54,8 +54,8 @@ export class EditableTitleComponent {
     ) {
     }
 
-    public onKeyDown(keyCode: number) {
-        if (keyCode === Keys.ESCAPE) {
+    public onKeyDown(event: KeyboardEvent) {
+        if (Keys.isEscape(event)) {
             this.toggleRename();
         }
     }

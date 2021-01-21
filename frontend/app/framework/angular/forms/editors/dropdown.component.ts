@@ -149,7 +149,10 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        if (Keys.isUp(event)) {
+        if (Keys.isEscape(event) && this.dropdown.isOpen) {
+            this.close();
+            return false;
+        } else if (Keys.isUp(event)) {
             this.selectPrevIndex();
             return false;
         } else if (Keys.isDown(event)) {
@@ -157,9 +160,6 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
             return false;
         } else if (Keys.isEnter(event)) {
             this.selectIndexAndClose(this.snapshot.suggestedIndex);
-            return false;
-        } else if (Keys.isEscape(event) && this.dropdown.isOpen) {
-            this.close();
             return false;
         }
 
