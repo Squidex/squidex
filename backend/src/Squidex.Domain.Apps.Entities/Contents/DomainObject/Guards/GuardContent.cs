@@ -160,9 +160,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 }
             }
 
-            if (!HasPermission(content, command, Permissions.AppContentsDelete) && !content.CreatedBy.Equals(command.Actor))
+            if (!HasPermission(content, command, Permissions.AppContentsDelete))
             {
-                throw new DomainForbiddenException(T.Get("You don't have permission to delete this content"));
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }
         }
 
@@ -186,10 +186,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         private static bool HasPermission(IContentEntity content, ContentCommand command, string permission)
         {
-            var permissionDeleteOwn = Permissions.ForApp(permission, content.AppId.Name, content.SchemaId.Name);
-            var result = command.User.Permissions().Allows(permissionDeleteOwn);
+            if (content.CreatedBy.Equals(command.Actor))
+            {
+                return true;
+            }
 
-            return result;
+            var requiredPermission = Permissions.ForApp(permission, content.AppId.Name, content.SchemaId.Name);
+
+            return command.User.Permissions().Allows(requiredPermission);
         }
     }
 }

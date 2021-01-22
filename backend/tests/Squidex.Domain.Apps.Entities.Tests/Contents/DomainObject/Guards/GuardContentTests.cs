@@ -17,7 +17,9 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
@@ -28,7 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly ClaimsPrincipal user = Mocks.FrontendUser();
+        private readonly ClaimsPrincipal userWithDeletePermission = Mocks.FrontendUser(permission: "squidex.apps.testapp.contents.*.delete");
         private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
+        private readonly Permission deleteContent = new Permission(Permissions.AppContentsDelete);
 
         [Fact]
         public async Task CanCreate_should_throw_exception_if_data_is_null()
@@ -319,6 +323,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             await GuardContent.CanDelete(command, content, contentRepository, schema);
         }
 
+        [Fact]
+        public async Task CanDelete_Own_should_not_throw_exception()
+        {
+            var schema = CreateSchema(false);
+            var refToken = new RefToken("string", "string");
+
+            var content = CreateOwnContent(status: Status.Published, refToken: refToken, schema: schema);
+            var command = CreateContentDeleteCommand(content);
+
+            await GuardContent.CanDelete(command, content, contentRepository, schema);
+        }
+
+        [Fact]
+        public async Task CanDeleteOwn_should_throw_exception()
+        {
+            var schema = CreateSchema(false);
+            var refToken = new RefToken("string", "string");
+            var content = CreateOwnContent(status: Status.Published, refToken: refToken, schema: schema);
+            var command = new DeleteContent { User = user };
+
+            await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardContent.CanDelete(command, content, contentRepository, schema));
+        }
+
         private void SetupCanUpdate(bool canUpdate)
         {
             A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>._, A<Status>._, user))
@@ -346,13 +373,46 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             };
         }
 
-        private IContentEntity CreateContent(Status status)
+        private IContentEntity CreateContent(Status status, RefToken? refToken = null, ISchemaEntity? schema = null)
+        {
+            return new ContentEntity
+            {
+                Id = DomainId.NewGuid(),
+                Status = status,
+                AppId = appId,
+                CreatedBy = refToken,
+                SchemaId = schema.AppId
+            };
+        }
+
+        private IContentEntity CreateOwnContent(Status status, ISchemaEntity? schema, RefToken? refToken = null)
+        {
+            return new ContentEntity
+            {
+                Id = DomainId.NewGuid(),
+                Status = status,
+                AppId = appId,
+                CreatedBy = refToken,
+                SchemaId = schema.AppId
+            };
+        }
+
+        private IContentEntity CreateOwnContent(Status status)
         {
             return new ContentEntity
             {
                 Id = DomainId.NewGuid(),
                 Status = status,
                 AppId = appId
+            };
+        }
+
+        private DeleteContent CreateContentDeleteCommand(IContentEntity content)
+        {
+            return new DeleteContent
+            {
+                Actor = content.CreatedBy,
+                User = userWithDeletePermission
             };
         }
     }

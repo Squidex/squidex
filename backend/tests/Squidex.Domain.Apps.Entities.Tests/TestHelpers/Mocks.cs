@@ -55,12 +55,12 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return CreateUser(role, "api");
         }
 
-        public static ClaimsPrincipal FrontendUser(string? role = null)
+        public static ClaimsPrincipal FrontendUser(string? role = null, string permission = null)
         {
             return CreateUser(role, DefaultClients.Frontend);
         }
 
-        private static ClaimsPrincipal CreateUser(string? role, string client)
+        private static ClaimsPrincipal CreateUser(string? role, string client, string permission = null)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -70,6 +70,11 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             if (role != null)
             {
                 claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
+
+            if (permission != null)
+            {
+                claimsIdentity.AddClaim(new Claim("urn:squidex:permissions", permission));
             }
 
             return claimsPrincipal;
