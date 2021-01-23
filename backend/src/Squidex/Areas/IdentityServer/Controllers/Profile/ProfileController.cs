@@ -33,20 +33,17 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
     public sealed class ProfileController : IdentityServerController
     {
         private static readonly ResizeOptions ResizeOptions = new ResizeOptions { Width = 128, Height = 128, Mode = ResizeMode.Crop };
-        private readonly SignInManager<IdentityUser> signInManager;
         private readonly IUserPictureStore userPictureStore;
         private readonly IUserService userService;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly MyIdentityOptions identityOptions;
 
         public ProfileController(
-            SignInManager<IdentityUser> signInManager,
+            IOptions<MyIdentityOptions> identityOptions,
             IUserPictureStore userPictureStore,
             IUserService userService,
-            IAssetThumbnailGenerator assetThumbnailGenerator,
-            IOptions<MyIdentityOptions> identityOptions)
+            IAssetThumbnailGenerator assetThumbnailGenerator)
         {
-            this.signInManager = signInManager;
             this.identityOptions = identityOptions.Value;
             this.userPictureStore = userPictureStore;
             this.userService = userService;
@@ -59,7 +56,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         {
             var user = await userService.GetAsync(User);
 
-            return View(await GetProfileVM<None>(user, successMessage: successMessage));
+            return View(await GetVM<None>(user, successMessage: successMessage));
         }
 
         [HttpPost]
@@ -69,7 +66,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             var properties =
-                signInManager.ConfigureExternalAuthenticationProperties(provider,
+                SignInManager.ConfigureExternalAuthenticationProperties(provider,
                     Url.Action(nameof(AddLoginCallback)), userService.GetUserId(User));
 
             return Challenge(properties, provider);
@@ -148,7 +145,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         private async Task AddLoginAsync(string id)
         {
-            var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync(id);
+            var externalLogin = await SignInManager.GetExternalLoginInfoWithDisplayNameAsync(id);
 
             await userService.AddLoginAsync(id, externalLogin);
         }
@@ -192,7 +189,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
             if (!ModelState.IsValid)
             {
-                return View(nameof(Profile), await GetProfileVM(user, model));
+                return View(nameof(Profile), await GetVM(user, model));
             }
 
             string errorMessage;
@@ -200,7 +197,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             {
                 await action(user.Id);
 
-                await signInManager.SignInAsync((IdentityUser)user.Identity, true);
+                await SignInManager.SignInAsync((IdentityUser)user.Identity, true);
 
                 return RedirectToAction(nameof(Profile), new { successMessage });
             }
@@ -213,10 +210,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 errorMessage = T.Get("users.errorHappened");
             }
 
-            return View(nameof(Profile), await GetProfileVM(user, model, errorMessage));
+            return View(nameof(Profile), await GetVM(user, model, errorMessage));
         }
 
-        private async Task<ProfileVM> GetProfileVM<TModel>(IUser? user, TModel? model = null, string? errorMessage = null, string? successMessage = null) where TModel : class
+        private async Task<ProfileVM> GetVM<TModel>(IUser? user, TModel? model = null, string? errorMessage = null, string? successMessage = null) where TModel : class
         {
             if (user == null)
             {
@@ -224,11 +221,11 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             }
 
             var (providers, hasPassword, logins) = await AsyncHelper.WhenAll(
-                signInManager.GetExternalProvidersAsync(),
+                SignInManager.GetExternalProvidersAsync(),
                 userService.HasPasswordAsync(user),
                 userService.GetLoginsAsync(user));
 
-            var result = new ProfileVM
+            var vm = new ProfileVM
             {
                 Id = user.Id,
                 ClientSecret = user.Claims.ClientSecret()!,
@@ -245,12 +242,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
             if (model != null)
             {
-                SimpleMapper.Map(model, result);
+                SimpleMapper.Map(model, vm);
             }
 
-            result.Properties ??= user.Claims.GetCustomProperties().Select(UserProperty.FromTuple).ToList();
+            vm.Properties ??= user.Claims.GetCustomProperties().Select(UserProperty.FromTuple).ToList();
 
-            return result;
+            return vm;
         }
     }
 }

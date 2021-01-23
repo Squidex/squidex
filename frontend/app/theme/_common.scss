@@ -216,6 +216,39 @@ body {
 }
 
 //
+// Status Icon
+//
+.status-icon {
+    & {
+        @include circle-icon(2rem);
+        background: $color-border;
+        border: 0;
+        color: $color-dark-foreground;
+        display: inline-block;
+    }
+
+    &-sm {
+        @include circle-icon(1.6rem);
+    }
+
+    &-lg {
+        @include circle-icon(2.8rem);
+    }
+
+    &-pending {
+        color: inherit;
+    }
+
+    &-failed {
+        background: $color-theme-error;
+    }
+
+    &-success {
+        background: $color-theme-green;
+    }
+}
+
+//
 // Animations
 //
 .spin {

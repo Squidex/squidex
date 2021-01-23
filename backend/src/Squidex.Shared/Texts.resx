@@ -892,6 +892,57 @@
   <data name="security.passwordStolen" xml:space="preserve">
     <value>This password has previously appeared in a data breach and should never be used. If you have ever used it anywhere before, change it!</value>
   </data>
+  <data name="setup.createUser.button" xml:space="preserve">
+    <value>Create User</value>
+  </data>
+  <data name="setup.createUser.confirmPassword" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="setup.createUser.failure" xml:space="preserve">
+    <value>Neither password authentication nor an external authentication provider such as Google is configured. Please check your settings and logs.</value>
+  </data>
+  <data name="setup.createUser.headline" xml:space="preserve">
+    <value>Admin User</value>
+  </data>
+  <data name="setup.createUser.headlineCreate" xml:space="preserve">
+    <value>Create Admin User</value>
+  </data>
+  <data name="setup.createUser.loginHint" xml:space="preserve">
+    <value>You have configured at least one external authentication provider such as Google. Just go to the login page and login to become administrator.</value>
+  </data>
+  <data name="setup.createUser.loginLink" xml:space="preserve">
+    <value>Go to Login Page.</value>
+  </data>
+  <data name="setup.createUser.separator" xml:space="preserve">
+    <value>OR</value>
+  </data>
+  <data name="setup.headline" xml:space="preserve">
+    <value>One Time Installation</value>
+  </data>
+  <data name="setup.hint" xml:space="preserve">
+    <value>You are seeing this screen because no user exists yet. After a user is created you are not able to use this screen again.</value>
+  </data>
+  <data name="setup.https.failure" xml:space="preserve">
+    <value> You are not accessing the site over https. If this warning is not correct then Squidex cannot detect https mode, because your instance is behind a reverse proxy such as nginx. Ensure that http headers are forwarded properly, via the &lt;code&gt;X-Forwarded-*&lt;/code&gt; headers.</value>
+  </data>
+  <data name="setup.https.success" xml:space="preserve">
+    <value>Congratulations, you are accessing your Squidex installation over a secure connection (https).</value>
+  </data>
+  <data name="setup.madeBy" xml:space="preserve">
+    <value>Proudly made by</value>
+  </data>
+  <data name="setup.madeByCopyright" xml:space="preserve">
+    <value>Sebastian Stehle and Contributors, 2016-2021</value>
+  </data>
+  <data name="setup.title" xml:space="preserve">
+    <value>Installation</value>
+  </data>
+  <data name="setup.url.failure" xml:space="preserve">
+    <value>You should access Squidex only over one one canonical URL and configure this URL over the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;.</value>
+  </data>
+  <data name="setup.url.success" xml:space="preserve">
+    <value>Congratulations the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable is configured properly.</value>
+  </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>This operation is not allowed, your account might be locked.</value>
   </data>

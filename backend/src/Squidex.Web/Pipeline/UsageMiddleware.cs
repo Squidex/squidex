@@ -18,18 +18,17 @@ namespace Squidex.Web.Pipeline
 {
     public sealed class UsageMiddleware : IMiddleware
     {
-        private readonly IAppLogStore logStore;
+        private readonly IAppLogStore usageLog;
         private readonly IApiUsageTracker usageTracker;
         private readonly IClock clock;
 
-        public UsageMiddleware(IAppLogStore logStore, IApiUsageTracker usageTracker, IClock clock)
+        public UsageMiddleware(IAppLogStore usageLog, IApiUsageTracker usageTracker, IClock clock)
         {
-            Guard.NotNull(logStore, nameof(logStore));
+            Guard.NotNull(usageLog, nameof(usageLog));
             Guard.NotNull(usageTracker, nameof(usageTracker));
             Guard.NotNull(clock, nameof(clock));
 
-            this.logStore = logStore;
-
+            this.usageLog = usageLog;
             this.usageTracker = usageTracker;
 
             this.clock = clock;
@@ -73,7 +72,7 @@ namespace Squidex.Web.Pipeline
                         request.UserClientId = clientId;
                         request.UserId = context.User.OpenIdSubject();
 
-                        await logStore.LogAsync(appId.Id, request);
+                        await usageLog.LogAsync(appId.Id, request);
 
                         if (request.Costs > 0)
                         {
