@@ -24,7 +24,6 @@ namespace Squidex.Web.Pipeline
         private readonly IHttpResponseFeature responseFeature = A.Fake<IHttpResponseFeature>();
         private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly RequestDelegate next;
-        private readonly RequestExceptionMiddleware sut;
         private bool isNextCalled;
 
         public RequestExceptionMiddlewareTests()
@@ -37,8 +36,6 @@ namespace Squidex.Web.Pipeline
             };
 
             httpContext.Features.Set(responseFeature);
-
-            sut = new RequestExceptionMiddleware(resultWriter, log);
         }
 
         [Fact]
@@ -46,7 +43,9 @@ namespace Squidex.Web.Pipeline
         {
             httpContext.Request.QueryString = new QueryString("?error=412");
 
-            await sut.InvokeAsync(httpContext, next);
+            var sut = new RequestExceptionMiddleware(next);
+
+            await sut.InvokeAsync(httpContext, resultWriter, log);
 
             Assert.False(isNextCalled);
 
@@ -60,7 +59,9 @@ namespace Squidex.Web.Pipeline
         {
             httpContext.Request.QueryString = new QueryString("?error=hello");
 
-            await sut.InvokeAsync(httpContext, next);
+            var sut = new RequestExceptionMiddleware(next);
+
+            await sut.InvokeAsync(httpContext, resultWriter, log);
 
             Assert.True(isNextCalled);
 
@@ -73,7 +74,9 @@ namespace Squidex.Web.Pipeline
         {
             httpContext.Request.QueryString = new QueryString("?error=99");
 
-            await sut.InvokeAsync(httpContext, next);
+            var sut = new RequestExceptionMiddleware(next);
+
+            await sut.InvokeAsync(httpContext, resultWriter, log);
 
             Assert.True(isNextCalled);
 
@@ -89,7 +92,9 @@ namespace Squidex.Web.Pipeline
                 throw new InvalidOperationException();
             });
 
-            await sut.InvokeAsync(httpContext, failingNext);
+            var sut = new RequestExceptionMiddleware(failingNext);
+
+            await sut.InvokeAsync(httpContext, resultWriter, log);
 
             A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._,
                     A<ObjectResult>.That.Matches(x => x.StatusCode == 500 && x.Value is ErrorDto)))
@@ -106,7 +111,9 @@ namespace Squidex.Web.Pipeline
                 throw ex;
             });
 
-            await sut.InvokeAsync(httpContext, failingNext);
+            var sut = new RequestExceptionMiddleware(failingNext);
+
+            await sut.InvokeAsync(httpContext, resultWriter, log);
 
             A.CallTo(() => log.Log(SemanticLogLevel.Error, ex, A<LogFormatter>._))
                 .MustHaveHappened();
@@ -123,7 +130,9 @@ namespace Squidex.Web.Pipeline
                 throw new InvalidOperationException();
             });
 
-            await sut.InvokeAsync(httpContext, failingNext);
+            var sut = new RequestExceptionMiddleware(failingNext);
+
+            await sut.InvokeAsync(httpContext, resultWriter, log);
 
             A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
                 .MustNotHaveHappened();
@@ -139,7 +148,9 @@ namespace Squidex.Web.Pipeline
                 return Task.CompletedTask;
             });
 
-            await sut.InvokeAsync(httpContext, failingNext);
+            var sut = new RequestExceptionMiddleware(failingNext);
+
+            await sut.InvokeAsync(httpContext, resultWriter, log);
 
             A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._,
                     A<ObjectResult>.That.Matches(x => x.StatusCode == 412 && x.Value is ErrorDto)))
@@ -159,7 +170,9 @@ namespace Squidex.Web.Pipeline
                 return Task.CompletedTask;
             });
 
-            await sut.InvokeAsync(httpContext, failingNext);
+            var sut = new RequestExceptionMiddleware(failingNext);
+
+            await sut.InvokeAsync(httpContext, resultWriter, log);
 
             A.CallTo(() => resultWriter.ExecuteAsync(A<ActionContext>._, A<ObjectResult>._))
                 .MustNotHaveHappened();

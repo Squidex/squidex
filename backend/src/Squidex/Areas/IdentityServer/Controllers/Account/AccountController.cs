@@ -230,7 +230,6 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 IsFailed = isFailed,
                 IsLogin = isLogin,
                 HasPasswordAuth = allowPasswordAuth,
-                HasPasswordAndExternal = allowPasswordAuth && externalProviders.Any(),
                 ReturnUrl = returnUrl
             };
 

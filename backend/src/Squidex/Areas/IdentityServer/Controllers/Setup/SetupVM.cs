@@ -19,10 +19,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
 
         public bool IsValidHttps { get; set; }
 
+        public bool IsAssetStoreFtp { get; set; }
+
+        public bool IsAssetStoreFile { get; set; }
+
+        public bool EverybodyCanCreateApps { get; set; }
+
         public bool HasExternalLogin { get; set; }
 
         public bool HasPasswordAuth { get; set; }
-
-        public bool HasPasswordAndExternal { get; set; }
     }
 }

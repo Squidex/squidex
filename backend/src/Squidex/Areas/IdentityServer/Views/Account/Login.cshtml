@@ -8,7 +8,7 @@
 
     ViewBag.Title = action;
 }
-    
+
 <div class="container">
     <div class="row text-center">
         <div class="btn-group profile-headline">
@@ -45,7 +45,7 @@
     }
 </form>
 
-@if (Model.HasPasswordAndExternal)
+@if (Model.HasExternalLogin && Model.HasPasswordAuth)
 {
     <div class="profile-separator">
         <div class="profile-separator-text">@T.Get("users.login.separator")</div>
@@ -54,36 +54,36 @@
 
 @if (Model.HasPasswordAuth)
 {
-        if (Model.IsLogin)
+    if (Model.IsLogin)
+    {
+        if (Model.IsFailed)
         {
-            if (Model.IsFailed)
-            {
-                <div class="form-alert form-alert-error">@T.Get("users.login.error")</div>
-            }
-
-            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
-                <div class="form-group">
-                    <input type="email" class="form-control" name="email" id="email" placeholder="@T.Get("users.login.emailPlaceholder")" />
-                </div>
-
-                <div class="form-group">
-                    <input type="password" class="form-control" name="password" id="password" placeholder="@T.Get("users.login.passwordPlaceholder")" />
-                </div>
-
-                <button type="submit" class="btn btn-block btn-primary">@action</button>
-            </form>
+            <div class="form-alert form-alert-error">@T.Get("users.login.error")</div>
         }
-        else
-        {
-            <div class="profile-password-signup text-center">@T.Get("users.login.askAdmin")</div>
-        }
+
+        <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
+            <div class="form-group">
+                <input type="email" class="form-control" name="email" id="email" placeholder="@T.Get("users.login.emailPlaceholder")" />
+            </div>
+
+            <div class="form-group">
+                <input type="password" class="form-control" name="password" id="password" placeholder="@T.Get("users.login.passwordPlaceholder")" />
+            </div>
+
+            <button type="submit" class="btn btn-block btn-primary">@action</button>
+        </form>
+    }
+    else
+    {
+        <div class="profile-password-signup text-center">@T.Get("users.login.askAdmin")</div>
+    }
 }
 
 @if (Model.IsLogin)
 {
     <p class="profile-footer">
-        @T.Get("users.login.noAccountSignupQuestion") 
-        
+        @T.Get("users.login.noAccountSignupQuestion")
+
         <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">
             @T.Get("users.login.noAccountSignupAction")
         </a>
@@ -93,7 +93,7 @@ else
 {
     <p class="profile-footer">
         @T.Get("users.login.noAccountLoginQuestion")
-        
+
         <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">
             @T.Get("users.login.noAccountLoginAction")
         </a>

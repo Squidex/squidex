@@ -15,6 +15,57 @@
             </div>
         }
     }
+
+    void RenderRuleAsSuccess(string message)
+    {
+        <div class="row mt-4">
+            <div class="col-auto">
+                <div class="status-icon status-icon-success mt-2">
+                    <i class="icon-checkmark"></i>
+                </div>
+            </div>
+
+            <div class="col">
+                <div>
+                    @Html.Raw(message)
+                </div>
+            </div>
+        </div>
+    }
+
+    void RenderRuleAsCritical(string message)
+    {
+        <div class="row mt-4">
+            <div class="col-auto">
+                <div class="status-icon status-icon-failed mt-2">
+                    <i class="icon-exclamation"></i>
+                </div>
+            </div>
+
+            <div class="col">
+                <div>
+                    <strong>@T.Get("common.critical")</strong>: @Html.Raw(message)
+                </div>
+            </div>
+        </div>
+    }
+
+    void RenderRuleAsWarning(string message)
+    {
+        <div class="row mt-4">
+            <div class="col-auto">
+                <div class="status-icon status-icon-warning mt-2">
+                    <i class="icon-exclamation"></i>
+                </div>
+            </div>
+
+            <div class="col">
+                <div>
+                    <strong>@T.Get("common.warning")</strong>: @Html.Raw(message)
+                </div>
+            </div>
+        </div>
+    }
 }
 
 <div class="card">
@@ -26,63 +77,44 @@
         <small class="form-text text-muted mt-2 mb-2">@T.Get("setup.hint")</small>
 
         <div class="profile-section">
-            <h2>System Status</h2>
+            <h2>@T.Get("setup.rules.headline")</h2>
 
-            <div class="row mt-4">
-                @if (Model.IsValidHttps)
-                {
-                    <div class="col-auto">
-                        <div class="status-icon status-icon-success mt-1">
-                            <i class="icon-checkmark"></i>
-                        </div>
-                    </div>
+            @if (Model.IsValidHttps)
+            {
+                RenderRuleAsSuccess(T.Get("setup.ruleHttps.success"));
+            }
+            else
+            {
+                RenderRuleAsCritical(T.Get("setup.ruleHttps.failure"));
+            }
 
-                    <div class="col">
-                        @Html.Raw(T.Get("setup.https.success"))
-                    </div>
-                }
-                else
-                {
-                    <div class="col-auto">
-                        <div class="status-icon status-icon-failed mt-1">
-                            <i class="icon-exclamation"></i>
-                        </div>
+            @if (Model.BaseUrlConfigured == Model.BaseUrlCurrent)
+            {
+                RenderRuleAsSuccess(T.Get("setup.ruleUrl.success"));
+            }
+            else
+            {
+                RenderRuleAsCritical(T.Get("setup.ruleUrl.failure", new { actual = Model.BaseUrlCurrent, configured = Model.BaseUrlConfigured }));
+            }
 
-                    </div>
+            @if (Model.EverybodyCanCreateApps)
+            {
+                RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAdmins"));
+            }
+            else
+            {
+                RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAll"));
+            }
 
-                    <div class="col">
-                        @Html.Raw(T.Get("setup.https.failure"))
-                    </div>
-                }
-            </div>
+            @if (Model.IsAssetStoreFtp)
+            {
+                RenderRuleAsWarning(T.Get("setup.ruleFtp.warning"));
+            }
 
-            <div class="row mt-4">
-                @if (Model.BaseUrlConfigured == Model.BaseUrlCurrent)
-                {
-                    <div class="col-auto">
-                        <div class="status-icon status-icon-success mt-1">
-                            <i class="icon-checkmark"></i>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        @Html.Raw(T.Get("setup.url.success"))
-                    </div>
-                }
-                else
-                {
-                    <div class="col-auto">
-                        <div class="status-icon status-icon-failed mt-1">
-                            <i class="icon-exclamation"></i>
-                        </div>
-
-                    </div>
-
-                    <div class="col">
-                        @Html.Raw(T.Get("setup.url.failure", new { actual = Model.BaseUrlCurrent, configured = Model.BaseUrlConfigured }))
-                    </div>
-                }
-            </div>
+            @if (Model.IsAssetStoreFile)
+            {
+                RenderRuleAsWarning(T.Get("setup.ruleFolder.warning"));
+            }
         </div>
 
         <hr />
@@ -110,7 +142,7 @@
                 </div>
             }
 
-            @if (Model.HasExternalLogin)
+            @if (Model.HasPasswordAuth)
             {
                 <h3>@T.Get("setup.createUser.headlineCreate")</h3>
 

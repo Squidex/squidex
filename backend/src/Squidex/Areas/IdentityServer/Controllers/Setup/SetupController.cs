@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Squidex.Areas.Api.Controllers.UI;
+using Squidex.Assets;
 using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Hosting;
@@ -22,20 +24,26 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Setup
 {
-    [AllowAnonymous]
     public class SetupController : IdentityServerController
     {
+        private readonly IAssetStore assetStore;
         private readonly IUrlGenerator urlGenerator;
         private readonly IUserService userService;
+        private readonly MyUIOptions uiOptions;
         private readonly MyIdentityOptions identityOptions;
 
-        public SetupController(IOptions<MyIdentityOptions> identityOptions,
+        public SetupController(
+            IAssetStore assetStore,
+            IOptions<MyUIOptions> uiOptions,
+            IOptions<MyIdentityOptions> identityOptions,
             IUrlGenerator urlGenerator,
             IUserService userService)
         {
+            this.assetStore = assetStore;
+            this.identityOptions = identityOptions.Value;
+            this.uiOptions = uiOptions.Value;
             this.urlGenerator = urlGenerator;
             this.userService = userService;
-            this.identityOptions = identityOptions.Value;
         }
 
         [HttpGet]
@@ -99,7 +107,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
                 BaseUrlConfigured = urlGenerator.BuildUrl(),
                 BaseUrlCurrent = $"{request.Scheme}://{request.Host}",
                 ErrorMessage = errorMessage,
+                EverybodyCanCreateApps = !uiOptions.OnlyAdminsCanCreateApps,
                 IsValidHttps = HttpContext.Request.IsHttps,
+                IsAssetStoreFile = assetStore is FolderAssetStore,
+                IsAssetStoreFtp = assetStore is FTPAssetStore,
                 HasExternalLogin = externalProviders.Any(),
                 HasPasswordAuth = identityOptions.AllowPasswordAuth,
             };
