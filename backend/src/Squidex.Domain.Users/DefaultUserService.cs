@@ -44,7 +44,7 @@ namespace Squidex.Domain.Users
 
         public async Task<bool> IsEmptyAsync()
         {
-            var result = await QueryAsync(null, 0, 0);
+            var result = await QueryAsync(null, 1, 0);
 
             return result.Total == 0;
         }

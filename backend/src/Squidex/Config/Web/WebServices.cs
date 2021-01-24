@@ -51,19 +51,7 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<SchemaResolver>()
                 .AsSelf();
 
-            services.AddSingletonAs<RobotsTxtMiddleware>()
-                .AsSelf();
-
-            services.AddSingletonAs<LocalCacheMiddleware>()
-                .AsSelf();
-
             services.AddSingletonAs<UsageMiddleware>()
-                .AsSelf();
-
-            services.AddSingletonAs<RequestExceptionMiddleware>()
-                .AsSelf();
-
-            services.AddSingletonAs<RequestLogPerformanceMiddleware>()
                 .AsSelf();
 
             services.AddSingletonAs(c => translator)

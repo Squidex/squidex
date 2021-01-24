@@ -9,7 +9,7 @@ using IdentityServer4.Models;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Error
 {
-    public class ErrorViewModel
+    public class ErrorVM
     {
         public ErrorMessage Error { get; set; }
     }

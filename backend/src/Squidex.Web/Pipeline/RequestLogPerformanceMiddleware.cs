@@ -14,22 +14,19 @@ using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {
-    public sealed class RequestLogPerformanceMiddleware : IMiddleware
+    public sealed class RequestLogPerformanceMiddleware
     {
         private readonly RequestLogOptions requestLogOptions;
-        private readonly ISemanticLog log;
+        private readonly RequestDelegate next;
 
-        public RequestLogPerformanceMiddleware(IOptions<RequestLogOptions> requestLogOptions, ISemanticLog log)
+        public RequestLogPerformanceMiddleware(RequestDelegate next, IOptions<RequestLogOptions> requestLogOptions)
         {
-            Guard.NotNull(requestLogOptions, nameof(requestLogOptions));
-            Guard.NotNull(log, nameof(log));
-
             this.requestLogOptions = requestLogOptions.Value;
 
-            this.log = log;
+            this.next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public async Task InvokeAsync(HttpContext context, ISemanticLog log)
         {
             var watch = ValueStopwatch.StartNew();
 

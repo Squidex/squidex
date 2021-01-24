@@ -7,23 +7,30 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Squidex.Caching;
+using Squidex.Domain.Users;
 
 namespace Squidex.Web.Pipeline
 {
-    public sealed class LocalCacheMiddleware
+    public sealed class SetupMiddleware
     {
         private readonly RequestDelegate next;
+        private bool isUserFound;
 
-        public LocalCacheMiddleware(RequestDelegate next)
+        public SetupMiddleware(RequestDelegate next)
         {
             this.next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, ILocalCache localCache)
+        public async Task InvokeAsync(HttpContext context, IUserService userService)
         {
-            using (localCache.StartContext())
+            if (!isUserFound && await userService.IsEmptyAsync())
             {
+                context.Response.Redirect("/identity-server/setup");
+            }
+            else
+            {
+                isUserFound = true;
+
                 await next(context);
             }
         }
