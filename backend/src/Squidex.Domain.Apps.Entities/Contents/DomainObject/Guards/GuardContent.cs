@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using NodaTime;
@@ -14,7 +13,6 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
@@ -50,6 +48,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
+            if (!HasPermission(content, command, Permissions.AppContentsUpdate))
+            {
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+            }
+
             Validate.It(e =>
             {
                 ValidateData(command, e);
@@ -64,6 +67,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
+            if (!HasPermission(content, command, Permissions.AppContentsPatch))
+            {
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+            }
+
             Validate.It(e =>
             {
                 ValidateData(command, e);
@@ -75,6 +83,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         public static void CanDeleteDraft(DeleteContentDraft command, IContentEntity content)
         {
             Guard.NotNull(command, nameof(command));
+
+            if (!HasPermission(content, command, Permissions.AppContentsDeleteDraft))
+            {
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+            }
 
             if (content.NewStatus == null)
             {
@@ -99,6 +112,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
+
+            if (!HasPermission(content, command, Permissions.AppContentsChangeStatus))
+            {
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+            }
 
             if (schema.SchemaDef.IsSingleton)
             {

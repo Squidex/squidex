@@ -140,6 +140,7 @@ namespace Squidex.Shared
         public const string AppContentReadOwn = "squidex.apps.{app}.contents.{name}.read.own";
         public const string AppContentsCreate = "squidex.apps.{app}.contents.{name}.create";
         public const string AppContentsUpdate = "squidex.apps.{app}.contents.{name}.update";
+        public const string AppContentsChangeStatus = "squidex.apps.{app}.contents.{name}.changestatus";
         public const string AppContentsUpdateOwn = "squidex.apps.{app}.contents.{name}.update.own";
         public const string AppContentsUpdatePartial = "squidex.apps.{app}.contents.{name}.update.partial";
         public const string AppContentsUpsert = "squidex.apps.{app}.contents.{name}.upsert";
@@ -147,6 +148,10 @@ namespace Squidex.Shared
         public const string AppContentsVersionDelete = "squidex.apps.{app}.contents.{name}.version.delete";
         public const string AppContentsDelete = "squidex.apps.{app}.contents.{name}.delete";
         public const string AppContentsDeleteOwn = "squidex.apps.{app}.contents.{name}.delete.own";
+        public const string AppContentsDeleteDraft = "squidex.apps.{app}.contents.{name}.deletedraft";
+        public const string AppContentsDeleteDraftOwn = "squidex.apps.{app}.contents.{name}.deletedraft.own";
+        public const string AppContentsPatch = "squidex.apps.{app}.contents.{name}.patch";
+        public const string AppContentsPatchOwn = "squidex.apps.{app}.contents.{name}.patch.own";
 
         static Permissions()
         {
