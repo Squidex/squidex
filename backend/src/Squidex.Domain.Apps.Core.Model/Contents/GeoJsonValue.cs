@@ -47,23 +47,17 @@ namespace Squidex.Domain.Apps.Core.Contents
                 }
                 catch
                 {
-                    if (geoObject.TryGetValue<JsonNumber>("latitude", out var lat))
+                    if (!geoObject.TryGetValue<JsonNumber>("latitude", out var lat) || !lat.Value.IsBetween(-90, 90))
                     {
-                        if (!lat.Value.IsBetween(-90, 90))
-                        {
-                            return GeoJsonParseResult.InvalidLatitude;
-                        }
+                        return GeoJsonParseResult.InvalidLatitude;
                     }
 
-                    if (geoObject.TryGetValue<JsonNumber>("longitude", out var lon))
+                    if (!geoObject.TryGetValue<JsonNumber>("longitude", out var lon) || !lon.Value.IsBetween(-180, 180))
                     {
-                        if (!lon.Value.IsBetween(-180, 180))
-                        {
-                            return GeoJsonParseResult.InvalidLongitude;
-                        }
+                        return GeoJsonParseResult.InvalidLongitude;
                     }
 
-                    geoJSON = new Point(new Position(lat!.Value, lon!.Value));
+                    geoJSON = new Point(new Position(lat.Value, lon.Value));
 
                     return GeoJsonParseResult.Success;
                 }
