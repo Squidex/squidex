@@ -7,7 +7,7 @@
 
 import { of } from 'rxjs';
 import { Mock } from 'typemoq';
-import { AppsState, AuthService, DateTime, Version } from './../';
+import { AppsState, AuthService, DateTime, FieldPropertiesDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaPropertiesDto, Version } from './../';
 
 const app = 'my-app';
 const creation = DateTime.today().addDays(-2);
@@ -30,10 +30,62 @@ const authService = Mock.ofType<AuthService>();
 authService.setup(x => x.user)
     .returns(() => <any>{ id: modifier, token: modifier });
 
+type SchemaValues = {
+    id?: number;
+    fields?: ReadonlyArray<RootFieldDto>;
+    fieldsInLists?: ReadonlyArray<string>;
+    fieldsInReferences?: ReadonlyArray<string>;
+    fieldRules?: ReadonlyArray<FieldRule>;
+    properties?: SchemaPropertiesDto;
+};
+
+function createSchema({ properties, id, fields, fieldsInLists, fieldsInReferences, fieldRules }: SchemaValues = {}) {
+    id = id || 1;
+
+    return new SchemaDetailsDto({},
+        `schema${1}`,
+        `schema${1}`,
+        'category',
+        properties || new SchemaPropertiesDto(), false, true,
+        creation,
+        creator,
+        modified,
+        modifier,
+        new Version('1'),
+        fields,
+        fieldsInLists || [],
+        fieldsInReferences || [],
+        fieldRules || []);
+}
+
+type FieldValues = {
+    id?: number;
+    properties: FieldPropertiesDto;
+    isDisabled?: boolean,
+    isHidden?: boolean,
+    partitioning?: string;
+    nested?: ReadonlyArray<NestedFieldDto>
+};
+
+function createField({ properties, id, partitioning, isDisabled, nested }: FieldValues) {
+    id = id || 1;
+
+    return new RootFieldDto({}, id, `field${id}`, properties, partitioning || 'language', false, false, isDisabled, nested);
+}
+
+function createNestedField({ properties, id, isDisabled }: FieldValues) {
+    id = id || 1;
+
+    return new NestedFieldDto({}, id, `nested${id}`, properties, 0, false, false, isDisabled);
+}
+
 export const TestValues = {
     app,
     appsState,
     authService,
+    createField,
+    createNestedField,
+    createSchema,
     creation,
     creator,
     modified,

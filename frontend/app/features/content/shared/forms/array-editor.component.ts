@@ -77,6 +77,10 @@ export class ArrayEditorComponent implements OnChanges {
         this.formModel.addItem(value);
     }
 
+    public clear() {
+        this.formModel.reset();
+    }
+
     public sort(event: CdkDragDrop<ReadonlyArray<FieldArrayItemForm>>) {
         this.formModel.sort(sorted(event));
 

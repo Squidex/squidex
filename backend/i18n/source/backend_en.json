@@ -172,6 +172,7 @@
   "contents.validation.normalCharactersBetween": "Must have between {min} and {max} text character(s).",
   "contents.validation.notAllowed": "Not an allowed value.",
   "contents.validation.pattern": "Must follow the pattern.",
+  "contents.validation.reference": "Geolocation can only have latitude and longitude property.",
   "contents.validation.referenceNotFound": "Reference '{id}' not found.",
   "contents.validation.referenceToInvalidSchema": "Reference '{id}' has invalid schema.",
   "contents.validation.regexTooSlow": "Regex is too slow.",

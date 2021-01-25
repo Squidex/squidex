@@ -601,6 +601,9 @@
   <data name="contents.validation.pattern" xml:space="preserve">
     <value>Deve seguire il pattern.</value>
   </data>
+  <data name="contents.validation.reference" xml:space="preserve">
+    <value>Geolocation can only have latitude and longitude property.</value>
+  </data>
   <data name="contents.validation.referenceNotFound" xml:space="preserve">
     <value>Contiene un collegamento '{id}' non valido.</value>
   </data>
@@ -938,10 +941,10 @@
     <value>Sebastian Stehle and Contributors, 2016-2021</value>
   </data>
   <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
-    <value>With your setup, only admins can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINCANCREATEAPPS=false&lt;/code&gt; as environment variable.</value>
+    <value>With your setup, only admins can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=false&lt;/code&gt; as environment variable.</value>
   </data>
   <data name="setup.ruleAppCreation.warningAll" xml:space="preserve">
-    <value>With your setup, every user can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINCANCREATEAPPS=true&lt;/code&gt; as environment variable.</value>
+    <value>With your setup, every user can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=true&lt;/code&gt; as environment variable.</value>
   </data>
   <data name="setup.ruleFolder.warning" xml:space="preserve">
     <value>You are using the &lt;strong&gt;folder asset store&lt;/strong&gt; where all assets are stored in the file system. Please remember to include the asset folder into your backup strategy and map it to a volume, if you are using Docker.</value>
