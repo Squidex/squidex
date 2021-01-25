@@ -6,12 +6,12 @@
  */
 
 export module Keys {
-    export const COMMA = 188;
-    export const DELETE = 8;
-    export const ENTER = 13;
-    export const ESCAPE = 27;
-    export const DOWN = 40;
-    export const UP = 38;
+    const COMMA = 188;
+    const DELETE = 8;
+    const ENTER = 13;
+    const ESCAPE = 27;
+    const DOWN = 40;
+    const UP = 38;
 
     export function isComma(event: KeyboardEvent) {
         const key = event.key || event.keyCode;
@@ -46,6 +46,6 @@ export module Keys {
     export function isEscape(event: KeyboardEvent) {
         const key = event.key?.toUpperCase() || event.keyCode;
 
-        return key === 'ESCAPE' || key === 'ESC' || key === UP;
+        return key === 'ESCAPE' || key === 'ESC' || key === ESCAPE;
     }
  }

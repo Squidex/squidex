@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly DomainId contentId = DomainId.NewGuid();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly NamedContentData contentData = new NamedContentData();
-        private readonly NamedContentData contentTransformed = new NamedContentData();
+        private readonly ContentData contentData = new ContentData();
+        private readonly ContentData contentTransformed = new ContentData();
         private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
         private readonly ContentQueryService sut;
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 .Returns(new List<ISchemaEntity> { schema });
 
             A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<ISchemaEntity?>._))
-                .ReturnsLazily(c => new ValueTask<Q>(c.GetArgument<Q>(1)!));
+                .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
             sut = new ContentQueryService(
                 appProvider,
@@ -119,14 +119,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task FindContentAsync_should_throw_404_if_not_found()
+        public async Task FindContentAsync_should_return_null_if_not_found()
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
             A.CallTo(() => contentRepository.FindContentAsync(ctx.App, schema, contentId, A<SearchScope>._))
                 .Returns<IContentEntity?>(null);
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindAsync(ctx, schemaId.Name, contentId));
+            Assert.Null(await sut.FindAsync(ctx, schemaId.Name, contentId));
         }
 
         [Theory]

@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithODataQuery("$filter=invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query));
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithJsonQuery("invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query));
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_parse_json_query_and_enrich_with_defaults()
         {
-            var query = Q.Empty.WithJsonQuery(Json("{ 'filter': { 'path': 'fileName', 'op': 'eq', 'value': 'ABC' } }"));
+            var query = Q.Empty.WithJsonQuery("{ \"filter\": { \"path\": \"fileName\", \"op\": \"eq\", \"value\": \"ABC\" } }");
 
             var q = await sut.ParseQueryAsync(requestContext, query);
 
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public async Task Should_parse_json_full_text_query_and_enrich_with_defaults()
         {
-            var query = Q.Empty.WithJsonQuery(Json("{ 'fullText': 'Hello' }"));
+            var query = Q.Empty.WithJsonQuery("{ \"fullText\": \"Hello\" }");
 
             var q = await sut.ParseQueryAsync(requestContext, query);
 
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_limit_number_of_assets()
+        public async Task Should_apply_default_limit()
         {
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
 
@@ -133,9 +133,30 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Assert.Equal("Filter: tags == 'id1'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
-        private static string Json(string text)
+        [Fact]
+        public async Task Should_not_fail_when_tags_not_found()
         {
-            return text.Replace('\'', '"');
+            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
+                .Returns(new Dictionary<string, string>());
+
+            var query = Q.Empty.WithODataQuery("$filter=tags eq 'name1'");
+
+            var q = await sut.ParseQueryAsync(requestContext, query);
+
+            Assert.Equal("Filter: tags == 'name1'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_not_normalize_other_field()
+        {
+            var query = Q.Empty.WithODataQuery("$filter=fileSize eq 123");
+
+            var q = await sut.ParseQueryAsync(requestContext, query);
+
+            Assert.Equal("Filter: fileSize == 123; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+
+            A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, A<string>._, A<HashSet<string>>._))
+                .MustNotHaveHappened();
         }
     }
 }

@@ -15,6 +15,6 @@ namespace Squidex.Domain.Apps.Events.Contents
     {
         public Status Status { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public ContentData Data { get; set; }
     }
 }

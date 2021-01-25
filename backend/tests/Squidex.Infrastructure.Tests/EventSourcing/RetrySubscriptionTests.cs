@@ -88,6 +88,26 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
+        public async Task Should_not_unsubscribe_after_last_error_to_keep_sender()
+        {
+            var ex = new InvalidOperationException();
+
+            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(eventSubscription, ex);
+
+            A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, ex))
+                .MustHaveHappened();
+
+            Assert.NotNull(sut.Sender);
+
+            sut.Unsubscribe();
+        }
+
+        [Fact]
         public async Task Should_not_forward_error_when_exception_is_raised_after_unsubscribe()
         {
             var ex = new InvalidOperationException();

@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 
         public RefToken LastModifiedBy { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public ContentData Data { get; set; }
 
-        public NamedContentData? DataOld { get; set; }
+        public ContentData? DataOld { get; set; }
 
         public Status Status { get; set; }
 

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -93,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/ui/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchemaUIFields(string app, string name, [FromBody] ConfigureUIFieldsDto request)
@@ -118,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/ordering/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchemaFieldOrdering(string app, string name, [FromBody] ReorderFieldsDto request)
@@ -144,7 +145,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/ordering/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutNestedFieldOrdering(string app, string name, long parentId, [FromBody] ReorderFieldsDto request)
@@ -170,7 +171,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] UpdateFieldDto request)
@@ -197,7 +198,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutNestedField(string app, string name, long parentId, long id, [FromBody] UpdateFieldDto request)
@@ -225,7 +226,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/lock/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> LockField(string app, string name, long id)
@@ -254,7 +255,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/lock/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> LockNestedField(string app, string name, long parentId, long id)
@@ -282,7 +283,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/hide/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> HideField(string app, string name, long id)
@@ -311,7 +312,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/hide/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> HideNestedField(string app, string name, long parentId, long id)
@@ -339,7 +340,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/show/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> ShowField(string app, string name, long id)
@@ -368,7 +369,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/show/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> ShowNestedField(string app, string name, long parentId, long id)
@@ -396,7 +397,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/enable/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> EnableField(string app, string name, long id)
@@ -425,7 +426,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/enable/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> EnableNestedField(string app, string name, long parentId, long id)
@@ -453,7 +454,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/disable/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableField(string app, string name, long id)
@@ -482,7 +483,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/disable/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableNestedField(string app, string name, long parentId, long id)
@@ -507,7 +508,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteField(string app, string name, long id)
@@ -533,7 +534,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteNestedField(string app, string name, long parentId, long id)

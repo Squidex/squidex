@@ -20,6 +20,13 @@ namespace Squidex.Infrastructure.Queries.OData
                 new FunctionSignatureWithReturnType(
                     EdmCoreModel.Instance.GetBoolean(false),
                     EdmCoreModel.Instance.GetString(true)));
+
+            CustomUriFunctions.AddCustomUriFunction("distanceto",
+                new FunctionSignatureWithReturnType(
+                    EdmCoreModel.Instance.GetDouble(false),
+                    EdmCoreModel.Instance.GetString(true),
+                    EdmCoreModel.Instance.GetInt32(true),
+                    EdmCoreModel.Instance.GetInt32(true)));
         }
 
         public static ODataUriParser? ParseQuery(this IEdmModel model, string query)

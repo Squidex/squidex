@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 {
     public static class DefaultValueExtensions
     {
-        public static void GenerateDefaultValues(this NamedContentData data, Schema schema, PartitionResolver partitionResolver)
+        public static void GenerateDefaultValues(this ContentData data, Schema schema, PartitionResolver partitionResolver)
         {
             var enricher = new DefaultValueGenerator(schema, partitionResolver);
 

@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using IdentityServer4.Models;
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Areas.IdentityServer.Controllers.Error
+namespace Squidex.Infrastructure.Queries
 {
-    public class ErrorViewModel
+    public sealed record FilterSphere(double Longitude, double Latitude, double Radius)
     {
-        public ErrorMessage Error { get; set; }
+        public override string ToString()
+        {
+            return $"Radius({Longitude}, {Latitude}, {Radius})";
+        }
     }
 }

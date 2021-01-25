@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
             Assert.Equal(
-                new NamedContentData()
+                new ContentData()
                     .AddField("ref1",
                         new ContentFieldData()
                             .AddJsonValue("iv",
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 contents[0].ReferenceData);
 
             Assert.Equal(
-                new NamedContentData()
+                new ContentData()
                     .AddField("ref1",
                         new ContentFieldData()
                             .AddJsonValue("iv",
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
             Assert.Equal(
-                new NamedContentData()
+                new ContentData()
                     .AddField("ref1",
                         new ContentFieldData()
                             .AddJsonValue("iv",
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 contents[0].ReferenceData);
 
             Assert.Equal(
-                new NamedContentData()
+                new ContentData()
                     .AddField("ref1",
                         new ContentFieldData()
                             .AddJsonValue("iv",
@@ -287,7 +287,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 Id = DomainId.NewGuid(),
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("ref1",
                             new ContentFieldData()
                                 .AddJsonValue("iv", JsonValue.Array(ref1.Select(x => x.ToString()).ToArray())))
@@ -305,7 +305,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 Id = id,
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("name",
                             new ContentFieldData()
                                 .AddValue("iv", name))

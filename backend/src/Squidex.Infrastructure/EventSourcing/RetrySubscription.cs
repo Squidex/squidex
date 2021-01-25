@@ -36,28 +36,34 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private void Subscribe()
         {
-            lock (this)
+            if (currentSubscription == null)
             {
-                if (currentSubscription == null)
+                lock (this)
                 {
-                    currentSubscription = eventSubscriptionFactory(this);
+                    if (currentSubscription == null)
+                    {
+                        currentSubscription = eventSubscriptionFactory(this);
+                    }
                 }
             }
         }
 
         public void Unsubscribe()
         {
-            lock (this)
+            if (currentSubscription != null)
             {
-                if (currentSubscription != null)
+                lock (this)
                 {
-                    timerCancellation.Cancel();
-                    timerCancellation.Dispose();
+                    if (currentSubscription != null)
+                    {
+                        timerCancellation.Cancel();
+                        timerCancellation.Dispose();
 
-                    currentSubscription.Unsubscribe();
-                    currentSubscription = null;
+                        currentSubscription.Unsubscribe();
+                        currentSubscription = null;
 
-                    timerCancellation = new CancellationTokenSource();
+                        timerCancellation = new CancellationTokenSource();
+                    }
                 }
             }
         }
@@ -79,10 +85,10 @@ namespace Squidex.Infrastructure.EventSourcing
                 return;
             }
 
-            Unsubscribe();
-
             if (retryWindow.CanRetryAfterFailure())
             {
+                Unsubscribe();
+
                 await Task.Delay(ReconnectWaitMs, timerCancellation.Token);
 
                 Subscribe();

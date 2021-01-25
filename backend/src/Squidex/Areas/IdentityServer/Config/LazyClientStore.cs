@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
@@ -69,20 +68,27 @@ namespace Squidex.Areas.IdentityServer.Config
 
             using (var scope = serviceProvider.CreateScope())
             {
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var user = await userManager.FindByIdWithClaimsAsync(clientId);
+                var user = await userService.FindByIdAsync(clientId);
 
-                if (!string.IsNullOrWhiteSpace(user?.ClientSecret()))
+                if (user == null)
                 {
-                    return CreateClientFromUser(user);
+                    return null;
+                }
+
+                var secret = user.Claims.ClientSecret();
+
+                if (!string.IsNullOrWhiteSpace(secret))
+                {
+                    return CreateClientFromUser(user, secret);
                 }
             }
 
             return null;
         }
 
-        private static Client CreateClientFromUser(UserWithClaims user)
+        private static Client CreateClientFromUser(IUser user, string secret)
         {
             return new Client
             {
@@ -91,7 +97,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 ClientClaimsPrefix = null,
                 ClientSecrets = new List<Secret>
                 {
-                    new Secret(user.ClientSecret().Sha256())
+                    new Secret(secret.Sha256())
                 },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
                 AllowedGrantTypes = GrantTypes.ClientCredentials,

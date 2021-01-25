@@ -71,15 +71,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Description = "The id of the content (usually GUID).",
                     DefaultValue = null,
                     ResolvedType = AllTypes.NonNullDomainId
+                },
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "version",
+                    Description = "The optional version of the content to retrieve an older instance (not cached).",
+                    DefaultValue = null,
+                    ResolvedType = AllTypes.Int
                 }
             };
 
-            public static readonly IFieldResolver Resolver = new FuncFieldResolver<object?>(c =>
+            public static IFieldResolver Resolver(DomainId schemaId)
             {
-                var contentId = c.GetArgument<DomainId>("id");
+                var schemaIdValue = schemaId.ToString();
 
-                return ((GraphQLExecutionContext)c.UserContext).FindContentAsync(contentId);
-            });
+                return new FuncFieldResolver<object?>(c =>
+                {
+                    var contentId = c.GetArgument<DomainId>("id");
+
+                    var version = c.GetArgument<int?>("version");
+
+                    if (version >= 0)
+                    {
+                        return ((GraphQLExecutionContext)c.UserContext).FindContentAsync(schemaIdValue, contentId, version.Value);
+                    }
+                    else
+                    {
+                        return ((GraphQLExecutionContext)c.UserContext).FindContentAsync(contentId);
+                    }
+                });
+            }
         }
 
         public static class QueryOrReferencing
@@ -421,11 +442,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
         }
 
-        private static NamedContentData GetContentData(IResolveFieldContext c)
+        private static ContentData GetContentData(IResolveFieldContext c)
         {
             var source = c.GetArgument<IDictionary<string, object>>("data");
 
-            return source.ToNamedContentData((IComplexGraphType)c.FieldDefinition.Arguments.Find("data").Flatten());
+            return source.ToContentData((IComplexGraphType)c.FieldDefinition.Arguments.Find("data").Flatten());
         }
 
         private static IFieldResolver ResolveAsync<T>(NamedId<DomainId> appId, NamedId<DomainId> schemaId, Func<IResolveFieldContext, ContentCommand> action)

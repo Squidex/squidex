@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
         }
 
-        public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
+        public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, ContentData data, ClaimsPrincipal user)
         {
             var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result.ToArray();
         }
 
-        private bool IsTrue(WorkflowCondition condition, NamedContentData data, ClaimsPrincipal user)
+        private bool IsTrue(WorkflowCondition condition, ContentData data, ClaimsPrincipal user)
         {
             if (condition?.Roles != null && user != null)
             {

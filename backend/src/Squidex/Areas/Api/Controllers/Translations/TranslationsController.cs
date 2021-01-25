@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Translations.Models;
 using Squidex.Infrastructure.Commands;
@@ -39,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Translations
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/translations/")]
-        [ProducesResponseType(typeof(TranslationDto), 200)]
+        [ProducesResponseType(typeof(TranslationDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppTranslate)]
         [ApiCosts(0)]
         public async Task<IActionResult> PostTranslation(string app, [FromBody] TranslateDto request)

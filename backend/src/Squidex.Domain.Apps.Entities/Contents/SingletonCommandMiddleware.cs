@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var schemaId = NamedId.Of(createSchema.SchemaId, createSchema.Name);
 
-                var data = new NamedContentData();
+                var data = new ContentData();
 
                 var contentId = schemaId.Id;
                 var content = new CreateContent

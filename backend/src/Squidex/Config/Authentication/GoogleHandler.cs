@@ -29,7 +29,7 @@ namespace Squidex.Config.Authentication
 
             if (!string.IsNullOrWhiteSpace(nameClaim))
             {
-                context.Identity.SetDisplayName(nameClaim);
+                context.Identity.AddClaim(new Claim(SquidexClaimTypes.DisplayName, nameClaim));
             }
 
             string? pictureUrl = null;
@@ -54,7 +54,7 @@ namespace Squidex.Config.Authentication
 
             if (!string.IsNullOrWhiteSpace(pictureUrl))
             {
-                context.Identity.SetPictureUrl(pictureUrl);
+                context.Identity.AddClaim(new Claim(SquidexClaimTypes.PictureUrl, pictureUrl));
             }
 
             return base.CreatingTicket(context);

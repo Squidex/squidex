@@ -19,7 +19,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The data to import.
         /// </summary>
         [LocalizedRequired]
-        public List<NamedContentData> Datas { get; set; }
+        public List<ContentData> Datas { get; set; }
 
         /// <summary>
         /// True to automatically publish the content.

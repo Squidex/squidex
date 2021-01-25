@@ -15,7 +15,6 @@ namespace Squidex.Pipeline.Squid
 {
     public sealed class SquidMiddleware
     {
-        private readonly RequestDelegate next;
         private readonly string squidHappyLG = LoadSvg("happy");
         private readonly string squidHappySM = LoadSvg("happy-sm");
         private readonly string squidSadLG = LoadSvg("sad");
@@ -23,76 +22,68 @@ namespace Squidex.Pipeline.Squid
 
         public SquidMiddleware(RequestDelegate next)
         {
-            this.next = next;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
             var request = context.Request;
 
-            if (request.Path.Equals("/squid.svg"))
+            var face = "sad";
+
+            if (request.Query.TryGetValue("face", out var faceValue) && (faceValue == "sad" || faceValue == "happy"))
             {
-                var face = "sad";
+                face = faceValue;
+            }
 
-                if (request.Query.TryGetValue("face", out var faceValue) && (faceValue == "sad" || faceValue == "happy"))
-                {
-                    face = faceValue;
-                }
+            var isSad = face == "sad";
 
-                var isSad = face == "sad";
+            var title = isSad ? "OH DAMN!" : "OH YEAH!";
 
-                var title = isSad ? "OH DAMN!" : "OH YEAH!";
+            if (request.Query.TryGetValue("title", out var titleValue) && !string.IsNullOrWhiteSpace(titleValue))
+            {
+                title = titleValue;
+            }
 
-                if (request.Query.TryGetValue("title", out var titleValue) && !string.IsNullOrWhiteSpace(titleValue))
-                {
-                    title = titleValue;
-                }
+            var text = "text";
 
-                var text = "text";
+            if (request.Query.TryGetValue("text", out var textValue) && !string.IsNullOrWhiteSpace(textValue))
+            {
+                text = textValue;
+            }
 
-                if (request.Query.TryGetValue("text", out var textValue) && !string.IsNullOrWhiteSpace(textValue))
-                {
-                    text = textValue;
-                }
+            var background = isSad ? "#F5F5F9" : "#4CC159";
 
-                var background = isSad ? "#F5F5F9" : "#4CC159";
+            if (request.Query.TryGetValue("background", out var backgroundValue) && !string.IsNullOrWhiteSpace(backgroundValue))
+            {
+                background = backgroundValue;
+            }
 
-                if (request.Query.TryGetValue("background", out var backgroundValue) && !string.IsNullOrWhiteSpace(backgroundValue))
-                {
-                    background = backgroundValue;
-                }
+            var isSmall = request.Query.TryGetValue("small", out _);
 
-                var isSmall = request.Query.TryGetValue("small", out _);
+            string svg;
 
-                string svg;
-
-                if (isSmall)
-                {
-                    svg = isSad ? squidSadSM : squidHappySM;
-                }
-                else
-                {
-                    svg = isSad ? squidSadLG : squidHappyLG;
-                }
-
-                var (l1, l2, l3) = SplitText(text);
-
-                svg = svg.Replace("{{TITLE}}", title.ToUpperInvariant());
-                svg = svg.Replace("{{TEXT1}}", l1);
-                svg = svg.Replace("{{TEXT2}}", l2);
-                svg = svg.Replace("{{TEXT3}}", l3);
-                svg = svg.Replace("[COLOR]", background);
-
-                context.Response.StatusCode = 200;
-                context.Response.ContentType = "image/svg+xml";
-                context.Response.Headers["Cache-Control"] = "public, max-age=604800";
-
-                await context.Response.WriteAsync(svg);
+            if (isSmall)
+            {
+                svg = isSad ? squidSadSM : squidHappySM;
             }
             else
             {
-                await next(context);
+                svg = isSad ? squidSadLG : squidHappyLG;
             }
+
+            var (l1, l2, l3) = SplitText(text);
+
+            svg = svg.Replace("{{TITLE}}", title.ToUpperInvariant());
+            svg = svg.Replace("{{TEXT1}}", l1);
+            svg = svg.Replace("{{TEXT2}}", l2);
+            svg = svg.Replace("{{TEXT3}}", l3);
+            svg = svg.Replace("[COLOR]", background);
+
+            context.Response.StatusCode = 200;
+            context.Response.ContentType = "image/svg+xml";
+            context.Response.Headers["Cache-Control"] = "public, max-age=604800";
+
+            await context.Response.WriteAsync(svg);
         }
 
         private static (string, string, string) SplitText(string text)

@@ -77,6 +77,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     @event.Payload.ContentId,
                     @event.Headers.EventStreamNumber());
 
+            if (content == null)
+            {
+                throw new DomainObjectNotFoundException(@event.Payload.ContentId.ToString());
+            }
+
             SimpleMapper.Map(content, result);
 
             switch (@event.Payload)
@@ -115,6 +120,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 content.AppId.Id,
                                 content.Id,
                                 content.Version - 1);
+
+                        if (previousContent == null)
+                        {
+                            throw new DomainObjectNotFoundException(@event.Payload.ContentId.ToString());
+                        }
 
                         result.DataOld = previousContent.Data;
                         break;

@@ -32,7 +32,7 @@ namespace Squidex.Extensions.Validation
 
         public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value is NamedContentData data)
+            if (value is ContentData data)
             {
                 var validateableFields = context.Schema.Fields.Where(IsValidateableField);
 
@@ -62,7 +62,7 @@ namespace Squidex.Extensions.Validation
             }
         }
 
-        private static ClrValue TryGetValue(IRootField field, NamedContentData data)
+        private static ClrValue TryGetValue(IRootField field, ContentData data)
         {
             var value = JsonValue.Null;
 

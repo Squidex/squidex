@@ -8,8 +8,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Newtonsoft.Json;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
 #pragma warning disable SA1115 // Parameter should follow comma
@@ -44,7 +47,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextIndexerTests_Mongo()
         {
-            SupportssQuerySyntax = false;
+            BsonJsonConvention.Register(JsonSerializer.Create(TestUtils.CreateSerializerSettings()));
+
+            SupportsQuerySyntax = false;
+            SupportsGeo = true;
         }
 
         [Fact]
@@ -53,11 +59,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             var both = ids2.Union(ids1).ToList();
 
             await TestCombinations(
-                Create(ids1[0], "de", "and und"),
-                Create(ids2[0], "en", "and und"),
+                CreateText(ids1[0], "de", "and und"),
+                CreateText(ids2[0], "en", "and und"),
 
-                Search(expected: both, text: "and"),
-                Search(expected: both, text: "und")
+                SearchText(expected: both, text: "and"),
+                SearchText(expected: both, text: "und")
             );
         }
     }

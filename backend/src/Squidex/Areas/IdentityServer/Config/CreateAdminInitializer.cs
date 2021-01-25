@@ -6,10 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
@@ -20,7 +18,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Log;
 using Squidex.Shared;
-using Squidex.Shared.Users;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
@@ -46,25 +44,24 @@ namespace Squidex.Areas.IdentityServer.Config
             {
                 using (var scope = serviceProvider.CreateScope())
                 {
-                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-                    var userFactory = scope.ServiceProvider.GetRequiredService<IUserFactory>();
+                    var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
                     var adminEmail = identityOptions.AdminEmail;
                     var adminPass = identityOptions.AdminPassword;
 
-                    var isEmpty = IsEmpty(userManager);
+                    var isEmpty = await IsEmptyAsync(userService);
 
                     if (isEmpty || identityOptions.AdminRecreate)
                     {
                         try
                         {
-                            var user = await userManager.FindByEmailWithClaimsAsync(adminEmail);
+                            var user = await userService.FindByEmailAsync(adminEmail);
 
                             if (user != null)
                             {
                                 if (identityOptions.AdminRecreate)
                                 {
-                                    var permissions = CreatePermissions(user.Permissions());
+                                    var permissions = CreatePermissions(user.Claims.Permissions());
 
                                     var values = new UserValues
                                     {
@@ -72,7 +69,7 @@ namespace Squidex.Areas.IdentityServer.Config
                                         Permissions = permissions
                                     };
 
-                                    await userManager.UpdateAsync(user.Identity, values);
+                                    await userService.UpdateAsync(user.Id, values);
                                 }
                             }
                             else
@@ -81,13 +78,12 @@ namespace Squidex.Areas.IdentityServer.Config
 
                                 var values = new UserValues
                                 {
-                                    Email = adminEmail,
                                     Password = adminPass,
                                     Permissions = permissions,
                                     DisplayName = adminEmail
                                 };
 
-                                await userManager.CreateAsync(userFactory, values);
+                                await userService.CreateAsync(adminEmail, values);
                             }
                         }
                         catch (Exception ex)
@@ -115,9 +111,11 @@ namespace Squidex.Areas.IdentityServer.Config
             return permissions;
         }
 
-        private static bool IsEmpty(UserManager<IdentityUser> userManager)
+        private static async Task<bool> IsEmptyAsync(IUserService userService)
         {
-            return userManager.SupportsQueryableUsers && !userManager.Users.Any();
+            var users = await userService.QueryAsync(take: 1);
+
+            return users.Total == 0;
         }
     }
 }

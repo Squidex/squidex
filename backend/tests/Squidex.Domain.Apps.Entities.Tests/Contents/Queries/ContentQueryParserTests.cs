@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -23,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentQueryParserTests
     {
+        private readonly ITextIndex textIndex = A.Fake<ITextIndex>();
         private readonly ISchemaEntity schema;
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -37,13 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var schemaDef =
                 new Schema(schemaId.Name)
-                    .AddString(1, "firstName", Partitioning.Invariant);
+                    .AddString(1, "firstName", Partitioning.Invariant)
+                    .AddGeolocation(2, "geo", Partitioning.Invariant);
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            sut = new ContentQueryParser(cache, TestUtils.DefaultSerializer, options);
+            sut = new ContentQueryParser(cache, TestUtils.DefaultSerializer, textIndex, options);
         }
 
         [Fact]
@@ -51,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithODataQuery("$filter=invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema));
         }
 
         [Fact]
@@ -59,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var query = Q.Empty.WithJsonQuery("invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema).AsTask());
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query, schema));
         }
 
         [Fact]
@@ -85,11 +90,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_parse_odata_query()
         {
-            var query = Q.Empty.WithODataQuery("$top=100&$orderby=data/firstName/iv asc&$search=Hello World");
+            var query = Q.Empty.WithODataQuery("$top=100&$orderby=data/firstName/iv asc&$filter=status eq 'Draft'");
 
             var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("FullText: 'Hello World'; Take: 100; Sort: data.firstName.iv Ascending, id Ascending", q.Query.ToString());
+            Assert.Equal("Filter: status == 'Draft'; Take: 100; Sort: data.firstName.iv Ascending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -105,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_parse_json_query_and_enrich_with_defaults()
         {
-            var query = Q.Empty.WithJsonQuery(Json("{ 'filter': { 'path': 'data.firstName.iv', 'op': 'eq', 'value': 'ABC' } }"));
+            var query = Q.Empty.WithJsonQuery("{ \"filter\": { \"path\": \"data.firstName.iv\", \"op\": \"eq\", \"value\": \"ABC\" } }");
 
             var q = await sut.ParseAsync(requestContext, query, schema);
 
@@ -113,41 +118,120 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_convert_json_query_and_enrich_with_defaults()
+        public async Task Should_convert_full_text_query_to_filter_with_other_filter()
         {
-            var query = Q.Empty.WithJsonQuery(
-                new Query<IJsonValue>
-                {
-                    Filter = new CompareFilter<IJsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC"))
-                });
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), requestContext.Scope()))
+                .Returns(new List<DomainId> { DomainId.Create("1"), DomainId.Create("2") });
+
+            var query = Q.Empty.WithODataQuery("$search=Hello&$filter=data/firstName/iv eq 'ABC'");
 
             var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+            Assert.Equal("Filter: (data.firstName.iv == 'ABC' && id in ['1', '2']); Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
-        public async Task Should_parse_json_full_text_query_and_enrich_with_defaults()
+        public async Task Should_convert_full_text_query_to_filter()
         {
-            var query = Q.Empty.WithJsonQuery(Json("{ 'fullText': 'Hello' }"));
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), requestContext.Scope()))
+                .Returns(new List<DomainId> { DomainId.Create("1"), DomainId.Create("2") });
+
+            var query = Q.Empty.WithODataQuery("$search=Hello");
 
             var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+            Assert.Equal("Filter: id in ['1', '2']; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
-        public async Task Should_convert_json_full_text_query_and_enrich_with_defaults()
+        public async Task Should_convert_full_text_query_to_filter_when_single_id_found()
         {
-            var query = Q.Empty.WithJsonQuery(
-                new Query<IJsonValue>
-                {
-                    FullText = "Hello"
-                });
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), requestContext.Scope()))
+                .Returns(new List<DomainId> { DomainId.Create("1") });
+
+            var query = Q.Empty.WithODataQuery("$search=Hello");
 
             var q = await sut.ParseAsync(requestContext, query, schema);
 
-            Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+            Assert.Equal("Filter: id in ['1']; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_convert_full_text_query_to_filter_when_index_returns_null()
+        {
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), requestContext.Scope()))
+                .Returns(Task.FromResult<List<DomainId>?>(null));
+
+            var query = Q.Empty.WithODataQuery("$search=Hello");
+
+            var q = await sut.ParseAsync(requestContext, query, schema);
+
+            Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_convert_full_text_query_to_filter_when_index_returns_empty()
+        {
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), requestContext.Scope()))
+                .Returns(new List<DomainId>());
+
+            var query = Q.Empty.WithODataQuery("$search=Hello");
+
+            var q = await sut.ParseAsync(requestContext, query, schema);
+
+            Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_convert_geo_query_to_filter()
+        {
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope()))
+                .Returns(new List<DomainId> { DomainId.Create("1"), DomainId.Create("2") });
+
+            var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
+
+            var q = await sut.ParseAsync(requestContext, query, schema);
+
+            Assert.Equal("Filter: id in ['1', '2']; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_convert_geo_query_to_filter_when_single_id_found()
+        {
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope()))
+                .Returns(new List<DomainId> { DomainId.Create("1") });
+
+            var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
+
+            var q = await sut.ParseAsync(requestContext, query, schema);
+
+            Assert.Equal("Filter: id in ['1']; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_convert_geo_query_to_filter_when_index_returns_null()
+        {
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope()))
+                .Returns(Task.FromResult<List<DomainId>?>(null));
+
+            var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
+
+            var q = await sut.ParseAsync(requestContext, query, schema);
+
+            Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_convert_geo_query_to_filter_when_index_returns_empty()
+        {
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope()))
+                .Returns(new List<DomainId>());
+
+            var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
+
+            var q = await sut.ParseAsync(requestContext, query, schema);
+
+            Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
         [Fact]
@@ -161,7 +245,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_limit_number_of_contents()
+        public async Task Should_apply_default_limit()
         {
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
 
@@ -180,9 +264,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal("Skip: 20; Take: 200; Sort: id Descending", q.Query.ToString());
         }
 
-        private static string Json(string text)
+        [Fact]
+        public async Task Should_convert_json_query_and_enrich_with_defaults()
         {
-            return text.Replace('\'', '"');
+            var query = Q.Empty.WithJsonQuery(
+                new Query<IJsonValue>
+                {
+                    Filter = new CompareFilter<IJsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC"))
+                });
+
+            var q = await sut.ParseAsync(requestContext, query, schema);
+
+            Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
     }
 }

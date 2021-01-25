@@ -224,5 +224,18 @@ namespace Squidex.Infrastructure.MongoDb
                 }
             }
         }
+
+        public static async Task<Version> GetVersionAsync(this IMongoDatabase database)
+        {
+            var command =
+                new BsonDocumentCommand<BsonDocument>(new BsonDocument
+                {
+                    { "buildInfo", 1 }
+                });
+
+            var result = await database.RunCommandAsync(command);
+
+            return Version.Parse(result["version"].AsString);
+        }
     }
 }

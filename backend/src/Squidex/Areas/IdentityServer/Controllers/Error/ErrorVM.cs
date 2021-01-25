@@ -5,22 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Shared.Users;
+using IdentityServer4.Models;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Areas.IdentityServer.Controllers.Error
 {
-    public interface IUserEventHandler
+    public class ErrorVM
     {
-        void OnUserRegistered(IUser user)
-        {
-        }
-
-        void OnUserUpdated(IUser user)
-        {
-        }
-
-        void OnConsentGiven(IUser user)
-        {
-        }
+        public ErrorMessage Error { get; set; }
     }
 }

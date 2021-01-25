@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -25,7 +26,7 @@ namespace Squidex.Config.Authentication
 
             if (!string.IsNullOrEmpty(displayName))
             {
-                context.Identity.SetDisplayName(displayName);
+                context.Identity.AddClaim(new Claim(SquidexClaimTypes.DisplayName, displayName));
             }
 
             string? id = null;
@@ -39,7 +40,7 @@ namespace Squidex.Config.Authentication
             {
                 var pictureUrl = $"https://apis.live.net/v5.0/{id}/picture";
 
-                context.Identity.SetPictureUrl(pictureUrl);
+                context.Identity.AddClaim(new Claim(SquidexClaimTypes.PictureUrl, pictureUrl));
             }
 
             return base.CreatingTicket(context);

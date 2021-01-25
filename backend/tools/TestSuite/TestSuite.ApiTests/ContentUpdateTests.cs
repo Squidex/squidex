@@ -7,10 +7,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
@@ -168,12 +166,12 @@ namespace TestSuite.ApiTests
                     {
                         new BulkUpdateJob
                         {
-                            Type = Squidex.ClientLibrary.BulkUpdateType.Upsert,
+                            Type = BulkUpdateType.Upsert,
                             Data = new
                             {
                                 number = new
                                 {
-                                    iv = -99
+                                    iv = TestEntity.ScriptTrigger
                                 }
                             }
                         }
@@ -209,12 +207,12 @@ namespace TestSuite.ApiTests
                     {
                         new BulkUpdateJob
                         {
-                            Type = Squidex.ClientLibrary.BulkUpdateType.Upsert,
+                            Type = BulkUpdateType.Upsert,
                             Data = new
                             {
                                 number = new
                                 {
-                                    iv = -99
+                                    iv = TestEntity.ScriptTrigger
                                 }
                             }
                         }

@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 {
     public static class ContentConverterFlat
     {
-        public static Dictionary<string, object?> ToFlatten(this NamedContentData content)
+        public static Dictionary<string, object?> ToFlatten(this ContentData content)
         {
             var result = new Dictionary<string, object?>();
 
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return result;
         }
 
-        public static FlatContentData ToFlatten(this NamedContentData content, string fallback)
+        public static FlatContentData ToFlatten(this ContentData content, string fallback)
         {
             var result = new FlatContentData();
 

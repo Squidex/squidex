@@ -64,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/assets/tags")]
-        [ProducesResponseType(typeof(Dictionary<string, int>), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetTags(string app)
@@ -92,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/assets/")]
-        [ProducesResponseType(typeof(AssetsDto), 200)]
+        [ProducesResponseType(typeof(AssetsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] DomainId? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
@@ -121,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/assets/query")]
-        [ProducesResponseType(typeof(AssetsDto), 200)]
+        [ProducesResponseType(typeof(AssetsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssetsPost(string app, [FromBody] QueryDto query)
@@ -147,7 +147,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/assets/{id}/")]
-        [ProducesResponseType(typeof(AssetDto), 200)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, DomainId id)
@@ -223,7 +223,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content/")]
-        [ProducesResponseType(typeof(AssetDto), 200)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpload)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetContent(string app, DomainId id, IFormFile file)
@@ -250,7 +250,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/")]
-        [ProducesResponseType(typeof(AssetDto), 200)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
@@ -276,7 +276,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/parent")]
-        [ProducesResponseType(typeof(AssetDto), 200)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]

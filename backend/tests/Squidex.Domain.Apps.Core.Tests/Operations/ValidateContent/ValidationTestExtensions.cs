@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 .ValidateAsync(value, context, CreateFormatter(errors));
         }
 
-        public static async Task ValidatePartialAsync(this NamedContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
+        public static async Task ValidatePartialAsync(this ContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             }
         }
 
-        public static async Task ValidateAsync(this NamedContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
+        public static async Task ValidateAsync(this ContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,

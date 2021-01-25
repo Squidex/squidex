@@ -7,27 +7,20 @@
 
 using System.Collections.Generic;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class NegateFilter<TValue> : FilterNode<TValue>
+    public sealed record NegateFilter<TValue>(FilterNode<TValue> Filter) : FilterNode<TValue>
     {
-        public FilterNode<TValue> Filter { get; }
-
-        public NegateFilter(FilterNode<TValue> filter)
-        {
-            Guard.NotNull(filter, nameof(filter));
-
-            Filter = filter;
-        }
-
         public override void AddFields(HashSet<string> fields)
         {
             Filter.AddFields(fields);
         }
 
-        public override T Accept<T>(FilterNodeVisitor<T, TValue> visitor)
+        public override T Accept<T, TArgs>(FilterNodeVisitor<T, TValue, TArgs> visitor, TArgs args)
         {
-            return visitor.Visit(this);
+            return visitor.Visit(this, args);
         }
 
         public override string ToString()

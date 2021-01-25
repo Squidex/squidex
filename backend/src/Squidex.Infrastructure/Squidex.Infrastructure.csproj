@@ -9,11 +9,7 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="NewFolder\**" />
-    <EmbeddedResource Remove="NewFolder\**" />
-    <None Remove="NewFolder\**" />
-  </ItemGroup>
-  <ItemGroup>
+    <PackageReference Include="GeoJSON.Net" Version="1.2.19" />
     <PackageReference Include="MailKit" Version="2.10.1" />
     <PackageReference Include="McMaster.NETCore.Plugins" Version="1.3.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />
@@ -48,5 +44,8 @@
   </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pool\" />
   </ItemGroup>
 </Project>

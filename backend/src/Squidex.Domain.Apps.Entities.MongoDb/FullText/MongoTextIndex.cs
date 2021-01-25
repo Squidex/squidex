@@ -21,6 +21,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
     public sealed class MongoTextIndex : MongoRepositoryBase<MongoTextIndexEntity>, ITextIndex
     {
+        private const int Limit = 2000;
+        private const int LimitHalf = 1000;
         private static readonly List<DomainId> EmptyResults = new List<DomainId>();
 
         public MongoTextIndex(IMongoDatabase database, bool setup = false)
@@ -33,12 +35,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return collection.Indexes.CreateManyAsync(new[]
             {
                 new CreateIndexModel<MongoTextIndexEntity>(
+                    Index.Ascending(x => x.DocId)),
+
+                new CreateIndexModel<MongoTextIndexEntity>(
                     Index
                         .Text("t.t")
                         .Ascending(x => x.AppId)
                         .Ascending(x => x.ServeAll)
                         .Ascending(x => x.ServePublished)
-                        .Ascending(x => x.SchemaId))
+                        .Ascending(x => x.SchemaId)),
+
+                new CreateIndexModel<MongoTextIndexEntity>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.ServeAll)
+                        .Ascending(x => x.ServePublished)
+                        .Ascending(x => x.SchemaId)
+                        .Ascending(x => x.GeoField)
+                        .Geo2DSphere(x => x.GeoObject))
             }, ct);
         }
 
@@ -53,40 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
             foreach (var command in commands)
             {
-                switch (command)
-                {
-                    case DeleteIndexEntry _:
-                        writes.Add(
-                            new DeleteOneModel<MongoTextIndexEntity>(
-                                Filter.Eq(x => x.DocId, command.DocId)));
-                        break;
-                    case UpdateIndexEntry update:
-                        writes.Add(
-                            new UpdateOneModel<MongoTextIndexEntity>(
-                                Filter.Eq(x => x.DocId, command.DocId),
-                                Update
-                                    .Set(x => x.ServeAll, update.ServeAll)
-                                    .Set(x => x.ServePublished, update.ServePublished)));
-                        break;
-                    case UpsertIndexEntry upsert when upsert.Texts.Count > 0:
-                        writes.Add(
-                            new ReplaceOneModel<MongoTextIndexEntity>(
-                                Filter.Eq(x => x.DocId, command.DocId),
-                                new MongoTextIndexEntity
-                                {
-                                    DocId = upsert.DocId,
-                                    ContentId = upsert.ContentId,
-                                    SchemaId = upsert.SchemaId.Id,
-                                    ServeAll = upsert.ServeAll,
-                                    ServePublished = upsert.ServePublished,
-                                    Texts = upsert.Texts.Select(x => new MongoTextIndexEntityText { Text = x.Value }).ToList(),
-                                    AppId = upsert.AppId.Id
-                                })
-                            {
-                                IsUpsert = true
-                            });
-                        break;
-                }
+                CommandFactory.CreateCommands(command, writes);
             }
 
             if (writes.Count == 0)
@@ -97,8 +78,27 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return Collection.BulkWriteAsync(writes);
         }
 
-        public async Task<List<DomainId>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope)
+        public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope)
         {
+            var byGeo =
+                await Collection.Find(
+                    Filter.And(
+                        Filter.Eq(x => x.AppId, app.Id),
+                        Filter.Eq(x => x.SchemaId, query.SchemaId),
+                        Filter_ByScope(scope),
+                        Filter.GeoWithinCenterSphere(x => x.GeoObject, query.Longitude, query.Latitude, query.Radius / 6378100)))
+                    .Limit(Limit).Only(x => x.ContentId)
+                    .ToListAsync();
+
+            var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
+
+            return byGeo.Select(x => DomainId.Create(x[field].AsString)).Distinct().ToList();
+        }
+
+        public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope)
+        {
+            var (queryText, filter) = query;
+
             if (string.IsNullOrWhiteSpace(queryText))
             {
                 return EmptyResults;
@@ -106,24 +106,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
             if (filter == null)
             {
-                return await SearchByAppAsync(queryText, app, scope, 2000);
+                return await SearchByAppAsync(queryText, app, scope, Limit);
             }
             else if (filter.Must)
             {
-                return await SearchBySchemaAsync(queryText, app, filter, scope, 2000);
+                return await SearchBySchemaAsync(queryText, app, filter, scope, Limit);
             }
             else
             {
                 var (bySchema, byApp) =
                     await AsyncHelper.WhenAll(
-                        SearchBySchemaAsync(queryText, app, filter, scope, 1000),
-                        SearchByAppAsync(queryText, app, scope, 1000));
+                        SearchBySchemaAsync(queryText, app, filter, scope, LimitHalf),
+                        SearchByAppAsync(queryText, app, scope, LimitHalf));
 
                 return bySchema.Union(byApp).Distinct().ToList();
             }
         }
 
-        private async Task<List<DomainId>> SearchBySchemaAsync(string queryText, IAppEntity app, SearchFilter filter, SearchScope scope, int limit)
+        private async Task<List<DomainId>> SearchBySchemaAsync(string queryText, IAppEntity app, TextFilter filter, SearchScope scope, int limit)
         {
             var bySchema =
                 await Collection.Find(

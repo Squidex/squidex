@@ -39,33 +39,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private readonly ISchemaEntity schema;
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
 
-        private readonly NamedContentData invalidData =
-            new NamedContentData()
+        private readonly ContentData invalidData =
+            new ContentData()
                 .AddField("my-field1",
                 new ContentFieldData()
                         .AddValue("iv", null))
                 .AddField("my-field2",
                     new ContentFieldData()
                         .AddValue("iv", 1));
-        private readonly NamedContentData data =
-            new NamedContentData()
+        private readonly ContentData data =
+            new ContentData()
                 .AddField("my-field1",
                     new ContentFieldData()
                         .AddValue("iv", 1));
-        private readonly NamedContentData patch =
-            new NamedContentData()
+        private readonly ContentData patch =
+            new ContentData()
                 .AddField("my-field2",
                     new ContentFieldData()
                         .AddValue("iv", 2));
-        private readonly NamedContentData otherData =
-            new NamedContentData()
+        private readonly ContentData otherData =
+            new ContentData()
                 .AddField("my-field1",
                     new ContentFieldData()
                         .AddValue("iv", 2))
                 .AddField("my-field2",
                     new ContentFieldData()
                         .AddValue("iv", 2));
-        private readonly NamedContentData patched;
+        private readonly ContentData patched;
         private readonly ContentDomainObject sut;
 
         protected override DomainId Id
@@ -724,12 +724,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return PublishAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
         }
 
-        private ScriptVars ScriptContext(NamedContentData? newData, NamedContentData? oldData, Status newStatus)
+        private ScriptVars ScriptContext(ContentData? newData, ContentData? oldData, Status newStatus)
         {
             return A<ScriptVars>.That.Matches(x => M(x, newData, oldData, newStatus, default));
         }
 
-        private ScriptVars ScriptContext(NamedContentData? newData, NamedContentData? oldData, Status newStatus, Status oldStatus)
+        private ScriptVars ScriptContext(ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
         {
             return A<ScriptVars>.That.Matches(x => M(x, newData, oldData, newStatus, oldStatus));
         }
@@ -739,7 +739,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return A<ScriptOptions>.That.Matches(x => x.CanDisallow && x.CanReject && x.AsContext);
         }
 
-        private bool M(ScriptVars x, NamedContentData? newData, NamedContentData? oldData, Status newStatus, Status oldStatus)
+        private bool M(ScriptVars x, ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
         {
             return
                 Equals(x.Data, newData) &&

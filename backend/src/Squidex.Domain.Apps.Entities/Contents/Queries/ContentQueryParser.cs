@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -39,63 +40,121 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly JsonSchema genericJsonSchema = BuildJsonSchema("Content", null);
         private readonly IMemoryCache cache;
         private readonly IJsonSerializer jsonSerializer;
+        private readonly ITextIndex textIndex;
         private readonly ContentOptions options;
 
-        public ContentQueryParser(IMemoryCache cache, IJsonSerializer jsonSerializer, IOptions<ContentOptions> options)
+        public ContentQueryParser(IMemoryCache cache, IJsonSerializer jsonSerializer, ITextIndex textIndex, IOptions<ContentOptions> options)
         {
             Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNull(textIndex, nameof(textIndex));
             Guard.NotNull(cache, nameof(cache));
             Guard.NotNull(options, nameof(options));
 
             this.jsonSerializer = jsonSerializer;
+            this.textIndex = textIndex;
             this.cache = cache;
             this.options = options.Value;
         }
 
-        public virtual ValueTask<Q> ParseAsync(Context context, Q q, ISchemaEntity? schema = null)
+        public virtual async Task<Q> ParseAsync(Context context, Q q, ISchemaEntity? schema = null)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(q, nameof(q));
 
             using (Profiler.TraceMethod<ContentQueryParser>())
             {
-                var query = q.Query;
+                var query = ParseQuery(context, q, schema);
 
-                if (!string.IsNullOrWhiteSpace(q.JsonQueryString))
-                {
-                    query = ParseJson(context, schema, q.JsonQueryString);
-                }
-                else if (q?.JsonQuery != null)
-                {
-                    query = ParseJson(context, schema, q.JsonQuery);
-                }
-                else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
-                {
-                    query = ParseOData(context, schema, q.ODataQuery);
-                }
+                await TransformFilterAsync(query, context, schema);
 
-                if (query.Sort.Count == 0)
-                {
-                    query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
-                }
-
-                if (!query.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
-                {
-                    query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
-                }
-
-                if (query.Take == long.MaxValue)
-                {
-                    query.Take = options.DefaultPageSize;
-                }
-                else if (query.Take > options.MaxResults)
-                {
-                    query.Take = options.MaxResults;
-                }
+                WithSorting(query);
+                WithPaging(query);
 
                 q = q!.WithQuery(query);
 
-                return new ValueTask<Q>(q);
+                return q;
+            }
+        }
+
+        private async Task TransformFilterAsync(ClrQuery query, Context context, ISchemaEntity? schema)
+        {
+            if (query.Filter != null && schema != null)
+            {
+                query.Filter = await GeoQueryTransformer.TransformAsync(query.Filter, context, schema, textIndex);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.FullText))
+            {
+                if (schema == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                var textQuery = new TextQuery(query.FullText, TextFilter.ShouldHaveSchemas(schema.Id));
+
+                var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope());
+                var fullTextFilter = ClrFilter.Eq("id", "__notfound__");
+
+                if (fullTextIds?.Any() == true)
+                {
+                    fullTextFilter = ClrFilter.In("id", fullTextIds.Select(x => x.ToString()).ToList());
+                }
+
+                if (query.Filter != null)
+                {
+                    query.Filter = ClrFilter.And(query.Filter, fullTextFilter);
+                }
+                else
+                {
+                    query.Filter = fullTextFilter;
+                }
+
+                query.FullText = null;
+            }
+        }
+
+        private ClrQuery ParseQuery(Context context, Q q, ISchemaEntity? schema)
+        {
+            var query = q.Query;
+
+            if (!string.IsNullOrWhiteSpace(q.JsonQueryString))
+            {
+                query = ParseJson(context, schema, q.JsonQueryString);
+            }
+            else if (q?.JsonQuery != null)
+            {
+                query = ParseJson(context, schema, q.JsonQuery);
+            }
+            else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+            {
+                query = ParseOData(context, schema, q.ODataQuery);
+            }
+
+            return query;
+        }
+
+        private static void WithSorting(ClrQuery query)
+        {
+            if (query.Sort.Count == 0)
+            {
+                query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
+            }
+
+            if (!query.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
+            {
+                query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
+            }
+        }
+
+        private void WithPaging(ClrQuery query)
+        {
+            if (query.Take == long.MaxValue)
+            {
+                query.Take = options.DefaultPageSize;
+            }
+            else if (query.Take > options.MaxResults)
+            {
+                query.Take = options.MaxResults;
             }
         }
 
@@ -182,14 +241,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 Properties =
                 {
-                    ["id"] = SchemaBuilder.StringProperty($"The id of the {name} content.", true),
-                    ["version"] = SchemaBuilder.NumberProperty($"The version of the {name}.", true),
-                    ["created"] = SchemaBuilder.DateTimeProperty($"The date and time when the {name} content has been created.", true),
-                    ["createdBy"] = SchemaBuilder.StringProperty($"The user that has created the {name} content.", true),
-                    ["lastModified"] = SchemaBuilder.DateTimeProperty($"The date and time when the {name} content has been modified last.", true),
-                    ["lastModifiedBy"] = SchemaBuilder.StringProperty($"The user that has updated the {name} content last.", true),
-                    ["newStatus"] = SchemaBuilder.StringProperty($"The new status of the content.", false),
-                    ["status"] = SchemaBuilder.StringProperty($"The status of the content.", true)
+                    [nameof(IContentEntity.Id).ToCamelCase()] = SchemaBuilder.StringProperty($"The id of the {name} content.", true),
+                    [nameof(IContentEntity.Version).ToCamelCase()] = SchemaBuilder.NumberProperty($"The version of the {name}.", true),
+                    [nameof(IContentEntity.Created).ToCamelCase()] = SchemaBuilder.DateTimeProperty($"The date and time when the {name} content has been created.", true),
+                    [nameof(IContentEntity.CreatedBy).ToCamelCase()] = SchemaBuilder.StringProperty($"The user that has created the {name} content.", true),
+                    [nameof(IContentEntity.LastModified).ToCamelCase()] = SchemaBuilder.DateTimeProperty($"The date and time when the {name} content has been modified last.", true),
+                    [nameof(IContentEntity.LastModifiedBy).ToCamelCase()] = SchemaBuilder.StringProperty($"The user that has updated the {name} content last.", true),
+                    [nameof(IContentEntity.NewStatus).ToCamelCase()] = SchemaBuilder.StringProperty($"The new status of the content.", false),
+                    [nameof(IContentEntity.Status).ToCamelCase()] = SchemaBuilder.StringProperty($"The status of the content.", true)
                 },
                 Type = JsonObjectType.Object
             };

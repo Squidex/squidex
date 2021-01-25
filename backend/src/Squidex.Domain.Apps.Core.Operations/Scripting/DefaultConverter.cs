@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 case Status status:
                     result = status.ToString();
                     return true;
-                case NamedContentData content:
+                case ContentData content:
                     result = new ContentDataObject(engine, content);
                     return true;
             }

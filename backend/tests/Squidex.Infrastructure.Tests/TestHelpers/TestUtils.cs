@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.TestHelpers
 {
-    public static class JsonHelper
+    public static class TestUtils
     {
         public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
 

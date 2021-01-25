@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
             var value = new
             {
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("value",
                             new ContentFieldData()
                                 .AddValue("en", "Hello"))

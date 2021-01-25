@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -62,9 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             var contentRepository =
                 new MongoContentRepository(
                     mongoDatabase,
-                    CreateAppProvider(),
-                    CreateTextIndexer(),
-                    TestUtils.DefaultSerializer);
+                    CreateAppProvider());
 
             Task.Run(async () =>
             {
@@ -105,11 +102,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                                 for (var i = 0; i < numValues; i++)
                                 {
                                     var data =
-                                        new IdContentData()
-                                            .AddField(1,
+                                        new ContentData()
+                                            .AddField("field1",
                                                 new ContentFieldData()
                                                     .AddJsonValue(JsonValue.Create(i)))
-                                            .AddField(2,
+                                            .AddField("field2",
                                                 new ContentFieldData()
                                                     .AddJsonValue(JsonValue.Create(Lorem.Paragraph(200, 20))));
 
@@ -117,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                                     {
                                         DocumentId = DomainId.NewGuid(),
                                         AppId = appId,
-                                        DataByIds = data,
+                                        Data = data,
                                         IndexedAppId = appId.Id,
                                         IndexedSchemaId = schemaId.Id,
                                         IsDeleted = false,
@@ -148,16 +145,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<DomainId>(0)!, x.GetArgument<DomainId>(1)!)));
 
             return appProvider;
-        }
-
-        private static ITextIndex CreateTextIndexer()
-        {
-            var textIndexer = A.Fake<ITextIndex>();
-
-            A.CallTo(() => textIndexer.SearchAsync(A<string>._, A<IAppEntity>._, A<SearchFilter>._, A<SearchScope>._))
-                .Returns(new List<DomainId> { DomainId.NewGuid() });
-
-            return textIndexer;
         }
 
         private static void SetupJson()

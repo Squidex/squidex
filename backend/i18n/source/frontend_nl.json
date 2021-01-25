@@ -340,6 +340,7 @@
   "contents.arrayNoFields": "Voeg eerst een genest veld toe om items toe te voegen.",
   "contents.assetsUpload": "Zet bestanden neer of klik",
   "contents.autotranslate": "Automatisch vertalen vanuit de hoofdtaal",
+  "contents.bulkFailed": "Verwijderen van inhoud is mislukt. Laad opnieuw.",
   "contents.changeStatusTo": "Verander inhoud item(s) in {action}",
   "contents.changeStatusToImmediately": "Zet onmiddellijk op {action}.",
   "contents.changeStatusToLater": "Zet op {action} op een latere datum en tijd.",

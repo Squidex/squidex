@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
 
             [IgnoreDataMember]
-            public NamedContentData Data
+            public ContentData Data
             {
                 get { return NewVersion?.Data ?? CurrentVersion.Data; }
             }

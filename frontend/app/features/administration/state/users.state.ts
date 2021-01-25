@@ -164,6 +164,18 @@ export class UsersState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public delete(user: UserDto) {
+        return this.usersService.deleteUser(user).pipe(
+            tap(updated => {
+                this.next(s => {
+                    const users = s.users.filter(x => x.id !== user.id);
+
+                    return { ...s, users, total: s.total - 1 };
+                }, 'Delete');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public search(query: string) {
         if (!this.next({ query, page: 0 }, 'Loading Search')) {
             return EMPTY;

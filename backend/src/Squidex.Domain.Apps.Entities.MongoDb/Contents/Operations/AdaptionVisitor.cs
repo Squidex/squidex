@@ -9,48 +9,86 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NodaTime;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal sealed class AdaptionVisitor : TransformVisitor<ClrValue>
+    internal sealed class AdaptionVisitor : TransformVisitor<ClrValue, AdaptionVisitor.Args>
     {
-        private readonly Func<PropertyPath, PropertyPath> pathConverter;
+        private static readonly AdaptionVisitor Instance = new AdaptionVisitor();
 
-        public AdaptionVisitor(Func<PropertyPath, PropertyPath> pathConverter)
+        public struct Args
         {
-            this.pathConverter = pathConverter;
+            public readonly DomainId AppId;
+
+            public Args(DomainId appId)
+            {
+                AppId = appId;
+            }
         }
 
-        public override FilterNode<ClrValue> Visit(CompareFilter<ClrValue> nodeIn)
+        private AdaptionVisitor()
         {
-            CompareFilter<ClrValue> result;
+        }
 
-            var path = pathConverter(nodeIn.Path);
+        public static FilterNode<ClrValue>? AdaptFilter(FilterNode<ClrValue> filter, DomainId appId)
+        {
+            var args = new Args(appId);
 
-            var value = nodeIn.Value.Value;
+            return filter.Accept(Instance, args);
+        }
 
-            if (value is Instant &&
-                !string.Equals(path[0], "mt", StringComparison.OrdinalIgnoreCase) &&
-                !string.Equals(path[0], "ct", StringComparison.OrdinalIgnoreCase))
+        public override FilterNode<ClrValue> Visit(CompareFilter<ClrValue> nodeIn, Args args)
+        {
+            var result = nodeIn;
+
+            var (path, op, value) = nodeIn;
+
+            var clrValue = value.Value;
+
+            if (string.Equals(path[0], "id", StringComparison.OrdinalIgnoreCase))
             {
-                result = new CompareFilter<ClrValue>(path, nodeIn.Operator, value.ToString());
+                path = "_id";
+
+                if (clrValue is List<string> idList)
+                {
+                    value = idList.Select(x => DomainId.Combine(args.AppId, DomainId.Create(x)).ToString()).ToList();
+                }
+                else if (clrValue is string id)
+                {
+                    value = DomainId.Combine(args.AppId, DomainId.Create(id)).ToString();
+                }
+                else if (clrValue is List<Guid> guidIdList)
+                {
+                    value = guidIdList.Select(x => DomainId.Combine(args.AppId, DomainId.Create(x)).ToString()).ToList();
+                }
+                else if (clrValue is Guid guidId)
+                {
+                    value = DomainId.Combine(args.AppId, DomainId.Create(guidId)).ToString();
+                }
             }
             else
             {
-                result = new CompareFilter<ClrValue>(path, nodeIn.Operator, nodeIn.Value);
+                path = Adapt.MapPath(path);
+
+                if (clrValue is List<Guid> guidList)
+                {
+                    value = guidList.Select(x => x.ToString()).ToList();
+                }
+                else if (clrValue is Guid guid)
+                {
+                    value = guid.ToString();
+                }
+                else if (clrValue is Instant &&
+                    !string.Equals(path[0], "mt", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(path[0], "ct", StringComparison.OrdinalIgnoreCase))
+                {
+                    value = clrValue.ToString();
+                }
             }
 
-            if (value is List<Guid> guidList)
-            {
-                result = new CompareFilter<ClrValue>(path, nodeIn.Operator, guidList.Select(x => x.ToString()).ToList());
-            }
-            else if (value is Guid guid)
-            {
-                result = new CompareFilter<ClrValue>(path, nodeIn.Operator, guid.ToString());
-            }
-
-            return result;
+            return result with { Path = path, Value = value };
         }
     }
 }

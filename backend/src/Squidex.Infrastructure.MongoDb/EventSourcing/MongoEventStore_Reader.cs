@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(subscriber, nameof(subscriber));
 
-            if (IsReplicaSet)
+            if (CanUseChangeStreams)
             {
                 return new MongoEventStoreSubscription(this, subscriber, streamFilter, position);
             }

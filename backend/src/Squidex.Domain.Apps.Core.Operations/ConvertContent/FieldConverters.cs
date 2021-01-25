@@ -42,9 +42,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                     try
                     {
-                        var (_, error) = JsonValueConverter.ConvertValue(field, value, jsonSerializer);
-
-                        if (error != null)
+                        if (!JsonValueValidator.IsValid(field, value, jsonSerializer))
                         {
                             return null;
                         }

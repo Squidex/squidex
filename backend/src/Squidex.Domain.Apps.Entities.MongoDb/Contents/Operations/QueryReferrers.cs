@@ -15,11 +15,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryReferrers : OperationBase
     {
-        public QueryReferrers(DataConverter dataConverter)
-            : base(dataConverter)
-        {
-        }
-
         protected override Task PrepareAsync(CancellationToken ct = default)
         {
             var index =

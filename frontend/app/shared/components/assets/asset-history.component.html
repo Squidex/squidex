@@ -12,7 +12,7 @@
             <div class="event-created">{{assetEvent.event.created | sqxFromNow}}</div>
     
             <ng-container *ngIf="assetEvent.canDownload">
-                <a class="event-load force" [href]="asset | sqxAssetUrl:assetEvent.fileVersion" sqxExternalLink="noicon">{{ 'assets.downloadVersion' | sqxTranslate }}</a> 
+                <a class="event-load force" [href]="asset | sqxAssetUrl:assetEvent.version" sqxExternalLink="noicon">{{ 'assets.downloadVersion' | sqxTranslate }}</a> 
             </ng-container>
         </div>
     </div>

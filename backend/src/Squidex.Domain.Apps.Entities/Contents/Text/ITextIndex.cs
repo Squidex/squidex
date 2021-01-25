@@ -14,7 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public interface ITextIndex
     {
-        Task<List<DomainId>?> SearchAsync(string? queryText, IAppEntity app, SearchFilter? filter, SearchScope scope);
+        Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope);
+
+        Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope);
 
         Task ClearAsync();
 

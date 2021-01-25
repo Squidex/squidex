@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.grainFactory = grainFactory;
         }
 
-        public async Task<IContentEntity> GetAsync(DomainId appId, DomainId id, long version)
+        public async Task<IContentEntity?> GetAsync(DomainId appId, DomainId id, long version)
         {
             using (Profiler.TraceMethod<ContentLoader>())
             {
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (content == null || content.Version <= EtagVersion.Empty || (version > EtagVersion.Any && content.Version != version))
                 {
-                    throw new DomainObjectNotFoundException(id.ToString());
+                    return null;
                 }
 
                 return content;

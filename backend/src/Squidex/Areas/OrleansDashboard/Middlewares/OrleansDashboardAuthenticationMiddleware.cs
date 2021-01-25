@@ -33,7 +33,9 @@ namespace Squidex.Areas.OrleansDashboard.Middlewares
 
             if (authentication.Succeeded)
             {
-                if (authentication.Principal?.Permissions().Allows(OrleansPermissions) == true)
+                var permisisons = authentication.Principal?.Claims.Permissions();
+
+                if (permisisons?.Allows(OrleansPermissions) == true)
                 {
                     await next(context);
                 }

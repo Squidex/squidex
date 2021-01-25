@@ -13,12 +13,14 @@ using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public sealed class TextIndexingProcess : IEventConsumer
     {
         private const string NotFound = "<404>";
+        private readonly IJsonSerializer jsonSerializer;
         private readonly ITextIndex textIndex;
         private readonly ITextIndexerState textIndexerState;
 
@@ -50,12 +52,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private sealed class Updates
         {
             private readonly Dictionary<DomainId, TextContentState> states;
+            private readonly IJsonSerializer jsonSerializer;
             private readonly Dictionary<DomainId, TextContentState> updates = new Dictionary<DomainId, TextContentState>();
             private readonly Dictionary<string, IndexCommand> commands = new Dictionary<string, IndexCommand>();
 
-            public Updates(Dictionary<DomainId, TextContentState> states)
+            public Updates(Dictionary<DomainId, TextContentState> states, IJsonSerializer jsonSerializer)
             {
                 this.states = states;
+
+                this.jsonSerializer = jsonSerializer;
             }
 
             public async Task WriteAsync(ITextIndex textIndex, ITextIndexerState textIndexerState)
@@ -107,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
             }
 
-            private void Create(ContentEvent @event, NamedContentData data)
+            private void Create(ContentEvent @event, ContentData data)
             {
                 var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
 
@@ -123,9 +128,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     {
                         ContentId = @event.ContentId,
                         DocId = state.DocIdCurrent,
+                        GeoObjects = data.ToGeo(jsonSerializer),
                         ServeAll = true,
                         ServePublished = false,
-                        Texts = data.ToTexts()
+                        Texts = data.ToTexts(),
+                        IsNew = true
                     });
 
                 states[state.UniqueContentId] = state;
@@ -165,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
             }
 
-            private void Update(ContentEvent @event, NamedContentData data)
+            private void Update(ContentEvent @event, ContentData data)
             {
                 var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
 
@@ -178,6 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             {
                                 ContentId = @event.ContentId,
                                 DocId = state.DocIdNew,
+                                GeoObjects = data.ToGeo(jsonSerializer),
                                 ServeAll = true,
                                 ServePublished = false,
                                 Texts = data.ToTexts()
@@ -200,6 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                             {
                                 ContentId = @event.ContentId,
                                 DocId = state.DocIdCurrent,
+                                GeoObjects = data.ToGeo(jsonSerializer),
                                 ServeAll = true,
                                 ServePublished = isPublished,
                                 Texts = data.ToTexts()
@@ -321,11 +330,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public TextIndexingProcess(ITextIndex textIndex, ITextIndexerState textIndexerState)
+        public TextIndexingProcess(
+            IJsonSerializer jsonSerializer,
+            ITextIndex textIndex,
+            ITextIndexerState textIndexerState)
         {
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
             Guard.NotNull(textIndex, nameof(textIndex));
             Guard.NotNull(textIndexerState, nameof(textIndexerState));
 
+            this.jsonSerializer = jsonSerializer;
             this.textIndex = textIndex;
             this.textIndexerState = textIndexerState;
         }
@@ -340,7 +354,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var states = await QueryStatesAsync(events);
 
-            var updates = new Updates(states);
+            var updates = new Updates(states, jsonSerializer);
 
             foreach (var @event in events)
             {

@@ -162,7 +162,7 @@ namespace TestSuite.ApiTests
             var contributor_1 = contributors_1.Items.FirstOrDefault(x => x.ContributorName == contributorEmail);
 
             // Should return contributor with correct email.
-            Assert.Equal(contributorRole1, contributor_1.Role);
+            Assert.Equal(contributorRole1, contributor_1?.Role);
 
 
             // STEP 2: Update contributor role.
@@ -172,7 +172,7 @@ namespace TestSuite.ApiTests
             var contributor_2 = contributors_2.Items.FirstOrDefault(x => x.ContributorId == contributor_1.ContributorId);
 
             // Should return contributor with correct role.
-            Assert.Equal(contributorRole2, contributor_2.Role);
+            Assert.Equal(contributorRole2, contributor_2?.Role);
 
 
             // STEP 3: Remove contributor.

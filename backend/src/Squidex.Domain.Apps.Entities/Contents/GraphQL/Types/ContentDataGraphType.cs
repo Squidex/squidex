@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class ContentDataGraphType : ObjectGraphType<NamedContentData>
+    public sealed class ContentDataGraphType : ObjectGraphType<ContentData>
     {
         public ContentDataGraphType(ISchemaEntity schema, string schemaName, string schemaType, IGraphModel model)
         {

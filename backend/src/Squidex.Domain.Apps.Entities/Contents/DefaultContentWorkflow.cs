@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.FromResult(Status.Draft);
         }
 
-        public Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
+        public Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, ContentData data, ClaimsPrincipal user)
         {
             return Task.FromResult(true);
         }

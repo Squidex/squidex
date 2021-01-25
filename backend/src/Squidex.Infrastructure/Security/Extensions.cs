@@ -67,6 +67,12 @@ namespace Squidex.Infrastructure.Security
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.Email)?.Value;
         }
 
+        public static string? GetEmail(this ClaimsPrincipal principal)
+        {
+            return principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value ??
+                   principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.Email)?.Value;
+        }
+
         public static bool IsInClient(this ClaimsPrincipal principal, string client)
         {
             return principal.Claims.Any(x => x.Type == OpenIdClaims.ClientId && string.Equals(x.Value, client, StringComparison.OrdinalIgnoreCase));

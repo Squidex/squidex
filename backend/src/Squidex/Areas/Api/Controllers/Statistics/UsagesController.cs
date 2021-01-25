@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -66,7 +67,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/log/")]
-        [ProducesResponseType(typeof(LogDownloadDto), 200)]
+        [ProducesResponseType(typeof(LogDownloadDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
         public IActionResult GetLog(string app)
@@ -93,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
-        [ProducesResponseType(typeof(CallsUsageDtoDto), 200)]
+        [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
@@ -122,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/storage/today/")]
-        [ProducesResponseType(typeof(CurrentStorageDto), 200)]
+        [ProducesResponseType(typeof(CurrentStorageDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetCurrentStorageSize(string app)
@@ -149,7 +150,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/storage/{fromDate}/{toDate}/")]
-        [ProducesResponseType(typeof(StorageUsagePerDateDto[]), 200)]
+        [ProducesResponseType(typeof(StorageUsagePerDateDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUsage)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetStorageSizes(string app, DateTime fromDate, DateTime toDate)

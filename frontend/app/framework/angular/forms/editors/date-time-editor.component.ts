@@ -86,7 +86,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
 
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions) {
         super(changeDetector, {
-            isLocal: false
+            isLocal: true
         });
 
         this.hideDateButtonsSettings = !!uiOptions.get('hideDateButtons');

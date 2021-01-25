@@ -6,6 +6,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
+import { Version } from '@app/framework';
 import { ApiUrlConfig, AssetDto, AuthService, MathHelper, StringHelper, Types } from '@app/shared/internal';
 
 @Pipe({
@@ -18,7 +19,7 @@ export class AssetUrlPipe implements PipeTransform {
     ) {
     }
 
-    public transform(asset: AssetDto, version?: number, withQuery = false): string {
+    public transform(asset: AssetDto, version?: number | Version, withQuery = false): string {
         let url = asset.fullUrl(this.apiUrl);
 
         if (withQuery) {
@@ -27,6 +28,8 @@ export class AssetUrlPipe implements PipeTransform {
 
         if (Types.isNumber(version)) {
             url = StringHelper.appendToUrl(url, 'version', version);
+        } else if (Types.is(version, Version)) {
+            url = StringHelper.appendToUrl(url, 'version', version.value);
         }
 
         return url;
@@ -47,7 +50,7 @@ export class AssetPreviewUrlPipe implements PipeTransform {
     public transform(asset: AssetDto): string {
         let url =  asset.fullUrl(this.apiUrl, this.authService);
 
-        url = StringHelper.appendToUrl(url, 'version', asset.fileVersion);
+        url = StringHelper.appendToUrl(url, 'version', asset.version);
 
         return url;
     }

@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return true;
         }
 
-        private void ReplaceAssetUrl(NamedContentData data)
+        private void ReplaceAssetUrl(ContentData data)
         {
             foreach (var field in data.Values)
             {

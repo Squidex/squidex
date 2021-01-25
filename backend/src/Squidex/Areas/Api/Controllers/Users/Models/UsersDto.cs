@@ -7,8 +7,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Squidex.Domain.Users;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared.Users;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models
@@ -26,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         [LocalizedRequired]
         public UserDto[] Items { get; set; }
 
-        public static UsersDto FromResults(IEnumerable<UserWithClaims> items, long total, Resources resources)
+        public static UsersDto FromResults(IEnumerable<IUser> items, long total, Resources resources)
         {
             var result = new UsersDto
             {

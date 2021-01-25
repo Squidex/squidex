@@ -8,10 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
+using Squidex.Infrastructure.Security;
 using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers
@@ -22,7 +22,7 @@ namespace Squidex.Areas.IdentityServer.Controllers
         {
             var externalLogin = await signInManager.GetExternalLoginInfoAsync(expectedXsrf);
 
-            var email = externalLogin.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            var email = externalLogin.Principal.GetEmail();
 
             if (string.IsNullOrWhiteSpace(email))
             {

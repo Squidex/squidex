@@ -31,8 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public HashSet<DomainId>? ReferencedIds { get; set; }
         }
 
-        public QueryReferences(DataConverter dataConverter, QueryByIds queryByIds)
-            : base(dataConverter)
+        public QueryReferences(QueryByIds queryByIds)
         {
             this.queryByIds = queryByIds;
         }

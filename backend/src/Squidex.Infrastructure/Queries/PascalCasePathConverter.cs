@@ -10,7 +10,7 @@ using Squidex.Text;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class PascalCasePathConverter<TValue> : TransformVisitor<TValue>
+    public sealed class PascalCasePathConverter<TValue> : TransformVisitor<TValue, None>
     {
         private static readonly PascalCasePathConverter<TValue> Instance = new PascalCasePathConverter<TValue>();
 
@@ -20,10 +20,10 @@ namespace Squidex.Infrastructure.Queries
 
         public static FilterNode<TValue>? Transform(FilterNode<TValue> node)
         {
-            return node.Accept(Instance);
+            return node.Accept(Instance, None.Value);
         }
 
-        public override FilterNode<TValue>? Visit(CompareFilter<TValue> nodeIn)
+        public override FilterNode<TValue>? Visit(CompareFilter<TValue> nodeIn, None args)
         {
             return new CompareFilter<TValue>(nodeIn.Path.Select(x => x.ToPascalCase()).ToList(), nodeIn.Operator, nodeIn.Value);
         }

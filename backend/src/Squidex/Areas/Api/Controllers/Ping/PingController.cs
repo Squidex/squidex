@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -33,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Ping
         /// 200 => Infos returned.
         /// </returns>
         [HttpGet]
-        [ProducesResponseType(typeof(ExposedValues), 200)]
+        [ProducesResponseType(typeof(ExposedValues), StatusCodes.Status200OK)]
         [Route("info/")]
         public IActionResult GetInfo()
         {

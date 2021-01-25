@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             this.partitionResolver = partitionResolver;
         }
 
-        public void Enrich(NamedContentData data)
+        public void Enrich(ContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
