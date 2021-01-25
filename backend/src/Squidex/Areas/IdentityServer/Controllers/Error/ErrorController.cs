@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure;
 

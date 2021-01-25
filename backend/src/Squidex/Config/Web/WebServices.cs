@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Translations;
 using Squidex.Pipeline.Plugins;
-using Squidex.Pipeline.Robots;
 using Squidex.Shared;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
