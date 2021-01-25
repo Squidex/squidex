@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 foreach (var content in group)
                 {
-                    content.Data = content.Data.ConvertName2Name(schema.SchemaDef, converters);
+                    content.Data = content.Data.Convert(schema.SchemaDef, converters);
                 }
             }
         }

@@ -808,7 +808,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_not_return_data_when_field_not_part_of_content()
         {
             var contentId = DomainId.NewGuid();
-            var content = TestContent.Create(appId, schemaId, contentId, DomainId.Empty, DomainId.Empty, new NamedContentData());
+            var content = TestContent.Create(appId, schemaId, contentId, DomainId.Empty, DomainId.Empty, new ContentData());
 
             var query = @"
                 query {

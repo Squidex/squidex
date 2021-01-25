@@ -15,19 +15,15 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : IContentRepository, IInitializable
     {
-        private readonly IAppProvider appProvider;
-        private readonly DataConverter converter;
         private readonly MongoContentCollection collectionAll;
         private readonly MongoContentCollection collectionPublished;
 
@@ -36,22 +32,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             StatusSerializer.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(serializer, nameof(serializer));
-
-            this.appProvider = appProvider;
-
-            converter = new DataConverter(serializer);
 
             collectionAll =
                 new MongoContentCollection(
-                    "States_Contents_All2", database, appProvider, converter);
+                    "States_Contents_All3", database, appProvider);
 
             collectionPublished =
                 new MongoContentCollection(
-                    "States_Contents_Published2", database, appProvider, converter);
+                    "States_Contents_Published3", database, appProvider);
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)

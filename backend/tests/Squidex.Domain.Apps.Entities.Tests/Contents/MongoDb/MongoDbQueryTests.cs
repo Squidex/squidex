@@ -81,9 +81,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         }
 
         [Fact]
-        public void Should_throw_exception_for_invalid_field()
+        public void Should_not_throw_exception_for_invalid_field()
         {
-            Assert.Throws<KeyNotFoundException>(() => _F(ClrFilter.Eq("data/invalid/iv", "Me")));
+            _F(ClrFilter.Eq("data/invalid/iv", "Me"));
         }
 
         [Fact]
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_query_with_empty_test()
         {
             var i = _F(ClrFilter.Empty("data/firstName/iv"));
-            var o = _C("{ '$or' : [{ 'do.1.iv' : { '$exists' : false } }, { 'do.1.iv' : null }, { 'do.1.iv' : '' }, { 'do.1.iv' : [] }] }");
+            var o = _C("{ '$or' : [{ 'do.firstName.iv' : { '$exists' : false } }, { 'do.firstName.iv' : null }, { 'do.firstName.iv' : '' }, { 'do.firstName.iv' : [] }] }");
 
             Assert.Equal(o, i);
         }
@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_query_with_datetime_data()
         {
             var i = _F(ClrFilter.Eq("data/birthday/iv", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
-            var o = _C("{ 'do.5.iv' : '1988-01-19T12:00:00Z' }");
+            var o = _C("{ 'do.birthday.iv' : '1988-01-19T12:00:00Z' }");
 
             Assert.Equal(o, i);
         }
@@ -215,7 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_query_with_underscore_field()
         {
             var i = _F(ClrFilter.Eq("data/dashed_field/iv", "Value"));
-            var o = _C("{ 'do.8.iv' : 'Value' }");
+            var o = _C("{ 'do.dashed-field.iv' : 'Value' }");
 
             Assert.Equal(o, i);
         }
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_query_with_references_equals()
         {
             var i = _F(ClrFilter.Eq("data/friends/iv", "guid"));
-            var o = _C("{ 'do.7.iv' : 'guid' }");
+            var o = _C("{ 'do.friends.iv' : 'guid' }");
 
             Assert.Equal(o, i);
         }
@@ -233,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_query_with_array_field()
         {
             var i = _F(ClrFilter.Eq("data/hobbies/iv/name", "PC"));
-            var o = _C("{ 'do.9.iv.91' : 'PC' }");
+            var o = _C("{ 'do.hobbies.iv.name' : 'PC' }");
 
             Assert.Equal(o, i);
         }
@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_query_with_assets_equals()
         {
             var i = _F(ClrFilter.Eq("data/pictures/iv", "guid"));
-            var o = _C("{ 'do.6.iv' : 'guid' }");
+            var o = _C("{ 'do.pictures.iv' : 'guid' }");
 
             Assert.Equal(o, i);
         }
@@ -260,7 +260,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_orderby_with_single_field()
         {
             var i = _S(SortBuilder.Descending("data/age/iv"));
-            var o = _C("{ 'do.4.iv' : -1 }");
+            var o = _C("{ 'do.age.iv' : -1 }");
 
             Assert.Equal(o, i);
         }
@@ -269,7 +269,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_orderby_with_multiple_fields()
         {
             var i = _S(SortBuilder.Ascending("data/age/iv"), SortBuilder.Descending("data/firstName/en"));
-            var o = _C("{ 'do.4.iv' : 1, 'do.1.en' : -1 }");
+            var o = _C("{ 'do.age.iv' : 1, 'do.firstName.en' : -1 }");
 
             Assert.Equal(o, i);
         }
@@ -320,7 +320,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                     i = sortDefinition.Render(Serializer, Registry).ToString();
                 });
 
-            cursor.QuerySort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel(appId, schemaDef));
+            cursor.QuerySort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel(appId));
 
             return i;
         }
@@ -328,7 +328,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         private string _Q(ClrQuery query)
         {
             var rendered =
-                query.AdjustToModel(appId, schemaDef).BuildFilter<MongoContentEntity>().Filter!
+                query.AdjustToModel(appId).BuildFilter<MongoContentEntity>().Filter!
                     .Render(Serializer, Registry).ToString();
 
             return rendered;

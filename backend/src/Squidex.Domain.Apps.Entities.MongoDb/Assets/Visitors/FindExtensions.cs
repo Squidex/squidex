@@ -25,12 +25,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
                 query.Filter = FirstPascalPathConverter<ClrValue>.Transform(query.Filter);
             }
 
-            query.Sort = query.Sort
-                .Select(x =>
-                    new SortNode(
-                        x.Path.ToFirstPascalCase(),
-                        x.Order))
-                    .ToList();
+            if (query.Sort != null)
+            {
+                query.Sort = query.Sort.Select(x => new SortNode(x.Path.ToFirstPascalCase(), x.Order)).ToList();
+            }
 
             return query;
         }

@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var @event = new EnrichedContentEvent
             {
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("city",
                             new ContentFieldData()
                                 .AddJsonValue(JsonValue.Array()))
@@ -285,7 +285,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var @event = new EnrichedContentEvent
             {
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("categories",
                             new ContentFieldData()
                                 .AddJsonValue(JsonValue.Array("ref1", "ref2", "ref3")))

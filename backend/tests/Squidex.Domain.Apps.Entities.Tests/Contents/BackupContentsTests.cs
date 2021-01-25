@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 });
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("asset",
                         new ContentFieldData()
                             .AddValue("en", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                     .Add("asset", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")));
 
             var updateData =
-                new NamedContentData()
+                new ContentData()
                     .AddField("asset",
                         new ContentFieldData()
                             .AddValue("en", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")

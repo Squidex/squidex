@@ -34,18 +34,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryScheduled queryScheduled;
         private readonly string name;
 
-        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, DataConverter dataConverter)
+        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider)
             : base(database)
         {
             this.name = name;
 
-            queryAsStream = new QueryAsStream(dataConverter, appProvider);
-            queryBdId = new QueryById(dataConverter);
-            queryByIds = new QueryByIds(dataConverter);
-            queryByQuery = new QueryByQuery(dataConverter, appProvider);
-            queryReferences = new QueryReferences(dataConverter, queryByIds);
-            queryReferrers = new QueryReferrers(dataConverter);
-            queryScheduled = new QueryScheduled(dataConverter);
+            queryAsStream = new QueryAsStream();
+            queryBdId = new QueryById();
+            queryByIds = new QueryByIds();
+            queryByQuery = new QueryByQuery(appProvider);
+            queryReferences = new QueryReferences(queryByIds);
+            queryReferrers = new QueryReferrers();
+            queryScheduled = new QueryScheduled();
         }
 
         public IMongoCollection<MongoContentEntity> GetInternalCollection()

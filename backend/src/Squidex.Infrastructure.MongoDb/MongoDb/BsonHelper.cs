@@ -11,6 +11,7 @@ namespace Squidex.Infrastructure.MongoDb
     {
         private const string TypeBson = "§type";
         private const string TypeJson = "$type";
+        private const string DotReplacement = "_§§_";
 
         public static string UnescapeBson(this string value)
         {
@@ -19,7 +20,7 @@ namespace Squidex.Infrastructure.MongoDb
                 return TypeJson;
             }
 
-            return ReplaceFirstCharacter(value, '§', '$');
+            return ReplaceFirstCharacter(value, '§', '$').Replace(DotReplacement, ".");
         }
 
         public static string EscapeJson(this string value)
@@ -29,7 +30,7 @@ namespace Squidex.Infrastructure.MongoDb
                 return TypeBson;
             }
 
-            return ReplaceFirstCharacter(value, '$', '§');
+            return ReplaceFirstCharacter(value, '$', '§').Replace(".", DotReplacement);
         }
 
         private static string ReplaceFirstCharacter(string value, char toReplace, char replacement)

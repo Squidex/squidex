@@ -14,9 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
     {
         public Status Status { get; }
 
-        public NamedContentData Data { get; }
+        public ContentData Data { get; }
 
-        public ContentVersion(Status status, NamedContentData data)
+        public ContentVersion(Status status, ContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return new ContentVersion(status, Data);
         }
 
-        public ContentVersion WithData(NamedContentData data)
+        public ContentVersion WithData(ContentData data)
         {
             return new ContentVersion(Status, data);
         }

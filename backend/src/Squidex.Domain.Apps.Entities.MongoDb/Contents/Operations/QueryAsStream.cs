@@ -16,14 +16,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     public sealed class QueryAsStream : OperationBase
     {
-        private readonly IAppProvider appProvider;
-
-        public QueryAsStream(DataConverter converter, IAppProvider appProvider)
-            : base(converter)
-        {
-            this.appProvider = appProvider;
-        }
-
         protected override async Task PrepareAsync(CancellationToken ct = default)
         {
             var indexBySchema =
@@ -48,14 +40,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 {
                     foreach (var entity in cursor.Current)
                     {
-                        var schema = await appProvider.GetSchemaAsync(appId, entity.SchemaId.Id, false);
-
-                        if (schema != null)
-                        {
-                            entity.ParseData(schema.SchemaDef, DataConverter);
-
-                            yield return entity;
-                        }
+                        yield return entity;
                     }
                 }
             }

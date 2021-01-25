@@ -20,6 +20,9 @@ using Xunit;
 using ClrFilter = Squidex.Infrastructure.Queries.ClrFilter;
 using SortBuilder = Squidex.Infrastructure.Queries.SortBuilder;
 
+#pragma warning disable SA1300 // Element should begin with upper-case letter
+#pragma warning disable IDE1006 // Naming Styles
+
 namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 {
     public class MongoDbQueryTests
@@ -37,14 +40,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_throw_exception_for_full_text_search()
         {
-            Assert.Throws<ValidationException>(() => Q(new ClrQuery { FullText = "Full Text" }));
+            Assert.Throws<ValidationException>(() => _Q(new ClrQuery { FullText = "Full Text" }));
         }
 
         [Fact]
         public void Should_make_query_with_lastModified()
         {
-            var i = F(ClrFilter.Eq("lastModified", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
-            var o = C("{ 'mt' : ISODate('1988-01-19T12:00:00Z') }");
+            var i = _F(ClrFilter.Eq("lastModified", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
+            var o = _C("{ 'mt' : ISODate('1988-01-19T12:00:00Z') }");
 
             Assert.Equal(o, i);
         }
@@ -52,8 +55,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_lastModifiedBy()
         {
-            var i = F(ClrFilter.Eq("lastModifiedBy", "Me"));
-            var o = C("{ 'mb' : 'Me' }");
+            var i = _F(ClrFilter.Eq("lastModifiedBy", "Me"));
+            var o = _C("{ 'mb' : 'Me' }");
 
             Assert.Equal(o, i);
         }
@@ -61,8 +64,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_created()
         {
-            var i = F(ClrFilter.Eq("created", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
-            var o = C("{ 'ct' : ISODate('1988-01-19T12:00:00Z') }");
+            var i = _F(ClrFilter.Eq("created", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
+            var o = _C("{ 'ct' : ISODate('1988-01-19T12:00:00Z') }");
 
             Assert.Equal(o, i);
         }
@@ -70,8 +73,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_createdBy()
         {
-            var i = F(ClrFilter.Eq("createdBy", "Me"));
-            var o = C("{ 'cb' : 'Me' }");
+            var i = _F(ClrFilter.Eq("createdBy", "Me"));
+            var o = _C("{ 'cb' : 'Me' }");
 
             Assert.Equal(o, i);
         }
@@ -79,8 +82,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_version()
         {
-            var i = F(ClrFilter.Eq("version", 0));
-            var o = C("{ 'vs' : NumberLong(0) }");
+            var i = _F(ClrFilter.Eq("version", 0));
+            var o = _C("{ 'vs' : NumberLong(0) }");
 
             Assert.Equal(o, i);
         }
@@ -88,8 +91,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_fileVersion()
         {
-            var i = F(ClrFilter.Eq("fileVersion", 2));
-            var o = C("{ 'fv' : NumberLong(2) }");
+            var i = _F(ClrFilter.Eq("fileVersion", 2));
+            var o = _C("{ 'fv' : NumberLong(2) }");
 
             Assert.Equal(o, i);
         }
@@ -97,8 +100,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_tags()
         {
-            var i = F(ClrFilter.Eq("tags", "tag1"));
-            var o = C("{ 'td' : 'tag1' }");
+            var i = _F(ClrFilter.Eq("tags", "tag1"));
+            var o = _C("{ 'td' : 'tag1' }");
 
             Assert.Equal(o, i);
         }
@@ -106,8 +109,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_fileName()
         {
-            var i = F(ClrFilter.Eq("fileName", "Logo.png"));
-            var o = C("{ 'fn' : 'Logo.png' }");
+            var i = _F(ClrFilter.Eq("fileName", "Logo.png"));
+            var o = _C("{ 'fn' : 'Logo.png' }");
 
             Assert.Equal(o, i);
         }
@@ -115,8 +118,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_mimeType()
         {
-            var i = F(ClrFilter.Eq("mimeType", "text/json"));
-            var o = C("{ 'mm' : 'text/json' }");
+            var i = _F(ClrFilter.Eq("mimeType", "text/json"));
+            var o = _C("{ 'mm' : 'text/json' }");
 
             Assert.Equal(o, i);
         }
@@ -124,8 +127,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_fileSize()
         {
-            var i = F(ClrFilter.Eq("fileSize", 1024));
-            var o = C("{ 'fs' : NumberLong(1024) }");
+            var i = _F(ClrFilter.Eq("fileSize", 1024));
+            var o = _C("{ 'fs' : NumberLong(1024) }");
 
             Assert.Equal(o, i);
         }
@@ -133,8 +136,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_pixelHeight()
         {
-            var i = F(ClrFilter.Eq("metadata.pixelHeight", 600));
-            var o = C("{ 'md.pixelHeight' : 600 }");
+            var i = _F(ClrFilter.Eq("metadata.pixelHeight", 600));
+            var o = _C("{ 'md.pixelHeight' : 600 }");
 
             Assert.Equal(o, i);
         }
@@ -142,8 +145,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_pixelWidth()
         {
-            var i = F(ClrFilter.Eq("metadata.pixelWidth", 800));
-            var o = C("{ 'md.pixelWidth' : 800 }");
+            var i = _F(ClrFilter.Eq("metadata.pixelWidth", 800));
+            var o = _C("{ 'md.pixelWidth' : 800 }");
 
             Assert.Equal(o, i);
         }
@@ -151,8 +154,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_orderby_with_single_field()
         {
-            var i = S(SortBuilder.Descending("lastModified"));
-            var o = C("{ 'mt' : -1 }");
+            var i = _S(SortBuilder.Descending("lastModified"));
+            var o = _C("{ 'mt' : -1 }");
 
             Assert.Equal(o, i);
         }
@@ -160,8 +163,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_orderby_with_multiple_fields()
         {
-            var i = S(SortBuilder.Ascending("lastModified"), SortBuilder.Descending("lastModifiedBy"));
-            var o = C("{ 'mt' : 1, 'mb' : -1 }");
+            var i = _S(SortBuilder.Ascending("lastModified"), SortBuilder.Descending("lastModifiedBy"));
+            var o = _C("{ 'mt' : 1, 'mb' : -1 }");
 
             Assert.Equal(o, i);
         }
@@ -190,17 +193,17 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                 .MustHaveHappened();
         }
 
-        private static string C(string value)
+        private static string _C(string value)
         {
             return value.Replace('\'', '"');
         }
 
-        private static string F(FilterNode<ClrValue> filter)
+        private static string _F(FilterNode<ClrValue> filter)
         {
-            return Q(new ClrQuery { Filter = filter });
+            return _Q(new ClrQuery { Filter = filter });
         }
 
-        private static string S(params SortNode[] sorts)
+        private static string _S(params SortNode[] sorts)
         {
             var cursor = A.Fake<IFindFluent<MongoAssetEntity, MongoAssetEntity>>();
 
@@ -217,11 +220,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             return i;
         }
 
-        private static string Q(ClrQuery query)
+        private static string _Q(ClrQuery query)
         {
-            var rendered =
-                query.AdjustToModel().BuildFilter<MongoAssetEntity>(false).Filter!
-                    .Render(Serializer, Registry).ToString();
+            var filter = query.AdjustToModel().BuildFilter<MongoAssetEntity>(false).Filter!;
+
+            var rendered = filter.Render(Serializer, Registry).ToString();
 
             return rendered;
         }

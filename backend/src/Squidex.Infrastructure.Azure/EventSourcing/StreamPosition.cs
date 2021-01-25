@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text;
-using Microsoft.Extensions.ObjectPool;
+using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
     internal sealed class StreamPosition
     {
-        private static readonly ObjectPool<StringBuilder> StringBuilderPool =
-            new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
-
         public static readonly StreamPosition Empty = new StreamPosition(0, -1, -1);
 
         public long Timestamp { get; }
@@ -38,7 +34,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static implicit operator string(StreamPosition position)
         {
-            var sb = StringBuilderPool.Get();
+            var sb = DefaultPools.StringBuilder.Get();
             try
             {
                 sb.Append(position.Timestamp);
@@ -51,7 +47,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
             finally
             {
-                StringBuilderPool.Return(sb);
+                DefaultPools.StringBuilder.Return(sb);
             }
         }
 

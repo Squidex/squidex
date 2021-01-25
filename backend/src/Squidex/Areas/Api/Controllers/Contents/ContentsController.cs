@@ -433,7 +433,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 201)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false, [FromQuery] DomainId? id = null)
+        public async Task<IActionResult> PostContent(string app, string name, [FromBody] ContentData request, [FromQuery] bool publish = false, [FromQuery] DomainId? id = null)
         {
             var command = new CreateContent { Data = request.ToCleaned(), Publish = publish };
 
@@ -530,7 +530,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpsert)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, DomainId id, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
+        public async Task<IActionResult> PostContent(string app, string name, DomainId id, [FromBody] ContentData request, [FromQuery] bool publish = false)
         {
             var command = new UpsertContent { ContentId = id, Data = request.ToCleaned(), Publish = publish };
 
@@ -559,7 +559,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(string app, string name, DomainId id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PutContent(string app, string name, DomainId id, [FromBody] ContentData request)
         {
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
 
@@ -588,7 +588,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PatchContent(string app, string name, DomainId id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PatchContent(string app, string name, DomainId id, [FromBody] ContentData request)
         {
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
 

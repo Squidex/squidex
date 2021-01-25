@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly DomainId contentId = DomainId.NewGuid();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly NamedContentData contentData = new NamedContentData();
-        private readonly NamedContentData contentTransformed = new NamedContentData();
+        private readonly ContentData contentData = new ContentData();
+        private readonly ContentData contentTransformed = new ContentData();
         private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
         private readonly ContentQueryService sut;
 

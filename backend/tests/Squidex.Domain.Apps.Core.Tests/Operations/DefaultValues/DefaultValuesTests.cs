@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         public void Should_enrich_with_default_values()
         {
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
                             .AddValue("de", "de-string"))
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         public void Should_also_enrich_with_default_values_when_string_is_empty()
         {
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
                             .AddValue("de", string.Empty))

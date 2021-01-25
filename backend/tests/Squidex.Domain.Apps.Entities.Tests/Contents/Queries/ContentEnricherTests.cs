@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_clone_data_when_requested()
         {
-            var source = CreateContent(new NamedContentData());
+            var source = CreateContent(new ContentData());
 
             var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), new Lazy<IContentQueryService>(() => contentQuery));
 
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_not_clone_data_when_not_requested()
         {
-            var source = CreateContent(new NamedContentData());
+            var source = CreateContent(new ContentData());
 
             var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), new Lazy<IContentQueryService>(() => contentQuery));
 
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Same(source.Data, result.Data);
         }
 
-        private ContentEntity CreateContent(NamedContentData? data = null)
+        private ContentEntity CreateContent(ContentData? data = null)
         {
             return new ContentEntity { SchemaId = schemaId, Data = data! };
         }

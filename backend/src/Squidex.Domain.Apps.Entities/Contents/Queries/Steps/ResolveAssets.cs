@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             {
                 foreach (var content in contents)
                 {
-                    content.ReferenceData ??= new NamedContentData();
+                    content.ReferenceData ??= new ContentData();
 
                     var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData())!;
 

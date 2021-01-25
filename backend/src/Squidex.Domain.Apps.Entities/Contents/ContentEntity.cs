@@ -30,9 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public RefToken LastModifiedBy { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public ContentData Data { get; set; }
 
-        public NamedContentData? ReferenceData { get; set; }
+        public ContentData? ReferenceData { get; set; }
 
         public ScheduleJob? ScheduleJob { get; set; }
 

@@ -457,7 +457,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         private BulkUpdateContents BulkCommand(BulkUpdateType type, Query<IJsonValue>? query = null,
-            DomainId? id = null, NamedContentData? data = null, Instant? dueTime = null)
+            DomainId? id = null, ContentData? data = null, Instant? dueTime = null)
         {
             return new BulkUpdateContents
             {
@@ -494,12 +494,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return requestContext;
         }
 
-        private static (DomainId Id, NamedContentData Data, Query<IJsonValue>? Query) CreateTestData(bool withQuery)
+        private static (DomainId Id, ContentData Data, Query<IJsonValue>? Query) CreateTestData(bool withQuery)
         {
             Query<IJsonValue>? query = withQuery ? new Query<IJsonValue>() : null;
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("value",
                         new ContentFieldData()
                             .AddJsonValue("iv", JsonValue.Create(1)));

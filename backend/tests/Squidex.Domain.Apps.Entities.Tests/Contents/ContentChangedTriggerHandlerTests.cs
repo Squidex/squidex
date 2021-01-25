@@ -142,8 +142,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            var dataNow = new NamedContentData();
-            var dataOld = new NamedContentData();
+            var dataNow = new ContentData();
+            var dataOld = new ContentData();
 
             A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 12))
                 .Returns(new ContentEntity { AppId = appId, SchemaId = schemaMatch, Version = 12, Data = dataNow, Id = @event.ContentId });

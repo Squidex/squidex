@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var @event = new EnrichedContentEvent
             {
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("references",
                             new ContentFieldData()
                                 .AddJsonValue(JsonValue.Array(referenceId1, referenceId2))),
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return new ContentEntity
             {
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("field1",
                             new ContentFieldData()
                                 .AddJsonValue(JsonValue.Create($"Hello {index}")))

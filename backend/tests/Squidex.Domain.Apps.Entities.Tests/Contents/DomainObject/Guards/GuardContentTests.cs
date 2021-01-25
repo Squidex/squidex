@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(true);
 
-            var command = new CreateContent { Data = new NamedContentData() };
+            var command = new CreateContent { Data = new ContentData() };
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanCreate(command, contentWorkflow, schema));
         }
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(true);
 
-            var command = new CreateContent { Data = new NamedContentData(), ContentId = schema.Id };
+            var command = new CreateContent { Data = new ContentData(), ContentId = schema.Id };
 
             await GuardContent.CanCreate(command, contentWorkflow, schema);
         }
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             SetupCanCreatePublish(schema, false);
 
-            var command = new CreateContent { Data = new NamedContentData(), Publish = true };
+            var command = new CreateContent { Data = new ContentData(), Publish = true };
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanCreate(command, contentWorkflow, schema));
         }
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             SetupCanCreatePublish(schema, true);
 
-            var command = new CreateContent { Data = new NamedContentData(), Publish = true };
+            var command = new CreateContent { Data = new ContentData(), Publish = true };
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanCreate(command, contentWorkflow, schema));
         }
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(false);
 
-            var command = new CreateContent { Data = new NamedContentData() };
+            var command = new CreateContent { Data = new ContentData() };
 
             await GuardContent.CanCreate(command, contentWorkflow, schema);
         }
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             SetupCanUpdate(false);
 
             var content = CreateContent(Status.Draft);
-            var command = new UpdateContent { Data = new NamedContentData() };
+            var command = new UpdateContent { Data = new ContentData() };
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanUpdate(command, content, contentWorkflow));
         }
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             SetupCanUpdate(true);
 
             var content = CreateContent(Status.Draft);
-            var command = new UpdateContent { Data = new NamedContentData(), User = user };
+            var command = new UpdateContent { Data = new ContentData(), User = user };
 
             await GuardContent.CanUpdate(command, content, contentWorkflow);
         }
@@ -147,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             SetupCanUpdate(false);
 
             var content = CreateContent(Status.Draft);
-            var command = new PatchContent { Data = new NamedContentData() };
+            var command = new PatchContent { Data = new ContentData() };
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanPatch(command, content, contentWorkflow));
         }
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             SetupCanUpdate(true);
 
             var content = CreateContent(Status.Draft);
-            var command = new PatchContent { Data = new NamedContentData(), User = user };
+            var command = new PatchContent { Data = new ContentData(), User = user };
 
             await GuardContent.CanPatch(command, content, contentWorkflow);
         }
@@ -327,7 +327,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         private void SetupCanCreatePublish(ISchemaEntity schema, bool canCreate)
         {
-            A.CallTo(() => contentWorkflow.CanPublishOnCreateAsync(schema, A<NamedContentData>._, user))
+            A.CallTo(() => contentWorkflow.CanPublishOnCreateAsync(schema, A<ContentData>._, user))
                 .Returns(canCreate);
         }
 

@@ -36,8 +36,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public MongoContentEntity[] Joined { get; set; }
         }
 
-        public QueryByQuery(DataConverter dataConverter, IAppProvider appProvider)
-            : base(dataConverter)
+        public QueryByQuery(IAppProvider appProvider)
         {
             this.appProvider = appProvider;
         }
@@ -76,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     return new List<(DomainId SchemaId, DomainId Id, Status Status)>();
                 }
 
-                var filter = BuildFilter(appId, schemaId, filterNode.AdjustToModel(appId, schema.SchemaDef));
+                var filter = BuildFilter(appId, schemaId, filterNode.AdjustToModel(appId));
 
                 var contentItems = await Collection.FindStatusAsync(filter);
 
@@ -99,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                var query = q.Query.AdjustToModel(app.Id, null);
+                var query = q.Query.AdjustToModel(app.Id);
 
                 var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference);
 
@@ -111,13 +110,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
                     {
                         contentTotal = await Collection.Find(filter).CountDocumentsAsync();
-                    }
-
-                    var contentSchemas = schemas.ToDictionary(x => x.Id);
-
-                    foreach (var entity in contentEntities)
-                    {
-                        entity.ParseData(contentSchemas[entity.IndexedSchemaId].SchemaDef, DataConverter);
                     }
                 }
 
@@ -141,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                var query = q.Query.AdjustToModel(app.Id, schema.SchemaDef);
+                var query = q.Query.AdjustToModel(app.Id);
 
                 var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), query, q.Reference);
 
@@ -153,11 +145,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
                     {
                         contentTotal = await Collection.Find(filter).CountDocumentsAsync();
-                    }
-
-                    foreach (var entity in contentEntities)
-                    {
-                        entity.ParseData(schema.SchemaDef, DataConverter);
                     }
                 }
 

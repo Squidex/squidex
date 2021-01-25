@@ -15,6 +15,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool OptimizeValidation { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public ContentData Data { get; set; }
     }
 }

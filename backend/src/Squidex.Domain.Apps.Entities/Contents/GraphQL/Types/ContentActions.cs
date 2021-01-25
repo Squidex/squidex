@@ -442,11 +442,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
         }
 
-        private static NamedContentData GetContentData(IResolveFieldContext c)
+        private static ContentData GetContentData(IResolveFieldContext c)
         {
             var source = c.GetArgument<IDictionary<string, object>>("data");
 
-            return source.ToNamedContentData((IComplexGraphType)c.FieldDefinition.Arguments.Find("data").Flatten());
+            return source.ToContentData((IComplexGraphType)c.FieldDefinition.Arguments.Find("data").Flatten());
         }
 
         private static IFieldResolver ResolveAsync<T>(NamedId<DomainId> appId, NamedId<DomainId> schemaId, Func<IResolveFieldContext, ContentCommand> action)

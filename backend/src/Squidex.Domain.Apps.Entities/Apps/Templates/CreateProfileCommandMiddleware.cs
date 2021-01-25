@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 ContentId = postsId.Id,
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("firstName",
                             new ContentFieldData()
                                 .AddValue("John"))

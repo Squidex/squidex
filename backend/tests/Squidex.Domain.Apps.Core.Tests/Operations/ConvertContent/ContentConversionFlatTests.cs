@@ -16,8 +16,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 {
     public class ContentConversionFlatTests
     {
-        private readonly NamedContentData source =
-            new NamedContentData()
+        private readonly ContentData source =
+            new ContentData()
                 .AddField("field1",
                     new ContentFieldData()
                         .AddValue("de", 1)

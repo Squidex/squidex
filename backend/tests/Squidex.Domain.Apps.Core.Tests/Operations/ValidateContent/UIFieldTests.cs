@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     .AddUI(2, "my-ui2", Partitioning.Invariant);
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-ui1", new ContentFieldData())
                     .AddField("my-ui2", new ContentFieldData()
                         .AddValue("iv", null));
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                         .AddUI(101, "my-ui"));
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-array", new ContentFieldData()
                         .AddJsonValue(
                             JsonValue.Array(

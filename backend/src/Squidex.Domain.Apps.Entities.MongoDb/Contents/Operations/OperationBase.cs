@@ -21,13 +21,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public IMongoCollection<MongoContentEntity> Collection { get; private set; }
 
-        public DataConverter DataConverter { get; }
-
-        protected OperationBase(DataConverter dataConverter)
-        {
-            DataConverter = dataConverter;
-        }
-
         public Task PrepareAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
         {
             Collection = collection;

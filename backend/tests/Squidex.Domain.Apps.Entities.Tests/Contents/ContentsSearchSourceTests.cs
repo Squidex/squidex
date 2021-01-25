@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 Id = DomainId.NewGuid(),
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("field1",
                             new ContentFieldData()
                                 .AddJsonValue("iv", JsonValue.Create("hello")))
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 Id = DomainId.NewGuid(),
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("field",
                             new ContentFieldData()
                                 .AddJsonValue("iv", JsonValue.Create("hello"))),
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 Id = DomainId.NewGuid(),
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("field",
                             new ContentFieldData()
                                 .AddJsonValue("en", JsonValue.Create("hello"))),
@@ -132,12 +132,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 Id = DomainId.NewGuid(),
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("field",
                             new ContentFieldData()
                                 .AddJsonValue("iv", JsonValue.Create("raw"))),
                 ReferenceData =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("field",
                             new ContentFieldData()
                                 .AddJsonValue("en", JsonValue.Create("resolved"))),

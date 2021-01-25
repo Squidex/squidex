@@ -38,24 +38,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_convert_for_value_conversion()
-        {
-            var field = Fields.Json(1, "json", Partitioning.Invariant);
-
-            var source =
-                new ContentFieldData()
-                    .AddJsonValue(JsonValue.Object());
-
-            var result = FieldConverters.ForValues(ValueConverters.EncodeJson(TestUtils.DefaultSerializer))(source, field);
-
-            var expected =
-                new ContentFieldData()
-                    .AddValue("iv", "e30=");
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
         public void Should_return_same_values_when_excluding_changed_types_if_all_values_are_valid()
         {
             var field = Fields.Number(1, "number", Partitioning.Invariant);
