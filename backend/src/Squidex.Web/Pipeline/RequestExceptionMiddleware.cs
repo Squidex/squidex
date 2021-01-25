@@ -29,7 +29,7 @@ namespace Squidex.Web.Pipeline
 
         public async Task InvokeAsync(HttpContext context, IActionResultExecutor<ObjectResult> writer, ISemanticLog log)
         {
-            if (context.Request.Query.TryGetValue("error", out var header) && int.TryParse(header, out var statusCode) && IsErrorStatusCode(statusCode))
+            if (TryGetErrorCode(context, out var statusCode) && IsErrorStatusCode(statusCode))
             {
                 var (error, _) = ApiExceptionConverter.ToErrorDto(statusCode, context);
 
@@ -70,6 +70,13 @@ namespace Squidex.Web.Pipeline
             {
                 StatusCode = error.StatusCode
             });
+        }
+
+        private static bool TryGetErrorCode(HttpContext context, out int statusCode)
+        {
+            statusCode = 0;
+
+            return context.Request.Query.TryGetValue("error", out var header) && int.TryParse(header, out statusCode);
         }
 
         private static bool IsErrorStatusCode(int statusCode)
