@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     public sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
     {
@@ -27,71 +27,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             Name = schemaType.SafeTypeName();
 
-            AddField(new FieldType
-            {
-                Name = "id",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = EntityResolvers.Id,
-                Description = $"The id of the {schemaName} content."
-            });
+            AddField(ContentFields.Id);
+            AddField(ContentFields.Version);
+            AddField(ContentFields.Created);
+            AddField(ContentFields.CreatedBy);
+            AddField(ContentFields.LastModified);
+            AddField(ContentFields.LastModifiedBy);
+            AddField(ContentFields.Status);
+            AddField(ContentFields.StatusColor);
 
-            AddField(new FieldType
-            {
-                Name = "version",
-                ResolvedType = AllTypes.NonNullInt,
-                Resolver = EntityResolvers.Version,
-                Description = $"The version of the {schemaName} content."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "created",
-                ResolvedType = AllTypes.NonNullDate,
-                Resolver = EntityResolvers.Created,
-                Description = $"The date and time when the {schemaName} content has been created."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "createdBy",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = EntityResolvers.CreatedBy,
-                Description = $"The user that has created the {schemaName} content."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "lastModified",
-                ResolvedType = AllTypes.NonNullDate,
-                Resolver = EntityResolvers.LastModified,
-                Description = $"The date and time when the {schemaName} content has been modified last."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "lastModifiedBy",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = EntityResolvers.LastModifiedBy,
-                Description = $"The user that has updated the {schemaName} content last."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "status",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = ContentResolvers.Status,
-                Description = $"The the status of the {schemaName} content."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "statusColor",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = ContentResolvers.StatusColor,
-                Description = $"The color status of the {schemaName} content."
-            });
-
-            Interface<ContentInterfaceGraphType>();
+            AddResolvedInterface(ContentInterfaceGraphType.Instance);
 
             Description = $"The structure of a {schemaName} content type.";
 
@@ -103,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
            return value is IContentEntity content && content.SchemaId?.Id == schemaId;
         }
 
-        public void Initialize(IGraphModel model, ISchemaEntity schema, IEnumerable<ISchemaEntity> all, int pageSize)
+        public void Initialize(IGraphModel model, ISchemaEntity schema, IEnumerable<ISchemaEntity> all)
         {
             var schemaType = schema.TypeName();
             var schemaName = schema.DisplayName();
@@ -113,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = "url",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = ContentResolvers.Url,
-                Description = $"The url to the the {schemaName} content."
+                Description = $"The url to the content."
             });
 
             var contentDataType = new ContentDataGraphType(schema, schemaName, schemaType, model);
@@ -125,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Name = "data",
                     ResolvedType = new NonNullGraphType(contentDataType),
                     Resolver = ContentResolvers.Data,
-                    Description = $"The data of the {schemaName} content."
+                    Description = $"The data of the content."
                 });
             }
 
@@ -138,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Name = "flatData",
                     ResolvedType = new NonNullGraphType(contentDataTypeFlat),
                     Resolver = ContentResolvers.FlatData,
-                    Description = $"The flat data of the {schemaName} content."
+                    Description = $"The flat data of the content."
                 });
             }
 
@@ -150,18 +95,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                 var contentType = model.GetContentType(referencingId);
 
-                AddReferencingQueries(referencingId, referencingType, referencingName, contentType, pageSize);
+                AddReferencingQueries(referencingId, referencingType, referencingName, contentType);
             }
         }
 
-        private void AddReferencingQueries(DomainId referencingId, string referencingType, string referencingName, IGraphType contentType, int pageSize)
+        private void AddReferencingQueries(DomainId referencingId, string referencingType, string referencingName, IGraphType contentType)
         {
             var resolver = ContentActions.QueryOrReferencing.Referencing(referencingId);
 
             AddField(new FieldType
             {
                 Name = $"referencing{referencingType}Contents",
-                Arguments = ContentActions.QueryOrReferencing.Arguments(pageSize),
+                Arguments = ContentActions.QueryOrReferencing.Arguments,
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
                 Resolver = resolver,
                 Description = $"Query {referencingName} content items."
@@ -170,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"referencing{referencingType}ContentsWithTotal",
-                Arguments = ContentActions.QueryOrReferencing.Arguments(pageSize),
+                Arguments = ContentActions.QueryOrReferencing.Arguments,
                 ResolvedType = new ContentsResultGraphType(referencingType, referencingName, contentType),
                 Resolver = resolver,
                 Description = $"Query {referencingName} content items with total count."

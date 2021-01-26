@@ -10,9 +10,9 @@ using GraphQL.Language.AST;
 using GraphQL.Types;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    public sealed class JsonConverter : IAstFromValueConverter
+    internal sealed class JsonConverter : IAstFromValueConverter
     {
         public static readonly JsonConverter Instance = new JsonConverter();
 

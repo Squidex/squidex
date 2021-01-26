@@ -9,9 +9,9 @@ using GraphQL.Language.AST;
 using GraphQL.Types;
 using NodaTime;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    public sealed class InstantConverter : IAstFromValueConverter
+    internal sealed class InstantConverter : IAstFromValueConverter
     {
         public static readonly InstantConverter Instance = new InstantConverter();
 

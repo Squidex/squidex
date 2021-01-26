@@ -33,6 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public ICommandBus CommandBus { get; }
 
+        public ISemanticLog Log { get; }
+
         public GraphQLExecutionContext(Context context, IServiceProvider resolver)
             : base(context
                     .WithoutCleanup()
@@ -44,6 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             CommandBus = resolver.GetRequiredService<ICommandBus>();
 
+            Log = resolver.GetRequiredService<ISemanticLog>();
+
             dataLoaderContextAccessor = resolver.GetRequiredService<IDataLoaderContextAccessor>();
 
             this.resolver = resolver;
@@ -54,9 +58,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var loader = resolver.GetRequiredService<DataLoaderDocumentListener>();
 
             execution.Listeners.Add(loader);
-            execution.FieldMiddleware.Use(Middlewares.Logging(resolver.GetRequiredService<ISemanticLog>()));
-            execution.FieldMiddleware.Use(Middlewares.Errors());
-
             execution.UserContext = this;
         }
 

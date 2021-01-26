@@ -9,7 +9,7 @@ using GraphQL.Types;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
-    public sealed class GeolocationInputGraphType : InputObjectGraphType
+    internal sealed class GeolocationInputGraphType : InputObjectGraphType
     {
         public static readonly IGraphType Nullable = new GeolocationInputGraphType();
 

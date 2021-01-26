@@ -10,7 +10,7 @@ using System.Linq;
 using GraphQL.Types;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     public sealed class ContentUnionGraphType : UnionGraphType
     {

@@ -14,7 +14,8 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Log;
@@ -26,46 +27,48 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         private static readonly IDocumentExecuter Executor = new DocumentExecuter();
         private readonly Dictionary<DomainId, ContentGraphType> contentTypes = new Dictionary<DomainId, ContentGraphType>();
-        private readonly PartitionResolver partitionResolver;
-        private readonly IObjectGraphType assetType;
-        private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
-        private readonly GraphQLTypeVisitor graphQLTypeVisitor;
+        private readonly GraphQLTypeFactory graphQLTypeFactory;
         private readonly ISemanticLog log;
-
-        public bool CanGenerateAssetSourceUrl { get; }
+#pragma warning disable IDE0044 // Add readonly modifier
+        private GraphQLTypeVisitor typeVisitor;
+#pragma warning disable IDE0044 // Add readonly modifier
+        private PartitionResolver partitionResolver;
+#pragma warning restore IDE0044 // Add readonly modifier
 
         static GraphQLModel()
         {
             ValueConverter.Register<string, DomainId>(DomainId.Create);
         }
 
-        public GraphQLModel(IAppEntity app,
-            IEnumerable<ISchemaEntity> schemas,
-            int pageSizeContents,
-            int pageSizeAssets,
-            IUrlGenerator urlGenerator, ISemanticLog log)
+        public GraphQLTypeFactory TypeFactory
         {
+            get { return graphQLTypeFactory; }
+        }
+
+        public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, GraphQLTypeFactory typeFactory, ISemanticLog log)
+        {
+            graphQLTypeFactory = typeFactory;
+
             this.log = log;
 
             partitionResolver = app.PartitionResolver();
 
-            CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
-
-            assetType = new AssetGraphType(this);
-            assetListType = new ListGraphType(new NonNullGraphType(assetType));
-
-            graphQLTypeVisitor = new GraphQLTypeVisitor(contentTypes, this, assetListType);
+            typeVisitor = new GraphQLTypeVisitor(contentTypes, this);
 
             var allSchemas = schemas.Where(x => x.SchemaDef.IsPublished).ToList();
 
             BuildSchemas(allSchemas);
 
-            graphQLSchema = BuildSchema(this, pageSizeContents, pageSizeAssets, allSchemas);
+            graphQLSchema = BuildSchema(this, allSchemas);
             graphQLSchema.RegisterValueConverter(JsonConverter.Instance);
             graphQLSchema.RegisterValueConverter(InstantConverter.Instance);
 
-            InitializeContentTypes(allSchemas, pageSizeContents);
+            InitializeContentTypes(allSchemas);
+
+            partitionResolver = null!;
+
+            typeVisitor = null!;
         }
 
         private void BuildSchemas(List<ISchemaEntity> allSchemas)
@@ -76,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
         }
 
-        private void InitializeContentTypes(List<ISchemaEntity> allSchemas, int pageSize)
+        private void InitializeContentTypes(List<ISchemaEntity> allSchemas)
         {
             var i = 0;
 
@@ -84,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 var schema = allSchemas[i];
 
-                contentType.Initialize(this, schema, allSchemas, pageSize);
+                contentType.Initialize(this, schema, allSchemas);
 
                 i++;
             }
@@ -93,18 +96,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 graphQLSchema.RegisterType(contentType);
             }
+
+            graphQLSchema.Initialize();
+            graphQLSchema.CleanupMetadata();
         }
 
-        private static GraphQLSchema BuildSchema(GraphQLModel model, int pageSizeContents, int pageSizeAssets, List<ISchemaEntity> schemas)
+        private static GraphQLSchema BuildSchema(GraphQLModel model, List<ISchemaEntity> schemas)
         {
             var schema = new GraphQLSchema
             {
-                Query = new AppQueriesGraphType(
-                    model,
-                    pageSizeContents,
-                    pageSizeAssets,
-                    schemas)
+                Query = new AppQueriesGraphType(model, schemas)
             };
+
+            schema.RegisterType(ContentInterfaceGraphType.Instance);
 
             var schemasWithFields = schemas.Where(x => x.SchemaDef.Fields.Count > 0);
 
@@ -128,12 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public (IGraphType?, ValueResolver?, QueryArguments?) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
         {
-            return field.Accept(graphQLTypeVisitor, new GraphQLTypeVisitor.Args(schema, fieldName));
-        }
-
-        public IGraphType GetAssetType()
-        {
-            return assetType;
+            return field.Accept(typeVisitor, new GraphQLTypeVisitor.Args(schema, fieldName));
         }
 
         public IGraphType GetContentType(DomainId schemaId)

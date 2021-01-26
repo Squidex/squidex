@@ -8,9 +8,9 @@
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    public sealed class NoopGraphType : ScalarGraphType
+    internal sealed class NoopGraphType : ScalarGraphType
     {
         public NoopGraphType(string name)
         {

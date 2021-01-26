@@ -8,6 +8,7 @@
 using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -30,14 +31,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                 if (resolvedType != null && valueResolver != null)
                 {
-                    var resolver = ContentResolvers.NestedValue(valueResolver, nestedField.Name);
-
                     AddField(new FieldType
                     {
                         Name = nestedName,
                         Arguments = args,
                         ResolvedType = resolvedType,
-                        Resolver = resolver,
+                        Resolver = ContentResolvers.NestedValue(valueResolver, nestedField.Name),
                         Description = $"The {fieldDisplayName}/{nestedField.DisplayName()} nested field."
                     });
                 }

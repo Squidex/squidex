@@ -8,9 +8,9 @@
 using GraphQL.Language.AST;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    public sealed class JsonValueNode : ValueNode<IJsonValue>
+    internal sealed class JsonValueNode : ValueNode<IJsonValue>
     {
         public JsonValueNode(IJsonValue value)
         {

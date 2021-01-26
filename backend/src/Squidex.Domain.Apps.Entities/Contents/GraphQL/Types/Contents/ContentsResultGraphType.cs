@@ -8,7 +8,7 @@
 using GraphQL.Types;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     public sealed class ContentsResultGraphType : ObjectGraphType<IResultList<IContentEntity>>
     {
@@ -19,16 +19,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "total",
-                Resolver = ContentResolvers.ListTotal,
                 ResolvedType = AllTypes.NonNullInt,
+                Resolver = ContentResolvers.ListTotal,
                 Description = $"The total number of {schemaName} items."
             });
 
             AddField(new FieldType
             {
                 Name = "items",
-                Resolver = ContentResolvers.ListItems,
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
+                Resolver = ContentResolvers.ListItems,
                 Description = $"The {schemaName} items."
             });
 

@@ -8,9 +8,9 @@
 using System;
 using GraphQL.Resolvers;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    public static class EntityResolvers
+    internal static class EntityResolvers
     {
         public static readonly IFieldResolver Id = Resolve<IEntity>(x => x.Id.ToString());
         public static readonly IFieldResolver Created = Resolve<IEntity>(x => x.Created);
@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IFieldResolver LastModifiedBy = Resolve<IEntityWithLastModifiedBy>(x => x.LastModifiedBy.ToString());
         public static readonly IFieldResolver Version = Resolve<IEntityWithVersion>(x => x.Version);
 
-        private static IFieldResolver Resolve<TSource>(Func<TSource, object> action)
+        private static IFieldResolver Resolve<TSource>(Func<TSource, object> resolver)
         {
-            return new FuncFieldResolver<TSource, object?>(c => action(c.Source));
+            return Resolvers.Sync(resolver);
         }
     }
 }

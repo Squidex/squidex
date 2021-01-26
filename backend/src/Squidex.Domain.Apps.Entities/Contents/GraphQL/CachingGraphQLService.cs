@@ -10,10 +10,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Utilities;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Infrastructure;
 using Squidex.Log;
 
@@ -41,9 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var model = await GetModelAsync(context.App);
 
-            var ctx = new GraphQLExecutionContext(context, resolver);
+            var graphQlContext = new GraphQLExecutionContext(context, resolver);
 
-            var result = await Task.WhenAll(queries.Select(q => QueryInternalAsync(model, ctx, q)));
+            var result = await Task.WhenAll(queries.Select(q => QueryInternalAsync(model, graphQlContext, q)));
 
             return (result.Any(x => x.HasError), result.Map(x => x.Response));
         }
@@ -55,21 +53,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var model = await GetModelAsync(context.App);
 
-            var ctx = new GraphQLExecutionContext(context, resolver);
+            var graphQlContext = new GraphQLExecutionContext(context, resolver);
 
-            var result = await QueryInternalAsync(model, ctx, query);
+            var result = await QueryInternalAsync(model, graphQlContext, query);
 
             return result;
         }
 
-        private static async Task<(bool HasError, object Response)> QueryInternalAsync(GraphQLModel model, GraphQLExecutionContext ctx, GraphQLQuery query)
+        private static async Task<(bool HasError, object Response)> QueryInternalAsync(GraphQLModel model, GraphQLExecutionContext context, GraphQLQuery query)
         {
             if (string.IsNullOrWhiteSpace(query.Query))
             {
                 return (false, new { data = new object() });
             }
 
-            var (data, errors) = await model.ExecuteAsync(ctx, query);
+            var (data, errors) = await model.ExecuteAsync(context, query);
 
             if (errors?.Any() == true)
             {
@@ -93,21 +91,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
                 return new GraphQLModel(app,
                     allSchemas,
-                    GetPageSizeForContents(),
-                    GetPageSizeForAssets(),
-                    resolver.GetRequiredService<IUrlGenerator>(),
+                    resolver.GetRequiredService<GraphQLTypeFactory>(),
                     resolver.GetRequiredService<ISemanticLog>());
             });
-        }
-
-        private int GetPageSizeForContents()
-        {
-            return resolver.GetRequiredService<IOptions<ContentOptions>>().Value.DefaultPageSizeGraphQl;
-        }
-
-        private int GetPageSizeForAssets()
-        {
-            return resolver.GetRequiredService<IOptions<AssetOptions>>().Value.DefaultPageSizeGraphQl;
         }
 
         private static object CreateCacheKey(DomainId appId, string etag)

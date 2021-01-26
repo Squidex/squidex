@@ -15,17 +15,17 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public static class ContentResolvers
+    internal static class ContentResolvers
     {
         public static IFieldResolver NestedValue(ValueResolver valueResolver, string key)
         {
-            return new FuncFieldResolver<JsonObject, object?>(c =>
+            return Resolvers.Sync<JsonObject, object?>((source, fieldContext, context) =>
             {
-                if (c.Source.TryGetValue(key, out var value))
+                if (source.TryGetValue(key, out var value))
                 {
-                    return valueResolver(value, c);
+                    return valueResolver(value, fieldContext, context);
                 }
 
                 return null;
@@ -34,11 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static IFieldResolver Partition(ValueResolver valueResolver, string key)
         {
-            return new FuncFieldResolver<ContentFieldData, object?>(c =>
+            return Resolvers.Sync<ContentFieldData, object?>((source, fieldContext, context) =>
             {
-                if (c.Source.TryGetValue(key, out var value) && value != null)
+                if (source.TryGetValue(key, out var value) && value != null)
                 {
-                    return valueResolver(value, c);
+                    return valueResolver(value, fieldContext, context);
                 }
 
                 return null;
@@ -47,11 +47,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static IFieldResolver FlatPartition(ValueResolver valueResolver, string key)
         {
-            return new FuncFieldResolver<FlatContentData, object?>(c =>
+            return Resolvers.Sync<FlatContentData, object?>((source, fieldContext, context) =>
             {
-                if (c.Source.TryGetValue(key, out var value) && value != null)
+                if (source.TryGetValue(key, out var value) && value != null)
                 {
-                    return valueResolver(value, c);
+                    return valueResolver(value, fieldContext, context);
                 }
 
                 return null;
@@ -62,9 +62,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             var fieldName = field.Name;
 
-            return new FuncFieldResolver<ContentData, IReadOnlyDictionary<string, IJsonValue>?>(c =>
+            return Resolvers.Sync<ContentData, IReadOnlyDictionary<string, IJsonValue>?>(source =>
             {
-                return c.Source?.GetOrDefault(fieldName);
+                return source?.GetOrDefault(fieldName);
             });
         }
 
@@ -83,24 +83,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         });
 
         public static readonly IFieldResolver Data = Resolve(x => x.Data);
-        public static readonly IFieldResolver Status = Resolve(x => x.Status.Name.ToUpperInvariant());
-        public static readonly IFieldResolver StatusColor = Resolve(x => x.StatusColor);
+
         public static readonly IFieldResolver ListTotal = ResolveList(x => x.Total);
+
         public static readonly IFieldResolver ListItems = ResolveList(x => x);
 
-        private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, IResolveFieldContext, GraphQLExecutionContext, T> action)
+        private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, IResolveFieldContext, GraphQLExecutionContext, T> resolver)
         {
-            return new FuncFieldResolver<IEnrichedContentEntity, object?>(c => action(c.Source, c, (GraphQLExecutionContext)c.UserContext));
+            return Resolvers.Sync(resolver);
         }
 
-        private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, T> action)
+        private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, T> resolver)
         {
-            return new FuncFieldResolver<IEnrichedContentEntity, object?>(c => action(c.Source));
+            return Resolvers.Sync(resolver);
         }
 
-        private static IFieldResolver ResolveList<T>(Func<IResultList<IEnrichedContentEntity>, T> action)
+        private static IFieldResolver ResolveList<T>(Func<IResultList<IEnrichedContentEntity>, T> resolver)
         {
-            return new FuncFieldResolver<IResultList<IEnrichedContentEntity>, object?>(c => action(c.Source));
+            return Resolvers.Sync(resolver);
         }
     }
 }

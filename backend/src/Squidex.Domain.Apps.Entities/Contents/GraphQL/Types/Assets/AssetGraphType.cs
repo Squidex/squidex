@@ -5,14 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using GraphQL;
+using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 {
-    public sealed class AssetGraphType : ObjectGraphType<IEnrichedAssetEntity>
+    internal sealed class AssetGraphType : ObjectGraphType<IEnrichedAssetEntity>
     {
-        public AssetGraphType(IGraphModel model)
+        public AssetGraphType(bool canGenerateSourceUrl)
         {
             Name = "Asset";
 
@@ -68,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "mimeType",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = AssetResolvers.MimeType,
+                Resolver = Resolve(x => x.MimeType),
                 Description = "The mime type."
             });
 
@@ -76,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "url",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = AssetResolvers.Url,
+                Resolver = Url,
                 Description = "The url to the asset."
             });
 
@@ -84,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "thumbnailUrl",
                 ResolvedType = AllTypes.String,
-                Resolver = AssetResolvers.ThumbnailUrl,
+                Resolver = ThumbnailUrl,
                 Description = "The thumbnail url to the asset."
             });
 
@@ -92,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "fileName",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = AssetResolvers.FileName,
+                Resolver = Resolve(x => x.FileName),
                 Description = "The file name."
             });
 
@@ -100,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "fileHash",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = AssetResolvers.FileHash,
+                Resolver = Resolve(x => x.FileHash),
                 Description = "The hash of the file. Can be null for old files."
             });
 
@@ -108,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "fileType",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = AssetResolvers.FileType,
+                Resolver = Resolve(x => x.FileName.FileType()),
                 Description = "The file type."
             });
 
@@ -116,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "fileSize",
                 ResolvedType = AllTypes.NonNullInt,
-                Resolver = AssetResolvers.FileSize,
+                Resolver = Resolve(x => x.FileSize),
                 Description = "The size of the file in bytes."
             });
 
@@ -124,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "fileVersion",
                 ResolvedType = AllTypes.NonNullInt,
-                Resolver = AssetResolvers.FileVersion,
+                Resolver = Resolve(x => x.FileVersion),
                 Description = "The version of the file."
             });
 
@@ -132,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "slug",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = AssetResolvers.Slug,
+                Resolver = Resolve(x => x.Slug),
                 Description = "The file name as slug."
             });
 
@@ -140,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "isProtected",
                 ResolvedType = AllTypes.NonNullBoolean,
-                Resolver = AssetResolvers.IsProtected,
+                Resolver = Resolve(x => x.IsProtected),
                 Description = "True, when the asset is not public."
             });
 
@@ -148,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "isImage",
                 ResolvedType = AllTypes.NonNullBoolean,
-                Resolver = AssetResolvers.IsImage,
+                Resolver = Resolve(x => x.Type == AssetType.Image),
                 Description = "Determines if the uploaded file is an image.",
                 DeprecationReason = "Use 'type' field instead."
             });
@@ -157,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "pixelWidth",
                 ResolvedType = AllTypes.Int,
-                Resolver = AssetResolvers.PixelWidth,
+                Resolver = Resolve(x => x.Metadata.GetPixelWidth()),
                 Description = "The width of the image in pixels if the asset is an image.",
                 DeprecationReason = "Use 'metadata' field instead."
             });
@@ -166,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "pixelHeight",
                 ResolvedType = AllTypes.Int,
-                Resolver = AssetResolvers.PixelHeight,
+                Resolver = Resolve(x => x.Metadata.GetPixelHeight()),
                 Description = "The height of the image in pixels if the asset is an image.",
                 DeprecationReason = "Use 'metadata' field instead."
             });
@@ -175,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "type",
                 ResolvedType = AllTypes.NonNullAssetType,
-                Resolver = AssetResolvers.Type,
+                Resolver = Resolve(x => x.Type),
                 Description = "The type of the image."
             });
 
@@ -183,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "metadataText",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = AssetResolvers.MetadataText,
+                Resolver = Resolve(x => x.MetadataText),
                 Description = "The text representation of the metadata."
             });
 
@@ -191,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "tags",
                 ResolvedType = null,
-                Resolver = AssetResolvers.Tags,
+                Resolver = Resolve(x => x.TagNames),
                 Description = "The asset tags.",
                 Type = AllTypes.NonNullTagsType
             });
@@ -205,18 +211,43 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Description = "The asset metadata."
             });
 
-            if (model.CanGenerateAssetSourceUrl)
+            if (canGenerateSourceUrl)
             {
                 AddField(new FieldType
                 {
                     Name = "sourceUrl",
                     ResolvedType = AllTypes.NonNullString,
-                    Resolver = AssetResolvers.SourceUrl,
+                    Resolver = SourceUrl,
                     Description = "The source url of the asset."
                 });
             }
 
             Description = "An asset";
+        }
+
+        private static readonly IFieldResolver Url = Resolve((asset, _, context) =>
+        {
+            return context.UrlGenerator.AssetContent(asset.AppId, asset.Id.ToString());
+        });
+
+        private static readonly IFieldResolver SourceUrl = Resolve((asset, _, context) =>
+        {
+            return context.UrlGenerator.AssetSource(asset.AppId, asset.Id, asset.FileVersion);
+        });
+
+        private static readonly IFieldResolver ThumbnailUrl = Resolve((asset, _, context) =>
+        {
+            return context.UrlGenerator.AssetThumbnail(asset.AppId, asset.Id.ToString(), asset.Type);
+        });
+
+        private static IFieldResolver Resolve<T>(Func<IEnrichedAssetEntity, IResolveFieldContext, GraphQLExecutionContext, T> resolver)
+        {
+            return Resolvers.Sync(resolver);
+        }
+
+        private static IFieldResolver Resolve<T>(Func<IEnrichedAssetEntity, T> resolver)
+        {
+            return Resolvers.Sync(resolver);
         }
     }
 }

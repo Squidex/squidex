@@ -10,19 +10,20 @@ using System.Linq;
 using GraphQL;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public delegate object ValueResolver(IJsonValue value, IResolveFieldContext context);
+    public delegate object ValueResolver(IJsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
     internal sealed class GraphQLTypeVisitor : IFieldVisitor<(IGraphType?, ValueResolver?, QueryArguments?), GraphQLTypeVisitor.Args>
     {
-        private static readonly ValueResolver NoopResolver = (value, c) => value;
+        private static readonly ValueResolver NoopResolver = (value, fieldContext, contex) => value;
+
         private readonly Dictionary<DomainId, ContentGraphType> schemaTypes;
-        private readonly IGraphType assetListType;
         private readonly IGraphModel model;
 
         public readonly struct Args
@@ -38,13 +39,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
         }
 
-        public GraphQLTypeVisitor(
-            Dictionary<DomainId, ContentGraphType> schemaTypes,
-            IGraphModel model,
-            IGraphType assetListType)
+        public GraphQLTypeVisitor(Dictionary<DomainId, ContentGraphType> schemaTypes, IGraphModel model)
         {
-            this.assetListType = assetListType;
             this.model = model;
+
             this.schemaTypes = schemaTypes;
         }
 
@@ -115,14 +113,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private (IGraphType?, ValueResolver?, QueryArguments?) ResolveAssets()
         {
-            var resolver = new ValueResolver((value, c) =>
+            var resolver = new ValueResolver((value, _, context) =>
             {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
                 return context.GetReferencedAssetsAsync(value);
             });
 
-            return (assetListType, resolver, null);
+            return (model.TypeFactory.AssetsList, resolver, null);
         }
 
         private (IGraphType?, ValueResolver?, QueryArguments?) ResolveReferences(IField<ReferencesFieldProperties> field, Args args)
@@ -141,10 +137,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 contentType = union;
             }
 
-            var resolver = new ValueResolver((value, c) =>
+            var resolver = new ValueResolver((value, _, context) =>
             {
-                var context = (GraphQLExecutionContext)c.UserContext;
-
                 return context.GetReferencedContentsAsync(value);
             });
 

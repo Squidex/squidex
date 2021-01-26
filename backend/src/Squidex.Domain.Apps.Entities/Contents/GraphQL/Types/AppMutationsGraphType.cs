@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
 

@@ -10,9 +10,9 @@ using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    public static class Converters
+    internal static class Converters
     {
         public static ContentData ToContentData(this IDictionary<string, object> source, IComplexGraphType type)
         {

@@ -5,35 +5,42 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 {
-    public sealed class AssetsResultGraphType : ObjectGraphType<IResultList<IAssetEntity>>
+    internal sealed class AssetsResultGraphType : ObjectGraphType<IResultList<IAssetEntity>>
     {
-        public AssetsResultGraphType(IGraphType assetType)
+        public AssetsResultGraphType(IGraphType assetsList)
         {
             Name = "AssetResultDto";
 
             AddField(new FieldType
             {
                 Name = "total",
-                ResolvedType = AllTypes.Int,
-                Resolver = AssetResolvers.ListTotal,
+                ResolvedType = AllTypes.NonNullInt,
+                Resolver = ResolveList(x => x.Total),
                 Description = "The total count of assets."
             });
 
             AddField(new FieldType
             {
                 Name = "items",
-                Resolver = AssetResolvers.ListItems,
-                ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
+                ResolvedType = assetsList,
+                Resolver = ResolveList(x => x),
                 Description = "The assets."
             });
 
             Description = "List of assets and total count of assets.";
+        }
+
+        private static IFieldResolver ResolveList<T>(Func<IResultList<IEnrichedAssetEntity>, T> resolver)
+        {
+            return Resolvers.Sync(resolver);
         }
     }
 }
