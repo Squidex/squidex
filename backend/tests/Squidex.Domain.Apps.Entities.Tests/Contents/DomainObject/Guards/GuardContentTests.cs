@@ -30,11 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly ClaimsPrincipal userWithDeletePermission = Mocks.FrontendUser(permission: Permissions.AppContentsDelete);
-        private readonly ClaimsPrincipal userWithStatusChangePermission = Mocks.FrontendUser(permission: Permissions.AppContentsChangeStatus);
-        private readonly ClaimsPrincipal userWithUpdatePermission = Mocks.FrontendUser(permission: Permissions.AppContentsUpdate);
-        private readonly ClaimsPrincipal userWithPatchPermission = Mocks.FrontendUser(permission: Permissions.AppContentsPatch);
-        private readonly ClaimsPrincipal userWithDeleteDraftPermission = Mocks.FrontendUser(permission: Permissions.AppContentsDeleteDraft);
         private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
+        private readonly RefToken refToken = new RefToken("string", "string");
 
         [Fact]
         public async Task CanCreate_should_throw_exception_if_data_is_null()
@@ -105,9 +102,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         public async Task CanUpdate_should_throw_exception_if_data_is_null()
         {
             SetupCanUpdate(true, user);
-
-            var content = CreateContent(Status.Draft);
-            var command = new UpdateContent();
+            var schema = CreateSchema(false);
+            var content = CreateContent(Status.Draft, schema: schema, refTokenParam: refToken);
+            var command = new UpdateContent { Actor = refToken };
 
             await ValidationAssert.ThrowsAsync(() => GuardContent.CanUpdate(command, content, contentWorkflow),
                 new ValidationError("Data is required.", "Data"));
@@ -117,9 +114,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it()
         {
             SetupCanUpdate(false, user);
-
-            var content = CreateContent(Status.Draft);
-            var command = new UpdateContent { Data = new NamedContentData() };
+            var schema = CreateSchema(false);
+            var content = CreateContent(Status.Draft, schema: schema, refTokenParam: refToken);
+            var command = new UpdateContent { Data = new NamedContentData(), Actor = refToken };
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanUpdate(command, content, contentWorkflow));
         }
@@ -128,43 +125,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         public async Task CanUpdate_should_not_throw_exception_if_data_is_not_null()
         {
             SetupCanUpdate(true, user);
-
-            var content = CreateContent(Status.Draft);
-            var command = new UpdateContent { Data = new NamedContentData(), User = user };
+            var schema = CreateSchema(false);
+            var content = CreateContent(Status.Draft, schema: schema, refTokenParam: refToken);
+            var command = new UpdateContent { Data = new NamedContentData(), User = user, Actor = refToken };
 
             await GuardContent.CanUpdate(command, content, contentWorkflow);
-        }
-
-        [Fact]
-        public async Task CanUpdateOwn_should_not_throw_exception_if_has_permission()
-        {
-            SetupCanUpdate(true, userWithUpdatePermission);
-            var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
-            var content = CreateOwnContent(status: Status.Draft, refToken: refToken, schema: schema);
-            var command = UpdateContentCommand(content);
-
-            await GuardContent.CanUpdate(command, content, contentWorkflow);
-        }
-
-        [Fact]
-        public async Task CanUpdateOwn_should_throw_exception_if_has_not_permission()
-        {
-            var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
-            var content = CreateOwnContent(status: Status.Draft, refToken: refToken, schema: schema);
-            var command = new UpdateContent { User = user };
-
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardContent.CanUpdate(command, content, contentWorkflow));
         }
 
         [Fact]
         public async Task CanPatch_should_throw_exception_if_data_is_null()
         {
             SetupCanUpdate(true, user);
-
-            var content = CreateContent(Status.Draft);
-            var command = new PatchContent();
+            var schema = CreateSchema(false);
+            var content = CreateContent(Status.Draft, schema: schema, refTokenParam: refToken);
+            var command = new PatchContent { Actor = refToken };
 
             await ValidationAssert.ThrowsAsync(() => GuardContent.CanPatch(command, content, contentWorkflow),
                 new ValidationError("Data is required.", "Data"));
@@ -174,9 +148,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         public async Task CanPatch_should_throw_exception_if_workflow_blocks_it()
         {
             SetupCanUpdate(false, user);
-
-            var content = CreateContent(Status.Draft);
-            var command = new PatchContent { Data = new NamedContentData() };
+            var schema = CreateSchema(false);
+            var content = CreateContent(Status.Draft, schema: schema, refTokenParam: refToken);
+            var command = new PatchContent { Data = new NamedContentData(), Actor = refToken };
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanPatch(command, content, contentWorkflow));
         }
@@ -185,34 +159,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         public async Task CanPatch_should_not_throw_exception_if_data_is_not_null()
         {
             SetupCanUpdate(true, user);
-
-            var content = CreateContent(Status.Draft);
-            var command = new PatchContent { Data = new NamedContentData(), User = user };
+            var schema = CreateSchema(false);
+            var content = CreateContent(Status.Draft, schema: schema, refTokenParam: refToken);
+            var command = new PatchContent { Data = new NamedContentData(), User = user, Actor = refToken };
 
             await GuardContent.CanPatch(command, content, contentWorkflow);
-        }
-
-        [Fact]
-        public async Task CanPatchOwn_should_not_throw_exception_if_has_permission()
-        {
-            SetupCanUpdate(true, userWithPatchPermission);
-            var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
-            var content = CreateOwnContent(status: Status.Draft, refToken: refToken, schema: schema);
-            var command = PatchContentCommand(content);
-
-            await GuardContent.CanPatch(command, content, contentWorkflow);
-        }
-
-        [Fact]
-        public async Task CanPatchOwn_should_throw_exception_if_has_not_permission()
-        {
-            var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
-            var content = CreateOwnContent(status: Status.Draft, refToken: refToken, schema: schema);
-            var command = new PatchContent { User = user };
-
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardContent.CanPatch(command, content, contentWorkflow));
         }
 
         [Fact]
@@ -220,8 +171,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(true);
 
-            var content = CreateContent(Status.Published);
-            var command = new ChangeContentStatus { Status = Status.Draft };
+            var content = CreateContent(Status.Published, schema: schema, refTokenParam: refToken);
+            var command = new ChangeContentStatus { Status = Status.Draft, Actor = refToken };
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(command, content, contentWorkflow, contentRepository, schema));
         }
@@ -231,8 +182,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(false);
 
-            var content = CreateContent(Status.Draft);
-            var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast, User = user };
+            var content = CreateContent(Status.Draft, schema: schema, refTokenParam: refToken);
+            var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast, User = user, Actor = refToken };
 
             A.CallTo(() => contentWorkflow.CanMoveToAsync(content, content.Status, command.Status, user))
                 .Returns(true);
@@ -246,8 +197,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(false);
 
-            var content = CreateContent(Status.Draft);
-            var command = new ChangeContentStatus { Status = Status.Published, User = user };
+            var content = CreateContent(Status.Draft, schema: schema, refTokenParam: refToken );
+            var command = new ChangeContentStatus { Status = Status.Published, User = user, Actor = refToken };
 
             A.CallTo(() => contentWorkflow.CanMoveToAsync(content, content.Status, command.Status, user))
                 .Returns(false);
@@ -261,8 +212,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(true);
 
-            var content = CreateContent(Status.Published);
-            var command = new ChangeContentStatus { Status = Status.Draft, User = user };
+            var content = CreateContent(Status.Published, refTokenParam: refToken, schema: schema);
+            var command = new ChangeContentStatus { Status = Status.Draft, User = user, Actor = refToken };
 
             A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, content.Id, SearchScope.Published))
                 .Returns(true);
@@ -275,8 +226,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(true);
 
-            var content = CreateDraftContent(Status.Draft);
-            var command = new ChangeContentStatus { Status = Status.Published };
+            var content = CreateDraftContent(Status.Draft, refTokenParam: refToken);
+            var command = new ChangeContentStatus { Status = Status.Published, User = user, Actor = refToken };
 
             await GuardContent.CanChangeStatus(command, content, contentWorkflow, contentRepository, schema);
         }
@@ -286,8 +237,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(false);
 
-            var content = CreateContent(Status.Draft);
-            var command = new ChangeContentStatus { Status = Status.Published, User = user };
+            var content = CreateContent(Status.Draft, schema: schema, refTokenParam: refToken);
+            var command = new ChangeContentStatus { Status = Status.Published, User = user, Actor = refToken };
 
             A.CallTo(() => contentWorkflow.CanMoveToAsync(content, content.Status, command.Status, user))
                 .Returns(true);
@@ -296,39 +247,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanChangeOwnStatus_should_not_throw_exception_if_has_permission()
-        {
-            var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
-            var content = CreateOwnContent(status: Status.Draft, refToken: refToken, schema: schema);
-            var command = ChangeContentSatusCommand(content);
-
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, content.Status, command.Status, userWithStatusChangePermission))
-                .Returns(true);
-
-            await GuardContent.CanChangeStatus(command, content, contentWorkflow, contentRepository, schema);
-        }
-
-        [Fact]
-        public async Task CanChangeOwnStatus_should_throw_exception_if_has_no_permission()
-        {
-            var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
-            var content = CreateOwnContent(status: Status.Draft, refToken: refToken, schema: schema);
-            var command = new ChangeContentStatus { User = user, Status = Status.Published };
-
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, content.Status, command.Status, userWithStatusChangePermission))
-                .Returns(true);
-
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardContent.CanChangeStatus(command, content, contentWorkflow, contentRepository, schema));
-        }
-
-        [Fact]
         public void CreateDraft_should_throw_exception_if_not_published()
         {
-            CreateSchema(false);
+            var schema = CreateSchema(false);
 
-            var content = CreateContent(Status.Draft);
+            var content = CreateContent(Status.Draft, schema: schema);
             var command = new CreateContentDraft();
 
             Assert.Throws<DomainException>(() => GuardContent.CanCreateDraft(command, content));
@@ -337,7 +260,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         [Fact]
         public void CreateDraft_should_not_throw_exception()
         {
-            var content = CreateContent(Status.Published);
+            var schema = CreateSchema(false);
+            var content = CreateContent(Status.Published, schema: schema);
             var command = new CreateContentDraft();
 
             GuardContent.CanCreateDraft(command, content);
@@ -346,10 +270,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         [Fact]
         public void CanDeleteDraft_should_throw_exception_if_no_draft_found()
         {
-            CreateSchema(false);
+            var schema = CreateSchema(false);
 
-            var content = CreateContent(Status.Published);
-            var command = new DeleteContentDraft();
+            var content = CreateContent(Status.Published, schema: schema, refTokenParam: refToken);
+            var command = new DeleteContentDraft { Actor = refToken };
 
             Assert.Throws<DomainException>(() => GuardContent.CanDeleteDraft(command, content));
         }
@@ -357,32 +281,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         [Fact]
         public void CanDeleteDraft_should_not_throw_exception()
         {
-            var content = CreateDraftContent(Status.Draft);
-            var command = new DeleteContentDraft();
+            var content = CreateDraftContent(Status.Draft, refToken);
+            var command = new DeleteContentDraft { Actor = refToken };
 
             GuardContent.CanDeleteDraft(command, content);
-        }
-
-        [Fact]
-        public void CanDeleteDraftOwn_should_not_throw_exception_if_has_permission()
-        {
-            var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
-            var content = CreateOwnContent(status: Status.Published, refToken: refToken, schema: schema);
-            var command = DeleteDraftContentCommand(content);
-
-            GuardContent.CanDeleteDraft(command, content);
-        }
-
-        [Fact]
-        public void CanDeleteDraftOwn_should_throw_exception_if_has_not_permission()
-        {
-            var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
-            var content = CreateOwnContent(status: Status.Draft, refToken: refToken, schema: schema);
-            var command = new DeleteContentDraft { User = user };
-
-            Assert.Throws<DomainForbiddenException>(() => GuardContent.CanDeleteDraft(command, content));
         }
 
         [Fact]
@@ -390,8 +292,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(true);
 
-            var content = CreateContent(Status.Published);
-            var command = new DeleteContent();
+            var content = CreateContent(Status.Published, schema: schema, refTokenParam: refToken);
+            var command = new DeleteContent { Actor = refToken };
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanDelete(command, content, contentRepository, schema));
         }
@@ -401,8 +303,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(true);
 
-            var content = CreateContent(Status.Published);
-            var command = new DeleteContent();
+            var content = CreateContent(Status.Published, schema: schema, refTokenParam: refToken);
+            var command = new DeleteContent { Actor = refToken };
 
             A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, content.Id, SearchScope.All))
                 .Returns(true);
@@ -415,38 +317,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var schema = CreateSchema(false);
 
-            var content = CreateContent(Status.Published);
-            var command = new DeleteContent();
+            var content = CreateContent(Status.Published, schema: schema, refTokenParam: refToken);
+            var command = new DeleteContent { Actor = refToken };
 
             await GuardContent.CanDelete(command, content, contentRepository, schema);
         }
 
         [Fact]
-        public async Task CanDelete_Own_should_not_throw_exception()
+        public void CheckPermission_if_content_has_createdby_should_return()
         {
             var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
+            var content = CreateOwnContent(status: Status.Published, refTokenParam: refToken, schema: schema);
+            var command = new DeleteContent { Actor = refToken };
 
-            var content = CreateOwnContent(status: Status.Published, refToken: refToken, schema: schema);
+            GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete);
+        }
+
+        [Fact]
+        public void CheckPermission_if_user_has_permission_should_not_throw_exception()
+        {
+            var schema = CreateSchema(false);
+            var wrongRefToken = new RefToken("stringwrong", "stringwrong");
+            var content = CreateOwnContent(status: Status.Published, refTokenParam: wrongRefToken, schema: schema);
             var command = CreateContentDeleteCommand(content);
 
-            await GuardContent.CanDelete(command, content, contentRepository, schema);
+            GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete);
         }
 
         [Fact]
-        public async Task CanDeleteOwn_should_throw_exception()
+        public void CheckPermission_if_user_has_not_permission_should_throw_exception()
         {
             var schema = CreateSchema(false);
-            var refToken = new RefToken("string", "string");
-            var content = CreateOwnContent(status: Status.Published, refToken: refToken, schema: schema);
-            var command = new DeleteContent { User = user };
+            var wrongRefToken = new RefToken("stringwrong", "stringwrong");
+            var content = CreateOwnContent(status: Status.Published, refTokenParam: wrongRefToken, schema: schema);
+            var command = new DeleteContent { Actor = refToken, User = user };
 
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardContent.CanDelete(command, content, contentRepository, schema));
+            Assert.Throws<DomainForbiddenException>(() => GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete));
         }
 
-        private void SetupCanUpdate(bool canUpdate, ClaimsPrincipal user)
+        private void SetupCanUpdate(bool canUpdate, ClaimsPrincipal userMock)
         {
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>._, A<Status>._, user))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>._, A<Status>._, userMock))
                 .Returns(canUpdate);
         }
 
@@ -461,29 +372,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "my-schema"), new Schema("schema", isSingleton: isSingleton));
         }
 
-        private IContentEntity CreateDraftContent(Status status)
+        private IContentEntity CreateDraftContent(Status status, RefToken? refTokenParam)
         {
             return new ContentEntity
             {
                 Id = DomainId.NewGuid(),
                 NewStatus = status,
-                AppId = appId
+                AppId = appId,
+                CreatedBy = refTokenParam
             };
         }
 
-        private IContentEntity CreateContent(Status status, RefToken? refToken = null, ISchemaEntity? schema = null)
+        private IContentEntity CreateContent(Status status, RefToken? refTokenParam = null, ISchemaEntity? schema = null)
         {
             return new ContentEntity
             {
                 Id = DomainId.NewGuid(),
                 Status = status,
                 AppId = appId,
-                CreatedBy = refToken,
+                CreatedBy = refTokenParam,
                 SchemaId = schema.AppId
             };
         }
 
-        private IContentEntity CreateOwnContent(Status status, ISchemaEntity? schema, RefToken? refToken = null)
+        private IContentEntity CreateOwnContent(Status status, ISchemaEntity? schema, RefToken? refTokenParam = null)
         {
             return new ContentEntity
             {
@@ -491,7 +403,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 Status = status,
                 NewStatus = status,
                 AppId = appId,
-                CreatedBy = refToken,
+                CreatedBy = refTokenParam,
                 SchemaId = schema.AppId
             };
         }
@@ -502,45 +414,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             {
                 Actor = content.CreatedBy,
                 User = userWithDeletePermission
-            };
-        }
-
-        private ChangeContentStatus ChangeContentSatusCommand(IContentEntity content)
-        {
-            return new ChangeContentStatus
-            {
-                Status = Status.Published,
-                Actor = content.CreatedBy,
-                User = userWithStatusChangePermission
-            };
-        }
-
-        private UpdateContent UpdateContentCommand(IContentEntity content)
-        {
-            return new UpdateContent
-            {
-                Actor = content.CreatedBy,
-                User = userWithUpdatePermission,
-                Data = new NamedContentData()
-            };
-        }
-
-        private PatchContent PatchContentCommand(IContentEntity content)
-        {
-            return new PatchContent
-            {
-                Actor = content.CreatedBy,
-                User = userWithPatchPermission,
-                Data = new NamedContentData()
-            };
-        }
-
-        private DeleteContentDraft DeleteDraftContentCommand(IContentEntity content)
-        {
-            return new DeleteContentDraft
-            {
-                Actor = content.CreatedBy,
-                User = userWithPatchPermission
             };
         }
     }

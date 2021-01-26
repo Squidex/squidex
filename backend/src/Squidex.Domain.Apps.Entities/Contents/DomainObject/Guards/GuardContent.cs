@@ -47,11 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             IContentWorkflow contentWorkflow)
         {
             Guard.NotNull(command, nameof(command));
-
-            if (!HasPermission(content, command, Permissions.AppContentsUpdate))
-            {
-                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
-            }
+            GuardContent.CheckPermission(content, command, Permissions.AppContentsUpdate);
 
             Validate.It(e =>
             {
@@ -66,11 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             IContentWorkflow contentWorkflow)
         {
             Guard.NotNull(command, nameof(command));
-
-            if (!HasPermission(content, command, Permissions.AppContentsPatch))
-            {
-                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
-            }
+            GuardContent.CheckPermission(content, command, Permissions.AppContentsPatch);
 
             Validate.It(e =>
             {
@@ -83,11 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         public static void CanDeleteDraft(DeleteContentDraft command, IContentEntity content)
         {
             Guard.NotNull(command, nameof(command));
-
-            if (!HasPermission(content, command, Permissions.AppContentsDeleteDraft))
-            {
-                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
-            }
+            GuardContent.CheckPermission(content, command, Permissions.AppContentsDeleteDraft);
 
             if (content.NewStatus == null)
             {
@@ -112,11 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
-
-            if (!HasPermission(content, command, Permissions.AppContentsChangeStatus))
-            {
-                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
-            }
+            GuardContent.CheckPermission(content, command, Permissions.AppContentsChangeStatus);
 
             if (schema.SchemaDef.IsSingleton)
             {
@@ -162,6 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
+            GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete);
 
             if (schema.SchemaDef.IsSingleton)
             {
@@ -176,11 +161,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 {
                     throw new DomainException(T.Get("contents.referenced"));
                 }
-            }
-
-            if (!HasPermission(content, command, Permissions.AppContentsDelete))
-            {
-                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }
         }
 
@@ -202,16 +182,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
-        private static bool HasPermission(IContentEntity content, ContentCommand command, string permission)
+        public static void CheckPermission(IContentEntity content, ContentCommand command, string permission)
         {
-            if (content.CreatedBy.Equals(command.Actor))
+            if (content.CreatedBy != null && content.CreatedBy.Equals(command.Actor))
             {
-                return true;
+                return;
             }
 
             var requiredPermission = Permissions.ForApp(permission, content.AppId.Name, content.SchemaId.Name);
-
-            return command.User.Permissions().Allows(requiredPermission);
+            if (!command.User.Permissions().Allows(requiredPermission))
+            {
+                throw new DomainForbiddenException("...");
+            }
         }
     }
 }
