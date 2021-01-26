@@ -32,6 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly ISemanticLog log;
 #pragma warning disable IDE0044 // Add readonly modifier
         private GraphQLTypeVisitor typeVisitor;
+#pragma warning disable IDE0044 // Add readonly modifier
         private PartitionResolver partitionResolver;
 #pragma warning restore IDE0044 // Add readonly modifier
 
@@ -95,6 +96,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 graphQLSchema.RegisterType(contentType);
             }
+
+            graphQLSchema.Initialize();
+            graphQLSchema.CleanupMetadata();
         }
 
         private static GraphQLSchema BuildSchema(GraphQLModel model, List<ISchemaEntity> schemas)

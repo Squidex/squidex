@@ -35,7 +35,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             public Args(ISchemaEntity schema, string fieldName)
             {
                 Schema = schema;
-
                 SchemaField = fieldName;
             }
         }
