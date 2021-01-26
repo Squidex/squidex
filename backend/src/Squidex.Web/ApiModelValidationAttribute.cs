@@ -5,7 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
@@ -16,6 +19,7 @@ namespace Squidex.Web
 {
     public sealed class ApiModelValidationAttribute : ActionFilterAttribute
     {
+        private const string RequestBodyTooLarge = "Request body too large.";
         private readonly bool allErrors;
 
         public ApiModelValidationAttribute(bool allErrors)
@@ -33,6 +37,14 @@ namespace Squidex.Web
                 {
                     if (value.ValidationState == ModelValidationState.Invalid)
                     {
+                        foreach (var error in value.Errors)
+                        {
+                            if (error.ErrorMessage?.Contains(RequestBodyTooLarge, StringComparison.OrdinalIgnoreCase) == true)
+                            {
+                                throw new BadHttpRequestException(error.ErrorMessage, 413);
+                            }
+                        }
+
                         if (string.IsNullOrWhiteSpace(key))
                         {
                             errors.Add(new ValidationError(T.Get("common.httpInvalidRequestFormat")));

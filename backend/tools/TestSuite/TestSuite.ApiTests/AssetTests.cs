@@ -71,6 +71,20 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_not_create_very_big_asset()
+        {
+            // STEP 1: Create small asset
+            await _.UploadFileAsync(1_000_000);
+
+
+            // STEP 2: Create big asset
+            var ex = await Assert.ThrowsAsync<HttpRequestException>(() => _.UploadFileAsync(10_000_000));
+
+            // Client library cannot catch this exception properly.
+            Assert.Null(ex.StatusCode);
+        }
+
+        [Fact]
         public async Task Should_replace_asset()
         {
             // STEP 1: Create asset
@@ -307,7 +321,7 @@ namespace TestSuite.ApiTests
             // STEP 5: Wait for recursive deleter to delete the asset.
             await Task.Delay(5000);
 
-            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id.ToString()));
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id));
 
             Assert.Equal(404, ex.StatusCode);
         }
