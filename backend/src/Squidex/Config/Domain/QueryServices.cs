@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Web.Services;
 
 namespace Squidex.Config.Domain
@@ -29,8 +30,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DataLoaderDocumentListener>()
                 .AsSelf();
 
-            services.AddSingletonAs<CachingGraphQLService>()
-                .As<IGraphQLService>();
+            services.AddSingletonAs<GraphQLTypeFactory>()
+                .AsSelf();
 
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();

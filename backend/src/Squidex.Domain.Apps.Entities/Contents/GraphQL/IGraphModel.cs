@@ -16,11 +16,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public interface IGraphModel
     {
-        bool CanGenerateAssetSourceUrl { get; }
-
         IFieldPartitioning ResolvePartition(Partitioning key);
 
-        IGraphType GetAssetType();
+        GraphQLTypeFactory TypeFactory { get; }
 
         IGraphType GetContentType(DomainId schemaId);
 

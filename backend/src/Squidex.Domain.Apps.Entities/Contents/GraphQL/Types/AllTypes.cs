@@ -8,7 +8,7 @@
 using System;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {

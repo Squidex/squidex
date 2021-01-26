@@ -32,8 +32,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     AddField(new FieldType
                     {
                         Name = nestedName,
-                        Resolver = null,
                         ResolvedType = resolvedType,
+                        Resolver = null,
                         Description = $"The {fieldDisplayName}/{nestedField.DisplayName()} nested field."
                     }).WithSourceName(nestedField.Name);
                 }

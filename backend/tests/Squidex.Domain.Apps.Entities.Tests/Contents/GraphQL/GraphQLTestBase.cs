@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -157,6 +158,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
                 var dataLoaderContext = new DataLoaderContextAccessor();
 
+                var urlGenerator = new FakeUrlGenerator();
+
                 services = new Dictionary<Type, object>
                 {
                     [typeof(IAppProvider)] = appProvider,
@@ -164,11 +167,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     [typeof(ICommandBus)] = testBase.commandBus,
                     [typeof(IContentQueryService)] = testBase.contentQuery,
                     [typeof(IDataLoaderContextAccessor)] = dataLoaderContext,
-                    [typeof(IOptions<AssetOptions>)] = Options.Create(new AssetOptions()),
-                    [typeof(IOptions<ContentOptions>)] = Options.Create(new ContentOptions()),
+                    [typeof(IUrlGenerator)] = urlGenerator,
                     [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
-                    [typeof(IUrlGenerator)] = new FakeUrlGenerator(),
-                    [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext)
+                    [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext),
+                    [typeof(GraphQLTypeFactory)] = new GraphQLTypeFactory(urlGenerator)
                 };
             }
 

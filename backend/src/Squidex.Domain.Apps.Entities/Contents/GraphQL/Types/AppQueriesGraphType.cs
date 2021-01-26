@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
@@ -14,12 +15,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class AppQueriesGraphType : ObjectGraphType
     {
-        public AppQueriesGraphType(IGraphModel model, int pageSizeContents, int pageSizeAssets, IEnumerable<ISchemaEntity> schemas)
+        public AppQueriesGraphType(IGraphModel model, IEnumerable<ISchemaEntity> schemas)
         {
-            var assetType = model.GetAssetType();
-
-            AddAssetFind(assetType);
-            AddAssetsQueries(assetType, pageSizeAssets);
+            AddField(model.TypeFactory.FindAsset);
+            AddField(model.TypeFactory.QueryAssets);
+            AddField(model.TypeFactory.QueryAssetsWithTotal);
 
             foreach (var schema in schemas)
             {
@@ -39,23 +39,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     schemaId,
                     schemaType,
                     schemaName,
-                    contentType,
-                    pageSizeContents);
+                    contentType);
             }
 
             Description = "The app queries.";
-        }
-
-        private void AddAssetFind(IGraphType assetType)
-        {
-            AddField(new FieldType
-            {
-                Name = "findAsset",
-                Arguments = AssetActions.Find.Arguments,
-                ResolvedType = assetType,
-                Resolver = AssetActions.Find.Resolver,
-                Description = "Find an asset by id."
-            });
         }
 
         private void AddContentFind(DomainId schemaId, string schemaType, string schemaName, IGraphType contentType)
@@ -70,37 +57,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddAssetsQueries(IGraphType assetType, int pageSize)
-        {
-            var resolver = AssetActions.Query.Resolver;
-
-            AddField(new FieldType
-            {
-                Name = "queryAssets",
-                Arguments = AssetActions.Query.Arguments(pageSize),
-                ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
-                Resolver = resolver,
-                Description = "Get assets."
-            });
-
-            AddField(new FieldType
-            {
-                Name = "queryAssetsWithTotal",
-                Arguments = AssetActions.Query.Arguments(pageSize),
-                ResolvedType = new AssetsResultGraphType(assetType),
-                Resolver = resolver,
-                Description = "Get assets and total count."
-            });
-        }
-
-        private void AddContentQueries(DomainId schemaId, string schemaType, string schemaName, IGraphType contentType, int pageSize)
+        private void AddContentQueries(DomainId schemaId, string schemaType, string schemaName, IGraphType contentType)
         {
             var resolver = ContentActions.QueryOrReferencing.Query(schemaId);
 
             AddField(new FieldType
             {
                 Name = $"query{schemaType}Contents",
-                Arguments = ContentActions.QueryOrReferencing.Arguments(pageSize),
+                Arguments = ContentActions.QueryOrReferencing.Arguments,
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
                 Resolver = resolver,
                 Description = $"Query {schemaName} content items."
@@ -109,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"query{schemaType}ContentsWithTotal",
-                Arguments = ContentActions.QueryOrReferencing.Arguments(pageSize),
+                Arguments = ContentActions.QueryOrReferencing.Arguments,
                 ResolvedType = new ContentsResultGraphType(schemaType, schemaName, contentType),
                 Resolver = resolver,
                 Description = $"Query {schemaName} content items with total count."
