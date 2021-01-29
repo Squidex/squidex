@@ -53,7 +53,7 @@ steps:
         - release/*
 
   - name: test_run
-    image: mcr.microsoft.com/dotnet/sdk:5.0
+    image: mcr.microsoft.com/dotnet/sdk:5.0.102-ca-patch-buster-slim
     environment:
       CONFIG__SERVER__URL: http://localhost:8080
       CONFIG__WAIT: 60
