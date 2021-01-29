@@ -69,6 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 SimpleMapper.Map(field,
                     new NestedFieldDto
                     {
+                        FieldId = field.Id,
                         Properties = properties
                     });
 
