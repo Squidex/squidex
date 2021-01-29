@@ -60,18 +60,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType NonNullAssetType = new NonNullGraphType(AssetType);
 
-        public static readonly IGraphType NoopDate = new NoopGraphType(Date);
-
         public static readonly IGraphType NoopJson = new NoopGraphType(Json);
-
-        public static readonly IGraphType NoopFloat = new NoopGraphType(Float);
-
-        public static readonly IGraphType NoopString = new NoopGraphType(String);
-
-        public static readonly IGraphType NoopBoolean = new NoopGraphType(Boolean);
-
-        public static readonly IGraphType NoopTags = new NoopGraphType("TagsScalar");
-
-        public static readonly IGraphType NoopGeolocation = new NoopGraphType("GeolocationScalar");
     }
 }

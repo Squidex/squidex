@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -16,13 +15,12 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public static class ContentActions
+    internal static class ContentActions
     {
         private static readonly QueryArgument Id = new QueryArgument(AllTypes.None)
         {
@@ -107,26 +105,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             };
 
-            public static IFieldResolver Resolver(DomainId schemaId)
+            public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
             {
-                var schemaIdValue = schemaId.ToString();
+                var contentId = fieldContext.GetArgument<DomainId>("id");
 
-                return Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
+                var version = fieldContext.GetArgument<int?>("version");
+
+                if (version >= 0)
                 {
-                    var contentId = fieldContext.GetArgument<DomainId>("id");
-
-                    var version = fieldContext.GetArgument<int?>("version");
-
-                    if (version >= 0)
-                    {
-                        return await context.FindContentAsync(schemaIdValue, contentId, version.Value);
-                    }
-                    else
-                    {
-                        return await context.FindContentAsync(contentId);
-                    }
-                });
-            }
+                    return await context.FindContentAsync(fieldContext.FieldDefinition.SchemaId(), contentId, version.Value);
+                }
+                else
+                {
+                    return await context.FindContentAsync(contentId);
+                }
+            });
         }
 
         public static class QueryOrReferencing
@@ -170,31 +163,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             };
 
-            public static IFieldResolver Query(DomainId schemaId)
+            public static readonly IFieldResolver Query = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
             {
-                var schemaIdValue = schemaId.ToString();
+                var query = fieldContext.BuildODataQuery();
 
-                return Resolvers.Async<object, object>(async (_, fieldContext, context) =>
-                {
-                    var query = fieldContext.BuildODataQuery();
+                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), query);
+            });
 
-                    return await context.QueryContentsAsync(schemaIdValue, query);
-                });
-            }
-
-            public static IFieldResolver Referencing(DomainId schemaId)
+            public static readonly IFieldResolver Referencing = Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
             {
-                var schemaIdValue = schemaId.ToString();
+                var query = fieldContext.BuildODataQuery();
 
-                return Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
-                {
-                    var query = fieldContext.BuildODataQuery();
-
-                    var contentId = source.Id;
-
-                    return await context.QueryReferencingContentsAsync(schemaIdValue, query, source.Id);
-                });
-            }
+                return await context.QueryReferencingContentsAsync(fieldContext.FieldDefinition.SchemaId(), query, source.Id);
+            });
         }
 
         public static class Create
@@ -214,26 +195,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static IFieldResolver Resolver(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
+            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
             {
-                return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
+                var contentPublish = c.GetArgument<bool>("publish");
+                var contentData = GetContentData(c);
+                var contentId = c.GetArgument<string?>("id");
+
+                var command = new CreateContent { Data = contentData, Publish = contentPublish };
+
+                if (!string.IsNullOrWhiteSpace(contentId))
                 {
-                    var contentPublish = c.GetArgument<bool>("publish");
-                    var contentData = GetContentData(c);
-                    var contentId = c.GetArgument<string?>("id");
+                    var id = DomainId.Create(contentId);
 
-                    var command = new CreateContent { Data = contentData, Publish = contentPublish };
+                    command.ContentId = id;
+                }
 
-                    if (!string.IsNullOrWhiteSpace(contentId))
-                    {
-                        var id = DomainId.Create(contentId);
-
-                        command.ContentId = id;
-                    }
-
-                    return command;
-                });
-            }
+                return command;
+            });
         }
 
         public static class Upsert
@@ -255,19 +233,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static IFieldResolver Resolver(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
+            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
             {
-                return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
-                {
-                    var contentPublish = c.GetArgument<bool>("publish");
-                    var contentData = GetContentData(c);
-                    var contentId = c.GetArgument<string>("id");
+                var contentPublish = c.GetArgument<bool>("publish");
+                var contentData = GetContentData(c);
+                var contentId = c.GetArgument<string>("id");
 
-                    var id = DomainId.Create(contentId);
+                var id = DomainId.Create(contentId);
 
-                    return new UpsertContent { ContentId = id, Data = contentData, Publish = contentPublish };
-                });
-            }
+                return new UpsertContent { ContentId = id, Data = contentData, Publish = contentPublish };
+            });
         }
 
         public static class Update
@@ -288,16 +263,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static IFieldResolver Resolver(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
+            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
             {
-                return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
-                {
-                    var contentId = c.GetArgument<DomainId>("id");
-                    var contentData = GetContentData(c);
+                var contentId = c.GetArgument<DomainId>("id");
+                var contentData = GetContentData(c);
 
-                    return new UpdateContent { ContentId = contentId, Data = contentData };
-                });
-            }
+                return new UpdateContent { ContentId = contentId, Data = contentData };
+            });
         }
 
         public static class Patch
@@ -318,16 +290,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 };
             }
 
-            public static IFieldResolver Resolver(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
+            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
             {
-                return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
-                {
-                    var contentId = c.GetArgument<DomainId>("id");
-                    var contentData = GetContentData(c);
+                var contentId = c.GetArgument<DomainId>("id");
+                var contentData = GetContentData(c);
 
-                    return new PatchContent { ContentId = contentId, Data = contentData };
-                });
-            }
+                return new PatchContent { ContentId = contentId, Data = contentData };
+            });
         }
 
         public static class ChangeStatus
@@ -352,17 +321,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 ExpectedVersion
             };
 
-            public static IFieldResolver Resolver(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
+            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
             {
-                return ResolveAsync<IEnrichedContentEntity>(appId, schemaId, c =>
-                {
-                    var contentId = c.GetArgument<DomainId>("id");
-                    var contentStatus = new Status(c.GetArgument<string>("status"));
-                    var contentDueTime = c.GetArgument<Instant?>("dueTime");
+                var contentId = c.GetArgument<DomainId>("id");
+                var contentStatus = c.GetArgument<Status>("status");
+                var contentDueTime = c.GetArgument<Instant?>("dueTime");
 
-                    return new ChangeContentStatus { ContentId = contentId, Status = contentStatus, DueTime = contentDueTime };
-                });
-            }
+                return new ChangeContentStatus { ContentId = contentId, Status = contentStatus, DueTime = contentDueTime };
+            });
         }
 
         public static class Delete
@@ -373,15 +339,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 ExpectedVersion
             };
 
-            public static IFieldResolver Resolver(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
+            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
             {
-                return ResolveAsync<EntitySavedResult>(appId, schemaId, c =>
-                {
-                    var contentId = c.GetArgument<DomainId>("id");
+                var contentId = c.GetArgument<DomainId>("id");
 
-                    return new DeleteContent { ContentId = contentId };
-                });
-            }
+                return new DeleteContent { ContentId = contentId };
+            });
         }
 
         private static ContentData GetContentData(IResolveFieldContext c)
@@ -391,21 +354,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return source.ToContentData((IComplexGraphType)c.FieldDefinition.Arguments.Find("data").Flatten());
         }
 
-        private static IFieldResolver ResolveAsync<T>(NamedId<DomainId> appId, NamedId<DomainId> schemaId, Func<IResolveFieldContext, ContentCommand> action)
+        private static IFieldResolver ResolveAsync(Func<IResolveFieldContext, ContentCommand> action)
         {
-            return Resolvers.Async<object, T>(async (source, fieldContext, context) =>
+            return Resolvers.Async<object, object>(async (source, fieldContext, context) =>
             {
                 try
                 {
                     var command = action(fieldContext);
 
-                    command.AppId = appId;
-                    command.SchemaId = schemaId;
+                    command.AppId = fieldContext.FieldDefinition.AppId();
+                    command.SchemaId = fieldContext.FieldDefinition.SchemaNamedId();
                     command.ExpectedVersion = fieldContext.GetArgument("expectedVersion", EtagVersion.Any);
 
                     var commandContext = await context.CommandBus.PublishAsync(command);
 
-                    return commandContext.Result<T>();
+                    return commandContext.PlainResult!;
                 }
                 catch (ValidationException ex)
                 {

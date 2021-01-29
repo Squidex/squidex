@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             {
                 if (source.TryGetValue(field.Name, out var t) && t is IDictionary<string, object> nested && field.ResolvedType is IComplexGraphType complexType)
                 {
-                    result[field.GetSourceName()] = nested.ToFieldData(complexType);
+                    result[field.SourceName()] = nested.ToFieldData(complexType);
                 }
             }
 
@@ -49,11 +49,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
                             }
                         }
 
-                        result[field.GetSourceName()] = arr;
+                        result[field.SourceName()] = arr;
                     }
                     else
                     {
-                        result[field.GetSourceName()] = JsonConverter.ParseJson(value);
+                        result[field.SourceName()] = JsonConverter.ParseJson(value);
                     }
                 }
             }
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             {
                 if (source.TryGetValue(field.Name, out var value))
                 {
-                    result[field.GetSourceName()] = JsonConverter.ParseJson(value);
+                    result[field.SourceName()] = JsonConverter.ParseJson(value);
                 }
             }
 

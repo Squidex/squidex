@@ -12,26 +12,24 @@ using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public sealed class ContentDataGraphType : ObjectGraphType<ContentData>
+    internal sealed class DataGraphType : ObjectGraphType<ContentData>
     {
-        public ContentDataGraphType(ISchemaEntity schema, string schemaName, string schemaType, IGraphModel model)
+        public DataGraphType(GraphQLModel model, SchemaInfo schemaInfo)
         {
-            Name = $"{schemaType}DataDto";
+            Name = schemaInfo.DataType;
 
-            foreach (var (field, fieldName, typeName) in schema.SchemaDef.Fields.SafeFields())
+            foreach (var fieldInfo in schemaInfo.Fields)
             {
-                var (resolvedType, valueResolver, args) = model.GetGraphType(schema, field, typeName);
+                var (resolvedType, resolver, args) = model.GetGraphType(fieldInfo);
 
-                if (valueResolver != null)
+                if (resolver != null)
                 {
-                    var displayName = field.DisplayName();
-
                     var fieldGraphType = new ObjectGraphType
                     {
-                        Name = $"{schemaType}Data{typeName}Dto"
+                        Name = fieldInfo.TypeName
                     };
 
-                    var partitioning = model.ResolvePartition(field.Partitioning);
+                    var partitioning = model.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
 
                     foreach (var partitionKey in partitioning.AllKeys)
                     {
@@ -40,24 +38,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                             Name = partitionKey.EscapePartition(),
                             Arguments = args,
                             ResolvedType = resolvedType,
-                            Resolver = ContentResolvers.Partition(valueResolver, partitionKey),
-                            Description = field.RawProperties.Hints
-                        });
+                            Resolver = resolver,
+                            Description = fieldInfo.Field.RawProperties.Hints
+                        }).WithSourceName(partitionKey);
                     }
 
-                    fieldGraphType.Description = $"The structure of the {displayName} field of the {schemaName} content type.";
+                    fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content type.";
 
                     AddField(new FieldType
                     {
-                        Name = fieldName,
+                        Name = fieldInfo.FieldName,
                         ResolvedType = fieldGraphType,
-                        Resolver = ContentResolvers.Field(field),
-                        Description = $"The {displayName} field."
-                    });
+                        Resolver = ContentResolvers.Field,
+                        Description = $"The {fieldInfo.DisplayName} field."
+                    }).WithSourceName(fieldInfo);
                 }
             }
 
-            Description = $"The structure of the {schemaName} data type.";
+            Description = $"The structure of the {schemaInfo.DisplayName} data type.";
         }
     }
 }

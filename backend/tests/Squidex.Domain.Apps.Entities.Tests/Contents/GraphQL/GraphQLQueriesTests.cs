@@ -221,7 +221,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             flatData = new
                             {
                                 myString = "value",
-                                myNumber = 1,
+                                myNumber = 1.0,
                                 myBoolean = true,
                                 myDatetime = content.LastModified,
                                 myJsonValue = 1,
@@ -244,12 +244,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 {
                                     new
                                     {
-                                        nestedNumber = 10,
+                                        nestedNumber = 10.0,
                                         nestedBoolean = true
                                     },
                                     new
                                     {
-                                        nestedNumber = 20,
+                                        nestedNumber = 20.0,
                                         nestedBoolean = false
                                     }
                                 }

@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public static class ContentFields
+    internal static class ContentFields
     {
         public static readonly FieldType Id = new FieldType
         {

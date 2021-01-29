@@ -196,11 +196,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 ["gql_2Numbers"] = new
                 {
-                    iv = 22
+                    iv = 22.0
                 },
                 ["gql_2Numbers2"] = new
                 {
-                    iv = 23
+                    iv = 23.0
                 },
                 ["myString"] = new
                 {
@@ -208,11 +208,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 ["myNumber"] = new
                 {
-                    iv = 1
+                    iv = 1.0
                 },
                 ["myNumber2"] = new
                 {
-                    iv = 2
+                    iv = 2.0
                 },
                 ["myBoolean"] = new
                 {
@@ -255,14 +255,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         new
                         {
-                            nestedNumber = 10,
-                            nestedNumber2 = 11,
+                            nestedNumber = 10.0,
+                            nestedNumber2 = 11.0,
                             nestedBoolean = true
                         },
                         new
                         {
-                            nestedNumber = 20,
-                            nestedNumber2 = 21,
+                            nestedNumber = 20.0,
+                            nestedNumber2 = 21.0,
                             nestedBoolean = false
                         }
                     }

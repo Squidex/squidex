@@ -12,6 +12,7 @@ using GraphQL;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.ObjectPool;
 using Squidex.Text;
@@ -97,22 +98,69 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
         }
 
-        public static FieldType WithSourceName(this FieldType field, object value)
+        public static FieldType WithSourceName(this FieldType field, string value)
+        {
+            return field.WithMetadata(nameof(SourceName), value);
+        }
+
+        public static FieldType WithSourceName(this FieldType field, FieldInfo value)
+        {
+            return field.WithMetadata(nameof(SourceName), value.Field.Name);
+        }
+
+        public static string SourceName(this FieldType field)
+        {
+            return field.GetMetadata<string>(nameof(SourceName));
+        }
+
+        public static FieldType WithSchemaId(this FieldType field, SchemaInfo value)
+        {
+            return field.WithMetadata(nameof(SchemaId), value.Schema.Id.ToString());
+        }
+
+        public static string SchemaId(this FieldType field)
+        {
+            return field.GetMetadata<string>(nameof(SchemaId));
+        }
+
+        public static FieldType WithSchemaNamedId(this FieldType field, SchemaInfo value)
+        {
+            return field.WithMetadata(nameof(SchemaNamedId), value.Schema.NamedId());
+        }
+
+        public static NamedId<DomainId> SchemaNamedId(this FieldType field)
+        {
+            return field.GetMetadata<NamedId<DomainId>>(nameof(SchemaNamedId));
+        }
+
+        public static FieldType WithAppId(this FieldType field, NamedId<DomainId> value)
+        {
+            return field.WithMetadata(nameof(AppId), value);
+        }
+
+        public static NamedId<DomainId> AppId(this FieldType field)
+        {
+            return field.GetMetadata<NamedId<DomainId>>(nameof(AppId));
+        }
+
+        private static FieldType WithMetadata(this FieldType field, string key, object value)
         {
             if (field is MetadataProvider metadataProvider)
             {
-                metadataProvider.Metadata = new Dictionary<string, object>
+                if (metadataProvider.Metadata is Dictionary<string, object> dict)
                 {
-                    ["sourceName"] = value
-                };
+                    dict[key] = value;
+                }
+                else
+                {
+                    metadataProvider.Metadata = new Dictionary<string, object>
+                    {
+                        [key] = value
+                    };
+                }
             }
 
             return field;
-        }
-
-        public static string GetSourceName(this FieldType field)
-        {
-            return field.GetMetadata("sourceName", string.Empty);
         }
 
         public static IGraphType Flatten(this QueryArgument type)

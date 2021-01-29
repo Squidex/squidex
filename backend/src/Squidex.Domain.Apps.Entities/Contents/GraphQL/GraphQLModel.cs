@@ -5,139 +5,161 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Log;
 using GraphQLSchema = GraphQL.Types.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public sealed class GraphQLModel : IGraphModel
+    public sealed class GraphQLModel
     {
         private static readonly IDocumentExecuter Executor = new DocumentExecuter();
-        private readonly Dictionary<DomainId, ContentGraphType> contentTypes = new Dictionary<DomainId, ContentGraphType>();
-        private readonly GraphQLSchema graphQLSchema;
-        private readonly GraphQLTypeFactory graphQLTypeFactory;
+        private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new Dictionary<SchemaInfo, ContentGraphType>(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
+        private readonly GraphQLSchema schema;
+        private readonly GraphQLTypeFactory typeFactory;
         private readonly ISemanticLog log;
 #pragma warning disable IDE0044 // Add readonly modifier
-        private GraphQLTypeVisitor typeVisitor;
-#pragma warning disable IDE0044 // Add readonly modifier
+        private GraphQLFieldVisitor fieldVisitor;
+        private GraphQLFieldInputVisitor fieldInputVisitor;
         private PartitionResolver partitionResolver;
 #pragma warning restore IDE0044 // Add readonly modifier
 
         static GraphQLModel()
         {
+            ValueConverter.Register<JsonBoolean, bool>(x => x.Value);
+            ValueConverter.Register<JsonNumber, double>(x => x.Value);
+            ValueConverter.Register<JsonString, string>(x => x.Value);
+            ValueConverter.Register<JsonString, DateTimeOffset>(x => DateTimeOffset.Parse(x.Value, CultureInfo.InvariantCulture));
             ValueConverter.Register<string, DomainId>(DomainId.Create);
         }
 
         public GraphQLTypeFactory TypeFactory
         {
-            get { return graphQLTypeFactory; }
+            get { return typeFactory; }
         }
 
         public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, GraphQLTypeFactory typeFactory, ISemanticLog log)
         {
-            graphQLTypeFactory = typeFactory;
+            this.typeFactory = typeFactory;
 
             this.log = log;
 
             partitionResolver = app.PartitionResolver();
 
-            typeVisitor = new GraphQLTypeVisitor(contentTypes, this);
+            fieldVisitor = new GraphQLFieldVisitor(this);
+            fieldInputVisitor = new GraphQLFieldInputVisitor(this);
 
-            var allSchemas = schemas.Where(x => x.SchemaDef.IsPublished).ToList();
+            var allSchemas = schemas.Where(x => x.SchemaDef.IsPublished).Select(SchemaInfo.Build).ToList();
 
             BuildSchemas(allSchemas);
 
-            graphQLSchema = BuildSchema(this, allSchemas);
-            graphQLSchema.RegisterValueConverter(JsonConverter.Instance);
-            graphQLSchema.RegisterValueConverter(InstantConverter.Instance);
+            schema = BuildSchema(allSchemas);
+            schema.RegisterValueConverter(JsonConverter.Instance);
+            schema.RegisterValueConverter(InstantConverter.Instance);
 
             InitializeContentTypes(allSchemas);
 
             partitionResolver = null!;
 
-            typeVisitor = null!;
+            fieldVisitor = null!;
+            fieldInputVisitor = null!;
         }
 
-        private void BuildSchemas(List<ISchemaEntity> allSchemas)
+        private void BuildSchemas(List<SchemaInfo> allSchemas)
         {
-            foreach (var schema in allSchemas)
+            foreach (var schemaInfo in allSchemas)
             {
-                contentTypes[schema.Id] = new ContentGraphType(schema);
+                var contentType = new ContentGraphType(schemaInfo);
+
+                contentTypes[schemaInfo] = contentType;
+                contentResultTypes[schemaInfo] = new ContentResultGraphType(contentType, schemaInfo);
             }
         }
 
-        private void InitializeContentTypes(List<ISchemaEntity> allSchemas)
+        private void InitializeContentTypes(List<SchemaInfo> allSchemas)
         {
-            var i = 0;
-
-            foreach (var contentType in contentTypes.Values)
+            foreach (var (schemaInfo, contentType) in contentTypes)
             {
-                var schema = allSchemas[i];
-
-                contentType.Initialize(this, schema, allSchemas);
-
-                i++;
+                contentType.Initialize(this, schemaInfo, allSchemas);
             }
 
             foreach (var contentType in contentTypes.Values)
             {
-                graphQLSchema.RegisterType(contentType);
+                schema.RegisterType(contentType);
             }
 
-            graphQLSchema.Initialize();
-            graphQLSchema.CleanupMetadata();
+            schema.Initialize();
+            schema.CleanupMetadata();
         }
 
-        private static GraphQLSchema BuildSchema(GraphQLModel model, List<ISchemaEntity> schemas)
+        private GraphQLSchema BuildSchema(List<SchemaInfo> schemas)
         {
-            var schema = new GraphQLSchema
+            var newSchema = new GraphQLSchema
             {
-                Query = new AppQueriesGraphType(model, schemas)
+                Query = new AppQueriesGraphType(this, schemas)
             };
 
-            schema.RegisterType(ContentInterfaceGraphType.Instance);
+            newSchema.RegisterType(ContentInterfaceGraphType.Instance);
 
-            var schemasWithFields = schemas.Where(x => x.SchemaDef.Fields.Count > 0);
+            var schemasWithFields = schemas.Where(x => x.Fields.Count > 0);
 
             if (schemasWithFields.Any())
             {
-                schema.Mutation = new AppMutationsGraphType(model, schemasWithFields);
+                newSchema.Mutation = new AppMutationsGraphType(this, schemasWithFields);
             }
 
-            return schema;
+            return newSchema;
         }
 
-        public IFieldPartitioning ResolvePartition(Partitioning key)
+        internal IFieldPartitioning ResolvePartition(Partitioning key)
         {
             return partitionResolver(key);
         }
 
-        public IGraphType? GetInputGraphType(ISchemaEntity schema, IField field, string fieldName)
+        internal IGraphType? GetInputGraphType(FieldInfo fieldInfo)
         {
-            return InputFieldVisitor.Build(field, this, schema, fieldName);
+            return fieldInfo.Field.Accept(fieldInputVisitor, fieldInfo);
         }
 
-        public (IGraphType?, ValueResolver?, QueryArguments?) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
+        internal (IGraphType?, IFieldResolver?, QueryArguments?) GetGraphType(FieldInfo fieldInfo)
         {
-            return field.Accept(typeVisitor, new GraphQLTypeVisitor.Args(schema, fieldName));
+            return fieldInfo.Field.Accept(fieldVisitor, fieldInfo);
         }
 
-        public IGraphType GetContentType(DomainId schemaId)
+        internal IObjectGraphType? GetContentType(DomainId schemaId)
+        {
+            return contentTypes.FirstOrDefault(x => x.Key.Schema.Id == schemaId).Value;
+        }
+
+        internal IObjectGraphType GetContentType(SchemaInfo schemaId)
         {
             return contentTypes.GetOrDefault(schemaId);
+        }
+
+        internal IObjectGraphType GetContentResultType(SchemaInfo schemaId)
+        {
+            return contentResultTypes.GetOrDefault(schemaId);
+        }
+
+        internal IEnumerable<KeyValuePair<SchemaInfo, ContentGraphType>> GetAllContentTypes()
+        {
+            return contentTypes;
         }
 
         public async Task<(object Data, object[]? Errors)> ExecuteAsync(GraphQLExecutionContext context, GraphQLQuery query)
@@ -148,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 context.Setup(execution);
 
-                execution.Schema = graphQLSchema;
+                execution.Schema = schema;
                 execution.Inputs = query.Inputs;
                 execution.Query = query.Query;
             });

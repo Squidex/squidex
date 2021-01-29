@@ -6,67 +6,22 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using GraphQL;
 using GraphQL.Resolvers;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal static class ContentResolvers
     {
-        public static IFieldResolver NestedValue(ValueResolver valueResolver, string key)
+        public static readonly IFieldResolver Field = Resolvers.Sync<ContentData, object?>((content, fieldContext, _) =>
         {
-            return Resolvers.Sync<JsonObject, object?>((source, fieldContext, context) =>
-            {
-                if (source.TryGetValue(key, out var value))
-                {
-                    return valueResolver(value, fieldContext, context);
-                }
+            var fieldName = fieldContext.FieldDefinition.SourceName();
 
-                return null;
-            });
-        }
-
-        public static IFieldResolver Partition(ValueResolver valueResolver, string key)
-        {
-            return Resolvers.Sync<ContentFieldData, object?>((source, fieldContext, context) =>
-            {
-                if (source.TryGetValue(key, out var value) && value != null)
-                {
-                    return valueResolver(value, fieldContext, context);
-                }
-
-                return null;
-            });
-        }
-
-        public static IFieldResolver FlatPartition(ValueResolver valueResolver, string key)
-        {
-            return Resolvers.Sync<FlatContentData, object?>((source, fieldContext, context) =>
-            {
-                if (source.TryGetValue(key, out var value) && value != null)
-                {
-                    return valueResolver(value, fieldContext, context);
-                }
-
-                return null;
-            });
-        }
-
-        public static IFieldResolver Field(RootField field)
-        {
-            var fieldName = field.Name;
-
-            return Resolvers.Sync<ContentData, IReadOnlyDictionary<string, IJsonValue>?>(source =>
-            {
-                return source?.GetOrDefault(fieldName);
-            });
-        }
+            return content?.GetOrDefault(fieldName);
+        });
 
         public static readonly IFieldResolver Url = Resolve((content, _, context) =>
         {

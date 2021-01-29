@@ -5,33 +5,30 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public sealed class ContentDataInputGraphType : InputObjectGraphType
+    internal sealed class DataInputGraphType : InputObjectGraphType
     {
-        public ContentDataInputGraphType(ISchemaEntity schema, string schemaName, string schemaType, IGraphModel model)
+        public DataInputGraphType(GraphQLModel model, SchemaInfo schemaInfo)
         {
-            Name = $"{schemaType}DataInputDto";
+            Name = schemaInfo.DataInputType;
 
-            foreach (var (field, fieldName, typeName) in schema.SchemaDef.Fields.SafeFields().Where(x => x.Field.IsForApi(true)))
+            foreach (var fieldInfo in schemaInfo.Fields)
             {
-                var resolvedType = model.GetInputGraphType(schema, field, typeName);
+                var resolvedType = model.GetInputGraphType(fieldInfo);
 
                 if (resolvedType != null)
                 {
-                    var displayName = field.DisplayName();
-
                     var fieldGraphType = new InputObjectGraphType
                     {
-                        Name = $"{schemaType}Data{typeName}InputDto"
+                        Name = fieldInfo.LocalizedInputType
                     };
 
-                    var partitioning = model.ResolvePartition(field.Partitioning);
+                    var partitioning = model.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
 
                     foreach (var partitionKey in partitioning.AllKeys)
                     {
@@ -40,23 +37,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                             Name = partitionKey.EscapePartition(),
                             ResolvedType = resolvedType,
                             Resolver = null,
-                            Description = field.RawProperties.Hints
+                            Description = fieldInfo.Field.RawProperties.Hints
                         }).WithSourceName(partitionKey);
                     }
 
-                    fieldGraphType.Description = $"The structure of the {displayName} field of the {schemaName} content input type.";
+                    fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content input type.";
 
                     AddField(new FieldType
                     {
-                        Name = fieldName,
+                        Name = fieldInfo.FieldName,
                         ResolvedType = fieldGraphType,
                         Resolver = null,
-                        Description = $"The {displayName} field."
-                    }).WithSourceName(field.Name);
+                        Description = $"The {fieldInfo.DisplayName} field."
+                    }).WithSourceName(fieldInfo);
                 }
             }
 
-            Description = $"The structure of the {schemaName} data input type.";
+            Description = $"The structure of the {schemaInfo.DisplayName} data input type.";
         }
     }
 }

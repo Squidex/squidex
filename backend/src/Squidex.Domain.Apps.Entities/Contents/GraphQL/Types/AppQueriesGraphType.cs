@@ -8,76 +8,61 @@
 using System.Collections.Generic;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class AppQueriesGraphType : ObjectGraphType
     {
-        public AppQueriesGraphType(IGraphModel model, IEnumerable<ISchemaEntity> schemas)
+        public AppQueriesGraphType(GraphQLModel model, IEnumerable<SchemaInfo> schemaInfos)
         {
             AddField(model.TypeFactory.FindAsset);
             AddField(model.TypeFactory.QueryAssets);
             AddField(model.TypeFactory.QueryAssetsWithTotal);
 
-            foreach (var schema in schemas)
+            foreach (var schemaInfo in schemaInfos)
             {
-                var schemaId = schema.Id;
-                var schemaType = schema.TypeName();
-                var schemaName = schema.DisplayName();
+                var contentType = model.GetContentType(schemaInfo);
 
-                var contentType = model.GetContentType(schema.Id);
-
-                AddContentFind(
-                    schemaId,
-                    schemaType,
-                    schemaName,
-                    contentType);
-
-                AddContentQueries(
-                    schemaId,
-                    schemaType,
-                    schemaName,
-                    contentType);
+                AddContentFind(schemaInfo, contentType);
+                AddContentQueries(model, schemaInfo, contentType);
             }
 
             Description = "The app queries.";
         }
 
-        private void AddContentFind(DomainId schemaId, string schemaType, string schemaName, IGraphType contentType)
+        private void AddContentFind(SchemaInfo schemaInfo, IGraphType contentType)
         {
             AddField(new FieldType
             {
-                Name = $"find{schemaType}Content",
+                Name = $"find{schemaInfo.TypeName}Content",
                 Arguments = ContentActions.Find.Arguments,
                 ResolvedType = contentType,
-                Resolver = ContentActions.Find.Resolver(schemaId),
-                Description = $"Find an {schemaName} content by id."
-            });
+                Resolver = ContentActions.Find.Resolver,
+                Description = $"Find an {schemaInfo.DisplayName} content by id."
+            }).WithSchemaId(schemaInfo);
         }
 
-        private void AddContentQueries(DomainId schemaId, string schemaType, string schemaName, IGraphType contentType)
+        private void AddContentQueries(GraphQLModel model, SchemaInfo schemaInfo, IGraphType contentType)
         {
-            var resolver = ContentActions.QueryOrReferencing.Query(schemaId);
-
             AddField(new FieldType
             {
-                Name = $"query{schemaType}Contents",
+                Name = $"query{schemaInfo.TypeName}Contents",
                 Arguments = ContentActions.QueryOrReferencing.Arguments,
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
-                Resolver = resolver,
-                Description = $"Query {schemaName} content items."
-            });
+                Resolver = ContentActions.QueryOrReferencing.Query,
+                Description = $"Query {schemaInfo.DisplayName} content items."
+            }).WithSchemaId(schemaInfo);
+
+            var resultType = model.GetContentResultType(schemaInfo);
 
             AddField(new FieldType
             {
-                Name = $"query{schemaType}ContentsWithTotal",
+                Name = $"query{schemaInfo.TypeName}ContentsWithTotal",
                 Arguments = ContentActions.QueryOrReferencing.Arguments,
-                ResolvedType = new ContentsResultGraphType(schemaType, schemaName, contentType),
-                Resolver = resolver,
-                Description = $"Query {schemaName} content items with total count."
-            });
+                ResolvedType = resultType,
+                Resolver = ContentActions.QueryOrReferencing.Query,
+                Description = $"Query {schemaInfo.DisplayName} content items with total count."
+            }).WithSchemaId(schemaInfo);
         }
     }
 }

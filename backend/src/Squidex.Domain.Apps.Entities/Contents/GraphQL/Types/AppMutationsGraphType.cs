@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
@@ -15,83 +16,77 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class AppMutationsGraphType : ObjectGraphType
     {
-        public AppMutationsGraphType(IGraphModel model, IEnumerable<ISchemaEntity> schemas)
+        public AppMutationsGraphType(GraphQLModel model, IEnumerable<SchemaInfo> schemas)
         {
-            foreach (var schema in schemas)
+            foreach (var schemaInfo in schemas.Where(x => x.Fields.Count > 0))
             {
-                var appId = schema.AppId;
+                var contentType = model.GetContentType(schemaInfo);
 
-                var schemaId = schema.NamedId();
-                var schemaType = schema.TypeName();
-                var schemaName = schema.DisplayName();
-
-                var contentType = model.GetContentType(schema.Id);
-
-                var inputType = new ContentDataInputGraphType(schema, schemaName, schemaType, model);
+                var inputType = new DataInputGraphType(model, schemaInfo);
 
                 AddField(new FieldType
                 {
-                    Name = $"create{schemaType}Content",
+                    Name = $"create{schemaInfo.TypeName}Content",
                     Arguments = ContentActions.Create.Arguments(inputType),
                     ResolvedType = contentType,
-                    Resolver = ContentActions.Create.Resolver(appId, schemaId),
-                    Description = $"Creates an {schemaName} content."
-                });
+                    Resolver = ContentActions.Create.Resolver,
+                    Description = $"Creates an {schemaInfo.DisplayName} content."
+                }).WithSchemaNamedId(schemaInfo);
 
                 AddField(new FieldType
                 {
-                    Name = $"update{schemaType}Content",
+                    Name = $"update{schemaInfo.TypeName}Content",
                     Arguments = ContentActions.Update.Arguments(inputType),
                     ResolvedType = contentType,
-                    Resolver = ContentActions.Update.Resolver(appId, schemaId),
-                    Description = $"Update an {schemaName} content by id."
-                });
+                    Resolver = ContentActions.Update.Resolver,
+                    Description = $"Update an {schemaInfo.DisplayName} content by id."
+                }).WithSchemaNamedId(schemaInfo);
 
                 AddField(new FieldType
                 {
-                    Name = $"upsert{schemaType}Content",
+                    Name = $"upsert{schemaInfo.TypeName}Content",
                     Arguments = ContentActions.Upsert.Arguments(inputType),
                     ResolvedType = contentType,
-                    Resolver = ContentActions.Upsert.Resolver(appId, schemaId),
-                    Description = $"Upsert an {schemaName} content by id."
-                });
+                    Resolver = ContentActions.Upsert.Resolver,
+                    Description = $"Upsert an {schemaInfo.DisplayName} content by id."
+                }).WithSchemaNamedId(schemaInfo);
 
                 AddField(new FieldType
                 {
-                    Name = $"patch{schemaType}Content",
+                    Name = $"patch{schemaInfo.TypeName}Content",
                     Arguments = ContentActions.Patch.Arguments(inputType),
                     ResolvedType = contentType,
-                    Resolver = ContentActions.Patch.Resolver(appId, schemaId),
-                    Description = $"Patch an {schemaName} content by id."
-                });
+                    Resolver = ContentActions.Patch.Resolver,
+                    Description = $"Patch an {schemaInfo.DisplayName} content by id."
+                }).WithSchemaNamedId(schemaInfo);
 
                 AddField(new FieldType
                 {
-                    Name = $"change{schemaType}Content",
+                    Name = $"change{schemaInfo.TypeName}Content",
                     Arguments = ContentActions.ChangeStatus.Arguments,
                     ResolvedType = contentType,
-                    Resolver = ContentActions.ChangeStatus.Resolver(appId, schemaId),
-                    Description = $"Change a {schemaName} content."
-                });
+                    Resolver = ContentActions.ChangeStatus.Resolver,
+                    Description = $"Change a {schemaInfo.DisplayName} content."
+                }).WithSchemaNamedId(schemaInfo);
 
                 AddField(new FieldType
                 {
-                    Name = $"delete{schemaType}Content",
+                    Name = $"delete{schemaInfo.TypeName}Content",
                     Arguments = ContentActions.Delete.Arguments,
                     ResolvedType = EntitySavedGraphType.NonNull,
-                    Resolver = ContentActions.Delete.Resolver(appId, schemaId),
-                    Description = $"Delete an {schemaName} content."
-                });
+                    Resolver = ContentActions.Delete.Resolver,
+                    Description = $"Delete an {schemaInfo.DisplayName} content."
+                }).WithSchemaNamedId(schemaInfo);
 
                 AddField(new FieldType
                 {
-                    Name = $"publish{schemaType}Content",
+                    Name = $"publish{schemaInfo.TypeName}Content",
                     Arguments = ContentActions.ChangeStatus.Arguments,
                     ResolvedType = contentType,
-                    Resolver = ContentActions.ChangeStatus.Resolver(appId, schemaId),
-                    Description = $"Publish a {schemaName} content.",
-                    DeprecationReason = $"Use 'change{schemaType}Content' instead"
-                });
+                    Resolver = ContentActions.ChangeStatus.Resolver,
+                    Description = $"Publish a {schemaInfo.DisplayName} content.",
+                    DeprecationReason = $"Use 'change{schemaInfo.TypeName}Content' instead"
+                }).WithSchemaNamedId(schemaInfo);
             }
 
             Description = "The app mutations.";

@@ -10,18 +10,18 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public sealed class ContentsResultGraphType : ObjectGraphType<IResultList<IContentEntity>>
+    internal sealed class ContentResultGraphType : ObjectGraphType<IResultList<IContentEntity>>
     {
-        public ContentsResultGraphType(string schemaType, string schemaName, IGraphType contentType)
+        public ContentResultGraphType(ContentGraphType contentType, SchemaInfo schemaInfo)
         {
-            Name = $"{schemaType}ResultDto";
+            Name = schemaInfo.ResultType;
 
             AddField(new FieldType
             {
                 Name = "total",
                 ResolvedType = AllTypes.NonNullInt,
                 Resolver = ContentResolvers.ListTotal,
-                Description = $"The total number of {schemaName} items."
+                Description = $"The total number of {schemaInfo.DisplayName} items."
             });
 
             AddField(new FieldType
@@ -29,10 +29,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 Name = "items",
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
                 Resolver = ContentResolvers.ListItems,
-                Description = $"The {schemaName} items."
+                Description = $"The {schemaInfo.DisplayName} items."
             });
 
-            Description = $"List of {schemaName} items and total count.";
+            Description = $"List of {schemaInfo.DisplayName} items and total count.";
         }
     }
 }

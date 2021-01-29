@@ -9,23 +9,19 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
+    internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
     {
         private readonly DomainId schemaId;
 
-        public ContentGraphType(ISchemaEntity schema)
+        public ContentGraphType(SchemaInfo schemaInfo)
         {
-            schemaId = schema.Id;
+            schemaId = schemaInfo.Schema.Id;
 
-            var schemaType = schema.TypeName();
-            var schemaName = schema.DisplayName();
-
-            Name = schemaType.SafeTypeName();
+            Name = schemaInfo.ContentType;
 
             AddField(ContentFields.Id);
             AddField(ContentFields.Version);
@@ -38,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             AddResolvedInterface(ContentInterfaceGraphType.Instance);
 
-            Description = $"The structure of a {schemaName} content type.";
+            Description = $"The structure of a {schemaInfo.DisplayName} content type.";
 
             IsTypeOf = CheckType;
         }
@@ -48,11 +44,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
            return value is IContentEntity content && content.SchemaId?.Id == schemaId;
         }
 
-        public void Initialize(IGraphModel model, ISchemaEntity schema, IEnumerable<ISchemaEntity> all)
+        public void Initialize(GraphQLModel model, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> all)
         {
-            var schemaType = schema.TypeName();
-            var schemaName = schema.DisplayName();
-
             AddField(new FieldType
             {
                 Name = "url",
@@ -61,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 Description = $"The url to the content."
             });
 
-            var contentDataType = new ContentDataGraphType(schema, schemaName, schemaType, model);
+            var contentDataType = new DataGraphType(model, schemaInfo);
 
             if (contentDataType.Fields.Any())
             {
@@ -74,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 });
             }
 
-            var contentDataTypeFlat = new ContentDataFlatGraphType(schema, schemaName, schemaType, model);
+            var contentDataTypeFlat = new DataFlatGraphType(model, schemaInfo);
 
             if (contentDataTypeFlat.Fields.Any())
             {
@@ -87,46 +80,42 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 });
             }
 
-            foreach (var other in all.Where(x => References(x, schema)))
+            foreach (var other in all.Where(x => References(x, schemaInfo)))
             {
-                var referencingId = other.Id;
-                var referencingType = other.TypeName();
-                var referencingName = other.DisplayName();
-
-                var contentType = model.GetContentType(referencingId);
-
-                AddReferencingQueries(referencingId, referencingType, referencingName, contentType);
+                AddReferencingQueries(model, other);
             }
         }
 
-        private void AddReferencingQueries(DomainId referencingId, string referencingType, string referencingName, IGraphType contentType)
+        private void AddReferencingQueries(GraphQLModel model, SchemaInfo referencingSchemaInfo)
         {
-            var resolver = ContentActions.QueryOrReferencing.Referencing(referencingId);
+            var contentType = model.GetContentType(referencingSchemaInfo);
 
             AddField(new FieldType
             {
-                Name = $"referencing{referencingType}Contents",
+                Name = $"referencing{referencingSchemaInfo.TypeName}Contents",
                 Arguments = ContentActions.QueryOrReferencing.Arguments,
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
-                Resolver = resolver,
-                Description = $"Query {referencingName} content items."
-            });
+                Resolver = ContentActions.QueryOrReferencing.Referencing,
+                Description = $"Query {referencingSchemaInfo.DisplayName} content items."
+            }).WithSchemaId(referencingSchemaInfo);
+
+            var contentResultsTyp = model.GetContentResultType(referencingSchemaInfo);
 
             AddField(new FieldType
             {
-                Name = $"referencing{referencingType}ContentsWithTotal",
+                Name = $"referencing{referencingSchemaInfo.TypeName}ContentsWithTotal",
                 Arguments = ContentActions.QueryOrReferencing.Arguments,
-                ResolvedType = new ContentsResultGraphType(referencingType, referencingName, contentType),
-                Resolver = resolver,
-                Description = $"Query {referencingName} content items with total count."
-            });
+                ResolvedType = contentResultsTyp,
+                Resolver = ContentActions.QueryOrReferencing.Referencing,
+                Description = $"Query {referencingSchemaInfo.DisplayName} content items with total count."
+            }).WithSchemaId(referencingSchemaInfo);
         }
 
-        private static bool References(ISchemaEntity other, ISchemaEntity schema)
+        private static bool References(SchemaInfo other, SchemaInfo schema)
         {
-            var id = schema.Id;
+            var id = schema.Schema.Id;
 
-            return other.SchemaDef.Fields.Any(x => References(x, id));
+            return other.Schema.SchemaDef.Fields.Any(x => References(x, id));
         }
 
         private static bool References(IField field, DomainId id)
