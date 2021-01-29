@@ -196,10 +196,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             AddField(new FieldType
             {
                 Name = "tags",
-                ResolvedType = null,
+                ResolvedType = AllTypes.NonNullStrings,
                 Resolver = Resolve(x => x.TagNames),
                 Description = "The asset tags.",
-                Type = AllTypes.NonNullTagsType
             });
 
             AddField(new FieldType

@@ -13,13 +13,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class DataInputGraphType : InputObjectGraphType
     {
-        public DataInputGraphType(GraphQLModel model, SchemaInfo schemaInfo)
+        public DataInputGraphType(Builder builder, SchemaInfo schemaInfo)
         {
             Name = schemaInfo.DataInputType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
             {
-                var resolvedType = model.GetInputGraphType(fieldInfo);
+                var resolvedType = builder.GetInputGraphType(fieldInfo);
 
                 if (resolvedType != null)
                 {
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Name = fieldInfo.LocalizedInputType
                     };
 
-                    var partitioning = model.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
+                    var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
 
                     foreach (var partitionKey in partitioning.AllKeys)
                     {
@@ -48,7 +48,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Name = fieldInfo.FieldName,
                         ResolvedType = fieldGraphType,
                         Resolver = null,
-                        Description = $"The {fieldInfo.DisplayName} field."
                     }).WithSourceName(fieldInfo);
                 }
             }

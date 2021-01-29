@@ -10,15 +10,15 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public sealed class NestedGraphType : ObjectGraphType<JsonObject>
+    internal sealed class NestedGraphType : ObjectGraphType<JsonObject>
     {
-        public NestedGraphType(GraphQLModel model, FieldInfo fieldInfo)
+        public NestedGraphType(Builder builder, FieldInfo fieldInfo)
         {
             Name = fieldInfo.NestedType;
 
             foreach (var nestedFieldInfo in fieldInfo.Fields)
             {
-                var (resolvedType, resolver, args) = model.GetGraphType(nestedFieldInfo);
+                var (resolvedType, resolver, args) = builder.GetGraphType(nestedFieldInfo);
 
                 if (resolvedType != null && resolver != null)
                 {
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Arguments = args,
                         ResolvedType = resolvedType,
                         Resolver = resolver,
-                        Description = $"The {fieldInfo.DisplayName}/{nestedFieldInfo.DisplayName} nested field."
+                        Description = nestedFieldInfo.Field.RawProperties.Hints
                     }).WithSourceName(nestedFieldInfo);
                 }
             }

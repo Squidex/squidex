@@ -10,15 +10,15 @@ using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public sealed class DataFlatGraphType : ObjectGraphType<FlatContentData>
+    internal sealed class DataFlatGraphType : ObjectGraphType<FlatContentData>
     {
-        public DataFlatGraphType(GraphQLModel model, SchemaInfo schemaInfo)
+        public DataFlatGraphType(Builder builder, SchemaInfo schemaInfo)
         {
             Name = schemaInfo.DataFlatType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
             {
-                var (resolvedType, resolver, args) = model.GetGraphType(fieldInfo);
+                var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
 
                 if (resolver != null)
                 {

@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
            return value is IContentEntity content && content.SchemaId?.Id == schemaId;
         }
 
-        public void Initialize(GraphQLModel model, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> all)
+        public void Initialize(Builder builder, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> all)
         {
             AddField(new FieldType
             {
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 Description = $"The url to the content."
             });
 
-            var contentDataType = new DataGraphType(model, schemaInfo);
+            var contentDataType = new DataGraphType(builder, schemaInfo);
 
             if (contentDataType.Fields.Any())
             {
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 });
             }
 
-            var contentDataTypeFlat = new DataFlatGraphType(model, schemaInfo);
+            var contentDataTypeFlat = new DataFlatGraphType(builder, schemaInfo);
 
             if (contentDataTypeFlat.Fields.Any())
             {
@@ -82,13 +82,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             foreach (var other in all.Where(x => References(x, schemaInfo)))
             {
-                AddReferencingQueries(model, other);
+                AddReferencingQueries(builder, other);
             }
         }
 
-        private void AddReferencingQueries(GraphQLModel model, SchemaInfo referencingSchemaInfo)
+        private void AddReferencingQueries(Builder builder, SchemaInfo referencingSchemaInfo)
         {
-            var contentType = model.GetContentType(referencingSchemaInfo);
+            var contentType = builder.GetContentType(referencingSchemaInfo);
 
             AddField(new FieldType
             {
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 Description = $"Query {referencingSchemaInfo.DisplayName} content items."
             }).WithSchemaId(referencingSchemaInfo);
 
-            var contentResultsTyp = model.GetContentResultType(referencingSchemaInfo);
+            var contentResultsTyp = builder.GetContentResultType(referencingSchemaInfo);
 
             AddField(new FieldType
             {

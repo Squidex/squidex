@@ -14,13 +14,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class DataGraphType : ObjectGraphType<ContentData>
     {
-        public DataGraphType(GraphQLModel model, SchemaInfo schemaInfo)
+        public DataGraphType(Builder builder, SchemaInfo schemaInfo)
         {
             Name = schemaInfo.DataType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
             {
-                var (resolvedType, resolver, args) = model.GetGraphType(fieldInfo);
+                var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
 
                 if (resolver != null)
                 {
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Name = fieldInfo.TypeName
                     };
 
-                    var partitioning = model.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
+                    var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
 
                     foreach (var partitionKey in partitioning.AllKeys)
                     {
@@ -49,8 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     {
                         Name = fieldInfo.FieldName,
                         ResolvedType = fieldGraphType,
-                        Resolver = ContentResolvers.Field,
-                        Description = $"The {fieldInfo.DisplayName} field."
+                        Resolver = ContentResolvers.Field
                     }).WithSourceName(fieldInfo);
                 }
             }

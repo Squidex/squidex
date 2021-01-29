@@ -10,19 +10,18 @@ using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
-using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class AppMutationsGraphType : ObjectGraphType
+    internal sealed class AppMutationsGraphType : ObjectGraphType
     {
-        public AppMutationsGraphType(GraphQLModel model, IEnumerable<SchemaInfo> schemas)
+        public AppMutationsGraphType(Builder builder, IEnumerable<SchemaInfo> schemas)
         {
             foreach (var schemaInfo in schemas.Where(x => x.Fields.Count > 0))
             {
-                var contentType = model.GetContentType(schemaInfo);
+                var contentType = builder.GetContentType(schemaInfo);
 
-                var inputType = new DataInputGraphType(model, schemaInfo);
+                var inputType = new DataInputGraphType(builder, schemaInfo);
 
                 AddField(new FieldType
                 {

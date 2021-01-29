@@ -11,13 +11,13 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class GraphQLFieldInputVisitor : IFieldVisitor<IGraphType?, FieldInfo>
+    internal sealed class GraphQLFieldInputVisitor : IFieldVisitor<IGraphType?, FieldInfo>
     {
-        private readonly GraphQLModel model;
+        private readonly Builder builder;
 
-        public GraphQLFieldInputVisitor(GraphQLModel model)
+        public GraphQLFieldInputVisitor(Builder builder)
         {
-            this.model = model;
+            this.builder = builder;
         }
 
         public IGraphType? Visit(IArrayField field, FieldInfo args)
@@ -25,14 +25,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             var schemaFieldType =
                 new ListGraphType(
                     new NonNullGraphType(
-                        new NestedInputGraphType(model, args)));
+                        new NestedInputGraphType(builder, args)));
 
             return schemaFieldType;
         }
 
         public IGraphType? Visit(IField<AssetsFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.References;
+            return AllTypes.Strings;
         }
 
         public IGraphType? Visit(IField<BooleanFieldProperties> field, FieldInfo args)
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IGraphType? Visit(IField<ReferencesFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Json;
+            return AllTypes.Strings;
         }
 
         public IGraphType? Visit(IField<StringFieldProperties> field, FieldInfo args)
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IGraphType? Visit(IField<TagsFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Tags;
+            return AllTypes.Strings;
         }
 
         public IGraphType? Visit(IField<UIFieldProperties> field, FieldInfo args)

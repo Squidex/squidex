@@ -16,8 +16,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     {
         public static readonly Type None = typeof(NoopGraphType);
 
-        public static readonly Type NonNullTagsType = typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>);
-
         public static readonly IGraphType Int = new IntGraphType();
 
         public static readonly IGraphType DomainId = new StringGraphType();
@@ -28,19 +26,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType Date = new InstantGraphType();
 
-        public static readonly IGraphType Tags = new ListGraphType(new NonNullGraphType(new StringGraphType()));
-
         public static readonly IGraphType Json = new JsonGraphType();
 
         public static readonly IGraphType Float = new FloatGraphType();
 
         public static readonly IGraphType String = new StringGraphType();
 
+        public static readonly IGraphType Strings = new ListGraphType(new NonNullGraphType(new StringGraphType()));
+
         public static readonly IGraphType Boolean = new BooleanGraphType();
 
         public static readonly IGraphType AssetType = new EnumerationGraphType<AssetType>();
-
-        public static readonly IGraphType References = new ListGraphType(new NonNullGraphType(new StringGraphType()));
 
         public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
 
@@ -55,6 +51,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType NonNullFloat = new NonNullGraphType(Float);
 
         public static readonly IGraphType NonNullString = new NonNullGraphType(String);
+
+        public static readonly IGraphType NonNullStrings = new NonNullGraphType(Strings);
 
         public static readonly IGraphType NonNullBoolean = new NonNullGraphType(Boolean);
 

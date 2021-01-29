@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using GraphQL;
 using GraphQL.NewtonsoftJson;
+using GraphQL.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime;
@@ -38,6 +39,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_creating_content()
         {
+            var f = new FloatGraphType().ParseValue("12.0");
+
             var query = @"
                 mutation {
                   createMySchemaContent(data: <DATA>, publish: true) {
@@ -478,9 +481,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var data = TestContent.Data(content, schemaRefId1.Id, schemaRefId2.Id);
 
-            var json = JsonConvert.SerializeObject(data);
+            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
 
-            return Regex.Replace(json, "\"([^\"]+)\":", x => x.Groups[1].Value + ":");
+            return Regex.Replace(json, "\"([^\"]+)\":", x => x.Groups[1].Value + ":").Replace(".0", string.Empty);
         }
     }
 }

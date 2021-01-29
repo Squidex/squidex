@@ -33,11 +33,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return context.GetReferencedContentsAsync(value);
         });
 
-        private readonly GraphQLModel model;
+        private readonly Builder builder;
 
-        public GraphQLFieldVisitor(GraphQLModel model)
+        public GraphQLFieldVisitor(Builder builder)
         {
-            this.model = model;
+            this.builder = builder;
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IArrayField field, FieldInfo args)
@@ -45,14 +45,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             var schemaFieldType =
                 new ListGraphType(
                     new NonNullGraphType(
-                        new NestedGraphType(model, args)));
+                        new NestedGraphType(builder, args)));
 
             return (schemaFieldType, Noop, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field, FieldInfo args)
         {
-            return (model.TypeFactory.AssetsList, Assets, null);
+            return (builder.TypeFactory.AssetsList, Assets, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<BooleanFieldProperties> field, FieldInfo args)
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<TagsFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Tags, Noop, null);
+            return (AllTypes.Strings, Noop, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<UIFieldProperties> field, FieldInfo args)
@@ -102,11 +102,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private (IGraphType?, IFieldResolver?, QueryArguments?) ResolveReferences(IField<ReferencesFieldProperties> field, FieldInfo args)
         {
-            IGraphType? contentType = model.GetContentType(field.Properties.SingleId());
+            IGraphType? contentType = builder.GetContentType(field.Properties.SingleId());
 
             if (contentType == null)
             {
-                var union = new ContentUnionGraphType(model, args, field.Properties);
+                var union = new ContentUnionGraphType(builder, args, field.Properties);
 
                 if (!union.PossibleTypes.Any())
                 {

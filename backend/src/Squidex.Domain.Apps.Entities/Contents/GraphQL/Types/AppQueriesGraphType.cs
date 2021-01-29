@@ -11,20 +11,20 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class AppQueriesGraphType : ObjectGraphType
+    internal sealed class AppQueriesGraphType : ObjectGraphType
     {
-        public AppQueriesGraphType(GraphQLModel model, IEnumerable<SchemaInfo> schemaInfos)
+        public AppQueriesGraphType(Builder builder, IEnumerable<SchemaInfo> schemaInfos)
         {
-            AddField(model.TypeFactory.FindAsset);
-            AddField(model.TypeFactory.QueryAssets);
-            AddField(model.TypeFactory.QueryAssetsWithTotal);
+            AddField(builder.TypeFactory.FindAsset);
+            AddField(builder.TypeFactory.QueryAssets);
+            AddField(builder.TypeFactory.QueryAssetsWithTotal);
 
             foreach (var schemaInfo in schemaInfos)
             {
-                var contentType = model.GetContentType(schemaInfo);
+                var contentType = builder.GetContentType(schemaInfo);
 
                 AddContentFind(schemaInfo, contentType);
-                AddContentQueries(model, schemaInfo, contentType);
+                AddContentQueries(builder, schemaInfo, contentType);
             }
 
             Description = "The app queries.";
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }).WithSchemaId(schemaInfo);
         }
 
-        private void AddContentQueries(GraphQLModel model, SchemaInfo schemaInfo, IGraphType contentType)
+        private void AddContentQueries(Builder builder, SchemaInfo schemaInfo, IGraphType contentType)
         {
             AddField(new FieldType
             {
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Description = $"Query {schemaInfo.DisplayName} content items."
             }).WithSchemaId(schemaInfo);
 
-            var resultType = model.GetContentResultType(schemaInfo);
+            var resultType = builder.GetContentResultType(schemaInfo);
 
             AddField(new FieldType
             {

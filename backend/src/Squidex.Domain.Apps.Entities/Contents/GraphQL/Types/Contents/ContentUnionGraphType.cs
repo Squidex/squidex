@@ -13,11 +13,11 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public sealed class ContentUnionGraphType : UnionGraphType
+    internal sealed class ContentUnionGraphType : UnionGraphType
     {
         private readonly Dictionary<DomainId, IObjectGraphType> types = new Dictionary<DomainId, IObjectGraphType>();
 
-        public ContentUnionGraphType(GraphQLModel model, FieldInfo fieldInfo, ReferencesFieldProperties properties)
+        public ContentUnionGraphType(Builder builder, FieldInfo fieldInfo, ReferencesFieldProperties properties)
         {
             Name = fieldInfo.UnionType;
 
@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 foreach (var schemaId in properties.SchemaIds)
                 {
-                    var contentType = model.GetContentType(schemaId);
+                    var contentType = builder.GetContentType(schemaId);
 
                     if (contentType != null)
                     {
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             }
             else
             {
-                foreach (var (key, value) in model.GetAllContentTypes())
+                foreach (var (key, value) in builder.GetAllContentTypes())
                 {
                     types[key.Schema.Id] = value;
                 }

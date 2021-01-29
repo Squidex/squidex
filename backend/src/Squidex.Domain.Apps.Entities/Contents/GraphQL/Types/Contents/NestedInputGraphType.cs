@@ -11,13 +11,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class NestedInputGraphType : InputObjectGraphType
     {
-        public NestedInputGraphType(GraphQLModel model, FieldInfo fieldInfo)
+        public NestedInputGraphType(Builder builder, FieldInfo fieldInfo)
         {
             Name = fieldInfo.NestedInputType;
 
             foreach (var nestedFieldInfo in fieldInfo.Fields)
             {
-                var resolvedType = model.GetInputGraphType(nestedFieldInfo);
+                var resolvedType = builder.GetInputGraphType(nestedFieldInfo);
 
                 if (resolvedType != null)
                 {
@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Name = nestedFieldInfo.FieldName,
                         ResolvedType = resolvedType,
                         Resolver = null,
-                        Description = $"The {fieldInfo.DisplayName}/{nestedFieldInfo.DisplayName} nested field."
+                        Description = nestedFieldInfo.Field.RawProperties.Hints
                     }).WithSourceName(nestedFieldInfo);
                 }
             }
