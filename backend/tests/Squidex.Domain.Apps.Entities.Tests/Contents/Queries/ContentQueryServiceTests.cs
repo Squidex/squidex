@@ -205,9 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task QueryAll_should_not_return_contents_if_user_has_no_permission()
         {
             var ctx = CreateContext(isFrontend: false, allowSchema: false);
-
             var ids = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
-
             var q = Q.Empty.WithIds(ids);
 
             A.CallTo(() => contentRepository.QueryAsync(ctx.App, A<List<ISchemaEntity>>.That.Matches(x => x.Count == 0), q, SearchScope.All))
@@ -219,19 +217,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Theory]
-        [InlineData(0, 1, SearchScope.All)]
-        [InlineData(0, 0, SearchScope.Published)]
-        public async Task QueryAll_should_return_q_with_createdby(int isFrontend, int unpublished, SearchScope scope)
+        [InlineData(SearchScope.All)]
+        [InlineData(SearchScope.Published)]
+        public async Task QueryAll_should_query_only_own_content_if_user_has_own_permission_only(SearchScope scope)
         {
-            var ctx = CreateContextWithOwnReadPermission(isFrontend: isFrontend == 0, allowSchema: true)
-                    .WithUnpublished(unpublished == 1);
-
+            var ctx = CreateContext(true, true, Permissions.AppContentsReadOwn);
             var content = CreateContent(contentId);
-
             var q = Q.Empty.WithReference(DomainId.NewGuid());
 
             A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<Q>.Ignored, scope))
-              .Returns(ResultList.CreateFrom(5, content));
+                .Returns(ResultList.CreateFrom(5, content));
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, q);
 
@@ -239,21 +234,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Theory]
-        [InlineData(0, 1, SearchScope.All)]
-        [InlineData(0, 0, SearchScope.Published)]
-        public async Task QueryAll_should_return_q_createdby_with_null(int isFrontend, int unpublished, SearchScope scope)
+        [InlineData(SearchScope.All)]
+        [InlineData(SearchScope.Published)]
+        public async Task QueryAll_should_query_has_not_createdby_if_user_has_not_own_permission(SearchScope scope)
         {
-            var ctx = CreateContext(isFrontend: isFrontend == 0, allowSchema: true)
-                    .WithUnpublished(unpublished == 1);
-
+            var ctx = CreateContext(false, true);
             var content = CreateContent(contentId);
-
             var q = Q.Empty.WithReference(DomainId.NewGuid());
 
             A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<Q>._, scope))
-              .Returns(ResultList.CreateFrom(5, content));
+                .Returns(ResultList.CreateFrom(5, content));
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, q);
+
             Assert.Null(q.CreatedBy);
         }
 
@@ -291,7 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 });
         }
 
-        private Context CreateContext(bool isFrontend, bool allowSchema)
+        private Context CreateContext(bool isFrontend, bool allowSchema, string permission = Permissions.AppContentsRead)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -303,29 +296,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (allowSchema)
             {
-                var permission = Permissions.ForApp(Permissions.AppContentsRead, appId.Name, schemaId.Name).Id;
+                var perm = Permissions.ForApp(permission, appId.Name, schemaId.Name).Id;
 
-                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
-            }
-
-            return new Context(claimsPrincipal, Mocks.App(appId));
-        }
-
-        private Context CreateContextWithOwnReadPermission(bool isFrontend, bool allowSchema)
-        {
-            var claimsIdentity = new ClaimsIdentity();
-            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-            if (isFrontend)
-            {
-                claimsIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
-            }
-
-            if (allowSchema)
-            {
-                var permission = Permissions.ForApp(Permissions.AppContentReadOwn, appId.Name, schemaId.Name).Id;
-
-                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, perm));
             }
 
             return new Context(claimsPrincipal, Mocks.App(appId));
@@ -339,20 +312,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 Data = contentData,
                 SchemaId = schemaId,
                 Status = Status.Published
-            };
-
-            return content;
-        }
-
-        private IContentEntity CreateOwnContent(DomainId id, RefToken refToken)
-        {
-            var content = new ContentEntity
-            {
-                Id = id,
-                Data = contentData,
-                SchemaId = schemaId,
-                Status = Status.Published,
-                CreatedBy = refToken
             };
 
             return content;

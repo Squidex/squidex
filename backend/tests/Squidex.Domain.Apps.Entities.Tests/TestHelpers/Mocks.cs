@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
@@ -74,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
             if (permission != null)
             {
-                claimsIdentity.AddClaim(new Claim("urn:squidex:permissions", permission));
+                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
             }
 
             return claimsPrincipal;

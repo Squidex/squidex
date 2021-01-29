@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             var requiredPermission = Permissions.ForApp(permission, content.AppId.Name, content.SchemaId.Name);
             if (!command.User.Permissions().Allows(requiredPermission))
             {
-                throw new DomainForbiddenException("...");
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }
         }
     }
