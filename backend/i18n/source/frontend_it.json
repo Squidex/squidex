@@ -625,6 +625,7 @@
   "rules.wizard.selectAction": "Seleziona l'Azione",
   "rules.wizard.selectTrigger": "Seleziona l'Attivazione",
   "rules.wizard.triggerHint": "La selezione del tipo di attivazione non potrà essere modificata successivamente.",
+  "schema.fields.localConfirmText": "Blocca il campo",
   "schemas.addField": "Aggiungi un Campo",
   "schemas.addFieldAndClose": "Crea e chiudi",
   "schemas.addFieldAndCreate": "Crea e aggiungi il campo",
