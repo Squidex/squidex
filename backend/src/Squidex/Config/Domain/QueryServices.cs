@@ -30,7 +30,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DataLoaderDocumentListener>()
                 .AsSelf();
 
-            services.AddSingletonAs<GraphQLTypeFactory>()
+            services.AddSingletonAs<SharedTypes>()
                 .AsSelf();
 
             services.AddSingletonAs<CachingGraphQLService>()

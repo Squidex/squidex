@@ -11,9 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class ContentInterfaceGraphType : InterfaceGraphType<IEnrichedContentEntity>
     {
-        public static readonly IInterfaceGraphType Instance = new ContentInterfaceGraphType();
-
-        private ContentInterfaceGraphType()
+        public ContentInterfaceGraphType()
         {
             Name = "Content";
 

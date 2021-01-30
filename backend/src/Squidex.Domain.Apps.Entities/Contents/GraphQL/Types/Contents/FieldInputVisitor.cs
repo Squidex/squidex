@@ -11,11 +11,11 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    internal sealed class GraphQLFieldInputVisitor : IFieldVisitor<IGraphType?, FieldInfo>
+    internal sealed class FieldInputVisitor : IFieldVisitor<IGraphType?, FieldInfo>
     {
         private readonly Builder builder;
 
-        public GraphQLFieldInputVisitor(Builder builder)
+        public FieldInputVisitor(Builder builder)
         {
             this.builder = builder;
         }

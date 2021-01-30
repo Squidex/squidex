@@ -28,14 +28,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     {
         private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new Dictionary<SchemaInfo, ContentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
-        private readonly GraphQLTypeFactory typeFactory;
-        private readonly GraphQLFieldVisitor fieldVisitor;
-        private readonly GraphQLFieldInputVisitor fieldInputVisitor;
+        private readonly SharedTypes sharedTypes;
+        private readonly FieldVisitor fieldVisitor;
+        private readonly FieldInputVisitor fieldInputVisitor;
         private readonly PartitionResolver partitionResolver;
 
-        public GraphQLTypeFactory TypeFactory
+        public SharedTypes SharedTypes
         {
-            get { return typeFactory; }
+            get { return sharedTypes; }
         }
 
         static Builder()
@@ -48,14 +48,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             ValueConverter.Register<string, Status>(x => new Status(x));
         }
 
-        public Builder(IAppEntity app, GraphQLTypeFactory typeFactory)
+        public Builder(IAppEntity app, SharedTypes sharedTypes)
         {
-            this.typeFactory = typeFactory;
+            this.sharedTypes = sharedTypes;
 
             partitionResolver = app.PartitionResolver();
 
-            fieldVisitor = new GraphQLFieldVisitor(this);
-            fieldInputVisitor = new GraphQLFieldInputVisitor(this);
+            fieldVisitor = new FieldVisitor(this);
+            fieldInputVisitor = new FieldInputVisitor(this);
         }
 
         public GraphQLSchema BuildSchema(IEnumerable<ISchemaEntity> schemas)
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var schemaInfo in schemaInfos)
             {
-                var contentType = new ContentGraphType(schemaInfo);
+                var contentType = new ContentGraphType(this, schemaInfo);
 
                 contentTypes[schemaInfo] = contentType;
                 contentResultTypes[schemaInfo] = new ContentResultGraphType(contentType, schemaInfo);
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             newSchema.RegisterValueConverter(JsonConverter.Instance);
             newSchema.RegisterValueConverter(InstantConverter.Instance);
 
-            newSchema.RegisterType(ContentInterfaceGraphType.Instance);
+            newSchema.RegisterType(sharedTypes.ContentInterface);
 
             if (schemas.Any())
             {

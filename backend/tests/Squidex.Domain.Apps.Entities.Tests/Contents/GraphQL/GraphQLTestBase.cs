@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     [typeof(IUrlGenerator)] = urlGenerator,
                     [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
                     [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext),
-                    [typeof(GraphQLTypeFactory)] = new GraphQLTypeFactory(urlGenerator)
+                    [typeof(SharedTypes)] = new SharedTypes(urlGenerator)
                 };
             }
 

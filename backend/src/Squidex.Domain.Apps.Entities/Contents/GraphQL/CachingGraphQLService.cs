@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
                 return new GraphQLModel(app,
                     allSchemas,
-                    resolver.GetRequiredService<GraphQLTypeFactory>(),
+                    resolver.GetRequiredService<SharedTypes>(),
                     resolver.GetRequiredService<ISemanticLog>());
             });
         }
