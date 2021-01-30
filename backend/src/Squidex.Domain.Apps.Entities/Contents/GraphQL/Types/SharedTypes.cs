@@ -9,14 +9,16 @@ using System;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public class GraphQLTypeFactory
+    public sealed class SharedTypes
     {
         private readonly Lazy<IGraphType> asset;
         private readonly Lazy<IGraphType> assetsList;
         private readonly Lazy<IGraphType> assetsResult;
+        private readonly Lazy<IInterfaceGraphType> contentInterface;
         private readonly Lazy<FieldType> findAsset;
         private readonly Lazy<FieldType> queryAssets;
         private readonly Lazy<FieldType> queryAssetsWithTotal;
@@ -27,13 +29,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IGraphType AssetsResult => assetsResult.Value;
 
+        public IInterfaceGraphType ContentInterface => contentInterface.Value;
+
         public FieldType FindAsset => findAsset.Value;
 
         public FieldType QueryAssets => queryAssets.Value;
 
         public FieldType QueryAssetsWithTotal => queryAssetsWithTotal.Value;
 
-        public GraphQLTypeFactory(IUrlGenerator urlGenerator)
+        public SharedTypes(IUrlGenerator urlGenerator)
         {
             asset = new Lazy<IGraphType>(() =>
             {
@@ -48,6 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             assetsResult = new Lazy<IGraphType>(() =>
             {
                 return new AssetsResultGraphType(AssetsList);
+            });
+
+            contentInterface = new Lazy<IInterfaceGraphType>(() =>
+            {
+                return new ContentInterfaceGraphType();
             });
 
             findAsset = new Lazy<FieldType>(() =>

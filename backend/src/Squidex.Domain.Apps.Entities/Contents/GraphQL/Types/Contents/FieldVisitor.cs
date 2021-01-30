@@ -11,14 +11,13 @@ using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     public delegate object ValueResolver(IJsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
-    internal sealed class GraphQLFieldVisitor : IFieldVisitor<(IGraphType?, IFieldResolver?, QueryArguments?), FieldInfo>
+    internal sealed class FieldVisitor : IFieldVisitor<(IGraphType?, IFieldResolver?, QueryArguments?), FieldInfo>
     {
         private static readonly IFieldResolver Noop = CreateValueResolver((value, fieldContext, contex) => value);
         private static readonly IFieldResolver Json = CreateValueResolver(ContentActions.Json.Resolver);
@@ -35,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private readonly Builder builder;
 
-        public GraphQLFieldVisitor(Builder builder)
+        public FieldVisitor(Builder builder)
         {
             this.builder = builder;
         }
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field, FieldInfo args)
         {
-            return (builder.TypeFactory.AssetsList, Assets, null);
+            return (builder.SharedTypes.AssetsList, Assets, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<BooleanFieldProperties> field, FieldInfo args)

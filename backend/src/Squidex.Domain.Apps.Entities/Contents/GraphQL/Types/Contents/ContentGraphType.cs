@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         private readonly DomainId schemaId;
 
-        public ContentGraphType(SchemaInfo schemaInfo)
+        public ContentGraphType(Builder builder, SchemaInfo schemaInfo)
         {
             schemaId = schemaInfo.Schema.Id;
 
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             AddField(ContentFields.Status);
             AddField(ContentFields.StatusColor);
 
-            AddResolvedInterface(ContentInterfaceGraphType.Instance);
+            AddResolvedInterface(builder.SharedTypes.ContentInterface);
 
             Description = $"The structure of a {schemaInfo.DisplayName} content type.";
 
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
            return value is IContentEntity content && content.SchemaId?.Id == schemaId;
         }
 
-        public void Initialize(Builder builder, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> all)
+        public void Initialize(Builder builder, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> allSchemas)
         {
             AddField(new FieldType
             {
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 });
             }
 
-            foreach (var other in all.Where(x => References(x, schemaInfo)))
+            foreach (var other in allSchemas.Where(IsReferencingThis))
             {
                 AddReferencingQueries(builder, other);
             }
@@ -111,14 +111,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             }).WithSchemaId(referencingSchemaInfo);
         }
 
-        private static bool References(SchemaInfo other, SchemaInfo schema)
+        private bool IsReferencingThis(SchemaInfo other)
         {
-            var id = schema.Schema.Id;
-
-            return other.Schema.SchemaDef.Fields.Any(x => References(x, id));
+            return other.Schema.SchemaDef.Fields.Any(IsReferencingThis);
         }
 
-        private static bool References(IField field, DomainId id)
+        private bool IsReferencingThis(IField field)
         {
             switch (field)
             {
@@ -126,9 +124,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     return
                         reference.Properties.SchemaIds == null ||
                         reference.Properties.SchemaIds.Count == 0 ||
-                        reference.Properties.SchemaIds.Contains(id);
+                        reference.Properties.SchemaIds.Contains(schemaId);
                 case IArrayField arrayField:
-                    return arrayField.Fields.Any(x => References(x, id));
+                    return arrayField.Fields.Any(IsReferencingThis);
             }
 
             return false;
