@@ -18,6 +18,7 @@ services:
       - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
       - STORE__TYPE=MongoDB
+      - GRAPHQL__CACHEDURATION=0
     networks:
       - internal
     depends_on:

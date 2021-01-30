@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using FakeItEasy;
 using GraphQL.DataLoader;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core;
@@ -139,52 +140,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return serializer.Serialize(result);
         }
 
-        public sealed class TestServiceProvider : IServiceProvider
-        {
-            private readonly Dictionary<Type, object> services;
-
-            public TestServiceProvider(GraphQLTestBase testBase)
-            {
-                var appProvider = A.Fake<IAppProvider>();
-
-                A.CallTo(() => appProvider.GetSchemasAsync(testBase.appId.Id))
-                    .Returns(new List<ISchemaEntity>
-                    {
-                        testBase.schema,
-                        testBase.schemaRef1,
-                        testBase.schemaRef2,
-                        testBase.schemaInvalidName
-                    });
-
-                var dataLoaderContext = new DataLoaderContextAccessor();
-
-                var urlGenerator = new FakeUrlGenerator();
-
-                services = new Dictionary<Type, object>
-                {
-                    [typeof(IAppProvider)] = appProvider,
-                    [typeof(IAssetQueryService)] = testBase.assetQuery,
-                    [typeof(ICommandBus)] = testBase.commandBus,
-                    [typeof(IContentQueryService)] = testBase.contentQuery,
-                    [typeof(IDataLoaderContextAccessor)] = dataLoaderContext,
-                    [typeof(IUrlGenerator)] = urlGenerator,
-                    [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
-                    [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext),
-                    [typeof(SharedTypes)] = new SharedTypes(urlGenerator)
-                };
-            }
-
-            public object GetService(Type serviceType)
-            {
-                return services.GetOrDefault(serviceType);
-            }
-        }
-
         private CachingGraphQLService CreateSut()
         {
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            return new CachingGraphQLService(cache, new TestServiceProvider(this));
+            var appProvider = A.Fake<IAppProvider>();
+
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+                .Returns(new List<ISchemaEntity>
+                {
+                    schema,
+                    schemaRef1,
+                    schemaRef2,
+                    schemaInvalidName
+                });
+
+            var dataLoaderContext = (IDataLoaderContextAccessor)new DataLoaderContextAccessor();
+            var dataLoaderListener = new DataLoaderDocumentListener(dataLoaderContext);
+
+            var services =
+                new ServiceCollection()
+                    .AddMemoryCache()
+                    .AddSingleton(A.Fake<ISemanticLog>())
+                    .AddSingleton(appProvider)
+                    .AddSingleton(assetQuery)
+                    .AddSingleton(commandBus)
+                    .AddSingleton(contentQuery)
+                    .AddSingleton(dataLoaderContext)
+                    .AddSingleton(dataLoaderListener)
+                    .AddSingleton<SharedTypes>()
+                    .AddSingleton<IUrlGenerator,
+                        FakeUrlGenerator>()
+                    .BuildServiceProvider();
+
+            return new CachingGraphQLService(cache, services, Options.Create(new GraphQLOptions()));
         }
     }
 }

@@ -21,6 +21,8 @@ namespace Squidex.Config.Domain
         {
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
+            services.Configure<GraphQLOptions>(config, "graphql");
+
             services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<UrlGenerator>(c, exposeSourceUrl))
                 .As<IUrlGenerator>();
 
