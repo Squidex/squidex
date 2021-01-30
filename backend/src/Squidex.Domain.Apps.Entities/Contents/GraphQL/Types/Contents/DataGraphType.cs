@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     var fieldGraphType = new ObjectGraphType
                     {
-                        Name = fieldInfo.TypeName
+                        Name = fieldInfo.LocalizedType
                     };
 
                     var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);

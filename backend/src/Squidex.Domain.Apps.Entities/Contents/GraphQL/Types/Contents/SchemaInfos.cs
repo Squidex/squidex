@@ -5,79 +5,182 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Text;
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+#pragma warning disable SA1649 // File name should match first type name
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed record SchemaInfo(ISchemaEntity Schema, string TypeName, IReadOnlyList<FieldInfo> Fields)
+    internal sealed class SchemaInfo
     {
-        public string DisplayName { get; set; } = Schema.DisplayName();
+        public ISchemaEntity Schema { get; }
 
-        public string ContentType { get; } = TypeName.SafeTypeName();
+        public string TypeName { get; }
 
-        public string DataType { get; } = $"{TypeName}DataDto";
+        public string DisplayName { get; }
 
-        public string DataInputType { get; } = $"{TypeName}DataInputDto";
+        public string ContentType { get; }
 
-        public string DataFlatType { get; } = $"{TypeName}FlatDataDto";
+        public string DataType { get; }
 
-        public string ResultType { get; } = $"{TypeName}ResultDto";
+        public string DataInputType { get; }
 
-        public static SchemaInfo Build(ISchemaEntity schema)
+        public string DataFlatType { get; }
+
+        public string ResultType { get; }
+
+        public IReadOnlyList<FieldInfo> Fields { get; }
+
+        private SchemaInfo(ISchemaEntity schema, string typeName, IReadOnlyList<FieldInfo> fields, Names names)
         {
-            var typeName = schema.TypeName();
+            Schema = schema;
+            ContentType = names[typeName];
+            DataFlatType = names[$"{typeName}FlatDataDto"];
+            DataInputType = names[$"{typeName}DataInputDto"];
+            ResultType = names[$"{typeName}ResultDto"];
+            DataType = names[$"{typeName}DataDto"];
+            DisplayName = schema.DisplayName();
+            Fields = fields;
+            TypeName = typeName;
+        }
 
-            var fields =
-                schema.SchemaDef.Fields.SafeFields()
-                    .Select(x => FieldInfo.Build(x.Field, x.Name, $"{typeName}{x.Type}"))
-                    .ToList();
+        public override string ToString()
+        {
+            return TypeName;
+        }
 
-            return new SchemaInfo(
-                schema,
-                schema.TypeName(),
-                fields);
+        public static IEnumerable<SchemaInfo> Build(IEnumerable<ISchemaEntity> schemas)
+        {
+            var names = new Names();
+
+            foreach (var schema in schemas.Where(x => x.SchemaDef.IsPublished && x.SchemaDef.Fields.Count > 0).OrderBy(x => x.Created))
+            {
+                var typeName = schema.TypeName();
+
+                var fields = FieldInfo.EmptyFields;
+
+                if (schema.SchemaDef.Fields.Count > 0)
+                {
+                    var fieldNames = new Names();
+
+                    fields = new List<FieldInfo>(schema.SchemaDef.Fields.Count);
+
+                    foreach (var field in schema.SchemaDef.Fields)
+                    {
+                        fields.Add(FieldInfo.Build(field, fieldNames[field], names[$"{typeName}Data{field.TypeName()}"], names));
+                    }
+                }
+
+                yield return new SchemaInfo(schema, typeName, fields, names);
+            }
         }
     }
 
-    public sealed record FieldInfo(IField Field, string FieldName, string TypeName, IReadOnlyList<FieldInfo> Fields)
+    internal sealed class FieldInfo
     {
-        private static readonly IReadOnlyList<FieldInfo> EmptyFields = new List<FieldInfo>();
+        public static readonly List<FieldInfo> EmptyFields = new List<FieldInfo>();
 
-        public string DisplayName { get; set; } = Field.DisplayName();
+        public IField Field { get; set; }
 
-        public string LocalizedType { get; } = $"{TypeName}Dto";
+        public string FieldName { get; }
 
-        public string LocalizedInputType { get; } = $"{TypeName}InputDto";
+        public string DisplayName { get; }
 
-        public string NestedType { get; } = $"{TypeName}ChildDto";
+        public string LocalizedType { get; }
 
-        public string NestedInputType { get; } = $"{TypeName}ChildInputDto";
+        public string LocalizedInputType { get; }
 
-        public string UnionType { get; } = $"{TypeName}UnionDto";
+        public string NestedType { get; }
 
-        public static FieldInfo Build(IRootField rootField, string fieldName, string typeName)
+        public string NestedInputType { get; }
+
+        public string UnionType { get; }
+
+        public IReadOnlyList<FieldInfo> Fields { get; }
+
+        private FieldInfo(IField field, string fieldName, string typeName, IReadOnlyList<FieldInfo> fields, Names names)
+        {
+            DisplayName = field.DisplayName();
+            Field = field;
+            Fields = fields;
+            FieldName = fieldName;
+            LocalizedType = names[$"{typeName}Dto"];
+            LocalizedInputType = names[$"{typeName}InputDto"];
+            NestedInputType = names[$"{typeName}ChildInputDto"];
+            NestedType = names[$"{typeName}ChildDto"];
+            UnionType = names[$"{typeName}UnionDto"];
+        }
+
+        public override string ToString()
+        {
+            return FieldName;
+        }
+
+        internal static FieldInfo Build(IRootField rootField, string fieldName, string typeName, Names names)
         {
             var fields = EmptyFields;
 
-            if (rootField is IArrayField arrayField)
+            if (rootField is IArrayField arrayField && arrayField.Fields.Count > 0)
             {
-                fields =
-                    arrayField.Fields.SafeFields()
-                        .Select(x => Build(x.Field, x.Name, $"{typeName}{x.Type}"))
-                        .ToList();
+                var fieldNames = new Names();
+
+                fields = new List<FieldInfo>(arrayField.Fields.Count);
+
+                foreach (var field in arrayField.Fields)
+                {
+                    fields.Add(new FieldInfo(field, fieldNames[field], $"{typeName}{field.TypeName()}", EmptyFields, names));
+                }
             }
 
-            return new FieldInfo(rootField, fieldName, typeName, fields);
+            return new FieldInfo(rootField, fieldName, typeName, fields, names);
+        }
+    }
+
+    internal sealed class Names
+    {
+        private readonly Dictionary<string, int> takenNames = new Dictionary<string, int>();
+
+        public string this[IField field]
+        {
+            get
+            {
+                return this[field.Name.ToCamelCase()];
+            }
         }
 
-        public static FieldInfo Build(INestedField nestedField, string fieldName, string fieldTypeName)
+        public string this[string name]
         {
-            return new FieldInfo(nestedField, fieldName, fieldTypeName, EmptyFields);
+            get
+            {
+                Guard.NotNullOrEmpty(name, nameof(name));
+
+                if (!char.IsLetter(name[0]))
+                {
+                    name = "gql_" + name;
+                }
+                else if (name.Equals("Content", StringComparison.OrdinalIgnoreCase))
+                {
+                    name = $"{name}Entity";
+                }
+
+                // Avoid duplicate names.
+                if (!takenNames.TryGetValue(name, out var offset))
+                {
+                    takenNames[name] = 0;
+                    return name;
+                }
+
+                takenNames[name] = ++offset;
+
+                // Add + 1 to all offset for backwars compatibility.
+                return $"{name}{offset + 1}";
+            }
         }
     }
 }

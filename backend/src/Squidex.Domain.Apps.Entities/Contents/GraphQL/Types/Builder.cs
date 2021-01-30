@@ -60,11 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public GraphQLSchema BuildSchema(IEnumerable<ISchemaEntity> schemas)
         {
-            var schemaInfos =
-                schemas
-                    .Where(x => x.SchemaDef.IsPublished).Select(SchemaInfo.Build)
-                    .Where(x => x.Fields.Count > 0)
-                    .ToList();
+            var schemaInfos = SchemaInfo.Build(schemas).ToList();
 
             foreach (var schemaInfo in schemaInfos)
             {
