@@ -21,4 +21,6 @@
 .circle {
     @include circle(16px);
     border: 1px solid $color-border-dark;
+    margin: 0;
+    margin-bottom: .125rem;
 }
