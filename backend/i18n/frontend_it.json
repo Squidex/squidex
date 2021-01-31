@@ -400,6 +400,7 @@
   "contents.noReferencing": "This content is not referenced by another item.",
   "contents.pendingChangesTextToChange": "Non hai salvato le modifiche.\n\nSe cambi lo stato perderai le modifiche.\n\n**Sei sicuro di voler continuare?**",
   "contents.pendingChangesTextToClose": "Non hai salvato le modifiche.\n\nChiudendo il contenuto corrente perderai tutte le modifiche.\n\n**Sei sicuro di voler continuare?**",
+  "contents.pendingChangesTextToPreview": "You have unsaved changes.\n\nYou will not see them on preview.\n\n**Do you want to continue anyway?**",
   "contents.pendingChangesTitle": "Modifiche non salvate",
   "contents.publishAll": "Publish All",
   "contents.referencesCreateNew": "Aggiungi nuovo",

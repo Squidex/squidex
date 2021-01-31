@@ -44,6 +44,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
+    public confirmPreview = () => {
+        return this.checkPendingChangesBeforePreview();
+    }
+
     constructor(apiUrl: ApiUrlConfig, authService: AuthService, appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly autoSaveService: AutoSaveService,
@@ -208,23 +212,25 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    public checkPendingChangesBeforeClose() {
-        if (this.content && !this.content.canUpdate) {
-            return of(true);
-        }
+    public checkPendingChangesBeforePreview() {
+        return this.checkPendingChanges('i18n:contents.pendingChangesTextToPreview');
+    }
 
-        return this.contentForm.hasChanged() ?
-            this.dialogs.confirm('i18n:contents.pendingChangesTitle', 'i18n:contents.pendingChangesTextToClose') :
-            of(true);
+    public checkPendingChangesBeforeClose() {
+        return this.checkPendingChanges('i18n:contents.pendingChangesTextToClose');
     }
 
     public checkPendingChangesBeforeChangingStatus() {
+        return this.checkPendingChanges('i18n:contents.pendingChangesTextToChange');
+    }
+
+    private checkPendingChanges(text: string) {
         if (this.content && !this.content.canUpdate) {
             return of(true);
         }
 
         return this.contentForm.hasChanged() ?
-            this.dialogs.confirm('i18n:contents.pendingChangesTitle', 'i18n:contents.pendingChangesTextToChange') :
+            this.dialogs.confirm('i18n:contents.pendingChangesTitle', text) :
             of(true);
     }
 

@@ -54,10 +54,10 @@
                     </ng-container>
 
                     <ng-container *ngIf="tab === 'editor'">
-                        <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
+                        <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
 
                         <ng-container *ngIf="content?.canDelete">
-                            <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
+                            <button type="button" class="btn btn-outline-secondary ml-2" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
                                 <i class="icon-dots"></i>
                             </button>
 

@@ -7,6 +7,8 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { ContentDto, fadeAnimation, interpolate, LocalStoreService, ModalModel, SchemaDetailsDto, Settings, StatefulComponent } from '@app/shared';
+import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 interface State {
     // The name of the selected preview config.
@@ -26,6 +28,9 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PreviewButtonComponent extends StatefulComponent<State> implements OnInit {
+    @Input()
+    public confirm?: () => Observable<boolean>;
+
     @Input()
     public content: ContentDto;
 
@@ -56,7 +61,16 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
         if (name) {
             this.selectUrl(name);
 
-            this.navigateTo(name);
+            if (this.confirm) {
+                this.confirm().pipe(take(1))
+                    .subscribe(confirmed => {
+                        if (confirmed) {
+                            this.navigateTo(name);
+                        }
+                    });
+            } else {
+                this.navigateTo(name);
+            }
         }
 
         this.dropdown.hide();
