@@ -368,7 +368,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         private ISchemaEntity CreateSchema(bool isSingleton)
         {
-            return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "my-schema"), new Schema("schema", isSingleton: isSingleton));
+            return Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, isSingleton: isSingleton));
         }
 
         private T CreateCommand<T>(T command) where T : ContentCommand
