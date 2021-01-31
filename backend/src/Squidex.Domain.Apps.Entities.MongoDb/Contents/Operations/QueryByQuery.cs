@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 var query = q.Query.AdjustToModel(app.Id);
 
-                var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference);
+                var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference, q.CreatedBy);
 
                 var contentEntities = await FindContentsAsync(query, filter);
                 var contentTotal = (long)contentEntities.Count;
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 var query = q.Query.AdjustToModel(app.Id);
 
-                var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), query, q.Reference);
+                var filter = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), query, q.Reference, q.CreatedBy);
 
                 var contentEntities = await FindContentsAsync(query, filter);
                 var contentTotal = (long)contentEntities.Count;
@@ -216,7 +216,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Filter.And(filters);
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds,  ClrQuery? query, DomainId referenced)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds,  ClrQuery? query,
+            DomainId referenced, RefToken? createdBy)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -233,6 +234,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             if (referenced != default)
             {
                 filters.Add(Filter.AnyEq(x => x.ReferencedIds, referenced));
+            }
+
+            if (createdBy != null)
+            {
+                filters.Add(Filter.Eq(x => x.CreatedBy, createdBy));
             }
 
             return Filter.And(filters);

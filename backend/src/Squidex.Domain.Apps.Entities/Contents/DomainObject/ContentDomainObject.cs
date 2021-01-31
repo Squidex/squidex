@@ -129,6 +129,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         await LoadContext(c);
 
+                        GuardContent.CanValidate(c, Snapshot);
+
                         await context.ValidateContentAndInputAsync(Snapshot.Data);
 
                         return true;

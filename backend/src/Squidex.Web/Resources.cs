@@ -20,17 +20,17 @@ namespace Squidex.Web
         private readonly Dictionary<(string, string), bool> schemaPermissions = new Dictionary<(string, string), bool>();
 
         // Contents
-        public bool CanReadContent(string schema) => IsAllowedForSchema(P.AppContentsRead, schema);
+        public bool CanReadContent(string schema) => IsAllowedForSchema(P.AppContentsReadOwn, schema);
 
         public bool CanCreateContent(string schema) => IsAllowedForSchema(P.AppContentsCreate, schema);
 
-        public bool CanCreateContentVersion(string schema) => IsAllowedForSchema(P.AppContentsVersionCreate, schema);
+        public bool CanCreateContentVersion(string schema) => IsAllowedForSchema(P.AppContentsVersionCreateOwn, schema);
 
-        public bool CanDeleteContent(string schema) => IsAllowedForSchema(P.AppContentsDelete, schema);
+        public bool CanDeleteContent(string schema) => IsAllowedForSchema(P.AppContentsDeleteOwn, schema);
 
-        public bool CanDeleteContentVersion(string schema) => IsAllowedForSchema(P.AppContentsVersionDelete, schema);
+        public bool CanDeleteContentVersion(string schema) => IsAllowedForSchema(P.AppContentsVersionDeleteOwn, schema);
 
-        public bool CanUpdateContent(string schema) => IsAllowedForSchema(P.AppContentsUpdate, schema);
+        public bool CanUpdateContent(string schema) => IsAllowedForSchema(P.AppContentsUpdateOwn, schema);
 
         // Schemas
         public bool CanUpdateSchema(string schema) => IsAllowedForSchema(P.AppSchemasDelete, schema);

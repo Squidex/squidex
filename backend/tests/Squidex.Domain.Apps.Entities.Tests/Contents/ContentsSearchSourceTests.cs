@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             foreach (var schemaId in allowedSchemas)
             {
-                var permission = Permissions.ForApp(Permissions.AppContentsRead, appId.Name, schemaId.Name).Id;
+                var permission = Permissions.ForApp(Permissions.AppContentsReadOwn, appId.Name, schemaId.Name).Id;
 
                 claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
             }

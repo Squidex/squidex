@@ -15,6 +15,8 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
@@ -46,6 +48,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
+            CheckPermission(content, command, Permissions.AppContentsUpdate);
+
             Validate.It(e =>
             {
                 ValidateData(command, e);
@@ -60,6 +64,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
+            CheckPermission(content, command, Permissions.AppContentsUpdate);
+
             Validate.It(e =>
             {
                 ValidateData(command, e);
@@ -68,9 +74,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             await ValidateCanUpdate(content, contentWorkflow, command.User);
         }
 
+        public static void CanValidate(ValidateContent command, IContentEntity content)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            CheckPermission(content, command, Permissions.AppContentsRead);
+        }
+
         public static void CanDeleteDraft(DeleteContentDraft command, IContentEntity content)
         {
             Guard.NotNull(command, nameof(command));
+
+            CheckPermission(content, command, Permissions.AppContentsVersionDelete);
 
             if (content.NewStatus == null)
             {
@@ -81,6 +96,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         public static void CanCreateDraft(CreateContentDraft command, IContentEntity content)
         {
             Guard.NotNull(command, nameof(command));
+
+            CheckPermission(content, command, Permissions.AppContentsVersionCreate);
 
             if (content.Status != Status.Published)
             {
@@ -95,6 +112,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
+
+            CheckPermission(content, command, Permissions.AppContentsChangeStatus);
 
             if (schema.SchemaDef.IsSingleton)
             {
@@ -141,6 +160,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
+            CheckPermission(content, command, Permissions.AppContentsDeleteOwn);
+
             if (schema.SchemaDef.IsSingleton)
             {
                 throw new DomainException(T.Get("contents.singletonNotDeletable"));
@@ -172,6 +193,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             if (!await contentWorkflow.CanUpdateAsync(content, status, user))
             {
                 throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
+            }
+        }
+
+        public static void CheckPermission(IContentEntity content, ContentCommand command, string permission)
+        {
+            if (content.CreatedBy?.Equals(command.Actor) == true)
+            {
+                return;
+            }
+
+            var requiredPermission = Permissions.ForApp(permission, content.AppId.Name, content.SchemaId.Name);
+
+            if (!command.User.Claims.Permissions().Allows(requiredPermission))
+            {
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }
         }
     }

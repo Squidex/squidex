@@ -85,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private OpenApiPathItem GenerateSchemaGetsOperation()
         {
-            return Add(OpenApiOperationMethod.Get, Permissions.AppContentsRead, "/",
+            return Add(OpenApiOperationMethod.Get, Permissions.AppContentsReadOwn, "/",
                 operation =>
             {
                 operation.OperationId = $"Query{schemaType}Contents";
@@ -103,7 +103,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private OpenApiPathItem GenerateSchemaGetOperation()
         {
-            return Add(OpenApiOperationMethod.Get, Permissions.AppContentsRead, "/{id}", operation =>
+            return Add(OpenApiOperationMethod.Get, Permissions.AppContentsReadOwn, "/{id}", operation =>
             {
                 operation.OperationId = $"Get{schemaType}Content";
 
@@ -133,7 +133,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private OpenApiPathItem GenerateSchemaUpdateOperation()
         {
-            return Add(OpenApiOperationMethod.Put, Permissions.AppContentsUpdate, "/{id}",
+            return Add(OpenApiOperationMethod.Put, Permissions.AppContentsUpdateOwn, "/{id}",
                 operation =>
             {
                 operation.OperationId = $"Update{schemaType}Content";
@@ -149,7 +149,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private OpenApiPathItem GenerateSchemaUpdatePatchOperation()
         {
-            return Add(OpenApiOperationMethod.Patch, Permissions.AppContentsUpdate, "/{id}",
+            return Add(OpenApiOperationMethod.Patch, Permissions.AppContentsUpdateOwn, "/{id}",
                 operation =>
             {
                 operation.OperationId = $"Path{schemaType}Content";
@@ -165,7 +165,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private OpenApiPathItem GenerateSchemaStatusOperation()
         {
-            return Add(OpenApiOperationMethod.Put, Permissions.AppContentsUpdate, "/{id}/status",
+            return Add(OpenApiOperationMethod.Put, Permissions.AppContentsUpdateOwn, "/{id}/status",
                 operation =>
             {
                 operation.OperationId = $"Change{schemaType}ContentStatus";
@@ -181,7 +181,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private OpenApiPathItem GenerateSchemaDeleteOperation()
         {
-            return Add(OpenApiOperationMethod.Delete, Permissions.AppContentsDelete, "/{id}",
+            return Add(OpenApiOperationMethod.Delete, Permissions.AppContentsDeleteOwn, "/{id}",
                 operation =>
             {
                 operation.OperationId = $"Delete{schemaType}Content";

@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private static bool HasPermission(Context context, string schemaName)
         {
-            var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schemaName);
+            var permission = Permissions.ForApp(Permissions.AppContentsReadOwn, context.App.Name, schemaName);
 
             return context.Permissions.Allows(permission);
         }

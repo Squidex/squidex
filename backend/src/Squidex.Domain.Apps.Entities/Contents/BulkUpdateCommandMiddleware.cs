@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var command = new UpdateContent { Data = job.Data! };
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdate);
+                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdateOwn);
                         return command;
                     }
 
@@ -216,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var command = new PatchContent { Data = job.Data! };
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdate);
+                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdateOwn);
                         return command;
                     }
 
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var command = new ValidateContent();
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsRead);
+                        await EnrichAsync(id, task, command, Permissions.AppContentsReadOwn);
                         return command;
                     }
 
@@ -232,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var command = new ChangeContentStatus { Status = job.Status, DueTime = job.DueTime };
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdate);
+                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdateOwn);
                         return command;
                     }
 
@@ -240,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var command = new DeleteContent();
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsDelete);
+                        await EnrichAsync(id, task, command, Permissions.AppContentsDeleteOwn);
                         return command;
                     }
 

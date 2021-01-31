@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 using Squidex.Shared;
@@ -91,6 +92,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
+
+            if (!HasPermission(context, schema, Permissions.AppContentsRead))
+            {
+                q.CreatedBy = context.User.Token();
+            }
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
@@ -193,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache);
             }
 
-            if (schema != null && !HasPermission(context, schema))
+            if (schema != null && !HasPermission(context, schema, Permissions.AppContentsReadOwn))
             {
                 throw new DomainForbiddenException(T.Get("schemas.noPermission"));
             }
@@ -205,12 +211,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schemas = await appProvider.GetSchemasAsync(context.App.Id);
 
-            return schemas.Where(x => HasPermission(context, x)).ToList();
+            return schemas.Where(x => HasPermission(context, x, Permissions.AppContentsReadOwn)).ToList();
         }
 
-        private static bool HasPermission(Context context, ISchemaEntity schema)
+        private static bool HasPermission(Context context, ISchemaEntity schema, string permissionId)
         {
-            var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schema.SchemaDef.Name);
+            var permission = Permissions.ForApp(permissionId, context.App.Name, schema.SchemaDef.Name);
 
             return context.Permissions.Allows(permission);
         }

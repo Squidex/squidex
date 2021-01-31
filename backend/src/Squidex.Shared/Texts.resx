@@ -238,6 +238,9 @@
   <data name="common.email" xml:space="preserve">
     <value>Email</value>
   </data>
+  <data name="common.errorNoPermission" xml:space="preserve">
+    <value>You do not have the necessary permission.</value>
+  </data>
   <data name="common.field" xml:space="preserve">
     <value>Field</value>
   </data>
