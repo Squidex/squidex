@@ -218,6 +218,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Empty(result);
         }
 
+        [Fact]
+        public async Task QueryAll_should_only_query_only_users_contents_if_no_permission()
+        {
+            var ctx =
+                CreateContext(true, true, Permissions.AppContentsReadOwn);
+
+            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
+
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<Q>.That.Matches(x => x.CreatedBy!.Equals(ctx.User.Token())), SearchScope.All))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task QueryAll_should_query_all_contents_if_user_has_permission()
+        {
+            var ctx =
+                CreateContext(true, true, Permissions.AppContentsRead);
+
+            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
+
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<Q>.That.Matches(x => x.CreatedBy == null), SearchScope.All))
+                .MustHaveHappened();
+        }
+
         [Theory]
         [InlineData(1, 0, SearchScope.All)]
         [InlineData(1, 1, SearchScope.All)]
@@ -252,7 +276,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 });
         }
 
-        private Context CreateContext(bool isFrontend, bool allowSchema)
+        private Context CreateContext(bool isFrontend, bool allowSchema, string permissionId = Permissions.AppContentsRead)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -264,9 +288,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (allowSchema)
             {
-                var permission = Permissions.ForApp(Permissions.AppContentsRead, appId.Name, schemaId.Name).Id;
+                var concretePermission = Permissions.ForApp(permissionId, appId.Name, schemaId.Name).Id;
 
-                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, concretePermission));
             }
 
             return new Context(claimsPrincipal, Mocks.App(appId));

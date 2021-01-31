@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_exception_when_content_cannot_be_resolved()
         {
-            SetupContext(Permissions.AppContentsUpdate);
+            SetupContext(Permissions.AppContentsUpdateOwn);
 
             var (_, _, query) = CreateTestData(true);
 
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_exception_when_query_resolves_multiple_contents()
         {
-            var requestContext = SetupContext(Permissions.AppContentsUpdate);
+            var requestContext = SetupContext(Permissions.AppContentsUpdateOwn);
 
             var (id, data, query) = CreateTestData(true);
 
@@ -240,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_security_exception_when_user_has_no_permission_for_creating()
         {
-            SetupContext(Permissions.AppContentsRead);
+            SetupContext(Permissions.AppContentsReadOwn);
 
             var (id, data, _) = CreateTestData(false);
 
@@ -257,7 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_update_content()
         {
-            SetupContext(Permissions.AppContentsUpdate);
+            SetupContext(Permissions.AppContentsUpdateOwn);
 
             var (id, data, _) = CreateTestData(false);
 
@@ -275,7 +275,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_security_exception_when_user_has_no_permission_for_updating()
         {
-            SetupContext(Permissions.AppContentsRead);
+            SetupContext(Permissions.AppContentsReadOwn);
 
             var (id, data, _) = CreateTestData(false);
 
@@ -292,7 +292,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_patch_content()
         {
-            SetupContext(Permissions.AppContentsUpdate);
+            SetupContext(Permissions.AppContentsUpdateOwn);
 
             var (id, data, _) = CreateTestData(false);
 
@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_security_exception_when_user_has_no_permission_for_patching()
         {
-            SetupContext(Permissions.AppContentsRead);
+            SetupContext(Permissions.AppContentsReadOwn);
 
             var (id, data, _) = CreateTestData(false);
 
@@ -327,7 +327,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_change_content_status()
         {
-            SetupContext(Permissions.AppContentsUpdate);
+            SetupContext(Permissions.AppContentsUpdateOwn);
 
             var (id, _, _) = CreateTestData(false);
 
@@ -344,7 +344,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_change_content_status_with_due_time()
         {
-            SetupContext(Permissions.AppContentsUpdate);
+            SetupContext(Permissions.AppContentsUpdateOwn);
 
             var time = Instant.FromDateTimeUtc(DateTime.UtcNow);
 
@@ -363,7 +363,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_security_exception_when_user_has_no_permission_for_changing_status()
         {
-            SetupContext(Permissions.AppContentsRead);
+            SetupContext(Permissions.AppContentsReadOwn);
 
             var (id, _, _) = CreateTestData(false);
 
@@ -380,7 +380,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_validate_content()
         {
-            SetupContext(Permissions.AppContentsRead);
+            SetupContext(Permissions.AppContentsReadOwn);
 
             var (id, _, _) = CreateTestData(false);
 
@@ -398,7 +398,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_security_exception_when_user_has_no_permission_for_validation()
         {
-            SetupContext(Permissions.AppContentsDelete);
+            SetupContext(Permissions.AppContentsDeleteOwn);
 
             var (id, _, _) = CreateTestData(false);
 
@@ -415,7 +415,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_delete_content()
         {
-            SetupContext(Permissions.AppContentsDelete);
+            SetupContext(Permissions.AppContentsDeleteOwn);
 
             var (id, _, _) = CreateTestData(false);
 
@@ -433,7 +433,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_security_exception_when_user_has_no_permission_for_deletion()
         {
-            SetupContext(Permissions.AppContentsRead);
+            SetupContext(Permissions.AppContentsReadOwn);
 
             var (id, _, _) = CreateTestData(false);
 

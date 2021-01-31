@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
@@ -55,12 +56,12 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return CreateUser(role, "api");
         }
 
-        public static ClaimsPrincipal FrontendUser(string? role = null)
+        public static ClaimsPrincipal FrontendUser(string? role = null, string? permission = null)
         {
-            return CreateUser(role, DefaultClients.Frontend);
+            return CreateUser(role, DefaultClients.Frontend, permission);
         }
 
-        private static ClaimsPrincipal CreateUser(string? role, string client)
+        private static ClaimsPrincipal CreateUser(string? role, string client, string? permission = null)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -70,6 +71,11 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             if (role != null)
             {
                 claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
+
+            if (permission != null)
+            {
+                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
             }
 
             return claimsPrincipal;

@@ -51,6 +51,7 @@
   "common.displayName": "Display name",
   "common.editor": "Editor",
   "common.email": "Email",
+  "common.errorNoPermission": "You do not have the necessary permission.",
   "common.field": "Field",
   "common.fieldIds": "Field IDs",
   "common.fieldName": "Field name",
