@@ -48,6 +48,7 @@ namespace Squidex.Config.Domain
 
             services.AddReplicatedCache();
             services.AddAsyncLocalCache();
+            services.AddBackgroundCache();
 
             services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();

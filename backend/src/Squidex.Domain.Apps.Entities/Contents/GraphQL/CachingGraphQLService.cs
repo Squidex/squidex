@@ -8,31 +8,40 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Utilities;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using NodaTime;
+using Squidex.Caching;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Log;
+
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class CachingGraphQLService : IGraphQLService
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
-        private readonly IMemoryCache cache;
-        private readonly IServiceProvider resolver;
+        private readonly IBackgroundCache cache;
+        private readonly ISchemasHash schemasHash;
+        private readonly IServiceProvider serviceProvider;
         private readonly GraphQLOptions options;
 
-        public CachingGraphQLService(IMemoryCache cache, IServiceProvider resolver, IOptions<GraphQLOptions> options)
+        public sealed record CacheEntry(GraphQLModel Model, string Hash, Instant Created);
+
+        public CachingGraphQLService(IBackgroundCache cache, ISchemasHash schemasHash, IServiceProvider serviceProvider, IOptions<GraphQLOptions> options)
         {
             Guard.NotNull(cache, nameof(cache));
-            Guard.NotNull(resolver, nameof(resolver));
+            Guard.NotNull(schemasHash, nameof(schemasHash));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
             Guard.NotNull(options, nameof(options));
 
             this.cache = cache;
-            this.resolver = resolver;
+            this.schemasHash = schemasHash;
+            this.serviceProvider = serviceProvider;
             this.options = options.Value;
         }
 
@@ -43,9 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var model = await GetModelAsync(context.App);
 
-            var graphQlContext = new GraphQLExecutionContext(context, resolver);
+            var executionContext =
+                serviceProvider.GetRequiredService<GraphQLExecutionContext>()
+                    .WithContext(context);
 
-            var result = await Task.WhenAll(queries.Select(q => QueryInternalAsync(model, graphQlContext, q)));
+            var result = await Task.WhenAll(queries.Select(q => QueryInternalAsync(model, executionContext, q)));
 
             return (result.Any(x => x.HasError), result.Map(x => x.Response));
         }
@@ -57,9 +68,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var model = await GetModelAsync(context.App);
 
-            var graphQlContext = new GraphQLExecutionContext(context, resolver);
+            var executionContext =
+                serviceProvider.GetRequiredService<GraphQLExecutionContext>()
+                    .WithContext(context);
 
-            var result = await QueryInternalAsync(model, graphQlContext, query);
+            var result = await QueryInternalAsync(model, executionContext, query);
 
             return result;
         }
@@ -83,7 +96,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
         }
 
-        private Task<GraphQLModel> GetModelAsync(IAppEntity app)
+        private async Task<GraphQLModel> GetModelAsync(IAppEntity app)
+        {
+            var entry = await GetModelEntryAsync(app);
+
+            return entry.Model;
+        }
+
+        private Task<CacheEntry> GetModelEntryAsync(IAppEntity app)
         {
             if (options.CacheDuration <= 0)
             {
@@ -92,22 +112,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var cacheKey = CreateCacheKey(app.Id, app.Version.ToString());
 
-            return cache.GetOrCreateAsync(cacheKey, async entry =>
+            return cache.GetOrCreateAsync(cacheKey, CacheDuration, async entry =>
             {
-                entry.AbsoluteExpirationRelativeToNow = CacheDuration;
-
                 return await CreateModelAsync(app);
+            },
+            async entry =>
+            {
+                var (created, hash) = await schemasHash.GetCurrentHashAsync(app.Id);
+
+                return created < entry.Created || string.Equals(hash, entry.Hash, StringComparison.OrdinalIgnoreCase);
             });
         }
 
-        private async Task<GraphQLModel> CreateModelAsync(IAppEntity app)
+        private async Task<CacheEntry> CreateModelAsync(IAppEntity app)
         {
-            var allSchemas = await resolver.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
+            var allSchemas = await serviceProvider.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
 
-            return new GraphQLModel(app,
-                allSchemas,
-                resolver.GetRequiredService<SharedTypes>(),
-                resolver.GetRequiredService<ISemanticLog>());
+            var hash = await schemasHash.ComputeHashAsync(app, allSchemas);
+
+            return new CacheEntry(
+                new GraphQLModel(app,
+                    allSchemas,
+                    serviceProvider.GetRequiredService<SharedTypes>(),
+                    serviceProvider.GetRequiredService<ISemanticLog>()),
+                hash,
+                SystemClock.Instance.GetCurrentInstant());
         }
 
         private static object CreateCacheKey(DomainId appId, string etag)

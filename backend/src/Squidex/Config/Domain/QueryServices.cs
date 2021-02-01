@@ -29,6 +29,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DataLoaderContextAccessor>()
                 .As<IDataLoaderContextAccessor>();
 
+            services.AddTransientAs<GraphQLExecutionContext>()
+                .AsSelf();
+
             services.AddSingletonAs<DataLoaderDocumentListener>()
                 .AsSelf();
 

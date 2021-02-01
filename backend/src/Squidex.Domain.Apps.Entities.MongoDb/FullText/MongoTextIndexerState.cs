@@ -75,6 +75,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 }
             }
 
+            if (writes.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
             return Collection.BulkWriteAsync(writes);
         }
     }

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Squidex.Caching;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -142,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private CachingGraphQLService CreateSut()
         {
-            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+            var cache = new BackgroundCache(new MemoryCache(Options.Create(new MemoryCacheOptions())));
 
             var appProvider = A.Fake<IAppProvider>();
 
@@ -161,6 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var services =
                 new ServiceCollection()
                     .AddMemoryCache()
+                    .AddTransient<GraphQLExecutionContext>()
                     .AddSingleton(A.Fake<ISemanticLog>())
                     .AddSingleton(appProvider)
                     .AddSingleton(assetQuery)
@@ -173,7 +175,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         FakeUrlGenerator>()
                     .BuildServiceProvider();
 
-            return new CachingGraphQLService(cache, services, Options.Create(new GraphQLOptions()));
+            var schemasHash = A.Fake<ISchemasHash>();
+
+            return new CachingGraphQLService(cache, schemasHash, services, Options.Create(new GraphQLOptions()));
         }
     }
 }

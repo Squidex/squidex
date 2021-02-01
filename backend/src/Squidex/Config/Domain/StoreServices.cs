@@ -25,12 +25,15 @@ using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 using Squidex.Domain.Apps.Entities.MongoDb.History;
 using Squidex.Domain.Apps.Entities.MongoDb.Rules;
+using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
@@ -114,6 +117,9 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
                         .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State, DomainId>>();
+
+                    services.AddSingletonAs<MongoSchemasHash>()
+                        .AsOptional<ISchemasHash>().As<IEventConsumer>();
 
                     services.AddSingletonAs<MongoTextIndex>()
                         .AsOptional<ITextIndex>();
