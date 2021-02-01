@@ -151,20 +151,20 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (NewStatus.HasValue)
             {
-                if (resources.CanDeleteContentVersionOwn(schema))
+                if (resources.CanDeleteContentVersion(schema))
                 {
                     AddDeleteLink("draft/delete", resources.Url<ContentsController>(x => nameof(x.DeleteVersion), values));
                 }
             }
             else if (Status == Status.Published)
             {
-                if (resources.CanCreateContentVersionOwn(schema))
+                if (resources.CanCreateContentVersion(schema))
                 {
                     AddPostLink("draft/create", resources.Url<ContentsController>(x => nameof(x.CreateDraft), values));
                 }
             }
 
-            if (content.NextStatuses != null && resources.CanUpdateContentOwn(schema))
+            if (content.NextStatuses != null && resources.CanUpdateContent(schema))
             {
                 foreach (var next in content.NextStatuses)
                 {
@@ -172,12 +172,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 }
             }
 
-            if (content.IsSingleton == false && resources.CanDeleteContentOwn(schema))
+            if (content.IsSingleton == false && resources.CanDeleteContent(schema))
             {
                 AddDeleteLink("delete", resources.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }
 
-            if (content.CanUpdate && resources.CanUpdateContentOwn(schema))
+            if (content.CanUpdate && resources.CanUpdateContent(schema))
             {
                 AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
                 AddPatchLink("patch", resources.Url<ContentsController>(x => nameof(x.PatchContent), values));

@@ -92,9 +92,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
-            var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schemaIdOrName);
 
-            if (!context.Permissions.Allows(permission))
+            if (HasPermission(context, Permissions.AppContentsRead, schema))
             {
                 q.CreatedBy = context.User.Token();
             }
@@ -200,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache);
             }
 
-            if (schema != null && !HasPermission(context, schema))
+            if (schema != null && !HasPermission(context, Permissions.AppContentsReadOwn, schema))
             {
                 throw new DomainForbiddenException(T.Get("schemas.noPermission"));
             }
@@ -212,14 +211,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schemas = await appProvider.GetSchemasAsync(context.App.Id);
 
-            return schemas.Where(x => HasPermission(context, x)).ToList();
+            return schemas.Where(x => HasPermission(context, Permissions.AppContentsReadOwn, x)).ToList();
         }
 
-        private static bool HasPermission(Context context, ISchemaEntity schema)
+        private static bool HasPermission(Context context, string permission, ISchemaEntity schema)
         {
-            var permissionReadOwn = Permissions.ForApp(Permissions.AppContentsReadOwn, context.App.Name, schema.SchemaDef.Name);
+            var specificPermission = Permissions.ForApp(permission, context.App.Name, schema.SchemaDef.Name);
 
-            return context.Permissions.Allows(permissionReadOwn);
+            return context.Permissions.Allows(specificPermission);
         }
 
         private Task<IContentEntity?> FindCoreAsync(Context context, DomainId id, ISchemaEntity schema)

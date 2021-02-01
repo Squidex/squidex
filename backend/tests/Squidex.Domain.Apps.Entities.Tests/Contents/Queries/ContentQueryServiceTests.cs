@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -223,14 +224,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = CreateContext(true, true, Permissions.AppContentsReadOwn);
             var content = CreateContent(contentId);
-            var q = Q.Empty.WithReference(DomainId.NewGuid());
+            var query = Q.Empty.WithReference(DomainId.NewGuid());
+            query.CreatedBy = ctx.User.Token();
 
-            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<Q>.Ignored, scope))
-                .Returns(ResultList.CreateFrom(5, content));
+            A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<Q>._, scope))
+               .Invokes((IAppEntity app, ISchemaEntity schema, Q q, SearchScope scope) => q.CreatedBy = ctx.User.Token())
+               .Returns(ResultList.CreateFrom(5, content));
 
-            var result = await sut.QueryAsync(ctx, schemaId.Name, q);
+            var result = await sut.QueryAsync(ctx, schemaId.Name, query);
 
-            Assert.Equal(q.CreatedBy, ctx.User.Token());
+            Assert.Equal(query.CreatedBy, ctx.User.Token());
         }
 
         [Theory]
@@ -296,9 +299,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             if (allowSchema)
             {
-                var perm = Permissions.ForApp(permission, appId.Name, schemaId.Name).Id;
+                var specificPermission = Permissions.ForApp(permission, appId.Name, schemaId.Name).Id;
 
-                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, perm));
+                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, specificPermission));
             }
 
             return new Context(claimsPrincipal, Mocks.App(appId));
