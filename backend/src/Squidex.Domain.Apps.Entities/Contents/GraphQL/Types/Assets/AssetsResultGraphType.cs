@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             AddField(new FieldType
             {
                 Name = "items",
-                ResolvedType = assetsList,
+                ResolvedType = new NonNullGraphType(assetsList),
                 Resolver = ResolveList(x => x),
                 Description = "The assets."
             });

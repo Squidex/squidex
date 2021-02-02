@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             assetsList = new Lazy<IGraphType>(() =>
             {
-                return new NonNullGraphType(new ListGraphType(new NonNullGraphType(Asset)));
+                return new ListGraphType(new NonNullGraphType(Asset));
             });
 
             assetsResult = new Lazy<IGraphType>(() =>
