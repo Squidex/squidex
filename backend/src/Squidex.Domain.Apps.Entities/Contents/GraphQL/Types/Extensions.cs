@@ -88,16 +88,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return field.GetMetadata<NamedId<DomainId>>(nameof(SchemaNamedId));
         }
 
-        public static FieldType WithAppId(this FieldType field, NamedId<DomainId> value)
-        {
-            return field.WithMetadata(nameof(AppId), value);
-        }
-
-        public static NamedId<DomainId> AppId(this FieldType field)
-        {
-            return field.GetMetadata<NamedId<DomainId>>(nameof(AppId));
-        }
-
         private static FieldType WithMetadata(this FieldType field, string key, object value)
         {
             if (field is MetadataProvider metadataProvider)

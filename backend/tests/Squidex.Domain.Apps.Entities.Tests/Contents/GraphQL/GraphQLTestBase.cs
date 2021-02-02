@@ -33,7 +33,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public class GraphQLTestBase
+    public class GraphQLTestBase : IClassFixture<TranslationsFixture>
     {
         protected readonly IAppEntity app;
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();

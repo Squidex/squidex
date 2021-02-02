@@ -16,8 +16,10 @@ using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Shared;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -37,10 +39,49 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_return_error_when_user_has_no_permission_to_create()
+        {
+            var query = @"
+                mutation {
+                  createMySchemaContent(data: { myNumber: { iv: 42 } }) {
+                    id
+                  }
+                }";
+
+            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+
+            var expected = new
+            {
+                data = new
+                {
+                    createMySchemaContent = (object?)null,
+                },
+                errors = new[]
+                {
+                    new
+                    {
+                        message = "You do not have the necessary permission.",
+                        locations = new[]
+                        {
+                            new
+                            {
+                                line = 3,
+                                column = 19
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_return_single_content_when_creating_content()
         {
-            var f = new FloatGraphType().ParseValue("12.0");
-
             var query = @"
                 mutation {
                   createMySchemaContent(data: <DATA>, publish: true) {
@@ -50,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsCreate);
 
             var expected = new
             {
@@ -83,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsCreate);
 
             var expected = new
             {
@@ -117,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = GetInput() });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query, Inputs = GetInput() }, Permissions.AppContentsCreate);
 
             var expected = new
             {
@@ -139,6 +180,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_return_error_when_user_has_no_permission_to_update()
+        {
+            var query = @"
+                mutation {
+                  updateMySchemaContent(id: ""<ID>"", data: { myNumber: { iv: 42 } }) {
+                    id
+                  }
+                }".Replace("<ID>", contentId.ToString());
+
+            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+
+            var expected = new
+            {
+                data = new
+                {
+                    updateMySchemaContent = (object?)null,
+                },
+                errors = new[]
+                {
+                    new
+                    {
+                        message = "You do not have the necessary permission.",
+                        locations = new[]
+                        {
+                            new
+                            {
+                                line = 3,
+                                column = 19
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_return_single_content_when_updating_content()
         {
             var query = @"
@@ -150,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -182,7 +264,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = GetInput() });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -203,6 +285,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_return_error_when_user_has_no_permission_to_upsert()
+        {
+            var query = @"
+                mutation {
+                  upsertMySchemaContent(id: ""<ID>"", data: { myNumber: { iv: 42 } }) {
+                    id
+                  }
+                }".Replace("<ID>", contentId.ToString());
+
+            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+
+            var expected = new
+            {
+                data = new
+                {
+                    upsertMySchemaContent = (object?)null,
+                },
+                errors = new[]
+                {
+                    new
+                    {
+                        message = "You do not have the necessary permission.",
+                        locations = new[]
+                        {
+                            new
+                            {
+                                line = 3,
+                                column = 19
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_return_single_content_when_upserting_content()
         {
             var query = @"
@@ -214,7 +337,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsUpsert);
 
             var expected = new
             {
@@ -247,7 +370,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = GetInput() });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpsert);
 
             var expected = new
             {
@@ -269,6 +392,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_return_error_when_user_has_no_permission_to_patch()
+        {
+            var query = @"
+                mutation {
+                  patchMySchemaContent(id: ""<ID>"", data: { myNumber: { iv: 42 } }) {
+                    id
+                  }
+                }".Replace("<ID>", contentId.ToString());
+
+            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+
+            var expected = new
+            {
+                data = new
+                {
+                    patchMySchemaContent = (object?)null,
+                },
+                errors = new[]
+                {
+                    new
+                    {
+                        message = "You do not have the necessary permission.",
+                        locations = new[]
+                        {
+                            new
+                            {
+                                line = 3,
+                                column = 19
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_return_single_content_when_patching_content()
         {
             var query = @"
@@ -280,7 +444,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -312,7 +476,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, Inputs = GetInput() });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -333,7 +497,48 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_publish_command_for_status_change()
+        public async Task Should_return_error_when_user_has_no_permission_to_change_status()
+        {
+            var query = @"
+                mutation {
+                  changeMySchemaContent(id: ""<ID>"", status: ""Published"") {
+                    id
+                  }
+                }".Replace("<ID>", contentId.ToString());
+
+            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+
+            var expected = new
+            {
+                data = new
+                {
+                    changeMySchemaContent = (object?)null,
+                },
+                errors = new[]
+                {
+                    new
+                    {
+                        message = "You do not have the necessary permission.",
+                        locations = new[]
+                        {
+                            new
+                            {
+                                line = 3,
+                                column = 19
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_return_single_content_when_changing_status()
         {
             var dueTime = SystemClock.Instance.GetCurrentInstant().WithoutMs();
 
@@ -346,7 +551,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsChangeStatusOwn);
 
             var expected = new
             {
@@ -368,7 +573,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_publish_command_for_status_change_without_due_time()
+        public async Task Should_return_single_content_when_changing_status_without_due_time()
         {
             var query = @"
                 mutation {
@@ -379,7 +584,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsChangeStatusOwn);
 
             var expected = new
             {
@@ -401,7 +606,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_publish_command_for_status_change_with_null_due_time()
+        public async Task Should_return_single_content_when_changing_status_with_null_due_time()
         {
             var query = @"
                 mutation {
@@ -412,7 +617,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsChangeStatusOwn);
 
             var expected = new
             {
@@ -434,7 +639,45 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_publish_command_for_delete()
+        public async Task Should_return_error_when_user_has_no_permission_to_delete()
+        {
+            var query = @"
+                mutation {
+                  deleteMySchemaContent(id: ""<ID>"") {
+                    version
+                  }
+                }".Replace("<ID>", contentId.ToString());
+
+            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+
+            var expected = new
+            {
+                data = (object?)null,
+                errors = new[]
+                {
+                    new
+                    {
+                        message = "You do not have the necessary permission.",
+                        locations = new[]
+                        {
+                            new
+                            {
+                                line = 3,
+                                column = 19
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_return_new_version_when_deleting_content()
         {
             var query = @"
                 mutation {
@@ -445,7 +688,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(new EntitySavedResult(13));
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query });
+            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsDeleteOwn);
 
             var expected = new
             {
@@ -465,6 +708,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     x.ContentId == contentId &&
                     x.ExpectedVersion == 10)))
                 .MustHaveHappened();
+        }
+
+        private Task<(bool HasError, object Response)> ExecuteAsync(GraphQLQuery query, string permissionId)
+        {
+            var permission = Permissions.ForApp(permissionId, app.Name, schemaId.Name).Id;
+
+            var withPermission = new Context(Mocks.FrontendUser(permission: permission), app);
+
+            return sut.QueryAsync(withPermission, query);
         }
 
         private Inputs GetInput()

@@ -16,44 +16,14 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal static class ContentActions
     {
-        private static readonly QueryArgument Id = new QueryArgument(AllTypes.None)
-        {
-            Name = "id",
-            Description = "The id of the content (usually GUID).",
-            DefaultValue = null,
-            ResolvedType = AllTypes.NonNullDomainId
-        };
-
-        private static readonly QueryArgument NewId = new QueryArgument(AllTypes.None)
-        {
-            Name = "id",
-            Description = "The optional custom content id.",
-            DefaultValue = null,
-            ResolvedType = AllTypes.String
-        };
-
-        private static readonly QueryArgument ExpectedVersion = new QueryArgument(AllTypes.None)
-        {
-            Name = "expectedVersion",
-            Description = "The expected version",
-            DefaultValue = EtagVersion.Any,
-            ResolvedType = AllTypes.Int
-        };
-
-        private static readonly QueryArgument Publish = new QueryArgument(AllTypes.None)
-        {
-            Name = "publish",
-            Description = "Set to true to autopublish content on create.",
-            DefaultValue = false,
-            ResolvedType = AllTypes.Boolean
-        };
-
         public static class Json
         {
             public static readonly QueryArguments Arguments = new QueryArguments
@@ -95,7 +65,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                Id,
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "id",
+                    Description = "The id of the content (usually GUID).",
+                    DefaultValue = null,
+                    ResolvedType = AllTypes.NonNullDomainId
+                },
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "version",
@@ -191,11 +167,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         DefaultValue = null,
                         ResolvedType = new NonNullGraphType(inputType)
                     },
-                    Publish, NewId
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "publish",
+                        Description = "Set to true to autopublish content on create.",
+                        DefaultValue = false,
+                        ResolvedType = AllTypes.Boolean
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "id",
+                        Description = "The optional custom content id.",
+                        DefaultValue = null,
+                        ResolvedType = AllTypes.String
+                    }
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsCreate, c =>
             {
                 var contentPublish = c.GetArgument<bool>("publish");
                 var contentData = GetContentData(c);
@@ -220,7 +209,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    Id,
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "id",
+                        Description = "The id of the content (usually GUID).",
+                        DefaultValue = null,
+                        ResolvedType = AllTypes.NonNullDomainId
+                    },
                     new QueryArgument(AllTypes.None)
                     {
                         Name = "data",
@@ -228,12 +223,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         DefaultValue = null,
                         ResolvedType = new NonNullGraphType(inputType)
                     },
-                    Publish,
-                    ExpectedVersion
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "publish",
+                        Description = "Set to true to autopublish content on create.",
+                        DefaultValue = false,
+                        ResolvedType = AllTypes.Boolean
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "expectedVersion",
+                        Description = "The expected version",
+                        DefaultValue = EtagVersion.Any,
+                        ResolvedType = AllTypes.Int
+                    }
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpsert, c =>
             {
                 var contentPublish = c.GetArgument<bool>("publish");
                 var contentData = GetContentData(c);
@@ -251,7 +258,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    Id,
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "id",
+                        Description = "The optional custom content id.",
+                        DefaultValue = null,
+                        ResolvedType = AllTypes.String
+                    },
                     new QueryArgument(AllTypes.None)
                     {
                         Name = "data",
@@ -259,11 +272,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         DefaultValue = null,
                         ResolvedType = new NonNullGraphType(inputType)
                     },
-                    ExpectedVersion
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "expectedVersion",
+                        Description = "The expected version",
+                        DefaultValue = EtagVersion.Any,
+                        ResolvedType = AllTypes.Int
+                    }
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpdateOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
                 var contentData = GetContentData(c);
@@ -278,7 +297,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    Id,
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "id",
+                        Description = "The optional custom content id.",
+                        DefaultValue = null,
+                        ResolvedType = AllTypes.String
+                    },
                     new QueryArgument(AllTypes.None)
                     {
                         Name = "data",
@@ -286,11 +311,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         DefaultValue = null,
                         ResolvedType = new NonNullGraphType(inputType)
                     },
-                    ExpectedVersion
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "expectedVersion",
+                        Description = "The expected version",
+                        DefaultValue = EtagVersion.Any,
+                        ResolvedType = AllTypes.Int
+                    }
                 };
             }
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpdateOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
                 var contentData = GetContentData(c);
@@ -303,7 +334,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                Id,
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "id",
+                    Description = "The id of the content (usually GUID).",
+                    DefaultValue = null,
+                    ResolvedType = AllTypes.NonNullDomainId
+                },
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "status",
@@ -318,10 +355,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     DefaultValue = null,
                     ResolvedType = AllTypes.Date
                 },
-                ExpectedVersion
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "expectedVersion",
+                    Description = "The expected version",
+                    DefaultValue = EtagVersion.Any,
+                    ResolvedType = AllTypes.Int
+                }
             };
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsChangeStatusOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
                 var contentStatus = c.GetArgument<Status>("status");
@@ -335,11 +378,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                Id,
-                ExpectedVersion
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "id",
+                    Description = "The id of the content (usually GUID).",
+                    DefaultValue = null,
+                    ResolvedType = AllTypes.NonNullDomainId
+                },
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "expectedVersion",
+                    Description = "The expected version",
+                    DefaultValue = EtagVersion.Any,
+                    ResolvedType = AllTypes.Int
+                }
             };
 
-            public static readonly IFieldResolver Resolver = ResolveAsync(c =>
+            public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsDeleteOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
 
@@ -354,35 +409,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return source.ToContentData((IComplexGraphType)c.FieldDefinition.Arguments.Find("data").Flatten());
         }
 
-        private static IFieldResolver ResolveAsync(Func<IResolveFieldContext, ContentCommand> action)
+        private static IFieldResolver ResolveAsync(string permissionId, Func<IResolveFieldContext, ContentCommand> action)
         {
             return Resolvers.Async<object, object>(async (source, fieldContext, context) =>
             {
-                try
-                {
-                    var command = action(fieldContext);
+                var schemaId = fieldContext.FieldDefinition.SchemaNamedId();
 
-                    command.AppId = fieldContext.FieldDefinition.AppId();
-                    command.SchemaId = fieldContext.FieldDefinition.SchemaNamedId();
-                    command.ExpectedVersion = fieldContext.GetArgument("expectedVersion", EtagVersion.Any);
+                CheckPermission(permissionId, context, schemaId);
 
-                    var commandContext = await context.CommandBus.PublishAsync(command);
+                var contentCommand = action(fieldContext);
 
-                    return commandContext.PlainResult!;
-                }
-                catch (ValidationException ex)
-                {
-                    fieldContext.Errors.Add(new ExecutionError(ex.Message));
+                contentCommand.SchemaId = schemaId;
+                contentCommand.ExpectedVersion = fieldContext.GetArgument("expectedVersion", EtagVersion.Any);
 
-                    throw;
-                }
-                catch (DomainException ex)
-                {
-                    fieldContext.Errors.Add(new ExecutionError(ex.Message));
+                var commandContext = await context.CommandBus.PublishAsync(contentCommand);
 
-                    throw;
-                }
+                return commandContext.PlainResult!;
             });
+        }
+
+        private static void CheckPermission(string permissionId, GraphQLExecutionContext context, NamedId<DomainId> schemaId)
+        {
+            var requestContext = context.Context;
+            var requestPermission = Permissions.ForApp(permissionId, requestContext.App.Name, schemaId.Name);
+
+            if (!requestContext.Permissions.Allows(requestPermission))
+            {
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+            }
         }
     }
 }
