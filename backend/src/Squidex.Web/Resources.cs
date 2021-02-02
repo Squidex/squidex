@@ -175,8 +175,6 @@ namespace Squidex.Web
 
         public ApiController Controller { get; }
 
-        public PermissionSet Permissions => Context.Permissions;
-
         public Context Context { get; set; }
 
         public Resources(ApiController controller)
@@ -200,7 +198,7 @@ namespace Squidex.Web
 
         public bool Includes(Permission permission, PermissionSet? additional = null)
         {
-            return Permissions.Includes(permission) || additional?.Includes(permission) == true;
+            return Context.Permissions.Includes(permission) || additional?.Includes(permission) == true;
         }
 
         public bool IsAllowedForSchema(string id, string schema)
@@ -232,7 +230,7 @@ namespace Squidex.Web
 
             var permission = P.ForApp(id, app, schema);
 
-            return Permissions.Allows(permission) || additional?.Allows(permission) == true;
+            return Context.Permissions.Allows(permission) || additional?.Allows(permission) == true;
         }
 
         private string? GetAppName()

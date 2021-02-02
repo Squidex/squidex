@@ -65,6 +65,11 @@ namespace Squidex.Domain.Apps.Entities
             return new Context(claimsPrincipal);
         }
 
+        public bool Allows(string permissionId, string schema = Permission.Any)
+        {
+            return Permissions.Allows(permissionId, App.Name, schema);
+        }
+
         public Context Clone()
         {
             var clone = new Context(User, App);

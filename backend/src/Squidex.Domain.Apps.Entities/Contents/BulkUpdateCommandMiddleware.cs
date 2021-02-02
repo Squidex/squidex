@@ -262,9 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 command.SchemaId = schema.NamedId();
             }
 
-            var permission = Permissions.ForApp(permissionId, command.AppId.Name, command.SchemaId.Name);
-
-            if (!task.Context.Permissions.Allows(permission))
+            if (!task.Context.Allows(permissionId, command.SchemaId.Name))
             {
                 throw new DomainForbiddenException("Forbidden");
             }

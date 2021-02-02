@@ -57,9 +57,7 @@ namespace Squidex.Web
                             schema = Permission.Any;
                         }
 
-                        var permission = Permissions.ForApp(id, app, schema);
-
-                        if (permissions.Allows(permission))
+                        if (permissions.Allows(id, app, schema))
                         {
                             hasPermission = true;
                             break;

@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
-using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
@@ -430,10 +429,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static void CheckPermission(string permissionId, GraphQLExecutionContext context, NamedId<DomainId> schemaId)
         {
-            var requestContext = context.Context;
-            var requestPermission = Permissions.ForApp(permissionId, requestContext.App.Name, schemaId.Name);
-
-            if (!requestContext.Permissions.Allows(requestPermission))
+            if (!context.Context.Allows(permissionId, schemaId.Name))
             {
                 throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }

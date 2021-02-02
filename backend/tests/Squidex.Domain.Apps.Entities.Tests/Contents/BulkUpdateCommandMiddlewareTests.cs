@@ -12,6 +12,7 @@ using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
@@ -486,7 +487,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
 
-            var requestContext = new Context(claimsPrincipal);
+            var requestContext = new Context(claimsPrincipal, Mocks.App(appId));
 
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);

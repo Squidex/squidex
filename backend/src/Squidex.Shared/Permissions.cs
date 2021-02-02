@@ -174,18 +174,18 @@ namespace Squidex.Shared
             }
         }
 
+        public static bool Allows(this PermissionSet permissions, string id, string app = Permission.Any, string schema = Permission.Any)
+        {
+            var permission = ForApp(id, app, schema);
+
+            return permissions.Allows(permission);
+        }
+
         public static Permission ForApp(string id, string app = Permission.Any, string schema = Permission.Any)
         {
             Guard.NotNull(id, nameof(id));
 
             return new Permission(id.Replace("{app}", app ?? Permission.Any).Replace("{name}", schema ?? Permission.Any));
-        }
-
-        public static PermissionSet ToAppPermissions(this PermissionSet permissions, string app)
-        {
-            var matching = permissions.Where(x => x.StartsWith($"squidex.apps.{app}"));
-
-            return new PermissionSet(matching);
         }
 
         public static string[] ToAppNames(this PermissionSet permissions)

@@ -22,6 +22,11 @@ namespace Squidex.Shared.Identity
             return new PermissionSet(user.GetClaims(SquidexClaimTypes.Permissions).Select(x => new Permission(x.Value)));
         }
 
+        public static bool Allows(this ClaimsPrincipal user, string id, string app = Permission.Any, string schema = Permission.Any)
+        {
+            return user.Claims.Permissions().Allows(id, app, schema);
+        }
+
         public static bool IsHidden(this IEnumerable<Claim> user)
         {
             return user.HasClaimValue(SquidexClaimTypes.Hidden, "true");

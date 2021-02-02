@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using GraphQL;
 using GraphQL.NewtonsoftJson;
-using GraphQL.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime;

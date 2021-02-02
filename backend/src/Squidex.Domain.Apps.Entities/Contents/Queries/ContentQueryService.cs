@@ -216,9 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private static bool HasPermission(Context context, ISchemaEntity schema, string permissionId)
         {
-            var permission = Permissions.ForApp(permissionId, context.App.Name, schema.SchemaDef.Name);
-
-            return context.Permissions.Allows(permission);
+            return context.Permissions.Allows(permissionId, context.App.Name, schema.SchemaDef.Name);
         }
 
         private Task<IContentEntity?> FindCoreAsync(Context context, DomainId id, ISchemaEntity schema)

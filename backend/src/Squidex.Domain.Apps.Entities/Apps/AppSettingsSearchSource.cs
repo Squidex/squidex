@@ -36,9 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             {
                 if (result.Count < MaxItems && term.Contains(query, StringComparison.OrdinalIgnoreCase))
                 {
-                    var permission = Permissions.ForApp(permissionId, appId.Name);
-
-                    if (context.Permissions.Allows(permission))
+                    if (context.Allows(permissionId))
                     {
                         var url = generate(appId);
 

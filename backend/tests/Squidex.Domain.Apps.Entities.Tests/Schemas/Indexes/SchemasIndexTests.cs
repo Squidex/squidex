@@ -247,7 +247,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var (_, schemaGrain) = SetupSchema();
 
-            var command = new UpdateSchema { SchemaId = schemaId };
+            var command = new UpdateSchema { SchemaId = schemaId, AppId = appId };
 
             var context =
                 new CommandContext(command, commandBus)
@@ -262,13 +262,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_update_index_with_result_when_schema_is_updated()
         {
-            var (_, schemaGrain) = SetupSchema();
+            var (schema, schemaGrain) = SetupSchema();
 
-            var command = new UpdateSchema { SchemaId = schemaId };
+            var command = new UpdateSchema { SchemaId = schemaId, AppId = appId };
 
             var context =
                 new CommandContext(command, commandBus)
-                    .Complete(schemaGrain);
+                    .Complete(schema);
 
             await sut.HandleAsync(context);
 
