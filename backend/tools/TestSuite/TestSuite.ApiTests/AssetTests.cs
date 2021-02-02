@@ -78,10 +78,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Create big asset
-            var ex = await Assert.ThrowsAsync<HttpRequestException>(() => _.UploadFileAsync(10_000_000));
+            var ex = await Assert.ThrowsAnyAsync<Exception>(() => _.UploadFileAsync(10_000_000));
 
             // Client library cannot catch this exception properly.
-            Assert.Null(ex.StatusCode);
+            Assert.True(ex is HttpRequestException || ex is SquidexManagementException);
         }
 
         [Fact]
