@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.DataLoader;
-using GraphQL.Utilities;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
@@ -27,37 +25,53 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
         private static readonly List<IEnrichedContentEntity> EmptyContents = new List<IEnrichedContentEntity>();
         private readonly IDataLoaderContextAccessor dataLoaderContextAccessor;
-        private readonly IServiceProvider resolver;
+        private readonly DataLoaderDocumentListener dataLoaderDocumentListener;
+        private readonly IUrlGenerator urlGenerator;
+        private readonly ISemanticLog log;
+        private readonly ICommandBus commandBus;
+        private Context context;
 
-        public IUrlGenerator UrlGenerator { get; }
-
-        public ICommandBus CommandBus { get; }
-
-        public ISemanticLog Log { get; }
-
-        public GraphQLExecutionContext(Context context, IServiceProvider resolver)
-            : base(context
-                    .WithoutCleanup()
-                    .WithoutContentEnrichment(),
-                resolver.GetRequiredService<IAssetQueryService>(),
-                resolver.GetRequiredService<IContentQueryService>())
+        public IUrlGenerator UrlGenerator
         {
-            UrlGenerator = resolver.GetRequiredService<IUrlGenerator>();
+            get { return urlGenerator; }
+        }
 
-            CommandBus = resolver.GetRequiredService<ICommandBus>();
+        public ICommandBus CommandBus
+        {
+            get { return commandBus; }
+        }
 
-            Log = resolver.GetRequiredService<ISemanticLog>();
+        public ISemanticLog Log
+        {
+            get { return log; }
+        }
 
-            dataLoaderContextAccessor = resolver.GetRequiredService<IDataLoaderContextAccessor>();
+        public override Context Context
+        {
+            get { return context; }
+        }
 
-            this.resolver = resolver;
+        public GraphQLExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery,
+            IDataLoaderContextAccessor dataLoaderContextAccessor, DataLoaderDocumentListener dataLoaderDocumentListener, ICommandBus commandBus, IUrlGenerator urlGenerator, ISemanticLog log)
+            : base(assetQuery, contentQuery)
+        {
+            this.commandBus = commandBus;
+            this.dataLoaderContextAccessor = dataLoaderContextAccessor;
+            this.dataLoaderDocumentListener = dataLoaderDocumentListener;
+            this.urlGenerator = urlGenerator;
+            this.log = log;
+        }
+
+        public GraphQLExecutionContext WithContext(Context newContext)
+        {
+            context = newContext.WithoutCleanup().WithoutContentEnrichment();
+
+            return this;
         }
 
         public void Setup(ExecutionOptions execution)
         {
-            var loader = resolver.GetRequiredService<DataLoaderDocumentListener>();
-
-            execution.Listeners.Add(loader);
+            execution.Listeners.Add(dataLoaderDocumentListener);
             execution.UserContext = this;
         }
 

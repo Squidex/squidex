@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
         private readonly IMongoDatabase mongoDatabase;
 
-        public IContentRepository ContentRepository { get; }
+        public MongoContentRepository ContentRepository { get; }
 
         public NamedId<DomainId>[] AppIds { get; } =
         {

@@ -63,7 +63,7 @@
     <PackageReference Include="Squidex.Assets.FTP" Version="1.3.0" />
     <PackageReference Include="Squidex.Assets.Mongo" Version="1.3.0" />
     <PackageReference Include="Squidex.Assets.S3" Version="1.3.0" />
-    <PackageReference Include="Squidex.Caching.Orleans" Version="1.3.0" />
+    <PackageReference Include="Squidex.Caching.Orleans" Version="1.5.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="6.8.0" />
     <PackageReference Include="Squidex.Hosting" Version="1.8.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
