@@ -223,7 +223,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 if (context.IsCompleted && context.Command is AppCommand appCommand)
                 {
-                    var app = await GetAppCoreAsync(appCommand.AggregateId);
+                    var app = context.PlainResult as IAppEntity;
+
+                    if (app == null)
+                    {
+                        app = await GetAppCoreAsync(appCommand.AggregateId);
+                    }
 
                     if (app != null)
                     {

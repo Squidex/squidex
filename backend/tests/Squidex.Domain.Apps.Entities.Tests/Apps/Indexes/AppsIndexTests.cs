@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_all_apps_from_user_permissions()
         {
-            var expected = SetupApp();
+            var (expected, _) = SetupApp();
 
             A.CallTo(() => indexByName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new[] { appId.Name })))
                 .Returns(new List<DomainId> { appId.Id });
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_all_apps_from_user()
         {
-            var expected = SetupApp();
+            var (expected, _) = SetupApp();
 
             A.CallTo(() => indexByUser.GetIdsAsync())
                 .Returns(new List<DomainId> { appId.Id });
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_combined_apps()
         {
-            var expected = SetupApp();
+            var (expected, _) = SetupApp();
 
             A.CallTo(() => indexByName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new[] { appId.Name })))
                 .Returns(new List<DomainId> { appId.Id });
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_all_apps()
         {
-            var expected = SetupApp();
+            var (expected, _) = SetupApp();
 
             A.CallTo(() => indexByName.GetIdsAsync())
                 .Returns(new List<DomainId> { appId.Id });
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_app_by_name()
         {
-            var expected = SetupApp();
+            var (expected, _) = SetupApp();
 
             A.CallTo(() => indexByName.GetIdAsync(appId.Name))
                 .Returns(appId.Id);
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_app_by_name_and_id_if_cached_before()
         {
-            var expected = SetupApp();
+            var (expected, _) = SetupApp();
 
             A.CallTo(() => indexByName.GetIdAsync(appId.Name))
                 .Returns(appId.Id);
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_app_by_id()
         {
-            var expected = SetupApp();
+            var (expected, _) = SetupApp();
 
             var actual1 = await sut.GetAppAsync(appId.Id, false);
             var actual2 = await sut.GetAppAsync(appId.Id, false);
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_app_by_id_and_name_if_cached_before()
         {
-            var expected = SetupApp();
+            var (expected, _) = SetupApp();
 
             var actual1 = await sut.GetAppAsync(appId.Id, true);
             var actual2 = await sut.GetAppAsync(appId.Id, true);
@@ -328,6 +328,40 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
+        public async Task Should_update_index_when_app_is_updated()
+        {
+            var (_, appGrain) = SetupApp();
+
+            var command = new UpdateApp { AppId = appId };
+
+            var context =
+                new CommandContext(command, commandBus)
+                    .Complete();
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => appGrain.GetStateAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_update_index_with_result_when_app_is_updated()
+        {
+            var (app, appGrain) = SetupApp();
+
+            var command = new UpdateApp { AppId = appId };
+
+            var context =
+                new CommandContext(command, commandBus)
+                    .Complete(app);
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => appGrain.GetStateAsync())
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_remove_from_user_index_on_remove_of_contributor()
         {
             SetupApp();
@@ -424,7 +458,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .MustHaveHappened();
         }
 
-        private IAppEntity SetupApp(long version = 0)
+        private (IAppEntity, IAppGrain) SetupApp(long version = 0)
         {
             var appEntity = A.Fake<IAppEntity>();
 
@@ -445,7 +479,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => grainFactory.GetGrain<IAppGrain>(appId.Id.ToString(), null))
                 .Returns(appGrain);
 
-            return appEntity;
+            return (appEntity, appGrain);
         }
 
         private CreateApp Create(string name)

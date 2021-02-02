@@ -86,7 +86,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/graphql/")]
-        [ApiPermissionOrAnonymous(Permissions.AppContents)]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLPostDto query)
         {
@@ -118,7 +118,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/graphql/batch")]
-        [ApiPermissionOrAnonymous(Permissions.AppContents)]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLPostDto[] batch)
         {

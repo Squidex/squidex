@@ -155,7 +155,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (context.IsCompleted && context.Command is SchemaCommand schemaCommand)
                 {
-                    var schema = await GetSchemaCoreAsync(schemaCommand.AggregateId);
+                    var schema = context.PlainResult as ISchemaEntity;
+
+                    if (schema == null)
+                    {
+                        schema = await GetSchemaCoreAsync(schemaCommand.AggregateId);
+                    }
 
                     if (schema != null)
                     {

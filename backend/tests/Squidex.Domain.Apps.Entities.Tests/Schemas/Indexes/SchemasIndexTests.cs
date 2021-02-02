@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_resolve_schema_by_name()
         {
-            var expected = SetupSchema();
+            var (expected, _) = SetupSchema();
 
             A.CallTo(() => index.GetIdAsync(schemaId.Name))
                 .Returns(schemaId.Id);
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_resolve_schema_by_name_and_id_if_cached_before()
         {
-            var expected = SetupSchema();
+            var (expected, _) = SetupSchema();
 
             A.CallTo(() => index.GetIdAsync(schemaId.Name))
                 .Returns(schemaId.Id);
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_resolve_schema_by_id()
         {
-            var expected = SetupSchema();
+            var (expected, _) = SetupSchema();
 
             var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, false);
             var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, false);
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_resolve_schema_by_id_and_name_if_cached_before()
         {
-            var expected = SetupSchema();
+            var (expected, _) = SetupSchema();
 
             var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
             var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_resolve_schemas_by_id()
         {
-            var schema = SetupSchema();
+            var (schema, _) = SetupSchema();
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<DomainId> { schema.Id });
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_return_empty_schemas_if_schema_not_created()
         {
-            var schema = SetupSchema(EtagVersion.NotFound);
+            var (schema, _) = SetupSchema(EtagVersion.NotFound);
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<DomainId> { schema.Id });
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_return_schema_if_deleted()
         {
-            var schema = SetupSchema(0, true);
+            var (schema, _) = SetupSchema(0, true);
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<DomainId> { schema.Id });
@@ -243,9 +243,43 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
+        public async Task Should_update_index_when_schema_is_updated()
+        {
+            var (_, schemaGrain) = SetupSchema();
+
+            var command = new UpdateSchema { SchemaId = schemaId };
+
+            var context =
+                new CommandContext(command, commandBus)
+                    .Complete();
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => schemaGrain.GetStateAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_update_index_with_result_when_schema_is_updated()
+        {
+            var (_, schemaGrain) = SetupSchema();
+
+            var command = new UpdateSchema { SchemaId = schemaId };
+
+            var context =
+                new CommandContext(command, commandBus)
+                    .Complete(schemaGrain);
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => schemaGrain.GetStateAsync())
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_remove_schema_from_index_on_delete_when_existed_before()
         {
-            var schema = SetupSchema();
+            var (schema, _) = SetupSchema();
 
             var command = new DeleteSchema { SchemaId = schemaId, AppId = appId };
 
@@ -275,7 +309,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return new CreateSchema { SchemaId = schemaId.Id, Name = name, AppId = appId };
         }
 
-        private ISchemaEntity SetupSchema(long version = 0, bool isDeleted = false)
+        private (ISchemaEntity, ISchemaGrain) SetupSchema(long version = 0, bool isDeleted = false)
         {
             var schemaEntity = A.Fake<ISchemaEntity>();
 
@@ -300,7 +334,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(key, null))
                 .Returns(schemaGrain);
 
-            return schemaEntity;
+            return (schemaEntity, schemaGrain);
         }
     }
 }
