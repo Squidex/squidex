@@ -95,16 +95,16 @@
     <value>Il campo è {0} obbligatorio.</value>
   </data>
   <data name="annotations_StringLength" xml:space="preserve">
-    <value>The field {name|lower} must be a string with a maximum length of {max}.</value>
+    <value>Il campo {name|lower} deve essere una stringa avente una lunghezza massima di {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLength" xml:space="preserve">
-    <value>The field {0} must be a string with a maximum length of {1}.</value>
+    <value>Il campo {0} deve essere una stringa avente una lunghezza massima di {1}.</value>
   </data>
   <data name="annotations_StringLengthMinimum" xml:space="preserve">
-    <value>The field {name|lower} must be a string with a minimum length of {min} and a maximum length of {max}.</value>
+    <value>Il campo {name|lower} deve essere una stringa avente lunghezza minima di {min} e massima di {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
-    <value>The field {0} must be a string with a minimum length of {1} and a maximum length of {2}.</value>
+    <value>Il campo {0} deve essere una stringa avente lunghezza minima di {1} e massima di {2}.</value>
   </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
     <value>Un client con lo stesso id esiste già.</value>
@@ -221,7 +221,7 @@
     <value>ID o Email del collaboratore</value>
   </data>
   <data name="common.critical" xml:space="preserve">
-    <value>Critial</value>
+    <value>Critico</value>
   </data>
   <data name="common.data" xml:space="preserve">
     <value>Data</value>
@@ -428,7 +428,7 @@
     <value>Iscriviti</value>
   </data>
   <data name="common.success" xml:space="preserve">
-    <value>Success</value>
+    <value>Successo</value>
   </data>
   <data name="common.text" xml:space="preserve">
     <value>Testo</value>
@@ -605,7 +605,7 @@
     <value>Deve seguire il pattern.</value>
   </data>
   <data name="contents.validation.reference" xml:space="preserve">
-    <value>Geolocation can only have latitude and longitude property.</value>
+    <value>La Geolocalizzazione può avere come campi solamente come latidutine e longitudine.</value>
   </data>
   <data name="contents.validation.referenceNotFound" xml:space="preserve">
     <value>Contiene un collegamento '{id}' non valido.</value>
@@ -614,7 +614,7 @@
     <value>Contiene dei collegamenti '{id}' ad uno schema errato.</value>
   </data>
   <data name="contents.validation.regexTooSlow" xml:space="preserve">
-    <value>La Regex è troppo lenta.</value>
+    <value>La regular expression è troppo lenta.</value>
   </data>
   <data name="contents.validation.required" xml:space="preserve">
     <value>Il campo è obbligatorio.</value>
@@ -662,7 +662,7 @@
     <value>La Password devono contenere almeno un numero ('0'-'9').</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresLower" xml:space="preserve">
-    <value>La passowrd deve avere almeno una lettera minuscola ('a'-'z').</value>
+    <value>La password deve avere almeno una lettera minuscola ('a'-'z').</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
     <value>La passowrd deve avere almeno un carattere non alfanumerico.</value>
@@ -698,7 +698,7 @@
     <value>L'entità ({id}) non esiste.</value>
   </data>
   <data name="exceptions.domainObjectVersion" xml:space="preserve">
-    <value>L'entità ({id}) requested version {expectedVersion}, but found {currentVersion}.</value>
+    <value>L'entità ({id}) richiede la versione {expectedVersion}, ma è stata trovata {currentVersion}.</value>
   </data>
   <data name="history.apps.clientAdded" xml:space="preserve">
     <value>aggiunto client {[Id]} all'app</value>
@@ -746,10 +746,10 @@
     <value>ha aggiunto il ruolo {[Name]}</value>
   </data>
   <data name="history.apps.roleDeleted" xml:space="preserve">
-    <value>ha eliminato role {[Name]}</value>
+    <value>ha eliminato il ruolo {[Name]}</value>
   </data>
   <data name="history.apps.roleUpdated" xml:space="preserve">
-    <value>ha aggiornato role {[Name]}</value>
+    <value>ha aggiornato il ruolo {[Name]}</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
     <value>ha sostituito la risorsa.</value>
@@ -881,7 +881,7 @@
     <value>I Radio button e dropdown menu hanno bisogno che siano definiti dei valori.</value>
   </data>
   <data name="schemas.tags.editorNeedsAllowedValues" xml:space="preserve">
-    <value>Checkboxes e dropdown menu hanno bisogno che siano definiti dei valori.</value>
+    <value>Checkbox e dropdown menu hanno bisogno che siano definiti dei valori.</value>
   </data>
   <data name="schemas.uiFieldCannotBeDisabled" xml:space="preserve">
     <value>Il campo UI non può essere disabilitato.</value>
@@ -908,70 +908,70 @@
     <value>Questa password risulta essere stata compromessa e non dovrebbe essere mai utilizzata. Se l'hai utilizzata in precedenza, cambiala!</value>
   </data>
   <data name="setup.createUser.button" xml:space="preserve">
-    <value>Create User</value>
+    <value>Nuovo utente</value>
   </data>
   <data name="setup.createUser.confirmPassword" xml:space="preserve">
-    <value>Confirm</value>
+    <value>Conferma password</value>
   </data>
   <data name="setup.createUser.failure" xml:space="preserve">
-    <value>Neither password authentication nor an external authentication provider such as Google is configured. Please check your settings and logs.</value>
+    <value>Non è stata configurata la password di autenticazione e nessun provider esterno di autenticazione come Google è stato configurato. Verifica per favore le tue impostazioni e i log.</value>
   </data>
   <data name="setup.createUser.headline" xml:space="preserve">
-    <value>Admin User</value>
+    <value>Utente Amministratore</value>
   </data>
   <data name="setup.createUser.headlineCreate" xml:space="preserve">
     <value>Create Admin User</value>
   </data>
   <data name="setup.createUser.loginHint" xml:space="preserve">
-    <value>You have configured at least one external authentication provider such as Google. Just go to the login page and login to become administrator.</value>
+    <value>Hai configurato almeno un provider di autenticazione esterno come Google. Basta andare alla pagina di accesso e accedere per diventare amministratore.</value>
   </data>
   <data name="setup.createUser.loginLink" xml:space="preserve">
-    <value>Go to Login Page.</value>
+    <value>Vai alla pagina di Login.</value>
   </data>
   <data name="setup.createUser.separator" xml:space="preserve">
-    <value>OR</value>
+    <value>O</value>
   </data>
   <data name="setup.headline" xml:space="preserve">
-    <value>Installation</value>
+    <value>Installazione</value>
   </data>
   <data name="setup.hint" xml:space="preserve">
-    <value>You are seeing this screen because no user exists yet. After a user is created, you are not able to use this screen again.</value>
+    <value>Vedi questa schermata perché non esiste ancora alcun utente. Dopo aver creato un utente, non sarà più possibile visualizzare questa schermata.</value>
   </data>
   <data name="setup.madeBy" xml:space="preserve">
-    <value>Proudly made by</value>
+    <value>Orgogliosamente realizzato da</value>
   </data>
   <data name="setup.madeByCopyright" xml:space="preserve">
-    <value>Sebastian Stehle and Contributors, 2016-2021</value>
+    <value>Sebastian Stehle e Collaboratori, 2016-2021</value>
   </data>
   <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
-    <value>With your setup, only admins can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=false&lt;/code&gt; as environment variable.</value>
+    <value>Con questa impostazione solamente gli amministratori possono creare nuove app. Se volessi cambiare questa impostazione utilizza &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=false&lt;/code&gt; come variabile d'ambiente.</value>
   </data>
   <data name="setup.ruleAppCreation.warningAll" xml:space="preserve">
-    <value>With your setup, every user can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=true&lt;/code&gt; as environment variable.</value>
+    <value>Con questa impostazione, ogni utente può creare nuove app. Se volessi cambiare questa impostazione utilizza &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=true&lt;/code&gt; come variabile d'ambiente.</value>
   </data>
   <data name="setup.ruleFolder.warning" xml:space="preserve">
-    <value>You are using the &lt;strong&gt;folder asset store&lt;/strong&gt; where all assets are stored in the file system. Please remember to include the asset folder into your backup strategy and map it to a volume, if you are using Docker.</value>
+    <value>Stai usando &lt;strong&gt;la cartella delle risorse&lt;/strong&gt; dove tutte le risorse sono salvate all'interno del file system. Ricordati per favore di includere la cartella delle risorse all'interno della gestione dei backup e mappalo in un volume, se stai usando Docker.</value>
   </data>
   <data name="setup.ruleFtp.warning" xml:space="preserve">
-    <value>You are using the &lt;strong&gt;FTP asset store&lt;/strong&gt;. It is not recommended to use this storage type because of bad performance.</value>
+    <value>Stai usando &lt;strong&gt;FTP per salvare le risorse&lt;/strong&gt;. Questa impostazione non è consigliata in quanto l'utilizzo di questo tipo di storage peggiora le performance.</value>
   </data>
   <data name="setup.ruleHttps.failure" xml:space="preserve">
-    <value> You are not accessing the site over https. If this warning is not correct then Squidex cannot detect https mode, because your instance is behind a reverse proxy such as nginx. Ensure that http headers are forwarded properly, via the &lt;code&gt;X-Forwarded-*&lt;/code&gt; headers.</value>
+    <value>Non stai accedendo al sito tramite https. Se questo avviso non è corretto, Squidex non può rilevare la modalità https, perché la tua istanza è dietro un reverse proxy come nginx. Assicurati che gli header http vengano inoltrati correttamente, tramite &lt;code&gt;X-Forwarded-*&lt;/code&gt;.</value>
   </data>
   <data name="setup.ruleHttps.success" xml:space="preserve">
     <value>Congratulations, you are accessing your Squidex installation over a secure connection (https).</value>
   </data>
   <data name="setup.rules.headline" xml:space="preserve">
-    <value>System Checklist</value>
+    <value>Checklist di Sistema</value>
   </data>
   <data name="setup.ruleUrl.failure" xml:space="preserve">
-    <value>You should access Squidex only over one one canonical URL and configure this URL over the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;.</value>
+    <value>Dovresti accedere a Squidex solo con un URL canonico e configurare questo URL sulla variabile d'ambiente &lt;code&gt; URLS__BASEURL &lt;/code&gt;. Il base URL corrente &lt;code&gt; {actual} &lt;/code&gt; non corrisponde al base URL &lt;code&gt;{configured}&lt;/code&gt;.</value>
   </data>
   <data name="setup.ruleUrl.success" xml:space="preserve">
-    <value>Congratulations the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable is configured properly.</value>
+    <value>Congratulazioni la variabile d'ambiente &lt;code&gt;URLS__BASEURL&lt;/code&gt;  è stata configurata correttamente.</value>
   </data>
   <data name="setup.title" xml:space="preserve">
-    <value>Installation</value>
+    <value>Installazione</value>
   </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>Questa operazione non è consentita, il tuo account potrebbe essere bloccato.</value>
@@ -1010,7 +1010,7 @@
     <value>Acconsento</value>
   </data>
   <data name="users.deleteYourselfError" xml:space="preserve">
-    <value>You cannot delete yourself.</value>
+    <value>Non puoi cancellare te stesso.</value>
   </data>
   <data name="users.error.headline" xml:space="preserve">
     <value>Operazione non riuscita</value>
