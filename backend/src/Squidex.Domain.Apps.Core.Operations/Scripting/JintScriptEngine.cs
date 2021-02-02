@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 {
                     var context = CreateEngine(vars, options, tcs.TrySetException, true, cts.Token);
 
-                    context.Engine.SetValue("complete", new Action<JsValue?>(value =>
+                    context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
                     {
                         tcs.TrySetResult(vars.Data!);
                     }));
@@ -135,12 +135,12 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         private ExecutionContext CreateEngine(ScriptVars vars, ScriptOptions options, ExceptionHandler? exceptionHandler = null, bool async = false, CancellationToken ct = default)
         {
-            var engine = new Engine(options =>
+            var engine = new Engine(engineOptions =>
             {
-                options.AddObjectConverter(DefaultConverter.Instance);
-                options.SetReferencesResolver(NullPropagation.Instance);
-                options.Strict();
-                options.TimeoutInterval(TimeoutScript);
+                engineOptions.AddObjectConverter(DefaultConverter.Instance);
+                engineOptions.SetReferencesResolver(NullPropagation.Instance);
+                engineOptions.Strict();
+                engineOptions.TimeoutInterval(TimeoutScript);
             });
 
             if (options.CanDisallow)

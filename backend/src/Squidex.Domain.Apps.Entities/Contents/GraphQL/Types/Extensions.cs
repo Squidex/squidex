@@ -10,7 +10,7 @@ using System.Linq;
 using GraphQL;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.ObjectPool;
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         }
                     }
 
-                    if (type is IObjectGraphType objectGraphType && objectGraphType.ResolvedInterfaces != null)
+                    if (type is IObjectGraphType { ResolvedInterfaces: { } } objectGraphType)
                     {
                         foreach (var @interface in objectGraphType.ResolvedInterfaces)
                         {
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         }
                     }
 
-                    if (type is IAbstractGraphType abstractGraphType && abstractGraphType.PossibleTypes != null)
+                    if (type is IAbstractGraphType { PossibleTypes: { } } abstractGraphType)
                     {
                         foreach (var possibleType in abstractGraphType.PossibleTypes)
                         {

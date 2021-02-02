@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         {
             switch (value)
             {
-                case JsonNull _:
+                case JsonNull:
                     writer.WriteNull();
                     break;
                 case JsonBoolean s:

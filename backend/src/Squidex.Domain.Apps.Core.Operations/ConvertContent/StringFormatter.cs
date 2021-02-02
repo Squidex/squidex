@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(BooleanFieldProperties properties, Args args)
         {
-            if (args.Value is JsonBoolean boolean && boolean.Value)
+            if (args.Value is JsonBoolean { Value: true })
             {
                 return "Yes";
             }

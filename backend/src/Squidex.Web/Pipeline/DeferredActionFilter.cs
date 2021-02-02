@@ -17,7 +17,7 @@ namespace Squidex.Web.Pipeline
         {
             var resultContext = await next();
 
-            if (resultContext.Result is ObjectResult objectResult && objectResult.Value is Deferred deferred)
+            if (resultContext.Result is ObjectResult { Value: Deferred deferred } objectResult)
             {
                 objectResult.Value = await deferred.Value;
             }

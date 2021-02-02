@@ -7,9 +7,8 @@
 
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class FieldInputVisitor : IFieldVisitor<IGraphType?, FieldInfo>
     {

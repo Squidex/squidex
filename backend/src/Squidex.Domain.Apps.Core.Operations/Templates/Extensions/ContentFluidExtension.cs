@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
             FluidValue.SetTypeMapping<JsonString>(x => FluidValue.Create(x.Value));
             FluidValue.SetTypeMapping<JsonBoolean>(x => FluidValue.Create(x.Value));
             FluidValue.SetTypeMapping<JsonNumber>(x => FluidValue.Create(x.Value));
-            FluidValue.SetTypeMapping<JsonNull>(x => FluidValue.Create(null));
+            FluidValue.SetTypeMapping<JsonNull>(_ => FluidValue.Create(null));
 
             memberAccessStrategy.Register<ContentData, object?>(
                 (value, name) => value.GetOrDefault(name));

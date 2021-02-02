@@ -43,14 +43,16 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
             return new Roles(json.ToDictionary(x => x.Key, x =>
             {
+                var (key, value) = x;
+
                 var permissions = PermissionSet.Empty;
 
-                if (x.Value.Permissions.Length > 0)
+                if (value.Permissions.Length > 0)
                 {
-                    permissions = new PermissionSet(x.Value.Permissions);
+                    permissions = new PermissionSet(value.Permissions);
                 }
 
-                return new Role(x.Key, permissions, x.Value.Properties);
+                return new Role(key, permissions, value.Properties);
             }));
         }
     }

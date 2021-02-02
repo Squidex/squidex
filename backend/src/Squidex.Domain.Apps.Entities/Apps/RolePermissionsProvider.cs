@@ -12,8 +12,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
-#pragma warning disable IDE0028 // Simplify collection initialization
-
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class RolePermissionsProvider
@@ -65,9 +63,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var schemas = await appProvider.GetSchemasAsync(app.Id);
 
-            var schemaNames = new List<string>();
+            var schemaNames = new List<string>
+            {
+                Permission.Any
+            };
 
-            schemaNames.Add(Permission.Any);
             schemaNames.AddRange(schemas.Select(x => x.SchemaDef.Name));
 
             return schemaNames;

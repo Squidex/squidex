@@ -267,7 +267,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         [Fact]
         public void CanDeleteDraft_should_throw_exception_if_no_draft_found()
         {
-            var schema = CreateSchema(false);
+            CreateSchema(false);
 
             var content = CreateContent(Status.Published);
             var command = CreateCommand(new DeleteContentDraft());

@@ -18,8 +18,6 @@ namespace Squidex.Domain.Apps.Core
 
         string? AssetThumbnail(NamedId<DomainId> appId, string idOrSlug, AssetType assetType);
 
-        string AppSettingsUI(NamedId<DomainId> appId);
-
         string AssetsUI(NamedId<DomainId> appId, string? query = null);
 
         string AssetContent(NamedId<DomainId> appId, string idOrSlug);

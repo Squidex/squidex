@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
@@ -39,8 +38,6 @@ namespace Squidex.Domain.Apps.Core.Apps
         public const string Developer = "Developer";
         public const string Owner = "Owner";
         public const string Reader = "Reader";
-
-        public static readonly ReadOnlyCollection<string> EmptyProperties = new ReadOnlyCollection<string>(new List<string>());
 
         public PermissionSet Permissions { get; }
 

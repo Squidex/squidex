@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             execution.UserContext = this;
         }
 
-        public override async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
+        public async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
         {
             var dataLoader = GetAssetsLoader();
 

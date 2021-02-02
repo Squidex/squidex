@@ -247,8 +247,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     [nameof(IContentEntity.CreatedBy).ToCamelCase()] = SchemaBuilder.StringProperty($"The user that has created the {name} content.", true),
                     [nameof(IContentEntity.LastModified).ToCamelCase()] = SchemaBuilder.DateTimeProperty($"The date and time when the {name} content has been modified last.", true),
                     [nameof(IContentEntity.LastModifiedBy).ToCamelCase()] = SchemaBuilder.StringProperty($"The user that has updated the {name} content last.", true),
-                    [nameof(IContentEntity.NewStatus).ToCamelCase()] = SchemaBuilder.StringProperty($"The new status of the content.", false),
-                    [nameof(IContentEntity.Status).ToCamelCase()] = SchemaBuilder.StringProperty($"The status of the content.", true)
+                    [nameof(IContentEntity.NewStatus).ToCamelCase()] = SchemaBuilder.StringProperty("The new status of the content."),
+                    [nameof(IContentEntity.Status).ToCamelCase()] = SchemaBuilder.StringProperty("The status of the content.", true)
                 },
                 Type = JsonObjectType.Object
             };

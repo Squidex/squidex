@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
             var propertyName = property.AsString();
 
-            valueProperties.GetOrAdd(propertyName, k => new ContentFieldProperty(this)).Value = value;
+            valueProperties.GetOrAdd(propertyName, _ => new ContentFieldProperty(this)).Value = value;
 
             return true;
         }

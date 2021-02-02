@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             switch (@event.Payload)
             {
-                case AssetFolderCreated _:
+                case AssetFolderCreated:
                     assetFolderIds.Add(@event.Headers.AggregateId());
                     break;
                 case AssetCreated assetCreated:

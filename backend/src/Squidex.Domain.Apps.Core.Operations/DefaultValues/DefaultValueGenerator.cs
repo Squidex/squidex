@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
             foreach (var field in schema.Fields)
             {
-                var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
+                var fieldData = data.GetOrCreate(field.Name, _ => new ContentFieldData());
 
                 if (fieldData != null)
                 {

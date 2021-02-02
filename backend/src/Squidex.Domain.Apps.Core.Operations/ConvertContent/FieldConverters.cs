@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
     public static class FieldConverters
     {
-        public static readonly FieldConverter Noop = (data, field) => data;
+        public static readonly FieldConverter Noop = (data, _) => data;
 
         public static readonly FieldConverter ExcludeHidden = (data, field) =>
         {
@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 foreach (var (key, value) in data.ToList())
                 {
-                    IJsonValue? newValue = value;
+                    var newValue = value;
 
                     for (var i = 0; i < converters.Length; i++)
                     {

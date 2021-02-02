@@ -86,10 +86,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             switch (@event.Payload)
             {
-                case ContentCreated _:
+                case ContentCreated:
                     result.Type = EnrichedContentEventType.Created;
                     break;
-                case ContentDeleted _:
+                case ContentDeleted:
                     result.Type = EnrichedContentEventType.Deleted;
                     break;
 
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         break;
                     }
 
-                case ContentUpdated _:
+                case ContentUpdated:
                     {
                         result.Type = EnrichedContentEventType.Updated;
 

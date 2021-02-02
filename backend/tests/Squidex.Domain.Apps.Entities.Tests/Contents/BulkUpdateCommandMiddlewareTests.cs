@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupContext(Permissions.AppContentsUpdateOwn);
 
-            var (_, _, query) = CreateTestData(true);
+            CreateTestData(true);
 
             var command = BulkCommand(BulkUpdateType.ChangeStatus);
 
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var requestContext = SetupContext(Permissions.AppContentsUpdateOwn);
 
-            var (id, data, query) = CreateTestData(true);
+            var (id, _, query) = CreateTestData(true);
 
             A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
                 .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_upsert_content_with_custom_id()
         {
-            var requestContext = SetupContext(Permissions.AppContentsUpsert);
+            SetupContext(Permissions.AppContentsUpsert);
 
             var (id, data, _) = CreateTestData(true);
 
@@ -471,7 +471,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         Id = id,
                         Data = data!,
                         DueTime = dueTime,
-                        Query = query,
+                        Query = query
                     }
                 },
                 SchemaId = schemaId

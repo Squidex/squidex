@@ -111,7 +111,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
                 IsAssetStoreFile = assetStore is FolderAssetStore,
                 IsAssetStoreFtp = assetStore is FTPAssetStore,
                 HasExternalLogin = externalProviders.Any(),
-                HasPasswordAuth = identityOptions.AllowPasswordAuth,
+                HasPasswordAuth = identityOptions.AllowPasswordAuth
             };
 
             if (model != null)

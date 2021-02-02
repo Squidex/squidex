@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var ctx =
                 CreateContext(true, true, Permissions.AppContentsReadOwn);
 
-            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
+            await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
 
             A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<Q>.That.Matches(x => x.CreatedBy!.Equals(ctx.User.Token())), SearchScope.All))
                 .MustHaveHappened();
@@ -236,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var ctx =
                 CreateContext(true, true, Permissions.AppContentsRead);
 
-            var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
+            await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
 
             A.CallTo(() => contentRepository.QueryAsync(ctx.App, schema, A<Q>.That.Matches(x => x.CreatedBy == null), SearchScope.All))
                 .MustHaveHappened();

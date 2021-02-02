@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     return result;
                 }
 
-                if (!(@event.Payload is AppEvent))
+                if (@event.Payload is not AppEvent)
                 {
                     return result;
                 }

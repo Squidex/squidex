@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         break;
 
-                    case JsonArray arr:
+                    case JsonArray:
                         break;
 
                     case JsonObject obj:

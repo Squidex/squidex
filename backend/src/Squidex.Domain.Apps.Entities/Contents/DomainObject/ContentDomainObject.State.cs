@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             break;
                         }
 
-                    case ContentDraftDeleted _:
+                    case ContentDraftDeleted:
                         {
                             NewVersion = null;
 
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             break;
                         }
 
-                    case ContentSchedulingCancelled _:
+                    case ContentSchedulingCancelled:
                         {
                             ScheduleJob = null;
 
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             break;
                         }
 
-                    case ContentDeleted _:
+                    case ContentDeleted:
                         {
                             IsDeleted = true;
 

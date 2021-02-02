@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "top",
-                    Description = $"Optional number of assets to take.",
+                    Description = "Optional number of assets to take.",
                     DefaultValue = null,
                     ResolvedType = AllTypes.Int
                 },

@@ -39,56 +39,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contentQuery.FindAsync(Context, schemaIdOrName, id, version);
         }
 
-        public virtual async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
-        {
-            var asset = cachedAssets.GetOrDefault(id);
-
-            if (asset == null)
-            {
-                await maxRequests.WaitAsync();
-                try
-                {
-                    asset = await assetQuery.FindAsync(Context, id);
-                }
-                finally
-                {
-                    maxRequests.Release();
-                }
-
-                if (asset != null)
-                {
-                    cachedAssets[asset.Id] = asset;
-                }
-            }
-
-            return asset;
-        }
-
-        public virtual async Task<IEnrichedContentEntity?> FindContentAsync(DomainId schemaId, DomainId id)
-        {
-            var content = cachedContents.GetOrDefault(id);
-
-            if (content == null)
-            {
-                await maxRequests.WaitAsync();
-                try
-                {
-                    content = await contentQuery.FindAsync(Context, schemaId.ToString(), id);
-                }
-                finally
-                {
-                    maxRequests.Release();
-                }
-
-                if (content != null)
-                {
-                    cachedContents[content.Id] = content;
-                }
-            }
-
-            return content;
-        }
-
         public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(string odata)
         {
             var q = Q.Empty.WithODataQuery(odata);

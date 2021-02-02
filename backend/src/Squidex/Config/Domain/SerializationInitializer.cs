@@ -12,7 +12,6 @@ using Newtonsoft.Json;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Hosting;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Orleans;

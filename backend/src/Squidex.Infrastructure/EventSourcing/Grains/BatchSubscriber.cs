@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private sealed class Job
         {
-            public StoredEvent? StoredEvent { get; set; }
+            public StoredEvent? StoredEvent { get; init; }
 
             public Exception? Exception { get; set; }
 
@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             public bool ShouldHandle { get; set; }
 
-            public object Sender { get; set; }
+            public object Sender { get; init; }
         }
 
         public BatchSubscriber(

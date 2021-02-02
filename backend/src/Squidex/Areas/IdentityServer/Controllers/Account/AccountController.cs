@@ -18,11 +18,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Domain.Users;
-using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
-using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -32,23 +30,17 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
     public sealed class AccountController : IdentityServerController
     {
         private readonly IUserService userService;
-        private readonly IUrlGenerator urlGenerator;
         private readonly MyIdentityOptions identityOptions;
-        private readonly ISemanticLog log;
         private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
             IUserService userService,
-            IUrlGenerator urlGenerator,
             IOptions<MyIdentityOptions> identityOptions,
-            ISemanticLog log,
             IIdentityServerInteractionService interactions)
         {
             this.identityOptions = identityOptions.Value;
             this.interactions = interactions;
-            this.urlGenerator = urlGenerator;
             this.userService = userService;
-            this.log = log;
         }
 
         [HttpGet]

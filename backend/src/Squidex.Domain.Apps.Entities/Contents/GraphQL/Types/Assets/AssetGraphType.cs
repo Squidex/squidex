@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "tags",
                 ResolvedType = AllTypes.NonNullStrings,
                 Resolver = Resolve(x => x.TagNames),
-                Description = "The asset tags.",
+                Description = "The asset tags."
             });
 
             AddField(new FieldType

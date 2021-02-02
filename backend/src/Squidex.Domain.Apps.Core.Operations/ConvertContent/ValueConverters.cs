@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     {
                         foreach (var (fieldName, nestedValue) in nested.ToList())
                         {
-                            IJsonValue? newValue = nestedValue;
+                            var newValue = nestedValue;
 
                             if (arrayField.FieldsByName.TryGetValue(fieldName, out var nestedField))
                             {

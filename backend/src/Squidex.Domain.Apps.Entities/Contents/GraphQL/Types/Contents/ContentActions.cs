@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "top",
-                    Description = $"Optional number of contents to take.",
+                    Description = "Optional number of contents to take.",
                     DefaultValue = null,
                     ResolvedType = AllTypes.Int
                 },

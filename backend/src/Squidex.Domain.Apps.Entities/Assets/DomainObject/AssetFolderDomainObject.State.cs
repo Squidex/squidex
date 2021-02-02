@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             return true;
                         }
 
-                    case AssetFolderDeleted _:
+                    case AssetFolderDeleted:
                         {
                             IsDeleted = true;
 

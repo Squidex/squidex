@@ -76,7 +76,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/login-add-callback/")]
         public Task<IActionResult> AddLoginCallback()
         {
-            return MakeChangeAsync<None>(u => AddLoginAsync(u),
+            return MakeChangeAsync(u => AddLoginAsync(u),
                 T.Get("users.profile.addLoginDone"), None.Value);
         }
 
@@ -132,7 +132,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/upload-picture/")]
         public Task<IActionResult> UploadPicture(List<IFormFile> file)
         {
-            return MakeChangeAsync<None>(user => UpdatePictureAsync(file, user),
+            return MakeChangeAsync(user => UpdatePictureAsync(file, user),
                 T.Get("users.profile.uploadPictureDone"), None.Value);
         }
 

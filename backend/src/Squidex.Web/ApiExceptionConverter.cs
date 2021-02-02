@@ -85,25 +85,25 @@ namespace Squidex.Web
                 case ValidationException ex:
                     return (CreateError(400, T.Get("common.httpValidationError"), ToErrors(ex.Errors).ToArray()), true);
 
-                case DomainObjectNotFoundException _:
+                case DomainObjectNotFoundException:
                     return (CreateError(404), true);
 
-                case DomainObjectVersionException _:
+                case DomainObjectVersionException:
                     return (CreateError(412, exception.Message), true);
 
-                case DomainObjectConflictException _:
+                case DomainObjectConflictException:
                     return (CreateError(409, exception.Message), true);
 
-                case DomainForbiddenException _:
+                case DomainForbiddenException:
                     return (CreateError(403, exception.Message), true);
 
-                case DomainException _:
+                case DomainException:
                     return (CreateError(400, exception.Message), true);
 
-                case SecurityException _:
+                case SecurityException:
                     return (CreateError(403), false);
 
-                case DecoderFallbackException _:
+                case DecoderFallbackException:
                     return (CreateError(400, exception.Message), true);
 
                 case BadHttpRequestException ex:

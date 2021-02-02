@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 Name = "url",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = ContentResolvers.Url,
-                Description = $"The url to the content."
+                Description = "The url to the content."
             });
 
             var contentDataType = new DataGraphType(builder, schemaInfo);
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     Name = "data",
                     ResolvedType = new NonNullGraphType(contentDataType),
                     Resolver = ContentResolvers.Data,
-                    Description = $"The data of the content."
+                    Description = "The data of the content."
                 });
             }
 
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     Name = "flatData",
                     ResolvedType = new NonNullGraphType(contentDataTypeFlat),
                     Resolver = ContentResolvers.FlatData,
-                    Description = $"The flat data of the content."
+                    Description = "The flat data of the content."
                 });
             }
 

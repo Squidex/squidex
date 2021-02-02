@@ -118,14 +118,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                             break;
                         }
 
-                    case SchemaPublished _:
+                    case SchemaPublished:
                         {
                             SchemaDef = SchemaDef.Publish();
 
                             break;
                         }
 
-                    case SchemaUnpublished _:
+                    case SchemaUnpublished:
                         {
                             SchemaDef = SchemaDef.Unpublish();
 
@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                             break;
                         }
 
-                    case SchemaDeleted _:
+                    case SchemaDeleted:
                         {
                             IsDeleted = true;
 

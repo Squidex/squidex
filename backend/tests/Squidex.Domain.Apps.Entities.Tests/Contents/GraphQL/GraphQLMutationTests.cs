@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 data = new
                 {
-                    createMySchemaContent = (object?)null,
+                    createMySchemaContent = (object?)null
                 },
                 errors = new[]
                 {
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 data = new
                 {
-                    updateMySchemaContent = (object?)null,
+                    updateMySchemaContent = (object?)null
                 },
                 errors = new[]
                 {
@@ -299,7 +299,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 data = new
                 {
-                    upsertMySchemaContent = (object?)null,
+                    upsertMySchemaContent = (object?)null
                 },
                 errors = new[]
                 {
@@ -406,7 +406,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 data = new
                 {
-                    patchMySchemaContent = (object?)null,
+                    patchMySchemaContent = (object?)null
                 },
                 errors = new[]
                 {
@@ -511,7 +511,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 data = new
                 {
-                    changeMySchemaContent = (object?)null,
+                    changeMySchemaContent = (object?)null
                 },
                 errors = new[]
                 {

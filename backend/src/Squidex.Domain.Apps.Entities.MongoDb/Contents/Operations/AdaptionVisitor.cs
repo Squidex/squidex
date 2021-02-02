@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     {
         private static readonly AdaptionVisitor Instance = new AdaptionVisitor();
 
-        public struct Args
+        public readonly struct Args
         {
             public readonly DomainId AppId;
 
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             var result = nodeIn;
 
-            var (path, op, value) = nodeIn;
+            var (path, _, value) = nodeIn;
 
             var clrValue = value.Value;
 

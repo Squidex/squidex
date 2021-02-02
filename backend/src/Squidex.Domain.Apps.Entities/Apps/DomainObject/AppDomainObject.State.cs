@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                             return l;
                         });
 
-                    case AppArchived _:
+                    case AppArchived:
                         {
                             Plan = null;
 

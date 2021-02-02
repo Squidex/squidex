@@ -15,7 +15,7 @@ using Squidex.Text;
 
 #pragma warning disable SA1649 // File name should match first type name
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class SchemaInfo
     {

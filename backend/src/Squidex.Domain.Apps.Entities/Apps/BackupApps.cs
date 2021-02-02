@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AppContributorAssigned appContributorAssigned:
                     context.UserMapping.Backup(appContributorAssigned.ContributorId);
                     break;
-                case AppImageUploaded _:
+                case AppImageUploaded:
                     await WriteAssetAsync(context.AppId, context.Writer);
                     break;
             }
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         break;
                     }
 
-                case AppImageUploaded _:
+                case AppImageUploaded:
                     {
                         await ReadAssetAsync(context.AppId, context.Reader);
 

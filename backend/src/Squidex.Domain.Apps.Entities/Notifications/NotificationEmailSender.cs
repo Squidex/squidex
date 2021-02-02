@@ -26,15 +26,15 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         private sealed class TemplatesVars
         {
-            public IUser User { get; set; }
+            public IUser? User { get; set; }
 
-            public IUser? Assigner { get; set; }
+            public IUser? Assigner { get; init; }
 
-            public string AppName { get; set; }
+            public string AppName { get; init; }
 
-            public long? ApiCalls { get; set; }
+            public long? ApiCalls { get; init; }
 
-            public long? ApiCallsLimit { get; set; }
+            public long? ApiCallsLimit { get; init; }
 
             public string URL { get; set; }
         }

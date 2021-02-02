@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             var foundIds = new List<DomainId>();
 
-            if (value is ICollection<DomainId> assetIds && assetIds.Count > 0)
+            if (value is ICollection<DomainId> { Count: > 0 } assetIds)
             {
                 var assets = await checkAssets(assetIds);
                 var index = 0;

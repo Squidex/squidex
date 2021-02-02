@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                 {
                     if (contentFieldData != null)
                     {
-                        var fieldValue = target.GetOrAdd(key, x => new ContentFieldData());
+                        var fieldValue = target.GetOrAdd(key, _ => new ContentFieldData());
 
                         if (fieldValue != null)
                         {
@@ -89,20 +89,20 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             var target = new ContentData();
 
-            foreach (var fieldValue in ValidValues)
+            foreach (var (fieldName, fieldValue) in ValidValues)
             {
-                if (fieldValue.Value != null)
+                if (fieldValue != null)
                 {
                     var resultValue = new ContentFieldData();
 
-                    foreach (var (key, value) in fieldValue.Value.Where(x => x.Value.Type != JsonValueType.Null))
+                    foreach (var (key, value) in fieldValue.Where(x => x.Value.Type != JsonValueType.Null))
                     {
                         resultValue[key] = value;
                     }
 
                     if (resultValue.Count > 0)
                     {
-                        target[fieldValue.Key] = resultValue;
+                        target[fieldName] = resultValue;
                     }
                 }
             }

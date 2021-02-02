@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly DefaultFieldValueValidatorsFactory Instance = new DefaultFieldValueValidatorsFactory();
 
-        public struct Args
+        public readonly struct Args
         {
             public readonly ValidatorContext Context;
 

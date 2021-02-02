@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
-            if (value != null && value is TValue typedValue)
+            if (value is TValue typedValue)
             {
                 if (min.HasValue && max.HasValue)
                 {

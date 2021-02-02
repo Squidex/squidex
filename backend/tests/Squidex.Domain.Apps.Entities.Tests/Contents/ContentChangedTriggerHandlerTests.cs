@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
@@ -32,7 +31,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public class ContentChangedTriggerHandlerTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly ILocalCache localCache = new AsyncLocalCache();
         private readonly IContentLoader contentLoader = A.Fake<IContentLoader>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");

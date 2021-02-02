@@ -295,7 +295,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                             switch (result)
                             {
-                                case PlanChangedResult _:
+                                case PlanChangedResult:
                                     ChangePlan(c);
                                     break;
                             }

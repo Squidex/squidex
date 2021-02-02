@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 ContentId = id,
                 JobIndex = task.JobIndex,
-                Exception = exception,
+                Exception = exception
             });
         }
 
@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             ContentId = id,
                             JobIndex = task.JobIndex,
-                            Exception = ex,
+                            Exception = ex
                         });
                     }
                 }
@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 task.Results.Add(new BulkUpdateResultItem
                 {
                     JobIndex = task.JobIndex,
-                    Exception = ex,
+                    Exception = ex
                 });
             }
 

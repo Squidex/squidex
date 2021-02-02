@@ -78,7 +78,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_return_401_if_user_is_anonymous()
         {
-            var user = SetupUser(null);
+            SetupUser(null);
 
             var app = CreateApp(appName);
 

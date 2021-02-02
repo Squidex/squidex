@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.Queries
                 Reference = new JsonSchema
                 {
                     Format = GeoJson.Format
-                },
+                }
             };
 
             Schema.Properties["stringArray"] = new JsonSchemaProperty

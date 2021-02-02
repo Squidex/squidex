@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.History
                 FullName = user.Claims.DisplayName(),
                 PreferredLanguage = "en",
                 PreferredTimezone = null,
-                Settings = settings,
+                Settings = settings
             };
 
             if (user.Email.IsEmail())
@@ -149,8 +149,14 @@ namespace Squidex.Domain.Apps.Entities.History
                             };
 
                             publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
-                            publishRequest.Preformatted = new NotificationFormattingDto();
-                            publishRequest.Preformatted.Subject["en"] = comment.Text;
+
+                            publishRequest.Preformatted = new NotificationFormattingDto
+                            {
+                                Subject =
+                                {
+                                    ["en"] = comment.Text
+                                }
+                            };
 
                             if (comment.Url?.IsAbsoluteUri == true)
                             {

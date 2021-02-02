@@ -16,17 +16,6 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ContentReferencesExtensions
     {
-        public static HashSet<DomainId> GetReferencedIds(this ContentData source, Schema schema, int referencesPerField = int.MaxValue)
-        {
-            Guard.NotNull(schema, nameof(schema));
-
-            var result = new HashSet<DomainId>();
-
-            AddReferencedIds(source, schema.Fields, result, referencesPerField);
-
-            return result;
-        }
-
         public static void AddReferencedIds(this ContentData source, Schema schema, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(schema, nameof(schema));
@@ -42,20 +31,6 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             foreach (var field in fields)
             {
                 AddReferencedIds(source, result, referencesPerField, field);
-            }
-        }
-
-        public static void AddReferencedIds(this ContentData source, IField field, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
-        {
-            Guard.NotNull(field, nameof(field));
-            Guard.NotNull(result, nameof(result));
-
-            if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
-            {
-                foreach (var partitionValue in fieldData)
-                {
-                    ReferencesExtractor.Extract(field, partitionValue.Value, result, referencesPerField);
-                }
             }
         }
 

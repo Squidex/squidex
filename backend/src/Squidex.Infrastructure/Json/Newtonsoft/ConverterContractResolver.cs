@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         protected override JsonConverter? ResolveContractConverter(Type objectType)
         {
-            JsonConverter? result = base.ResolveContractConverter(objectType);
+            var result = base.ResolveContractConverter(objectType);
 
             if (result != null)
             {

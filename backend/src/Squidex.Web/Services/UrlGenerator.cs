@@ -42,11 +42,6 @@ namespace Squidex.Web.Services
             return urlGenerator.BuildUrl($"api/assets/{appId.Name}/{idOrSlug}?width=100&mode=Max");
         }
 
-        public string AppSettingsUI(NamedId<DomainId> appId)
-        {
-            return urlGenerator.BuildUrl($"app/{appId.Name}/settings", false);
-        }
-
         public string AssetContentBase()
         {
             return urlGenerator.BuildUrl("api/assets/");
@@ -77,11 +72,6 @@ namespace Squidex.Web.Services
             return urlGenerator.BuildUrl($"app/{appId.Name}/assets", false) + query != null ? $"?query={query}" : string.Empty;
         }
 
-        public string AssetsUI(NamedId<Named> appId, string? query = null)
-        {
-            return urlGenerator.BuildUrl($"app/{appId.Name}/assets?query={query}", false);
-        }
-
         public string BackupsUI(NamedId<DomainId> appId)
         {
             return urlGenerator.BuildUrl($"app/{appId.Name}/settings/backups", false);
@@ -90,11 +80,6 @@ namespace Squidex.Web.Services
         public string ClientsUI(NamedId<DomainId> appId)
         {
             return urlGenerator.BuildUrl($"app/{appId.Name}/settings/clients", false);
-        }
-
-        public string ContentsUI(NamedId<DomainId> appId)
-        {
-            return urlGenerator.BuildUrl($"app/{appId.Name}/content", false);
         }
 
         public string ContentsUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId)

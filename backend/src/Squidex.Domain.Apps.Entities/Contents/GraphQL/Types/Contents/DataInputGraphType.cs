@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     {
                         Name = fieldInfo.FieldName,
                         ResolvedType = fieldGraphType,
-                        Resolver = null,
+                        Resolver = null
                     }).WithSourceName(fieldInfo);
                 }
             }

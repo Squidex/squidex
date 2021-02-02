@@ -42,8 +42,7 @@ namespace Squidex.Extensions.Actions
 
         public static bool IsAssetDeletion(this EnrichedEvent @event)
         {
-            return @event is EnrichedAssetEvent assetEvent &&
-                (assetEvent.Type == EnrichedAssetEventType.Deleted);
+            return @event is EnrichedAssetEvent { Type: EnrichedAssetEventType.Deleted };
         }
 
         public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null, CancellationToken ct = default)

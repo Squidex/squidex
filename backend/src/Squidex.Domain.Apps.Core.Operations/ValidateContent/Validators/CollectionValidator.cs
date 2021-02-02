@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public CollectionValidator(bool isRequired, int? minItems = null, int? maxItems = null)
         {
-            if (minItems.HasValue && maxItems.HasValue && minItems > maxItems)
+            if (minItems.HasValue && minItems > maxItems)
             {
                 throw new ArgumentException("Min length must be greater than max length.", nameof(minItems));
             }

@@ -37,23 +37,23 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             switch (@event.Payload)
             {
-                case FieldEvent _:
-                case SchemaPreviewUrlsConfigured _:
-                case SchemaScriptsConfigured _:
-                case SchemaUpdated _:
-                case ParentFieldEvent _:
+                case FieldEvent:
+                case SchemaPreviewUrlsConfigured:
+                case SchemaScriptsConfigured:
+                case SchemaUpdated:
+                case ParentFieldEvent:
                     result.Type = EnrichedSchemaEventType.Updated;
                     break;
-                case SchemaCreated _:
+                case SchemaCreated:
                     result.Type = EnrichedSchemaEventType.Created;
                     break;
-                case SchemaPublished _:
+                case SchemaPublished:
                     result.Type = EnrichedSchemaEventType.Published;
                     break;
-                case SchemaUnpublished _:
+                case SchemaUnpublished:
                     result.Type = EnrichedSchemaEventType.Unpublished;
                     break;
-                case SchemaDeleted _:
+                case SchemaDeleted:
                     result.Type = EnrichedSchemaEventType.Deleted;
                     break;
                 default:
