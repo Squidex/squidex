@@ -130,17 +130,50 @@ export class FileDropDirective {
             return null;
         }
 
-        let files: File[] = [];
+        const files: File[] = [];
 
-        for (let i = 0; i < dataTransfer.items.length; i++) {
-            const item = dataTransfer.items[i];
+        const items = getItems(dataTransfer);
 
-            await transferFileTree(item, files);
+        // Loop over files first, otherwise Chromes deletes them in the async call.
+        for (const item of items) {
+            const file = item.getAsFile();
+
+            if (file && !!file.type && this.isAllowedFile(file)) {
+                files.push(file);
+            }
         }
 
-        files = files.filter(f => this.isAllowedFile(f));
+        for (const item of items) {
+            if (Types.isFunction(item['webkitGetAsEntry'])) {
+                const webkitEntry = item.webkitGetAsEntry();
 
-        return files.length > 0 ? files : null;
+                if (webkitEntry && webkitEntry.isDirectory) {
+                    await this.transferWebkitTree(webkitEntry, files);
+                }
+            }
+        }
+
+        if (files.length === 0) {
+            return null;
+        }
+
+        return files;
+    }
+
+    private async transferWebkitTree(item: any, files: File[]) {
+        if (item.isFile) {
+            const file = await getFilePromise(item);
+
+            if (file && this.isAllowedFile(file)) {
+                files.push(file);
+            }
+        } else if (item.isDirectory) {
+            const entries = await getFilesPromise(item);
+
+            for (const entry of entries) {
+                await this.transferWebkitTree(entry, files);
+            }
+        }
     }
 
     private hasAllowedFile(dataTransfer: DataTransfer | null) {
@@ -148,18 +181,14 @@ export class FileDropDirective {
             return null;
         }
 
-        for (let i = 0; i < dataTransfer.files.length; i++) {
-            const file = dataTransfer.files.item(i);
-
-            if (file && this.isAllowedFile(file)) {
+        for (const file of getFiles(dataTransfer)) {
+            if (this.isAllowedFile(file)) {
                 return true;
             }
         }
 
-        for (let i = 0; i < dataTransfer.items.length; i++) {
-            const file = dataTransfer.items[i];
-
-            if (file && this.isAllowedFile(file)) {
+        for (const item of getItems(dataTransfer)) {
+            if (this.isAllowedFile(item)) {
                 return true;
             }
         }
@@ -196,40 +225,6 @@ function hasFiles(dataTransfer: DataTransfer): boolean {
     }
 }
 
-async function transferWebkitTree(item: any, files: File[]) {
-    if (item.isFile) {
-        const file = await getFilePromise(item);
-
-        files.push(file);
-    } else if (item.isDirectory) {
-        const entries = await getFilesPromise(item);
-
-        for (const entry of entries) {
-            await transferWebkitTree(entry, files);
-        }
-    }
-}
-
-async function transferFileTree(item: DataTransferItem, files: File[]) {
-    if (Types.isFunction(item['webkitGetAsEntry'])) {
-        const webkitEntry = item.webkitGetAsEntry();
-
-        if (webkitEntry) {
-            await transferWebkitTree(webkitEntry, files);
-
-            return;
-        }
-    }
-
-    if (Types.isFunction(item['getAsFile'])) {
-        const fileItem = item.getAsFile();
-
-        if (fileItem) {
-            files.push(fileItem);
-        }
-    }
-}
-
 function getFilesPromise(item: any): Promise<ReadonlyArray<any>> {
     return new Promise((resolve, reject) => {
         try {
@@ -250,6 +245,38 @@ function getFilePromise(item: any): Promise<File> {
             reject(ex);
         }
     });
+}
+
+function getItems(dataTransfer: DataTransfer) {
+    const result: DataTransferItem[] = [];
+
+    if (dataTransfer.files) {
+        for (let i = 0; i < dataTransfer.items.length; i++) {
+            const item = dataTransfer.items[i];
+
+            if (item) {
+                result.push(item);
+            }
+        }
+    }
+
+    return result;
+}
+
+function getFiles(dataTransfer: DataTransfer) {
+    const result: File[] = [];
+
+    if (dataTransfer.files) {
+        for (let i = 0; i < dataTransfer.files.length; i++) {
+            const file = dataTransfer.files[i];
+
+            if (file) {
+                result.push(file);
+            }
+        }
+    }
+
+    return result;
 }
 
 interface DragDropEvent extends MouseEvent {
