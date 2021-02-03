@@ -93,36 +93,32 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            var content = SimpleMapper.Map(value, new MongoContentEntity
-            {
-                IndexedAppId = value.AppId.Id,
-                IndexedSchemaId = value.SchemaId.Id,
-                Version = newVersion
-            });
-
-            content.DocumentId = value.UniqueId;
-            content.ScheduledAt = value.ScheduleJob?.DueTime;
-            content.ScheduleJob = value.ScheduleJob;
-            content.NewStatus = value.NewStatus;
+            var content = CreateContent(value, value.Data, newVersion);
 
             await collectionAll.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
         private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            var content = SimpleMapper.Map(value, new MongoContentEntity
-            {
-                IndexedAppId = value.AppId.Id,
-                IndexedSchemaId = value.SchemaId.Id,
-                Version = newVersion
-            });
-
-            content.DocumentId = value.UniqueId;
-            content.ScheduledAt = null;
-            content.ScheduleJob = null;
-            content.NewStatus = null;
+            var content = CreateContent(value, value.CurrentVersion.Data, newVersion);
 
             await collectionPublished.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
+        }
+
+        private static MongoContentEntity CreateContent(ContentDomainObject.State value, ContentData data, long newVersion)
+        {
+            var content = SimpleMapper.Map(value, new MongoContentEntity());
+
+            content.Data = data;
+            content.DocumentId = value.UniqueId;
+            content.IndexedAppId = value.AppId.Id;
+            content.IndexedSchemaId = value.SchemaId.Id;
+            content.NewStatus = null;
+            content.ScheduledAt = null;
+            content.ScheduleJob = null;
+            content.Version = newVersion;
+
+            return content;
         }
     }
 }

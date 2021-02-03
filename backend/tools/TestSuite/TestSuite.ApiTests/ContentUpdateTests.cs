@@ -416,6 +416,42 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_create_draft_version()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, true);
+
+
+                // STEP 2: Create draft.
+                content = await _.Contents.CreateDraftAsync(content.Id);
+
+
+                // STEP 3: Update the item and ensure that the data has not changed.
+                await _.Contents.PatchAsync(content.Id, new TestEntityData { Number = 2 });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(1, updated.Data.Number);
+
+
+                // STEP 4: Get the unpublished version
+                var unpublished = await _.Contents.GetAsync(content.Id, QueryContext.Default.Unpublished());
+
+                Assert.Equal(2, unpublished.Data.Number);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
         public async Task Should_delete_item()
         {
             // STEP 1: Create a new item.
