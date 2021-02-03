@@ -54,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/graphql/")]
-        [ApiPermissionOrAnonymous(Permissions.AppContents)]
+        [ApiPermissionOrAnonymous]
         [ApiCosts(2)]
         public async Task<IActionResult> GetGraphQL(string app, [FromQuery] GraphQLGetDto? queries = null)
         {
