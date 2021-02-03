@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities
                 return (null, null);
             }
 
-            var schema = await GetSchemaAsync(appId, id, false, canCache);
+            var schema = await GetSchemaAsync(appId, id, canCache);
 
             if (schema == null)
             {
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities
                 localCache.Add(AppCacheKey(app.Id), app);
             }
 
-            return app?.IsArchived == true ? null : app;
+            return app;
         }
 
         public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false)
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities
                 localCache.Add(AppCacheKey(app.Id), app);
             }
 
-            return app?.IsArchived == true ? null : app;
+            return app;
         }
 
         public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false)
@@ -101,10 +101,10 @@ namespace Squidex.Domain.Apps.Entities
                 localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
             }
 
-            return schema?.IsDeleted == true ? null : schema;
+            return schema;
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool allowDeleted = false, bool canCache = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false)
         {
             var schema = await localCache.GetOrCreateAsync(SchemaCacheKey(appId, id), () =>
             {
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities
                 localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
             }
 
-            return schema?.IsDeleted == true && !allowDeleted ? null : schema;
+            return schema;
         }
 
         public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions)

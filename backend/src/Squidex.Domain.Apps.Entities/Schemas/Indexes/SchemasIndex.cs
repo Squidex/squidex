@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (schema != null)
                 {
-                    await CacheItAsync(schema, false);
+                    await CacheItAsync(schema);
                 }
 
                 return schema;
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                     if (schema != null)
                     {
-                        await CacheItAsync(schema, true);
+                        await InvalidateItAsync(schema);
 
                         if (context.Command is DeleteSchema)
                         {
@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schema = (await grainFactory.GetGrain<ISchemaGrain>(id.ToString()).GetStateAsync()).Value;
 
-            if (schema.Version <= EtagVersion.Empty)
+            if (schema.Version <= EtagVersion.Empty || schema.IsDeleted)
             {
                 return null;
             }
@@ -226,11 +226,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return $"{typeof(SchemasIndex)}_Schemas_Id_{appId}_{id}";
         }
 
-        private Task CacheItAsync(ISchemaEntity schema, bool publish)
+        private Task InvalidateItAsync(ISchemaEntity schema)
+        {
+            return grainCache.RemoveAsync(
+                GetCacheKey(schema.AppId.Id, schema.Id),
+                GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name));
+        }
+
+        private Task CacheItAsync(ISchemaEntity schema)
         {
             return Task.WhenAll(
-                grainCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.Id), schema, CacheDuration, publish),
-                grainCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema, CacheDuration, publish));
+                grainCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.Id), schema, CacheDuration),
+                grainCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema, CacheDuration));
         }
     }
 }

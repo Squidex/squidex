@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                var schema = await appProvider.GetSchemaAsync(appId, schemaId, false);
+                var schema = await appProvider.GetSchemaAsync(appId, schemaId);
 
                 if (schema == null)
                 {

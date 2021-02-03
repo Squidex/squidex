@@ -84,7 +84,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             {
                 var schemaId = DomainId.Create(guid);
 
-                schema = await appProvider.GetSchemaAsync(AppId, schemaId, false);
+                schema = await appProvider.GetSchemaAsync(AppId, schemaId);
             }
             else
             {

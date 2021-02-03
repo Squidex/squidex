@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ctx = CreateContext(isFrontend: false, allowSchema: true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true))
                 .Returns(schema);
 
             var result = await sut.GetSchemaOrThrowAsync(ctx, input);

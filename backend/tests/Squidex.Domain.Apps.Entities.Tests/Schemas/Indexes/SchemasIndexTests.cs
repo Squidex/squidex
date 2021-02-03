@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_return_schema_if_deleted()
+        public async Task Should_return_empty_schemas_if_schema_deleted()
         {
             var (schema, _) = SetupSchema(0, true);
 
@@ -163,19 +163,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             var actual = await sut.GetSchemasAsync(appId.Id);
 
-            Assert.Same(actual[0], schema);
+            Assert.Empty(actual);
         }
 
         [Fact]
-        public async Task Should_add_schema_to_index_on_create()
+        public async Task Should_add_schema_to_index_when_creating()
         {
             var token = RandomHash.Simple();
 
             A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
                 .Returns(token);
 
+            var command = Create(schemaId.Name);
+
             var context =
-                new CommandContext(Create(schemaId.Name), commandBus)
+                new CommandContext(command, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);
@@ -195,8 +197,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
                 .Returns(token);
 
+            var command = Create(schemaId.Name);
+
             var context =
-                new CommandContext(Create(schemaId.Name), commandBus);
+                new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
@@ -208,13 +212,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_not_add_to_index_on_create_if_name_taken()
+        public async Task Should_not_add_to_indexes_when_name_is_taken()
         {
             A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
                 .Returns(Task.FromResult<string?>(null));
 
+            var command = Create(schemaId.Name);
+
             var context =
-                new CommandContext(Create(schemaId.Name), commandBus)
+                new CommandContext(command, commandBus)
                     .Complete();
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
@@ -227,10 +233,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_not_add_to_index_on_create_if_name_invalid()
+        public async Task Should_not_add_to_indexes_when_name_is_invalid()
         {
+            var command = Create("INVALID");
+
             var context =
-                new CommandContext(Create("INVALID"), commandBus)
+                new CommandContext(command, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);
@@ -277,7 +285,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_remove_schema_from_index_on_delete_when_existed_before()
+        public async Task Should_remove_schema_from_index_when_deleted_and_exists()
         {
             var (schema, _) = SetupSchema();
 
