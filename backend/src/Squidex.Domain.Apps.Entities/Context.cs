@@ -22,25 +22,13 @@ namespace Squidex.Domain.Apps.Entities
     {
         private static readonly IReadOnlyDictionary<string, string> EmptyHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        private IAppEntity? app;
-
         public IReadOnlyDictionary<string, string> Headers { get; }
 
         public ClaimsPermissions UserPermissions { get; }
 
         public ClaimsPrincipal User { get; }
 
-        public IAppEntity App
-        {
-            get
-            {
-                return app ?? throw new InvalidOperationException("Not in an app context.");
-            }
-            set
-            {
-                app = value;
-            }
-        }
+        public IAppEntity App { get; set; }
 
         public bool IsFrontendClient => User.IsInClient(DefaultClients.Frontend);
 
@@ -52,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities
 
         private Context(IAppEntity app, ClaimsPrincipal user, ClaimsPermissions userPermissions, IReadOnlyDictionary<string, string> headers)
         {
-            this.app = app;
+            App = app;
 
             User = user;
             UserPermissions = userPermissions;
@@ -97,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities
             {
                 if (headers != null)
                 {
-                    return new Context(context.app!, context.User, context.UserPermissions, headers);
+                    return new Context(context.App!, context.User, context.UserPermissions, headers);
                 }
 
                 return context;

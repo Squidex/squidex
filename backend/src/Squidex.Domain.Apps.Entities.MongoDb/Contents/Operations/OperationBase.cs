@@ -21,11 +21,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public IMongoCollection<MongoContentEntity> Collection { get; private set; }
 
-        public Task PrepareAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
+        public async Task PrepareAsync(IMongoCollection<MongoContentEntity> collection, bool skipIndex, CancellationToken ct = default)
         {
             Collection = collection;
 
-            return PrepareAsync(ct);
+            if (!skipIndex)
+            {
+                await PrepareAsync(ct);
+            }
         }
 
         protected virtual Task PrepareAsync(CancellationToken ct = default)

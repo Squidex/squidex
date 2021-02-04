@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 await maxRequests.WaitAsync();
                 try
                 {
-                    assets = await assetQuery.QueryAsync(Context, null, Q.Empty.WithIds(notLoadedAssets));
+                    assets = await assetQuery.QueryAsync(Context, null, Q.Empty.WithIds(notLoadedAssets).WithoutTotal());
                 }
                 finally
                 {
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 await maxRequests.WaitAsync();
                 try
                 {
-                    contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(notLoadedContents));
+                    contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(notLoadedContents).WithoutTotal());
                 }
                 finally
                 {

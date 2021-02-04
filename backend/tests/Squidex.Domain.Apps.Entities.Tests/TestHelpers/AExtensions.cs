@@ -20,14 +20,9 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return that.Matches(x => x.Query!.ToString() == query);
         }
 
-        public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata)
+        public static Q HasIdsWithoutTotal(this INegatableArgumentConstraintManager<Q> that, params DomainId[] ids)
         {
-            return that.HasOData(odata, default);
-        }
-
-        public static Q HasOData(this INegatableArgumentConstraintManager<Q> that, string odata, DomainId reference = default)
-        {
-            return that.Matches(x => x.ODataQuery == odata && x.Reference == reference);
+            return that.Matches(x => x.Ids != null && x.Ids.SetEquals(ids) && x.NoTotal == true);
         }
 
         public static Q HasIds(this INegatableArgumentConstraintManager<Q> that, params DomainId[] ids)

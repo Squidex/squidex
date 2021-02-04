@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
@@ -29,18 +30,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             _ = fixture;
         }
 
-        [Fact]
-        public async Task Should_verify_ids()
+        public IEnumerable<object[]> Collections()
+        {
+            yield return new[] { _.ContentRepository };
+        }
+
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_verify_ids(IContentRepository repository)
         {
             var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
-            var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), ids, SearchScope.Published);
+            var contents = await repository.QueryIdsAsync(_.RandomAppId(), ids, SearchScope.Published);
 
             Assert.NotNull(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_by_ids()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_by_ids(IContentRepository repository)
         {
             var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
@@ -49,33 +57,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 _.RandomSchema()
             };
 
-            var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), schemas, Q.Empty.WithIds(ids), SearchScope.All);
+            var contents = await repository.QueryAsync(_.RandomApp(), schemas, Q.Empty.WithIds(ids), SearchScope.All);
 
             Assert.NotNull(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_by_ids_and_schema()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_by_ids_and_schema(IContentRepository repository)
         {
             var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
-            var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), Q.Empty.WithIds(ids), SearchScope.All);
+            var contents = await repository.QueryAsync(_.RandomApp(), _.RandomSchema(), Q.Empty.WithIds(ids), SearchScope.All);
 
             Assert.NotNull(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_ids_by_filter()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_ids_by_filter(IContentRepository repository)
         {
             var filter = F.Eq("data.value.iv", 12);
 
-            var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter);
+            var contents = await repository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter);
 
             Assert.NotEmpty(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_by_filter()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_by_filter(IContentRepository repository)
         {
             var query = new ClrQuery
             {
@@ -86,41 +97,45 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 Filter = F.Eq("data.value.iv", 12)
             };
 
-            var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), Q.Empty.WithQuery(query), SearchScope.Published);
+            var contents = await repository.QueryAsync(_.RandomApp(), _.RandomSchema(), Q.Empty.WithQuery(query), SearchScope.Published);
 
             Assert.NotEmpty(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_scheduled()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_scheduled(IContentRepository repository)
         {
             var time = SystemClock.Instance.GetCurrentInstant();
 
-            await _.ContentRepository.QueryScheduledWithoutDataAsync(time, _ => Task.CompletedTask);
+            await repository.QueryScheduledWithoutDataAsync(time, _ => Task.CompletedTask);
         }
 
-        [Fact]
-        public async Task Should_query_contents_with_default_query()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_with_default_query(IContentRepository repository)
         {
             var query = new ClrQuery();
 
-            var contents = await QueryAsync(query);
+            var contents = await QueryAsync(repository, query);
 
             Assert.NotEmpty(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_with_default_query_and_id()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_with_default_query_and_id(IContentRepository repository)
         {
             var query = new ClrQuery();
 
-            var contents = await QueryAsync(query, reference: DomainId.NewGuid());
+            var contents = await QueryAsync(repository, query, reference: DomainId.NewGuid());
 
             Assert.Empty(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_with_large_skip()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_with_large_skip(IContentRepository repository)
         {
             var query = new ClrQuery
             {
@@ -130,51 +145,58 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                 }
             };
 
-            var contents = await QueryAsync(query, 1000, 9000);
+            var contents = await QueryAsync(repository, query, 1000, 9000);
 
             Assert.NotEmpty(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_with_query_fulltext()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_with_query_fulltext(IContentRepository repository)
         {
             var query = new ClrQuery
             {
                 FullText = "hello"
             };
 
-            var contents = await QueryAsync(query);
+            var contents = await QueryAsync(repository, query);
 
             Assert.NotNull(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_with_query_filter()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_with_query_filter(IContentRepository repository)
         {
             var query = new ClrQuery
             {
                 Filter = F.Eq("data.value.iv", 200)
             };
 
-            var contents = await QueryAsync(query, 1000, 0);
+            var contents = await QueryAsync(repository, query, 1000, 0);
 
             Assert.NotEmpty(contents);
         }
 
-        [Fact]
-        public async Task Should_query_contents_with_query_filter_and_id()
+        [Theory]
+        [MemberData(nameof(Collections))]
+        public async Task Should_query_contents_with_query_filter_and_id(IContentRepository repository)
         {
             var query = new ClrQuery
             {
                 Filter = F.Eq("data.value.iv", 12)
             };
 
-            var contents = await QueryAsync(query, 1000, 0, reference: DomainId.NewGuid());
+            var contents = await QueryAsync(repository, query, 1000, 0, reference: DomainId.NewGuid());
 
             Assert.Empty(contents);
         }
 
-        private async Task<IResultList<IContentEntity>> QueryAsync(ClrQuery clrQuery, int take = 1000, int skip = 100, DomainId reference = default)
+        private async Task<IResultList<IContentEntity>> QueryAsync(IContentRepository repository,
+            ClrQuery clrQuery,
+            int take = 1000,
+            int skip = 100,
+            DomainId reference = default)
         {
             if (clrQuery.Take == long.MaxValue)
             {
@@ -199,7 +221,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                     .WithQuery(clrQuery)
                     .WithReference(reference);
 
-            var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), _.RandomSchema(), q, SearchScope.All);
+            var contents = await repository.QueryAsync(_.RandomApp(), _.RandomSchema(), q, SearchScope.All);
 
             return contents;
         }
