@@ -100,7 +100,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 var query = fieldContext.BuildODataQuery();
 
-                return await context.QueryAssetsAsync(query);
+                var q = Q.Empty.WithODataQuery(query);
+
+                return await context.QueryAssetsAsync(q);
             });
         }
     }

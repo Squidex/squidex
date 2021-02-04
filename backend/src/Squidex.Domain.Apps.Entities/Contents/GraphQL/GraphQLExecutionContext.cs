@@ -64,7 +64,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public GraphQLExecutionContext WithContext(Context newContext)
         {
-            context = newContext.WithoutCleanup().WithoutContentEnrichment();
+            context = newContext
+                .Clone(b => b
+                    .WithoutCleanup()
+                    .WithoutContentEnrichment());
 
             return this;
         }

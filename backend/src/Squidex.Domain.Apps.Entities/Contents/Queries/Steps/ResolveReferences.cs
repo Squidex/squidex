@@ -153,14 +153,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 return EmptyContents;
             }
 
-            var references = await ContentQuery.QueryAsync(context.Clone().WithoutContentEnrichment(true), Q.Empty.WithIds(ids));
+            var queryContext = context.Clone(b => b
+                .WithoutContentEnrichment(true)
+                .WithoutTotal());
+
+            var references = await ContentQuery.QueryAsync(queryContext, Q.Empty.WithIds(ids));
 
             return references.ToLookup(x => x.Id);
         }
 
         private static bool ShouldEnrich(Context context)
         {
-            return context.IsFrontendClient && context.ShouldEnrichContent();
+            return context.IsFrontendClient && !context.ShouldSkipContentEnrichment();
         }
     }
 }

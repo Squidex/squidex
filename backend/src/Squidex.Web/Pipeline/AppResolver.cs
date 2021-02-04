@@ -123,15 +123,17 @@ namespace Squidex.Web.Pipeline
 
         private static Context SetContext(HttpContext httpContext, IAppEntity app)
         {
-            var requestContext = new Context(httpContext.User, app);
-
-            foreach (var (key, value) in httpContext.Request.Headers)
-            {
-                if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
+            var requestContext =
+                new Context(httpContext.User, app).Clone(builder =>
                 {
-                    requestContext.Headers.Add(key, value.ToString());
-                }
-            }
+                    foreach (var (key, value) in httpContext.Request.Headers)
+                    {
+                        if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
+                        {
+                            builder.SetHeader(key, value.ToString());
+                        }
+                    }
+                });
 
             httpContext.Features.Set(requestContext);
 
@@ -140,7 +142,7 @@ namespace Squidex.Web.Pipeline
 
         private static bool HasPermission(string appName, Context requestContext)
         {
-            return requestContext.Permissions.Includes(Permissions.ForApp(Permissions.App, appName));
+            return requestContext.UserPermissions.Includes(Permissions.ForApp(Permissions.App, appName));
         }
 
         private static bool AllowAnonymous(ActionExecutingContext context)

@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_add_referenced_id_and__as_dependency()
+        public async Task Should_add_referenced_id_and_as_dependency()
         {
             var ref1_1 = CreateRefContent(DomainId.NewGuid(), 1, "ref1_1", 13, refSchemaId1);
             var ref1_2 = CreateRefContent(DomainId.NewGuid(), 2, "ref1_2", 17, refSchemaId1);
@@ -101,7 +101,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
+            A.CallTo(() => contentQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -139,7 +140,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
+            A.CallTo(() => contentQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -191,7 +193,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { ref1_2.Id }, new[] { ref2_1.Id, ref2_2.Id })
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichContent()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
+            A.CallTo(() => contentQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -255,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
             };
 
-            var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).WithoutContentEnrichment(true);
+            var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).Clone(b => b.WithoutContentEnrichment(true));
 
             await sut.EnrichAsync(ctx, contents, schemaProvider);
 

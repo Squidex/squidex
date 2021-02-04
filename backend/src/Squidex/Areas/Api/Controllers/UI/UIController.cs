@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         {
             var result = new UISettingsDto
             {
-                CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.Permissions.Includes(CreateAppPermission)
+                CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateAppPermission)
             };
 
             return Ok(result);

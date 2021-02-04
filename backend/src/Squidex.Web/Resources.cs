@@ -198,7 +198,7 @@ namespace Squidex.Web
 
         public bool Includes(Permission permission, PermissionSet? additional = null)
         {
-            return Context.Permissions.Includes(permission) || additional?.Includes(permission) == true;
+            return Context.UserPermissions.Includes(permission) || additional?.Includes(permission) == true;
         }
 
         public bool IsAllowedForSchema(string id, string schema)
@@ -230,7 +230,7 @@ namespace Squidex.Web
 
             var permission = P.ForApp(id, app, schema);
 
-            return Context.Permissions.Allows(permission) || additional?.Allows(permission) == true;
+            return Context.UserPermissions.Allows(permission) || additional?.Allows(permission) == true;
         }
 
         private string? GetAppName()

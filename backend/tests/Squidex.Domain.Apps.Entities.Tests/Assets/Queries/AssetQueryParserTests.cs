@@ -35,11 +35,19 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
+        public async Task Should_skip_total_when_set_in_context()
+        {
+            var q = await sut.ParseAsync(requestContext.Clone(b => b.WithoutTotal()), Q.Empty);
+
+            Assert.True(q.NoTotal);
+        }
+
+        [Fact]
         public async Task Should_throw_if_odata_query_is_invalid()
         {
             var query = Q.Empty.WithODataQuery("$filter=invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query));
         }
 
         [Fact]
@@ -47,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithJsonQuery("invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseQueryAsync(requestContext, query));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ParseAsync(requestContext, query));
         }
 
         [Fact]
@@ -55,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithODataQuery("$top=100&$orderby=fileName asc&$search=Hello World");
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("FullText: 'Hello World'; Take: 100; Sort: fileName Ascending, id Ascending", q.Query.ToString());
         }
@@ -65,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithODataQuery("$top=200&$filter=fileName eq 'ABC'");
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
@@ -75,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithJsonQuery("{ \"filter\": { \"path\": \"fileName\", \"op\": \"eq\", \"value\": \"ABC\" } }");
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("Filter: fileName == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
@@ -85,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithJsonQuery("{ \"fullText\": \"Hello\" }");
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
@@ -95,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty;
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
@@ -105,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("Skip: 20; Take: 200; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
@@ -115,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20&$orderby=id desc");
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("Skip: 20; Take: 200; Sort: id Descending", q.Query.ToString());
         }
@@ -128,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var query = Q.Empty.WithODataQuery("$filter=tags eq 'name1'");
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("Filter: tags == 'id1'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
@@ -141,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var query = Q.Empty.WithODataQuery("$filter=tags eq 'name1'");
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("Filter: tags == 'name1'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
@@ -151,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = Q.Empty.WithODataQuery("$filter=fileSize eq 123");
 
-            var q = await sut.ParseQueryAsync(requestContext, query);
+            var q = await sut.ParseAsync(requestContext, query);
 
             Assert.Equal("Filter: fileSize == 123; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
 

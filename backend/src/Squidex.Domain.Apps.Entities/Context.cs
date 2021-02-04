@@ -20,66 +20,116 @@ namespace Squidex.Domain.Apps.Entities
 {
     public sealed class Context
     {
-        public IDictionary<string, string> Headers { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private static readonly IReadOnlyDictionary<string, string> EmptyHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        public IAppEntity App { get; set; }
+        private IAppEntity? app;
+
+        public IReadOnlyDictionary<string, string> Headers { get; }
+
+        public ClaimsPermissions UserPermissions { get; }
 
         public ClaimsPrincipal User { get; }
 
-        public ClaimsPermissions Permissions { get; }
-
-        public bool IsFrontendClient { get; }
-
-        public Context(ClaimsPrincipal user)
+        public IAppEntity App
         {
-            Guard.NotNull(user, nameof(user));
-
-            User = user;
-
-            Permissions = User.Claims.Permissions();
-
-            IsFrontendClient = User.IsInClient(DefaultClients.Frontend);
+            get
+            {
+                return app ?? throw new InvalidOperationException("Not in an app context.");
+            }
+            set
+            {
+                app = value;
+            }
         }
+
+        public bool IsFrontendClient => User.IsInClient(DefaultClients.Frontend);
 
         public Context(ClaimsPrincipal user, IAppEntity app)
-            : this(user)
+            : this(app, user, user.Claims.Permissions(), EmptyHeaders)
         {
-            App = app;
+            Guard.NotNull(user, nameof(user));
         }
 
-        public static Context Anonymous()
+        private Context(IAppEntity app, ClaimsPrincipal user, ClaimsPermissions userPermissions, IReadOnlyDictionary<string, string> headers)
+        {
+            this.app = app;
+
+            User = user;
+            UserPermissions = userPermissions;
+
+            Headers = headers;
+        }
+
+        public static Context Anonymous(IAppEntity app)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-            return new Context(claimsPrincipal);
+            return new Context(claimsPrincipal, app);
         }
 
-        public static Context Admin()
+        public static Context Admin(IAppEntity app)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
             claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, P.All));
 
-            return new Context(claimsPrincipal);
+            return new Context(claimsPrincipal, app);
         }
 
         public bool Allows(string permissionId, string schema = Permission.Any)
         {
-            return Permissions.Allows(permissionId, App.Name, schema);
+            return UserPermissions.Allows(permissionId, App.Name, schema);
         }
 
-        public Context Clone()
+        private sealed class HeaderBuilder : ICloneBuilder
         {
-            var clone = new Context(User, App);
+            private readonly Context context;
+            private Dictionary<string, string>? headers;
 
-            foreach (var (key, value) in Headers)
+            public HeaderBuilder(Context context)
             {
-                clone.Headers[key] = value;
+                this.context = context;
             }
 
-            return clone;
+            public Context Build()
+            {
+                if (headers != null)
+                {
+                    return new Context(context.app!, context.User, context.UserPermissions, headers);
+                }
+
+                return context;
+            }
+
+            public void Remove(string key)
+            {
+                headers ??= new Dictionary<string, string>(context.Headers, StringComparer.OrdinalIgnoreCase);
+                headers.Remove(key);
+            }
+
+            public void SetHeader(string key, string value)
+            {
+                headers ??= new Dictionary<string, string>(context.Headers, StringComparer.OrdinalIgnoreCase);
+                headers[key] = value;
+            }
         }
+
+        public Context Clone(Action<ICloneBuilder> action)
+        {
+            var builder = new HeaderBuilder(this);
+
+            action(builder);
+
+            return builder.Build();
+        }
+    }
+
+    public interface ICloneBuilder
+    {
+        void SetHeader(string key, string value);
+
+        void Remove(string key);
     }
 }

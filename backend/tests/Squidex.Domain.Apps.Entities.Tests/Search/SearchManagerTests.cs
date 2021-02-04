@@ -9,6 +9,8 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
+using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Log;
 using Xunit;
 
@@ -19,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Search
         private readonly ISearchSource source1 = A.Fake<ISearchSource>();
         private readonly ISearchSource source2 = A.Fake<ISearchSource>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext = Context.Anonymous(Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app")));
         private readonly SearchManager sut;
 
         public SearchManagerTests()
