@@ -95,12 +95,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var content = CreateContent(value, value.Data, newVersion);
 
+            content.NewStatus = value.NewStatus;
+            content.ScheduledAt = value.ScheduleJob?.DueTime;
+            content.ScheduleJob = value.ScheduleJob;
+
             await collectionAll.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
         private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
             var content = CreateContent(value, value.CurrentVersion.Data, newVersion);
+
+            content.NewStatus = null;
+            content.ScheduledAt = null;
+            content.ScheduleJob = null;
 
             await collectionPublished.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
@@ -113,9 +121,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             content.DocumentId = value.UniqueId;
             content.IndexedAppId = value.AppId.Id;
             content.IndexedSchemaId = value.SchemaId.Id;
-            content.NewStatus = null;
-            content.ScheduledAt = null;
-            content.ScheduleJob = null;
             content.Version = newVersion;
 
             return content;

@@ -435,12 +435,14 @@ namespace TestSuite.ApiTests
                 var updated = await _.Contents.GetAsync(content.Id);
 
                 Assert.Equal(1, updated.Data.Number);
+                Assert.Null(updated.NewStatus);
 
 
                 // STEP 4: Get the unpublished version
                 var unpublished = await _.Contents.GetAsync(content.Id, QueryContext.Default.Unpublished());
 
                 Assert.Equal(2, unpublished.Data.Number);
+                Assert.Equal("Draft", unpublished.NewStatus);
             }
             finally
             {
