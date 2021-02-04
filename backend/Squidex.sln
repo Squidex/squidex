@@ -61,6 +61,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Web", "src\Squidex.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migrations", "src\Migrations\Migrations.csproj", "{23615A39-F3FB-4575-A91C-535899DFB636}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Cloud", "extensions\Squidex.Cloud\Squidex.Cloud.csproj", "{809F5EC1-674B-4D57-A776-573D8B284184}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -311,6 +313,18 @@ Global
 		{23615A39-F3FB-4575-A91C-535899DFB636}.Release|x64.Build.0 = Release|Any CPU
 		{23615A39-F3FB-4575-A91C-535899DFB636}.Release|x86.ActiveCfg = Release|Any CPU
 		{23615A39-F3FB-4575-A91C-535899DFB636}.Release|x86.Build.0 = Release|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Debug|x64.Build.0 = Debug|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Debug|x86.Build.0 = Debug|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Release|Any CPU.Build.0 = Release|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Release|x64.ActiveCfg = Release|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Release|x64.Build.0 = Release|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Release|x86.ActiveCfg = Release|Any CPU
+		{809F5EC1-674B-4D57-A776-573D8B284184}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -337,6 +351,7 @@ Global
 		{F3C41B82-6A67-409A-B7FE-54543EE4F38B} = {FB8BC3A2-2010-4C3C-A87D-D4A98C05EE52}
 		{5B2D251F-46E3-486A-AE16-E3FE06B559ED} = {7EDE8CF1-B1E4-4005-B154-834B944E0D7A}
 		{23615A39-F3FB-4575-A91C-535899DFB636} = {94207AA6-4923-4183-A558-E0F8196B8CA3}
+		{809F5EC1-674B-4D57-A776-573D8B284184} = {FB8BC3A2-2010-4C3C-A87D-D4A98C05EE52}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02F2E872-3141-44F5-BD6A-33CD84E9FE08}
