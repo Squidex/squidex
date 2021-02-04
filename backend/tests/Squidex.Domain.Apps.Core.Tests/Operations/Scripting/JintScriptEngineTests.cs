@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
 using Xunit;
@@ -287,8 +288,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
                 getJSON('http://squidex.io', function(result) {
                     data.operation = { iv: result.key };
-                });        
-
+                });
             ";
 
             await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sut.TransformAsync(context, script, contentOptions));
@@ -437,6 +437,25 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var result = ((IScriptEngine)sut).Evaluate(context, script);
 
             Assert.False(result);
+        }
+
+        [Fact]
+        public void Should_handle_domain_id_as_string()
+        {
+            var id = DomainId.NewGuid();
+
+            const string script = @"
+                return value;
+            ";
+
+            var context = new ScriptVars
+            {
+                ["value"] = id
+            };
+
+            var result = sut.Execute(context, script);
+
+            Assert.Equal(id.ToString(), result.ToString());
         }
     }
 }

@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
 
         [Theory]
         [InlineData("{{ e.id }}", "42,my-app")]
-        [InlineData("{{ e.id.name}}", "my-app")]
+        [InlineData("{{ e.id.name }}", "my-app")]
         [InlineData("{{ e.id.id }}", "42")]
         public async Task Should_render_named_id(string template, string expected)
         {
@@ -62,6 +62,21 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
             var result = await RenderAync(template, value);
 
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_format_domain_id()
+        {
+            var value = new
+            {
+                Id = DomainId.NewGuid()
+            };
+
+            var template = "{{ e.id }}";
+
+            var result = await RenderAync(template, value);
+
+            Assert.Equal(value.Id.ToString(), result);
         }
 
         [Fact]
