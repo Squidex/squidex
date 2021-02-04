@@ -93,31 +93,32 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            var content = CreateContent(value, value.Data, newVersion);
+            var content = CreateContent(value, newVersion);
 
-            content.NewStatus = value.NewStatus;
+            content.Data = value.Data;
             content.ScheduledAt = value.ScheduleJob?.DueTime;
             content.ScheduleJob = value.ScheduleJob;
+            content.NewStatus = value.NewStatus;
 
             await collectionAll.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
         private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            var content = CreateContent(value, value.CurrentVersion.Data, newVersion);
+            var content = CreateContent(value, newVersion);
 
-            content.NewStatus = null;
+            content.Data = value.CurrentVersion.Data;
             content.ScheduledAt = null;
             content.ScheduleJob = null;
+            content.NewStatus = null;
 
             await collectionPublished.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
-        private static MongoContentEntity CreateContent(ContentDomainObject.State value, ContentData data, long newVersion)
+        private static MongoContentEntity CreateContent(ContentDomainObject.State value, long newVersion)
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity());
 
-            content.Data = data;
             content.DocumentId = value.UniqueId;
             content.IndexedAppId = value.AppId.Id;
             content.IndexedSchemaId = value.SchemaId.Id;
