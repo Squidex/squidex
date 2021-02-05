@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Fluid;
@@ -15,22 +13,21 @@ using Fluid.Ast;
 using Fluid.Tags;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 
-#pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
-
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class ReferencesFluidExtension : IFluidExtension
+    public sealed class AssetsFluidExtension : IFluidExtension
     {
         private readonly IAppProvider appProvider;
-        private readonly IContentQueryService contentQuery;
+        private readonly IAssetQueryService assetQuery;
 
-        private sealed class ReferenceTag : ArgumentsTag
+        private sealed class AssetTag : ArgumentsTag
         {
-            private readonly ReferencesFluidExtension root;
+            private readonly AssetsFluidExtension root;
 
-            public ReferenceTag(ReferencesFluidExtension root)
+            public AssetTag(AssetsFluidExtension root)
             {
                 this.root = root;
             }
@@ -48,23 +45,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                     var requestContext =
                         Context.Admin(app).Clone(b => b
-                            .WithoutContentEnrichment()
-                            .WithUnpublished()
                             .WithoutTotal());
 
                     var id = (await arguments[1].Expression.EvaluateAsync(context)).ToStringValue();
 
-                    var domainId = DomainId.Create(id);
-                    var domainIds = new List<DomainId> { domainId };
+                    var asset = await root.assetQuery.FindAsync(requestContext, DomainId.Create(id));
 
-                    var contents = await root.contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(domainIds));
-                    var content = contents.FirstOrDefault();
-
-                    if (content != null)
+                    if (asset != null)
                     {
                         var name = (await arguments[0].Expression.EvaluateAsync(context)).ToStringValue();
 
-                        context.SetValue(name, content);
+                        context.SetValue(name, asset);
                     }
                 }
 
@@ -72,29 +63,30 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public ReferencesFluidExtension(IAppProvider appProvider, IContentQueryService contentQuery)
+        public AssetsFluidExtension(IAppProvider appProvider, IAssetQueryService assetQuery)
         {
-            Guard.NotNull(contentQuery, nameof(contentQuery));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(appProvider, nameof(appProvider));
 
-            this.contentQuery = contentQuery;
+            this.assetQuery = assetQuery;
 
             this.appProvider = appProvider;
         }
 
         public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
         {
-            memberAccessStrategy.Register<IContentEntity>();
+            memberAccessStrategy.Register<IAssetEntity>();
+            memberAccessStrategy.Register<IAssetInfo>();
             memberAccessStrategy.Register<IEntity>();
             memberAccessStrategy.Register<IEntityWithCreatedBy>();
             memberAccessStrategy.Register<IEntityWithLastModifiedBy>();
             memberAccessStrategy.Register<IEntityWithVersion>();
-            memberAccessStrategy.Register<IEnrichedContentEntity>();
+            memberAccessStrategy.Register<IEnrichedAssetEntity>();
         }
 
         public void RegisterLanguageExtensions(FluidParserFactory factory)
         {
-            factory.RegisterTag("reference", new ReferenceTag(this));
+            factory.RegisterTag("asset", new AssetTag(this));
         }
     }
 }

@@ -52,7 +52,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                 using (cts.Token.Register(() => tcs.TrySetCanceled()))
                 {
-                    var context = CreateEngine(vars, options, tcs.TrySetException, true, cts.Token);
+                    var context =
+                        CreateEngine(options)
+                            .Extend(vars, options)
+                            .Extend(extensions)
+                            .ExtendAsync(extensions, tcs.TrySetException, cts.Token);
 
                     context.Engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
@@ -82,7 +86,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                 using (cts.Token.Register(() => tcs.TrySetCanceled()))
                 {
-                    var context = CreateEngine(vars, options, tcs.TrySetException, true, cts.Token);
+                    var context =
+                        CreateEngine(options)
+                            .Extend(vars, options)
+                            .Extend(extensions)
+                            .ExtendAsync(extensions, tcs.TrySetException, cts.Token);
 
                     context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
                     {
@@ -126,14 +134,17 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
-            var context = CreateEngine(vars, options);
+            var context =
+                CreateEngine(options)
+                    .Extend(vars, options)
+                    .Extend(extensions);
 
             Execute(context.Engine, script);
 
             return JsonMapper.Map(context.Engine.GetCompletionValue());
         }
 
-        private ExecutionContext CreateEngine(ScriptVars vars, ScriptOptions options, ExceptionHandler? exceptionHandler = null, bool async = false, CancellationToken ct = default)
+        private ExecutionContext CreateEngine(ScriptOptions options)
         {
             var engine = new Engine(engineOptions =>
             {
@@ -158,14 +169,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 extension.Extend(engine);
             }
 
-            var context = new ExecutionContext(engine, ct, exceptionHandler);
-
-            context.AddVariables(vars, options);
-
-            foreach (var extension in extensions)
-            {
-                extension.Extend(context, async);
-            }
+            var context = new ExecutionContext(engine);
 
             return context;
         }

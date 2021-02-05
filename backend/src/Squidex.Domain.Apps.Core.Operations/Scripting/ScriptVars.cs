@@ -6,21 +6,17 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public sealed class ScriptVars : Dictionary<string, object?>
+    public sealed class ScriptVars : ScriptContext
     {
-        public ScriptVars()
-            : base(StringComparer.OrdinalIgnoreCase)
-        {
-        }
-
         public ClaimsPrincipal? User
         {
             get => GetValue<ClaimsPrincipal?>();
@@ -68,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             get => GetValue<ContentData?>();
             set
             {
-                SetValue(value, "oldData");
+                SetValue(value, nameof(OldData));
                 SetValue(value);
             }
         }
@@ -78,9 +74,21 @@ namespace Squidex.Domain.Apps.Core.Scripting
             get => GetValue<Status>();
             set
             {
-                SetValue(value, "oldStatus");
+                SetValue(value, nameof(OldStatus));
                 SetValue(value);
             }
+        }
+
+        [Obsolete("Use dataOld")]
+        public ContentData? OldData
+        {
+            get => GetValue<ContentData?>();
+        }
+
+        [Obsolete("Use statusOld")]
+        public Status? OldStatus
+        {
+            get => GetValue<Status?>();
         }
 
         public void SetValue(object? value, [CallerMemberName] string? key = null)
