@@ -141,7 +141,9 @@ namespace Squidex.Web
 
         private void SetContext()
         {
-            actionExecutingContext.HttpContext.Features.Set(new Context(new ClaimsPrincipal(actionExecutingContext.HttpContext.User)));
+            var context = new Context(new ClaimsPrincipal(actionExecutingContext.HttpContext.User), null!);
+
+            actionExecutingContext.HttpContext.Features.Set(context);
         }
     }
 }

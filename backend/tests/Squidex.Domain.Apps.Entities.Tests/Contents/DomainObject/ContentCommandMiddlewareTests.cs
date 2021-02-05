@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly DomainId contentId = DomainId.NewGuid();
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext;
         private readonly ContentCommandMiddleware sut;
 
         public sealed class MyCommand : SquidexCommand
@@ -35,6 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public ContentCommandMiddlewareTests()
         {
+            requestContext = Context.Anonymous(Mocks.App(AppNamedId));
+
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 

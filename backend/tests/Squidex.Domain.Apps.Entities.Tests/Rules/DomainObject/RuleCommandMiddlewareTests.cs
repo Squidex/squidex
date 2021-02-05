@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly DomainId ruleId = DomainId.NewGuid();
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext;
         private readonly RuleCommandMiddleware sut;
 
         public sealed class MyCommand : SquidexCommand
@@ -34,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         public RuleCommandMiddlewareTests()
         {
+            requestContext = Context.Anonymous(Mocks.App(AppNamedId));
+
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 

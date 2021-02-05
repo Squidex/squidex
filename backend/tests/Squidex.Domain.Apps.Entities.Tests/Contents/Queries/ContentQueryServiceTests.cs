@@ -137,8 +137,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task FindContentAsync_should_return_content(int isFrontend, int unpublished, SearchScope scope)
         {
             var ctx =
-                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
-                    .WithUnpublished(unpublished == 1);
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true).Clone(b => b
+                    .WithUnpublished(unpublished == 1));
 
             var content = CreateContent(contentId);
 
@@ -183,8 +183,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task QueryAsync_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
             var ctx =
-                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
-                    .WithUnpublished(unpublished == 1);
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true).Clone(b => b
+                    .WithUnpublished(unpublished == 1));
 
             var content = CreateContent(contentId);
 
@@ -250,8 +250,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task QueryAll_should_return_contents(int isFrontend, int unpublished, SearchScope scope)
         {
             var ctx =
-                CreateContext(isFrontend: isFrontend == 1, allowSchema: true)
-                    .WithUnpublished(unpublished == 1);
+                CreateContext(isFrontend: isFrontend == 1, allowSchema: true).Clone(b => b
+                    .WithUnpublished(unpublished == 1));
 
             var ids = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
 

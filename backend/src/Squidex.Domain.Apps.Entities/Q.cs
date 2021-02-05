@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities
     {
         public static Q Empty => new Q();
 
+        public ClrQuery Query { get; init; } = new ClrQuery();
+
         public IReadOnlyList<DomainId>? Ids { get; init; }
 
         public DomainId Referencing { get; init; }
@@ -29,9 +31,9 @@ namespace Squidex.Domain.Apps.Entities
 
         public Query<IJsonValue>? JsonQuery { get; init; }
 
-        public ClrQuery Query { get; init; } = new ClrQuery();
+        public RefToken? CreatedBy { get; init; }
 
-        public RefToken? CreatedBy { get; set; }
+        public bool NoTotal { get; init; }
 
         private Q()
         {
@@ -42,6 +44,11 @@ namespace Squidex.Domain.Apps.Entities
             Guard.NotNull(query, nameof(query));
 
             return this with { Query = query };
+        }
+
+        public Q WithoutTotal(bool value = true)
+        {
+            return this with { NoTotal = value };
         }
 
         public Q WithODataQuery(string? query)

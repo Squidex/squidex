@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = $"query{schemaInfo.TypeName}ContentsWithTotal",
                 Arguments = ContentActions.QueryOrReferencing.Arguments,
                 ResolvedType = resultType,
-                Resolver = ContentActions.QueryOrReferencing.Query,
+                Resolver = ContentActions.QueryOrReferencing.QueryWithTotal,
                 Description = $"Query {schemaInfo.DisplayName} content items with total count."
             }).WithSchemaId(schemaInfo);
         }

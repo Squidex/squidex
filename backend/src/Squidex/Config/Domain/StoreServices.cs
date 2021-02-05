@@ -115,7 +115,7 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoAssetFolderRepository>()
                         .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State, DomainId>>();
 
-                    services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
+                    services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName), false))
                         .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State, DomainId>>();
 
                     services.AddSingletonAs<MongoSchemasHash>()

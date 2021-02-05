@@ -33,8 +33,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryReferrers queryReferrers;
         private readonly QueryScheduled queryScheduled;
         private readonly string name;
+        private readonly bool useWildcardIndex;
 
-        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider)
+        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, bool useWildcardIndex)
             : base(database)
         {
             this.name = name;
@@ -46,6 +47,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryReferences = new QueryReferences(queryByIds);
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
+
+            this.useWildcardIndex = useWildcardIndex;
         }
 
         public IMongoCollection<MongoContentEntity> GetInternalCollection()
@@ -60,13 +63,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
         {
-            await queryAsStream.PrepareAsync(collection, ct);
-            await queryBdId.PrepareAsync(collection, ct);
-            await queryByIds.PrepareAsync(collection, ct);
-            await queryByQuery.PrepareAsync(collection, ct);
-            await queryReferences.PrepareAsync(collection, ct);
-            await queryReferrers.PrepareAsync(collection, ct);
-            await queryScheduled.PrepareAsync(collection, ct);
+            if (useWildcardIndex)
+            {
+                await collection.Indexes.CreateOneAsync(
+                    new CreateIndexModel<MongoContentEntity>(
+                        Index.Wildcard()
+                    ), null, ct);
+            }
+
+            var skipIndex = useWildcardIndex;
+
+            await queryAsStream.PrepareAsync(collection, skipIndex, ct);
+            await queryBdId.PrepareAsync(collection, skipIndex, ct);
+            await queryByIds.PrepareAsync(collection, skipIndex, ct);
+            await queryByQuery.PrepareAsync(collection, skipIndex, ct);
+            await queryReferences.PrepareAsync(collection, skipIndex, ct);
+            await queryReferrers.PrepareAsync(collection, skipIndex, ct);
+            await queryScheduled.PrepareAsync(collection, skipIndex, ct);
         }
 
         public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds)

@@ -32,17 +32,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             StatusSerializer.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, bool useWildcardIndex)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
 
             collectionAll =
                 new MongoContentCollection(
-                    "States_Contents_All3", database, appProvider);
+                    "States_Contents_All3", database, appProvider, useWildcardIndex);
 
             collectionPublished =
                 new MongoContentCollection(
-                    "States_Contents_Published3", database, appProvider);
+                    "States_Contents_Published3", database, appProvider, useWildcardIndex);
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)

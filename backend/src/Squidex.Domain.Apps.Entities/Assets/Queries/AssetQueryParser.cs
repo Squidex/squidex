@@ -46,25 +46,32 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.options = options.Value;
         }
 
-        public virtual async Task<Q> ParseQueryAsync(Context context, Q q)
+        public virtual async Task<Q> ParseAsync(Context context, Q q)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(q, nameof(q));
 
             using (Profiler.TraceMethod<AssetQueryParser>())
             {
-                var query = ParseQuery(q);
+                var query = ParseClrQuery(q);
 
                 await TransformTagAsync(context, query);
 
                 WithSorting(query);
                 WithPaging(query);
 
-                return q!.WithQuery(query);
+                q = q.WithQuery(query);
+
+                if (context.ShouldSkipTotal())
+                {
+                    q = q.WithoutTotal();
+                }
+
+                return q;
             }
         }
 
-        private ClrQuery ParseQuery(Q q)
+        private ClrQuery ParseClrQuery(Q q)
         {
             var query = q.Query;
 

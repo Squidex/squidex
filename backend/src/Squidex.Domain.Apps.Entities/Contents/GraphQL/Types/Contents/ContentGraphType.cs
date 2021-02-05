@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 Name = $"referencing{referencingSchemaInfo.TypeName}ContentsWithTotal",
                 Arguments = ContentActions.QueryOrReferencing.Arguments,
                 ResolvedType = contentResultsTyp,
-                Resolver = ContentActions.QueryOrReferencing.Referencing,
+                Resolver = ContentActions.QueryOrReferencing.ReferencingWithTotal,
                 Description = $"Query {referencingSchemaInfo.DisplayName} content items with total count."
             }).WithSchemaId(referencingSchemaInfo);
         }

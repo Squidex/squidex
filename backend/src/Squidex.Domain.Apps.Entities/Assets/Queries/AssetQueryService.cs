@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(q, nameof(q));
 
-            q = await queryParser.ParseQueryAsync(context, q);
+            q = await queryParser.ParseAsync(context, q);
 
             var assets = await assetRepository.QueryAsync(context.App.Id, parentId, q);
 

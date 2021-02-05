@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext;
         private readonly AppCommandMiddleware sut;
 
         public sealed class MyCommand : SquidexCommand
@@ -40,6 +40,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         public AppCommandMiddlewareTests()
         {
+            requestContext = Context.Anonymous(Mocks.App(appId));
+
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 

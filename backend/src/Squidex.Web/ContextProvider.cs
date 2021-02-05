@@ -25,7 +25,7 @@ namespace Squidex.Web
                 {
                     if (asyncLocal.Value == null)
                     {
-                        asyncLocal.Value = Context.Anonymous();
+                        asyncLocal.Value = Context.Anonymous(null!);
                     }
 
                     return asyncLocal.Value;

@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentWorkflow.GetInfoAsync(content, content.Status))
                 .Returns(Task.FromResult<StatusInfo>(null!));
 
-            var ctx = requestContext.WithResolveFlow(true);
+            var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
 
             await sut.EnrichAsync(ctx, new[] { content }, null!);
 
@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => contentWorkflow.CanUpdateAsync(content, content.Status, requestContext.User))
                 .Returns(true);
 
-            var ctx = requestContext.WithResolveFlow(true);
+            var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
 
             await sut.EnrichAsync(ctx, new[] { content }, null!);
 
@@ -148,11 +148,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_not_enrich_content_with_can_update_if_disabled_in_context()
         {
-            requestContext.WithResolveFlow(false);
-
             var content = new ContentEntity { SchemaId = schemaId };
 
-            var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId)).WithResolveFlow(false);
+            var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId)).Clone(b => b.WithResolveFlow(false));
 
             await sut.EnrichAsync(ctx, new[] { content }, null!);
 
