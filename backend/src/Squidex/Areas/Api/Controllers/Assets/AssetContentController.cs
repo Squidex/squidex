@@ -34,6 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
     {
         private readonly IAssetFileStore assetFileStore;
         private readonly IAssetQueryService assetQuery;
+        private readonly IAssetLoader assetLoader;
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
@@ -41,12 +42,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
             ICommandBus commandBus,
             IAssetFileStore assetFileStore,
             IAssetQueryService assetQuery,
+            IAssetLoader assetLoader,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator)
             : base(commandBus)
         {
             this.assetFileStore = assetFileStore;
             this.assetQuery = assetQuery;
+            this.assetLoader = assetLoader;
             this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
@@ -119,9 +122,17 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return StatusCode(403);
             }
 
-            if (asset != null && queries.Version > EtagVersion.Any && asset.Version != queries.Version && Context.App != null)
+            if (asset != null && queries.Version > EtagVersion.Any && asset.Version != queries.Version)
             {
-                asset = await assetQuery.FindAsync(Context, asset.Id, queries.Version);
+                if (Context.App != null)
+                {
+                    asset = await assetQuery.FindAsync(Context, asset.Id, queries.Version);
+                }
+                else
+                {
+                    // Fallback for old endpoint. Does not set the surrogate key.
+                    asset = await assetLoader.GetAsync(asset.AppId.Id, asset.Id, queries.Version);
+                }
             }
 
             if (asset == null)

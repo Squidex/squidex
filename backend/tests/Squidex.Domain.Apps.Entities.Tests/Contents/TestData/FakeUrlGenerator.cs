@@ -36,11 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             return $"contents/{schemaId.Name}/{contentId}";
         }
 
-        public string AppSettingsUI(NamedId<DomainId> appId)
-        {
-            throw new NotSupportedException();
-        }
-
         public string AssetsUI(NamedId<DomainId> appId, string? query = null)
         {
             throw new NotSupportedException();
