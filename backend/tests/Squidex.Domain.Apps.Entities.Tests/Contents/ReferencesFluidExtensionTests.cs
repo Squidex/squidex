@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
@@ -17,18 +18,24 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ReferenceFluidExtensionTests
+    public class ReferencesFluidExtensionTests
     {
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly FluidTemplateEngine sut;
 
-        public ReferenceFluidExtensionTests()
+        public ReferencesFluidExtensionTests()
         {
+            var services =
+                new ServiceCollection()
+                    .AddSingleton(appProvider)
+                    .AddSingleton(contentQuery)
+                    .BuildServiceProvider();
+
             var extensions = new IFluidExtension[]
             {
-                new ReferencesFluidExtension(contentQuery, appProvider)
+                new ReferencesFluidExtension(services)
             };
 
             A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))
@@ -43,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var referenceId1 = DomainId.NewGuid();
             var reference1 = CreateReference(referenceId1, 1);
             var referenceId2 = DomainId.NewGuid();
-            var reference2 = CreateReference(referenceId1, 2);
+            var reference2 = CreateReference(referenceId2, 2);
 
             var @event = new EnrichedContentEvent
             {
@@ -67,20 +74,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
             };
 
             var template = @"
-{% for id in event.data.references.iv %}
-    {% reference 'ref', id %}
-    Text: {{ ref.data.field1.iv }} {{ ref.data.field2.iv }}
-{% endfor %}
-";
+                {% for id in event.data.references.iv %}
+                    {% reference 'ref', id %}
+                    Text: {{ ref.data.field1.iv }} {{ ref.data.field2.iv }} {{ ref.id }}
+                {% endfor %}
+                ";
 
-            var expected = @"
-    Text: Hello 1 World 1
-    Text: Hello 2 World 2
-";
+            var expected = $@"
+                Text: Hello 1 World 1 {referenceId1}
+                Text: Hello 2 World 2 {referenceId2}
+            ";
 
             var result = await sut.RenderAsync(template, vars);
 
-            Assert.Equal(expected, result);
+            Assert.Equal(Cleanup(expected), Cleanup(result));
         }
 
         private static IEnrichedContentEntity CreateReference(DomainId referenceId, int index)
@@ -97,6 +104,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 .AddJsonValue(JsonValue.Create($"World {index}"))),
                 Id = referenceId
             };
+        }
+
+        private static string Cleanup(string text)
+        {
+            return text
+                .Replace("\r", string.Empty)
+                .Replace("\n", string.Empty)
+                .Replace(" ", string.Empty);
         }
     }
 }

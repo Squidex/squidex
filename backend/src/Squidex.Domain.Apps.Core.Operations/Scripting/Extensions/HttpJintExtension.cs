@@ -29,14 +29,11 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             this.httpClientFactory = httpClientFactory;
         }
 
-        public void Extend(ExecutionContext context, bool async)
+        public void ExtendAsync(ExecutionContext context)
         {
-            if (async)
-            {
-                var engine = context.Engine;
+            var action = new GetJsonDelegate((url, callback, headers) => GetJson(context, url, callback, headers));
 
-                engine.SetValue("getJSON", new GetJsonDelegate((url, callback, headers) => GetJson(context, url, callback, headers)));
-            }
+            context.Engine.SetValue("getJSON", action);
         }
 
         private void GetJson(ExecutionContext context, string url, Action<JsValue> callback, JsValue? headers)
@@ -46,6 +43,18 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         private async Task GetJsonAsync(ExecutionContext context, string url, Action<JsValue> callback, JsValue? headers)
         {
+            if (callback == null)
+            {
+                context.Fail(new JavaScriptException("Callback cannot be null."));
+                return;
+            }
+
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            {
+                context.Fail(new JavaScriptException("URL is not valid."));
+                return;
+            }
+
             context.MarkAsync();
 
             try

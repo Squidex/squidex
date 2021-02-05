@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         {
             var random = _.RandomValue();
 
-            var assets = await _.AssetRepository.FindAssetAsync(_.RandomAppId(), random, random, 1024);
+            var assets = await _.AssetRepository.FindAssetByHashAsync(_.RandomAppId(), random, random, 1024);
 
             Assert.NotNull(assets);
         }

@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -195,7 +196,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 CanReject = true
             };
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
+            var vars = new ScriptVars();
+
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
 
             Assert.NotEmpty(ex.Errors);
         }
@@ -212,7 +215,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 CanReject = true
             };
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
+            var vars = new ScriptVars();
+
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
 
             Assert.Equal("Not valid", ex.Errors.Single().Message);
         }
@@ -229,7 +234,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 CanDisallow = true
             };
 
-            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
+            var vars = new ScriptVars();
+
+            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options));
 
             Assert.Equal("Script has forbidden the operation.", ex.Message);
         }
@@ -246,9 +253,39 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 CanDisallow = true
             };
 
-            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(new ScriptVars(), script, options));
+            var vars = new ScriptVars();
+
+            var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options));
 
             Assert.Equal("Operation not allowed", ex.Message);
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_getJson_url_is_null()
+        {
+            const string script = @"
+                getJSON(null, function(result) {
+                    complete(result);
+                });
+            ";
+
+            var vars = new ScriptVars();
+
+            await Assert.ThrowsAsync<JavaScriptException>(() => sut.ExecuteAsync(vars, script));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_when_getJson_callback_is_null()
+        {
+            const string script = @"
+                var url = 'http://squidex.io';
+
+                getJSON(url, null);
+            ";
+
+            var vars = new ScriptVars();
+
+            await Assert.ThrowsAsync<JavaScriptException>(() => sut.ExecuteAsync(vars, script));
         }
 
         [Fact]
@@ -257,14 +294,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var httpHandler = SetupRequest();
 
             const string script = @"
-                async = true;
+                var url = 'http://squidex.io';
 
-                getJSON('http://squidex.io', function(result) {
+                getJSON(url, function(result) {
                     complete(result);
                 });
             ";
 
-            var result = await sut.ExecuteAsync(new ScriptVars(), script);
+            var vars = new ScriptVars();
+
+            var result = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");
@@ -280,19 +319,21 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var httpHandler = SetupRequest();
 
             const string script = @"
-                async = true;
-
                 var headers = {
                     'X-Header1': 1,
                     'X-Header2': '2'                
                 };
 
-                getJSON('http://squidex.io', function(result) {
+                var url = 'http://squidex.io';
+
+                getJSON(url, function(result) {
                     complete(result);
                 }, headers);
             ";
 
-            var result = await sut.ExecuteAsync(new ScriptVars(), script);
+            var vars = new ScriptVars();
+
+            var result = await sut.ExecuteAsync(vars, script);
 
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");
