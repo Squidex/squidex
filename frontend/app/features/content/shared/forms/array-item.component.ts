@@ -10,7 +10,6 @@ import { AppLanguageDto, EditContentForm, FieldArrayItemForm, FieldArrayItemValu
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ArraySectionComponent } from './array-section.component';
-import { FieldEditorComponent } from './field-editor.component';
 
 interface State {
     // The when the section is collapsed.
@@ -63,7 +62,7 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    @ViewChildren(FieldEditorComponent)
+    @ViewChildren(ArraySectionComponent)
     public sections: QueryList<ArraySectionComponent>;
 
     public isCollapsed = false;
