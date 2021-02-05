@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,6 +35,32 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public TimeSpan TimeoutExecution { get; set; } = TimeSpan.FromMilliseconds(4000);
 
+        private TimeSpan ActualTimeoutScript
+        {
+            get
+            {
+                if (Debugger.IsAttached)
+                {
+                    return TimeSpan.FromHours(1);
+                }
+
+                return TimeoutScript;
+            }
+        }
+
+        private TimeSpan ActualTimeoutExecution
+        {
+            get
+            {
+                if (Debugger.IsAttached)
+                {
+                    return TimeSpan.FromHours(1);
+                }
+
+                return TimeoutExecution;
+            }
+        }
+
         public JintScriptEngine(IMemoryCache cache, IEnumerable<IJintExtension>? extensions = null)
         {
             parser = new Parser(cache);
@@ -46,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
-            using (var cts = new CancellationTokenSource(TimeoutExecution))
+            using (var cts = new CancellationTokenSource(ActualTimeoutExecution))
             {
                 var tcs = new TaskCompletionSource<IJsonValue>();
 
@@ -80,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
-            using (var cts = new CancellationTokenSource(TimeoutExecution))
+            using (var cts = new CancellationTokenSource(ActualTimeoutExecution))
             {
                 var tcs = new TaskCompletionSource<ContentData>();
 
@@ -151,7 +178,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 engineOptions.AddObjectConverter(DefaultConverter.Instance);
                 engineOptions.SetReferencesResolver(NullPropagation.Instance);
                 engineOptions.Strict();
-                engineOptions.TimeoutInterval(TimeoutScript);
+                engineOptions.TimeoutInterval(ActualTimeoutScript);
             });
 
             if (options.CanDisallow)
