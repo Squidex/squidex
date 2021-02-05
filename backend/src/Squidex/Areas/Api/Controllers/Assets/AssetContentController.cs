@@ -17,7 +17,6 @@ using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Log;
@@ -34,23 +33,20 @@ namespace Squidex.Areas.Api.Controllers.Assets
     public sealed class AssetContentController : ApiController
     {
         private readonly IAssetFileStore assetFileStore;
-        private readonly IAssetRepository assetRepository;
-        private readonly IAssetLoader assetLoader;
+        private readonly IAssetQueryService assetQuery;
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
         public AssetContentController(
             ICommandBus commandBus,
             IAssetFileStore assetFileStore,
-            IAssetRepository assetRepository,
-            IAssetLoader assetLoader,
+            IAssetQueryService assetQuery,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator)
             : base(commandBus)
         {
             this.assetFileStore = assetFileStore;
-            this.assetRepository = assetRepository;
-            this.assetLoader = assetLoader;
+            this.assetQuery = assetQuery;
             this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
@@ -74,11 +70,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AllowAnonymous]
         public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, [FromQuery] AssetContentQueryDto queries, string? more = null)
         {
-            var asset = await assetRepository.FindAssetAsync(AppId, DomainId.Create(idOrSlug));
+            var asset = await assetQuery.FindAsync(Context, DomainId.Create(idOrSlug));
 
             if (asset == null)
             {
-                asset = await assetRepository.FindAssetBySlugAsync(AppId, idOrSlug);
+                asset = await assetQuery.FindBySlugAsync(Context, idOrSlug);
             }
 
             return await DeliverAssetAsync(asset, queries);
@@ -102,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Obsolete("Use overload with app name")]
         public async Task<IActionResult> GetAssetContent(DomainId id, [FromQuery] AssetContentQueryDto queries)
         {
-            var asset = await assetRepository.FindAssetAsync(id);
+            var asset = await assetQuery.FindGlobalAsync(Context, id);
 
             return await DeliverAssetAsync(asset, queries);
         }
@@ -123,9 +119,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return StatusCode(403);
             }
 
-            if (asset != null && queries.Version > EtagVersion.Any && asset.Version != queries.Version)
+            if (asset != null && queries.Version > EtagVersion.Any && asset.Version != queries.Version && Context.App != null)
             {
-                asset = await assetLoader.GetAsync(asset.AppId.Id, asset.Id, queries.Version);
+                asset = await assetQuery.FindAsync(Context, asset.Id, queries.Version);
             }
 
             if (asset == null)

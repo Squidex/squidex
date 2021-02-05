@@ -25,52 +25,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IAppProvider appProvider;
         private readonly IContentEnricher contentEnricher;
         private readonly IContentRepository contentRepository;
-        private readonly IContentLoader contentVersionLoader;
+        private readonly IContentLoader contentLoader;
         private readonly ContentQueryParser queryParser;
 
         public ContentQueryService(
             IAppProvider appProvider,
             IContentEnricher contentEnricher,
             IContentRepository contentRepository,
-            IContentLoader contentVersionLoader,
+            IContentLoader assetLoader,
             ContentQueryParser queryParser)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(contentEnricher, nameof(contentEnricher));
             Guard.NotNull(contentRepository, nameof(contentRepository));
-            Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
+            Guard.NotNull(assetLoader, nameof(assetLoader));
             Guard.NotNull(queryParser, nameof(queryParser));
 
             this.appProvider = appProvider;
             this.contentEnricher = contentEnricher;
             this.contentRepository = contentRepository;
-            this.contentVersionLoader = contentVersionLoader;
+            this.contentLoader = assetLoader;
             this.queryParser = queryParser;
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = -1)
+        public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any)
         {
             Guard.NotNull(context, nameof(context));
 
-            if (id == default)
-            {
-                throw new DomainObjectNotFoundException(id.ToString());
-            }
-
-            var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
-
             using (Profiler.TraceMethod<ContentQueryService>())
             {
+                var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
+
                 IContentEntity? content;
 
                 if (version > EtagVersion.Empty)
                 {
-                    content = await FindByVersionAsync(context, id, version);
+                    content = await contentLoader.GetAsync(context.App.Id, id, version);
                 }
                 else
                 {
-                    content = await FindCoreAsync(context, id, schema);
+                    content = await contentRepository.FindContentAsync(context.App, schema, id, context.Scope());
                 }
 
                 if (content == null || content.SchemaId.Id != schema.Id)
@@ -86,20 +81,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
-            if (q == null)
-            {
-                return EmptyContents;
-            }
-
-            var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
-
-            if (!HasPermission(context, schema, Permissions.AppContentsRead))
-            {
-                q.CreatedBy = context.User.Token();
-            }
-
             using (Profiler.TraceMethod<ContentQueryService>())
             {
+                if (q == null)
+                {
+                    return EmptyContents;
+                }
+
+                var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
+
+                if (!HasPermission(context, schema, Permissions.AppContentsRead))
+                {
+                    q.CreatedBy = context.User.Token();
+                }
+
                 q = await queryParser.ParseAsync(context, q, schema);
 
                 var contents = await contentRepository.QueryAsync(context.App, schema, q, context.Scope());
@@ -117,20 +112,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
-            if (q == null)
-            {
-                return EmptyContents;
-            }
-
-            var schemas = await GetSchemasAsync(context);
-
-            if (schemas.Count == 0)
-            {
-                return EmptyContents;
-            }
-
             using (Profiler.TraceMethod<ContentQueryService>())
             {
+                if (q == null)
+                {
+                    return EmptyContents;
+                }
+
+                var schemas = await GetSchemasAsync(context);
+
+                if (schemas.Count == 0)
+                {
+                    return EmptyContents;
+                }
+
                 q = await queryParser.ParseAsync(context, q);
 
                 var contents = await contentRepository.QueryAsync(context.App, schemas, q, context.Scope());
@@ -217,16 +212,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private static bool HasPermission(Context context, ISchemaEntity schema, string permissionId)
         {
             return context.Permissions.Allows(permissionId, context.App.Name, schema.SchemaDef.Name);
-        }
-
-        private Task<IContentEntity?> FindCoreAsync(Context context, DomainId id, ISchemaEntity schema)
-        {
-            return contentRepository.FindContentAsync(context.App, schema, id, context.Scope());
-        }
-
-        private Task<IContentEntity?> FindByVersionAsync(Context context, DomainId id, long version)
-        {
-            return contentVersionLoader.GetAsync(context.App.Id, id, version);
         }
     }
 }

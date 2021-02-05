@@ -12,6 +12,7 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
@@ -20,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
+        private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
         private readonly IAssetFolderRepository assetFolderRepository = A.Fake<IAssetFolderRepository>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext;
@@ -30,76 +32,167 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
+            SetupEnricher();
+
             A.CallTo(() => queryParser.ParseQueryAsync(requestContext, A<Q>._))
                 .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
-            sut = new AssetQueryService(assetEnricher, assetRepository, assetFolderRepository, queryParser);
+            sut = new AssetQueryService(assetEnricher, assetRepository, assetLoader, assetFolderRepository, queryParser);
+        }
+
+        [Fact]
+        public async Task Should_find_asset_by_slug_and_enrich_it()
+        {
+            var asset = CreateAsset(DomainId.NewGuid());
+
+            A.CallTo(() => assetRepository.FindAssetBySlugAsync(appId.Id, "slug"))
+                .Returns(asset);
+
+            var result = await sut.FindBySlugAsync(requestContext, "slug");
+
+            AssertAsset(asset, result);
+        }
+
+        [Fact]
+        public async Task Should_return_null_if_asset_by_slug_cannot_be_found()
+        {
+            var asset = CreateAsset(DomainId.NewGuid());
+
+            A.CallTo(() => assetRepository.FindAssetBySlugAsync(appId.Id, "slug"))
+                .Returns(Task.FromResult<IAssetEntity?>(null));
+
+            var result = await sut.FindBySlugAsync(requestContext, "slug");
+
+            Assert.Null(result);
         }
 
         [Fact]
         public async Task Should_find_asset_by_id_and_enrich_it()
         {
-            var found = new AssetEntity { Id = DomainId.NewGuid() };
+            var asset = CreateAsset(DomainId.NewGuid());
 
-            var enriched = new AssetEntity();
+            A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, asset.Id))
+                .Returns(asset);
 
-            A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, found.Id))
-                .Returns(found);
+            var result = await sut.FindAsync(requestContext, asset.Id);
 
-            A.CallTo(() => assetEnricher.EnrichAsync(found, requestContext))
-                .Returns(enriched);
+            AssertAsset(asset, result);
+        }
 
-            var result = await sut.FindAsync(requestContext, found.Id);
+        [Fact]
+        public async Task Should_return_null_if_asset_by_id_cannot_be_found()
+        {
+            var asset = CreateAsset(DomainId.NewGuid());
 
-            Assert.Same(enriched, result);
+            A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, asset.Id))
+                .Returns(Task.FromResult<IAssetEntity?>(null));
+
+            var result = await sut.FindAsync(requestContext, asset.Id);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task Should_find_asset_by_id_and_version_and_enrich_it()
+        {
+            var asset = CreateAsset(DomainId.NewGuid());
+
+            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2))
+                .Returns(asset);
+
+            var result = await sut.FindAsync(requestContext, asset.Id, 2);
+
+            AssertAsset(asset, result);
+        }
+
+        [Fact]
+        public async Task Should_return_null_if_asset_by_id_and_version_cannot_be_found()
+        {
+            var asset = CreateAsset(DomainId.NewGuid());
+
+            A.CallTo(() => assetLoader.GetAsync(appId.Id, asset.Id, 2))
+                .Returns(Task.FromResult<IAssetEntity?>(null));
+
+            var result = await sut.FindAsync(requestContext, asset.Id, 2);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task Should_find_global_asset_by_id_and_enrich_it()
+        {
+            var asset = CreateAsset(DomainId.NewGuid());
+
+            A.CallTo(() => assetRepository.FindAssetAsync(asset.Id))
+                .Returns(asset);
+
+            var result = await sut.FindGlobalAsync(requestContext, asset.Id);
+
+            AssertAsset(asset, result);
+        }
+
+        [Fact]
+        public async Task Should_return_null_if_global_asset_by_id_cannot_be_found()
+        {
+            var asset = CreateAsset(DomainId.NewGuid());
+
+            A.CallTo(() => assetRepository.FindAssetAsync(asset.Id))
+                .Returns(Task.FromResult<IAssetEntity?>(null));
+
+            var result = await sut.FindGlobalAsync(requestContext, asset.Id);
+
+            Assert.Null(result);
         }
 
         [Fact]
         public async Task Should_find_assets_by_hash_and_and_enrich_it()
         {
-            var found = new AssetEntity { Id = DomainId.NewGuid() };
+            var asset = CreateAsset(DomainId.NewGuid());
 
-            var enriched = new AssetEntity();
-
-            A.CallTo(() => assetRepository.FindAssetAsync(appId.Id, "hash", "name", 123))
-                .Returns(found);
-
-            A.CallTo(() => assetEnricher.EnrichAsync(found, requestContext))
-                .Returns(enriched);
+            A.CallTo(() => assetRepository.FindAssetByHashAsync(appId.Id, "hash", "name", 123))
+                .Returns(asset);
 
             var result = await sut.FindByHashAsync(requestContext, "hash", "name", 123);
 
-            Assert.Same(enriched, result);
+            AssertAsset(asset, result);
         }
 
         [Fact]
-        public async Task Should_load_assets_with_query_and_resolve_tags()
+        public async Task Should_return_null_if_asset_by_hash_cannot_be_found()
         {
-            var found1 = new AssetEntity { Id = DomainId.NewGuid() };
-            var found2 = new AssetEntity { Id = DomainId.NewGuid() };
+            var asset = CreateAsset(DomainId.NewGuid());
 
-            var enriched1 = new AssetEntity();
-            var enriched2 = new AssetEntity();
+            A.CallTo(() => assetRepository.FindAssetByHashAsync(appId.Id, "hash", "name", 123))
+                .Returns(Task.FromResult<IAssetEntity?>(null));
+
+            var result = await sut.FindByHashAsync(requestContext, "hash", "name", 123);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task Should_query_assets_and_enrich_it()
+        {
+            var asset1 = CreateAsset(DomainId.NewGuid());
+            var asset2 = CreateAsset(DomainId.NewGuid());
 
             var parentId = DomainId.NewGuid();
 
             var q = Q.Empty.WithODataQuery("fileName eq 'Name'");
 
             A.CallTo(() => assetRepository.QueryAsync(appId.Id, parentId, q))
-                .Returns(ResultList.CreateFrom(8, found1, found2));
-
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2), requestContext))
-                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
+                .Returns(ResultList.CreateFrom(8, asset1, asset2));
 
             var result = await sut.QueryAsync(requestContext, parentId, q);
 
             Assert.Equal(8, result.Total);
 
-            Assert.Equal(new[] { enriched1, enriched2 }, result.ToArray());
+            AssertAsset(asset1, result[0]);
+            AssertAsset(asset2, result[1]);
         }
 
         [Fact]
-        public async Task Should_load_assets_folders_from_repository()
+        public async Task Should_query_asset_folders()
         {
             var parentId = DomainId.NewGuid();
 
@@ -114,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_resolve_folder_path_from_root()
+        public async Task Should_find_asset_folder_with_path()
         {
             var folderId1 = DomainId.NewGuid();
             var folder1 = CreateFolder(folderId1);
@@ -205,6 +298,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Assert.Empty(result);
         }
 
+        private static void AssertAsset(IAssetEntity source, IEnrichedAssetEntity? result)
+        {
+            Assert.NotNull(result);
+            Assert.NotSame(source, result);
+            Assert.Equal(source.AssetId, result?.AssetId);
+        }
+
         private static IAssetFolderEntity CreateFolder(DomainId id, DomainId parentId = default)
         {
             var assetFolder = A.Fake<IAssetFolderEntity>();
@@ -213,6 +313,22 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetFolder.ParentId).Returns(parentId);
 
             return assetFolder;
+        }
+
+        private static AssetEntity CreateAsset(DomainId id)
+        {
+            return new AssetEntity { Id = id };
+        }
+
+        private void SetupEnricher()
+        {
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>._, A<Context>._))
+                .ReturnsLazily(x =>
+                {
+                    var input = x.GetArgument<IEnumerable<IAssetEntity>>(0)!;
+
+                    return Task.FromResult<IReadOnlyList<IEnrichedAssetEntity>>(input.Select(c => SimpleMapper.Map(c, new AssetEntity())).ToList());
+                });
         }
     }
 }

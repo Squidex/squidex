@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, string hash, string fileName, long fileSize)
+        public async Task<IAssetEntity?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
