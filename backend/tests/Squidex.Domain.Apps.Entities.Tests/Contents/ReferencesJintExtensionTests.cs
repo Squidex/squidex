@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -29,9 +30,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ReferencesJintExtensionTests()
         {
+            var services =
+                new ServiceCollection()
+                    .AddSingleton(appProvider)
+                    .AddSingleton(contentQuery)
+                    .BuildServiceProvider();
+
             var extensions = new IJintExtension[]
             {
-                new ReferencesJintExtension(appProvider, contentQuery)
+                new ReferencesJintExtension(services)
             };
 
             A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))

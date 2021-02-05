@@ -12,7 +12,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Jint.Native;
 using Jint.Runtime;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
@@ -21,17 +23,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ReferencesJintExtension : IJintExtension
     {
         private delegate void GetReferencesDelegate(JsValue references, Action<JsValue> callback);
-        private readonly IAppProvider appProvider;
-        private readonly IContentQueryService contentQuery;
+        private readonly IServiceProvider serviceProvider;
 
-        public ReferencesJintExtension(IAppProvider appProvider, IContentQueryService contentQuery)
+        public ReferencesJintExtension(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(contentQuery, nameof(contentQuery));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
-            this.appProvider = appProvider;
-
-            this.contentQuery = contentQuery;
+            this.serviceProvider = serviceProvider;
         }
 
         public void ExtendAsync(ExecutionContext context)
@@ -90,18 +88,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             try
             {
-                var app = await appProvider.GetAppAsync(appId);
-
-                if (app == null)
-                {
-                    throw new JavaScriptException("App does not exist.");
-                }
+                var app = await GetAppAsync(appId);
 
                 var requestContext =
                     new Context(user, app).Clone(b => b
                         .WithoutContentEnrichment()
                         .WithUnpublished()
                         .WithoutTotal());
+
+                var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
 
                 var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids));
 
@@ -111,6 +106,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 context.Fail(ex);
             }
+        }
+
+        private async Task<IAppEntity> GetAppAsync(DomainId appId)
+        {
+            var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
+
+            var app = await appProvider.GetAppAsync(appId);
+
+            if (app == null)
+            {
+                throw new JavaScriptException("App does not exist.");
+            }
+
+            return app;
         }
     }
 }

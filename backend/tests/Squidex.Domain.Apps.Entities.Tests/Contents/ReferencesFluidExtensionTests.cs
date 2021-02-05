@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
@@ -26,9 +27,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ReferencesFluidExtensionTests()
         {
+            var services =
+                new ServiceCollection()
+                    .AddSingleton(appProvider)
+                    .AddSingleton(contentQuery)
+                    .BuildServiceProvider();
+
             var extensions = new IFluidExtension[]
             {
-                new ReferencesFluidExtension(appProvider, contentQuery)
+                new ReferencesFluidExtension(services)
             };
 
             A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))

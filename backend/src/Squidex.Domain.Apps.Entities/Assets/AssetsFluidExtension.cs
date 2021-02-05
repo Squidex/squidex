@@ -5,38 +5,40 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Fluid;
 using Fluid.Ast;
 using Fluid.Tags;
+using GraphQL.Utilities;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Core.ValidateContent;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetsFluidExtension : IFluidExtension
     {
-        private readonly IAppProvider appProvider;
-        private readonly IAssetQueryService assetQuery;
+        private readonly IServiceProvider serviceProvider;
 
         private sealed class AssetTag : ArgumentsTag
         {
-            private readonly AssetsFluidExtension root;
+            private readonly IServiceProvider serviceProvider;
 
-            public AssetTag(AssetsFluidExtension root)
+            public AssetTag(IServiceProvider serviceProvider)
             {
-                this.root = root;
+                this.serviceProvider = serviceProvider;
             }
 
             public override async ValueTask<Completion> WriteToAsync(TextWriter writer, TextEncoder encoder, TemplateContext context, FilterArgument[] arguments)
             {
                 if (arguments.Length == 2 && context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
                 {
-                    var app = await root.appProvider.GetAppAsync(enrichedEvent.AppId.Id, false);
+                    var app = await GetAppAsync(enrichedEvent);
 
                     if (app == null)
                     {
@@ -49,7 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     var id = (await arguments[1].Expression.EvaluateAsync(context)).ToStringValue();
 
-                    var asset = await root.assetQuery.FindAsync(requestContext, DomainId.Create(id));
+                    var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
+
+                    var asset = await assetQuery.FindAsync(requestContext, DomainId.Create(id));
 
                     if (asset != null)
                     {
@@ -61,16 +65,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 return Completion.Normal;
             }
+
+            private Task<IAppEntity?> GetAppAsync(EnrichedEvent enrichedEvent)
+            {
+                var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
+
+                return appProvider.GetAppAsync(enrichedEvent.AppId.Id, false);
+            }
         }
 
-        public AssetsFluidExtension(IAppProvider appProvider, IAssetQueryService assetQuery)
+        public AssetsFluidExtension(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
-            this.assetQuery = assetQuery;
-
-            this.appProvider = appProvider;
+            this.serviceProvider = serviceProvider;
         }
 
         public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
@@ -86,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public void RegisterLanguageExtensions(FluidParserFactory factory)
         {
-            factory.RegisterTag("asset", new AssetTag(this));
+            factory.RegisterTag("asset", new AssetTag(serviceProvider));
         }
     }
 }

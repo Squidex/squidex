@@ -10,9 +10,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using GraphQL.Utilities;
 using Jint.Native;
 using Jint.Runtime;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
@@ -21,17 +23,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetsJintExtension : IJintExtension
     {
         private delegate void GetAssetsDelegate(JsValue references, Action<JsValue> callback);
-        private readonly IAppProvider appProvider;
-        private readonly IAssetQueryService assetQuery;
+        private readonly IServiceProvider serviceProvider;
 
-        public AssetsJintExtension(IAppProvider appProvider, IAssetQueryService assetQuery)
+        public AssetsJintExtension(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(assetQuery, nameof(assetQuery));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
-            this.appProvider = appProvider;
-
-            this.assetQuery = assetQuery;
+            this.serviceProvider = serviceProvider;
         }
 
         public void ExtendAsync(ExecutionContext context)
@@ -90,16 +88,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             try
             {
-                var app = await appProvider.GetAppAsync(appId);
-
-                if (app == null)
-                {
-                    throw new JavaScriptException("App does not exist.");
-                }
+                var app = await GetAppAsync(appId);
 
                 var requestContext =
                     new Context(user, app).Clone(b => b
                         .WithoutTotal());
+
+                var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
 
                 var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids));
 
@@ -109,6 +104,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 context.Fail(ex);
             }
+        }
+
+        private async Task<IAppEntity> GetAppAsync(DomainId appId)
+        {
+            var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
+
+            var app = await appProvider.GetAppAsync(appId);
+
+            if (app == null)
+            {
+                throw new JavaScriptException("App does not exist.");
+            }
+
+            return app;
         }
     }
 }
