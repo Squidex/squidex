@@ -20,12 +20,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
         private readonly IRulesIndex rulesIndex = A.Fake<IRulesIndex>();
         private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext;
         private readonly RuleQueryService sut;
 
         public RuleQueryServiceTests()
         {
-            requestContext.App = Mocks.App(appId);
+            requestContext = Context.Anonymous(Mocks.App(appId));
 
             sut = new RuleQueryService(rulesIndex, ruleEnricher);
         }

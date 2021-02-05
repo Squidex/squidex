@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (!HasPermission(context, schema, Permissions.AppContentsRead))
                 {
-                    q.CreatedBy = context.User.Token();
+                    q = q with { CreatedBy = context.User.Token() };
                 }
 
                 q = await queryParser.ParseAsync(context, q, schema);
@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private static bool HasPermission(Context context, ISchemaEntity schema, string permissionId)
         {
-            return context.Permissions.Allows(permissionId, context.App.Name, schema.SchemaDef.Name);
+            return context.UserPermissions.Allows(permissionId, context.App.Name, schema.SchemaDef.Name);
         }
     }
 }

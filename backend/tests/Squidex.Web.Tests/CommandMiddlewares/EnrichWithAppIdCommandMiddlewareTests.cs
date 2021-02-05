@@ -11,6 +11,7 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
@@ -22,20 +23,15 @@ namespace Squidex.Web.CommandMiddlewares
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext;
         private readonly EnrichWithAppIdCommandMiddleware sut;
 
         public EnrichWithAppIdCommandMiddlewareTests()
         {
+            requestContext = Context.Anonymous(Mocks.App(appId));
+
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
-
-            var app = A.Fake<IAppEntity>();
-
-            A.CallTo(() => app.Id).Returns(appId.Id);
-            A.CallTo(() => app.Name).Returns(appId.Name);
-
-            requestContext.App = app;
 
             sut = new EnrichWithAppIdCommandMiddleware(contextProvider);
         }
@@ -43,7 +39,8 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_throw_exception_if_app_not_found()
         {
-            requestContext.App = null!;
+            A.CallTo(() => contextProvider.Context)
+                .Returns(Context.Anonymous(null!));
 
             var command = new CreateContent();
             var context = Ctx(command);

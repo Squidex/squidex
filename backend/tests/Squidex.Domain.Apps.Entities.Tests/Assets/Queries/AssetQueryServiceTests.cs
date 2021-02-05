@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             SetupEnricher();
 
-            A.CallTo(() => queryParser.ParseQueryAsync(requestContext, A<Q>._))
+            A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._))
                 .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
             sut = new AssetQueryService(assetEnricher, assetRepository, assetLoader, assetFolderRepository, queryParser);

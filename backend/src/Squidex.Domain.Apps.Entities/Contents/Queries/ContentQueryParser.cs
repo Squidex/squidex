@@ -63,14 +63,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             using (Profiler.TraceMethod<ContentQueryParser>())
             {
-                var query = ParseQuery(context, q, schema);
+                var query = ParseClrQuery(context, q, schema);
 
                 await TransformFilterAsync(query, context, schema);
 
                 WithSorting(query);
                 WithPaging(query);
 
-                q = q!.WithQuery(query);
+                q = q.WithQuery(query);
+
+                if (context.ShouldSkipTotal())
+                {
+                    q = q.WithoutTotal();
+                }
 
                 return q;
             }
@@ -113,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private ClrQuery ParseQuery(Context context, Q q, ISchemaEntity? schema)
+        private ClrQuery ParseClrQuery(Context context, Q q, ISchemaEntity? schema)
         {
             var query = q.Query;
 

@@ -81,7 +81,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var (id, _, query) = CreateTestData(true);
 
-            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
+            A.CallTo(() => contentQuery.QueryAsync(
+                    A<Context>.That.Matches(x =>
+                        x.ShouldSkipCleanup() &&
+                        x.ShouldSkipContentEnrichment() &&
+                        x.ShouldSkipTotal()),
+                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query)))
                 .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
 
             var command = BulkCommand(BulkUpdateType.ChangeStatus, query);
@@ -101,7 +106,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var (id, data, query) = CreateTestData(true);
 
-            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
+            A.CallTo(() => contentQuery.QueryAsync(
+                    A<Context>.That.Matches(x =>
+                        x.ShouldSkipCleanup() &&
+                        x.ShouldSkipContentEnrichment() &&
+                        x.ShouldSkipTotal()),
+                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query)))
                 .Returns(ResultList.CreateFrom(1, CreateContent(id)));
 
             var command = BulkCommand(BulkUpdateType.Upsert, query: query, data: data);
@@ -125,7 +135,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var id1 = DomainId.NewGuid();
             var id2 = DomainId.NewGuid();
 
-            A.CallTo(() => contentQuery.QueryAsync(requestContext, A<string>._, A<Q>.That.Matches(x => x.JsonQuery == query)))
+            A.CallTo(() => contentQuery.QueryAsync(
+                    A<Context>.That.Matches(x =>
+                        x.ShouldSkipCleanup() &&
+                        x.ShouldSkipContentEnrichment() &&
+                        x.ShouldSkipTotal()),
+                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query)))
                 .Returns(ResultList.CreateFrom(2,
                     CreateContent(id1),
                     CreateContent(id2)));

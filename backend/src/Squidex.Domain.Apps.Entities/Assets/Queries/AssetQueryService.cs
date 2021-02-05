@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                q = await queryParser.ParseQueryAsync(context, q);
+                q = await queryParser.ParseAsync(context, q);
 
                 var assets = await assetRepository.QueryAsync(context.App.Id, parentId, q);
 

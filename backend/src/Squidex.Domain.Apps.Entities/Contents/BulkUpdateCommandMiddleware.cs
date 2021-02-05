@@ -80,7 +80,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         PropagateCompletion = true
                     });
 
-                    var requestContext = contextProvider.Context.WithoutContentEnrichment().WithUnpublished(true);
+                    var requestContext = contextProvider.Context.Clone(b => b
+                        .WithoutContentEnrichment()
+                        .WithoutCleanup()
+                        .WithUnpublished(true)
+                        .WithoutTotal());
+
                     var requestedSchema = bulkUpdates.SchemaId.Name;
 
                     var results = new ConcurrentBag<BulkUpdateResultItem>();

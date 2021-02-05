@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private readonly DomainId assetId = DomainId.NewGuid();
         private readonly AssetDomainObjectGrain asset;
         private readonly AssetFile file;
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext;
         private readonly AssetCommandMiddleware sut;
 
         public sealed class MyCommand : SquidexCommand
@@ -62,6 +62,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             asset = new AssetDomainObjectGrain(serviceProvider, null!);
             asset.ActivateAsync(Id.ToString()).Wait();
+
+            requestContext = Context.Anonymous(Mocks.App(AppNamedId));
 
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);

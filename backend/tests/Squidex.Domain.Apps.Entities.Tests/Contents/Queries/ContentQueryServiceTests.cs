@@ -303,7 +303,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, concretePermission));
             }
 
-            return new Context(claimsPrincipal, Mocks.App(appId)).WithUnpublished(isUnpublished == 1);
+            return new Context(claimsPrincipal, Mocks.App(appId)).Clone(b => b.WithUnpublished(isUnpublished == 1));
         }
 
         private static void AssertContent(IContentEntity source, IEnrichedContentEntity? result)

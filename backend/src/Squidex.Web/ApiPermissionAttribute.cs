@@ -35,7 +35,7 @@ namespace Squidex.Web
         {
             if (permissionIds.Length > 0)
             {
-                var permissions = context.HttpContext.Context().Permissions;
+                var permissions = context.HttpContext.Context().UserPermissions;
 
                 var hasPermission = false;
 

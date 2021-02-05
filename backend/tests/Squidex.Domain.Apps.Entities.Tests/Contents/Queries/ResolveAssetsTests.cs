@@ -88,7 +88,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { doc2.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id)))
+            A.CallTo(() => assetQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id)))
                 .Returns(ResultList.CreateFrom(4, doc1, doc2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -119,7 +120,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { doc2.Id, doc1.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id, img1.Id, img2.Id)))
+            A.CallTo(() => assetQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id, img1.Id, img2.Id)))
                 .Returns(ResultList.CreateFrom(4, img1, img2, doc1, doc2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -171,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
             };
 
-            var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).WithoutContentEnrichment(true);
+            var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).Clone(b => b.WithoutContentEnrichment(true));
 
             await sut.EnrichAsync(ctx, contents, schemaProvider);
 
@@ -212,7 +214,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.NotNull(contents[0].ReferenceData);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.HasIds(id1)))
+            A.CallTo(() => assetQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(id1)))
                 .MustHaveHappened();
         }
 

@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public static class ContextExtensions
+    public static class ContentExtensions
     {
         private const string HeaderFlatten = "X-Flatten";
         private const string HeaderLanguages = "X-Languages";
@@ -44,24 +44,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context.ShouldProvideUnpublished() || context.IsFrontendClient ? SearchScope.All : SearchScope.Published;
         }
 
-        public static bool ShouldCleanup(this Context context)
+        public static bool ShouldSkipCleanup(this Context context)
         {
-            return !context.Headers.ContainsKey(HeaderNoCleanup);
+            return context.Headers.ContainsKey(HeaderNoCleanup);
         }
 
-        public static Context WithoutCleanup(this Context context, bool value = true)
+        public static ICloneBuilder WithoutCleanup(this ICloneBuilder builder, bool value = true)
         {
-            return SetBoolean(context, HeaderNoCleanup, value);
+            return builder.WithBoolean(HeaderNoCleanup, value);
         }
 
-        public static bool ShouldEnrichContent(this Context context)
+        public static bool ShouldSkipContentEnrichment(this Context context)
         {
-            return !context.Headers.ContainsKey(HeaderNoEnrichment);
+            return context.Headers.ContainsKey(HeaderNoEnrichment);
         }
 
-        public static Context WithoutContentEnrichment(this Context context, bool value = true)
+        public static ICloneBuilder WithoutContentEnrichment(this ICloneBuilder builder, bool value = true)
         {
-            return SetBoolean(context, HeaderNoEnrichment, value);
+            return builder.WithBoolean(HeaderNoEnrichment, value);
         }
 
         public static bool ShouldProvideUnpublished(this Context context)
@@ -69,9 +69,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context.Headers.ContainsKey(HeaderUnpublished);
         }
 
-        public static Context WithUnpublished(this Context context, bool value = true)
+        public static ICloneBuilder WithUnpublished(this ICloneBuilder builder, bool value = true)
         {
-            return SetBoolean(context, HeaderUnpublished, value);
+            return builder.WithBoolean(HeaderUnpublished, value);
         }
 
         public static bool ShouldFlatten(this Context context)
@@ -79,9 +79,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context.Headers.ContainsKey(HeaderFlatten);
         }
 
-        public static Context WithFlatten(this Context context, bool value = true)
+        public static ICloneBuilder WithFlatten(this ICloneBuilder builder, bool value = true)
         {
-            return SetBoolean(context, HeaderFlatten, value);
+            return builder.WithBoolean(HeaderFlatten, value);
         }
 
         public static bool ShouldResolveFlow(this Context context)
@@ -89,9 +89,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context.Headers.ContainsKey(HeaderResolveFlow);
         }
 
-        public static Context WithResolveFlow(this Context context, bool value = true)
+        public static ICloneBuilder WithResolveFlow(this ICloneBuilder builder, bool value = true)
         {
-            return SetBoolean(context, HeaderResolveFlow, value);
+            return builder.WithBoolean(HeaderResolveFlow, value);
         }
 
         public static bool ShouldResolveLanguages(this Context context)
@@ -99,9 +99,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return !context.Headers.ContainsKey(HeaderNoResolveLanguages);
         }
 
-        public static Context WithoutResolveLanguages(this Context context, bool value = true)
+        public static ICloneBuilder WithoutResolveLanguages(this ICloneBuilder builder, bool value = true)
         {
-            return SetBoolean(context, HeaderNoResolveLanguages, value);
+            return builder.WithBoolean(HeaderNoResolveLanguages, value);
         }
 
         public static IEnumerable<string> AssetUrls(this Context context)
@@ -114,18 +114,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Enumerable.Empty<string>();
         }
 
-        public static Context WithAssetUrlsToResolve(this Context context, IEnumerable<string> fieldNames)
+        public static ICloneBuilder WithAssetUrlsToResolve(this ICloneBuilder builder, IEnumerable<string>? fieldNames)
         {
-            if (fieldNames?.Any() == true)
-            {
-                context.Headers[HeaderResolveUrls] = string.Join(",", fieldNames);
-            }
-            else
-            {
-                context.Headers.Remove(HeaderResolveUrls);
-            }
-
-            return context;
+            return builder.WithStrings(HeaderResolveUrls, fieldNames);
         }
 
         public static IEnumerable<Language> Languages(this Context context)
@@ -148,32 +139,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Enumerable.Empty<Language>();
         }
 
-        public static Context WithLanguages(this Context context, IEnumerable<string> fieldNames)
+        public static ICloneBuilder WithLanguages(this ICloneBuilder builder, IEnumerable<string> fieldNames)
         {
-            if (fieldNames?.Any() == true)
-            {
-                context.Headers[HeaderLanguages] = string.Join(",", fieldNames);
-            }
-            else
-            {
-                context.Headers.Remove(HeaderLanguages);
-            }
-
-            return context;
-        }
-
-        private static Context SetBoolean(Context context, string key, bool value)
-        {
-            if (value)
-            {
-                context.Headers[key] = "1";
-            }
-            else
-            {
-                context.Headers.Remove(key);
-            }
-
-            return context;
+            return builder.WithStrings(HeaderLanguages, fieldNames);
         }
     }
 }

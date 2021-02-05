@@ -100,7 +100,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 var query = fieldContext.BuildODataQuery();
 
-                return await context.QueryAssetsAsync(query);
+                var q = Q.Empty.WithODataQuery(query).WithoutTotal();
+
+                return await context.QueryAssetsAsync(q);
+            });
+
+            public static readonly IFieldResolver ResolverWithTotal = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
+            {
+                var query = fieldContext.BuildODataQuery();
+
+                var q = Q.Empty.WithODataQuery(query);
+
+                return await context.QueryAssetsAsync(q);
             });
         }
     }

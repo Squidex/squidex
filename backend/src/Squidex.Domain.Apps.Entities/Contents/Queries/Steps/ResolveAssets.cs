@@ -118,7 +118,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 return EmptyAssets;
             }
 
-            var assets = await assetQuery.QueryAsync(context.Clone().WithoutAssetEnrichment(true), null, Q.Empty.WithIds(ids));
+            var queryContext = context.Clone(b => b
+                .WithoutAssetEnrichment(true)
+                .WithoutTotal());
+
+            var assets = await assetQuery.QueryAsync(queryContext, null, Q.Empty.WithIds(ids));
 
             return assets.ToLookup(x => x.Id);
         }
@@ -133,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private static bool ShouldEnrich(Context context)
         {
-            return context.IsFrontendClient && context.ShouldEnrichContent();
+            return context.IsFrontendClient && !context.ShouldSkipContentEnrichment();
         }
     }
 }

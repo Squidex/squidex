@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Name = "queryAssetsWithTotal",
                     Arguments = AssetActions.Query.Arguments,
                     ResolvedType = AssetsResult,
-                    Resolver = AssetActions.Query.Resolver,
+                    Resolver = AssetActions.Query.ResolverWithTotal,
                     Description = "Get assets and total count."
                 };
             });

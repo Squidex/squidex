@@ -49,13 +49,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         return Completion.Normal;
                     }
 
-                    var appContext =
-                        Context.Admin()
-                            .WithoutContentEnrichment()
-                            .WithoutCleanup()
-                            .WithUnpublished();
-
-                    appContext.App = app;
+                    var appContext = Context.Admin(app).Clone(b => b
+                        .WithoutContentEnrichment()
+                        .WithoutCleanup()
+                        .WithUnpublished());
 
                     var id = (await arguments[1].Expression.EvaluateAsync(context)).ToStringValue();
 

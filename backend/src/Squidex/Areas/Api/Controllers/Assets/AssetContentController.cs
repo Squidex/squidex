@@ -16,6 +16,7 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -73,14 +74,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AllowAnonymous]
         public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, [FromQuery] AssetContentQueryDto queries, string? more = null)
         {
-            var asset = await assetQuery.FindAsync(Context, DomainId.Create(idOrSlug));
+            var requestContext = Context.Clone(b => b.WithoutAssetEnrichment());
+
+            var asset = await assetQuery.FindAsync(requestContext, DomainId.Create(idOrSlug));
 
             if (asset == null)
             {
-                asset = await assetQuery.FindBySlugAsync(Context, idOrSlug);
+                asset = await assetQuery.FindBySlugAsync(requestContext, idOrSlug);
             }
 
-            return await DeliverAssetAsync(asset, queries);
+            return await DeliverAssetAsync(requestContext, asset, queries);
         }
 
         /// <summary>
@@ -101,12 +104,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Obsolete("Use overload with app name")]
         public async Task<IActionResult> GetAssetContent(DomainId id, [FromQuery] AssetContentQueryDto queries)
         {
-            var asset = await assetQuery.FindGlobalAsync(Context, id);
+            var requestContext = Context.Clone(b => b.WithoutAssetEnrichment());
 
-            return await DeliverAssetAsync(asset, queries);
+            var asset = await assetQuery.FindGlobalAsync(requestContext, id);
+
+            return await DeliverAssetAsync(requestContext, asset, queries);
         }
 
-        private async Task<IActionResult> DeliverAssetAsync(IAssetEntity? asset, AssetContentQueryDto queries)
+        private async Task<IActionResult> DeliverAssetAsync(Context context, IAssetEntity? asset, AssetContentQueryDto queries)
         {
             queries ??= new AssetContentQueryDto();
 
@@ -124,9 +129,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (asset != null && queries.Version > EtagVersion.Any && asset.Version != queries.Version)
             {
-                if (Context.App != null)
+                if (context.App != null)
                 {
-                    asset = await assetQuery.FindAsync(Context, asset.Id, queries.Version);
+                    asset = await assetQuery.FindAsync(context, asset.Id, queries.Version);
                 }
                 else
                 {

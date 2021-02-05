@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private async Task<ValueConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
         {
-            if (context.ShouldCleanup())
+            if (!context.ShouldSkipCleanup())
             {
                 var ids = new HashSet<DomainId>();
 

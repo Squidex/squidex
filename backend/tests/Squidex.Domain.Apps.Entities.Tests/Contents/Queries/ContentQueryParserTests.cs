@@ -52,6 +52,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
+        public async Task Should_skip_total_when_set_in_context()
+        {
+            var q = await sut.ParseAsync(requestContext.Clone(b => b.WithoutTotal()), Q.Empty);
+
+            Assert.True(q.NoTotal);
+        }
+
+        [Fact]
         public async Task Should_throw_if_odata_query_is_invalid()
         {
             var query = Q.Empty.WithODataQuery("$filter=invalid");
