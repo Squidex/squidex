@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -34,14 +34,24 @@ namespace Squidex.Extensions.Actions.AzureQueue
 
         protected override async Task<(string Description, AzureQueueJob Data)> CreateJobAsync(EnrichedEvent @event, AzureQueueAction action)
         {
+            var requestBody = string.Empty;
             var queueName = await FormatAsync(action.Queue, @event);
+
+            if (!string.IsNullOrEmpty(action.Payload))
+            {
+                requestBody = await FormatAsync(action.Payload, @event);
+            }
+            else
+            {
+                requestBody = ToEnvelopeJson(@event);
+            }
 
             var ruleDescription = $"Send AzureQueueJob to azure queue '{queueName}'";
             var ruleJob = new AzureQueueJob
             {
                 QueueConnectionString = action.ConnectionString,
                 QueueName = queueName,
-                MessageBodyV2 = ToEnvelopeJson(@event)
+                MessageBodyV2 = requestBody
             };
 
             return (ruleDescription, ruleJob);
