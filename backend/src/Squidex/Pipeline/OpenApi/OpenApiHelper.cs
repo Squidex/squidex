@@ -18,9 +18,9 @@ namespace Squidex.Pipeline.OpenApi
     {
         public static readonly string SecurityDocs = LoadDocs("security");
 
-        public static readonly string SchemaBodyDocs = LoadDocs("schemabody");
+        public static readonly string SchemaBodyDocs = LoadDocs("schema-body");
 
-        public static readonly string SchemaQueryDocs = LoadDocs("schemaquery");
+        public static readonly string SchemaQueryDocs = LoadDocs("schema-query");
 
         private static string LoadDocs(string name)
         {

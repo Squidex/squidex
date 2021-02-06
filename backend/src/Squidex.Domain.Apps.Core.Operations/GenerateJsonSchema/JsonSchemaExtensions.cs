@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 if (property != null)
                 {
-                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}FlatProperty", () => property);
+                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}FlatPropertyDto", () => property);
 
                     jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyReference));
                 }
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 if (partitionObject.Properties.Count > 0)
                 {
-                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}Property", () => partitionObject);
+                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}PropertyDto", () => partitionObject);
 
                     jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyReference));
                 }

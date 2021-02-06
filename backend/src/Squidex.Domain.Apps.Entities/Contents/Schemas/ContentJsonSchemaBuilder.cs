@@ -6,23 +6,11 @@
 // ==========================================================================
 
 using NJsonSchema;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public static class ContentJsonSchemaBuilder
     {
-        public static JsonSchema CreateContentSchema(this Schema schema, JsonSchema? dataSchema, bool extended)
-        {
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(dataSchema, nameof(dataSchema));
-
-            var schemaName = schema.Properties.Label.Or(schema.Name);
-
-            return BuildSchema(schemaName, dataSchema, extended);
-        }
-
         public static JsonSchema BuildSchema(string name, JsonSchema? dataSchema, bool extended = false)
         {
             var jsonSchema = new JsonSchema

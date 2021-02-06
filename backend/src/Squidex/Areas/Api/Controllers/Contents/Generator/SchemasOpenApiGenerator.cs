@@ -52,19 +52,20 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             requestCache.AddDependency(app.UniqueId, app.Version);
 
-            var builder = new AppBuilder(
-                app, 
+            var builder = new Builder(
+                app,
                 document,
                 schemaResolver,
-                schemaGenerator,
-                flat);
+                schemaGenerator);
 
             foreach (var schema in schemas.Where(x => x.SchemaDef.IsPublished))
             {
                 requestCache.AddDependency(schema.UniqueId, schema.Version);
 
-                GenerateSchemaOperations(builder.Schema(schema.SchemaDef));
+                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, flat));
             }
+
+            GenerateSharedOperations(builder.Shared());
 
             var context =
                 new DocumentProcessorContext(document,
@@ -82,17 +83,22 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return document;
         }
 
+        private static void GenerateSharedOperations(OperationsBuilder builder)
+        {
+            var contentsSchema = BuildResults(builder);
+
+            builder.AddOperation(OpenApiOperationMethod.Get, "/")
+                .RequirePermission(Permissions.AppContentsReadOwn)
+                .Operation("Query")
+                .OperationSummary("Query contents across all schemas.")
+                .HasQuery("ids", JsonObjectType.String, "Comma-separated list of content IDs.")
+                .Responds(200, "Content items retrieved.", contentsSchema)
+                .Responds(400, "Query not valid.");
+        }
+
         private static void GenerateSchemaOperations(OperationsBuilder builder)
         {
-            var contentsSchema = new JsonSchema
-            {
-                Properties =
-                {
-                    ["total"] = SchemaBuilder.NumberProperty(builder.FormatText("The total number of schema content items."), true),
-                    ["items"] = SchemaBuilder.ArrayProperty(builder.ContentSchema, builder.FormatText("The schema content items."), true)
-                },
-                Type = JsonObjectType.Object
-            };
+            var contentsSchema = BuildResults(builder);
 
             builder.AddOperation(OpenApiOperationMethod.Get, "/")
                 .RequirePermission(Permissions.AppContentsReadOwn)
@@ -132,7 +138,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .OperationSummary("Create a schema content item.")
                 .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
                 .HasQuery("id", JsonObjectType.String, "The optional custom content id.")
-                .HasId()
                 .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
                 .Responds(201, "Content item created", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
@@ -188,6 +193,19 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .OperationSummary("Delete a schema content item.")
                 .HasId()
                 .Responds(204, "Content item deleted");
+        }
+
+        private static JsonSchema BuildResults(OperationsBuilder builder)
+        {
+            return new JsonSchema
+            {
+                Properties =
+                {
+                    ["total"] = SchemaBuilder.NumberProperty("The total number of content items.", true),
+                    ["items"] = SchemaBuilder.ArrayProperty(builder.ContentSchema, "The content items.", true)
+                },
+                Type = JsonObjectType.Object
+            };
         }
     }
 }

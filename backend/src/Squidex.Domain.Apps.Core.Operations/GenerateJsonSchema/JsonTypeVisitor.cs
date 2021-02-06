@@ -66,9 +66,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<AssetsFieldProperties> field, Args args)
         {
-            var itemSchema = args.SchemaResolver("AssetItem", () => SchemaBuilder.String());
-
-            return SchemaBuilder.ArrayProperty(itemSchema);
+            return SchemaBuilder.ArrayProperty(SchemaBuilder.String());
         }
 
         public JsonSchemaProperty? Visit(IField<BooleanFieldProperties> field, Args args)
@@ -133,9 +131,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            var itemSchema = args.SchemaResolver("ReferenceItem", () => SchemaBuilder.String());
-
-            return SchemaBuilder.ArrayProperty(itemSchema);
+            return SchemaBuilder.ArrayProperty(SchemaBuilder.String());
         }
 
         public JsonSchemaProperty? Visit(IField<StringFieldProperties> field, Args args)
@@ -162,9 +158,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<TagsFieldProperties> field, Args args)
         {
-            var itemSchema = args.SchemaResolver("TagItem", () => SchemaBuilder.String());
-
-            return SchemaBuilder.ArrayProperty(itemSchema);
+            return SchemaBuilder.ArrayProperty(SchemaBuilder.String());
         }
 
         public JsonSchemaProperty? Visit(IField<UIFieldProperties> field, Args args)

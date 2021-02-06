@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using NJsonSchema;
 using NSwag;
 using Squidex.Infrastructure;
@@ -30,12 +31,19 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         public string FormatText(string text)
         {
-            return text?.Replace("schema", $"'{SchemaDisplayName}'", StringComparison.OrdinalIgnoreCase)!;
+            return text?.Replace("schema ", $"'{SchemaDisplayName}' ", StringComparison.OrdinalIgnoreCase)!;
         }
 
         public OperationBuilder AddOperation(string method, string path)
         {
-            var operation = new OpenApiOperation();
+            var operation = new OpenApiOperation
+            {
+                Tags = new List<string>
+                {
+                    SchemaDisplayName
+                }
+            };
+
             var operations = Parent.Document.Paths.GetOrAddNew($"{Path}{path}");
 
             operations[method] = operation;

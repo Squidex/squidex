@@ -43,38 +43,77 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             ChangeStatusSchema = schemaGenerator.GenerateWithReference<JsonSchema>(typeof(ChangeStatusDto).ToContextualType(), schemaResolver);
         }
 
+        public OperationsBuilder Shared()
+        {
+            var dataSchema = ResolveSchema("DataDto", () =>
+            {
+                return JsonSchema.CreateAnySchema();
+            });
+
+            var contentSchema = ResolveSchema($"ContentDto", () =>
+            {
+                return ContentJsonSchemaBuilder.BuildSchema("Shared", dataSchema, true);
+            });
+
+            var path = $"/content/{AppName}";
+
+            var builder = new OperationsBuilder
+            {
+                ContentSchema = contentSchema,
+                DataSchema = dataSchema,
+                Path = path,
+                Parent = this,
+                SchemaDisplayName = "__Shared",
+                SchemaName = "__Shared",
+                SchemaTypeName = "__Shared",
+            };
+
+            var description = "API endpoints for operations across all schemas.";
+
+            Document.Tags.Add(new OpenApiTag { Name = "__Shared", Description = description });
+
+            return builder;
+        }
+
         public OperationsBuilder Schema(Schema schema, bool flat)
         {
             var typeName = schema.TypeName();
 
-            var dataSchema = ResolveSchema($"{typeName}Dto", () =>
+            var displayName = schema.DisplayName();
+
+            var dataSchema = ResolveSchema($"{typeName}DataDto", () =>
             {
                 return schema.BuildJsonSchema(partitionResolver, ResolveSchema);
             });
 
+            var dataFlatSchema = ResolveSchema($"{typeName}FlatDataDto", () =>
+            {
+                return schema.BuildFlatJsonSchema(ResolveSchema);
+            });
+
             var contentSchema = ResolveSchema($"{typeName}ContentDto", () =>
             {
-                if (flat)
-                {
-                    return schema.CreateContentSchema(dataSchema, true);
-                }
-                else
-                {
-                    var flatData = schema.BuildFlatJsonSchema(ResolveSchema);
+                var data = flat ? dataFlatSchema : dataSchema;
 
-                    return schema.CreateContentSchema(flatData, true);
-                }
+                return ContentJsonSchemaBuilder.BuildSchema(displayName, dataFlatSchema, true);
             });
+
+            var path = $"/content/{AppName}/{schema.Name}";
 
             var builder = new OperationsBuilder
             {
-                SchemaName = schema.Name,
-                SchemaDisplayName = schema.DisplayName(),
-                SchemaTypeName = schema.TypeName(),
                 ContentSchema = contentSchema,
                 DataSchema = dataSchema,
+                Path = path,
                 Parent = this,
+                SchemaDisplayName = displayName,
+                SchemaName = schema.Name,
+                SchemaTypeName = typeName
             };
+
+            var description = builder.FormatText("API endpoints for schema content items.");
+
+            Document.Tags.Add(new OpenApiTag { Name = displayName, Description = description });
 
             return builder;
         }
