@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -34,19 +35,22 @@ namespace Squidex.Areas.Api.Controllers.Rules
         private readonly IRuleQueryService ruleQuery;
         private readonly IRuleRunnerService ruleRunnerService;
         private readonly IRuleEventRepository ruleEventsRepository;
+        private readonly EventJsonSchemaGenerator eventJsonSchemaGenerator;
         private readonly RuleRegistry ruleRegistry;
 
         public RulesController(ICommandBus commandBus,
             IRuleEventRepository ruleEventsRepository,
             IRuleQueryService ruleQuery,
             IRuleRunnerService ruleRunnerService,
-            RuleRegistry ruleRegistry)
+            RuleRegistry ruleRegistry,
+            EventJsonSchemaGenerator eventJsonSchemaGenerator)
             : base(commandBus)
         {
             this.ruleEventsRepository = ruleEventsRepository;
             this.ruleQuery = ruleQuery;
             this.ruleRunnerService = ruleRunnerService;
             this.ruleRegistry = ruleRegistry;
+            this.eventJsonSchemaGenerator = eventJsonSchemaGenerator;
         }
 
         /// <summary>
@@ -353,6 +357,47 @@ namespace Squidex.Areas.Api.Controllers.Rules
             await ruleEventsRepository.CancelAsync(id);
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Provide a list of all event types that are used in rules.
+        /// </summary>
+        /// <returns>
+        /// 200 => Rule events returned.
+        /// </returns>
+        [HttpGet]
+        [Route("rules/eventtypes")]
+        [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+        [AllowAnonymous]
+        public IActionResult GetEventTypes()
+        {
+            var types = eventJsonSchemaGenerator.AllTypes;
+
+            return Ok(types);
+        }
+
+        /// <summary>
+        /// Provide the json schema for the event with the specified name.
+        /// </summary>
+        /// <param name="name">The name of the event.</param>
+        /// <returns>
+        /// 200 => Rule event type found.
+        /// 404 => Rule event not found.
+        /// </returns>
+        [HttpGet]
+        [Route("rules/eventtypes/{name}")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [AllowAnonymous]
+        public IActionResult GetEventSchema(string name)
+        {
+            var schema = eventJsonSchemaGenerator.GetSchema(name);
+
+            if (schema == null)
+            {
+                return NotFound();
+            }
+
+            return Content(schema.ToJson(), "application/json");
         }
 
         private async Task<RuleDto> InvokeCommandAsync(ICommand command)

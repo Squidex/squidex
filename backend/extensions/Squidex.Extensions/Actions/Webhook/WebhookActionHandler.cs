@@ -30,6 +30,7 @@ namespace Squidex.Extensions.Actions.Webhook
 
         protected override async Task<(string Description, WebhookJob Data)> CreateJobAsync(EnrichedEvent @event, WebhookAction action)
         {
+            var requestUrl = await FormatAsync(action.Url, @event);
             var requestBody = string.Empty;
             var requestSignature = string.Empty;
 
@@ -46,8 +47,6 @@ namespace Squidex.Extensions.Actions.Webhook
 
                 requestSignature = $"{requestBody}{action.SharedSecret}".Sha256Base64();
             }
-
-            var requestUrl = await FormatAsync(action.Url, @event);
 
             var ruleDescription = $"Send event to webhook '{requestUrl}'";
             var ruleJob = new WebhookJob

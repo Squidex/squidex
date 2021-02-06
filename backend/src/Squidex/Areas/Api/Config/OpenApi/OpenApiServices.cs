@@ -5,9 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using NJsonSchema;
+using NJsonSchema.Generation;
 using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
 using NSwag.Generation;
@@ -52,6 +55,18 @@ namespace Squidex.Areas.Api.Config.OpenApi
             services.AddSingletonAs<XmlResponseTypesProcessor>()
                 .As<IOperationProcessor>();
 
+            services.AddSingleton(c =>
+            {
+                var settings = ConfigureSchemaSettings(new JsonSchemaGeneratorSettings
+                {
+                    FlattenInheritanceHierarchy = true,
+                    SerializerOptions = null,
+                    SerializerSettings = c.GetRequiredService<JsonSerializerSettings>()
+                });
+
+                return new JsonSchemaGenerator(settings);
+            });
+
             services.AddOpenApiDocument(settings =>
             {
                 settings.ConfigureName();
@@ -68,21 +83,26 @@ namespace Squidex.Areas.Api.Config.OpenApi
             settings.Title = "Squidex API";
         }
 
-        public static void ConfigureSchemaSettings<T>(this T settings) where T : OpenApiDocumentGeneratorSettings
+        public static T ConfigureSchemaSettings<T>(this T settings) where T : JsonSchemaGeneratorSettings
         {
             settings.AllowReferencesWithProperties = true;
 
             settings.TypeMappers = new List<ITypeMapper>
             {
+                CreateStringMap<DomainId>(),
                 CreateStringMap<Instant>(JsonFormatStrings.DateTime),
                 CreateStringMap<Language>(),
-                CreateStringMap<DomainId>(),
+                CreateStringMap<NamedId<DomainId>>(),
+                CreateStringMap<NamedId<Guid>>(),
+                CreateStringMap<NamedId<string>>(),
                 CreateStringMap<RefToken>(),
                 CreateStringMap<Status>(),
 
                 CreateObjectMap<JsonObject>(),
                 CreateObjectMap<AssetMetadata>()
             };
+
+            return settings;
         }
 
         private static ITypeMapper CreateObjectMap<T>()

@@ -34,8 +34,9 @@ namespace Squidex.Extensions.Actions.AzureQueue
 
         protected override async Task<(string Description, AzureQueueJob Data)> CreateJobAsync(EnrichedEvent @event, AzureQueueAction action)
         {
-            var requestBody = string.Empty;
             var queueName = await FormatAsync(action.Queue, @event);
+
+            string requestBody;
 
             if (!string.IsNullOrEmpty(action.Payload))
             {
