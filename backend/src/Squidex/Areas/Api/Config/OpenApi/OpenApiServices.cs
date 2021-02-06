@@ -12,7 +12,6 @@ using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
 using NSwag.Generation;
 using NSwag.Generation.Processors;
-using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
@@ -57,10 +56,8 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 settings.ConfigureName();
                 settings.ConfigureSchemaSettings();
 
-                settings.OperationProcessors.Add(new ODataQueryParamsProcessor("/apps/{app}/assets", "assets", false));
+                settings.OperationProcessors.Add(new QueryParamsProcessor("/apps/{app}/assets"));
             });
-
-            services.AddTransient<SchemasOpenApiGenerator>();
         }
 
         private static void ConfigureName<T>(this T settings) where T : OpenApiDocumentGeneratorSettings

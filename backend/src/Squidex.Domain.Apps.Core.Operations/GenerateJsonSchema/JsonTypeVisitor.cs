@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.ObjectModel;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -12,7 +13,7 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
-    public delegate JsonSchema SchemaResolver(string name, JsonSchema schema);
+    public delegate JsonSchema SchemaResolver(string name, Func<JsonSchema> schema);
 
     internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonTypeVisitor.Args>
     {
@@ -65,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<AssetsFieldProperties> field, Args args)
         {
-            var itemSchema = args.SchemaResolver("AssetItem", SchemaBuilder.String());
+            var itemSchema = args.SchemaResolver("AssetItem", () => SchemaBuilder.String());
 
             return SchemaBuilder.ArrayProperty(itemSchema);
         }
@@ -82,25 +83,28 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            var geolocationSchema = SchemaBuilder.Object();
-
-            geolocationSchema.Format = GeoJson.Format;
-
-            geolocationSchema.Properties.Add("latitude", new JsonSchemaProperty
+            var reference = args.SchemaResolver("GeolocationDto", () =>
             {
-                Type = JsonObjectType.Number,
-                Maximum = 90,
-                Minimum = -90
-            }.SetRequired(true));
+                var geolocationSchema = SchemaBuilder.Object();
 
-            geolocationSchema.Properties.Add("longitude", new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Number,
-                Maximum = 180,
-                Minimum = -180
-            }.SetRequired(true));
+                geolocationSchema.Format = GeoJson.Format;
 
-            var reference = args.SchemaResolver("GeolocationDto", geolocationSchema);
+                geolocationSchema.Properties.Add("latitude", new JsonSchemaProperty
+                {
+                    Type = JsonObjectType.Number,
+                    Maximum = 90,
+                    Minimum = -90
+                }.SetRequired(true));
+
+                geolocationSchema.Properties.Add("longitude", new JsonSchemaProperty
+                {
+                    Type = JsonObjectType.Number,
+                    Maximum = 180,
+                    Minimum = -180
+                }.SetRequired(true));
+
+                return geolocationSchema;
+            });
 
             return SchemaBuilder.ObjectProperty(reference);
         }
@@ -129,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            var itemSchema = args.SchemaResolver("ReferenceItem", SchemaBuilder.String());
+            var itemSchema = args.SchemaResolver("ReferenceItem", () => SchemaBuilder.String());
 
             return SchemaBuilder.ArrayProperty(itemSchema);
         }
@@ -140,6 +144,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             property.MaxLength = field.Properties.MaxLength;
             property.MinLength = field.Properties.MinLength;
+
             property.Pattern = field.Properties.Pattern;
 
             if (field.Properties.AllowedValues != null)
@@ -157,7 +162,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<TagsFieldProperties> field, Args args)
         {
-            var itemSchema = args.SchemaResolver("ReferenceItem", SchemaBuilder.String());
+            var itemSchema = args.SchemaResolver("TagItem", () => SchemaBuilder.String());
 
             return SchemaBuilder.ArrayProperty(itemSchema);
         }

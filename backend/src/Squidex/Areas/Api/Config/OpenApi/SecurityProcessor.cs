@@ -55,7 +55,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
         private static void SetupDescription(OpenApiSecurityScheme securityScheme, string tokenUrl)
         {
-            var securityText = NSwagHelper.SecurityDocs.Replace("<TOKEN_URL>", tokenUrl);
+            var securityText = OpenApiHelper.SecurityDocs.Replace("<TOKEN_URL>", tokenUrl);
 
             securityScheme.Description = securityText;
         }
