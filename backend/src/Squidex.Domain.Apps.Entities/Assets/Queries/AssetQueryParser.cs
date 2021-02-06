@@ -152,22 +152,22 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 schema.Properties[name.ToCamelCase()] = property;
             }
 
-            AddProperty(nameof(IAssetEntity.Id), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.Created), JsonObjectType.String, JsonFormatStrings.DateTime);
-            AddProperty(nameof(IAssetEntity.CreatedBy), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.FileHash), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.FileName), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.FileSize), JsonObjectType.Integer);
-            AddProperty(nameof(IAssetEntity.FileVersion), JsonObjectType.Integer);
-            AddProperty(nameof(IAssetEntity.IsProtected), JsonObjectType.Boolean);
-            AddProperty(nameof(IAssetEntity.LastModified), JsonObjectType.String, JsonFormatStrings.DateTime);
-            AddProperty(nameof(IAssetEntity.LastModifiedBy), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.Metadata), JsonObjectType.None);
-            AddProperty(nameof(IAssetEntity.MimeType), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.Slug), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.Tags), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.Type), JsonObjectType.String);
-            AddProperty(nameof(IAssetEntity.Version), JsonObjectType.Integer);
+            AddProperty("id", JsonObjectType.String);
+            AddProperty("version", JsonObjectType.Integer);
+            AddProperty("created", JsonObjectType.String, JsonFormatStrings.DateTime);
+            AddProperty("createdBy", JsonObjectType.String);
+            AddProperty("fileHash", JsonObjectType.String);
+            AddProperty("fileName", JsonObjectType.String);
+            AddProperty("fileSize", JsonObjectType.Integer);
+            AddProperty("fileVersion", JsonObjectType.Integer);
+            AddProperty("isProtected", JsonObjectType.Boolean);
+            AddProperty("lastModified", JsonObjectType.String, JsonFormatStrings.DateTime);
+            AddProperty("lastModifiedBy", JsonObjectType.String);
+            AddProperty("metadata", JsonObjectType.None);
+            AddProperty("mimeType", JsonObjectType.String);
+            AddProperty("slug", JsonObjectType.String);
+            AddProperty("tags", JsonObjectType.String);
+            AddProperty("type", JsonObjectType.String);
 
             return schema;
         }
@@ -188,23 +188,23 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             var jsonType = new EdmComplexType("Squidex", "Json", null, false, true);
 
-            AddPropertyReference(nameof(IAssetEntity.Metadata), new EdmComplexTypeReference(jsonType, false));
+            AddPropertyReference("Metadata", new EdmComplexTypeReference(jsonType, false));
 
-            AddProperty(nameof(IAssetEntity.Id), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.Created), EdmPrimitiveTypeKind.DateTimeOffset);
-            AddProperty(nameof(IAssetEntity.CreatedBy), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.FileHash), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.FileName), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.IsProtected), EdmPrimitiveTypeKind.Boolean);
-            AddProperty(nameof(IAssetEntity.FileSize), EdmPrimitiveTypeKind.Int64);
-            AddProperty(nameof(IAssetEntity.FileVersion), EdmPrimitiveTypeKind.Int64);
-            AddProperty(nameof(IAssetEntity.LastModified), EdmPrimitiveTypeKind.DateTimeOffset);
-            AddProperty(nameof(IAssetEntity.LastModifiedBy), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.MimeType), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.Slug), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.Tags), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.Type), EdmPrimitiveTypeKind.String);
-            AddProperty(nameof(IAssetEntity.Version), EdmPrimitiveTypeKind.Int64);
+            AddProperty("id", EdmPrimitiveTypeKind.String);
+            AddProperty("version", EdmPrimitiveTypeKind.Int64);
+            AddProperty("created", EdmPrimitiveTypeKind.DateTimeOffset);
+            AddProperty("createdBy", EdmPrimitiveTypeKind.String);
+            AddProperty("fileHash", EdmPrimitiveTypeKind.String);
+            AddProperty("fileName", EdmPrimitiveTypeKind.String);
+            AddProperty("isProtected", EdmPrimitiveTypeKind.Boolean);
+            AddProperty("fileSize", EdmPrimitiveTypeKind.Int64);
+            AddProperty("fileVersion", EdmPrimitiveTypeKind.Int64);
+            AddProperty("lastModified", EdmPrimitiveTypeKind.DateTimeOffset);
+            AddProperty("lastModifiedBy", EdmPrimitiveTypeKind.String);
+            AddProperty("mimeType", EdmPrimitiveTypeKind.String);
+            AddProperty("slug", EdmPrimitiveTypeKind.String);
+            AddProperty("tags", EdmPrimitiveTypeKind.String);
+            AddProperty("type", EdmPrimitiveTypeKind.String);
 
             var container = new EdmEntityContainer("Squidex", "Container");
 

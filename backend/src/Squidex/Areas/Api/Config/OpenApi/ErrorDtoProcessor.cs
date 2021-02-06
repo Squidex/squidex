@@ -12,7 +12,6 @@ using NJsonSchema;
 using NSwag;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
-using Squidex.Pipeline.OpenApi;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.OpenApi
@@ -35,7 +34,11 @@ namespace Squidex.Areas.Api.Config.OpenApi
         {
             if (!operation.Responses.ContainsKey("500"))
             {
-                operation.AddResponse("500", "Operation failed", errorSchema);
+                const string description = "Operation failed.";
+
+                var response = new OpenApiResponse { Description = description, Schema = errorSchema };
+
+                operation.Responses["500"] = response;
             }
 
             foreach (var (code, response) in operation.Responses)

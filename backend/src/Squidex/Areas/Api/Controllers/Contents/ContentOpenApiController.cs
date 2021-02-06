@@ -43,6 +43,20 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         [HttpGet]
+        [Route("content/{app}/docs/flat/")]
+        [ApiCosts(0)]
+        [AllowAnonymous]
+        public IActionResult DocsFlat(string app)
+        {
+            var vm = new DocsVM
+            {
+                Specification = $"~/content/{app}/flat/swagger/v1/swagger.json"
+            };
+
+            return View(nameof(Docs), vm);
+        }
+
+        [HttpGet]
         [Route("content/{app}/swagger/v1/swagger.json")]
         [ApiCosts(0)]
         [AllowAnonymous]
@@ -51,6 +65,19 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
             var openApiDocument = schemasOpenApiGenerator.Generate(HttpContext, App, schemas);
+
+            return Content(openApiDocument.ToJson(), "application/json");
+        }
+
+        [HttpGet]
+        [Route("content/{app}/flat/swagger/v1/swagger.json")]
+        [ApiCosts(0)]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetFlatOpenApi(string app)
+        {
+            var schemas = await appProvider.GetSchemasAsync(AppId);
+
+            var openApiDocument = schemasOpenApiGenerator.Generate(HttpContext, App, schemas, true);
 
             return Content(openApiDocument.ToJson(), "application/json");
         }

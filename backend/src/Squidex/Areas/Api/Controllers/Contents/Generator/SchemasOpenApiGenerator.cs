@@ -9,31 +9,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Namotion.Reflection;
 using NJsonSchema;
-using NJsonSchema.Generation;
 using NSwag;
 using NSwag.Generation;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 using Squidex.Areas.Api.Config.OpenApi;
-using Squidex.Areas.Api.Controllers.Contents.Models;
+using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Pipeline.OpenApi;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemasOpenApiGenerator
     {
         private readonly OpenApiDocumentGeneratorSettings settings = new OpenApiDocumentGeneratorSettings();
+        private readonly OpenApiSchemaGenerator schemaGenerator;
         private readonly IRequestCache requestCache;
-        private OpenApiSchemaGenerator schemaGenerator;
-        private OpenApiDocument document;
-        private JsonSchema statusSchema;
-        private JsonSchemaResolver schemaResolver;
 
         public SchemasOpenApiGenerator(IEnumerable<IDocumentProcessor> documentProcessors, IRequestCache requestCache)
         {
@@ -44,19 +39,33 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 settings.DocumentProcessors.Add(processor);
             }
 
+            schemaGenerator = new OpenApiSchemaGenerator(settings);
+
             this.requestCache = requestCache;
         }
 
-        public OpenApiDocument Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas)
+        public OpenApiDocument Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat = false)
         {
-            document = NSwagHelper.CreateApiDocument(httpContext, app.Name);
+            var document = OpenApiHelper.CreateApiDocument(httpContext, app.Name);
 
-            schemaGenerator = new OpenApiSchemaGenerator(settings);
-            schemaResolver = new OpenApiSchemaResolver(document, settings);
+            var schemaResolver = new OpenApiSchemaResolver(document, settings);
 
-            statusSchema = GenerateStatusSchema();
+            requestCache.AddDependency(app.UniqueId, app.Version);
 
-            GenerateSchemasOperations(schemas, app);
+            var builder = new Builder(
+                app,
+                document,
+                schemaResolver,
+                schemaGenerator);
+
+            foreach (var schema in schemas.Where(x => x.SchemaDef.IsPublished))
+            {
+                requestCache.AddDependency(schema.UniqueId, schema.Version);
+
+                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, flat));
+            }
+
+            GenerateSharedOperations(builder.Shared());
 
             var context =
                 new DocumentProcessorContext(document,
@@ -74,35 +83,129 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return document;
         }
 
-        private JsonSchema GenerateStatusSchema()
+        private static void GenerateSharedOperations(OperationsBuilder builder)
         {
-            var statusDtoType = typeof(ChangeStatusDto);
+            var contentsSchema = BuildResults(builder);
 
-            return schemaGenerator.GenerateWithReference<JsonSchema>(statusDtoType.ToContextualType(), schemaResolver);
+            builder.AddOperation(OpenApiOperationMethod.Get, "/")
+                .RequirePermission(Permissions.AppContentsReadOwn)
+                .Operation("Query")
+                .OperationSummary("Query contents across all schemas.")
+                .HasQuery("ids", JsonObjectType.String, "Comma-separated list of content IDs.")
+                .Responds(200, "Content items retrieved.", contentsSchema)
+                .Responds(400, "Query not valid.");
         }
 
-        private void GenerateSchemasOperations(IEnumerable<ISchemaEntity> schemas, IAppEntity app)
+        private static void GenerateSchemaOperations(OperationsBuilder builder)
         {
-            requestCache.AddDependency(app.UniqueId, app.Version);
+            var contentsSchema = BuildResults(builder);
 
-            var appBasePath = $"/content/{app.Name}";
+            builder.AddOperation(OpenApiOperationMethod.Get, "/")
+                .RequirePermission(Permissions.AppContentsReadOwn)
+                .Operation("Query")
+                .OperationSummary("Query schema contents items.")
+                .Describe(OpenApiHelper.SchemaQueryDocs)
+                .HasQueryOptions(true)
+                .Responds(200, "Content items retrieved.", contentsSchema)
+                .Responds(400, "Query not valid.");
 
-            foreach (var schema in schemas.Where(x => x.SchemaDef.IsPublished))
+            builder.AddOperation(OpenApiOperationMethod.Get, "/{id}")
+                .RequirePermission(Permissions.AppContentsReadOwn)
+                .Operation("Get")
+                .OperationSummary("Get a schema content item.")
+                .HasId()
+                .Responds(200, "Content item returned.", builder.ContentSchema);
+
+            builder.AddOperation(OpenApiOperationMethod.Get, "/{id}/{version}")
+                .RequirePermission(Permissions.AppContentsReadOwn)
+                .Operation("Get")
+                .OperationSummary("Get a schema content item by id and version.")
+                .HasPath("version", JsonObjectType.Number, "The version of the content item.")
+                .HasId()
+                .Responds(200, "Content item returned.", builder.ContentSchema);
+
+            builder.AddOperation(OpenApiOperationMethod.Get, "/{id}/validity")
+                .RequirePermission(Permissions.AppContentsReadOwn)
+                .Operation("Validate")
+                .OperationSummary("Validates a schema content item.")
+                .HasId()
+                .Responds(200, "Content item is valid.")
+                .Responds(400, "Content item is not valid.");
+
+            builder.AddOperation(OpenApiOperationMethod.Post, "/")
+                .RequirePermission(Permissions.AppContentsCreate)
+                .Operation("Create")
+                .OperationSummary("Create a schema content item.")
+                .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
+                .HasQuery("id", JsonObjectType.String, "The optional custom content id.")
+                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .Responds(201, "Content item created", builder.ContentSchema)
+                .Responds(400, "Content data not valid.");
+
+            builder.AddOperation(OpenApiOperationMethod.Post, "/{id}")
+                .RequirePermission(Permissions.AppContentsUpsert)
+                .Operation("Upsert")
+                .OperationSummary("Upsert a schema content item.")
+                .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
+                .HasId()
+                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .Responds(200, "Content item created or updated.", builder.ContentSchema)
+                .Responds(400, "Content data not valid.");
+
+            builder.AddOperation(OpenApiOperationMethod.Put, "/{id}")
+                .RequirePermission(Permissions.AppContentsUpdateOwn)
+                .Operation("Update")
+                .OperationSummary("Update a schema content item.")
+                .HasId()
+                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .Responds(200, "Content item updated.", builder.ContentSchema)
+                .Responds(400, "Content data not valid.");
+
+            builder.AddOperation(OpenApiOperationMethod.Patch, "/{id}")
+                .RequirePermission(Permissions.AppContentsUpdateOwn)
+                .Operation("Patch")
+                .OperationSummary("Patch a schema content item.")
+                .HasId()
+                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .Responds(200, "Content item updated.", builder.ContentSchema)
+                .Responds(400, "Content data not valid.");
+
+            builder.AddOperation(OpenApiOperationMethod.Put, "/{id}/status")
+                .RequirePermission(Permissions.AppContentsUpdateOwn)
+                .Operation("Patch")
+                .OperationSummary("Patch a schema content item.")
+                .HasId()
+                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .Responds(200, "Content item updated.", builder.ContentSchema)
+                .Responds(400, "Content data not valid.");
+
+            builder.AddOperation(OpenApiOperationMethod.Delete, "/{id}")
+                .RequirePermission(Permissions.AppContentsChangeStatusOwn)
+                .Operation("Change")
+                .OperationSummary("Change the status of a schema content item.")
+                .HasId()
+                .HasBody("request", builder.Parent.ChangeStatusSchema, "The request to change content status.")
+                .Responds(200, "Content status updated.", builder.ContentSchema);
+
+            builder.AddOperation(OpenApiOperationMethod.Delete, "/{id}")
+                .RequirePermission(Permissions.AppContentsDeleteOwn)
+                .Operation("Delete")
+                .OperationSummary("Delete a schema content item.")
+                .HasId()
+                .Responds(204, "Content item deleted");
+        }
+
+        private static JsonSchema BuildResults(OperationsBuilder builder)
+        {
+            return new JsonSchema
             {
-                requestCache.AddDependency(schema.UniqueId, schema.Version);
-
-                var partition = app.PartitionResolver();
-
-                new SchemaOpenApiGenerator(document, app.Name, appBasePath, schema.SchemaDef, AppendSchema, statusSchema, partition)
-                    .GenerateSchemaOperations();
-            }
-        }
-
-        private JsonSchema AppendSchema(string name, JsonSchema schema)
-        {
-            name = char.ToUpperInvariant(name[0]) + name[1..];
-
-            return new JsonSchema { Reference = document.Definitions.GetOrAdd(name, schema, (k, c) => c) };
+                Properties =
+                {
+                    ["total"] = SchemaBuilder.NumberProperty("The total number of content items.", true),
+                    ["items"] = SchemaBuilder.ArrayProperty(builder.ContentSchema, "The content items.", true)
+                },
+                Type = JsonObjectType.Object
+            };
         }
     }
 }
