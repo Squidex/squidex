@@ -15,7 +15,7 @@
 * **UI**: Change the default of date editors to local mode instead of UTC.
 * **UI**: Better support for SVG images in the rich text and markdown editor.
 * **UI**: Integrated video player for assets.
-* **UI**: Integrated document viewwer for documents like Word and PowerPoint.
+* **UI**: Integrated document viewer for documents like Word and PowerPoint.
 * **UI**: Fixed default value handling.
 * **UI**: Better sorting of schemas in custom Roles.
 
