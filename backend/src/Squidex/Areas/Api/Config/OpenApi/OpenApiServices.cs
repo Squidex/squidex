@@ -63,13 +63,15 @@ namespace Squidex.Areas.Api.Config.OpenApi
             services.AddTransient<SchemasOpenApiGenerator>();
         }
 
-        public static void ConfigureName<T>(this T settings) where T : OpenApiDocumentGeneratorSettings
+        private static void ConfigureName<T>(this T settings) where T : OpenApiDocumentGeneratorSettings
         {
             settings.Title = "Squidex API";
         }
 
         public static void ConfigureSchemaSettings<T>(this T settings) where T : OpenApiDocumentGeneratorSettings
         {
+            settings.AllowReferencesWithProperties = true;
+
             settings.TypeMappers = new List<ITypeMapper>
             {
                 CreateStringMap<Instant>(JsonFormatStrings.DateTime),
