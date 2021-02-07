@@ -12,7 +12,6 @@ using GraphQL;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Log;
 using GraphQLSchema = GraphQL.Types.Schema;
 
@@ -31,18 +30,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             schema = new Builder(app, typeFactory).BuildSchema(schemas);
         }
 
-        public async Task<(object Data, object[]? Errors)> ExecuteAsync(GraphQLExecutionContext context, GraphQLQuery query)
+        public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
-            Guard.NotNull(context, nameof(context));
+            options.Schema = schema;
 
-            var result = await Executor.ExecuteAsync(execution =>
-            {
-                context.Setup(execution);
-
-                execution.Schema = schema;
-                execution.Inputs = query.Inputs;
-                execution.Query = query.Query;
-            });
+            var result = await Executor.ExecuteAsync(options);
 
             if (result.Errors != null && result.Errors.Any())
             {
@@ -58,9 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     }));
             }
 
-            var errors = result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray();
-
-            return (result.Data, errors);
+            return result;
         }
     }
 }

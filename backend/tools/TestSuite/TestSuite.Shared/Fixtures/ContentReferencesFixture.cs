@@ -33,7 +33,7 @@ namespace TestSuite.Fixtures
                         throw;
                     }
                 }
-        }).Wait();
+            }).Wait();
 
             Contents = ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(SchemaName);
         }

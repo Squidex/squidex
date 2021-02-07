@@ -30,7 +30,8 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexRules(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<RuleOptions>(config, "rules");
+            services.Configure<RuleOptions>(config,
+                "rules");
 
             services.AddTransientAs<RuleDomainObject>()
                 .AsSelf();

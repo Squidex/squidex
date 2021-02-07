@@ -16,7 +16,8 @@ namespace Squidex.Config.Authentication
     {
         public static void AddSquidexIdentity(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<MyIdentityOptions>(config, "identity");
+            services.Configure<MyIdentityOptions>(config,
+                "identity");
 
             services.AddSingletonAs<DefaultUserResolver>()
                 .AsOptional<IUserResolver>();

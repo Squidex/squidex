@@ -15,7 +15,6 @@ using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -47,14 +46,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
             var expected = new
             {
-                data = new
-                {
-                    createMySchemaContent = (object?)null
-                },
                 errors = new[]
                 {
                     new
@@ -67,6 +62,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 line = 3,
                                 column = 19
                             }
+                        },
+                        path = new[]
+                        {
+                            "createMySchemaContent"
                         }
                     }
                 }
@@ -90,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsCreate);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsCreate);
 
             var expected = new
             {
@@ -123,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsCreate);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsCreate);
 
             var expected = new
             {
@@ -157,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query, Inputs = GetInput() }, Permissions.AppContentsCreate);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsCreate);
 
             var expected = new
             {
@@ -188,14 +187,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
             var expected = new
             {
-                data = new
-                {
-                    updateMySchemaContent = (object?)null
-                },
                 errors = new[]
                 {
                     new
@@ -208,6 +203,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 line = 3,
                                 column = 19
                             }
+                        },
+                        path = new[]
+                        {
+                            "updateMySchemaContent"
                         }
                     }
                 }
@@ -231,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -263,7 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -293,14 +292,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
             var expected = new
             {
-                data = new
-                {
-                    upsertMySchemaContent = (object?)null
-                },
                 errors = new[]
                 {
                     new
@@ -313,6 +308,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 line = 3,
                                 column = 19
                             }
+                        },
+                        path = new[]
+                        {
+                            "upsertMySchemaContent"
                         }
                     }
                 }
@@ -336,7 +335,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsUpsert);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsUpsert);
 
             var expected = new
             {
@@ -369,7 +368,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpsert);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpsert);
 
             var expected = new
             {
@@ -400,14 +399,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
             var expected = new
             {
-                data = new
-                {
-                    patchMySchemaContent = (object?)null
-                },
                 errors = new[]
                 {
                     new
@@ -420,6 +415,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 line = 3,
                                 column = 19
                             }
+                        },
+                        path = new[]
+                        {
+                            "patchMySchemaContent"
                         }
                     }
                 }
@@ -443,7 +442,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -475,7 +474,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -505,14 +504,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
             var expected = new
             {
-                data = new
-                {
-                    changeMySchemaContent = (object?)null
-                },
                 errors = new[]
                 {
                     new
@@ -525,6 +520,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 line = 3,
                                 column = 19
                             }
+                        },
+                        path = new[]
+                        {
+                            "changeMySchemaContent"
                         }
                     }
                 }
@@ -550,7 +549,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsChangeStatusOwn);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsChangeStatusOwn);
 
             var expected = new
             {
@@ -583,7 +582,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsChangeStatusOwn);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsChangeStatusOwn);
 
             var expected = new
             {
@@ -616,7 +615,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsChangeStatusOwn);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsChangeStatusOwn);
 
             var expected = new
             {
@@ -647,11 +646,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }".Replace("<ID>", contentId.ToString());
 
-            var result = await ExecuteAsync(new GraphQLQuery { Query = query }, Permissions.AppContentsReadOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
             var expected = new
             {
-                data = (object?)null,
                 errors = new[]
                 {
                     new
@@ -664,6 +662,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 line = 3,
                                 column = 19
                             }
+                        },
+                        path = new[]
+                        {
+                            "deleteMySchemaContent"
                         }
                     }
                 }
@@ -687,7 +689,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(new EntitySavedResult(13));
 
-            var result = await ExecuteAsync( new GraphQLQuery { Query = query }, Permissions.AppContentsDeleteOwn);
+            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsDeleteOwn);
 
             var expected = new
             {
@@ -707,15 +709,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     x.ContentId == contentId &&
                     x.ExpectedVersion == 10)))
                 .MustHaveHappened();
-        }
-
-        private Task<(bool HasError, object Response)> ExecuteAsync(GraphQLQuery query, string permissionId)
-        {
-            var permission = Permissions.ForApp(permissionId, app.Name, schemaId.Name).Id;
-
-            var withPermission = new Context(Mocks.FrontendUser(permission: permission), app);
-
-            return sut.QueryAsync(withPermission, query);
         }
 
         private Inputs GetInput()

@@ -39,6 +39,11 @@ namespace Squidex.Infrastructure.Commands
             {
                 throw new NotSupportedException();
             }
+
+            public ISemanticLog CreateScope(ILogAppender appender)
+            {
+                throw new NotSupportedException();
+            }
         }
 
         public LogCommandMiddlewareTests()
