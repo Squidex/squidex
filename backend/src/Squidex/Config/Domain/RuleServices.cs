@@ -80,6 +80,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IRuleEnqueuer>().As<IEventConsumer>();
 
+            services.AddSingletonAs<EventJsonSchemaGenerator>()
+                .AsSelf();
+
             services.AddSingletonAs<RuleRegistry>()
                 .As<ITypeProvider>().AsSelf();
 
