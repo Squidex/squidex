@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
 using Microsoft.AspNetCore.WebUtilities;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -20,6 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public DefaultDocumentWriter(IJsonSerializer jsonSerializer)
         {
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+
             this.jsonSerializer = jsonSerializer;
         }
 
