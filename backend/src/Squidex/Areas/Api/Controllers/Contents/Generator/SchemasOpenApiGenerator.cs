@@ -12,43 +12,40 @@ using Microsoft.AspNetCore.Http;
 using NJsonSchema;
 using NSwag;
 using NSwag.Generation;
-using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
-using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Hosting;
 using Squidex.Infrastructure.Caching;
-using Squidex.Pipeline.OpenApi;
 using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemasOpenApiGenerator
     {
-        private readonly OpenApiDocumentGeneratorSettings settings = new OpenApiDocumentGeneratorSettings();
+        private readonly IUrlGenerator urlGenerator;
+        private readonly OpenApiDocumentGeneratorSettings schemaSettings;
         private readonly OpenApiSchemaGenerator schemaGenerator;
         private readonly IRequestCache requestCache;
 
-        public SchemasOpenApiGenerator(IEnumerable<IDocumentProcessor> documentProcessors, IRequestCache requestCache)
+        public SchemasOpenApiGenerator(
+            IUrlGenerator urlGenerator,
+            OpenApiDocumentGeneratorSettings schemaSettings,
+            OpenApiSchemaGenerator schemaGenerator,
+            IRequestCache requestCache)
         {
-            settings.ConfigureSchemaSettings();
-
-            foreach (var processor in documentProcessors)
-            {
-                settings.DocumentProcessors.Add(processor);
-            }
-
-            schemaGenerator = new OpenApiSchemaGenerator(settings);
-
+            this.urlGenerator = urlGenerator;
+            this.schemaSettings = schemaSettings;
+            this.schemaGenerator = schemaGenerator;
             this.requestCache = requestCache;
         }
 
         public OpenApiDocument Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat = false)
         {
-            var document = OpenApiHelper.CreateApiDocument(httpContext, app.Name);
+            var document = CreateApiDocument(httpContext, app);
 
-            var schemaResolver = new OpenApiSchemaResolver(document, settings);
+            var schemaResolver = new OpenApiSchemaResolver(document, schemaSettings);
 
             requestCache.AddDependency(app.UniqueId, app.Version);
 
@@ -73,9 +70,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                     Enumerable.Empty<Type>(),
                     schemaResolver,
                     schemaGenerator,
-                    settings);
+                    schemaSettings);
 
-            foreach (var processor in settings.DocumentProcessors)
+            foreach (var processor in schemaSettings.DocumentProcessors)
             {
                 processor.Process(context);
             }
@@ -104,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .RequirePermission(Permissions.AppContentsReadOwn)
                 .Operation("Query")
                 .OperationSummary("Query schema contents items.")
-                .Describe(OpenApiHelper.SchemaQueryDocs)
+                .Describe(Properties.Resources.OpenApiSchemaQuery)
                 .HasQueryOptions(true)
                 .Responds(200, "Content items retrieved.", contentsSchema)
                 .Responds(400, "Query not valid.");
@@ -138,7 +135,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .OperationSummary("Create a schema content item.")
                 .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
                 .HasQuery("id", JsonObjectType.String, "The optional custom content id.")
-                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
                 .Responds(201, "Content item created", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
 
@@ -148,7 +145,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .OperationSummary("Upsert a schema content item.")
                 .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
                 .HasId()
-                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
                 .Responds(200, "Content item created or updated.", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
 
@@ -157,7 +154,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .Operation("Update")
                 .OperationSummary("Update a schema content item.")
                 .HasId()
-                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
                 .Responds(200, "Content item updated.", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
 
@@ -166,7 +163,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .Operation("Patch")
                 .OperationSummary("Patch a schema content item.")
                 .HasId()
-                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
                 .Responds(200, "Content item updated.", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
 
@@ -175,7 +172,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .Operation("Patch")
                 .OperationSummary("Patch a schema content item.")
                 .HasId()
-                .HasBody("data", builder.DataSchema, OpenApiHelper.SchemaBodyDocs)
+                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
                 .Responds(200, "Content item updated.", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
 
@@ -206,6 +203,48 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 },
                 Type = JsonObjectType.Object
             };
+        }
+
+        private OpenApiDocument CreateApiDocument(HttpContext context, IAppEntity app)
+        {
+            var appName = app.Name;
+
+            var scheme =
+                string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ?
+                    OpenApiSchema.Http :
+                    OpenApiSchema.Https;
+
+            var document = new OpenApiDocument
+            {
+                Schemes = new List<OpenApiSchema>
+                {
+                    scheme
+                },
+                Consumes = new List<string>
+                {
+                    "application/json"
+                },
+                Produces = new List<string>
+                {
+                    "application/json"
+                },
+                Info = new OpenApiInfo
+                {
+                    Title = $"Squidex Content API for '{appName}' App",
+                    Description =
+                        Properties.Resources.OpenApiContentDescription
+                            .Replace("[REDOC_LINK_NORMAL]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs"))
+                            .Replace("[REDOC_LINK_SIMPLE]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs/flat"))
+                },
+                SchemaType = SchemaType.OpenApi3
+            };
+
+            if (!string.IsNullOrWhiteSpace(context.Request.Host.Value))
+            {
+                document.Host = context.Request.Host.Value;
+            }
+
+            return document;
         }
     }
 }
