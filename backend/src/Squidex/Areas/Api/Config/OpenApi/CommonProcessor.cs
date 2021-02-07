@@ -19,6 +19,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
         private readonly string version;
         private readonly string backgroundColor = "#3f83df";
         private readonly string logoUrl;
+
         private readonly OpenApiExternalDocumentation documentation = new OpenApiExternalDocumentation
         {
             Url = "https://docs.squidex.io"

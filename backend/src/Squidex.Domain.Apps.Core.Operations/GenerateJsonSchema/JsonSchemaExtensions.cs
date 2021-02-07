@@ -14,12 +14,35 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public static class JsonSchemaExtensions
     {
+        public static JsonSchema BuildFlatJsonSchema(this Schema schema, SchemaResolver schemaResolver, bool withHidden = false)
+        {
+            Guard.NotNull(schemaResolver, nameof(schemaResolver));
+
+            var schemaName = schema.TypeName();
+
+            var jsonSchema = SchemaBuilder.Object();
+
+            foreach (var field in schema.Fields.ForApi(withHidden))
+            {
+                var property = JsonTypeVisitor.BuildProperty(field, schemaResolver, withHidden);
+
+                if (property != null)
+                {
+                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}FlatPropertyDto", () => property);
+
+                    jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyReference));
+                }
+            }
+
+            return jsonSchema;
+        }
+
         public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver, SchemaResolver schemaResolver, bool withHidden = false)
         {
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
 
-            var schemaName = schema.Name.ToPascalCase();
+            var schemaName = schema.TypeName();
 
             var jsonSchema = SchemaBuilder.Object();
 
@@ -47,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 if (partitionObject.Properties.Count > 0)
                 {
-                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}Property", partitionObject);
+                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}PropertyDto", () => partitionObject);
 
                     jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyReference));
                 }

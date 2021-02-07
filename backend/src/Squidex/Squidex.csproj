@@ -93,8 +93,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
-    <EmbeddedResource Include="Docs\schemabody.md" />
-    <EmbeddedResource Include="Docs\schemaquery.md" />
+    <EmbeddedResource Include="Docs\schema-body.md" />
+    <EmbeddedResource Include="Docs\schema-query.md" />
     <EmbeddedResource Include="Docs\security.md" />
     <EmbeddedResource Include="Pipeline\Squid\icon-happy-sm.svg" />
     <EmbeddedResource Include="Pipeline\Squid\icon-happy.svg" />
@@ -109,8 +109,8 @@
 
   <ItemGroup>
     <None Remove="Areas\Api\Controllers\Users\Assets\Avatar.png" />
-    <None Remove="Docs\schemabody.md" />
-    <None Remove="Docs\schemaquery.md" />
+    <None Remove="Docs\schema-body.md" />
+    <None Remove="Docs\schema-query.md" />
     <None Remove="Docs\security.md" />
     <None Remove="Pipeline\Squid\icon-happy-sm.svg" />
     <None Remove="Pipeline\Squid\icon-happy.svg" />

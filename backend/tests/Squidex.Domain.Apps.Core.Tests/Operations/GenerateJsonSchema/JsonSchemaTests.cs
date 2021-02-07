@@ -25,7 +25,12 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema { Reference = s });
+            var schemaResolver = new SchemaResolver((name, action) =>
+            {
+                return action();
+            });
+
+            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), schemaResolver);
             var jsonProperties = AllPropertyNames(jsonSchema);
 
             void CheckField(IField field)
@@ -55,13 +60,42 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         }
 
         [Fact]
-        public void Should_build_data_schema()
+        public void Should_build_flat_json_schema()
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema { Reference = s });
+            var schemaResolver = new SchemaResolver((name, action) =>
+            {
+                return action();
+            });
 
-            Assert.NotNull(jsonSchema);
+            var jsonSchema = schema.BuildFlatJsonSchema(schemaResolver);
+            var jsonProperties = AllPropertyNames(jsonSchema);
+
+            void CheckField(IField field)
+            {
+                if (!field.IsForApi())
+                {
+                    Assert.DoesNotContain(field.Name, jsonProperties);
+                }
+                else
+                {
+                    Assert.Contains(field.Name, jsonProperties);
+                }
+
+                if (field is IArrayField array)
+                {
+                    foreach (var nested in array.Fields)
+                    {
+                        CheckField(nested);
+                    }
+                }
+            }
+
+            foreach (var field in schema.Fields)
+            {
+                CheckField(field);
+            }
         }
 
         private static HashSet<string> AllPropertyNames(JsonSchema schema)

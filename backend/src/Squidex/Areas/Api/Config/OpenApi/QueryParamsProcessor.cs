@@ -5,32 +5,28 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NSwag;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
 namespace Squidex.Areas.Api.Config.OpenApi
 {
-    public sealed class ODataQueryParamsProcessor : IOperationProcessor
+    public sealed class QueryParamsProcessor : IOperationProcessor
     {
-        private readonly string supportedPath;
-        private readonly string entity;
-        private readonly bool supportSearch;
+        private readonly string path;
 
-        public ODataQueryParamsProcessor(string supportedPath, string entity, bool supportSearch)
+        public QueryParamsProcessor(string path)
         {
-            this.entity = entity;
-
-            this.supportSearch = supportSearch;
-            this.supportedPath = supportedPath;
+            this.path = path;
         }
 
         public bool Process(OperationProcessorContext context)
         {
-            if (context.OperationDescription.Path == supportedPath && context.OperationDescription.Method == "get")
+            if (context.OperationDescription.Path == path && context.OperationDescription.Method == OpenApiOperationMethod.Get)
             {
                 var operation = context.OperationDescription.Operation;
 
-                operation.AddOData(entity, supportSearch);
+                operation.AddQuery(false);
             }
 
             return true;
