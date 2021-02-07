@@ -5,6 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using GraphQL;
+using GraphQL.Execution;
+using GraphQL.NewtonsoftJson;
+using GraphQL.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Migrations;
 using Newtonsoft.Json;
@@ -15,6 +19,7 @@ using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -38,6 +43,7 @@ namespace Squidex.Config.Domain
                 new ContentFieldDataConverter(),
                 new DomainIdConverter(),
                 new EnvelopeHeadersConverter(),
+                new ExecutionResultJsonConverter(new ErrorInfoProvider()),
                 new FilterConverter(),
                 new InstantConverter(),
                 new JsonValueConverter(),
@@ -115,16 +121,29 @@ namespace Squidex.Config.Domain
             return services;
         }
 
-        public static IMvcBuilder AddSquidexSerializers(this IMvcBuilder mvc)
+        public static IMvcBuilder AddSquidexSerializers(this IMvcBuilder builder)
         {
-            mvc.AddNewtonsoftJson(options =>
+            builder.AddNewtonsoftJson(options =>
             {
                 options.AllowInputFormatterExceptionMessages = false;
 
                 ConfigureJson(options.SerializerSettings, TypeNameHandling.None);
             });
 
-            return mvc;
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddSquidexWriter(this IGraphQLBuilder builder)
+        {
+            builder.Services.AddSingleton<IDocumentWriter>(c =>
+            {
+                var settings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.None);
+                var serializer = new NewtonsoftJsonSerializer(settings);
+
+                return new DefaultDocumentWriter(serializer);
+            });
+
+            return builder;
         }
     }
 }

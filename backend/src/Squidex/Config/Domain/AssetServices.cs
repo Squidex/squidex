@@ -29,7 +29,8 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexAssets(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<AssetOptions>(config, "assets");
+            services.Configure<AssetOptions>(config,
+                "assets");
 
             if (config.GetValue<bool>("assets:deleteRecursive"))
             {

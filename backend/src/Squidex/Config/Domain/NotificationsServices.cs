@@ -25,7 +25,8 @@ namespace Squidex.Config.Domain
             {
                 services.AddSingleton(Options.Create(emailOptions));
 
-                services.Configure<NotificationEmailTextOptions>(config, "email:notifications");
+                services.Configure<NotificationEmailTextOptions>(config,
+                    "email:notifications");
 
                 services.AddSingletonAs<SmtpEmailSender>()
                     .As<IEmailSender>();

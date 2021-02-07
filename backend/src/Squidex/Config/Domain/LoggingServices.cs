@@ -35,9 +35,11 @@ namespace Squidex.Config.Domain
 
         private static void AddServices(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<RequestLogOptions>(config, "logging");
+            services.Configure<RequestLogOptions>(config,
+                "logging");
 
-            services.Configure<RequestLogStoreOptions>(config, "logging");
+            services.Configure<RequestLogStoreOptions>(config,
+                "logging");
 
             services.AddSingletonAs(_ => new ApplicationInfoLogAppender(typeof(LoggingServices).Assembly, Guid.NewGuid()))
                 .As<ILogAppender>();

@@ -17,7 +17,8 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexMigration(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<RebuildOptions>(config, "rebuild");
+            services.Configure<RebuildOptions>(config,
+                "rebuild");
 
             services.AddSingletonAs<Migrator>()
                 .AsSelf();

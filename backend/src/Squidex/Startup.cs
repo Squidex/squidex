@@ -51,11 +51,13 @@ namespace Squidex
             services.AddSquidexControllerServices(config);
             services.AddSquidexEventPublisher(config);
             services.AddSquidexEventSourcing(config);
+            services.AddSquidexGraphQL();
             services.AddSquidexHealthChecks(config);
             services.AddSquidexHistory(config);
             services.AddSquidexIdentity(config);
             services.AddSquidexIdentityServer();
             services.AddSquidexInfrastructure(config);
+            services.AddSquidexLocalization();
             services.AddSquidexMigration(config);
             services.AddSquidexNotifications(config);
             services.AddSquidexOpenApiSettings();
@@ -76,6 +78,7 @@ namespace Squidex
 
             app.UseDefaultForwardRules();
 
+            app.UseSquidexCacheKeys();
             app.UseSquidexHealthCheck();
             app.UseSquidexRobotsTxt();
             app.UseSquidexTracking();

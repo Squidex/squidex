@@ -231,7 +231,7 @@ namespace Squidex.Web.Pipeline
         {
             Guard.NotNull(httpContext, nameof(httpContext));
 
-            var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
+            var cacheContext = httpContext.Features.Get<CacheContext>();
 
             cacheContext?.Finish(httpContext.Response, stringBuilderPool);
         }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using GraphQL;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -94,9 +95,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }";
 
-            var result = await sut.QueryAsync(requestContext, new GraphQLQuery { Query = query, OperationName = "IntrospectionQuery" });
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, OperationName = "IntrospectionQuery" });
 
-            var json = serializer.Serialize(result.Response, true);
+            var json = serializer.Serialize(result.Data, true);
 
             Assert.NotEmpty(json);
         }

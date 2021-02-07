@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL.DataLoader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core;
@@ -21,19 +20,11 @@ namespace Squidex.Config.Domain
         {
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
-            services.Configure<GraphQLOptions>(config, "graphql");
+            services.Configure<GraphQLOptions>(config,
+                "graphql");
 
             services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<UrlGenerator>(c, exposeSourceUrl))
                 .As<IUrlGenerator>();
-
-            services.AddSingletonAs<DataLoaderContextAccessor>()
-                .As<IDataLoaderContextAccessor>();
-
-            services.AddTransientAs<GraphQLExecutionContext>()
-                .AsSelf();
-
-            services.AddSingletonAs<DataLoaderDocumentListener>()
-                .AsSelf();
 
             services.AddSingletonAs<SharedTypes>()
                 .AsSelf();

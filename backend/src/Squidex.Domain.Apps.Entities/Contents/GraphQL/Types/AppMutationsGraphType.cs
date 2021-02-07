@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             foreach (var schemaInfo in schemas.Where(x => x.Fields.Count > 0))
             {
-                var contentType = builder.GetContentType(schemaInfo);
+                var contentType = new NonNullGraphType(builder.GetContentType(schemaInfo));
 
                 var inputType = new DataInputGraphType(builder, schemaInfo);
 

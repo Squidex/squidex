@@ -5,6 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using GraphQL;
+using GraphQL.Server;
+using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -14,11 +17,11 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Caching;
-using Squidex.Infrastructure.Translations;
 using Squidex.Pipeline.Plugins;
-using Squidex.Shared;
 using Squidex.Web;
+using Squidex.Web.GraphQL;
 using Squidex.Web.Pipeline;
 using Squidex.Web.Services;
 
@@ -28,10 +31,6 @@ namespace Squidex.Config.Web
     {
         public static void AddSquidexMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
-            var translator = new ResourcesLocalizer(Texts.ResourceManager);
-
-            T.Setup(translator);
-
             services.AddDefaultWebServices(config);
             services.AddDefaultForwardRules();
 
@@ -52,9 +51,6 @@ namespace Squidex.Config.Web
 
             services.AddSingletonAs<UsageMiddleware>()
                 .AsSelf();
-
-            services.AddSingletonAs(c => translator)
-                .As<ILocalizer>();
 
             services.AddSingletonAs<StringLocalizer>()
                 .As<IStringLocalizer>().As<IStringLocalizerFactory>();
@@ -90,6 +86,29 @@ namespace Squidex.Config.Web
             .AddRazorRuntimeCompilation()
             .AddSquidexPlugins(config)
             .AddSquidexSerializers();
+        }
+
+        public static void AddSquidexGraphQL(this IServiceCollection services)
+        {
+            services.AddGraphQL(options =>
+            {
+                options.EnableMetrics = false;
+            })
+            .AddDataLoader()
+            .AddSystemTextJson()
+            .AddSquidexWriter();
+
+            services.AddSingletonAs<DummySchema>()
+                .AsSelf();
+
+            services.AddSingletonAs<DynamicExecutor>()
+                .As<IDocumentExecuter>();
+
+            services.AddSingletonAs<DynamicUserContextBuilder>()
+                .As<IUserContextBuilder>();
+
+            services.AddSingletonAs<GraphQLMiddleware>()
+                .AsSelf();
         }
     }
 }
