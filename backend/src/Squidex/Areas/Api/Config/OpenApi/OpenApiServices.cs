@@ -54,33 +54,52 @@ namespace Squidex.Areas.Api.Config.OpenApi
             services.AddSingletonAs<XmlResponseTypesProcessor>()
                 .As<IOperationProcessor>();
 
+            services.AddSingletonAs<JsonSchemaGenerator>()
+                .AsSelf();
+
+            services.AddSingletonAs<OpenApiSchemaGenerator>()
+                .AsSelf();
+
             services.AddSingleton(c =>
             {
-                var settings = ConfigureSchemaSettings(new JsonSchemaGeneratorSettings
+                var settings = new JsonSchemaGeneratorSettings
                 {
-                    FlattenInheritanceHierarchy = true,
-                    SerializerOptions = null,
                     SerializerSettings = c.GetRequiredService<JsonSerializerSettings>()
-                });
+                };
 
-                return new JsonSchemaGenerator(settings);
+                ConfigureSchemaSettings(settings, true);
+
+                return settings;
+            });
+
+            services.AddSingleton(c =>
+            {
+                var settings = new OpenApiDocumentGeneratorSettings
+                {
+                    SerializerSettings = c.GetRequiredService<JsonSerializerSettings>()
+                };
+
+                ConfigureSchemaSettings(settings, true);
+
+                foreach (var processor in c.GetRequiredService<IEnumerable<IDocumentProcessor>>())
+                {
+                    settings.DocumentProcessors.Add(processor);
+                }
+
+                return settings;
             });
 
             services.AddOpenApiDocument(settings =>
             {
-                settings.ConfigureName();
-                settings.ConfigureSchemaSettings();
+                settings.Title = "Squidex API";
+
+                ConfigureSchemaSettings(settings);
 
                 settings.OperationProcessors.Add(new QueryParamsProcessor("/apps/{app}/assets"));
             });
         }
 
-        private static void ConfigureName<T>(this T settings) where T : OpenApiDocumentGeneratorSettings
-        {
-            settings.Title = "Squidex API";
-        }
-
-        public static T ConfigureSchemaSettings<T>(this T settings) where T : JsonSchemaGeneratorSettings
+        private static void ConfigureSchemaSettings(JsonSchemaGeneratorSettings settings, bool flatten = false)
         {
             settings.AllowReferencesWithProperties = true;
 
@@ -99,7 +118,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 CreateObjectMap<AssetMetadata>()
             };
 
-            return settings;
+            settings.FlattenInheritanceHierarchy = true;
         }
 
         private static ITypeMapper CreateObjectMap<T>()
@@ -110,7 +129,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
                 schema.AdditionalPropertiesSchema = new JsonSchema
                 {
-                    Description = "Any JSON type"
+                    Description = "Any"
                 };
             });
         }

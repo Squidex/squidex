@@ -93,9 +93,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
-    <EmbeddedResource Include="Docs\schema-body.md" />
-    <EmbeddedResource Include="Docs\schema-query.md" />
-    <EmbeddedResource Include="Docs\security.md" />
     <EmbeddedResource Include="Pipeline\Squid\icon-happy-sm.svg" />
     <EmbeddedResource Include="Pipeline\Squid\icon-happy.svg" />
     <EmbeddedResource Include="Pipeline\Squid\icon-sad-sm.svg" />
@@ -109,9 +106,6 @@
 
   <ItemGroup>
     <None Remove="Areas\Api\Controllers\Users\Assets\Avatar.png" />
-    <None Remove="Docs\schema-body.md" />
-    <None Remove="Docs\schema-query.md" />
-    <None Remove="Docs\security.md" />
     <None Remove="Pipeline\Squid\icon-happy-sm.svg" />
     <None Remove="Pipeline\Squid\icon-happy.svg" />
     <None Remove="Pipeline\Squid\icon-sad-sm.svg" />
@@ -134,6 +128,21 @@
     <EmbeddedResource Include="..\..\i18n\frontend_en.json" Link="Areas\Frontend\Resources\frontend_en.json" />
     <EmbeddedResource Include="..\..\i18n\frontend_it.json" Link="Areas\Frontend\Resources\frontend_it.json" />
     <EmbeddedResource Include="..\..\i18n\frontend_nl.json" Link="Areas\Frontend\Resources\frontend_nl.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <PropertyGroup>
