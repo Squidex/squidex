@@ -7,32 +7,33 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps.Json
 {
-    public sealed class JsonLanguagesConfig
+    public sealed class LanguagesConfigSurrogate : ISurrogate<LanguagesConfig>
     {
-        [JsonProperty]
-        public Dictionary<string, JsonLanguageConfig> Languages { get; set; }
+        public Dictionary<string, LanguageConfigSurrogate> Languages { get; set; }
 
-        [JsonProperty]
         public string Master { get; set; }
 
-        public JsonLanguagesConfig()
+        public void FromSource(LanguagesConfig source)
         {
+            Languages = source.Languages.ToDictionary(x => x.Key, source =>
+            {
+                var surrogate = new LanguageConfigSurrogate();
+
+                surrogate.FromSource(source.Value);
+
+                return surrogate;
+            });
+
+            Master = source.Master;
         }
 
-        public JsonLanguagesConfig(LanguagesConfig value)
+        public LanguagesConfig ToSource()
         {
-            Languages = value.Languages.ToDictionary(x => x.Key, x => new JsonLanguageConfig(x.Value));
-
-            Master = value.Master;
-        }
-
-        public LanguagesConfig ToConfig()
-        {
-            var languages = Languages.ToDictionary(x => x.Key, x => x.Value.ToConfig());
+            var languages = Languages.ToDictionary(x => x.Key, x => x.Value.ToSource());
 
             var master = Master ?? languages.Keys.First();
 

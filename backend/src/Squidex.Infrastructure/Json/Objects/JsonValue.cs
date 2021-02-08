@@ -32,6 +32,11 @@ namespace Squidex.Infrastructure.Json.Objects
             return new JsonArray();
         }
 
+        public static JsonArray Array(IEnumerable<object?> values)
+        {
+            return new JsonArray(values);
+        }
+
         public static JsonArray Array(params object?[] values)
         {
             return new JsonArray(values);

@@ -5,17 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
-using Squidex.Infrastructure.Json.Objects;
-
-namespace Squidex.Domain.Apps.Core.Apps.Json
+namespace Squidex.Infrastructure
 {
-    public sealed class JsonRole
+    public interface ISurrogate<T>
     {
-        [JsonProperty]
-        public string[] Permissions { get; set; }
+        void FromSource(T source);
 
-        [JsonProperty]
-        public JsonObject Properties { get; set; }
+        T ToSource();
     }
 }

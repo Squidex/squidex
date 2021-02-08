@@ -7,40 +7,42 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json
 {
-    public sealed class JsonWorkflowStep
+    [DataContract]
+    public sealed class WorkflowStepSurrogate : ISurrogate<WorkflowStep>
     {
-        [JsonProperty]
-        public Dictionary<Status, JsonWorkflowTransition> Transitions { get; set; }
+        [DataMember(Name = "transitions")]
+        public Dictionary<Status, WorkflowTransitionSurrogate> Transitions { get; set; }
 
-        [JsonProperty]
-        public string? Color { get; set; }
-
-        [JsonProperty("noUpdate")]
+        [DataMember(Name = "noUpdate")]
         public bool NoUpdateFlag { get; set; }
 
-        [JsonProperty("noUpdateRules")]
+        [DataMember(Name = "noUpdateRules")]
         public NoUpdate? NoUpdate { get; set; }
 
-        public JsonWorkflowStep()
+        [DataMember(Name = "color")]
+        public string? Color { get; set; }
+
+        public void FromSource(WorkflowStep source)
         {
+            SimpleMapper.Map(source, this);
+
+            Transitions = source.Transitions.ToDictionary(x => x.Key, source =>
+            {
+                var surrogate = new WorkflowTransitionSurrogate();
+
+                surrogate.FromSource(source.Value);
+
+                return surrogate;
+            });
         }
 
-        public JsonWorkflowStep(WorkflowStep step)
-        {
-            SimpleMapper.Map(step, this);
-
-            Transitions =
-                step.Transitions.ToDictionary(
-                    x => x.Key,
-                    x => new JsonWorkflowTransition(x.Value));
-        }
-
-        public WorkflowStep ToStep()
+        public WorkflowStep ToSource()
         {
             var noUpdate = NoUpdate;
 
@@ -52,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
             var transitions =
                 Transitions?.ToDictionary(
                     x => x.Key,
-                    x => x.Value.ToTransition());
+                    x => x.Value.ToSource());
 
             return new WorkflowStep(transitions, Color, noUpdate);
         }

@@ -5,13 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Apps.Json;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Contents.Json;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
@@ -31,29 +35,25 @@ namespace Squidex.Config.Domain
             settings.Converters.Add(new StringEnumConverter());
 
             settings.ContractResolver = new ConverterContractResolver(
-                new AppClientsConverter(),
-                new AppContributorsConverter(),
-                new AppPatternsConverter(),
-                new ClaimsPrincipalConverter(),
                 new ContentFieldDataConverter(),
                 new EnvelopeHeadersConverter(),
                 new FilterConverter(),
                 new InstantConverter(),
                 new JsonValueConverter(),
-                new LanguagesConfigConverter(),
-                new NamedDomainIdConverter(),
-                new NamedGuidIdConverter(),
-                new NamedLongIdConverter(),
-                new NamedStringIdConverter(),
                 new PropertyPathConverter(),
-                new RoleConverter(),
-                new RolesConverter(),
-                new RuleConverter(),
-                new SchemaConverter(),
-                new StatusConverter(),
                 new StringEnumConverter(),
-                new WorkflowsConverter(),
-                new WorkflowStepConverter(),
+                new SurrogateConverter<AppClients, AppClientsSurrogate>(),
+                new SurrogateConverter<AppContributors, AppContributorsSurrogate>(),
+                new SurrogateConverter<AppPatterns, AppPatternsSurrogate>(),
+                new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
+                new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
+                new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),
+                new SurrogateConverter<Roles, RolesSurrogate>(),
+                new SurrogateConverter<Rule, RuleSorrgate>(),
+                new SurrogateConverter<Schema, SchemaSurrogate>(),
+                new SurrogateConverter<Workflows, WorkflowsSurrogate>(),
+                new SurrogateConverter<WorkflowStep, WorkflowStepSurrogate>(),
+                new SurrogateConverter<WorkflowTransition, WorkflowTransitionSurrogate>(),
                 new WriteonlyGeoJsonConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;

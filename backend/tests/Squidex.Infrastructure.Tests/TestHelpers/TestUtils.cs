@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Security.Claims;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Infrastructure.Json;
@@ -33,15 +34,11 @@ namespace Squidex.Infrastructure.TestHelpers
                 SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry ?? new TypeNameRegistry()),
 
                 ContractResolver = new ConverterContractResolver(
-                    new ClaimsPrincipalConverter(),
+                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
                     new EnvelopeHeadersConverter(),
                     new FilterConverter(),
                     new InstantConverter(),
                     new JsonValueConverter(),
-                    new NamedDomainIdConverter(),
-                    new NamedGuidIdConverter(),
-                    new NamedLongIdConverter(),
-                    new NamedStringIdConverter(),
                     new PropertyPathConverter(),
                     new StringEnumConverter()),
 

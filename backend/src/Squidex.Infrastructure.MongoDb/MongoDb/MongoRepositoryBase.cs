@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         static MongoRepositoryBase()
         {
-            RefTokenSerializer.Register();
+            TypeConverterStringSerializer<RefToken>.Register();
 
             InstantSerializer.Register();
 

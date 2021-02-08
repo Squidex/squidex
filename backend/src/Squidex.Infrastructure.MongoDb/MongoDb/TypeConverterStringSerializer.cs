@@ -1,23 +1,24 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public class RefTokenSerializer : ClassSerializerBase<RefToken>
+    public sealed class TypeConverterStringSerializer<T> : ClassSerializerBase<T> where T : class
     {
         public static void Register()
         {
             try
             {
-                BsonSerializer.RegisterSerializer(new RefTokenSerializer());
+                BsonSerializer.RegisterSerializer(new TypeConverterStringSerializer<T>());
             }
             catch (BsonSerializationException)
             {
@@ -25,14 +26,14 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        protected override RefToken DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)
+        protected override T DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var value = context.Reader.ReadString();
 
-            return RefToken.Parse(value);
+            return (T)Convert.ChangeType(value, typeof(T));
         }
 
-        protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, RefToken value)
+        protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, T value)
         {
             context.Writer.WriteString(value.ToString());
         }
