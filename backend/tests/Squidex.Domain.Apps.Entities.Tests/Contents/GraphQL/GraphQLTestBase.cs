@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FakeItEasy;
+using GraphQL;
 using GraphQL.DataLoader;
+using GraphQL.Execution;
+using GraphQL.NewtonsoftJson;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -27,6 +30,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
 using Squidex.Log;
+using Squidex.Shared;
 using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
@@ -35,22 +39,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public class GraphQLTestBase : IClassFixture<TranslationsFixture>
     {
-        protected readonly IAppEntity app;
+        protected readonly IJsonSerializer serializer =
+            TestUtils.CreateSerializer(TypeNameHandling.None,
+                new ExecutionResultJsonConverter(new ErrorInfoProvider()));
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-        protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
         protected readonly ISchemaEntity schema;
         protected readonly ISchemaEntity schemaRef1;
         protected readonly ISchemaEntity schemaRef2;
         protected readonly ISchemaEntity schemaInvalidName;
+        protected readonly IAppEntity app;
         protected readonly Context requestContext;
         protected readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         protected readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         protected readonly NamedId<DomainId> schemaRefId1 = NamedId.Of(DomainId.NewGuid(), "my-ref-schema1");
         protected readonly NamedId<DomainId> schemaRefId2 = NamedId.Of(DomainId.NewGuid(), "my-ref-schema2");
         protected readonly NamedId<DomainId> schemaInvalidNameId = NamedId.Of(DomainId.NewGuid(), "content");
-        protected readonly IGraphQLService sut;
+        protected readonly CachingGraphQLService sut;
 
         public GraphQLTestBase()
         {
@@ -123,22 +129,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = CreateSut();
         }
 
-        protected void AssertResult(object expected, (bool HasErrors, object Response) result, bool checkErrors = true)
+        protected void AssertResult(object expected, ExecutionResult result)
         {
-            if (checkErrors && result.HasErrors)
-            {
-                throw new InvalidOperationException(Serialize(result));
-            }
-
-            var resultJson = serializer.Serialize(result.Response, true);
+            var resultJson = serializer.Serialize(result, true);
             var expectJson = serializer.Serialize(expected, true);
 
             Assert.Equal(expectJson, resultJson);
         }
 
-        private string Serialize((bool HasErrors, object Response) result)
+        protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, string? permissionId = null)
         {
-            return serializer.Serialize(result);
+            var context = requestContext;
+
+            if (permissionId != null)
+            {
+                var permission = Permissions.ForApp(permissionId, app.Name, schemaId.Name).Id;
+
+                context = new Context(Mocks.FrontendUser(permission: permission), app);
+            }
+
+            return ExcecuteAsync(options, context);
+        }
+
+        private Task<ExecutionResult> ExcecuteAsync(ExecutionOptions options, Context context)
+        {
+            options.UserContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context);
+
+            var listener = sut.Services.GetService<DataLoaderDocumentListener>();
+
+            if (listener != null)
+            {
+                options.Listeners.Add(listener);
+            }
+
+            return sut.ExecuteAsync(options);
         }
 
         private CachingGraphQLService CreateSut()

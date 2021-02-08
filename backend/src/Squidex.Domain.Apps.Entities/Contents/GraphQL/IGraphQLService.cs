@@ -6,13 +6,12 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using GraphQL;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public interface IGraphQLService
     {
-        Task<(bool HasError, object Response)> QueryAsync(Context context, params GraphQLQuery[] queries);
-
-        Task<(bool HasError, object Response)> QueryAsync(Context context, GraphQLQuery query);
+        Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
     }
 }

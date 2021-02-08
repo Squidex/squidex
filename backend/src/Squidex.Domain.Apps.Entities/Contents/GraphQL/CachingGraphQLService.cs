@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
+using GraphQL;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -19,6 +19,7 @@ using Squidex.Infrastructure;
 using Squidex.Log;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+#pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
@@ -30,7 +31,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly IServiceProvider serviceProvider;
         private readonly GraphQLOptions options;
 
-        public sealed record CacheEntry(GraphQLModel Model, string Hash, Instant Created);
+        private sealed record CacheEntry(GraphQLModel Model, string Hash, Instant Created);
+
+        public IServiceProvider Services
+        {
+            get { return serviceProvider; }
+        }
 
         public CachingGraphQLService(IBackgroundCache cache, ISchemasHash schemasHash, IServiceProvider serviceProvider, IOptions<GraphQLOptions> options)
         {
@@ -45,55 +51,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             this.options = options.Value;
         }
 
-        public async Task<(bool HasError, object Response)> QueryAsync(Context context, params GraphQLQuery[] queries)
+        public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(queries, nameof(queries));
+            var context = ((GraphQLExecutionContext)options.UserContext).Context;
 
             var model = await GetModelAsync(context.App);
 
-            var executionContext =
-                serviceProvider.GetRequiredService<GraphQLExecutionContext>()
-                    .WithContext(context);
-
-            var result = await Task.WhenAll(queries.Select(q => QueryInternalAsync(model, executionContext, q)));
-
-            return (result.Any(x => x.HasError), result.Select(x => x.Response).ToArray());
-        }
-
-        public async Task<(bool HasError, object Response)> QueryAsync(Context context, GraphQLQuery query)
-        {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(query, nameof(query));
-
-            var model = await GetModelAsync(context.App);
-
-            var executionContext =
-                serviceProvider.GetRequiredService<GraphQLExecutionContext>()
-                    .WithContext(context);
-
-            var result = await QueryInternalAsync(model, executionContext, query);
-
-            return result;
-        }
-
-        private static async Task<(bool HasError, object Response)> QueryInternalAsync(GraphQLModel model, GraphQLExecutionContext context, GraphQLQuery query)
-        {
-            if (string.IsNullOrWhiteSpace(query.Query))
-            {
-                return (false, new { data = new object() });
-            }
-
-            var (data, errors) = await model.ExecuteAsync(context, query);
-
-            if (errors?.Any() == true)
-            {
-                return (false, new { data, errors });
-            }
-            else
-            {
-                return (false, new { data });
-            }
+            return await model.ExecuteAsync(options);
         }
 
         private async Task<GraphQLModel> GetModelAsync(IAppEntity app)

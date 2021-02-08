@@ -10,7 +10,6 @@ using System.Linq;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using Squidex.Hosting;
-using Squidex.Pipeline.OpenApi;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.OpenApi
@@ -55,7 +54,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
         private static void SetupDescription(OpenApiSecurityScheme securityScheme, string tokenUrl)
         {
-            var securityText = OpenApiHelper.SecurityDocs.Replace("<TOKEN_URL>", tokenUrl);
+            var securityText = Properties.Resources.OpenApiSecurity.Replace("<TOKEN_URL>", tokenUrl);
 
             securityScheme.Description = securityText;
         }

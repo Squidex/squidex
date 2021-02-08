@@ -6,12 +6,14 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using GraphQL;
+using GraphQL.Execution;
+using GraphQL.NewtonsoftJson;
+using GraphQL.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NodaTime;
-using NodaTime.Serialization.JsonNet;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Apps.Json;
@@ -21,6 +23,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -40,6 +43,7 @@ namespace Squidex.Config.Domain
             settings.ContractResolver = new ConverterContractResolver(
                 new ContentFieldDataConverter(),
                 new EnvelopeHeadersConverter(),
+                new ExecutionResultJsonConverter(new ErrorInfoProvider()),
                 new JsonValueConverter(),
                 new StringEnumConverter(),
                 new SurrogateConverter<AppClients, AppClientsSurrogate>(),
@@ -63,8 +67,6 @@ namespace Squidex.Config.Domain
             settings.DateParseHandling = DateParseHandling.None;
 
             settings.TypeNameHandling = typeNameHandling;
-
-            settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
             return settings;
         }
@@ -115,16 +117,29 @@ namespace Squidex.Config.Domain
             return services;
         }
 
-        public static IMvcBuilder AddSquidexSerializers(this IMvcBuilder mvc)
+        public static IMvcBuilder AddSquidexSerializers(this IMvcBuilder builder)
         {
-            mvc.AddNewtonsoftJson(options =>
+            builder.AddNewtonsoftJson(options =>
             {
                 options.AllowInputFormatterExceptionMessages = false;
 
                 ConfigureJson(options.SerializerSettings, TypeNameHandling.None);
             });
 
-            return mvc;
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddSquidexWriter(this IGraphQLBuilder builder)
+        {
+            builder.Services.AddSingleton<IDocumentWriter>(c =>
+            {
+                var settings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.None);
+                var serializer = new NewtonsoftJsonSerializer(settings);
+
+                return new DefaultDocumentWriter(serializer);
+            });
+
+            return builder;
         }
     }
 }

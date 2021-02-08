@@ -39,7 +39,8 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
 
         public static readonly JsonSerializerSettings DefaultSerializerSettings = CreateSerializerSettings();
 
-        public static JsonSerializerSettings CreateSerializerSettings(TypeNameHandling typeNameHandling = TypeNameHandling.Auto)
+        public static JsonSerializerSettings CreateSerializerSettings(TypeNameHandling typeNameHandling = TypeNameHandling.Auto,
+            JsonConverter? converter = null)
         {
             var typeNameRegistry =
                 new TypeNameRegistry()
@@ -74,12 +75,17 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                 TypeNameHandling = typeNameHandling
             }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
+            if (converter != null)
+            {
+                serializerSettings.Converters.Add(converter);
+            }
+
             return serializerSettings;
         }
 
-        public static IJsonSerializer CreateSerializer(TypeNameHandling typeNameHandling = TypeNameHandling.Auto)
+        public static IJsonSerializer CreateSerializer(TypeNameHandling typeNameHandling = TypeNameHandling.Auto, JsonConverter? converter = null)
         {
-            var serializerSettings = CreateSerializerSettings(typeNameHandling);
+            var serializerSettings = CreateSerializerSettings(typeNameHandling, converter);
 
             return new NewtonsoftJsonSerializer(serializerSettings);
         }
