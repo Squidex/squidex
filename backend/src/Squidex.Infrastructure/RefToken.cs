@@ -6,39 +6,40 @@
 // ==========================================================================
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure
 {
+    [TypeConverter(typeof(RefTokenTypeConverter))]
     public sealed record RefToken
     {
-        public string Type { get; }
+        public RefTokenType Type { get; }
 
         public string Identifier { get; }
 
         public bool IsClient
         {
-            get { return string.Equals(Type, RefTokenType.Client, StringComparison.OrdinalIgnoreCase); }
+            get { return Type == RefTokenType.Client; }
         }
 
         public bool IsSubject
         {
-            get { return string.Equals(Type, RefTokenType.Subject, StringComparison.OrdinalIgnoreCase); }
+            get { return Type == RefTokenType.Subject; }
         }
 
-        public RefToken(string type, string identifier)
+        public RefToken(RefTokenType type, string identifier)
         {
-            Guard.NotNullOrEmpty(type, nameof(type));
             Guard.NotNullOrEmpty(identifier, nameof(identifier));
 
-            Type = type.ToLowerInvariant();
+            Type = type;
 
             Identifier = identifier;
         }
 
         public override string ToString()
         {
-            return $"{Type}:{Identifier}";
+            return $"{Type.ToString().ToLowerInvariant()}:{Identifier}";
         }
 
         public override int GetHashCode()
@@ -48,19 +49,21 @@ namespace Squidex.Infrastructure
 
         public static bool TryParse(string value, [MaybeNullWhen(false)] out RefToken result)
         {
+            result = null!;
+
             if (value != null)
             {
                 var idx = value.IndexOf(':');
 
                 if (idx > 0 && idx < value.Length - 1)
                 {
-                    result = new RefToken(value.Substring(0, idx), value[(idx + 1)..]);
-
-                    return true;
+                    if (Enum.TryParse<RefTokenType>(value.Substring(0, idx), true, out var type))
+                    {
+                        result = new RefToken(type, value[(idx + 1)..]);
+                        return true;
+                    }
                 }
             }
-
-            result = null!;
 
             return false;
         }

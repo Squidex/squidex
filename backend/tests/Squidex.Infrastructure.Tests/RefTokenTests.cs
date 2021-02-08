@@ -24,31 +24,29 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_instantiate_token()
+        public void Should_instantiate_client_token()
         {
-            var token = new RefToken("client", "client1");
+            var token = new RefToken(RefTokenType.Client, "client1");
 
-            Assert.Equal("client", token.Type);
             Assert.Equal("client1", token.Identifier);
-
             Assert.True(token.IsClient);
         }
 
         [Fact]
         public void Should_instantiate_subject_token()
         {
-            var token = new RefToken("subject", "client1");
+            var token = new RefToken(RefTokenType.Subject, "subject1");
 
+            Assert.Equal("subject1", token.Identifier);
             Assert.True(token.IsSubject);
         }
 
         [Fact]
         public void Should_instantiate_token_and_lower_type()
         {
-            var token = new RefToken("Client", "client1");
+            var token = new RefToken(RefTokenType.Client, "client1");
 
-            Assert.Equal("client", token.Type);
-            Assert.Equal("client1", token.Identifier);
+            Assert.Equal("client:client1", token.ToString());
         }
 
         [Fact]
@@ -56,8 +54,8 @@ namespace Squidex.Infrastructure
         {
             var token = RefToken.Parse("client:client1");
 
-            Assert.Equal("client", token.Type);
             Assert.Equal("client1", token.Identifier);
+            Assert.True(token.IsClient);
         }
 
         [Fact]
@@ -65,8 +63,8 @@ namespace Squidex.Infrastructure
         {
             var token = RefToken.Parse("client:client1:app");
 
-            Assert.Equal("client", token.Type);
             Assert.Equal("client1:app", token.Identifier);
+            Assert.True(token.IsClient);
         }
 
         [Fact]

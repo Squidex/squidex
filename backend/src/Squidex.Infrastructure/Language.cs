@@ -7,11 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Squidex.Infrastructure
 {
+    [TypeConverter(typeof(LanguageTypeConverter))]
     public partial record Language
     {
         private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase);
