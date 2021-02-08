@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
@@ -60,11 +59,11 @@ namespace Migrations.Migrations
 
                     foreach (BsonDocument @event in commit["Events"].AsBsonArray)
                     {
-                        var data = JObject.Parse(@event["Payload"].AsString);
+                        var data = BsonDocument.Parse(@event["Payload"].AsString);
 
                         if (data.TryGetValue("appId", out var appIdValue))
                         {
-                            var appId = NamedId<Guid>.Parse(appIdValue.ToString(), Guid.TryParse).Id.ToString();
+                            var appId = NamedId<Guid>.Parse(appIdValue.AsString, Guid.TryParse).Id.ToString();
 
                             var eventUpdate = updater.Set($"Events.{index}.Metadata.AppId", appId);
 

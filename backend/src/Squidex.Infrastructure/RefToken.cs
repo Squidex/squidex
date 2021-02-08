@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure
             get { return Type == RefTokenType.Client; }
         }
 
-        public bool IsSubject
+        public bool IsUser
         {
             get { return Type == RefTokenType.Subject; }
         }
@@ -35,6 +35,16 @@ namespace Squidex.Infrastructure
             Type = type;
 
             Identifier = identifier;
+        }
+
+        public static RefToken Client(string identifier)
+        {
+            return new RefToken(RefTokenType.Client, identifier);
+        }
+
+        public static RefToken User(string identifier)
+        {
+            return new RefToken(RefTokenType.Subject, identifier);
         }
 
         public override string ToString()
@@ -57,11 +67,13 @@ namespace Squidex.Infrastructure
 
                 if (idx > 0 && idx < value.Length - 1)
                 {
-                    if (Enum.TryParse<RefTokenType>(value.Substring(0, idx), true, out var type))
+                    if (!Enum.TryParse<RefTokenType>(value.Substring(0, idx), true, out var type))
                     {
-                        result = new RefToken(type, value[(idx + 1)..]);
-                        return true;
+                        type = RefTokenType.Subject;
                     }
+
+                    result = new RefToken(type, value[(idx + 1)..]);
+                    return true;
                 }
             }
 

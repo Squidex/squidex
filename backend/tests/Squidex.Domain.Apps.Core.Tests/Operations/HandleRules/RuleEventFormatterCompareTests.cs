@@ -243,7 +243,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_email_and_display_name_from_client(string script)
         {
-            var @event = new EnrichedContentEvent { User = new ClientUser(new RefToken(RefTokenType.Client, "android")) };
+            var @event = new EnrichedContentEvent { User = new ClientUser(RefToken.Client("android")) };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -758,7 +758,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_actor(string script)
         {
-            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
+            var @event = new EnrichedContentEvent { Actor = RefToken.Client("android") };
 
             var result = await sut.FormatAsync(script, @event);
 

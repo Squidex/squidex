@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
         {
             var value = new
             {
-                User = new RefToken(RefTokenType.Subject, "me")
+                User = RefToken.User("me")
             };
 
             var result = await RenderAync(template, value);

@@ -7,25 +7,22 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json
 {
-    [DataContract]
     public sealed class WorkflowStepSurrogate : ISurrogate<WorkflowStep>
     {
-        [DataMember(Name = "transitions")]
         public Dictionary<Status, WorkflowTransitionSurrogate> Transitions { get; set; }
 
-        [DataMember(Name = "noUpdate")]
+        [JsonProperty("noUpdate")]
         public bool NoUpdateFlag { get; set; }
 
-        [DataMember(Name = "noUpdateRules")]
+        [JsonProperty("noUpdateRules")]
         public NoUpdate? NoUpdate { get; set; }
 
-        [DataMember(Name = "color")]
         public string? Color { get; set; }
 
         public void FromSource(WorkflowStep source)

@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace Squidex.Infrastructure.Json
 {
-    public class ClaimsPrinicpalSurrogate : List<ClaimsIdentitySurrogate>, ISurrogate<ClaimsPrincipal>
+    public sealed class ClaimsPrinicpalSurrogate : List<ClaimsIdentitySurrogate>, ISurrogate<ClaimsPrincipal>
     {
         public void FromSource(ClaimsPrincipal source)
         {

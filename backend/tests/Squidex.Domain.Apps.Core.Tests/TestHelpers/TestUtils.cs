@@ -11,6 +11,8 @@ using System.Reflection;
 using System.Security.Claims;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Contents;
@@ -24,7 +26,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
-using Squidex.Infrastructure.Queries.Json;
+using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
 using Xunit;
 
@@ -51,15 +54,13 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                 ContractResolver = new ConverterContractResolver(
                     new ContentFieldDataConverter(),
                     new EnvelopeHeadersConverter(),
-                    new FilterConverter(),
-                    new InstantConverter(),
                     new JsonValueConverter(),
-                    new PropertyPathConverter(),
                     new StringEnumConverter(),
                     new SurrogateConverter<AppClients, AppClientsSurrogate>(),
                     new SurrogateConverter<AppContributors, AppContributorsSurrogate>(),
                     new SurrogateConverter<AppPatterns, AppPatternsSurrogate>(),
                     new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
+                    new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
                     new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
                     new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),
                     new SurrogateConverter<Roles, RolesSurrogate>(),
@@ -71,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new WriteonlyGeoJsonConverter()),
 
                 TypeNameHandling = typeNameHandling
-            };
+            }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
             return serializerSettings;
         }

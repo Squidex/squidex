@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 .MustNotHaveHappened();
         }
 
-        private Envelope<IEvent> CreateEvent(string assignerType, bool isNewUser, bool isNewContributor = true, Instant? instant = null, int streamNumber = 2)
+        private Envelope<IEvent> CreateEvent(RefTokenType assignerType, bool isNewUser, bool isNewContributor = true, Instant? instant = null, int streamNumber = 2)
         {
             var @event = new AppContributorAssigned
             {

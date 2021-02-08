@@ -9,9 +9,12 @@ using System;
 using System.Security.Claims;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
-using Squidex.Infrastructure.Queries.Json;
+using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.TestHelpers
@@ -36,14 +39,12 @@ namespace Squidex.Infrastructure.TestHelpers
                 ContractResolver = new ConverterContractResolver(
                     new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
                     new EnvelopeHeadersConverter(),
-                    new FilterConverter(),
-                    new InstantConverter(),
                     new JsonValueConverter(),
-                    new PropertyPathConverter(),
+                    new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
                     new StringEnumConverter()),
 
                 TypeNameHandling = TypeNameHandling.Auto
-            };
+            }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         }
 
         public static T SerializeAndDeserialize<T>(this T value)

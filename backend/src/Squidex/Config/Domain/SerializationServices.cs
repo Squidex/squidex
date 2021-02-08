@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Apps.Json;
@@ -23,7 +25,8 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
-using Squidex.Infrastructure.Queries.Json;
+using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Config.Domain
@@ -37,15 +40,13 @@ namespace Squidex.Config.Domain
             settings.ContractResolver = new ConverterContractResolver(
                 new ContentFieldDataConverter(),
                 new EnvelopeHeadersConverter(),
-                new FilterConverter(),
-                new InstantConverter(),
                 new JsonValueConverter(),
-                new PropertyPathConverter(),
                 new StringEnumConverter(),
                 new SurrogateConverter<AppClients, AppClientsSurrogate>(),
                 new SurrogateConverter<AppContributors, AppContributorsSurrogate>(),
                 new SurrogateConverter<AppPatterns, AppPatternsSurrogate>(),
                 new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
+                new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
                 new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
                 new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),
                 new SurrogateConverter<Roles, RolesSurrogate>(),
@@ -62,6 +63,8 @@ namespace Squidex.Config.Domain
             settings.DateParseHandling = DateParseHandling.None;
 
             settings.TypeNameHandling = typeNameHandling;
+
+            settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 
             return settings;
         }

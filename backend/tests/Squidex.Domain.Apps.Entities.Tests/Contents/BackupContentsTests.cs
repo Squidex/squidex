@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_write_asset_urls()
         {
-            var me = new RefToken(RefTokenType.Subject, "123");
+            var me = RefToken.User("123");
 
             var assetsUrl = "https://old.squidex.com/api/assets/";
             var assetsUrlApp = "https://old.squidex.com/api/assets/my-app";
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_replace_asset_url_in_content()
         {
-            var me = new RefToken(RefTokenType.Subject, "123");
+            var me = RefToken.User("123");
 
             var newAssetsUrl = "https://new.squidex.com/api/assets";
             var newAssetsUrlApp = "https://old.squidex.com/api/assets/my-new-app";
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_restore_states_for_all_contents()
         {
-            var me = new RefToken(RefTokenType.Subject, "123");
+            var me = RefToken.User("123");
 
             var schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
             var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");

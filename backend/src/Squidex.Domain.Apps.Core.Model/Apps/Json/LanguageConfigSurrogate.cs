@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps.Json
 {
-    public class LanguageConfigSurrogate : ISurrogate<LanguageConfig>
+    public sealed class LanguageConfigSurrogate : ISurrogate<LanguageConfig>
     {
         public Language[]? Fallback { get; set; }
 

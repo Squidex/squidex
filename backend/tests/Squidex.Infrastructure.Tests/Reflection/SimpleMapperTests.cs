@@ -133,8 +133,8 @@ namespace Squidex.Infrastructure.Reflection
         {
             var obj1 = new Class1<RefToken, RefToken>
             {
-                P1 = new RefToken(RefTokenType.Subject, "1"),
-                P2 = new RefToken(RefTokenType.Subject, "2")
+                P1 = RefToken.User("1"),
+                P2 = RefToken.User("2")
             };
             var obj2 = SimpleMapper.Map(obj1, new Class2<string, string>());
 

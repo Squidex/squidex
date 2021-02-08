@@ -12,6 +12,7 @@ using System.Linq;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -44,7 +45,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             ValueConverter.Register<JsonNumber, double>(x => x.Value);
             ValueConverter.Register<JsonString, string>(x => x.Value);
             ValueConverter.Register<JsonString, DateTimeOffset>(x => DateTimeOffset.Parse(x.Value, CultureInfo.InvariantCulture));
+
             ValueConverter.Register<string, DomainId>(DomainId.Create);
+
             ValueConverter.Register<string, Status>(x => new Status(x));
         }
 

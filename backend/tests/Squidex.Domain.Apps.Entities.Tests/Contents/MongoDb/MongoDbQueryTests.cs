@@ -142,8 +142,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_lastModifiedBy()
         {
-            var i = _F(ClrFilter.Eq("lastModifiedBy", "Me"));
-            var o = _C("{ 'mb' : 'Me' }");
+            var i = _F(ClrFilter.Eq("lastModifiedBy", "me"));
+            var o = _C("{ 'mb' : 'user:me' }");
 
             Assert.Equal(o, i);
         }
@@ -160,8 +160,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_createdBy()
         {
-            var i = _F(ClrFilter.Eq("createdBy", "Me"));
-            var o = _C("{ 'cb' : 'Me' }");
+            var i = _F(ClrFilter.Eq("createdBy", "user:me"));
+            var o = _C("{ 'cb' : 'user:me' }");
 
             Assert.Equal(o, i);
         }

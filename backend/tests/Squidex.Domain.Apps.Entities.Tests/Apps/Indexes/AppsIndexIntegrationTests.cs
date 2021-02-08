@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 }
 
                 var creatorId = Guid.NewGuid().ToString();
-                var creatorToken = new RefToken(RefTokenType.Subject, creatorId);
+                var creatorToken = RefToken.User(creatorId);
                 var createCommand = new CreateApp { Actor = creatorToken, AppId = appId.Id };
 
                 var commandContext = new CommandContext(createCommand, A.Fake<ICommandBus>());

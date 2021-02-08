@@ -562,12 +562,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private RefToken UserActor()
         {
-            return new RefToken(RefTokenType.Subject, userId);
+            return RefToken.User(userId);
         }
 
         private RefToken ClientActor()
         {
-            return new RefToken(RefTokenType.Client, clientId);
+            return RefToken.Client(clientId);
         }
     }
 }

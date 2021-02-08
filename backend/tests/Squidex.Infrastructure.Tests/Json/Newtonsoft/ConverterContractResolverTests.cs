@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using NodaTime;
+using NodaTime.Serialization.JsonNet;
+using NodaTime.Text;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -47,7 +49,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             var serializerSettings = new JsonSerializerSettings
             {
-                ContractResolver = new ConverterContractResolver(new InstantConverter())
+                ContractResolver = new ConverterContractResolver(new NodaPatternConverter<Instant>(InstantPattern.ExtendedIso)),
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateParseHandling = DateParseHandling.None
             };
 
             var json = JsonConvert.SerializeObject(new MyClass { MyProperty = value }, serializerSettings);
@@ -62,15 +66,17 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             var serializerSettings = new JsonSerializerSettings
             {
-                ContractResolver = new ConverterContractResolver(new InstantConverter())
+                ContractResolver = new ConverterContractResolver(new NodaPatternConverter<Instant>(InstantPattern.ExtendedIso)),
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateParseHandling = DateParseHandling.None
             };
 
             serializerSettings.Converters.Add(new TodayConverter());
 
-            var result = JsonConvert.SerializeObject(Tuple.Create(value), serializerSettings);
-            var output = JsonConvert.DeserializeObject<Tuple<Instant>>(result, serializerSettings)!;
+            var result = JsonConvert.SerializeObject(value, serializerSettings);
+            var output = JsonConvert.DeserializeObject<Instant>(result, serializerSettings)!;
 
-            Assert.Equal(value, output.Item1);
+            Assert.Equal(value, output);
         }
 
         [Fact]

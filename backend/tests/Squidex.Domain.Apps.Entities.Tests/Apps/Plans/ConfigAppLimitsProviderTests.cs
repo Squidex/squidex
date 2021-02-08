@@ -181,11 +181,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             if (plan != null)
             {
-                A.CallTo(() => app.Plan).Returns(new AppPlan(new RefToken("user", "me"), plan));
+                A.CallTo(() => app.Plan)
+                    .Returns(new AppPlan(RefToken.User("me"), plan));
             }
             else
             {
-                A.CallTo(() => app.Plan).Returns(null);
+                A.CallTo(() => app.Plan)
+                    .Returns(null);
             }
 
             return app;

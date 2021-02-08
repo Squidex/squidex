@@ -11,16 +11,16 @@ using NodaTime.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    internal sealed class InstantGraphType : DateGraphType
+    internal sealed class InstantGraphType : DateTimeGraphType
     {
         public override object Serialize(object value)
         {
-            return ParseValue(value);
+            return value;
         }
 
         public override object ParseValue(object value)
         {
-            return InstantPattern.General.Parse(value.ToString()!).Value;
+            return InstantPattern.ExtendedIso.Parse(value.ToString()!).Value;
         }
 
         public override object? ParseLiteral(IValue value)

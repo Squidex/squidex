@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_instantiate_client_token()
         {
-            var token = new RefToken(RefTokenType.Client, "client1");
+            var token = RefToken.Client("client1");
 
             Assert.Equal("client1", token.Identifier);
             Assert.True(token.IsClient);
@@ -35,22 +35,31 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_instantiate_subject_token()
         {
-            var token = new RefToken(RefTokenType.Subject, "subject1");
+            var token = RefToken.User("subject1");
 
             Assert.Equal("subject1", token.Identifier);
-            Assert.True(token.IsSubject);
+            Assert.True(token.IsUser);
         }
 
         [Fact]
         public void Should_instantiate_token_and_lower_type()
         {
-            var token = new RefToken(RefTokenType.Client, "client1");
+            var token = RefToken.Client("client1");
 
             Assert.Equal("client:client1", token.ToString());
         }
 
         [Fact]
-        public void Should_parse_user_token_from_string()
+        public void Should_parse_token_with_unknown_type()
+        {
+            var token = RefToken.Parse("user:client1");
+
+            Assert.Equal("client1", token.Identifier);
+            Assert.True(token.IsUser);
+        }
+
+        [Fact]
+        public void Should_parse_token_from_string()
         {
             var token = RefToken.Parse("client:client1");
 
@@ -59,7 +68,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_parse_user_token_with_colon_in_identifier()
+        public void Should_parse_token_with_colon_in_identifier()
         {
             var token = RefToken.Parse("client:client1:app");
 

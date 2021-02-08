@@ -12,6 +12,7 @@ using MongoDB.Driver;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
@@ -32,8 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         static MongoDbQueryTests()
         {
+            TypeConverterStringSerializer<RefToken>.Register();
             InstantSerializer.Register();
-
             DomainIdSerializer.Register();
         }
 
@@ -55,8 +56,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_lastModifiedBy()
         {
-            var i = _F(ClrFilter.Eq("lastModifiedBy", "Me"));
-            var o = _C("{ 'mb' : 'Me' }");
+            var i = _F(ClrFilter.Eq("lastModifiedBy", "subject:me"));
+            var o = _C("{ 'mb' : 'subject:me' }");
 
             Assert.Equal(o, i);
         }
@@ -73,8 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         [Fact]
         public void Should_make_query_with_createdBy()
         {
-            var i = _F(ClrFilter.Eq("createdBy", "Me"));
-            var o = _C("{ 'cb' : 'Me' }");
+            var i = _F(ClrFilter.Eq("createdBy", "subject:me"));
+            var o = _C("{ 'cb' : 'subject:me' }");
 
             Assert.Equal(o, i);
         }

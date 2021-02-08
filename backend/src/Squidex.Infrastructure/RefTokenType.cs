@@ -10,7 +10,6 @@ namespace Squidex.Infrastructure
     public enum RefTokenType
     {
         Subject,
-        Client,
-        User
+        Client
     }
 }

@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             if (obj.TryGetValue(key, out var v))
             {
-                if (v.Type == JsonValueType.String && InstantPattern.General.Parse(v.ToString()).TryGetValue(default, out var instant))
+                if (v.Type == JsonValueType.String && InstantPattern.ExtendedIso.Parse(v.ToString()).TryGetValue(default, out var instant))
                 {
                     return instant;
                 }
