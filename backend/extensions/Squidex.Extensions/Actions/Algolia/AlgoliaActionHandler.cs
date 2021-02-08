@@ -86,7 +86,7 @@ namespace Squidex.Extensions.Actions.Algolia
 
                     json["objectID"] = contentId;
 
-                    ruleJob.Content.ToString();
+                    ruleJob.Content = json.ToString();
                 }
 
                 return (ruleDescription, ruleJob);
