@@ -5,19 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class StatusInfo
+    public sealed record StatusInfo(Status Status, string Color)
     {
-        public Status Status { get; }
-
-        public string Color { get; }
-
-        public StatusInfo(Status status, string color)
-        {
-            Status = status;
-
-            Color = color;
-        }
     }
 }

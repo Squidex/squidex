@@ -14,6 +14,8 @@ namespace Squidex.Infrastructure
     [TypeConverter(typeof(RefTokenTypeConverter))]
     public sealed record RefToken
     {
+        private static readonly char[] TrimChars = { ' ', ':' };
+
         public RefTokenType Type { get; }
 
         public string Identifier { get; }
@@ -57,34 +59,42 @@ namespace Squidex.Infrastructure
             return (Type.GetHashCode() * 397) ^ Identifier.GetHashCode();
         }
 
-        public static bool TryParse(string value, [MaybeNullWhen(false)] out RefToken result)
+        public static bool TryParse(string? value, [MaybeNullWhen(false)] out RefToken result)
         {
-            result = null!;
+            value = value?.Trim(TrimChars);
 
-            if (value != null)
+            if (string.IsNullOrWhiteSpace(value))
             {
-                var idx = value.IndexOf(':');
-
-                if (idx > 0 && idx < value.Length - 1)
-                {
-                    if (!Enum.TryParse<RefTokenType>(value.Substring(0, idx), true, out var type))
-                    {
-                        type = RefTokenType.Subject;
-                    }
-
-                    result = new RefToken(type, value[(idx + 1)..]);
-                    return true;
-                }
+                result = null!;
+                return false;
             }
 
-            return false;
+            value = value.Trim();
+
+            var idx = value.IndexOf(':');
+
+            if (idx > 0 && idx < value.Length - 1)
+            {
+                if (!Enum.TryParse<RefTokenType>(value.Substring(0, idx), true, out var type))
+                {
+                    type = RefTokenType.Subject;
+                }
+
+                result = new RefToken(type, value[(idx + 1)..]);
+            }
+            else
+            {
+                result = new RefToken(RefTokenType.Subject, value);
+            }
+
+            return true;
         }
 
         public static RefToken Parse(string value)
         {
             if (!TryParse(value, out var result))
             {
-                throw new ArgumentException("Ref token must have more than 2 parts divided by colon.", nameof(value));
+                throw new ArgumentException("Ref token cannot be null or empty.", nameof(value));
             }
 
             return result;

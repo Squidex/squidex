@@ -9,7 +9,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Infrastructure.MongoDb;
 using Xunit;
 

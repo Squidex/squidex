@@ -17,7 +17,6 @@ namespace Squidex.Infrastructure
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(":")]
-        [InlineData("user")]
         public void Should_throw_exception_if_parsing_invalid_input(string input)
         {
             Assert.Throws<ArgumentException>(() => RefToken.Parse(input));
@@ -50,11 +49,20 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
+        public void Should_parse_token_without_type()
+        {
+            var token = RefToken.Parse("subject1");
+
+            Assert.Equal("subject1", token.Identifier);
+            Assert.True(token.IsUser);
+        }
+
+        [Fact]
         public void Should_parse_token_with_unknown_type()
         {
-            var token = RefToken.Parse("user:client1");
+            var token = RefToken.Parse("user:subject1");
 
-            Assert.Equal("client1", token.Identifier);
+            Assert.Equal("subject1", token.Identifier);
             Assert.True(token.IsUser);
         }
 
