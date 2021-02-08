@@ -12,7 +12,7 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class TypeConverterStringSerializer<T> : ClassSerializerBase<T> where T : class
+    public sealed class TypeConverterStringSerializer<T> : SerializerBase<T>
     {
         public static void Register()
         {
@@ -26,16 +26,16 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        protected override T DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)
+        public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var value = context.Reader.ReadString();
 
             return (T)Convert.ChangeType(value, typeof(T));
         }
 
-        protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, T value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, T value)
         {
-            context.Writer.WriteString(value.ToString());
+            context.Writer.WriteString(value!.ToString());
         }
     }
 }

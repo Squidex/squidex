@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
@@ -29,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         static MongoContentRepository()
         {
-            StatusSerializer.Register();
+            TypeConverterStringSerializer<Status>.Register();
         }
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, bool useWildcardIndex)

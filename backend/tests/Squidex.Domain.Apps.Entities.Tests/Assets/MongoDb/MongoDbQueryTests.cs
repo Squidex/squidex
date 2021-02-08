@@ -10,6 +10,7 @@ using FakeItEasy;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NodaTime.Text;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
@@ -33,9 +34,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         static MongoDbQueryTests()
         {
-            TypeConverterStringSerializer<RefToken>.Register();
-            InstantSerializer.Register();
             DomainIdSerializer.Register();
+
+            TypeConverterStringSerializer<RefToken>.Register();
+            TypeConverterStringSerializer<Status>.Register();
+
+            InstantSerializer.Register();
         }
 
         [Fact]
@@ -174,6 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_take_statement()
         {
             var query = new ClrQuery { Take = 3 };
+
             var cursor = A.Fake<IFindFluent<MongoAssetEntity, MongoAssetEntity>>();
 
             cursor.QueryLimit(query.AdjustToModel());
@@ -186,6 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_skip_statement()
         {
             var query = new ClrQuery { Skip = 3 };
+
             var cursor = A.Fake<IFindFluent<MongoAssetEntity, MongoAssetEntity>>();
 
             cursor.QuerySkip(query.AdjustToModel());
