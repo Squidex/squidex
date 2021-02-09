@@ -27,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         private readonly MongoContentCollection collectionAll;
         private readonly MongoContentCollection collectionPublished;
+        private readonly IAppProvider appProvider;
 
         static MongoContentRepository()
         {
@@ -44,6 +45,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             collectionPublished =
                 new MongoContentCollection(
                     "States_Contents_Published3", database, appProvider, useWildcardIndex);
+
+            this.appProvider = appProvider;
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)

@@ -32,19 +32,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             IAppProvider appProvider,
             IContentEnricher contentEnricher,
             IContentRepository contentRepository,
-            IContentLoader assetLoader,
+            IContentLoader contentLoader,
             ContentQueryParser queryParser)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(contentEnricher, nameof(contentEnricher));
             Guard.NotNull(contentRepository, nameof(contentRepository));
-            Guard.NotNull(assetLoader, nameof(assetLoader));
+            Guard.NotNull(contentLoader, nameof(contentLoader));
             Guard.NotNull(queryParser, nameof(queryParser));
 
             this.appProvider = appProvider;
             this.contentEnricher = contentEnricher;
             this.contentRepository = contentRepository;
-            this.contentLoader = assetLoader;
+            this.contentLoader = contentLoader;
             this.queryParser = queryParser;
             this.queryParser = queryParser;
         }
