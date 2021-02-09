@@ -90,14 +90,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             return new ContentData()
                 .AddField("ref1",
                     new ContentFieldData()
-                        .AddValue("en", "EN")
-                        .AddValue("de", "DE"))
+                        .AddLocalized("en", "EN")
+                        .AddLocalized("de", "DE"))
                 .AddField("ref2",
                     new ContentFieldData()
-                        .AddValue("iv", 12))
+                        .AddInvariant(12))
                 .AddField("non-ref",
                     new ContentFieldData()
-                        .AddValue("iv", "Ignored"));
+                        .AddInvariant("Ignored"));
         }
     }
 }

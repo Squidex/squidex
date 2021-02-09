@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 new ContentData()
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(assetId1)));
+                            .AddInvariant(JsonValue.Array(assetId1)));
 
             A.CallTo(() => assetQuery.QueryAsync(
                     A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1)))
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 new ContentData()
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(assetId1, assetId2)));
+                            .AddInvariant(JsonValue.Array(assetId1, assetId2)));
 
             A.CallTo(() => assetQuery.QueryAsync(
                     A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1, assetId2)))

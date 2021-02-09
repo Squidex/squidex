@@ -102,16 +102,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new ContentData()
                     .AddField("asset",
                         new ContentFieldData()
-                            .AddValue("en", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")
-                            .AddValue("it", $"Asset: {oldAssetsUrl}/my-asset.jpg."))
+                            .AddLocalized("en", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")
+                            .AddLocalized("it", $"Asset: {oldAssetsUrl}/my-asset.jpg."))
                     .AddField("assetsInArray",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddLocalized("iv",
                                 JsonValue.Array(
                                     $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")))
                     .AddField("assetsInObj",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddLocalized("iv",
                                 JsonValue.Object()
                                     .Add("asset", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")));
 
@@ -119,16 +119,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new ContentData()
                     .AddField("asset",
                         new ContentFieldData()
-                            .AddValue("en", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")
-                            .AddValue("it", $"Asset: {newAssetsUrl}/my-asset.jpg."))
+                            .AddLocalized("en", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")
+                            .AddLocalized("it", $"Asset: {newAssetsUrl}/my-asset.jpg."))
                     .AddField("assetsInArray",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddLocalized("iv",
                                 JsonValue.Array(
                                     $"Asset: {newAssetsUrlApp}/my-asset.jpg.")))
                     .AddField("assetsInObj",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddLocalized("iv",
                                 JsonValue.Object()
                                     .Add("asset", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")));
 

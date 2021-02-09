@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentData()
                         .AddField("references",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Array(referenceId1, referenceId2))),
+                                .AddInvariant(JsonValue.Array(referenceId1, referenceId2))),
                 AppId = appId
             };
 
@@ -98,10 +98,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentData()
                         .AddField("field1",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Create($"Hello {index}")))
+                                .AddInvariant(JsonValue.Create($"Hello {index}")))
                         .AddField("field2",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Create($"World {index}"))),
+                                .AddInvariant(JsonValue.Create($"World {index}"))),
                 Id = referenceId
             };
         }

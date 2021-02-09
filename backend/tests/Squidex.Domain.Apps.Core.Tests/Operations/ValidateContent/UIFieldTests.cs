@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new ContentData()
                     .AddField("my-ui1", new ContentFieldData())
                     .AddField("my-ui2", new ContentFieldData()
-                        .AddValue("iv", null));
+                        .AddInvariant(null));
 
             var dataErrors = new List<ValidationError>();
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             var data =
                 new ContentData()
                     .AddField("my-array", new ContentFieldData()
-                        .AddJsonValue(
+                        .AddInvariant(
                             JsonValue.Array(
                                 JsonValue.Object()
                                     .Add("my-ui", null))));

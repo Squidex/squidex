@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                     .AddField("field1", null)
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("en", 2)
-                            .AddValue("it", JsonValue.Null));
+                            .AddLocalized("en", 2)
+                            .AddLocalized("it", JsonValue.Null));
 
             var actual = input.ToCleaned();
 
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                 new ContentData()
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("en", 2));
+                            .AddLocalized("en", 2));
 
             Assert.Equal(expected, actual);
         }
@@ -42,10 +42,10 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                 new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 1))
+                            .AddInvariant(1))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("de", 2));
+                            .AddLocalized("de", 2));
 
             var actual = source.MergeInto(source);
 
@@ -59,35 +59,35 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                 new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 1))
+                            .AddInvariant(1))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("de", 2)
-                            .AddValue("it", 2));
+                            .AddLocalized("de", 2)
+                            .AddLocalized("it", 2));
 
             var rhs =
                 new ContentData()
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("it", 3)
-                            .AddValue("en", 3))
+                            .AddLocalized("it", 3)
+                            .AddLocalized("en", 3))
                     .AddField("field3",
                         new ContentFieldData()
-                            .AddValue("iv", 4));
+                            .AddInvariant(4));
 
             var expected =
                 new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 1))
+                            .AddInvariant(1))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("it", 2)
-                            .AddValue("de", 2)
-                            .AddValue("en", 3))
+                            .AddLocalized("it", 2)
+                            .AddLocalized("de", 2)
+                            .AddLocalized("en", 3))
                     .AddField("field3",
                         new ContentFieldData()
-                            .AddValue("iv", 4));
+                            .AddInvariant(4));
 
             var actual = lhs.MergeInto(rhs);
 
@@ -103,19 +103,19 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                 new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 2))
+                            .AddInvariant(2))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddInvariant(2));
 
             var rhs =
                 new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 2))
+                            .AddInvariant(2))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddInvariant(2));
 
             Assert.True(lhs.Equals(rhs));
             Assert.True(lhs.Equals((object)rhs));
@@ -129,19 +129,19 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                 new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 2))
+                            .AddInvariant(2))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddInvariant(2));
 
             var rhs =
                 new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("en", 2))
+                            .AddLocalized("en", 2))
                     .AddField("field3",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddInvariant(2));
 
             Assert.False(lhs.Equals(rhs));
             Assert.False(lhs.Equals((object)rhs));
@@ -153,11 +153,11 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var lhs =
                 new ContentFieldData()
-                    .AddValue("iv", 2);
+                    .AddInvariant(2);
 
             var rhs =
                 new ContentFieldData()
-                    .AddValue("iv", 2);
+                    .AddInvariant(2);
 
             Assert.True(lhs.Equals(rhs));
             Assert.True(lhs.Equals((object)rhs));

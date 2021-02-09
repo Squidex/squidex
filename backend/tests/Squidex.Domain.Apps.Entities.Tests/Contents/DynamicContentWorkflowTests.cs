@@ -384,7 +384,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new ContentData()
                     .AddField("field",
                         new ContentFieldData()
-                            .AddValue("iv", value));
+                            .AddInvariant(value));
 
             return content;
         }

@@ -7,7 +7,6 @@
 
 using System;
 using System.Linq;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {

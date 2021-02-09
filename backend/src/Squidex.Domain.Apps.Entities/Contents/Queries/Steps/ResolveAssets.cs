@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                                 requestCache.AddDependency(referencedAsset.UniqueId, referencedAsset.Version);
 
-                                fieldReference.AddJsonValue(partitionKey, array);
+                                fieldReference.AddLocalized(partitionKey, array);
                             }
                         }
                     }

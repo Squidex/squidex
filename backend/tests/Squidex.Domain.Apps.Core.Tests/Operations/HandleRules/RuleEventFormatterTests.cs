@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Array()))
+                                .AddInvariant(JsonValue.Array()))
             };
 
             var result = await sut.FormatAsync("${CONTENT_DATA.city.iv.data.name}", @event);
@@ -288,7 +288,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("categories",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Array("ref1", "ref2", "ref3")))
+                                .AddInvariant(JsonValue.Array("ref1", "ref2", "ref3")))
             };
 
             var script = @"

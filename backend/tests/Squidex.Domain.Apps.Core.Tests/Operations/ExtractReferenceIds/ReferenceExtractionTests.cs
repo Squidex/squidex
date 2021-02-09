@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                 new ContentData()
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(id1.ToString(), id2.ToString())));
+                            .AddInvariant(JsonValue.Array(id1.ToString(), id2.ToString())));
 
             var ids = new HashSet<DomainId>();
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                 new ContentData()
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(id1.ToString(), id2.ToString())));
+                            .AddInvariant(JsonValue.Array(id1.ToString(), id2.ToString())));
 
             var ids = new HashSet<DomainId>();
 
@@ -79,13 +79,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                 new ContentData()
                     .AddField("references",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(id1, id2)))
+                            .AddInvariant(JsonValue.Array(id1, id2)))
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(id1)))
+                            .AddInvariant(JsonValue.Array(id1)))
                     .AddField("array",
                         new ContentFieldData()
-                            .AddJsonValue(
+                            .AddInvariant(
                                 JsonValue.Array(
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array(id1, id2)))));
@@ -94,13 +94,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                 new ContentData()
                     .AddField("references",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(id2)))
+                            .AddInvariant(JsonValue.Array(id2)))
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array()))
+                            .AddInvariant(JsonValue.Array()))
                     .AddField("array",
                         new ContentFieldData()
-                            .AddJsonValue(
+                            .AddInvariant(
                                 JsonValue.Array(
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array(id2)))));

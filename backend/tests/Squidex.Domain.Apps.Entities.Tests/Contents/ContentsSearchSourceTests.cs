@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Xunit;
@@ -68,10 +67,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentData()
                         .AddField("field1",
                             new ContentFieldData()
-                                .AddJsonValue("iv", JsonValue.Create("hello")))
+                                .AddInvariant("hello"))
                         .AddField("field2",
                             new ContentFieldData()
-                                .AddJsonValue("iv", JsonValue.Create("world"))),
+                                .AddInvariant("world")),
                 ReferenceFields = new[]
                 {
                     Fields.String(1, "field1", Partitioning.Invariant),
@@ -93,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentData()
                         .AddField("field",
                             new ContentFieldData()
-                                .AddJsonValue("iv", JsonValue.Create("hello"))),
+                                .AddInvariant("hello")),
                 ReferenceFields = new[]
                 {
                     Fields.String(1, "field", Partitioning.Invariant)
@@ -114,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentData()
                         .AddField("field",
                             new ContentFieldData()
-                                .AddJsonValue("en", JsonValue.Create("hello"))),
+                                .AddLocalized("en", "hello")),
                 ReferenceFields = new[]
                 {
                     Fields.String(1, "field", Partitioning.Language)
@@ -135,12 +134,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentData()
                         .AddField("field",
                             new ContentFieldData()
-                                .AddJsonValue("iv", JsonValue.Create("raw"))),
+                                .AddInvariant("raw")),
                 ReferenceData =
                     new ContentData()
                         .AddField("field",
                             new ContentFieldData()
-                                .AddJsonValue("en", JsonValue.Create("resolved"))),
+                                .AddLocalized("en", "resolved")),
                 ReferenceFields = new[]
                 {
                     Fields.String(1, "field", Partitioning.Language)

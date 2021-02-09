@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
                     new ContentData()
                         .AddField("value",
                             new ContentFieldData()
-                                .AddValue("en", "Hello"))
+                                .AddLocalized("en", "Hello"))
             };
 
             var result = await RenderAync(template, value);

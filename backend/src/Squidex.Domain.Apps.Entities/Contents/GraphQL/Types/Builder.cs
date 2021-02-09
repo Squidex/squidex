@@ -12,7 +12,6 @@ using System.Linq;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;

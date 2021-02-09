@@ -6,10 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Text.Json.Serialization;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {

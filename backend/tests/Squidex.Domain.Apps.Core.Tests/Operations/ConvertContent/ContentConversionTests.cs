@@ -41,13 +41,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("en", "EN"))
+                            .AddLocalized("en", "EN"))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 1))
+                            .AddInvariant(1))
                     .AddField("invalid",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddInvariant(2));
 
             var actual = input.Convert(schema, (data, field) => field.Name == "field2" ? null : data);
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("en", "EN"));
+                            .AddLocalized("en", "EN"));
 
             Assert.Equal(expected, actual);
         }
@@ -65,11 +65,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var lhs =
                 new ContentFieldData()
-                    .AddValue("iv", 2);
+                    .AddInvariant(2);
 
             var rhs =
                 new ContentFieldData()
-                    .AddValue("iv", 2);
+                    .AddInvariant(2);
 
             Assert.True(lhs.Equals(rhs));
             Assert.True(lhs.Equals((object)rhs));

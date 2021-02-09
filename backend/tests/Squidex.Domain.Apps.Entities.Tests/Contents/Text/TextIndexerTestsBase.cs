@@ -343,7 +343,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return new ContentData()
                 .AddField("text",
                     new ContentFieldData()
-                        .AddValue(language, text));
+                        .AddLocalized(language, text));
         }
 
         private static ContentData GeoData(string field, double latitude, double longitude)
@@ -351,7 +351,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return new ContentData()
                 .AddField(field,
                     new ContentFieldData()
-                        .AddValue("iv", JsonValue.Object().Add("latitude", latitude).Add("longitude", longitude)));
+                        .AddInvariant(JsonValue.Object().Add("latitude", latitude).Add("longitude", longitude)));
         }
 
         protected IndexOperation CreateDraft(DomainId id)
