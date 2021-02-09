@@ -287,7 +287,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_remove_schema_from_index_when_deleted_and_exists()
         {
-            var (schema, _) = SetupSchema();
+            var (schema, _) = SetupSchema(isDeleted: true);
 
             var command = new DeleteSchema { SchemaId = schemaId, AppId = appId };
 

@@ -227,7 +227,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                     if (app == null)
                     {
-                        app = await GetAppCoreAsync(appCommand.AggregateId);
+                        app = await GetAppCoreAsync(appCommand.AggregateId, true);
                     }
 
                     if (app != null)
@@ -307,11 +307,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return grainFactory.GetGrain<IAppsByUserIndexGrain>(id);
         }
 
-        private async Task<IAppEntity?> GetAppCoreAsync(DomainId id)
+        private async Task<IAppEntity?> GetAppCoreAsync(DomainId id, bool allowArchived = false)
         {
             var app = (await grainFactory.GetGrain<IAppGrain>(id.ToString()).GetStateAsync()).Value;
 
-            if (app.Version <= EtagVersion.Empty || app.IsArchived)
+            if (app.Version <= EtagVersion.Empty || (app.IsArchived && !allowArchived))
             {
                 return null;
             }

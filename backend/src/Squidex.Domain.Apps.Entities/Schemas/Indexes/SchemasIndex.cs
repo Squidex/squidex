@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                     if (schema == null)
                     {
-                        schema = await GetSchemaCoreAsync(schemaCommand.AggregateId);
+                        schema = await GetSchemaCoreAsync(schemaCommand.AggregateId, true);
                     }
 
                     if (schema != null)
@@ -204,11 +204,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId.ToString());
         }
 
-        private async Task<ISchemaEntity?> GetSchemaCoreAsync(DomainId id)
+        private async Task<ISchemaEntity?> GetSchemaCoreAsync(DomainId id, bool allowDeleted = false)
         {
             var schema = (await grainFactory.GetGrain<ISchemaGrain>(id.ToString()).GetStateAsync()).Value;
 
-            if (schema.Version <= EtagVersion.Empty || schema.IsDeleted)
+            if (schema.Version <= EtagVersion.Empty || (schema.IsDeleted && !allowDeleted))
             {
                 return null;
             }
