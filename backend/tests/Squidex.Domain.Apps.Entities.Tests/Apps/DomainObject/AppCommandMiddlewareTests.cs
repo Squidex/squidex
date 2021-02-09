@@ -53,8 +53,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var result = A.Fake<IAppEntity>();
 
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new MyCommand());
 
             context.Complete(result);
 
@@ -68,8 +69,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var file = new NoopAssetFile();
 
-            var command = CreateCommand(new UploadAppImage { AppId = appId, File = file });
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new UploadAppImage { AppId = appId, File = file });
 
             A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._))
                 .Returns(new ImageInfo(100, 100, false));
@@ -87,8 +89,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var file = new NoopAssetFile();
 
-            var command = CreateCommand(new UploadAppImage { AppId = appId, File = file });
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new UploadAppImage { AppId = appId, File = file });
 
             A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
                 .Returns(Task.FromResult<ImageInfo?>(null));

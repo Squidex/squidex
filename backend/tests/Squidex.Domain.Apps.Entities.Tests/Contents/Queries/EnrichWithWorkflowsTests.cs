@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class EnrichWithWorkflowsTests
     {
-        private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
+        private readonly IContentWorkflow workflow = A.Fake<IContentWorkflow>();
         private readonly Context requestContext;
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-            sut = new EnrichWithWorkflows(contentWorkflow);
+            sut = new EnrichWithWorkflows(workflow);
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            A.CallTo(() => contentWorkflow.GetNextAsync(content, content.Status, requestContext.User))
+            A.CallTo(() => workflow.GetNextAsync(content, content.Status, requestContext.User))
                 .Returns(nexts);
 
             await sut.EnrichAsync(requestContext, new[] { content }, null!);
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Equal(Status.Published, content.NextStatuses?.Single().Status);
 
-            A.CallTo(() => contentWorkflow.GetNextAsync(content, A<Status>._, requestContext.User))
+            A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.User))
                 .MustNotHaveHappened();
         }
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.Empty(content.NextStatuses);
 
-            A.CallTo(() => contentWorkflow.GetNextAsync(content, A<Status>._, requestContext.User))
+            A.CallTo(() => workflow.GetNextAsync(content, A<Status>._, requestContext.User))
                 .MustNotHaveHappened();
         }
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = new ContentEntity { SchemaId = schemaId };
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync(content, content.Status))
+            A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
             await sut.EnrichAsync(requestContext, new[] { content }, null!);
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = new ContentEntity { SchemaId = schemaId, NewStatus = Status.Archived };
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync(content, content.NewStatus.Value))
+            A.CallTo(() => workflow.GetInfoAsync(content, content.NewStatus.Value))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
 
             await sut.EnrichAsync(requestContext, new[] { content }, null!);
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = new ContentEntity { SchemaId = schemaId, ScheduleJob = ScheduleJob.Build(Status.Archived, user, default) };
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync(content, content.ScheduleJob.Status))
+            A.CallTo(() => workflow.GetInfoAsync(content, content.ScheduleJob.Status))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
 
             await sut.EnrichAsync(requestContext, new[] { content }, null!);
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = new ContentEntity { SchemaId = schemaId };
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync(content, content.Status))
+            A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
                 .Returns(Task.FromResult<StatusInfo>(null!));
 
             var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = new ContentEntity { SchemaId = schemaId };
 
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(content, content.Status, requestContext.User))
+            A.CallTo(() => workflow.CanUpdateAsync(content, content.Status, requestContext.User))
                 .Returns(true);
 
             var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.False(content.CanUpdate);
 
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(content, A<Status>._, requestContext.User))
+            A.CallTo(() => workflow.CanUpdateAsync(content, A<Status>._, requestContext.User))
                 .MustNotHaveHappened();
         }
     }

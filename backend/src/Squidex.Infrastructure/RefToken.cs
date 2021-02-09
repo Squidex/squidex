@@ -54,11 +54,6 @@ namespace Squidex.Infrastructure
             return $"{Type.ToString().ToLowerInvariant()}:{Identifier}";
         }
 
-        public override int GetHashCode()
-        {
-            return (Type.GetHashCode() * 397) ^ Identifier.GetHashCode();
-        }
-
         public static bool TryParse(string? value, [MaybeNullWhen(false)] out RefToken result)
         {
             value = value?.Trim(TrimChars);

@@ -87,8 +87,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Should_not_invoke_enricher_for_other_result()
         {
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new MyCommand());
 
             context.Complete(12);
 
@@ -103,8 +104,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var result = new AssetEntity();
 
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new MyCommand());
 
             context.Complete(result);
 
@@ -121,8 +123,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var result = A.Fake<IAssetEntity>();
 
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new MyCommand());
 
             context.Complete(result);
 
@@ -139,8 +142,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Create_should_create_domain_object()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new CreateAsset { AssetId = assetId, File = file });
 
             await sut.HandleAsync(context);
 
@@ -155,8 +159,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Create_should_calculate_hash()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var command = new CreateAsset { AssetId = assetId, File = file };
+
+            var context =
+                CreateCommandContext(
+                    command);
 
             await sut.HandleAsync(context);
 
@@ -166,8 +173,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Create_should_return_duplicate_result_if_file_with_same_hash_found()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new CreateAsset { AssetId = assetId, File = file });
 
             SetupSameHashAsset(file.FileName, file.FileSize, out _);
 
@@ -181,8 +189,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file, Duplicate = true });
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new CreateAsset { AssetId = assetId, File = file, Duplicate = true });
 
             SetupSameHashAsset(file.FileName, file.FileSize, out _);
 
@@ -196,8 +205,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Create_should_pass_through_duplicate()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new CreateAsset { AssetId = assetId, File = file });
 
             SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
 
@@ -213,8 +223,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Update_should_update_domain_object()
         {
-            var command = CreateCommand(new UpdateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new UpdateAsset { AssetId = assetId, File = file });
 
             await ExecuteCreateAsync();
 
@@ -227,8 +238,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Update_should_calculate_hash()
         {
-            var command = CreateCommand(new UpdateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var command = new UpdateAsset { AssetId = assetId, File = file };
+
+            var context =
+                CreateCommandContext(
+                    command);
 
             await ExecuteCreateAsync();
 
@@ -240,8 +254,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Update_should_enrich_asset()
         {
-            var command = CreateCommand(new UpdateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new UpdateAsset { AssetId = assetId, File = file });
 
             await ExecuteCreateAsync();
 
@@ -255,8 +270,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task AnnotateAsset_should_enrich_asset()
         {
-            var command = CreateCommand(new AnnotateAsset { AssetId = assetId, FileName = "newName" });
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new AnnotateAsset { AssetId = assetId, FileName = "newName" });
 
             await ExecuteCreateAsync();
 

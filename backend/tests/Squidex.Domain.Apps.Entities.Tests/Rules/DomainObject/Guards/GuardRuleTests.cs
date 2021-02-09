@@ -41,15 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
         [Fact]
         public async Task CanCreate_should_throw_exception_if_trigger_null()
         {
-            var command = new CreateRule
+            var command = CreateCommand(new CreateRule
             {
-                Trigger = null!,
                 Action = new TestAction
                 {
                     Url = validUrl
                 },
-                AppId = appId
-            };
+                Trigger = null!,
+            });
 
             await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, appProvider),
                 new ValidationError("Trigger is required.", "Trigger"));
@@ -58,15 +57,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
         [Fact]
         public async Task CanCreate_should_throw_exception_if_action_null()
         {
-            var command = new CreateRule
+            var command = CreateCommand(new CreateRule
             {
                 Trigger = new ContentChangedTriggerV2
                 {
                     Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = null!,
-                AppId = appId
-            };
+            });
 
             await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, appProvider),
                 new ValidationError("Action is required.", "Action"));
@@ -75,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
         [Fact]
         public async Task CanCreate_should_not_throw_exception_if_trigger_and_action_valid()
         {
-            var command = new CreateRule
+            var command = CreateCommand(new CreateRule
             {
                 Trigger = new ContentChangedTriggerV2
                 {
@@ -84,9 +82,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
                 Action = new TestAction
                 {
                     Url = validUrl
-                },
-                AppId = appId
-            };
+                }
+            });
 
             await GuardRule.CanCreate(command, appProvider);
         }
@@ -148,6 +145,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             var command = new DeleteRule();
 
             GuardRule.CanDelete(command);
+        }
+
+        private CreateRule CreateCommand(CreateRule command)
+        {
+            command.AppId = appId;
+
+            return command;
         }
 
         private IRuleEntity Rule()

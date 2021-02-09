@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             if (command.CheckReferrers)
             {
-                var hasReferrer = await contentRepository.HasReferrersAsync(content.AppId.Id, command.ContentId, SearchScope.All);
+                var hasReferrer = await contentRepository.HasReferrersAsync(content.AppId.Id, content.Id, SearchScope.All);
 
                 if (hasReferrer)
                 {
@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
-        private static async Task ValidateCanUpdate(IContentEntity content, IContentWorkflow contentWorkflow, ClaimsPrincipal user)
+        private static async Task ValidateCanUpdate(IContentEntity content, IContentWorkflow contentWorkflow, ClaimsPrincipal? user)
         {
             var status = content.NewStatus ?? content.Status;
 
@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static void CheckPermission(IContentEntity content, ContentCommand command, string permission)
         {
-            if (content.CreatedBy?.Equals(command.Actor) == true)
+            if (Equals(content.CreatedBy, command.Actor) || command.User == null)
             {
                 return;
             }

@@ -38,21 +38,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
         }
 
-        public async Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal user)
+        public async Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
             return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
         }
 
-        public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, ContentData data, ClaimsPrincipal user)
+        public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, ContentData data, ClaimsPrincipal? user)
         {
             var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
             return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, data, user);
         }
 
-        public async Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal user)
+        public async Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return status;
         }
 
-        public async Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal user)
+        public async Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
         {
             var result = new List<StatusInfo>();
 
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result.ToArray();
         }
 
-        private bool IsTrue(WorkflowCondition condition, ContentData data, ClaimsPrincipal user)
+        private bool IsTrue(WorkflowCondition condition, ContentData data, ClaimsPrincipal? user)
         {
             if (condition?.Roles != null && user != null)
             {

@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_name_not_valid()
         {
-            var command = new CreateSchema { AppId = appId, Name = "INVALID NAME" };
+            var command = CreateCommand(new CreateSchema { Name = "INVALID NAME" });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Name is not a valid slug.", "Name"));
@@ -45,9 +45,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_field_name_invalid()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -58,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Name is not a Javascript property name.",
@@ -68,9 +67,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_field_properties_null()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -81,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Properties is required.",
@@ -91,9 +89,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_field_properties_not_valid()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -104,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Max length must be greater or equal to min length.",
@@ -115,9 +112,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_field_partitioning_not_valid()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -128,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Partitioning is not a valid value.",
@@ -138,9 +134,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_fields_contains_duplicate_name()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -157,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Field 'field1' has been added twice.",
@@ -167,9 +162,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_nested_field_name_invalid()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -188,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Name is not a Javascript property name.",
@@ -198,9 +192,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_nested_field_properties_null()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -219,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Properties is required.",
@@ -229,9 +222,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_nested_field_is_array()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -250,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Nested field cannot be array fields.",
@@ -260,9 +252,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_nested_field_properties_not_valid()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -281,7 +272,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Max length must be greater or equal to min length.",
@@ -292,9 +283,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_nested_field_have_duplicate_names()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -318,7 +308,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Field 'nested1' has been added twice.",
@@ -328,9 +318,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_ui_field_is_invalid()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -345,7 +334,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                 FieldsInLists = new FieldNames("field1"),
                 FieldsInReferences = new FieldNames("field1"),
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("UI field cannot be hidden.",
@@ -361,7 +350,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_invalid_lists_field_are_used()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
                 Fields = new[]
                 {
@@ -381,7 +370,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                 FieldsInLists = new FieldNames(null!, null!, "field3", "field1", "field1", "field4"),
                 FieldsInReferences = null,
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Field is required.",
@@ -399,7 +388,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_invalid_references_field_are_used()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
                 Fields = new[]
                 {
@@ -419,7 +408,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                 FieldsInLists = null,
                 FieldsInReferences = new FieldNames(null!, null!, "field3", "field1", "field1", "field4"),
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Field is required.",
@@ -437,12 +426,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_throw_exception_if_references_contains_meta_field()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
                 FieldsInLists = null,
                 FieldsInReferences = new FieldNames("meta.id"),
                 Name = "new-schema"
-            };
+            });
 
             ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
                 new ValidationError("Field is not part of the schema.",
@@ -452,9 +441,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanCreate_should_not_throw_exception_if_command_is_valid()
         {
-            var command = new CreateSchema
+            var command = CreateCommand(new CreateSchema
             {
-                AppId = appId,
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -494,7 +482,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                 FieldsInLists = new FieldNames("field1", "meta.id"),
                 FieldsInReferences = new FieldNames("field1"),
                 Name = "new-schema"
-            };
+            });
 
             GuardSchema.CanCreate(command);
         }
@@ -704,6 +692,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             var command = new DeleteSchema();
 
             GuardSchema.CanDelete(command);
+        }
+
+        private CreateSchema CreateCommand(CreateSchema command)
+        {
+            command.AppId = appId;
+
+            return command;
         }
 
         private static StringFieldProperties ValidProperties()

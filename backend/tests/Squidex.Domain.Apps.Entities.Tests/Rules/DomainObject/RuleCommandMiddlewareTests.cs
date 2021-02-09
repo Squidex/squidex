@@ -45,8 +45,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         [Fact]
         public async Task Should_not_invoke_enricher_for_other_result()
         {
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                     new MyCommand());
 
             context.Complete(12);
 
@@ -61,8 +62,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         {
             var result = new RuleEntity();
 
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new MyCommand());
 
             context.Complete(result);
 
@@ -79,8 +81,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         {
             var result = A.Fake<IRuleEntity>();
 
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
+            var context =
+                CreateCommandContext(
+                    new MyCommand());
 
             context.Complete(result);
 

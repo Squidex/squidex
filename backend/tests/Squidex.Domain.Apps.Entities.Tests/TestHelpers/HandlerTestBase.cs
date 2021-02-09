@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
                 .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
         }
 
-        protected CommandContext CreateContextForCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
+        protected CommandContext CreateCommandContext<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
             return new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
         }
