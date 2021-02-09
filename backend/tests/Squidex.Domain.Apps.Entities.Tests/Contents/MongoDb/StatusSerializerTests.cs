@@ -9,7 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.MongoDb.Contents;
+using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_serialize_and_deserialize_status()
         {
-            StatusSerializer.Register();
+            TypeConverterStringSerializer<Status>.Register();
 
             var source = new TestObject
             {

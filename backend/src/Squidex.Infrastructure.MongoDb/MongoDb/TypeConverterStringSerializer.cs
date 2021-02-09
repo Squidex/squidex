@@ -5,27 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.ComponentModel;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
-using Squidex.Domain.Apps.Core.Contents;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
+namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class StatusSerializer : SerializerBase<Status>
+    public sealed class TypeConverterStringSerializer<T> : SerializerBase<T>
     {
+        private readonly TypeConverter typeConverter;
+
         public static void Register()
         {
             try
             {
-                try
-                {
-                    BsonSerializer.RegisterSerializer(new StatusSerializer());
-                }
-                catch (BsonSerializationException)
-                {
-                    return;
-                }
+                BsonSerializer.RegisterSerializer(new TypeConverterStringSerializer<T>());
             }
             catch (BsonSerializationException)
             {
@@ -33,16 +28,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public override Status Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        public TypeConverterStringSerializer()
+        {
+            typeConverter = TypeDescriptor.GetConverter(typeof(T));
+        }
+
+        public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var value = context.Reader.ReadString();
 
-            return new Status(value);
+            return (T)typeConverter.ConvertFromInvariantString(value);
         }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Status value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, T value)
         {
-            context.Writer.WriteString(value.Name);
+            context.Writer.WriteString(value!.ToString());
         }
     }
 }

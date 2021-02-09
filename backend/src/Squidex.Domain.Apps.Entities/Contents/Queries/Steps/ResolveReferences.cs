@@ -100,13 +100,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                                     var value = formatted.GetOrAdd(reference, x => Format(x, context, referencedSchema));
 
-                                    fieldReference.AddJsonValue(partition, value);
+                                    fieldReference.AddLocalized(partition, value);
                                 }
                                 else if (referencedContents.Count > 1)
                                 {
                                     var value = CreateFallback(context, referencedContents);
 
-                                    fieldReference.AddJsonValue(partition, value);
+                                    fieldReference.AddLocalized(partition, value);
                                 }
                             }
                         }

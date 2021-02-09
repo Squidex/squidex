@@ -238,7 +238,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 myString = "value",
                                 myNumber = 1.0,
                                 myBoolean = true,
-                                myDatetime = content.LastModified,
+                                myDatetime = content.LastModified.ToString(),
                                 myJsonValue = 1,
                                 myJson = new
                                 {

@@ -12,7 +12,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Squidex.Infrastructure.MongoDb
 {
@@ -34,18 +33,6 @@ namespace Squidex.Infrastructure.MongoDb
                         var bsonSerializer = Activator.CreateInstance(bsonSerializerType, serializer);
 
                         memberMap.SetSerializer((IBsonSerializer)bsonSerializer!);
-                    }
-                    else if (memberMap.MemberType == typeof(JToken))
-                    {
-                        memberMap.SetSerializer(JTokenSerializer<JToken>.Instance);
-                    }
-                    else if (memberMap.MemberType == typeof(JObject))
-                    {
-                        memberMap.SetSerializer(JTokenSerializer<JObject>.Instance);
-                    }
-                    else if (memberMap.MemberType == typeof(JValue))
-                    {
-                        memberMap.SetSerializer(JTokenSerializer<JValue>.Instance);
                     }
                 });
 

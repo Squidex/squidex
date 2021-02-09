@@ -6,32 +6,26 @@
 // ==========================================================================
 
 using System.Linq;
-using Newtonsoft.Json;
+using Squidex.Infrastructure;
+
 namespace Squidex.Domain.Apps.Core.Contents.Json
 {
-    public class JsonWorkflowTransition
+    public sealed class WorkflowTransitionSurrogate : ISurrogate<WorkflowTransition>
     {
-        [JsonProperty]
         public string? Expression { get; set; }
 
-        [JsonProperty]
         public string? Role { get; set; }
 
-        [JsonProperty]
         public string[]? Roles { get; set; }
 
-        public JsonWorkflowTransition()
+        public void FromSource(WorkflowTransition source)
         {
+            Roles = source.Roles?.ToArray();
+
+            Expression = source.Expression;
         }
 
-        public JsonWorkflowTransition(WorkflowTransition transition)
-        {
-            Roles = transition.Roles?.ToArray();
-
-            Expression = transition.Expression;
-        }
-
-        public WorkflowTransition ToTransition()
+        public WorkflowTransition ToSource()
         {
             var roles = Roles;
 

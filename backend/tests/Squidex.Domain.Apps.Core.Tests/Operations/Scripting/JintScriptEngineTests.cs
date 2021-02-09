@@ -106,18 +106,18 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number0",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0))
+                            .AddInvariant(1.0))
                     .AddField("number1",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0));
+                            .AddInvariant(1.0));
             var expected =
                 new ContentData()
                     .AddField("number1",
                         new ContentFieldData()
-                            .AddValue("iv", 2.0))
+                            .AddInvariant(2.0))
                     .AddField("number2",
                         new ContentFieldData()
-                            .AddValue("iv", 10.0));
+                            .AddInvariant(10.0));
 
             var context = new ScriptVars { Data = content };
 
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("operation",
                         new ContentFieldData()
-                            .AddValue("iv", "MyOperation"));
+                            .AddInvariant("MyOperation"));
 
             var context = new ScriptVars { Data = content, Operation = "MyOperation" };
 
@@ -231,7 +231,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("operation",
                         new ContentFieldData()
-                            .AddValue("iv", 42));
+                            .AddInvariant(42));
 
             var context = new ScriptVars { Data = content, Operation = "MyOperation" };
 
@@ -301,18 +301,18 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number0",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0))
+                            .AddInvariant(1.0))
                     .AddField("number1",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0));
+                            .AddInvariant(1.0));
             var expected =
                 new ContentData()
                     .AddField("number1",
                         new ContentFieldData()
-                            .AddValue("iv", 2.0))
+                            .AddInvariant(2.0))
                     .AddField("number2",
                         new ContentFieldData()
-                            .AddValue("iv", 10.0));
+                            .AddInvariant(10.0));
 
             var context = new ScriptVars { Data = content };
 
@@ -339,19 +339,19 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number0",
                         new ContentFieldData()
-                            .AddValue("iv", 3.0));
+                            .AddInvariant(3.0));
 
             var oldContent =
                 new ContentData()
                     .AddField("number0",
                         new ContentFieldData()
-                            .AddValue("iv", 5.0));
+                            .AddInvariant(5.0));
 
             var expected =
                 new ContentData()
                     .AddField("number0",
                         new ContentFieldData()
-                            .AddValue("iv", 13.0));
+                            .AddInvariant(13.0));
 
             var userIdentity = new ClaimsIdentity();
             var userPrincipal = new ClaimsPrincipal(userIdentity);

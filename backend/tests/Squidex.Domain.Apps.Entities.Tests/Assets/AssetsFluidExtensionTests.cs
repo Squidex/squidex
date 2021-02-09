@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     new ContentData()
                         .AddField("assets",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Array(assetId1, assetId2))),
+                                .AddInvariant(JsonValue.Array(assetId1, assetId2))),
                 AppId = appId
             };
 

@@ -115,10 +115,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                                     new ContentData()
                                         .AddField("field1",
                                             new ContentFieldData()
-                                                .AddJsonValue(JsonValue.Create(i)))
+                                                .AddInvariant(JsonValue.Create(i)))
                                         .AddField("field2",
                                             new ContentFieldData()
-                                                .AddJsonValue(JsonValue.Create(Lorem.Paragraph(200, 20))));
+                                                .AddInvariant(JsonValue.Create(Lorem.Paragraph(200, 20))));
 
                                 var content = new MongoContentEntity
                                 {

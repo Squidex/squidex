@@ -5,36 +5,28 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Rules.Json
 {
-    public sealed class JsonRule
+    public sealed class RuleSorrgate : ISurrogate<Rule>
     {
-        [JsonProperty]
         public RuleTrigger Trigger { get; set; }
 
-        [JsonProperty]
         public RuleAction Action { get; set; }
 
-        [JsonProperty]
         public bool IsEnabled { get; set; }
 
-        [JsonProperty]
         public string Name { get; set; }
 
-        public JsonRule()
+        public void FromSource(Rule source)
         {
+            SimpleMapper.Map(source, this);
         }
 
-        public JsonRule(Rule rule)
-        {
-            SimpleMapper.Map(rule, this);
-        }
-
-        public Rule ToRule()
+        public Rule ToSource()
         {
             var trigger = Trigger;
 

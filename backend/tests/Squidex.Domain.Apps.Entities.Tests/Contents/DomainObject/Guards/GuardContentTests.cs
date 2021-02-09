@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
-        private readonly RefToken actor = new RefToken(RefTokenType.Subject, "123");
+        private readonly RefToken actor = RefToken.User("123");
 
         [Fact]
         public async Task CanCreate_should_throw_exception_if_data_is_null()
@@ -335,7 +335,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             var permission = Permissions.ForApp(Permissions.AppContentsDelete, appId.Name, schemaId.Name).Id;
 
             var otherUser = Mocks.FrontendUser(permission: permission);
-            var otherActor = new RefToken(RefTokenType.Subject, "456");
+            var otherActor = RefToken.User("456");
 
             var content = CreateContent(Status.Published);
             var command = CreateCommand(new DeleteContent { Actor = otherActor, User = otherUser });
@@ -346,7 +346,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         [Fact]
         public void CheckPermission_should_exception_if_content_is_from_another_user_and_user_has_no_permission()
         {
-            var otherActor = new RefToken(RefTokenType.Subject, "456");
+            var otherActor = RefToken.User("456");
 
             var content = CreateContent(Status.Published);
             var command = CreateCommand(new DeleteContent { Actor = otherActor });

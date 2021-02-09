@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly RefToken actor = new RefToken(RefTokenType.Subject, "me");
+        private readonly RefToken actor = RefToken.User("me");
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly DomainId commentsId = DomainId.NewGuid();
         private readonly DomainId commentId = DomainId.NewGuid();

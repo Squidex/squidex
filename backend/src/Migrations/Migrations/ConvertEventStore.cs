@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 
@@ -53,10 +52,10 @@ namespace Migrations.Migrations
                 {
                     foreach (BsonDocument @event in commit["Events"].AsBsonArray)
                     {
-                        var meta = JObject.Parse(@event["Metadata"].AsString);
+                        var meta = BsonDocument.Parse(@event["Metadata"].AsString);
 
                         @event.Remove("EventId");
-                        @event["Metadata"] = meta.ToBson();
+                        @event["Metadata"] = meta;
                     }
 
                     await WriteAsync(new ReplaceOneModel<BsonDocument>(filter.Eq("_id", commit["_id"].AsString), commit), false);

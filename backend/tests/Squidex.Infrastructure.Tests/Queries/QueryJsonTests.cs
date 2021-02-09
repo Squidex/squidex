@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
@@ -166,7 +166,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_throw_exception_for_invalid_property_after_filter()
+        public void Should_not_throw_exception_when_filter_has_unknown_property()
         {
             var json = new
             {
@@ -178,7 +178,7 @@ namespace Squidex.Infrastructure.Queries
                 additional = 1
             };
 
-            Assert.ThrowsAny<JsonException>(() => SerializeAndDeserialize(json));
+            SerializeAndDeserialize(json);
         }
 
         private static FilterNode<IJsonValue> SerializeAndDeserialize<T>(T value)

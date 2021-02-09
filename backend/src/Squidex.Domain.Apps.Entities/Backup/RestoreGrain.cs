@@ -247,7 +247,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var actor = CurrentJob.Actor;
 
-            if (actor?.IsSubject == true)
+            if (actor?.IsUser == true)
             {
                 try
                 {

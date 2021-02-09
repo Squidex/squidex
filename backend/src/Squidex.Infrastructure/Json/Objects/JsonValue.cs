@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using NodaTime;
 
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
@@ -32,9 +33,14 @@ namespace Squidex.Infrastructure.Json.Objects
             return new JsonArray();
         }
 
-        public static JsonArray Array(params object?[] values)
+        public static JsonArray Array<T>(IEnumerable<T> values)
         {
-            return new JsonArray(values);
+            return new JsonArray(values?.OfType<object>());
+        }
+
+        public static JsonArray Array<T>(params T?[] values)
+        {
+            return new JsonArray(values?.OfType<object>());
         }
 
         public static JsonObject Object()

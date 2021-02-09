@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0));
+                            .AddInvariant(1.0));
 
             var result = ExecuteScript(original, @"data.number = { iv: 1 }");
 
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0));
+                            .AddInvariant(1.0));
 
             var result = ExecuteScript(original, @"data.number.iv = 1");
 
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0));
+                            .AddInvariant(1.0));
 
             var result = ExecuteScript(original, "Object.defineProperty(data, 'number', { value: { iv: 1 } })");
 
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0));
+                            .AddInvariant(1.0));
 
             var expected = new ContentData();
 
@@ -95,13 +95,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("string",
                         new ContentFieldData()
-                            .AddValue("iv", "1"));
+                            .AddInvariant("1"));
 
             var expected =
                 new ContentData()
                     .AddField("string",
                         new ContentFieldData()
-                            .AddValue("iv", "1new"));
+                            .AddInvariant("1new"));
 
             var result = ExecuteScript(original, @"data.string.iv = data.string.iv + 'new'");
 
@@ -115,13 +115,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0));
+                            .AddInvariant(1.0));
 
             var expected =
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", 3.0));
+                            .AddInvariant(3.0));
 
             var result = ExecuteScript(original, @"data.number.iv = data.number.iv + 2");
 
@@ -135,13 +135,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("boolean",
                         new ContentFieldData()
-                            .AddValue("iv", false));
+                            .AddInvariant(false));
 
             var expected =
                 new ContentData()
                     .AddField("boolean",
                         new ContentFieldData()
-                            .AddValue("iv", true));
+                            .AddInvariant(true));
 
             var result = ExecuteScript(original, @"data.boolean.iv = !data.boolean.iv");
 
@@ -155,13 +155,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(1.0, 2.0)));
+                            .AddInvariant(JsonValue.Array(1.0, 2.0)));
 
             var expected =
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(1.0, 4.0, 5.0)));
+                            .AddInvariant(JsonValue.Array(1.0, 4.0, 5.0)));
 
             var result = ExecuteScript(original, @"data.number.iv = [data.number.iv[0], data.number.iv[1] + 2, 5]");
 
@@ -175,13 +175,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Object().Add("lat", 1.0)));
+                            .AddInvariant(JsonValue.Object().Add("lat", 1.0)));
 
             var expected =
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Object().Add("lat", 1.0).Add("lon", 4.0)));
+                            .AddInvariant(JsonValue.Object().Add("lat", 1.0).Add("lon", 4.0)));
 
             var result = ExecuteScript(original, @"data.number.iv = { lat: data.number.iv.lat, lon: data.number.iv.lat + 3 }");
 
@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0));
+                            .AddInvariant(1.0));
 
             var result = ExecuteScript(original, "Object.defineProperty(data.number, 'iv', { value: 1 })");
 
@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("string",
                         new ContentFieldData()
-                            .AddValue("iv", "hello"));
+                            .AddInvariant("hello"));
 
             var expected =
                 new ContentData()
@@ -233,12 +233,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("f1",
                         new ContentFieldData()
-                            .AddValue("v11", "1")
-                            .AddValue("v12", "2"))
+                            .AddLocalized("v11", "1")
+                            .AddLocalized("v12", "2"))
                     .AddField("f2",
                         new ContentFieldData()
-                            .AddValue("v21", "3")
-                            .AddValue("v22", "4"));
+                            .AddLocalized("v21", "3")
+                            .AddLocalized("v22", "4"));
 
             var engine = new Engine();
 
@@ -265,7 +265,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("obj",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Object().Add("readonly", 1)));
+                            .AddInvariant(JsonValue.Object().Add("readonly", 1)));
 
             Assert.Throws<JavaScriptException>(() => ExecuteScript(original, "data.obj.iv.invalid = 1"));
             Assert.Throws<JavaScriptException>(() => ExecuteScript(original, "data.obj.iv.readonly = 2"));
@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("obj",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array()));
+                            .AddInvariant(JsonValue.Array()));
 
             ExecuteScript(original, "data.obj.iv[0] = 1");
         }

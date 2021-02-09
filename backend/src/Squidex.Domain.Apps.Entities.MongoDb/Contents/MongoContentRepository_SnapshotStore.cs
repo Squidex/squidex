@@ -9,6 +9,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -93,9 +94,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            var content = CreateContent(value, newVersion);
+            var content = await CreateContentAsync(value, value.Data, newVersion);
 
-            content.Data = value.Data;
             content.ScheduledAt = value.ScheduleJob?.DueTime;
             content.ScheduleJob = value.ScheduleJob;
             content.NewStatus = value.NewStatus;
@@ -105,9 +105,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            var content = CreateContent(value, newVersion);
+            var content = await CreateContentAsync(value, value.CurrentVersion.Data, newVersion);
 
-            content.Data = value.CurrentVersion.Data;
             content.ScheduledAt = null;
             content.ScheduleJob = null;
             content.NewStatus = null;
@@ -115,14 +114,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collectionPublished.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
         }
 
-        private static MongoContentEntity CreateContent(ContentDomainObject.State value, long newVersion)
+        private async Task<MongoContentEntity> CreateContentAsync(ContentDomainObject.State value, ContentData data, long newVersion)
         {
             var content = SimpleMapper.Map(value, new MongoContentEntity());
 
+            content.Data = data;
             content.DocumentId = value.UniqueId;
             content.IndexedAppId = value.AppId.Id;
             content.IndexedSchemaId = value.SchemaId.Id;
             content.Version = newVersion;
+
+            var schema = await appProvider.GetSchemaAsync(value.AppId.Id, value.SchemaId.Id, true);
+
+            if (schema != null)
+            {
+                content.ReferencedIds = content.Data.GetReferencedIds(schema.SchemaDef);
+            }
 
             return content;
         }

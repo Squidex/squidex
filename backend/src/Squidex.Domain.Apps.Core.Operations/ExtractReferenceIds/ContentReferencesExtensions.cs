@@ -16,6 +16,17 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ContentReferencesExtensions
     {
+        public static HashSet<DomainId> GetReferencedIds(this ContentData source, Schema schema, int referencesPerField = int.MaxValue)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var ids = new HashSet<DomainId>();
+
+            AddReferencedIds(source, schema, ids, referencesPerField);
+
+            return ids;
+        }
+
         public static void AddReferencedIds(this ContentData source, Schema schema, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(schema, nameof(schema));

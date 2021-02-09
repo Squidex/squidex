@@ -44,10 +44,10 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddValue("de", "de-string"))
+                            .AddLocalized("de", "de-string"))
                     .AddField("my-number",
                         new ContentFieldData()
-                            .AddValue("iv", 456));
+                            .AddInvariant(456));
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
@@ -68,10 +68,10 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddValue("de", string.Empty))
+                            .AddLocalized("de", string.Empty))
                     .AddField("my-number",
                         new ContentFieldData()
-                            .AddValue("iv", 456));
+                            .AddInvariant(456));
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 

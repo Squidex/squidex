@@ -44,7 +44,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             ValueConverter.Register<JsonNumber, double>(x => x.Value);
             ValueConverter.Register<JsonString, string>(x => x.Value);
             ValueConverter.Register<JsonString, DateTimeOffset>(x => DateTimeOffset.Parse(x.Value, CultureInfo.InvariantCulture));
+
             ValueConverter.Register<string, DomainId>(DomainId.Create);
+
             ValueConverter.Register<string, Status>(x => new Status(x));
         }
 

@@ -17,7 +17,6 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Caching;
 using Squidex.Pipeline.Plugins;
 using Squidex.Web;

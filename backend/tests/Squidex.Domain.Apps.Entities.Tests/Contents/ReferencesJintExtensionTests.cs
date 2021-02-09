@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new ContentData()
                     .AddField("references",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(referenceId1)));
+                            .AddInvariant(JsonValue.Array(referenceId1)));
 
             A.CallTo(() => contentQuery.QueryAsync(
                     A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), A<Q>.That.HasIds(referenceId1)))
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new ContentData()
                     .AddField("references",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(referenceId1, referenceId2)));
+                            .AddInvariant(JsonValue.Array(referenceId1, referenceId2)));
 
             A.CallTo(() => contentQuery.QueryAsync(
                     A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), A<Q>.That.HasIds(referenceId1, referenceId2)))
@@ -131,10 +131,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentData()
                         .AddField("field1",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Create($"Hello {index}")))
+                                .AddInvariant(JsonValue.Create($"Hello {index}")))
                         .AddField("field2",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Create($"World {index}"))),
+                                .AddInvariant(JsonValue.Create($"World {index}"))),
                 Id = referenceId
             };
         }

@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Array()))
+                                .AddInvariant(JsonValue.Array()))
             };
 
             var result = await sut.FormatAsync("${CONTENT_DATA.city.iv.data.name}", @event);
@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_format_json()
         {
-            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
+            var @event = new EnrichedContentEvent { Actor = RefToken.Client("android") };
 
             var result = await sut.FormatAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
 
@@ -252,7 +252,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_format_json_with_special_characters()
         {
-            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "mobile\"android") };
+            var @event = new EnrichedContentEvent { Actor = RefToken.Client("mobile\"android") };
 
             var result = await sut.FormatAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
 
@@ -288,7 +288,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("categories",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Array("ref1", "ref2", "ref3")))
+                                .AddInvariant(JsonValue.Array("ref1", "ref2", "ref3")))
             };
 
             var script = @"

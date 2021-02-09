@@ -332,7 +332,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 CreateInitialLanguage()
             };
 
-            if (command.Actor.IsSubject)
+            if (command.Actor.IsUser)
             {
                 events.Add(CreateInitialOwner(command.Actor));
             }

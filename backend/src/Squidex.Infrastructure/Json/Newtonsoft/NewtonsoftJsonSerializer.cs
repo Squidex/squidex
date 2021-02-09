@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using Newtonsoft.Json;
+using NewtonsoftException = Newtonsoft.Json.JsonException;
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {
@@ -32,37 +33,58 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public void Serialize<T>(T value, Stream stream, bool leaveOpen = false)
         {
-            using (var writer = new StreamWriter(stream, leaveOpen: leaveOpen))
+            try
             {
-                serializer.Serialize(writer, value);
+                using (var writer = new StreamWriter(stream, leaveOpen: leaveOpen))
+                {
+                    serializer.Serialize(writer, value);
 
-                writer.Flush();
+                    writer.Flush();
+                }
+            }
+            catch (NewtonsoftException ex)
+            {
+                throw new JsonException(ex.Message, ex);
             }
         }
 
         public T Deserialize<T>(string value, Type? actualType = null)
         {
-            using (var textReader = new StringReader(value))
+            try
             {
-                actualType ??= typeof(T);
-
-                using (var reader = GetReader(textReader))
+                using (var textReader = new StringReader(value))
                 {
-                    return (T)serializer.Deserialize(reader, actualType)!;
+                    actualType ??= typeof(T);
+
+                    using (var reader = GetReader(textReader))
+                    {
+                        return (T)serializer.Deserialize(reader, actualType)!;
+                    }
                 }
+            }
+            catch (NewtonsoftException ex)
+            {
+                throw new JsonException(ex.Message, ex);
             }
         }
 
         public T Deserialize<T>(Stream stream, Type? actualType = null, bool leaveOpen = false)
         {
-            using (var textReader = new StreamReader(stream, leaveOpen: leaveOpen))
+            try
             {
-                actualType ??= typeof(T);
-
-                using (var reader = GetReader(textReader))
+                using (var textReader = new StreamReader(stream, leaveOpen: leaveOpen))
                 {
-                    return (T)serializer.Deserialize(reader, actualType)!;
+                    actualType ??= typeof(T);
+
+                    using (var reader = GetReader(textReader))
+                    {
+                        return (T)serializer.Deserialize(reader, actualType)!;
+                    }
                 }
+            }
+            catch (NewtonsoftException ex)
+            {
+                throw new JsonException(ex.Message, ex);
             }
         }
 

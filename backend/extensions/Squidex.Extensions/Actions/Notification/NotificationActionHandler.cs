@@ -45,7 +45,7 @@ namespace Squidex.Extensions.Actions.Notification
 
                 if (!string.IsNullOrEmpty(action.Client))
                 {
-                    actor = new RefToken(RefTokenType.Client, action.Client);
+                    actor = RefToken.Client(action.Client);
                 }
 
                 var user = await userResolver.FindByIdOrEmailAsync(action.User);

@@ -131,12 +131,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private static RefToken Client(string identifier)
         {
-            return new RefToken(RefTokenType.Client, identifier);
+            return RefToken.Client(identifier);
         }
 
         private static RefToken Subject(string identifier)
         {
-            return new RefToken(RefTokenType.Subject, identifier);
+            return RefToken.User(identifier);
         }
     }
 }

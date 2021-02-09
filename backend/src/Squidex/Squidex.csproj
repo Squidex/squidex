@@ -34,6 +34,7 @@
   
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.0" />
+    <PackageReference Include="GraphQL.Server.Core" Version="4.4.1" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.NewtonsoftJson" Version="4.4.1" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="4.4.1" />
     <PackageReference Include="IdentityServer4" Version="4.1.1" />
@@ -53,6 +54,7 @@
     <PackageReference Include="Namotion.Reflection" Version="1.0.15" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NJsonSchema" Version="10.3.2" />
+    <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.9.4" />
     <PackageReference Include="OpenCover" Version="4.7.922" PrivateAssets="all" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="3.2.0" />

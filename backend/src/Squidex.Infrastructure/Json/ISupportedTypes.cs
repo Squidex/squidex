@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json.Converters;
+using System;
+using System.Collections.Generic;
 
-namespace Squidex.Infrastructure.Json.Newtonsoft
+namespace Squidex.Infrastructure.Json
 {
-    public sealed class DateConverter : IsoDateTimeConverter
+    public interface ISupportedTypes
     {
-        public DateConverter()
-        {
-            DateTimeFormat = "yyyy-MM-dd";
-        }
+        IEnumerable<Type> SupportedTypes { get; }
     }
 }

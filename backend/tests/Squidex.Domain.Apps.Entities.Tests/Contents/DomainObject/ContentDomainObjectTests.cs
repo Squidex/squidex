@@ -43,28 +43,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             new ContentData()
                 .AddField("my-field1",
                 new ContentFieldData()
-                        .AddValue("iv", null))
+                        .AddInvariant(null))
                 .AddField("my-field2",
                     new ContentFieldData()
-                        .AddValue("iv", 1));
+                        .AddInvariant(1));
         private readonly ContentData data =
             new ContentData()
                 .AddField("my-field1",
                     new ContentFieldData()
-                        .AddValue("iv", 1));
+                        .AddInvariant(1));
         private readonly ContentData patch =
             new ContentData()
                 .AddField("my-field2",
                     new ContentFieldData()
-                        .AddValue("iv", 2));
+                        .AddInvariant(2));
         private readonly ContentData otherData =
             new ContentData()
                 .AddField("my-field1",
                     new ContentFieldData()
-                        .AddValue("iv", 2))
+                        .AddInvariant(2))
                 .AddField("my-field2",
                     new ContentFieldData()
-                        .AddValue("iv", 2));
+                        .AddInvariant(2));
         private readonly ContentData patched;
         private readonly ContentDomainObject sut;
 

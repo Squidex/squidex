@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         private readonly IPersistence<TState> persistenceWithState = A.Fake<IPersistence<TState>>();
         private readonly IPersistence persistence = A.Fake<IPersistence>();
 
-        protected RefToken Actor { get; } = new RefToken(RefTokenType.Subject, "me");
+        protected RefToken Actor { get; } = RefToken.User("me");
 
-        protected RefToken ActorClient { get; } = new RefToken(RefTokenType.Client, "client");
+        protected RefToken ActorClient { get; } = RefToken.Client("client");
 
         protected DomainId AppId { get; } = DomainId.NewGuid();
 
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             command.ExpectedVersion = EtagVersion.Any;
             command.Actor ??= Actor;
 
-            if (command.User == null && command.Actor.IsSubject)
+            if (command.User == null && command.Actor.IsUser)
             {
                 command.User = User;
             }

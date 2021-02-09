@@ -56,7 +56,7 @@ namespace Squidex.Config.Domain
                             c.GetRequiredService<DocumentClient>(),
                             cosmosDbMasterKey,
                             cosmosDbDatabase,
-                            c.GetRequiredService<JsonSerializerSettings>()))
+                            c.GetRequiredService<IJsonSerializer>()))
                         .As<IEventStore>();
 
                     services.AddHealthChecks()

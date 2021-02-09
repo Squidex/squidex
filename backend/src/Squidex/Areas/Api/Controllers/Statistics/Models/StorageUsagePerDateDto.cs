@@ -6,9 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Text.Json.Serialization;
+using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
@@ -17,8 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// <summary>
         /// The date when the usage was tracked.
         /// </summary>
-        [JsonConverter(typeof(DateConverter))]
-        public DateTime Date { get; set; }
+        public LocalDate Date { get; set; }
 
         /// <summary>
         /// The number of assets.
@@ -34,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         {
             var result = new StorageUsagePerDateDto
             {
-                Date = stats.Date,
+                Date = LocalDate.FromDateTime(DateTime.SpecifyKind(stats.Date, DateTimeKind.Utc)),
                 TotalCount = stats.TotalCount,
                 TotalSize = stats.TotalSize
             };

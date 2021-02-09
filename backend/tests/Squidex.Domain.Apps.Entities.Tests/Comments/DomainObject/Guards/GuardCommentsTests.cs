@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
     public class GuardCommentsTests : IClassFixture<TranslationsFixture>
     {
         private readonly string commentsId = DomainId.NewGuid().ToString();
-        private readonly RefToken user1 = new RefToken(RefTokenType.Subject, "1");
-        private readonly RefToken user2 = new RefToken(RefTokenType.Subject, "2");
+        private readonly RefToken user1 = RefToken.User("1");
+        private readonly RefToken user2 = RefToken.User("2");
 
         [Fact]
         public void CanCreate_should_throw_exception_if_text_not_defined()

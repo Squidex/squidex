@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddJsonValue(JsonValue.Object());
+                    .AddInvariant(JsonValue.Object());
 
             var result = FieldConverters.ForValues((value, field, parent) => null)(source, field);
 
@@ -44,8 +44,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("en", null)
-                    .AddValue("de", 1);
+                    .AddLocalized("en", null)
+                    .AddLocalized("de", 1);
 
             var result = FieldConverters.ExcludeChangedTypes(TestUtils.DefaultSerializer)(source, field);
 
@@ -59,8 +59,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("en", "EN")
-                    .AddValue("de", 0);
+                    .AddLocalized("en", "EN")
+                    .AddLocalized("de", 0);
 
             var result = FieldConverters.ExcludeChangedTypes(TestUtils.DefaultSerializer)(source, field);
 
@@ -98,12 +98,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("en", "EN")
-                    .AddValue("it", "IT");
+                    .AddLocalized("en", "EN")
+                    .AddLocalized("it", "IT");
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("en", "EN");
+                    .AddLocalized("en", "EN");
 
             var result = FieldConverters.ResolveLanguages(languagesConfig)(source, field);
 
@@ -117,12 +117,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("iv", "A")
-                    .AddValue("it", "B");
+                    .AddLocalized("iv", "A")
+                    .AddLocalized("it", "B");
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("en", "A");
+                    .AddLocalized("en", "A");
 
             var result = FieldConverters.ResolveLanguages(languagesConfig)(source, field);
 
@@ -148,11 +148,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("iv", "A");
+                    .AddInvariant("A");
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("iv", "A");
+                    .AddInvariant("A");
 
             var result = FieldConverters.ResolveInvariant(languagesConfig)(source, field);
 
@@ -166,12 +166,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("de", "DE")
-                    .AddValue("en", "EN");
+                    .AddLocalized("de", "DE")
+                    .AddLocalized("en", "EN");
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("iv", "EN");
+                    .AddInvariant("EN");
 
             var result = FieldConverters.ResolveInvariant(languagesConfig)(source, field);
 
@@ -185,12 +185,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("de", "DE")
-                    .AddValue("it", "IT");
+                    .AddLocalized("de", "DE")
+                    .AddLocalized("it", "IT");
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("iv", "DE");
+                    .AddInvariant("DE");
 
             var result = FieldConverters.ResolveInvariant(languagesConfig)(source, field);
 
@@ -222,15 +222,15 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("en", "EN")
-                    .AddValue("it", "IT");
+                    .AddLocalized("en", "EN")
+                    .AddLocalized("it", "IT");
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("en", "EN")
-                    .AddValue("de", "EN")
-                    .AddValue("it", "IT")
-                    .AddValue("es", "IT");
+                    .AddLocalized("en", "EN")
+                    .AddLocalized("de", "EN")
+                    .AddLocalized("it", "IT")
+                    .AddLocalized("es", "IT");
 
             var result = FieldConverters.ResolveFallbackLanguages(config)(source, field);
 
@@ -244,11 +244,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("de", "DE");
+                    .AddLocalized("de", "DE");
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("de", "DE");
+                    .AddLocalized("de", "DE");
 
             var result = FieldConverters.ResolveFallbackLanguages(languagesConfig)(source, field);
 
@@ -262,12 +262,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("en", "EN")
-                    .AddValue("de", "DE");
+                    .AddLocalized("en", "EN")
+                    .AddLocalized("de", "DE");
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("de", "DE");
+                    .AddLocalized("de", "DE");
 
             var result = FieldConverters.FilterLanguages(languagesConfig, new[] { Language.DE })(source, field);
 
@@ -281,12 +281,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddValue("en", "EN")
-                    .AddValue("de", "DE");
+                    .AddLocalized("en", "EN")
+                    .AddLocalized("de", "DE");
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("en", "EN");
+                    .AddLocalized("en", "EN");
 
             var result = FieldConverters.FilterLanguages(languagesConfig, new[] { Language.CA })(source, field);
 
