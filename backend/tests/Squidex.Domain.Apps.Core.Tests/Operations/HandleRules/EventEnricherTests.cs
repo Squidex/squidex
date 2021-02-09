@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_enrich_with_user()
         {
-            var actor = new RefToken(RefTokenType.Client, "me");
+            var actor = RefToken.Client("me");
 
             var user = A.Dummy<IUser>();
 
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_enrich_with_user_and_cache()
         {
-            var actor = new RefToken(RefTokenType.Client, "me");
+            var actor = RefToken.Client("me");
 
             var user = A.Dummy<IUser>();
 

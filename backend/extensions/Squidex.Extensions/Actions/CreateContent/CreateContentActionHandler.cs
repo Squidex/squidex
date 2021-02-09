@@ -61,7 +61,7 @@ namespace Squidex.Extensions.Actions.CreateContent
 
             if (!string.IsNullOrEmpty(action.Client))
             {
-                ruleJob.Actor = new RefToken(RefTokenType.Client, action.Client);
+                ruleJob.Actor = RefToken.Client(action.Client);
             }
             else if (@event is EnrichedUserEventBase userEvent)
             {

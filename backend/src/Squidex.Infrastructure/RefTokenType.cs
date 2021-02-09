@@ -7,10 +7,9 @@
 
 namespace Squidex.Infrastructure
 {
-    public static class RefTokenType
+    public enum RefTokenType
     {
-        public const string Subject = "subject";
-
-        public const string Client = "client";
+        Subject,
+        Client
     }
 }

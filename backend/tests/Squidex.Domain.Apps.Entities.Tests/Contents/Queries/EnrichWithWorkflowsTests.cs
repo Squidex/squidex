@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly Context requestContext;
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly RefToken user = new RefToken(RefTokenType.Subject, "me");
+        private readonly RefToken user = RefToken.User("me");
         private readonly EnrichWithWorkflows sut;
 
         public EnrichWithWorkflowsTests()

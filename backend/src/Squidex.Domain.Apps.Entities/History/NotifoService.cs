@@ -273,7 +273,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
         private static void SetUser(AppEvent appEvent, PublishDto publishRequest)
         {
-            if (appEvent.Actor.IsSubject)
+            if (appEvent.Actor.IsUser)
             {
                 publishRequest.CreatorId = appEvent.Actor.Identifier;
             }

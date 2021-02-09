@@ -191,7 +191,7 @@ namespace Squidex.Infrastructure.States
 
         private EventData[] GetEventData(Envelope<IEvent>[] events, Guid commitId)
         {
-            return events.Map(x => eventDataFormatter.ToEventData(x, commitId, true));
+            return events.Select(x => eventDataFormatter.ToEventData(x, commitId, true)).ToArray();
         }
 
         private string GetStreamName()

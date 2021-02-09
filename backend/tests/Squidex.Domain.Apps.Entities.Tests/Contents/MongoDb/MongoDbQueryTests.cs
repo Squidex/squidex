@@ -14,6 +14,7 @@ using MongoDB.Driver;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
@@ -42,6 +43,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         static MongoDbQueryTests()
         {
+            DomainIdSerializer.Register();
+
+            TypeConverterStringSerializer<RefToken>.Register();
+            TypeConverterStringSerializer<Status>.Register();
+
             InstantSerializer.Register();
         }
 
@@ -142,8 +148,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_lastModifiedBy()
         {
-            var i = _F(ClrFilter.Eq("lastModifiedBy", "Me"));
-            var o = _C("{ 'mb' : 'Me' }");
+            var i = _F(ClrFilter.Eq("lastModifiedBy", "me"));
+            var o = _C("{ 'mb' : 'me' }");
 
             Assert.Equal(o, i);
         }
@@ -160,8 +166,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_createdBy()
         {
-            var i = _F(ClrFilter.Eq("createdBy", "Me"));
-            var o = _C("{ 'cb' : 'Me' }");
+            var i = _F(ClrFilter.Eq("createdBy", "user:me"));
+            var o = _C("{ 'cb' : 'user:me' }");
 
             Assert.Equal(o, i);
         }
@@ -278,6 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_take_statement()
         {
             var query = new ClrQuery { Take = 3 };
+
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.QueryLimit(query);
@@ -290,6 +297,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public void Should_make_skip_statement()
         {
             var query = new ClrQuery { Skip = 3 };
+
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.QuerySkip(query);

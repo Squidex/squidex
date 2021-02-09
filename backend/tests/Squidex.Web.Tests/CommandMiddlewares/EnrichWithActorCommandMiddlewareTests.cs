@@ -65,7 +65,7 @@ namespace Squidex.Web.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new RefToken(RefTokenType.Subject, "me"), command.Actor);
+            Assert.Equal(RefToken.User("me"), command.Actor);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace Squidex.Web.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new RefToken(RefTokenType.Client, "my-client"), command.Actor);
+            Assert.Equal(RefToken.Client("my-client"), command.Actor);
         }
 
         [Fact]
@@ -86,12 +86,12 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
 
-            var command = new CreateContent { Actor = new RefToken("subject", "me") };
+            var command = new CreateContent { Actor = RefToken.User("me") };
             var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new RefToken("subject", "me"), command.Actor);
+            Assert.Equal(RefToken.User("me"), command.Actor);
         }
 
         private CommandContext Ctx(ICommand command)

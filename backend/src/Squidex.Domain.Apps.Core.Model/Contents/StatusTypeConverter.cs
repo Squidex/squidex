@@ -25,12 +25,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value is string s)
-            {
-                return new Status(s);
-            }
-
-            return default(Status);
+            return new Status((string)value);
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)

@@ -30,35 +30,18 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public ContentFieldData AddValue(object? value)
+        public ContentFieldData AddInvariant(object? value)
         {
-            return AddJsonValue(JsonValue.Create(value));
-        }
-
-        public ContentFieldData AddValue(string key, object? value)
-        {
-            return AddJsonValue(key, JsonValue.Create(value));
-        }
-
-        public ContentFieldData AddJsonValue(IJsonValue value)
-        {
-            this[InvariantPartitioning.Key] = value;
+            this[InvariantPartitioning.Key] = JsonValue.Create(value);
 
             return this;
         }
 
-        public ContentFieldData AddJsonValue(string key, IJsonValue value)
+        public ContentFieldData AddLocalized(string key, object? value)
         {
             Guard.NotNullOrEmpty(key, nameof(key));
 
-            if (Language.IsValidLanguage(key))
-            {
-                this[key] = value;
-            }
-            else
-            {
-                this[key] = value;
-            }
+            this[key] = JsonValue.Create(value);
 
             return this;
         }

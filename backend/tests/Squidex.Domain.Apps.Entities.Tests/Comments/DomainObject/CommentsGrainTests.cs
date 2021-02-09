@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly DomainId commentsId = DomainId.NewGuid();
         private readonly DomainId commentId = DomainId.NewGuid();
-        private readonly RefToken actor = new RefToken(RefTokenType.Subject, "me");
+        private readonly RefToken actor = RefToken.User("me");
         private readonly CommentsGrain sut;
 
         private string Id

@@ -518,7 +518,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new ContentData()
                     .AddField("value",
                         new ContentFieldData()
-                            .AddJsonValue("iv", JsonValue.Create(1)));
+                            .AddInvariant(1));
 
             return (DomainId.NewGuid(), data, query);
         }

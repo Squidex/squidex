@@ -179,19 +179,19 @@
     <value>La risorsa è collegata ad un contenuto pertanto non può essere cancellata.</value>
   </data>
   <data name="backups.alreadyRunning" xml:space="preserve">
-    <value>E' in esecuzione una altro processo di backup.</value>
+    <value>È in esecuzione una altro processo di backup.</value>
   </data>
   <data name="backups.maxReached" xml:space="preserve">
     <value>Non puoi avere più di {max} backup.</value>
   </data>
   <data name="backups.restoreRunning" xml:space="preserve">
-    <value>E' in esecuzione un'operazione di restore.</value>
+    <value>È in esecuzione un'operazione di restore.</value>
   </data>
   <data name="comments.noPermissions" xml:space="preserve">
     <value>Puoi solo accedere alle tue notifiche.</value>
   </data>
   <data name="comments.notUserComment" xml:space="preserve">
-    <value>E' stato creato un commento da un altro utente.</value>
+    <value>È stato creato un commento da un altro utente.</value>
   </data>
   <data name="common.action" xml:space="preserve">
     <value>Azione</value>
@@ -239,7 +239,7 @@
     <value>Email</value>
   </data>
   <data name="common.errorNoPermission" xml:space="preserve">
-    <value>You do not have the necessary permission.</value>
+    <value>Non hai i permessi necessari.</value>
   </data>
   <data name="common.field" xml:space="preserve">
     <value>Campo</value>
@@ -359,7 +359,7 @@
     <value>Num. giorni</value>
   </data>
   <data name="common.odataFailure" xml:space="preserve">
-    <value>Fallito parsando la query: {message}</value>
+    <value>Fallito il parsing della query: {message}</value>
   </data>
   <data name="common.odataFilterNotValid" xml:space="preserve">
     <value>OData $filter condizione non valida: {message}</value>
@@ -458,7 +458,7 @@
     <value>Non c'è niente da eliminare.</value>
   </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
-    <value>Errore nel json, attesp un array di objects.</value>
+    <value>Errore nel json, atteso un array di objects.</value>
   </data>
   <data name="contents.invalidArrayOfStrings" xml:space="preserve">
     <value>Errore nel json, atteso un array di string.</value>
@@ -542,7 +542,7 @@
     <value>Deve essere tra {min} e {max} elemento(i).</value>
   </data>
   <data name="contents.validation.max" xml:space="preserve">
-    <value>Deve esseer minore o uguale a {max}.</value>
+    <value>Deve essere minore o uguale a {max}.</value>
   </data>
   <data name="contents.validation.maxCharacters" xml:space="preserve">
     <value>Il testo non deve avere più di {max} carattere(i).</value>
@@ -578,7 +578,7 @@
     <value>La larghezza {width}px deve essere maggiore di {min}px.</value>
   </data>
   <data name="contents.validation.minItems" xml:space="preserve">
-    <value>Deve avere almento {min} elemento(i).</value>
+    <value>Deve avere almeno {min} elemento(i).</value>
   </data>
   <data name="contents.validation.minLength" xml:space="preserve">
     <value>Deve avere almeno {min} carattere(i).</value>
@@ -605,7 +605,7 @@
     <value>Deve seguire il pattern.</value>
   </data>
   <data name="contents.validation.reference" xml:space="preserve">
-    <value>La Geolocalizzazione può avere come campi solamente come latidutine e longitudine.</value>
+    <value>La geolocalizzazione può avere come campi solamente come latitudine e longitudine.</value>
   </data>
   <data name="contents.validation.referenceNotFound" xml:space="preserve">
     <value>Contiene un collegamento '{id}' non valido.</value>
@@ -665,7 +665,7 @@
     <value>La password deve avere almeno una lettera minuscola ('a'-'z').</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
-    <value>La passowrd deve avere almeno un carattere non alfanumerico.</value>
+    <value>La password deve avere almeno un carattere non alfanumerico.</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresUniqueChars" xml:space="preserve">
     <value>La password deve essere composta almeno da {0} caratteri differenti.</value>
@@ -830,7 +830,7 @@
     <value>Il tuo indirizzo email è impostato su privato in Github. Impostalo come pubblico per poter utilizzare il login Github.</value>
   </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
-    <value>E' in esecuzione un'altra regola.</value>
+    <value>È in esecuzione un'altra regola.</value>
   </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Il valore predefinito calcolato e il valore predefinito non possono essere utilizzati insieme.</value>
@@ -872,10 +872,10 @@
     <value>Non è possibile annidare un campo di tipo array.</value>
   </data>
   <data name="schemas.references.resolveError" xml:space="preserve">
-    <value>E' possibile risolvere il nome del collegamento solamente quando il numero massimo di elementi è 1.</value>
+    <value>È possibile risolvere il nome del collegamento solamente quando il numero massimo di elementi è 1.</value>
   </data>
   <data name="schemas.string.inlineEditorError" xml:space="preserve">
-    <value>E' possibile la modifica in linea solamente per dropdown menu, slugs e campi di input.</value>
+    <value>È possibile la modifica in linea solamente per dropdown menu, slugs e campi di input.</value>
   </data>
   <data name="schemas.stringEditorsNeedAllowedValuesError" xml:space="preserve">
     <value>I Radio button e dropdown menu hanno bisogno che siano definiti dei valori.</value>
@@ -1199,7 +1199,7 @@
     <value>Lo step iniziale non può essere quello pubblico.</value>
   </data>
   <data name="workflows.publishedNotDefined" xml:space="preserve">
-    <value>Il Workflow deve avere uno step pubbico.</value>
+    <value>Il Workflow deve avere uno step pubblico.</value>
   </data>
   <data name="workflows.publishedStepNotFound" xml:space="preserve">
     <value>La Transition ha un obiettivo non valido.</value>

@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
                     {
                         var value = stringValue.ToStringValue();
 
-                        var instant = InstantPattern.General.Parse(value);
+                        var instant = InstantPattern.ExtendedIso.Parse(value);
 
                         if (instant.Success)
                         {

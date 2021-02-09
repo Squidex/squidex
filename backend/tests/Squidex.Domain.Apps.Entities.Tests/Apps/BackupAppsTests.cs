@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppUISettings appUISettings = A.Fake<IAppUISettings>();
         private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
         private readonly DomainId appId = DomainId.NewGuid();
-        private readonly RefToken actor = new RefToken(RefTokenType.Subject, "123");
+        private readonly RefToken actor = RefToken.User("123");
         private readonly BackupApps sut;
 
         public BackupAppsTests()
@@ -354,7 +354,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .Returns(true)
                 .AssignsOutAndRefParametersLazily(
                     new Func<string, RefToken, object[]>((x, _) =>
-                        new[] { new RefToken(RefTokenType.Subject, $"{x}_mapped") }));
+                        new[] { RefToken.User($"{x}_mapped") }));
 
             A.CallTo(() => mapping.TryMap("notfound", out mapped))
                 .Returns(false);

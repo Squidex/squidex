@@ -150,18 +150,6 @@ namespace Squidex.Infrastructure
             return source.Concat(Enumerable.Repeat(value, 1));
         }
 
-        public static TResult[] Map<TResult, T>(this T[] value, Func<T, TResult> convert)
-        {
-            var result = new TResult[value.Length];
-
-            for (var i = 0; i < value.Length; i++)
-            {
-                result[i] = convert(value[i]);
-            }
-
-            return result;
-        }
-
         public static int SequentialHashCode<T>(this IEnumerable<T> collection)
         {
             return collection.SequentialHashCode(EqualityComparer<T>.Default);

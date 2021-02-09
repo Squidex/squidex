@@ -207,11 +207,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsCreate, c =>
             {
-                var contentPublish = c.GetArgument<bool>("publish");
+                var publish = c.GetArgument<bool>("publish");
                 var contentData = GetContentData(c);
                 var contentId = c.GetArgument<string?>("id");
 
-                var command = new CreateContent { Data = contentData, Publish = contentPublish };
+                var command = new CreateContent { Data = contentData, Publish = publish };
 
                 if (!string.IsNullOrWhiteSpace(contentId))
                 {
@@ -263,13 +263,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpsert, c =>
             {
-                var contentPublish = c.GetArgument<bool>("publish");
+                var publish = c.GetArgument<bool>("publish");
+
                 var contentData = GetContentData(c);
                 var contentId = c.GetArgument<string>("id");
 
                 var id = DomainId.Create(contentId);
 
-                return new UpsertContent { ContentId = id, Data = contentData, Publish = contentPublish };
+                return new UpsertContent { ContentId = id, Data = contentData, Publish = publish };
             });
         }
 

@@ -130,20 +130,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new ContentData()
                     .AddField("asset1",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array($"url/to/{img1.Id}", img1.FileName)))
+                            .AddLocalized("iv", JsonValue.Array($"url/to/{img1.Id}", img1.FileName)))
                     .AddField("asset2",
                         new ContentFieldData()
-                            .AddValue("en", JsonValue.Array($"url/to/{img2.Id}", img2.FileName))),
+                            .AddLocalized("en", JsonValue.Array($"url/to/{img2.Id}", img2.FileName))),
                 contents[0].ReferenceData);
 
             Assert.Equal(
                 new ContentData()
                     .AddField("asset1",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(doc1.FileName)))
+                            .AddLocalized("iv", JsonValue.Array(doc1.FileName)))
                     .AddField("asset2",
                         new ContentFieldData()
-                            .AddValue("en", JsonValue.Array(doc2.FileName))),
+                            .AddLocalized("en", JsonValue.Array(doc2.FileName))),
                 contents[1].ReferenceData);
         }
 
@@ -227,10 +227,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new ContentData()
                         .AddField("asset1",
                             new ContentFieldData()
-                                .AddJsonValue("iv", JsonValue.Array(assets1.Select(x => x.ToString()).ToArray())))
+                                .AddLocalized("iv", JsonValue.Array(assets1.Select(x => x.ToString()))))
                         .AddField("asset2",
                             new ContentFieldData()
-                                .AddJsonValue("en", JsonValue.Array(assets2.Select(x => x.ToString()).ToArray()))),
+                                .AddLocalized("en", JsonValue.Array(assets2.Select(x => x.ToString())))),
                 SchemaId = schemaId
             };
         }

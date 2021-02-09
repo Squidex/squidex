@@ -27,7 +27,8 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexContents(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<ContentOptions>(config, "contents");
+            services.Configure<ContentOptions>(config,
+                "contents");
 
             services.AddSingletonAs(c => new Lazy<IContentQueryService>(c.GetRequiredService<IContentQueryService>))
                 .AsSelf();

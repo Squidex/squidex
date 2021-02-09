@@ -20,18 +20,18 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             new ContentData()
                 .AddField("field1",
                     new ContentFieldData()
-                        .AddValue("de", 1)
-                        .AddValue("en", 2))
+                        .AddLocalized("de", 1)
+                        .AddLocalized("en", 2))
                 .AddField("field2",
                     new ContentFieldData()
-                        .AddValue("de", JsonValue.Null)
-                        .AddValue("it", 4))
+                        .AddLocalized("de", null)
+                        .AddLocalized("it", 4))
                 .AddField("field3",
                     new ContentFieldData()
-                        .AddValue("en", 6))
+                        .AddLocalized("en", 6))
                 .AddField("field4",
                     new ContentFieldData()
-                        .AddValue("it", 7))
+                        .AddLocalized("it", 7))
                 .AddField("field5",
                     new ContentFieldData());
 
@@ -45,14 +45,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 {
                     "field1",
                     new ContentFieldData()
-                        .AddValue("de", 1)
-                        .AddValue("en", 2)
+                        .AddLocalized("de", 1)
+                        .AddLocalized("en", 2)
                 },
                 {
                     "field2",
                     new ContentFieldData()
-                        .AddValue("de", JsonValue.Null)
-                        .AddValue("it", 4)
+                        .AddLocalized("de", null)
+                        .AddLocalized("it", 4)
                 },
                 { "field3", JsonValue.Create(6) },
                 { "field4", JsonValue.Create(7) }

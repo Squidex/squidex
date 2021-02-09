@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public async Task Should_create_event_with_actor()
         {
-            var actor = new RefToken(RefTokenType.Subject, "me");
+            var actor = RefToken.User("me");
 
             var envelope = Envelope.Create<AppEvent>(new RuleManuallyTriggered { Actor = actor });
 

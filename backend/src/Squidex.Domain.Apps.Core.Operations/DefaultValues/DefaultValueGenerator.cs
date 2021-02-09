@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
             if (!fieldData.TryGetValue(partitionKey, out var value) || ShouldApplyDefaultValue(field, value))
             {
-                fieldData.AddJsonValue(partitionKey, defaultValue);
+                fieldData.AddLocalized(partitionKey, defaultValue);
             }
         }
 

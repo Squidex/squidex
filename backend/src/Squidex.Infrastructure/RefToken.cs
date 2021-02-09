@@ -6,39 +6,52 @@
 // ==========================================================================
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure
 {
+    [TypeConverter(typeof(RefTokenTypeConverter))]
     public sealed record RefToken
     {
-        public string Type { get; }
+        private static readonly char[] TrimChars = { ' ', ':' };
+
+        public RefTokenType Type { get; }
 
         public string Identifier { get; }
 
         public bool IsClient
         {
-            get { return string.Equals(Type, RefTokenType.Client, StringComparison.OrdinalIgnoreCase); }
+            get { return Type == RefTokenType.Client; }
         }
 
-        public bool IsSubject
+        public bool IsUser
         {
-            get { return string.Equals(Type, RefTokenType.Subject, StringComparison.OrdinalIgnoreCase); }
+            get { return Type == RefTokenType.Subject; }
         }
 
-        public RefToken(string type, string identifier)
+        public RefToken(RefTokenType type, string identifier)
         {
-            Guard.NotNullOrEmpty(type, nameof(type));
             Guard.NotNullOrEmpty(identifier, nameof(identifier));
 
-            Type = type.ToLowerInvariant();
+            Type = type;
 
             Identifier = identifier;
         }
 
+        public static RefToken Client(string identifier)
+        {
+            return new RefToken(RefTokenType.Client, identifier);
+        }
+
+        public static RefToken User(string identifier)
+        {
+            return new RefToken(RefTokenType.Subject, identifier);
+        }
+
         public override string ToString()
         {
-            return $"{Type}:{Identifier}";
+            return $"{Type.ToString().ToLowerInvariant()}:{Identifier}";
         }
 
         public override int GetHashCode()
@@ -46,30 +59,42 @@ namespace Squidex.Infrastructure
             return (Type.GetHashCode() * 397) ^ Identifier.GetHashCode();
         }
 
-        public static bool TryParse(string value, [MaybeNullWhen(false)] out RefToken result)
+        public static bool TryParse(string? value, [MaybeNullWhen(false)] out RefToken result)
         {
-            if (value != null)
+            value = value?.Trim(TrimChars);
+
+            if (string.IsNullOrWhiteSpace(value))
             {
-                var idx = value.IndexOf(':');
-
-                if (idx > 0 && idx < value.Length - 1)
-                {
-                    result = new RefToken(value.Substring(0, idx), value[(idx + 1)..]);
-
-                    return true;
-                }
+                result = null!;
+                return false;
             }
 
-            result = null!;
+            value = value.Trim();
 
-            return false;
+            var idx = value.IndexOf(':');
+
+            if (idx > 0 && idx < value.Length - 1)
+            {
+                if (!Enum.TryParse<RefTokenType>(value.Substring(0, idx), true, out var type))
+                {
+                    type = RefTokenType.Subject;
+                }
+
+                result = new RefToken(type, value[(idx + 1)..]);
+            }
+            else
+            {
+                result = new RefToken(RefTokenType.Subject, value);
+            }
+
+            return true;
         }
 
         public static RefToken Parse(string value)
         {
             if (!TryParse(value, out var result))
             {
-                throw new ArgumentException("Ref token must have more than 2 parts divided by colon.", nameof(value));
+                throw new ArgumentException("Ref token cannot be null or empty.", nameof(value));
             }
 
             return result;

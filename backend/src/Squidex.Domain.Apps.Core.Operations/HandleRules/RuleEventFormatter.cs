@@ -287,7 +287,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                             break;
                         case "timestamp":
                             {
-                                var instant = InstantPattern.General.Parse(text);
+                                var instant = InstantPattern.ExtendedIso.Parse(text);
 
                                 if (instant.Success)
                                 {
@@ -299,7 +299,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                         case "timestamp_sec":
                             {
-                                var instant = InstantPattern.General.Parse(text);
+                                var instant = InstantPattern.ExtendedIso.Parse(text);
 
                                 if (instant.Success)
                                 {

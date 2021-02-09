@@ -76,49 +76,49 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddValue("de", "value"))
+                            .AddLocalized("de", "value"))
                     .AddField("my-assets",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(assetId.ToString())))
+                            .AddInvariant(JsonValue.Array(assetId.ToString())))
                     .AddField("2_numbers",
                         new ContentFieldData()
-                            .AddValue("iv", 22))
+                            .AddInvariant(22))
                     .AddField("2-numbers",
                         new ContentFieldData()
-                            .AddValue("iv", 23))
+                            .AddInvariant(23))
                     .AddField("my-number",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0))
+                            .AddInvariant(1.0))
                     .AddField("my_number",
                         new ContentFieldData()
-                            .AddValue("iv", 2.0))
+                            .AddInvariant(2.0))
                     .AddField("my-boolean",
                         new ContentFieldData()
-                            .AddValue("iv", true))
+                            .AddInvariant(true))
                     .AddField("my-datetime",
                         new ContentFieldData()
-                            .AddValue("iv", now))
+                            .AddInvariant(now))
                     .AddField("my-tags",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array("tag1", "tag2")))
+                            .AddInvariant(JsonValue.Array("tag1", "tag2")))
                     .AddField("my-references",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(refId.ToString())))
+                            .AddInvariant(JsonValue.Array(refId.ToString())))
                     .AddField("my-union",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(refId.ToString())))
+                            .AddInvariant(JsonValue.Array(refId.ToString())))
                     .AddField("my-geolocation",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Object().Add("latitude", 10).Add("longitude", 20)))
+                            .AddInvariant(JsonValue.Object().Add("latitude", 10).Add("longitude", 20)))
                     .AddField("my-json",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Object().Add("value", 1)))
+                            .AddInvariant(JsonValue.Object().Add("value", 1)))
                     .AddField("my-localized",
                         new ContentFieldData()
-                            .AddValue("de-DE", "de-DE"))
+                            .AddLocalized("de-DE", "de-DE"))
                     .AddField("my-array",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(
+                            .AddInvariant(JsonValue.Array(
                                 JsonValue.Object()
                                     .Add("nested-boolean", true)
                                     .Add("nested-number", 10)
@@ -134,9 +134,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 AppId = appId,
                 Version = 1,
                 Created = now,
-                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
+                CreatedBy = RefToken.User("user1"),
                 LastModified = now,
-                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
+                LastModifiedBy = RefToken.User("user2"),
                 Data = data,
                 SchemaId = schemaId,
                 Status = Status.Draft,
@@ -154,16 +154,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 new ContentData()
                     .AddField(field,
                         new ContentFieldData()
-                            .AddValue("iv", value));
+                            .AddInvariant(value));
 
             var content = new ContentEntity
             {
                 Id = id,
                 Version = 1,
                 Created = now,
-                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
+                CreatedBy = RefToken.User("user1"),
                 LastModified = now,
-                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
+                LastModifiedBy = RefToken.User("user2"),
                 Data = data,
                 SchemaId = schemaId,
                 Status = Status.Draft,

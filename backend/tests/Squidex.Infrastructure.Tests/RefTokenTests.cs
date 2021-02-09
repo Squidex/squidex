@@ -17,56 +17,71 @@ namespace Squidex.Infrastructure
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(":")]
-        [InlineData("user")]
         public void Should_throw_exception_if_parsing_invalid_input(string input)
         {
             Assert.Throws<ArgumentException>(() => RefToken.Parse(input));
         }
 
         [Fact]
-        public void Should_instantiate_token()
+        public void Should_instantiate_client_token()
         {
-            var token = new RefToken("client", "client1");
+            var token = RefToken.Client("client1");
 
-            Assert.Equal("client", token.Type);
             Assert.Equal("client1", token.Identifier);
-
             Assert.True(token.IsClient);
         }
 
         [Fact]
         public void Should_instantiate_subject_token()
         {
-            var token = new RefToken("subject", "client1");
+            var token = RefToken.User("subject1");
 
-            Assert.True(token.IsSubject);
+            Assert.Equal("subject1", token.Identifier);
+            Assert.True(token.IsUser);
         }
 
         [Fact]
         public void Should_instantiate_token_and_lower_type()
         {
-            var token = new RefToken("Client", "client1");
+            var token = RefToken.Client("client1");
 
-            Assert.Equal("client", token.Type);
-            Assert.Equal("client1", token.Identifier);
+            Assert.Equal("client:client1", token.ToString());
         }
 
         [Fact]
-        public void Should_parse_user_token_from_string()
+        public void Should_parse_token_without_type()
+        {
+            var token = RefToken.Parse("subject1");
+
+            Assert.Equal("subject1", token.Identifier);
+            Assert.True(token.IsUser);
+        }
+
+        [Fact]
+        public void Should_parse_token_with_unknown_type()
+        {
+            var token = RefToken.Parse("user:subject1");
+
+            Assert.Equal("subject1", token.Identifier);
+            Assert.True(token.IsUser);
+        }
+
+        [Fact]
+        public void Should_parse_token_from_string()
         {
             var token = RefToken.Parse("client:client1");
 
-            Assert.Equal("client", token.Type);
             Assert.Equal("client1", token.Identifier);
+            Assert.True(token.IsClient);
         }
 
         [Fact]
-        public void Should_parse_user_token_with_colon_in_identifier()
+        public void Should_parse_token_with_colon_in_identifier()
         {
             var token = RefToken.Parse("client:client1:app");
 
-            Assert.Equal("client", token.Type);
             Assert.Equal("client1:app", token.Identifier);
+            Assert.True(token.IsClient);
         }
 
         [Fact]

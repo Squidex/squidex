@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using NJsonSchema;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;

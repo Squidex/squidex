@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
             if (@event.Payload is AppContributorAssigned appContributorAssigned)
             {
-                if (!appContributorAssigned.Actor.IsSubject || !appContributorAssigned.IsAdded)
+                if (!appContributorAssigned.Actor.IsUser || !appContributorAssigned.IsAdded)
                 {
                     return;
                 }

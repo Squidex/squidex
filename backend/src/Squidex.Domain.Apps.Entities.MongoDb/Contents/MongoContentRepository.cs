@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
@@ -26,10 +27,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         private readonly MongoContentCollection collectionAll;
         private readonly MongoContentCollection collectionPublished;
+        private readonly IAppProvider appProvider;
 
         static MongoContentRepository()
         {
-            StatusSerializer.Register();
+            TypeConverterStringSerializer<Status>.Register();
         }
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, bool useWildcardIndex)
@@ -43,6 +45,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             collectionPublished =
                 new MongoContentCollection(
                     "States_Contents_Published3", database, appProvider, useWildcardIndex);
+
+            this.appProvider = appProvider;
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)

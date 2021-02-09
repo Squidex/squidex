@@ -243,7 +243,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_email_and_display_name_from_client(string script)
         {
-            var @event = new EnrichedContentEvent { User = new ClientUser(new RefToken(RefTokenType.Client, "android")) };
+            var @event = new EnrichedContentEvent { User = new ClientUser(RefToken.Client("android")) };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -511,7 +511,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("country",
                             new ContentFieldData()
-                                .AddValue("zh-TW", "Berlin"))
+                                .AddLocalized("zh-TW", "Berlin"))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -534,7 +534,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", "Berlin"))
+                                .AddInvariant("Berlin"))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -557,7 +557,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", "Berlin"))
+                                .AddInvariant("Berlin"))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -580,7 +580,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Array()))
+                                .AddInvariant(JsonValue.Array()))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -603,7 +603,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
+                                .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -626,7 +626,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", "Berlin"))
+                                .AddInvariant("Berlin"))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -649,7 +649,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Array("Berlin")))
+                                .AddInvariant(JsonValue.Array("Berlin")))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -672,7 +672,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
+                                .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -695,7 +695,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
+                                .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -718,7 +718,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Array(1, 2, 3)))
+                                .AddInvariant(JsonValue.Array(1, 2, 3)))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -741,7 +741,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddJsonValue(JsonValue.Object().Add("name", "Berlin")))
+                                .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -758,7 +758,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_actor(string script)
         {
-            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
+            var @event = new EnrichedContentEvent { Actor = RefToken.Client("android") };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -795,7 +795,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("time",
                             new ContentFieldData()
-                                .AddValue(JsonValue.Create("2020-06-01T10:10:20Z")))
+                                .AddInvariant("2020-06-01T10:10:20Z"))
             };
 
             var result = await sut.FormatAsync(script, @event);

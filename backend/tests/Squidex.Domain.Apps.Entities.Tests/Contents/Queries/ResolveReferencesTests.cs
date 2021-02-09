@@ -150,13 +150,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new ContentData()
                     .AddField("ref1",
                         new ContentFieldData()
-                            .AddJsonValue("iv",
+                            .AddInvariant(
                                 JsonValue.Object()
                                     .Add("en", "ref1_1, 13")
                                     .Add("de", "ref1_1, 13")))
                     .AddField("ref2",
                         new ContentFieldData()
-                            .AddJsonValue("iv",
+                            .AddInvariant(
                                 JsonValue.Object()
                                     .Add("en", "ref2_1, 23")
                                     .Add("de", "ref2_1, 23"))),
@@ -166,13 +166,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new ContentData()
                     .AddField("ref1",
                         new ContentFieldData()
-                            .AddJsonValue("iv",
+                            .AddInvariant(
                                 JsonValue.Object()
                                     .Add("en", "ref1_2, 17")
                                     .Add("de", "ref1_2, 17")))
                     .AddField("ref2",
                         new ContentFieldData()
-                            .AddJsonValue("iv",
+                            .AddInvariant(
                                 JsonValue.Object()
                                     .Add("en", "ref2_2, 29")
                                     .Add("de", "ref2_2, 29"))),
@@ -203,13 +203,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new ContentData()
                     .AddField("ref1",
                         new ContentFieldData()
-                            .AddJsonValue("iv",
+                            .AddInvariant(
                                 JsonValue.Object()
                                     .Add("en", "ref1_1, 13")
                                     .Add("de", "ref1_1, 13")))
                     .AddField("ref2",
                         new ContentFieldData()
-                            .AddJsonValue("iv",
+                            .AddInvariant(
                                 JsonValue.Object()
                                     .Add("en", "2 Reference(s)")
                                     .Add("de", "2 Reference(s)"))),
@@ -219,13 +219,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 new ContentData()
                     .AddField("ref1",
                         new ContentFieldData()
-                            .AddJsonValue("iv",
+                            .AddInvariant(
                                 JsonValue.Object()
                                     .Add("en", "ref1_2, 17")
                                     .Add("de", "ref1_2, 17")))
                     .AddField("ref2",
                         new ContentFieldData()
-                            .AddJsonValue("iv",
+                            .AddInvariant(
                                 JsonValue.Object()
                                     .Add("en", "2 Reference(s)")
                                     .Add("de", "2 Reference(s)"))),
@@ -293,10 +293,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new ContentData()
                         .AddField("ref1",
                             new ContentFieldData()
-                                .AddJsonValue("iv", JsonValue.Array(ref1.Select(x => x.ToString()).ToArray())))
+                                .AddInvariant(JsonValue.Array(ref1.Select(x => x.ToString()))))
                         .AddField("ref2",
                             new ContentFieldData()
-                                .AddJsonValue("iv", JsonValue.Array(ref2.Select(x => x.ToString()).ToArray()))),
+                                .AddInvariant(JsonValue.Array(ref2.Select(x => x.ToString())))),
                 SchemaId = schemaId, AppId = appId,
                 Version = 0
             };
@@ -311,10 +311,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new ContentData()
                         .AddField("name",
                             new ContentFieldData()
-                                .AddValue("iv", name))
+                                .AddInvariant(name))
                         .AddField("number",
                             new ContentFieldData()
-                                .AddValue("iv", number)),
+                                .AddInvariant(number)),
                 SchemaId = refSchemaId, AppId = appId,
                 Version = version
             };

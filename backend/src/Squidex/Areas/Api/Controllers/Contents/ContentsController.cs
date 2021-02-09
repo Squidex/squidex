@@ -14,11 +14,11 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
+using Squidex.Web.GraphQL;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
@@ -26,25 +26,24 @@ namespace Squidex.Areas.Api.Controllers.Contents
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContentWorkflow contentWorkflow;
-        private readonly IGraphQLService graphQl;
+        private readonly GraphQLMiddleware graphQLMiddleware;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
             IContentWorkflow contentWorkflow,
-            IGraphQLService graphQl)
+            GraphQLMiddleware graphQLMiddleware)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
             this.contentWorkflow = contentWorkflow;
 
-            this.graphQl = graphQl;
+            this.graphQLMiddleware = graphQLMiddleware;
         }
 
         /// <summary>
         /// GraphQL endpoint.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="queries">The graphql query.</param>
         /// <returns>
         /// 200 => Contents returned or mutated.
         /// 404 => App not found.
@@ -53,87 +52,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
-        [Route("content/{app}/graphql/")]
-        [ApiPermissionOrAnonymous]
-        [ApiCosts(2)]
-        public async Task<IActionResult> GetGraphQL(string app, [FromQuery] GraphQLGetDto? queries = null)
-        {
-            var request = queries?.ToQuery() ?? new GraphQLQuery();
-
-            var (hasError, response) = await graphQl.QueryAsync(Context, request);
-
-            if (hasError)
-            {
-                return BadRequest(response);
-            }
-            else
-            {
-                return Ok(response);
-            }
-        }
-
-        /// <summary>
-        /// GraphQL endpoint.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="query">The graphql query.</param>
-        /// <returns>
-        /// 200 => Contents returned or mutated.
-        /// 404 => App not found.
-        /// </returns>
-        /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
-        /// </remarks>
         [HttpPost]
         [Route("content/{app}/graphql/")]
-        [ApiPermissionOrAnonymous]
-        [ApiCosts(2)]
-        public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLPostDto query)
-        {
-            var request = query?.ToQuery() ?? new GraphQLQuery();
-
-            var (hasError, response) = await graphQl.QueryAsync(Context, request);
-
-            if (hasError)
-            {
-                return BadRequest(response);
-            }
-            else
-            {
-                return Ok(response);
-            }
-        }
-
-        /// <summary>
-        /// GraphQL endpoint (Batch).
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="batch">The graphql queries.</param>
-        /// <returns>
-        /// 200 => Contents returned or mutated.
-        /// 404 => App not found.
-        /// </returns>
-        /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
-        /// </remarks>
-        [HttpPost]
         [Route("content/{app}/graphql/batch")]
         [ApiPermissionOrAnonymous]
         [ApiCosts(2)]
-        public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLPostDto[] batch)
+        public Task GetGraphQL(string app)
         {
-            var request = batch.Select(x => x.ToQuery()).ToArray();
-
-            var (hasError, response) = await graphQl.QueryAsync(Context, request);
-
-            if (hasError)
-            {
-                return BadRequest(response);
-            }
-            else
-            {
-                return Ok(response);
-            }
+            return graphQLMiddleware.InvokeAsync(HttpContext);
         }
 
         /// <summary>

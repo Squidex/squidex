@@ -8,11 +8,17 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Apps.Json;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
@@ -20,7 +26,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
-using Squidex.Infrastructure.Queries.Json;
+using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
 using Xunit;
 
@@ -32,7 +39,8 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
 
         public static readonly JsonSerializerSettings DefaultSerializerSettings = CreateSerializerSettings();
 
-        public static JsonSerializerSettings CreateSerializerSettings(TypeNameHandling typeNameHandling = TypeNameHandling.Auto)
+        public static JsonSerializerSettings CreateSerializerSettings(TypeNameHandling typeNameHandling = TypeNameHandling.Auto,
+            JsonConverter? converter = null)
         {
             var typeNameRegistry =
                 new TypeNameRegistry()
@@ -45,43 +53,39 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                 SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry),
 
                 ContractResolver = new ConverterContractResolver(
-                    new AppClientsConverter(),
-                    new AppContributorsConverter(),
-                    new AppPatternsConverter(),
-                    new ClaimsPrincipalConverter(),
                     new ContentFieldDataConverter(),
-                    new DomainIdConverter(),
                     new EnvelopeHeadersConverter(),
-                    new FilterConverter(),
-                    new InstantConverter(),
                     new JsonValueConverter(),
-                    new LanguageConverter(),
-                    new LanguagesConfigConverter(),
-                    new NamedDomainIdConverter(),
-                    new NamedGuidIdConverter(),
-                    new NamedLongIdConverter(),
-                    new NamedStringIdConverter(),
-                    new PropertyPathConverter(),
-                    new RefTokenConverter(),
-                    new RoleConverter(),
-                    new RolesConverter(),
-                    new RuleConverter(),
-                    new SchemaConverter(),
-                    new StatusConverter(),
                     new StringEnumConverter(),
-                    new WorkflowsConverter(),
-                    new WorkflowStepConverter(),
+                    new SurrogateConverter<AppClients, AppClientsSurrogate>(),
+                    new SurrogateConverter<AppContributors, AppContributorsSurrogate>(),
+                    new SurrogateConverter<AppPatterns, AppPatternsSurrogate>(),
+                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
+                    new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
+                    new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
+                    new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),
+                    new SurrogateConverter<Roles, RolesSurrogate>(),
+                    new SurrogateConverter<Rule, RuleSorrgate>(),
+                    new SurrogateConverter<Schema, SchemaSurrogate>(),
+                    new SurrogateConverter<Workflows, WorkflowsSurrogate>(),
+                    new SurrogateConverter<WorkflowStep, WorkflowStepSurrogate>(),
+                    new SurrogateConverter<WorkflowTransition, WorkflowTransitionSurrogate>(),
                     new WriteonlyGeoJsonConverter()),
 
                 TypeNameHandling = typeNameHandling
-            };
+            }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+
+            if (converter != null)
+            {
+                serializerSettings.Converters.Add(converter);
+            }
 
             return serializerSettings;
         }
 
-        public static IJsonSerializer CreateSerializer(TypeNameHandling typeNameHandling = TypeNameHandling.Auto)
+        public static IJsonSerializer CreateSerializer(TypeNameHandling typeNameHandling = TypeNameHandling.Auto, JsonConverter? converter = null)
         {
-            var serializerSettings = CreateSerializerSettings(typeNameHandling);
+            var serializerSettings = CreateSerializerSettings(typeNameHandling, converter);
 
             return new NewtonsoftJsonSerializer(serializerSettings);
         }
@@ -138,12 +142,16 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
 
         public static T SerializeAndDeserialize<T>(this object value)
         {
-            return DefaultSerializer.Deserialize<T>(DefaultSerializer.Serialize(value));
+            var json = DefaultSerializer.Serialize(value);
+
+            return DefaultSerializer.Deserialize<T>(json);
         }
 
         public static T SerializeAndDeserialize<T>(this T value)
         {
-            return DefaultSerializer.Deserialize<T>(DefaultSerializer.Serialize(value));
+            var json = DefaultSerializer.Serialize(value);
+
+            return DefaultSerializer.Deserialize<T>(json);
         }
 
         public static void TestFreeze(IFreezable sut)
