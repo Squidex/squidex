@@ -69,35 +69,37 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new JsonFieldProperties())
                     .AddString(2, "my-string", Partitioning.Language,
                         new StringFieldProperties())
-                    .AddNumber(3, "my-number", Partitioning.Invariant,
-                        new NumberFieldProperties())
-                    .AddNumber(4, "my_number", Partitioning.Invariant,
-                        new NumberFieldProperties())
-                    .AddAssets(5, "my-assets", Partitioning.Invariant,
-                        new AssetsFieldProperties())
-                    .AddBoolean(6, "my-boolean", Partitioning.Invariant,
-                        new BooleanFieldProperties())
-                    .AddDateTime(7, "my-datetime", Partitioning.Invariant,
-                        new DateTimeFieldProperties())
-                    .AddReferences(8, "my-references", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = schemaRefId1.Id })
-                    .AddReferences(81, "my-union", Partitioning.Invariant,
-                        new ReferencesFieldProperties())
-                    .AddReferences(9, "my-invalid", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
-                    .AddGeolocation(10, "my-geolocation", Partitioning.Invariant,
-                        new GeolocationFieldProperties())
-                    .AddTags(11, "my-tags", Partitioning.Invariant,
-                        new TagsFieldProperties())
-                    .AddString(12, "my-localized", Partitioning.Language,
+                    .AddString(3, "my-string2", Partitioning.Invariant,
                         new StringFieldProperties())
-                    .AddArray(13, "my-array", Partitioning.Invariant, f => f
+                    .AddString(4, "my-localized", Partitioning.Language,
+                        new StringFieldProperties())
+                    .AddNumber(5, "my-number", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddNumber(6, "my_number", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddAssets(7, "my-assets", Partitioning.Invariant,
+                        new AssetsFieldProperties())
+                    .AddBoolean(8, "my-boolean", Partitioning.Invariant,
+                        new BooleanFieldProperties())
+                    .AddDateTime(9, "my-datetime", Partitioning.Invariant,
+                        new DateTimeFieldProperties())
+                    .AddReferences(10, "my-references", Partitioning.Invariant,
+                        new ReferencesFieldProperties { SchemaId = schemaRefId1.Id })
+                    .AddReferences(11, "my-union", Partitioning.Invariant,
+                        new ReferencesFieldProperties())
+                    .AddReferences(12, "my-invalid", Partitioning.Invariant,
+                        new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
+                    .AddGeolocation(13, "my-geolocation", Partitioning.Invariant,
+                        new GeolocationFieldProperties())
+                    .AddTags(14, "my-tags", Partitioning.Invariant,
+                        new TagsFieldProperties())
+                    .AddArray(15, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number")
                         .AddNumber(123, "nested_number"))
-                    .AddNumber(14, "2_numbers", Partitioning.Invariant,
+                    .AddNumber(16, "2_numbers", Partitioning.Invariant,
                         new NumberFieldProperties())
-                    .AddNumber(15, "2-numbers", Partitioning.Invariant,
+                    .AddNumber(17, "2-numbers", Partitioning.Invariant,
                         new NumberFieldProperties())
                     .SetScripts(new SchemaScripts { Query = "<query-script>" });
 

@@ -35,6 +35,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 myString {
                     de
                 }
+                myString2 {
+                    iv
+                }
                 myNumber {
                     iv
                 }
@@ -77,6 +80,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-string",
                         new ContentFieldData()
                             .AddLocalized("de", "value"))
+                    .AddField("my-string2",
+                        new ContentFieldData()
+                            .AddInvariant(null))
                     .AddField("my-assets",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(assetId.ToString())))
@@ -91,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .AddInvariant(1.0))
                     .AddField("my_number",
                         new ContentFieldData()
-                            .AddInvariant(2.0))
+                            .AddInvariant(null))
                     .AddField("my-boolean",
                         new ContentFieldData()
                             .AddInvariant(true))
@@ -120,13 +126,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(
                                 JsonValue.Object()
-                                    .Add("nested-boolean", true)
                                     .Add("nested-number", 10)
-                                    .Add("nested_number", 11),
+                                    .Add("nested_number", null)
+                                    .Add("nested-boolean", true),
                                 JsonValue.Object()
-                                    .Add("nested-boolean", false)
                                     .Add("nested-number", 20)
-                                    .Add("nested_number", 21))));
+                                    .Add("nested_number", null)
+                                    .Add("nested-boolean", false))));
 
             var content = new ContentEntity
             {
@@ -206,13 +212,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     de = "value"
                 },
+                ["myString2"] = new
+                {
+                    iv = (object?)null
+                },
                 ["myNumber"] = new
                 {
                     iv = 1.0
                 },
                 ["myNumber2"] = new
                 {
-                    iv = 2.0
+                    iv = (object?)null
                 },
                 ["myBoolean"] = new
                 {
@@ -256,13 +266,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new
                         {
                             nestedNumber = 10.0,
-                            nestedNumber2 = 11.0,
+                            nestedNumber2 = (object?)null,
                             nestedBoolean = true
                         },
                         new
                         {
                             nestedNumber = 20.0,
-                            nestedNumber2 = 21.0,
+                            nestedNumber2 = (object?)null,
                             nestedBoolean = false
                         }
                     }

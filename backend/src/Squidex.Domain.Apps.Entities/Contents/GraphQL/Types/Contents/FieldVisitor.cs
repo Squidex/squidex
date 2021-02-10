@@ -128,6 +128,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 if (source.TryGetValue(key, out var value))
                 {
+                    if (value is JsonNull)
+                    {
+                        return null;
+                    }
+
                     return valueResolver(value, fieldContext, context);
                 }
 
