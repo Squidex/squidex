@@ -2,7 +2,7 @@
     <div class="inner-header">
         <ul class="nav nav-tabs2">
             <li class="nav-item" *ngFor="let script of editForm.form.controls | sqxKeys">
-                <a class="nav-link" [class.active]="selectedField === script" (click)="selectField(script)">
+                <a class="nav-link" [class.active]="schemaScript === script" (click)="selectField(script)">
                     {{script | titlecase}}
                 </a>
             </li>
@@ -15,8 +15,8 @@
 
     <div class="inner-main">
         <ng-container *ngFor="let script of editForm.form.controls | sqxKeys">
-            <ng-container *ngIf="selectedField === script">
-                <sqx-code-editor [noBorder]="true" [formControlName]="script"></sqx-code-editor>
+            <ng-container *ngIf="schemaScript === script">
+                <sqx-code-editor [noBorder]="true" [formControlName]="script" [completion]="schemaCompletions | async"></sqx-code-editor>
             </ng-container>
         </ng-container>
     </div>

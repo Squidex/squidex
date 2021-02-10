@@ -4,10 +4,17 @@
     .ace_editor {
         background: $color-dark-foreground;
         border: 1px solid $color-input;
+        border-radius: 0;
 
         &.no-border {
             border: 0;
         }
+    }
+
+    .ace_tooltip {
+        background: $color-dark-foreground;
+        border: 1px solid $color-input;
+        border-radius: 0;
     }
 
     .ace_active-line,
