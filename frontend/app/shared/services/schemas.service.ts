@@ -105,6 +105,8 @@ export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
     'Require'
 ];
 
+export type SchemaCompletions = ReadonlyArray<{ name: string, description: string }>;
+
 export class SchemaDetailsDto extends SchemaDto {
     public readonly contentFields: ReadonlyArray<RootFieldDto>;
 
@@ -695,6 +697,12 @@ export class SchemasService {
                 this.analytics.trackEvent('Schema', 'Deleted', appName);
             }),
             pretifyError('i18n:schemas.deleteFailed'));
+    }
+
+    public getCompletions(appName: string, schemaName: string): Observable<SchemaCompletions> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion`);
+
+        return this.http.get<SchemaCompletions>(url);
     }
 }
 
