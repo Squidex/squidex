@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         }
 
         /// <summary>
-        /// Upload a new asset.
+        /// Upload a new asset folder.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="request">The asset folder object that needs to be added to the App.</param>
