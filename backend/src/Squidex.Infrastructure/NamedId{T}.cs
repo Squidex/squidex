@@ -6,12 +6,14 @@
 // ==========================================================================
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure
 {
     public delegate bool Parser<T>(ReadOnlySpan<char> input, out T result);
 
+    [TypeConverter(typeof(NamedIdTypeConverter))]
     public sealed record NamedId<T> where T : notnull
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
