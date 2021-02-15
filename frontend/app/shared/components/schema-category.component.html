@@ -68,8 +68,8 @@
     
         <ng-template #simpleMode>
             <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item">
-                <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
-                    <span class="schema-name" *ngIf="forContent">{{schema.displayName}}</span>
+                <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
+                    <span class="schema-name">{{schema.displayName}}</span>
                 </a>
             </li>
         </ng-template>
