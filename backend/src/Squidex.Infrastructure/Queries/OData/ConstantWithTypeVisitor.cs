@@ -40,24 +40,25 @@ namespace Squidex.Infrastructure.Queries.OData
 
         public override ClrValue Visit(ConvertNode nodeIn)
         {
+            var value = ConstantVisitor.Visit(nodeIn.Source);
+
+            if (value == null)
+            {
+                return ClrValue.Null;
+            }
+
             if (nodeIn.TypeReference.Definition == BooleanType)
             {
-                var value = ConstantVisitor.Visit(nodeIn.Source);
-
                 return bool.Parse(value.ToString()!);
             }
 
             if (nodeIn.TypeReference.Definition == GuidType)
             {
-                var value = ConstantVisitor.Visit(nodeIn.Source);
-
                 return Guid.Parse(value.ToString()!);
             }
 
             if (nodeIn.TypeReference.Definition == DateTimeType || nodeIn.TypeReference.Definition == DateType)
             {
-                var value = ConstantVisitor.Visit(nodeIn.Source);
-
                 return ParseInstant(value);
             }
 
@@ -116,44 +117,52 @@ namespace Squidex.Infrastructure.Queries.OData
 
         public override ClrValue Visit(ConstantNode nodeIn)
         {
-            if (nodeIn.TypeReference.Definition == DateTimeType || nodeIn.TypeReference.Definition == DateType)
+            if (nodeIn.Value == null)
             {
-                return ParseInstant(nodeIn.Value);
+                return ClrValue.Null;
             }
 
-            if (nodeIn.TypeReference.Definition == GuidType)
+            if (nodeIn.TypeReference != null)
             {
-                return (Guid)nodeIn.Value;
-            }
+                if (nodeIn.TypeReference.Definition == DateTimeType || nodeIn.TypeReference.Definition == DateType)
+                {
+                    return ParseInstant(nodeIn.Value);
+                }
 
-            if (nodeIn.TypeReference.Definition == BooleanType)
-            {
-                return (bool)nodeIn.Value;
-            }
+                if (nodeIn.TypeReference.Definition == GuidType)
+                {
+                    return (Guid)nodeIn.Value;
+                }
 
-            if (nodeIn.TypeReference.Definition == SingleType)
-            {
-                return (float)nodeIn.Value;
-            }
+                if (nodeIn.TypeReference.Definition == BooleanType)
+                {
+                    return (bool)nodeIn.Value;
+                }
 
-            if (nodeIn.TypeReference.Definition == DoubleType)
-            {
-                return (double)nodeIn.Value;
-            }
+                if (nodeIn.TypeReference.Definition == SingleType)
+                {
+                    return (float)nodeIn.Value;
+                }
 
-            if (nodeIn.TypeReference.Definition == Int32Type)
-            {
-                return (int)nodeIn.Value;
-            }
+                if (nodeIn.TypeReference.Definition == DoubleType)
+                {
+                    return (double)nodeIn.Value;
+                }
 
-            if (nodeIn.TypeReference.Definition == Int64Type)
-            {
-                return (long)nodeIn.Value;
-            }
+                if (nodeIn.TypeReference.Definition == Int32Type)
+                {
+                    return (int)nodeIn.Value;
+                }
 
-            if (nodeIn.TypeReference.Definition == StringType)
-            {
-                return (string)nodeIn.Value;
+                if (nodeIn.TypeReference.Definition == Int64Type)
+                {
+                    return (long)nodeIn.Value;
+                }
+
+                if (nodeIn.TypeReference.Definition == StringType)
+                {
+                    return (string)nodeIn.Value;
+                }
             }
 
             throw new NotSupportedException();

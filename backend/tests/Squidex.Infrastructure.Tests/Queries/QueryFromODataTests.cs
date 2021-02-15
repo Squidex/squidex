@@ -67,11 +67,24 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("created")]
         [InlineData("createdNullable")]
         [InlineData("properties/datetime")]
-        [InlineData("properties/nested/dateime")]
+        [InlineData("properties/nested/datetime")]
         public void Should_parse_filter_when_type_is_datetime(string field)
         {
             var i = _Q($"$filter={field} eq 1988-01-19T12:00:00Z");
             var o = _C($"Filter: {field} == 1988-01-19T12:00:00Z");
+
+            Assert.Equal(o, i);
+        }
+
+        [Theory]
+        [InlineData("created")]
+        [InlineData("createdNullable")]
+        [InlineData("properties/datetime")]
+        [InlineData("properties/nested/datetime")]
+        public void Should_parse_filter_when_type_is_datetime_and_value_is_null(string field)
+        {
+            var i = _Q($"$filter={field} eq null");
+            var o = _C($"Filter: {field} == null");
 
             Assert.Equal(o, i);
         }
@@ -129,6 +142,19 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(o, i);
         }
 
+        [Theory]
+        [InlineData("id")]
+        [InlineData("idNullable")]
+        [InlineData("properties/uid")]
+        [InlineData("properties/nested/guid")]
+        public void Should_parse_filter_when_type_is_guid_and_value_is_null(string field)
+        {
+            var i = _Q($"$filter={field} eq null");
+            var o = _C($"Filter: {field} == null");
+
+            Assert.Equal(o, i);
+        }
+
         [Fact]
         public void Should_parse_filter_when_type_is_guid_list()
         {
@@ -178,6 +204,19 @@ namespace Squidex.Infrastructure.Queries
         {
             var i = _Q($"$filter={field} eq true");
             var o = _C($"Filter: {field} == True");
+
+            Assert.Equal(o, i);
+        }
+
+        [Theory]
+        [InlineData("isComicFigure")]
+        [InlineData("isComicFigureNullable")]
+        [InlineData("properties/boolean")]
+        [InlineData("properties/nested/boolean")]
+        public void Should_parse_filter_when_type_is_boolean_and_value_is_null(string field)
+        {
+            var i = _Q($"$filter={field} eq null");
+            var o = _C($"Filter: {field} == null");
 
             Assert.Equal(o, i);
         }
