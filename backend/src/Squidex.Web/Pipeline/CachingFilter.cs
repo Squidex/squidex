@@ -28,16 +28,17 @@ namespace Squidex.Web.Pipeline
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            cachingManager.Start(context.HttpContext);
+            var httpContext = context.HttpContext;
+
+            cachingManager.Start(httpContext);
 
             var resultContext = await next();
 
-            if (resultContext.HttpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag))
+            if (httpContext.Response.HasStarted == false &&
+                httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag) &&
+                IsCacheable(httpContext, etag))
             {
-                if (IsCacheable(resultContext.HttpContext, etag))
-                {
-                    resultContext.Result = new StatusCodeResult(304);
-                }
+                resultContext.Result = new StatusCodeResult(304);
             }
         }
 
