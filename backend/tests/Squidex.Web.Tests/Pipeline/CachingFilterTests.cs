@@ -74,6 +74,19 @@ namespace Squidex.Web.Pipeline
             Assert.Equal(200, ((StatusCodeResult)executedContext.Result).StatusCode);
         }
 
+        [Fact]
+        public async Task Should_not_return_304_for_post()
+        {
+            httpContext.Request.Method = HttpMethods.Post;
+            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "W/13";
+
+            httpContext.Response.Headers[HeaderNames.ETag] = "W/13";
+
+            await sut.OnActionExecutionAsync(executingContext, Next());
+
+            Assert.Equal(200, ((StatusCodeResult)executedContext.Result).StatusCode);
+        }
+
         private ActionExecutionDelegate Next()
         {
             return () => Task.FromResult(executedContext);
