@@ -12,6 +12,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
     public sealed class CreateContent : ContentDataCommand, ISchemaCommand
     {
+        public Status? Status { get; set; }
+
         public CreateContent()
         {
             ContentId = DomainId.NewGuid();

@@ -12,6 +12,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
     public sealed class UpsertContent : ContentDataCommand, ISchemaCommand
     {
+        public Status? Status { get; set; }
+
         public UpsertContent()
         {
             ContentId = DomainId.NewGuid();
