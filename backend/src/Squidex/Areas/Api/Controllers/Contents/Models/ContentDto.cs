@@ -149,7 +149,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 AddGetLink("previous", resources.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
             }
 
-            if (NewStatus.HasValue)
+            if (NewStatus != null)
             {
                 if (resources.CanDeleteContentVersion(schema))
                 {

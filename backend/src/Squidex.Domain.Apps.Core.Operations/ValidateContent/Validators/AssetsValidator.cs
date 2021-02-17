@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             this.properties = properties;
 
-            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
+            if (isRequired || properties.MinItems != null || properties.MaxItems != null)
             {
                 collectionValidator = new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }
@@ -101,14 +101,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         private void ValidateCommon(IAssetInfo asset, ImmutableQueue<string> path, AddError addError)
         {
-            if (properties.MinSize.HasValue && asset.FileSize < properties.MinSize)
+            if (properties.MinSize != null && asset.FileSize < properties.MinSize)
             {
                 var min = properties.MinSize.Value.ToReadableSize();
 
                 addError(path, T.Get("contents.validation.minimumSize", new { size = asset.FileSize.ToReadableSize(), min }));
             }
 
-            if (properties.MaxSize.HasValue && asset.FileSize > properties.MaxSize)
+            if (properties.MaxSize != null && asset.FileSize > properties.MaxSize)
             {
                 var max = properties.MaxSize.Value.ToReadableSize();
 
@@ -136,34 +136,34 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             var pixelWidth = asset.Metadata.GetPixelWidth();
             var pixelHeight = asset.Metadata.GetPixelHeight();
 
-            if (pixelWidth.HasValue && pixelHeight.HasValue)
+            if (pixelWidth != null && pixelHeight != null)
             {
                 var w = pixelWidth.Value;
                 var h = pixelHeight.Value;
 
                 var actualRatio = (double)w / h;
 
-                if (properties.MinWidth.HasValue && w < properties.MinWidth)
+                if (properties.MinWidth != null && w < properties.MinWidth)
                 {
                     addError(path, T.Get("contents.validation.minimumWidth", new { width = w, min = properties.MinWidth }));
                 }
 
-                if (properties.MaxWidth.HasValue && w > properties.MaxWidth)
+                if (properties.MaxWidth != null && w > properties.MaxWidth)
                 {
                     addError(path, T.Get("contents.validation.maximumWidth", new { width = w, max = properties.MaxWidth }));
                 }
 
-                if (properties.MinHeight.HasValue && h < properties.MinHeight)
+                if (properties.MinHeight != null && h < properties.MinHeight)
                 {
                     addError(path, T.Get("contents.validation.minimumHeight", new { height = h, min = properties.MinHeight }));
                 }
 
-                if (properties.MaxHeight.HasValue && h > properties.MaxHeight)
+                if (properties.MaxHeight != null && h > properties.MaxHeight)
                 {
                     addError(path, T.Get("contents.validation.maximumHeight", new { height = h, max = properties.MaxHeight }));
                 }
 
-                if (properties.AspectHeight.HasValue && properties.AspectWidth.HasValue)
+                if (properties.AspectHeight != null && properties.AspectWidth != null)
                 {
                     var expectedRatio = (double)properties.AspectWidth.Value / properties.AspectHeight.Value;
 

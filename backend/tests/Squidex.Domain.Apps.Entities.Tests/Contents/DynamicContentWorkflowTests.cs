@@ -97,6 +97,26 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public async Task Should_return_info_for_valid_status()
+        {
+            var content = CreateContent(Status.Draft, 2);
+
+            var info = await sut.GetInfoAsync(content, Status.Draft);
+
+            Assert.Equal(new StatusInfo(Status.Draft, StatusColors.Draft), info);
+        }
+
+        [Fact]
+        public async Task Should_return_info_as_null_for_invalid_status()
+        {
+            var content = CreateContent(Status.Draft, 2);
+
+            var info = await sut.GetInfoAsync(content, new Status("Invalid"));
+
+            Assert.Null(info);
+        }
+
+        [Fact]
         public async Task Should_return_draft_as_initial_status()
         {
             var result = await sut.GetInitialStatusAsync(Mocks.Schema(appId, schemaId));

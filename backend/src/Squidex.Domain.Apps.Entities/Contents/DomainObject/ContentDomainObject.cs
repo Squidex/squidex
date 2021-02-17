@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             await CreateAsync(c);
                         }
 
-                        if (c.Status != null && c.Status != Snapshot.Status)
+                        if (Is.OptionalChange(Snapshot.EditingStatus, c.Status))
                         {
                             await ChangeStatusAsync(c, c.Status.Value);
                         }

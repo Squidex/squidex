@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task RecoverAfterRestartAsync()
         {
-            state.Value.Jobs.RemoveAll(x => !x.Stopped.HasValue);
+            state.Value.Jobs.RemoveAll(x => x.Stopped == null);
 
             await state.WriteAsync();
         }

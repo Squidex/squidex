@@ -7,7 +7,6 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
@@ -49,11 +48,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             CheckPermission(content, command, Permissions.AppContentsUpdate, Permissions.AppContentsUpsert);
 
-            var status = content.NewStatus ?? content.Status;
-
-            if (!await contentWorkflow.CanUpdateAsync(content, status, command.User))
+            if (!command.DoNotValidateWorkflow)
             {
-                throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
+                var status = content.NewStatus ?? content.Status;
+
+                if (!await contentWorkflow.CanUpdateAsync(content, status, command.User))
+                {
+                    throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
+                }
             }
 
             Validate.It(e =>
@@ -123,11 +125,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             await Validate.It(async e =>
             {
-                if (!await contentWorkflow.CanMoveToAsync(content, oldStatus, status, command.User))
+                if (!command.DoNotValidateWorkflow)
                 {
-                    var values = new { oldStatus, newStatus = status };
+                    if (!await contentWorkflow.CanMoveToAsync(content, oldStatus, status, command.User))
+                    {
+                        var values = new { oldStatus, newStatus = status };
 
-                    e(T.Get("contents.statusTransitionNotAllowed", values), "Status");
+                        e(T.Get("contents.statusTransitionNotAllowed", values), "Status");
+                    }
+                }
+                else
+                {
+                    var info = await contentWorkflow.GetInfoAsync(content, content.Status);
+
+                    if (info == null)
+                    {
+                        e(T.Get("contents.statusNotValid"), "Status");
+                    }
                 }
             });
         }

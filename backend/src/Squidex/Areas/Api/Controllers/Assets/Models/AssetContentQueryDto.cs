@@ -111,7 +111,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         {
             if (!IgnoreFocus)
             {
-                if (FocusX.HasValue && FocusY.HasValue)
+                if (FocusX != null && FocusY != null)
                 {
                     return (FocusX.Value, FocusY.Value);
                 }
@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
                 var focusX = asset.Metadata.GetFocusX();
                 var focusY = asset.Metadata.GetFocusY();
 
-                if (focusX.HasValue && focusY.HasValue)
+                if (focusX != null && focusY != null)
                 {
                     return (focusX.Value, focusY.Value);
                 }

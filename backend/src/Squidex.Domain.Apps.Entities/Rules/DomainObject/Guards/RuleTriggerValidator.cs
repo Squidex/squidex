@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
         {
             var errors = new List<ValidationError>();
 
-            if (trigger.NumDays.HasValue && (trigger.NumDays < 1 || trigger.NumDays > 30))
+            if (trigger.NumDays != null && (trigger.NumDays < 1 || trigger.NumDays > 30))
             {
                 errors.Add(new ValidationError(Not.Between(nameof(trigger.NumDays), 1, 30), nameof(trigger.NumDays)));
             }

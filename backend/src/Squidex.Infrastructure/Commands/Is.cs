@@ -12,19 +12,19 @@ namespace Squidex.Infrastructure.Commands
 {
     public static class Is
     {
-        public static bool Change(DomainId oldValue, DomainId newValue)
+        public static bool Change<T>(T oldValue, T newValue)
         {
             return !Equals(oldValue, newValue);
         }
 
-        public static bool Change(string? oldValue, string? newValue)
+        public static bool OptionalChange<T>(T oldValue, [NotNullWhen(true)] T? newValue) where T : struct
         {
-            return !Equals(oldValue, newValue);
+            return newValue != null && !Equals(oldValue, newValue.Value);
         }
 
-        public static bool OptionalChange(bool oldValue, [NotNullWhen(true)] bool? newValue)
+        public static bool OptionalChange<T>(T oldValue, [NotNullWhen(true)] T? newValue) where T : class
         {
-            return newValue.HasValue && oldValue != newValue.Value;
+            return newValue != null && !Equals(oldValue, newValue);
         }
 
         public static bool OptionalChange(string oldValue, [NotNullWhen(true)] string? newValue)

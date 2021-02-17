@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     errors.Foreach((x, _) => x.WithPrefix(nameof(command.Properties)).AddTo(e));
                 }
 
-                if (command.ParentFieldId.HasValue)
+                if (command.ParentFieldId != null)
                 {
                     var arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value, false);
 

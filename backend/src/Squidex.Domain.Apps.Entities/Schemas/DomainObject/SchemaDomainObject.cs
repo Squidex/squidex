@@ -374,7 +374,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             NamedId<long>? GetFieldId(long? id)
             {
-                if (id.HasValue && Snapshot.SchemaDef.FieldsById.TryGetValue(id.Value, out var field))
+                if (id != null && Snapshot.SchemaDef.FieldsById.TryGetValue(id.Value, out var field))
                 {
                     return field.NamedId();
                 }
@@ -384,7 +384,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             if (command is ParentFieldCommand parentField && @event is ParentFieldEvent parentFieldEvent)
             {
-                if (parentField.ParentFieldId.HasValue)
+                if (parentField.ParentFieldId != null)
                 {
                     if (Snapshot.SchemaDef.FieldsById.TryGetValue(parentField.ParentFieldId.Value, out var field))
                     {

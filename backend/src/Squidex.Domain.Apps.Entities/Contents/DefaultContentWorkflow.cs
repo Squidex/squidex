@@ -73,11 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.FromResult(result);
         }
 
-        public Task<StatusInfo> GetInfoAsync(IContentEntity content, Status status)
+        public Task<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
         {
-            var result = Flow[status].Info;
+            var result = Flow.GetValueOrDefault(status).Info;
 
-            return Task.FromResult(result);
+            return Task.FromResult<StatusInfo?>(result);
         }
 
         public Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)

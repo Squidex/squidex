@@ -496,8 +496,8 @@
   <data name="contents.singletonNotDeletable" xml:space="preserve">
     <value>Singleton content cannot be deleted.</value>
   </data>
-  <data name="contents.statusSchedulingNotInFuture" xml:space="preserve">
-    <value>Due time must be in the future.</value>
+  <data name="contents.statusNotValid" xml:space="preserve">
+    <value>Status is not defined in the workflow.</value>
   </data>
   <data name="contents.statusTransitionNotAllowed" xml:space="preserve">
     <value>Cannot change status from {oldStatus} to {newStatus}.</value>
@@ -631,7 +631,7 @@
   <data name="contents.validation.wordsBetween" xml:space="preserve">
     <value>Must have between {min} and {max} word(s).</value>
   </data>
-  <data name="contents.workflowErorPublishing" xml:space="preserve">
+  <data name="contents.workflowErrorPublishing" xml:space="preserve">
     <value>Content workflow prevents publishing.</value>
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">

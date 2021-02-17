@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             this.properties = properties;
 
-            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
+            if (isRequired || properties.MinItems != null || properties.MaxItems != null)
             {
                 collectionValidator = new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }

@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             var isRequired = IsRequired(properties, args.Context);
 
-            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
+            if (isRequired || properties.MinItems != null || properties.MaxItems != null)
             {
                 yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new RequiredValidator();
             }
 
-            if (properties.MinValue.HasValue || properties.MaxValue.HasValue)
+            if (properties.MinValue != null || properties.MaxValue != null)
             {
                 yield return new RangeValidator<Instant>(properties.MinValue, properties.MaxValue);
             }
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new RequiredValidator();
             }
 
-            if (properties.MinValue.HasValue || properties.MaxValue.HasValue)
+            if (properties.MinValue != null || properties.MaxValue != null)
             {
                 yield return new RangeValidator<double>(properties.MinValue, properties.MaxValue);
             }
@@ -160,15 +160,15 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new RequiredStringValidator(true);
             }
 
-            if (properties.MinLength.HasValue || properties.MaxLength.HasValue)
+            if (properties.MinLength != null || properties.MaxLength != null)
             {
                 yield return new StringLengthValidator(properties.MinLength, properties.MaxLength);
             }
 
-            if (properties.MinCharacters.HasValue ||
-                properties.MaxCharacters.HasValue ||
-                properties.MinWords.HasValue ||
-                properties.MaxWords.HasValue)
+            if (properties.MinCharacters != null ||
+                properties.MaxCharacters != null ||
+                properties.MinWords != null ||
+                properties.MaxWords != null)
             {
                 Func<string, string>? transform = null;
 
@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             var isRequired = IsRequired(properties, args.Context);
 
-            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
+            if (isRequired || properties.MinItems != null || properties.MaxItems != null)
             {
                 yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }

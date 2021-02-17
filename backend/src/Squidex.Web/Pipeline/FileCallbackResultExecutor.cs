@@ -26,7 +26,7 @@ namespace Squidex.Web.Pipeline
         {
             try
             {
-                var (range, _, serveBody) = SetHeadersAndLog(context, result, result.FileSize, result.FileSize.HasValue);
+                var (range, _, serveBody) = SetHeadersAndLog(context, result, result.FileSize, result.FileSize != null);
 
                 if (!string.IsNullOrWhiteSpace(result.FileDownloadName) && result.SendInline)
                 {

@@ -103,6 +103,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
+        public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it_but_check_is_disabled()
+        {
+            SetupCanUpdate(false);
+
+            var content = CreateContent(Status.Draft);
+
+            var command = CreateCommand(new UpdateContent { Data = new ContentData(), DoNotValidateWorkflow = true });
+
+            await GuardContent.CanUpdate(command, content, workflow);
+        }
+
+        [Fact]
         public async Task CanUpdate_should_not_throw_exception_if_data_is_not_null()
         {
             SetupCanUpdate(true);

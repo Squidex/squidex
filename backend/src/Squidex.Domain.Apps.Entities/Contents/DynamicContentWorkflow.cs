@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return true;
         }
 
-        public async Task<StatusInfo> GetInfoAsync(IContentEntity content, Status status)
+        public async Task<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return new StatusInfo(status, GetColor(step));
             }
 
-            return new StatusInfo(status, StatusColors.Draft);
+            return null;
         }
 
         public async Task<Status> GetInitialStatusAsync(ISchemaEntity schema)

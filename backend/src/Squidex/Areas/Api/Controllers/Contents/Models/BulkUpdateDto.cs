@@ -36,6 +36,16 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public bool DoNotScript { get; set; } = true;
 
         /// <summary>
+        /// True to turn off validation for faster inserts. Default: false.
+        /// </summary>
+        public bool DoNotValidate { get; set; }
+
+        /// <summary>
+        /// True to turn off validation of workflow rules. Default: false.
+        /// </summary>
+        public bool DoNotValidateWorkflow { get; set; }
+
+        /// <summary>
         /// True to check referrers of this content.
         /// </summary>
         public bool CheckReferrers { get; set; }

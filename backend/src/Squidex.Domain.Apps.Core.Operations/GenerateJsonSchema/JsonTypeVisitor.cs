@@ -116,12 +116,12 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
             var property = SchemaBuilder.NumberProperty();
 
-            if (field.Properties.MinValue.HasValue)
+            if (field.Properties.MinValue != null)
             {
                 property.Minimum = (decimal)field.Properties.MinValue.Value;
             }
 
-            if (field.Properties.MaxValue.HasValue)
+            if (field.Properties.MaxValue != null)
             {
                 property.Maximum = (decimal)field.Properties.MaxValue.Value;
             }
