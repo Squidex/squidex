@@ -358,7 +358,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 201)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, [Bind] CreateContentDto request)
+        public async Task<IActionResult> PostContent(string app, string name, CreateContentDto request)
         {
             var command = request.ToCommand();
 
@@ -537,7 +537,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsChangeStatusOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContentStatus(string app, string name, DomainId id, ChangeStatusDto request)
+        public async Task<IActionResult> PutContentStatus(string app, string name, DomainId id, [FromBody] ChangeStatusDto request)
         {
             var command = request.ToCommand(id);
 
