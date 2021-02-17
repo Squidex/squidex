@@ -52,9 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.FromResult(Status.Draft);
         }
 
-        public Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, ContentData data, ClaimsPrincipal? user)
+        public Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
         {
-            return Task.FromResult(true);
+            var result = Flow.TryGetValue(status, out var step) && step.Transitions.Any(x => x.Status == next);
+
+            return Task.FromResult(result);
         }
 
         public Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)

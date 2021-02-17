@@ -197,6 +197,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     },
                     new QueryArgument(AllTypes.None)
                     {
+                        Name = "status",
+                        Description = "The initial status.",
+                        DefaultValue = false,
+                        ResolvedType = AllTypes.Boolean
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
                         Name = "id",
                         Description = "The optional custom content id.",
                         DefaultValue = null,
@@ -207,17 +214,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsCreate, c =>
             {
-                var publish = c.GetArgument<bool>("publish");
                 var contentData = GetContentData(c);
                 var contentId = c.GetArgument<string?>("id");
+                var contentStatus = c.GetArgument<string?>("status");
 
-                var command = new CreateContent { Data = contentData, Publish = publish };
+                var command = new CreateContent { Data = contentData };
 
                 if (!string.IsNullOrWhiteSpace(contentId))
                 {
-                    var id = DomainId.Create(contentId);
+                    command.ContentId = DomainId.Create(contentId);
+                }
 
-                    command.ContentId = id;
+                if (!string.IsNullOrWhiteSpace(contentStatus))
+                {
+                    command.Status = new Status(contentStatus);
+                }
+                else if (c.GetArgument<bool>("publish"))
+                {
+                    command.Status = Status.Published;
                 }
 
                 return command;
@@ -253,6 +267,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     },
                     new QueryArgument(AllTypes.None)
                     {
+                        Name = "status",
+                        Description = "The initial status.",
+                        DefaultValue = false,
+                        ResolvedType = AllTypes.Boolean
+                    },
+                    new QueryArgument(AllTypes.None)
+                    {
                         Name = "expectedVersion",
                         Description = "The expected version",
                         DefaultValue = EtagVersion.Any,
@@ -263,14 +284,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpsert, c =>
             {
-                var publish = c.GetArgument<bool>("publish");
-
                 var contentData = GetContentData(c);
                 var contentId = c.GetArgument<string>("id");
+                var contentStatus = c.GetArgument<string?>("status");
 
                 var id = DomainId.Create(contentId);
 
-                return new UpsertContent { ContentId = id, Data = contentData, Publish = publish };
+                var command = new UpsertContent { ContentId = id, Data = contentData };
+
+                if (!string.IsNullOrWhiteSpace(contentStatus))
+                {
+                    command.Status = new Status(contentStatus);
+                }
+                else if (c.GetArgument<bool>("publish"))
+                {
+                    command.Status = Status.Published;
+                }
+
+                return command;
             });
         }
 

@@ -38,6 +38,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
         }
 
+        public async Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
+        {
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+            return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, data, user);
+        }
+
         public async Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);

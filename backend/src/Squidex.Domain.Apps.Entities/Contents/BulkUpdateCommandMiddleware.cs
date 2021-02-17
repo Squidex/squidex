@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -235,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 case BulkUpdateType.ChangeStatus:
                     {
-                        var command = new ChangeContentStatus { Status = job.Status, DueTime = job.DueTime };
+                        var command = new ChangeContentStatus { Status = job.Status ?? Status.Draft, DueTime = job.DueTime };
 
                         await EnrichAsync(id, task, command, Permissions.AppContentsChangeStatusOwn);
                         return command;
