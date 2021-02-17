@@ -358,7 +358,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 201)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, CreateContentDto request)
+        public async Task<IActionResult> PostContent(string app, string name, [Bind] CreateContentDto request)
         {
             var command = request.ToCommand();
 

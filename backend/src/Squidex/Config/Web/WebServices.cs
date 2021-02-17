@@ -68,6 +68,7 @@ namespace Squidex.Config.Web
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
+                options.SuppressInferBindingSourcesForParameters = true;
                 options.SuppressModelStateInvalidFilter = true;
             });
 
