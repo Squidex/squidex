@@ -108,10 +108,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                         e(T.Get("contents.statusTransitionNotAllowed", values), nameof(command.Status));
                     }
                 }
-
-                if (isChangingStatus)
-                {
-                }
             });
         }
 
