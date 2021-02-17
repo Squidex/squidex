@@ -1,3 +1,9 @@
+.dropdown-menu {
+    max-height: 20rem;
+    overflow-x: inherit;
+    overflow-y: scroll;
+}
+
 .dropdown-item {
     cursor: pointer;
 }
