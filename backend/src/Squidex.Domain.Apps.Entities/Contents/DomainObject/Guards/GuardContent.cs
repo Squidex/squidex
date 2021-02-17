@@ -43,11 +43,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             });
         }
 
-        public static void CanUpdate(ContentDataCommand command, IContentEntity content)
+        public static async Task CanUpdate(ContentDataCommand command, IContentEntity content, IContentWorkflow contentWorkflow)
         {
             Guard.NotNull(command, nameof(command));
 
             CheckPermission(content, command, Permissions.AppContentsUpdate, Permissions.AppContentsUpsert);
+
+            var status = content.NewStatus ?? content.Status;
+
+            if (!await contentWorkflow.CanUpdateAsync(content, status, command.User))
+            {
+                throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
+            }
 
             Validate.It(e =>
             {
@@ -56,13 +63,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                     e(Not.Defined(nameof(command.Data)), nameof(command.Data));
                 }
             });
-        }
-
-        public static void CanValidate(ValidateContent command, IContentEntity content)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            CheckPermission(content, command, Permissions.AppContentsRead);
         }
 
         public static void CanDeleteDraft(DeleteContentDraft command, IContentEntity content)
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 {
                     var values = new { oldStatus, newStatus = status };
 
-                    e(T.Get("contents.statusTransitionNotAllowed", values), nameof(status));
+                    e(T.Get("contents.statusTransitionNotAllowed", values), "Status");
                 }
             });
         }
@@ -155,6 +155,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                     throw new DomainException(T.Get("contents.referenced"));
                 }
             }
+        }
+
+        public static void CanValidate(ValidateContent command, IContentEntity content)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            CheckPermission(content, command, Permissions.AppContentsRead);
         }
 
         public static void CheckPermission(IContentEntity content, ContentCommand command, params string[] permissions)

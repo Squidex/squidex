@@ -17,14 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly DefaultContentWorkflow sut = new DefaultContentWorkflow();
 
         [Fact]
-        public async Task Should_always_allow_publish_on_create()
-        {
-            var result = await sut.CanPublishOnCreateAsync(null!, null!, null!);
-
-            Assert.True(result);
-        }
-
-        [Fact]
         public async Task Should_return_draft_as_initial_status()
         {
             var result = await sut.GetInitialStatusAsync(null!);
@@ -33,7 +25,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_check_is_valid_next()
+        public async Task Should_allow_if_transition_is_valid()
+        {
+            var content = new ContentEntity { Status = Status.Published };
+
+            var result = await sut.CanMoveToAsync(null!, content.Status, Status.Draft, null!, null!);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task Should_allow_if_transition_is_valid_for_content()
         {
             var content = new ContentEntity { Status = Status.Published };
 

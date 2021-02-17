@@ -135,7 +135,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_check_is_valid_next()
+        public async Task Should_allow_if_transition_is_valid()
+        {
+            var content = CreateContent(Status.Draft, 2);
+
+            var result = await sut.CanMoveToAsync(Mocks.Schema(appId, schemaId), content.Status, Status.Published, content.Data, Mocks.FrontendUser("Editor"));
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task Should_allow_if_transition_is_valid_for_content()
         {
             var content = CreateContent(Status.Draft, 2);
 

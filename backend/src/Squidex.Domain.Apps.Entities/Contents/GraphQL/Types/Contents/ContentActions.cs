@@ -199,8 +199,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     {
                         Name = "status",
                         Description = "The initial status.",
-                        DefaultValue = false,
-                        ResolvedType = AllTypes.Boolean
+                        DefaultValue = null,
+                        ResolvedType = AllTypes.String
                     },
                     new QueryArgument(AllTypes.None)
                     {
@@ -269,8 +269,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     {
                         Name = "status",
                         Description = "The initial status.",
-                        DefaultValue = false,
-                        ResolvedType = AllTypes.Boolean
+                        DefaultValue = null,
+                        ResolvedType = AllTypes.String
                     },
                     new QueryArgument(AllTypes.None)
                     {

@@ -45,61 +45,43 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_data_is_null()
+        public void CanCreate_should_throw_exception_if_data_is_null()
         {
             var command = new CreateContent();
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanCreate(command, workflow, schema),
+            ValidationAssert.Throws(() => GuardContent.CanCreate(command, schema),
                 new ValidationError("Data is required.", "Data"));
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_singleton()
+        public void CanCreate_should_throw_exception_if_singleton()
         {
             var command = new CreateContent { Data = new ContentData() };
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanCreate(command, workflow, singleton));
+            Assert.Throws<DomainException>(() => GuardContent.CanCreate(command, singleton));
         }
 
         [Fact]
-        public async Task CanCreate_should_not_throw_exception_if_singleton_and_id_is_schema_id()
+        public void CanCreate_should_not_throw_exception_if_singleton_and_id_is_schema_id()
         {
             var command = new CreateContent { Data = new ContentData(), ContentId = schema.Id };
 
-            await GuardContent.CanCreate(command, workflow, schema);
+            GuardContent.CanCreate(command, schema);
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_publishing_not_allowed()
-        {
-            SetupCanCreatePublish(false);
-
-            var command = new CreateContent { Data = new ContentData(), Publish = true };
-
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanCreate(command, workflow, schema));
-        }
-
-        [Fact]
-        public async Task CanCreate_should_not_throw_exception_if_publishing_allowed()
-        {
-            SetupCanCreatePublish(true);
-
-            var command = new CreateContent { Data = new ContentData(), Publish = true };
-
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanCreate(command, workflow, schema));
-        }
-
-        [Fact]
-        public async Task CanCreate_should_not_throw_exception_if_data_is_not_null()
+        public void CanCreate_should_not_throw_exception_if_data_is_not_null()
         {
             var command = new CreateContent { Data = new ContentData() };
 
-            await GuardContent.CanCreate(command, workflow, schema);
+            GuardContent.CanCreate(command, schema);
         }
 
         [Fact]
         public async Task CanUpdate_should_throw_exception_if_data_is_null()
         {
+            SetupCanUpdate(true);
+
             var content = CreateContent(Status.Draft);
 
             var command = CreateCommand(new UpdateContent());
@@ -133,64 +115,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanPatch_should_throw_exception_if_data_is_null()
-        {
-            SetupCanUpdate(true);
-
-            var content = CreateContent(Status.Draft);
-
-            var command = CreateCommand(new PatchContent());
-
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanPatch(command, content, workflow),
-                new ValidationError("Data is required.", "Data"));
-        }
-
-        [Fact]
-        public async Task CanPatch_should_throw_exception_if_workflow_blocks_it()
-        {
-            SetupCanUpdate(false);
-
-            var content = CreateContent(Status.Draft);
-
-            var command = CreateCommand(new PatchContent { Data = new ContentData() });
-
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanPatch(command, content, workflow));
-        }
-
-        [Fact]
-        public async Task CanPatch_should_not_throw_exception_if_data_is_not_null()
-        {
-            SetupCanUpdate(true);
-
-            var content = CreateContent(Status.Draft);
-
-            var command = CreateCommand(new PatchContent { Data = new ContentData() });
-
-            await GuardContent.CanPatch(command, content, workflow);
-        }
-
-        [Fact]
         public async Task CanChangeStatus_should_throw_exception_if_singleton()
         {
             var content = CreateContent(Status.Published);
 
             var command = CreateCommand(new ChangeContentStatus { Status = Status.Draft });
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, singleton));
-        }
-
-        [Fact]
-        public async Task CanChangeStatus_should_throw_exception_if_due_date_in_past()
-        {
-            var content = CreateContent(Status.Draft);
-
-            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast });
-
-            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
-                .Returns(true);
-
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
-                new ValidationError("Due time must be in the future.", "DueTime"));
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, singleton));
         }
 
         [Fact]
@@ -203,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
                 .Returns(false);
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, schema),
                 new ValidationError("Cannot change status from Draft to Published.", "Status"));
         }
 
@@ -217,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, content.Id, SearchScope.Published))
                 .Returns(true);
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema));
+            await Assert.ThrowsAsync<ValidationException>(() => GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, schema));
         }
 
         [Fact]
@@ -227,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             var command = CreateCommand(new ChangeContentStatus { Status = Status.Published });
 
-            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, singleton);
+            await GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, singleton);
         }
 
         [Fact]
@@ -240,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
                 .Returns(true);
 
-            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema);
+            await GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, schema);
         }
 
         [Fact]
@@ -368,12 +299,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             A.CallTo(() => workflow.CanUpdateAsync(A<IContentEntity>._, A<Status>._, user))
                 .Returns(canUpdate);
-        }
-
-        private void SetupCanCreatePublish(bool canCreate)
-        {
-            A.CallTo(() => workflow.CanPublishOnCreateAsync(schema, A<ContentData>._, user))
-                .Returns(canCreate);
         }
 
         private T CreateCommand<T>(T command) where T : ContentCommand

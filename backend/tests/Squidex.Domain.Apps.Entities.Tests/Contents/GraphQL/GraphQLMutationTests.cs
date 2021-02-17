@@ -13,6 +13,7 @@ using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime;
+using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
@@ -80,12 +81,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_creating_content()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
                   createMySchemaContent(data: <DATA>, publish: true) {
                     <FIELDS>
                   }
-                }".Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -103,9 +104,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => commandBus.PublishAsync(
                 A<CreateContent>.That.Matches(x =>
-                    x.SchemaId.Equals(schemaId) &&
                     x.ExpectedVersion == EtagVersion.Any &&
-                    x.Publish &&
+                    x.SchemaId.Equals(schemaId) &&
+                    x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -113,12 +114,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_creating_content_with_custom_id()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  createMySchemaContent(data: <DATA>, id: ""123"", publish: true) {
+                  createMySchemaContent(data: <DATA>, id: '123', publish: true) {
                     <FIELDS>
                   }
-                }".Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -136,10 +137,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => commandBus.PublishAsync(
                 A<CreateContent>.That.Matches(x =>
-                    x.SchemaId.Equals(schemaId) &&
                     x.ExpectedVersion == EtagVersion.Any &&
                     x.ContentId == DomainId.Create("123") &&
-                    x.Publish &&
+                    x.SchemaId.Equals(schemaId) &&
+                    x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -147,12 +148,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_creating_content_with_variable()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
                   createMySchemaContent(data: $data, publish: true) {
                     <FIELDS>
                   }
-                }".Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -170,9 +171,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => commandBus.PublishAsync(
                 A<CreateContent>.That.Matches(x =>
-                    x.SchemaId.Equals(schemaId) &&
                     x.ExpectedVersion == EtagVersion.Any &&
-                    x.Publish &&
+                    x.SchemaId.Equals(schemaId) &&
+                    x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -180,12 +181,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_error_when_user_has_no_permission_to_update()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  updateMySchemaContent(id: ""<ID>"", data: { myNumber: { iv: 42 } }) {
+                  updateMySchemaContent(id: '<ID>', data: { myNumber: { iv: 42 } }) {
                     id
                   }
-                }".Replace("<ID>", contentId.ToString());
+                }");
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
@@ -221,12 +222,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_updating_content()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  updateMySchemaContent(id: ""<ID>"", data: <DATA>, expectedVersion: 10) {
+                  updateMySchemaContent(id: '<ID>', data: <DATA>, expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -246,6 +247,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<UpdateContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
+                    x.SchemaId.Equals(schemaId) &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -253,12 +255,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_updating_content_with_variable()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
-                  updateMySchemaContent(id: ""<ID>"", data: $data, expectedVersion: 10) {
+                  updateMySchemaContent(id: '<ID>', data: $data, expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -278,6 +280,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<UpdateContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
+                    x.SchemaId.Equals(schemaId) &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -285,12 +288,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_error_when_user_has_no_permission_to_upsert()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  upsertMySchemaContent(id: ""<ID>"", data: { myNumber: { iv: 42 } }) {
+                  upsertMySchemaContent(id: '<ID>', data: { myNumber: { iv: 42 } }) {
                     id
                   }
-                }".Replace("<ID>", contentId.ToString());
+                }");
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
@@ -326,12 +329,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_upserting_content()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  upsertMySchemaContent(id: ""<ID>"", data: <DATA>, publish: true, expectedVersion: 10) {
+                  upsertMySchemaContent(id: '<ID>', data: <DATA>, publish: true, expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -351,7 +354,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<UpsertContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
-                    x.Publish &&
+                    x.SchemaId.Equals(schemaId) &&
+                    x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -359,12 +363,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_upserting_content_with_variable()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
-                  upsertMySchemaContent(id: ""<ID>"", data: $data, publish: true, expectedVersion: 10) {
+                  upsertMySchemaContent(id: '<ID>', data: $data, publish: true, expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -384,7 +388,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<UpsertContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
-                    x.Publish &&
+                    x.SchemaId.Equals(schemaId) &&
+                    x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -392,12 +397,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_error_when_user_has_no_permission_to_patch()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  patchMySchemaContent(id: ""<ID>"", data: { myNumber: { iv: 42 } }) {
+                  patchMySchemaContent(id: '<ID>', data: { myNumber: { iv: 42 } }) {
                     id
                   }
-                }".Replace("<ID>", contentId.ToString());
+                }");
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
@@ -433,12 +438,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_patching_content()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  patchMySchemaContent(id: ""<ID>"", data: <DATA>, expectedVersion: 10) {
+                  patchMySchemaContent(id: '<ID>', data: <DATA>, expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<DATA>", GetDataString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -458,6 +463,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<PatchContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
+                    x.SchemaId.Equals(schemaId) &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -465,12 +471,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_patching_content_with_variable()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
-                  patchMySchemaContent(id: ""<ID>"", data: $data, expectedVersion: 10) {
+                  patchMySchemaContent(id: '<ID>', data: $data, expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -490,6 +496,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<PatchContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
+                    x.SchemaId.Equals(schemaId) &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -497,12 +504,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_error_when_user_has_no_permission_to_change_status()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  changeMySchemaContent(id: ""<ID>"", status: ""Published"") {
+                  changeMySchemaContent(id: '<ID>', status: 'Published') {
                     id
                   }
-                }".Replace("<ID>", contentId.ToString());
+                }");
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
@@ -538,14 +545,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_changing_status()
         {
-            var dueTime = SystemClock.Instance.GetCurrentInstant().WithoutMs();
+            var dueTime = InstantPattern.General.Parse("2021-12-12T11:10:09Z").Value;
 
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  changeMySchemaContent(id: ""<ID>"", status: ""Published"", dueTime: ""<TIME>"", expectedVersion: 10) {
+                  changeMySchemaContent(id: '<ID>', status: 'Published', dueTime: '2021-12-12T11:10:09Z', expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<TIME>", dueTime.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -566,6 +573,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     x.ContentId == contentId &&
                     x.DueTime == dueTime &&
                     x.ExpectedVersion == 10 &&
+                    x.SchemaId.Equals(schemaId) &&
                     x.Status == Status.Published)))
                 .MustHaveHappened();
         }
@@ -573,12 +581,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_changing_status_without_due_time()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  changeMySchemaContent(id: ""<ID>"", status: ""Published"", expectedVersion: 10) {
+                  changeMySchemaContent(id: '<ID>', status: 'Published', expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -599,6 +607,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     x.ContentId == contentId &&
                     x.DueTime == null &&
                     x.ExpectedVersion == 10 &&
+                    x.SchemaId.Equals(schemaId) &&
                     x.Status == Status.Published)))
                 .MustHaveHappened();
         }
@@ -606,12 +615,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_changing_status_with_null_due_time()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  changeMySchemaContent(id: ""<ID>"", status: ""Published"", dueTime: null, expectedVersion: 10) {
+                  changeMySchemaContent(id: '<ID>', status: 'Published', dueTime: null, expectedVersion: 10) {
                     <FIELDS>
                   }
-                }".Replace("<ID>", contentId.ToString()).Replace("<FIELDS>", TestContent.AllFields);
+                }");
 
             commandContext.Complete(content);
 
@@ -632,6 +641,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     x.ContentId == contentId &&
                     x.DueTime == null &&
                     x.ExpectedVersion == 10 &&
+                    x.SchemaId.Equals(schemaId) &&
                     x.Status == Status.Published)))
                 .MustHaveHappened();
         }
@@ -639,12 +649,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_error_when_user_has_no_permission_to_delete()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  deleteMySchemaContent(id: ""<ID>"") {
+                  deleteMySchemaContent(id: '<ID>') {
                     version
                   }
-                }".Replace("<ID>", contentId.ToString());
+                }");
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsReadOwn);
 
@@ -680,12 +690,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_new_version_when_deleting_content()
         {
-            var query = @"
+            var query = CreateQuery(@"
                 mutation {
-                  deleteMySchemaContent(id: ""<ID>"", expectedVersion: 10) {
+                  deleteMySchemaContent(id: '<ID>', expectedVersion: 10) {
                     version 
                   }
-                }".Replace("<ID>", contentId.ToString());
+                }");
 
             commandContext.Complete(new EntitySavedResult(13));
 
@@ -707,8 +717,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => commandBus.PublishAsync(
                 A<DeleteContent>.That.Matches(x =>
                     x.ContentId == contentId &&
-                    x.ExpectedVersion == 10)))
+                    x.ExpectedVersion == 10 &&
+                    x.SchemaId.Equals(schemaId))))
                 .MustHaveHappened();
+        }
+
+        private string CreateQuery(string query)
+        {
+            query = query
+                .Replace("'", "\"")
+                .Replace("<ID>", contentId.ToString())
+                .Replace("<FIELDS>", TestContent.AllFields);
+
+            if (query.Contains("<DATA>"))
+            {
+                var data = TestContent.Data(content, schemaRefId1.Id, schemaRefId2.Id);
+
+                var dataJson = JsonConvert.SerializeObject(data, Formatting.Indented);
+                var dataString = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":").Replace(".0", string.Empty);
+
+                query = query.Replace("<DATA>", dataString);
+            }
+
+            return query;
         }
 
         private Inputs GetInput()
@@ -719,15 +750,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             };
 
             return JObject.FromObject(input).ToInputs();
-        }
-
-        private string GetDataString()
-        {
-            var data = TestContent.Data(content, schemaRefId1.Id, schemaRefId2.Id);
-
-            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
-
-            return Regex.Replace(json, "\"([^\"]+)\":", x => x.Groups[1].Value + ":").Replace(".0", string.Empty);
         }
     }
 }

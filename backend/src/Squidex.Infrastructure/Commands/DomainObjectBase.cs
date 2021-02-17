@@ -193,9 +193,19 @@ namespace Squidex.Infrastructure.Commands
                     throw new DomainException("Object has already been deleted.");
                 }
 
-                if (!CanAccept(command))
+                if (Version < 0)
                 {
-                    throw new DomainException("Invalid command.");
+                    if (!CanAcceptCreation(command))
+                    {
+                        throw new DomainException("Invalid command.");
+                    }
+                }
+                else
+                {
+                    if (!CanAccept(command))
+                    {
+                        throw new DomainException("Invalid command.");
+                    }
                 }
             }
             else

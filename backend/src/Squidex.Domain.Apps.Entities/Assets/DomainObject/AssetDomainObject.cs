@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             return new HashSet<string>(normalized.Values);
         }
 
-        public void Create(CreateAsset command)
+        private void Create(CreateAsset command)
         {
             Raise(command, new AssetCreated
             {
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             });
         }
 
-        public void Update(UpdateAsset command)
+        private void Update(UpdateAsset command)
         {
             Raise(command, new AssetUpdated
             {
@@ -159,17 +159,17 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             });
         }
 
-        public void Annotate(AnnotateAsset command)
+        private void Annotate(AnnotateAsset command)
         {
             Raise(command, new AssetAnnotated());
         }
 
-        public void Move(MoveAsset command)
+        private void Move(MoveAsset command)
         {
             Raise(command, new AssetMoved());
         }
 
-        public void Delete(DeleteAsset command)
+        private void Delete(DeleteAsset command)
         {
             Raise(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize });
         }

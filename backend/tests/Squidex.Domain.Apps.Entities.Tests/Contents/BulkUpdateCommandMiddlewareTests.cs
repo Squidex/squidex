@@ -343,7 +343,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_change_content_status()
         {
-            SetupContext(Permissions.AppContentsUpdateOwn);
+            SetupContext(Permissions.AppContentsChangeStatusOwn);
 
             var (id, _, _) = CreateTestData(false);
 
@@ -360,7 +360,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_change_content_status_with_due_time()
         {
-            SetupContext(Permissions.AppContentsUpdateOwn);
+            SetupContext(Permissions.AppContentsChangeStatusOwn);
 
             var time = Instant.FromDateTimeUtc(DateTime.UtcNow);
 

@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is CreateContent;
+            return command is CreateContent || command is UpsertContent;
         }
 
         protected override bool CanAccept(ICommand command)
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         {
                             await LoadContext(c);
 
-                            if (c.DueTime.HasValue)
+                            if (c.DueTime > SystemClock.Instance.GetCurrentInstant())
                             {
                                 ScheduleStatus(c, c.DueTime.Value);
                             }
@@ -248,10 +248,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task ChangeStatusAsync(ContentCommand c, Status status)
         {
+            await GuardContent.CanChangeStatus(c, status, Snapshot, context.Workflow, context.Repository, context.Schema);
+
             if (status != Snapshot.Status)
             {
-                await GuardContent.CanChangeStatus(c, status, Snapshot, context.Workflow, context.Repository, context.Schema);
-
                 if (!c.DoNotScript && context.HasScript(c => c.Change))
                 {
                     var change = GetChange(status);
@@ -284,7 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task UpdateAsync(ContentDataCommand c, Func<ContentData, ContentData> newDataFunc, bool partial)
         {
-            GuardContent.CanUpdate(c, Snapshot);
+            await GuardContent.CanUpdate(c, Snapshot, context.Workflow);
 
             var dataNew = newDataFunc(Snapshot.Data);
 
@@ -324,42 +324,42 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
         }
 
-        public void Create(ContentCommand command, ContentData data, Status status)
+        private void Create(ContentCommand command, ContentData data, Status status)
         {
             Raise(command, new ContentCreated { Data = data, Status = status });
         }
 
-        public void Update(ContentCommand command, ContentData data)
+        private void Update(ContentCommand command, ContentData data)
         {
             Raise(command, new ContentUpdated { Data = data });
         }
 
-        public void ChangeStatus(ContentCommand command, Status status)
+        private void ChangeStatus(ContentCommand command, Status status)
         {
             Raise(command, new ContentStatusChanged { Status = status, Change = GetChange(status) });
         }
 
-        public void CreateDraft(CreateContentDraft command, Status status)
+        private void CreateDraft(CreateContentDraft command, Status status)
         {
             Raise(command, new ContentDraftCreated { Status = status });
         }
 
-        public void Delete(DeleteContent command)
+        private void Delete(DeleteContent command)
         {
             Raise(command, new ContentDeleted());
         }
 
-        public void DeleteDraft(DeleteContentDraft command)
+        private void DeleteDraft(DeleteContentDraft command)
         {
             Raise(command, new ContentDraftDeleted());
         }
 
-        public void CancelChangeStatus(ChangeContentStatus command)
+        private void CancelChangeStatus(ChangeContentStatus command)
         {
             Raise(command, new ContentSchedulingCancelled());
         }
 
-        public void ScheduleStatus(ChangeContentStatus command, Instant dueTime)
+        private void ScheduleStatus(ChangeContentStatus command, Instant dueTime)
         {
             Raise(command, new ContentStatusScheduled { DueTime = dueTime });
         }

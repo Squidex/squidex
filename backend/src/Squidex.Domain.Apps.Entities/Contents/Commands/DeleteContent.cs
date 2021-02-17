@@ -9,6 +9,5 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
     public sealed class DeleteContent : ContentCommand
     {
-        public bool CheckReferrers { get; set; }
     }
 }

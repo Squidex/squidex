@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -343,9 +344,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
-        /// <param name="request">The full data for the content item.</param>
-        /// <param name="publish">True to automatically publish the content.</param>
-        /// <param name="id">The optional custom content id.</param>
+        /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 201 => Content created.
         /// 400 => Content request not valid.
@@ -359,14 +358,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 201)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, [FromBody] ContentData request, [FromQuery] bool publish = false, [FromQuery] DomainId? id = null)
+        public async Task<IActionResult> PostContent(string app, string name, CreateContentDto request)
         {
-            var command = new CreateContent { Data = request.ToCleaned(), Publish = publish };
-
-            if (id != null && id.Value != default && !string.IsNullOrWhiteSpace(id.Value.ToString()))
-            {
-                command.ContentId = id.Value;
-            }
+            var command = request.ToCommand();
 
             var response = await InvokeCommandAsync(command);
 
@@ -392,6 +386,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(5)]
+        [Obsolete("Use bulk endpoint")]
         public async Task<IActionResult> PostContents(string app, string name, [FromBody] ImportContentsDto request)
         {
             var command = request.ToCommand();
@@ -441,8 +436,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to update.</param>
-        /// <param name="publish">True to automatically publish the content.</param>
-        /// <param name="request">The full data for the content item.</param>
+        /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 200 => Content updated.
         /// 400 => Content request not valid.
@@ -456,9 +450,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpsert)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, DomainId id, [FromBody] ContentData request, [FromQuery] bool publish = false)
+        public async Task<IActionResult> PostContent(string app, string name, DomainId id, UpsertContentDto request)
         {
-            var command = new UpsertContent { ContentId = id, Data = request.ToCleaned(), Publish = publish };
+            var command = request.ToCommand(id);
 
             var response = await InvokeCommandAsync(command);
 

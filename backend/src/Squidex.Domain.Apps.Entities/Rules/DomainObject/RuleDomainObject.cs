@@ -125,27 +125,27 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             await ruleEnqueuer.EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
         }
 
-        public void Create(CreateRule command)
+        private void Create(CreateRule command)
         {
             Raise(command, new RuleCreated());
         }
 
-        public void Update(UpdateRule command)
+        private void Update(UpdateRule command)
         {
             Raise(command, new RuleUpdated());
         }
 
-        public void Enable(EnableRule command)
+        private void Enable(EnableRule command)
         {
             Raise(command, new RuleEnabled());
         }
 
-        public void Disable(DisableRule command)
+        private void Disable(DisableRule command)
         {
             Raise(command, new RuleDisabled());
         }
 
-        public void Delete(DeleteRule command)
+        private void Delete(DeleteRule command)
         {
             Raise(command, new RuleDeleted());
         }

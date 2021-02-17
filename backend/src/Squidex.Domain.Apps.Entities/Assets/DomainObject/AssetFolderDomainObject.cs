@@ -97,22 +97,22 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
         }
 
-        public void Create(CreateAssetFolder command)
+        private void Create(CreateAssetFolder command)
         {
             Raise(command, new AssetFolderCreated());
         }
 
-        public void Move(MoveAssetFolder command)
+        private void Move(MoveAssetFolder command)
         {
             Raise(command, new AssetFolderMoved());
         }
 
-        public void Rename(RenameAssetFolder command)
+        private void Rename(RenameAssetFolder command)
         {
             Raise(command, new AssetFolderRenamed());
         }
 
-        public void Delete(DeleteAssetFolder command)
+        private void Delete(DeleteAssetFolder command)
         {
             Raise(command, new AssetFolderDeleted());
         }
