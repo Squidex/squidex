@@ -33,9 +33,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public ContentData? Data { get; set; }
 
         /// <summary>
-        /// The new status when the type is set to 'ChangeStatus'.
+        /// The new status when the type is set to 'ChangeStatus' or 'Upsert'.
         /// </summary>
-        public Status Status { get; set; }
+        public Status? Status { get; set; }
 
         /// <summary>
         /// The due time.

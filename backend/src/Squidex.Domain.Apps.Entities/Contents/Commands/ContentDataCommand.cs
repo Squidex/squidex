@@ -15,6 +15,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool OptimizeValidation { get; set; }
 
+        public bool CheckReferrers { get; set; }
+
         public ContentData Data { get; set; }
+
+        public Status? Status { get; set; }
     }
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using NodaTime;
@@ -22,49 +23,64 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class GuardContent
     {
-        public static async Task CanCreate(CreateContent command, IContentWorkflow contentWorkflow, ISchemaEntity schema)
+        public static Task CanCreate(CreateContent command, Status initialStatus, IContentWorkflow contentWorkflow, ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
 
-            if (schema.SchemaDef.IsSingleton && command.ContentId != schema.Id)
+            if (schema.SchemaDef.IsSingleton)
             {
-                throw new DomainException(T.Get("contents.singletonNotCreatable"));
+                if (command.ContentId != schema.Id)
+                {
+                    throw new DomainException(T.Get("contents.singletonNotCreatable"));
+                }
+
+                return Task.CompletedTask;
             }
 
-            if (command.Publish && !await contentWorkflow.CanPublishOnCreateAsync(schema, command.Data, command.User))
-            {
-                throw new DomainException(T.Get("contents.workflowErorPublishing"));
-            }
+            var isChangingStatus = command.Status != null && command.Status != initialStatus;
 
-            Validate.It(e =>
+            return Validate.It(async e =>
             {
                 ValidateData(command, e);
+
+                if (isChangingStatus)
+                {
+                    if (!await contentWorkflow.CanMoveToAsync(schema, initialStatus, command.Status!.Value, command.Data, command.User))
+                    {
+                        var values = new { oldStatus = initialStatus, newStatus = command.Status };
+
+                        e(T.Get("contents.statusTransitionNotAllowed", values), nameof(command.Status));
+                    }
+                }
             });
         }
 
-        public static async Task CanUpdate(UpdateContent command,
+        public static async Task CanUpdate(ContentDataCommand command,
             IContentEntity content,
-            IContentWorkflow contentWorkflow)
+            IContentWorkflow contentWorkflow,
+            IContentRepository contentRepository,
+            ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
 
             CheckPermission(content, command, Permissions.AppContentsUpdate);
 
-            Validate.It(e =>
+            var status = content.NewStatus ?? content.Status;
+
+            var isChangingStatus = command.Status != null && command.Status != status;
+
+            if (isChangingStatus)
             {
-                ValidateData(command, e);
-            });
+                CheckPermission(content, command, Permissions.AppContentsChangeStatus);
 
-            await ValidateCanUpdate(content, contentWorkflow, command.User);
-        }
-
-        public static async Task CanPatch(PatchContent command,
-            IContentEntity content,
-            IContentWorkflow contentWorkflow)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            CheckPermission(content, command, Permissions.AppContentsUpdate);
+                if (schema.SchemaDef.IsSingleton)
+                {
+                    if (content.NewStatus == null || command.Status != Status.Published)
+                    {
+                        throw new DomainException(T.Get("contents.singletonNotChangeable"));
+                    }
+                }
+            }
 
             Validate.It(e =>
             {
@@ -113,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            CheckPermission(content, command, Permissions.AppContentsChangeStatus);
+            CheckPermission(content, command, Permissions.AppContentsChangeStatus, Permissions.AppContentsUpsert);
 
             if (schema.SchemaDef.IsSingleton)
             {
@@ -196,14 +212,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
-        public static void CheckPermission(IContentEntity content, ContentCommand command, string permission)
+        public static void CheckPermission(IContentEntity content, ContentCommand command, params string[] permissions)
         {
             if (Equals(content.CreatedBy, command.Actor) || command.User == null)
             {
                 return;
             }
 
-            if (!command.User.Allows(permission, content.AppId.Name, content.SchemaId.Name))
+            if (permissions.All(x => !command.User.Allows(x, content.AppId.Name, content.SchemaId.Name)))
+            {
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+            }
+        }
+
+        public static void CheckPermission(CreateContent command, params string[] permissions)
+        {
+            if (command.User == null)
+            {
+                return;
+            }
+
+            if (permissions.All(x => !command.User.Allows(x, command.AppId.Name, command.SchemaId.Name)))
             {
                 throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }

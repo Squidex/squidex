@@ -182,7 +182,7 @@
   "contents.validation.unknownField": "Non è noto {fieldType}.",
   "contents.validation.wordCount": "Deve avere esattamente {count} parola(e).",
   "contents.validation.wordsBetween": "Deve essere tra {min} e {max} parola(e).",
-  "contents.workflowErorPublishing": "Il workflow del contenuto impedisce la pubblicazione.",
+  "contents.workflowErrorPublishing": "Il workflow del contenuto impedisce la pubblicazione.",
   "contents.workflowErrorUpdate": "Il workflow non consente le modifiche per lo stato {status}",
   "dotnet_identity_DefaultEror": "Si è verificato un errore sconosciuto.",
   "dotnet_identity_DuplicateEmail": "Email già in uso.",

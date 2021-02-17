@@ -182,7 +182,7 @@
   "contents.validation.unknownField": "Not a known {fieldType}.",
   "contents.validation.wordCount": "Must have exactly {count} word(s).",
   "contents.validation.wordsBetween": "Must have between {min} and {max} word(s).",
-  "contents.workflowErorPublishing": "Content workflow prevents publishing.",
+  "contents.workflowErrorPublishing": "Content workflow prevents publishing.",
   "contents.workflowErrorUpdate": "The workflow does not allow updates at status {status}",
   "dotnet_identity_DefaultEror": "An unknown failure has occurred.",
   "dotnet_identity_DuplicateEmail": "Email is already taken.",

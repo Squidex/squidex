@@ -32,6 +32,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             : base(appId, schemaId, schema)
         {
             JsonSerializer = jsonSerializer;
+
             ContentId = contentId;
         }
 

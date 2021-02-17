@@ -118,11 +118,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return Task.CompletedTask;
         }
 
-        public async Task ValidateInputAsync(ContentData data, bool publish)
+        public async Task ValidateInputAsync(ContentData data)
         {
             var validator =
                 new ContentValidator(Partition(),
-                    validationContext.AsPublishing(publish), validators, log);
+                    validationContext, validators, log);
 
             await validator.ValidateInputAsync(data);
 

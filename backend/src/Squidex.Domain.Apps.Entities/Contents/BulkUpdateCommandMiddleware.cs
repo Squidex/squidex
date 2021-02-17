@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 case BulkUpdateType.Upsert:
                     {
-                        var command = new UpsertContent { Data = job.Data! };
+                        var command = new UpsertContent { Data = job.Data!, Status = job.Status };
 
                         await EnrichAsync(id, task, command, Permissions.AppContentsUpsert);
                         return command;
@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var command = new ChangeContentStatus { Status = job.Status, DueTime = job.DueTime };
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdateOwn);
+                        await EnrichAsync(id, task, command, Permissions.AppContentsChangeStatusOwn);
                         return command;
                     }
 

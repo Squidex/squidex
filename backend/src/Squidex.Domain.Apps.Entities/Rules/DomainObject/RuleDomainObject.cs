@@ -152,11 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
         {
-            SimpleMapper.Map(command, @event);
-
-            @event.AppId ??= Snapshot.AppId;
-
-            RaiseEvent(Envelope.Create(@event));
+            RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
         }
     }
 }

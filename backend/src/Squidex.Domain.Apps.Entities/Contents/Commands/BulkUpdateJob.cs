@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public DomainId? Id { get; set; }
 
-        public Status Status { get; set; }
+        public Status? Status { get; set; }
 
         public Instant? DueTime { get; set; }
 
