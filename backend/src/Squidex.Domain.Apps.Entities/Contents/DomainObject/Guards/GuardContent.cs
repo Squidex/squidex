@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class GuardContent
     {
-        public static void CanCreate(ContentDataCommand command, ISchemaEntity schema)
+        public static void CanCreate(CreateContent command, ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             });
         }
 
-        public static async Task CanUpdate(ContentDataCommand command, IContentEntity content, IContentWorkflow contentWorkflow)
+        public static async Task CanUpdate(UpdateContent command, IContentEntity content, IContentWorkflow contentWorkflow)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
-        public static async Task CanChangeStatus(ContentCommand command, Status status,
+        public static async Task CanChangeStatus(ChangeContentStatus command,
             IContentEntity content,
             IContentWorkflow contentWorkflow,
             IContentRepository contentRepository,
@@ -101,9 +101,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             CheckPermission(content, command, Permissions.AppContentsChangeStatus, Permissions.AppContentsUpsert);
 
+            var newStatus = command.Status;
+
             if (schema.SchemaDef.IsSingleton)
             {
-                if (content.NewStatus == null || status != Status.Published)
+                if (content.NewStatus == null || newStatus != Status.Published)
                 {
                     throw new DomainException(T.Get("contents.singletonNotChangeable"));
                 }
@@ -127,16 +129,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             {
                 if (!command.DoNotValidateWorkflow)
                 {
-                    if (!await contentWorkflow.CanMoveToAsync(content, oldStatus, status, command.User))
+                    if (!await contentWorkflow.CanMoveToAsync(content, oldStatus, newStatus, command.User))
                     {
-                        var values = new { oldStatus, newStatus = status };
+                        var values = new { oldStatus, newStatus };
 
                         e(T.Get("contents.statusTransitionNotAllowed", values), "Status");
                     }
                 }
                 else
                 {
-                    var info = await contentWorkflow.GetInfoAsync(content, content.Status);
+                    var info = await contentWorkflow.GetInfoAsync(content, newStatus);
 
                     if (info == null)
                     {

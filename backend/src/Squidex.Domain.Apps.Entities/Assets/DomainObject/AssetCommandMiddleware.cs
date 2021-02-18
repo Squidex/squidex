@@ -113,7 +113,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
         }
 
-        private async Task UploadAsync(CommandContext context, string tempFile, UploadAssetCommand command, HashSet<string>? tags, bool created, NextDelegate next)
+        private async Task UploadAsync(CommandContext context, string tempFile, UploadAssetCommand command, HashSet<string>? tags, bool created,
+            NextDelegate next)
         {
             await EnrichWithMetadataAsync(command, tags);
 
@@ -125,7 +126,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
         }
 
-        private async Task<IEnrichedAssetEntity?> HandleCoreAsync(CommandContext context, bool created, NextDelegate next)
+        private async Task<IEnrichedAssetEntity?> HandleCoreAsync(CommandContext context, bool created,
+            NextDelegate next)
         {
             await base.HandleAsync(context, next);
 
@@ -156,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 {
                     await assetFileStore.UploadAsync(tempFile, hashStream);
 
-                    command.FileHash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
+                    command.FileHash = hashStream.GetHashStringAndReset();
                 }
             }
         }

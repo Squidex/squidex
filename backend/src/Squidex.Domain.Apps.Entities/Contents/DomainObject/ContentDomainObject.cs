@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case UpsertContent upsertContent:
                     return UpsertReturnAsync(upsertContent, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, c.OptimizeValidation);
 
                         if (Version > EtagVersion.Empty)
                         {
@@ -69,12 +69,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         }
                         else
                         {
-                            await CreateAsync(c);
+                            var create = SimpleMapper.Map(c, new CreateContent());
+
+                            await CreateAsync(create);
                         }
 
                         if (Is.OptionalChange(Snapshot.EditingStatus, c.Status))
                         {
-                            await ChangeStatusAsync(c, c.Status.Value);
+                            var changeStatus = SimpleMapper.Map(c, new ChangeContentStatus
+                            {
+                                Status = c.Status.Value
+                            });
+
+                            await ChangeStatusAsync(changeStatus);
                         }
 
                         return Snapshot;
@@ -83,13 +90,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case CreateContent createContent:
                     return CreateReturnAsync(createContent, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, false);
 
                         await CreateAsync(c);
 
                         if (c.Status != null && c.Status != Snapshot.Status)
                         {
-                            await ChangeStatusAsync(c, c.Status.Value);
+                            var changeStatus = SimpleMapper.Map(c, new ChangeContentStatus
+                            {
+                                Status = c.Status.Value
+                            });
+
+                            await ChangeStatusAsync(changeStatus);
                         }
 
                         return Snapshot;
@@ -98,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case ValidateContent validateContent:
                     return UpdateReturnAsync(validateContent, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, false);
 
                         GuardContent.CanValidate(c, Snapshot);
 
@@ -110,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case CreateContentDraft createContentDraft:
                     return UpdateReturnAsync(createContentDraft, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, false);
 
                         GuardContent.CanCreateDraft(c, Snapshot);
 
@@ -124,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case DeleteContentDraft deleteContentDraft:
                     return UpdateReturnAsync(deleteContentDraft, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, false);
 
                         GuardContent.CanDeleteDraft(c, Snapshot);
 
@@ -133,22 +145,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return Snapshot;
                     });
 
-                case UpdateContent updateContent:
-                    return UpdateReturnAsync(updateContent, async c =>
+                case PatchContent patchContent:
+                    return UpdateReturnAsync(patchContent, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, c.OptimizeValidation);
 
-                        await UpdateAsync(c, x => c.Data, false);
+                        await UpdateAsync(c, c.Data.MergeInto, true);
 
                         return Snapshot;
                     });
 
-                case PatchContent patchContent:
-                    return UpdateReturnAsync(patchContent, async c =>
+                case UpdateContent updateContent:
+                    return UpdateReturnAsync(updateContent, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, c.OptimizeValidation);
 
-                        await UpdateAsync(c, c.Data.MergeInto, true);
+                        await UpdateAsync(c, x => c.Data, false);
 
                         return Snapshot;
                     });
@@ -158,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         try
                         {
-                            await LoadContext(c);
+                            await LoadContext(c, c.OptimizeValidation);
 
                             if (c.DueTime > SystemClock.Instance.GetCurrentInstant())
                             {
@@ -166,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             }
                             else
                             {
-                                await ChangeStatusAsync(c, c.Status);
+                                await ChangeStatusAsync(c);
                             }
                         }
                         catch (Exception)
@@ -187,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, false);
 
                         await GuardContent.CanDelete(c, Snapshot, context.Repository, context.Schema);
 
@@ -211,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
         }
 
-        private async Task CreateAsync(ContentDataCommand c)
+        private async Task CreateAsync(CreateContent c)
         {
             var status = await context.GetInitialStatusAsync();
 
@@ -246,15 +258,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Create(c, dataNew, status);
         }
 
-        private async Task ChangeStatusAsync(ContentCommand c, Status status)
+        private async Task ChangeStatusAsync(ChangeContentStatus c)
         {
-            await GuardContent.CanChangeStatus(c, status, Snapshot, context.Workflow, context.Repository, context.Schema);
+            await GuardContent.CanChangeStatus(c, Snapshot, context.Workflow, context.Repository, context.Schema);
 
-            if (status != Snapshot.Status)
+            if (c.Status != Snapshot.Status)
             {
                 if (!c.DoNotScript && context.HasScript(c => c.Change))
                 {
-                    var change = GetChange(status);
+                    var change = GetChange(c.Status);
 
                     var data = Snapshot.Data.Clone();
 
@@ -263,7 +275,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         {
                             Operation = change.ToString(),
                             Data = data,
-                            Status = status,
+                            Status = c.Status,
                             StatusOld = Snapshot.EditingStatus
                         });
 
@@ -273,16 +285,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     }
                 }
 
-                if (!c.DoNotValidate && status == Status.Published)
+                if (!c.DoNotValidate && c.Status == Status.Published)
                 {
                     await context.ValidateOnPublishAsync(Snapshot.Data);
                 }
 
-                ChangeStatus(c, status);
+                ChangeStatus(c);
             }
         }
 
-        private async Task UpdateAsync(ContentDataCommand c, Func<ContentData, ContentData> newDataFunc, bool partial)
+        private async Task UpdateAsync(UpdateContent c, Func<ContentData, ContentData> newDataFunc, bool partial)
         {
             await GuardContent.CanUpdate(c, Snapshot, context.Workflow);
 
@@ -324,7 +336,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
         }
 
-        private void Create(ContentCommand command, ContentData data, Status status)
+        private void Create(CreateContent command, ContentData data, Status status)
         {
             Raise(command, new ContentCreated { Data = data, Status = status });
         }
@@ -334,9 +346,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Raise(command, new ContentUpdated { Data = data });
         }
 
-        private void ChangeStatus(ContentCommand command, Status status)
+        private void ChangeStatus(ChangeContentStatus command)
         {
-            Raise(command, new ContentStatusChanged { Status = status, Change = GetChange(status) });
+            Raise(command, new ContentStatusChanged { Change = GetChange(command.Status) });
         }
 
         private void CreateDraft(CreateContentDraft command, Status status)
@@ -385,9 +397,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
         }
 
-        private Task LoadContext(ContentCommand command)
+        private Task LoadContext(ContentCommand command, bool optimize)
         {
-            return context.LoadAsync(command.AppId, command.SchemaId, command, command.OptimizeValidation);
+            return context.LoadAsync(command.AppId, command.SchemaId, command, optimize);
         }
     }
 }

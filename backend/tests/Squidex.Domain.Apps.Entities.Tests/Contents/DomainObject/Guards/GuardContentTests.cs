@@ -8,7 +8,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -32,7 +31,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private readonly ISchemaEntity schema;
         private readonly ISchemaEntity singleton;
         private readonly ClaimsPrincipal user = Mocks.FrontendUser();
-        private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
         private readonly RefToken actor = RefToken.User("123");
 
         public GuardContentTests()
@@ -133,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             var command = CreateCommand(new ChangeContentStatus { Status = Status.Draft });
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, singleton));
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, singleton));
         }
 
         [Fact]
@@ -146,8 +144,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
                 .Returns(false);
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, schema),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
                 new ValidationError("Cannot change status from Draft to Published.", "Status"));
+        }
+
+        [Fact]
+        public async Task CanChangeStatus_should_throw_exception_if_status_valid()
+        {
+            var content = CreateContent(Status.Draft);
+
+            var command = CreateCommand(new ChangeContentStatus { Status = new Status("Invalid"), DoNotValidateWorkflow = true });
+
+            A.CallTo(() => workflow.GetInfoAsync(content, command.Status))
+                .Returns(Task.FromResult<StatusInfo?>(null));
+
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
+                new ValidationError("Status is not defined in the workflow.", "Status"));
         }
 
         [Fact]
@@ -160,7 +172,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, content.Id, SearchScope.Published))
                 .Returns(true);
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, schema));
+            await Assert.ThrowsAsync<ValidationException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema));
+        }
+
+        [Fact]
+        public async Task CanChangeStatus_should_not_throw_exception_if_status_flow_not_valid_but_check_disabled()
+        {
+            var content = CreateContent(Status.Draft);
+
+            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published, DoNotValidateWorkflow = true });
+
+            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
+                .Returns(false);
+
+            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema);
         }
 
         [Fact]
@@ -170,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             var command = CreateCommand(new ChangeContentStatus { Status = Status.Published });
 
-            await GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, singleton);
+            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, singleton);
         }
 
         [Fact]
@@ -183,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
                 .Returns(true);
 
-            await GuardContent.CanChangeStatus(command, command.Status, content, workflow, contentRepository, schema);
+            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema);
         }
 
         [Fact]

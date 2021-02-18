@@ -12,7 +12,6 @@ using GraphQL;
 using GraphQL.NewtonsoftJson;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NodaTime;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;

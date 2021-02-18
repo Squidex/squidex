@@ -18,5 +18,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
         public Instant? DueTime { get; set; }
 
         public DomainId? StatusJobId { get; set; }
+
+        public bool CheckReferrers { get; set; }
+
+        public bool DoNotValidate { get; set; }
+
+        public bool DoNotValidateWorkflow { get; set; }
+
+        public bool OptimizeValidation { get; set; }
     }
 }

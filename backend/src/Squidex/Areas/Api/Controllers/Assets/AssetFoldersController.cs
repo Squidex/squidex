@@ -48,16 +48,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/assets/folders", Order = -1)]
-        [ProducesResponseType(typeof(AssetsDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AssetFoldersDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] DomainId parentId)
         {
-            var (folders, path) =
-                await AsyncHelper.WhenAll(
-                    assetQuery.QueryAssetFoldersAsync(Context, parentId),
-                    assetQuery.FindAssetFolderAsync(Context.App.Id, parentId)
-                );
+            var (folders, path) = await AsyncHelper.WhenAll(
+                assetQuery.QueryAssetFoldersAsync(Context, parentId),
+                assetQuery.FindAssetFolderAsync(Context.App.Id, parentId));
 
             var response = Deferred.Response(() =>
             {

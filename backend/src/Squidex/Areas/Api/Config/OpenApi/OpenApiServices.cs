@@ -107,9 +107,9 @@ namespace Squidex.Areas.Api.Config.OpenApi
             {
                 CreateStringMap<DomainId>(),
                 CreateStringMap<Instant>(JsonFormatStrings.DateTime),
-                CreateStringMap<Language>(),
                 CreateStringMap<LocalDate>(JsonFormatStrings.Date),
                 CreateStringMap<LocalDateTime>(JsonFormatStrings.DateTime),
+                CreateStringMap<Language>(),
                 CreateStringMap<NamedId<DomainId>>(),
                 CreateStringMap<NamedId<Guid>>(),
                 CreateStringMap<NamedId<string>>(),
@@ -120,7 +120,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 CreateObjectMap<AssetMetadata>()
             };
 
-            settings.FlattenInheritanceHierarchy = true;
+            settings.FlattenInheritanceHierarchy = flatten;
         }
 
         private static ITypeMapper CreateObjectMap<T>()
