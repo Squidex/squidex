@@ -14,73 +14,73 @@ namespace Squidex.Areas.Api.Config.OpenApi
     {
         public static void AddQuery(this OpenApiOperation operation, bool supportSearch)
         {
-            var @string = new JsonSchema
+            var stringSchema = new JsonSchema
             {
                 Type = JsonObjectType.String
             };
 
-            var number = new JsonSchema
+            var numberSchema = new JsonSchema
             {
-                Type = JsonObjectType.String
+                Type = JsonObjectType.Number
             };
+
+            void AddQuery(OpenApiParameter parameter)
+            {
+                parameter.Kind = OpenApiParameterKind.Query;
+
+                operation.Parameters.Add(parameter);
+            }
 
             if (supportSearch)
             {
-                operation.Parameters.Add(new OpenApiParameter
+                AddQuery(new OpenApiParameter
                 {
-                    Schema = @string,
+                    Schema = stringSchema,
                     Name = "$search",
-                    Description = "Optional OData full text search.",
-                    Kind = OpenApiParameterKind.Query
+                    Description = "Optional OData full text search."
                 });
             }
 
-            operation.Parameters.Add(new OpenApiParameter
+            AddQuery(new OpenApiParameter
             {
-                Schema = number,
+                Schema = numberSchema,
                 Name = "$top",
-                Description = "Optional OData parameter to define the number of items to retrieve.",
-                Kind = OpenApiParameterKind.Query
+                Description = "Optional OData parameter to define the number of items to retrieve."
             });
 
-            operation.Parameters.Add(new OpenApiParameter
+            AddQuery(new OpenApiParameter
             {
-                Schema = number,
+                Schema = numberSchema,
                 Name = "$skip",
-                Description = "Optional OData parameter to skip items.",
-                Kind = OpenApiParameterKind.Query
+                Description = "Optional OData parameter to skip items."
             });
 
-            operation.Parameters.Add(new OpenApiParameter
+            AddQuery(new OpenApiParameter
             {
-                Schema = @string,
+                Schema = stringSchema,
                 Name = "$orderby",
-                Description = "Optional OData order definition to sort the result set.",
-                Kind = OpenApiParameterKind.Query
+                Description = "Optional OData order definition to sort the result set."
             });
 
-            operation.Parameters.Add(new OpenApiParameter
+            AddQuery(new OpenApiParameter
             {
-                Schema = @string,
+                Schema = stringSchema,
                 Name = "$filter",
-                Description = "Optional OData order definition to filter the result set.",
-                Kind = OpenApiParameterKind.Query
+                Description = "Optional OData order definition to filter the result set."
             });
 
-            operation.Parameters.Add(new OpenApiParameter
+            AddQuery(new OpenApiParameter
             {
-                Schema = @string,
+                Schema = stringSchema,
                 Name = "q",
-                Description = "JSON query as well formatted json string. Overrides all other query parameters, except 'ids'.",
-                Kind = OpenApiParameterKind.Query
+                Description = "JSON query as well formatted json string. Overrides all other query parameters, except 'ids'."
             });
 
-            operation.Parameters.Add(new OpenApiParameter
+            AddQuery(new OpenApiParameter
             {
-                Schema = @string,
+                Schema = stringSchema,
                 Name = "ids",
-                Description = "Comma separated list of content items. Overrides all other query parameters.",
-                Kind = OpenApiParameterKind.Query
+                Description = "Comma separated list of content items. Overrides all other query parameters."
             });
         }
     }
