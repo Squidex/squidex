@@ -173,7 +173,7 @@ steps:
     image: plugins/github-release
     settings:
       api_key:
-        from_secret: NUGET_KEY
+        from_secret: GITHUB_TOKEN
       files:
         - /release/binaries.zip
     volumes:
@@ -212,8 +212,8 @@ volumes:
       path: /var/lib/docker
 ---
 kind: secret
-name: NUGET_KEY
-data: 7MOgaTTaiCYWGeilp5nJK2JRbGOY6u4IvbcAJ1FXStXlgYFXQMRJZaXMf2F1q5lIwTOEBZVgtnP+DvJvy/dKYjiEg97rPvqPkhI=
+name: GITHUB_TOKEN
+data: ug4jjv04VM8v6+j18pGC/xVcnhB55AQI+F6Raz3mmZ7JRWYwDcu7x1PryHhkFBErtGrQHMHvr5EhAqwMaun7WurKUnI=
 ---
 kind: secret
 name: DOCKER_USERNAME
