@@ -22,7 +22,6 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
 using Squidex.Log;
 using Xunit;
@@ -804,7 +803,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(None.Value);
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Null(sut.Snapshot.NewVersion);
 
@@ -869,14 +868,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 x.ContentId == contentId && x.User == User;
         }
 
-        protected T CreateContentEvent<T>(T @event) where T : ContentEvent
+        private T CreateContentEvent<T>(T @event) where T : ContentEvent
         {
             @event.ContentId = contentId;
 
             return CreateEvent(@event);
         }
 
-        protected T CreateContentCommand<T>(T command) where T : ContentCommand
+        private T CreateContentCommand<T>(T command) where T : ContentCommand
         {
             command.ContentId = contentId;
 

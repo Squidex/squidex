@@ -30,21 +30,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.contextProvider = contextProvider;
         }
 
-        public override async Task HandleAsync(CommandContext context, NextDelegate next)
+        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
         {
-            await base.HandleAsync(context, next);
+            var payload = await base.EnrichResultAsync(context, result);
 
-            if (context.PlainResult is IRuleEntity rule && NotEnriched(context))
+            if (payload is IRuleEntity rule && payload is not IEnrichedRuleEntity)
             {
-                var enriched = await ruleEnricher.EnrichAsync(rule, contextProvider.Context);
-
-                context.Complete(enriched);
+                payload = await ruleEnricher.EnrichAsync(rule, contextProvider.Context);
             }
-        }
 
-        private static bool NotEnriched(CommandContext context)
-        {
-            return !(context.PlainResult is IEnrichedRuleEntity);
+            return payload;
         }
     }
 }

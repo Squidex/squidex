@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -16,6 +17,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
+using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
@@ -76,6 +78,30 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         protected CommandContext CreateCommandContext<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
             return new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
+        }
+
+        protected async Task<CommandContext> HandleAsync<TCommand>(ICommandMiddleware middleware, TCommand command) where TCommand : SquidexCommand
+        {
+            var context = new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
+
+            await middleware.HandleAsync(context);
+
+            return context;
+        }
+
+        protected async Task<object> PublishIdempotentAsync<T>(DomainObjectBase<T> domainObject, IAggregateCommand command) where T : class, IDomainState<T>, new()
+        {
+            var result = await domainObject.ExecuteAsync(command);
+
+            var previousSnapshot = domainObject.Snapshot;
+            var previousVersion = domainObject.Snapshot.Version;
+
+            await domainObject.ExecuteAsync(command);
+
+            Assert.Same(previousSnapshot, domainObject.Snapshot);
+            Assert.Equal(previousVersion, domainObject.Snapshot.Version);
+
+            return result.Payload;
         }
 
         protected TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand

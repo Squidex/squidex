@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Log;
 using Squidex.Shared.Users;
@@ -731,19 +730,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return PublishAsync(new ArchiveApp());
         }
 
-        private async Task<object?> PublishIdempotentAsync(AppCommand command)
+        private Task<object> PublishIdempotentAsync(AppCommand command)
         {
-            var result = await PublishAsync(command);
-
-            var previousSnapshot = sut.Snapshot;
-            var previousVersion = sut.Snapshot.Version;
-
-            await PublishAsync(command);
-
-            Assert.Same(previousSnapshot, sut.Snapshot);
-            Assert.Equal(previousVersion, sut.Snapshot.Version);
-
-            return result;
+            return PublishIdempotentAsync(sut, CreateCommand(command));
         }
 
         private async Task<object> PublishAsync(AppCommand command)

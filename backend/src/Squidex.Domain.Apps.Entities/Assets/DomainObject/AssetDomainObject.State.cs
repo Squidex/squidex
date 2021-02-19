@@ -116,14 +116,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                                 hasChanged = true;
                             }
 
-                            if (Is.OptionalChange(Tags, e.Tags))
+                            if (Is.OptionalSetChange(Tags, e.Tags))
                             {
                                 Tags = e.Tags;
 
                                 hasChanged = true;
                             }
 
-                            if (Is.OptionalChange(Metadata, e.Metadata))
+                            if (Is.OptionalMapChange(Metadata, e.Metadata))
                             {
                                 Metadata = e.Metadata;
 

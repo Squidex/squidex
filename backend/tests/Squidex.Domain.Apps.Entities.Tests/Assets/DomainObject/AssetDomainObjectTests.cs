@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Log;
 using Xunit;
 
@@ -45,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._))
-                .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x)!));
+                .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? new Dictionary<string, string>()));
 
             sut = new AssetDomainObject(Store, A.Dummy<ISemanticLog>(), tagService, assetQuery, contentRepository);
             sut.Setup(Id);
@@ -275,12 +274,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private Task ExecuteCreateAsync()
         {
-            return PublishAsync(new CreateAsset { File = file });
+            return PublishAsync(new CreateAsset { File = file, FileHash = "123" });
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return PublishAsync(new UpdateAsset { File = file });
+            return PublishAsync(new UpdateAsset { File = file, FileHash = "456" });
         }
 
         private Task ExecuteDeleteAsync()
@@ -288,33 +287,23 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             return PublishAsync(new DeleteAsset());
         }
 
-        protected T CreateAssetEvent<T>(T @event) where T : AssetEvent
+        private T CreateAssetEvent<T>(T @event) where T : AssetEvent
         {
             @event.AssetId = assetId;
 
             return CreateEvent(@event);
         }
 
-        protected T CreateAssetCommand<T>(T command) where T : AssetCommand
+        private T CreateAssetCommand<T>(T command) where T : AssetCommand
         {
             command.AssetId = assetId;
 
             return CreateCommand(command);
         }
 
-        private async Task<object?> PublishIdempotentAsync(AssetCommand command)
+        private Task<object> PublishIdempotentAsync(AssetCommand command)
         {
-            var result = await PublishAsync(command);
-
-            var previousSnapshot = sut.Snapshot;
-            var previousVersion = sut.Snapshot.Version;
-
-            await PublishAsync(command);
-
-            Assert.Same(previousSnapshot, sut.Snapshot);
-            Assert.Equal(previousVersion, sut.Snapshot.Version);
-
-            return result;
+            return PublishIdempotentAsync(sut, CreateAssetCommand(command));
         }
 
         private async Task<object> PublishAsync(AssetCommand command)

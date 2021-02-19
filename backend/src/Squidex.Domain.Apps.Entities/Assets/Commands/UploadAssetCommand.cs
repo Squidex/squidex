@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
-using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {

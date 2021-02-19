@@ -696,7 +696,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }");
 
-            commandContext.Complete(None.Value);
+            commandContext.Complete(new CommandResult(contentId, 13, 12));
 
             var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsDeleteOwn);
 

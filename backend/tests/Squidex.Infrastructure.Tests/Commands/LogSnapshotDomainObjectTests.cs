@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.Commands
                 return true;
             }
 
-            public override Task<object?> ExecuteAsync(IAggregateCommand command)
+            public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
             {
                 switch (command)
                 {
@@ -85,9 +85,9 @@ namespace Squidex.Infrastructure.Commands
 
                             return "UPDATED";
                         });
+                    default:
+                        throw new NotSupportedException();
                 }
-
-                return Task.FromResult<object?>(null);
             }
         }
 
@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustNotHaveHappened();
 
-            Assert.True(result is EntityCreatedResult<DomainId>);
+            Assert.Equal(new CommandResult(id, 0, EtagVersion.Empty), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
 
@@ -191,7 +191,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustNotHaveHappened();
 
-            Assert.True(result is EntitySavedResult);
+            Assert.Equal(new CommandResult(id, 1, 0), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
 
@@ -213,7 +213,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustHaveHappenedOnceExactly();
 
-            Assert.True(result is EntitySavedResult);
+            Assert.Equal(new CommandResult(id, 1, 0), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
 
@@ -264,7 +264,7 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = MyDomainState.Unchanged });
 
-            Assert.True(result is EntitySavedResult);
+            Assert.Equal(new CommandResult(id, 0, 0), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
 
@@ -322,7 +322,7 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new CreateCustom());
 
-            Assert.Equal("CREATED", result);
+            Assert.Equal(new CommandResult(id, 0, EtagVersion.Empty, "CREATED"), result);
         }
 
         [Fact]
@@ -332,7 +332,7 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new UpdateCustom());
 
-            Assert.Equal("UPDATED", result);
+            Assert.Equal(new CommandResult(id, 1, 0, "UPDATED"), result);
         }
 
         [Fact]

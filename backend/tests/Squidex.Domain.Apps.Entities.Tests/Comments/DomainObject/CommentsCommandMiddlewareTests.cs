@@ -40,17 +40,15 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         public async Task Should_invoke_grain_for_comments_command()
         {
             var command = CreateCommentsCommand(new CreateComment());
-            var context = CreateContextForCommand(command);
+            var context = CrateCommandContext(command);
 
             var grain = A.Fake<ICommentsGrain>();
-
-            var result = "Completed";
 
             A.CallTo(() => grainFactory.GetGrain<ICommentsGrain>(commentsId.ToString(), null))
                 .Returns(grain);
 
             A.CallTo(() => grain.ExecuteAsync(A<J<CommentsCommand>>.That.Matches(x => x.Value == command)))
-                .Returns(new J<object>(result));
+                .Returns(new CommandResult(commentsId, 0, 0).AsJ());
 
             var isNextCalled = false;
 
@@ -62,9 +60,6 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             });
 
             Assert.True(isNextCalled);
-
-            A.CallTo(() => grain.ExecuteAsync(A<J<CommentsCommand>>.That.Matches(x => x.Value == command)))
-                .Returns(new J<object>(12));
         }
 
         [Fact]
@@ -78,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 Text = "Hi @mail1@squidex.io, @mail2@squidex.io and @notfound@squidex.io"
             });
 
-            var context = CreateContextForCommand(command);
+            var context = CrateCommandContext(command);
 
             await sut.HandleAsync(context);
 
@@ -96,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 Text = "Hi @mail1@squidex.io and @mail2@squidex.io"
             });
 
-            var context = CreateContextForCommand(command);
+            var context = CrateCommandContext(command);
 
             await sut.HandleAsync(context);
 
@@ -112,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 Text = "Hi invalid@squidex.io"
             });
 
-            var context = CreateContextForCommand(command);
+            var context = CrateCommandContext(command);
 
             await sut.HandleAsync(context);
 
@@ -128,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 Text = "Hi @invalid@squidex.io", IsMention = true
             };
 
-            var context = CreateContextForCommand(command);
+            var context = CrateCommandContext(command);
 
             await sut.HandleAsync(context);
 
@@ -136,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 .MustNotHaveHappened();
         }
 
-        protected CommandContext CreateContextForCommand<TCommand>(TCommand command) where TCommand : CommentsCommand
+        private CommandContext CrateCommandContext(ICommand command)
         {
             return new CommandContext(command, commandBus);
         }
@@ -152,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 .Returns(user);
         }
 
-        protected T CreateCommentsCommand<T>(T command) where T : CommentsCommand
+        private T CreateCommentsCommand<T>(T command) where T : CommentsCommand
         {
             command.Actor = actor;
             command.AppId = appId;

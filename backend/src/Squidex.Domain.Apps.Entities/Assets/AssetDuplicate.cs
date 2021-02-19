@@ -5,19 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetCreatedResult
+    public sealed record AssetDuplicate(IEnrichedAssetEntity Asset)
     {
-        public IEnrichedAssetEntity Asset { get; }
-
-        public bool IsDuplicate { get; }
-
-        public AssetCreatedResult(IEnrichedAssetEntity asset, bool isDuplicate)
-        {
-            Asset = asset;
-
-            IsDuplicate = isDuplicate;
-        }
     }
 }

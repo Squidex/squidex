@@ -68,9 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                                 if (existing != null)
                                 {
-                                    var result = new AssetCreatedResult(existing, true);
-
-                                    context.Complete(result);
+                                    context.Complete(new AssetDuplicate(existing));
 
                                     await next(context);
                                     return;

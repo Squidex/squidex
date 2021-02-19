@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected virtual Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
         {
-            return Task.FromResult(result.Payload);
+            return Task.FromResult(result.Payload is None ? result : result.Payload);
         }
 
         private async Task<CommandResult> ExecuteCommandAsync(TCommand typedCommand)

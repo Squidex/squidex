@@ -32,12 +32,12 @@ namespace Squidex.Infrastructure.Commands
             return !string.IsNullOrWhiteSpace(newValue) && !string.Equals(oldValue, newValue);
         }
 
-        public static bool OptionalChange<T>(ISet<T> oldValue, [NotNullWhen(true)] ISet<T>? newValue)
+        public static bool OptionalSetChange<T>(ISet<T> oldValue, [NotNullWhen(true)] ISet<T>? newValue)
         {
             return newValue != null && !newValue.SetEquals(oldValue);
         }
 
-        public static bool OptionalChange<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> oldValue, [NotNullWhen(true)] IReadOnlyDictionary<TKey, TValue>? newValue) where TKey : notnull
+        public static bool OptionalMapChange<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> oldValue, [NotNullWhen(true)] IReadOnlyDictionary<TKey, TValue>? newValue) where TKey : notnull
         {
             return newValue != null && !newValue.EqualsDictionary(oldValue);
         }

@@ -314,9 +314,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = await CommandBus.PublishAsync(command);
 
-            if (context.PlainResult is AssetCreatedResult created)
+            if (context.PlainResult is AssetDuplicate created)
             {
-                return AssetDto.FromAsset(created.Asset, Resources, created.IsDuplicate);
+                return AssetDto.FromAsset(created.Asset, Resources, true);
             }
             else
             {
