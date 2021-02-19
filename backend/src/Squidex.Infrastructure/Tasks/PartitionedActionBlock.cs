@@ -23,18 +23,8 @@ namespace Squidex.Infrastructure.Tasks
             get { return Task.WhenAll(workers.Select(x => x.Completion)); }
         }
 
-        public PartitionedActionBlock(Action<TInput> action, Func<TInput, long> partitioner)
-            : this (action?.ToAsync()!, partitioner, new ExecutionDataflowBlockOptions())
-        {
-        }
-
         public PartitionedActionBlock(Func<TInput, Task> action, Func<TInput, long> partitioner)
             : this(action, partitioner, new ExecutionDataflowBlockOptions())
-        {
-        }
-
-        public PartitionedActionBlock(Action<TInput> action, Func<TInput, long> partitioner, ExecutionDataflowBlockOptions dataflowBlockOptions)
-            : this(action?.ToAsync()!, partitioner, dataflowBlockOptions)
         {
         }
 

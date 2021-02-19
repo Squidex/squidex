@@ -62,75 +62,75 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 Equals(assetCommand.AssetId, Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
-                case CreateAsset createAsset:
-                    return CreateReturnAsync(createAsset, async c =>
+                case CreateAsset c:
+                    return CreateReturnAsync(c, async create =>
                     {
-                        await GuardAsset.CanCreate(c, assetQuery);
+                        await GuardAsset.CanCreate(create, assetQuery);
 
-                        if (c.Tags != null)
+                        if (create.Tags != null)
                         {
-                            c.Tags = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
+                            create.Tags = await NormalizeTagsAsync(create.AppId.Id, create.Tags);
                         }
 
-                        Create(c);
+                        Create(create);
 
                         return Snapshot;
                     });
 
-                case AnnotateAsset annotateAsset:
-                    return UpdateReturnAsync(annotateAsset, async c =>
+                case AnnotateAsset c:
+                    return UpdateReturnAsync(c, async annotate =>
                     {
-                        GuardAsset.CanAnnotate(c);
+                        GuardAsset.CanAnnotate(annotate);
 
-                        if (c.Tags != null)
+                        if (annotate.Tags != null)
                         {
-                            c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
+                            annotate.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, annotate.Tags);
                         }
 
-                        Annotate(c);
+                        Annotate(annotate);
 
                         return Snapshot;
                     });
 
-                case UpdateAsset updateAsset:
-                    return UpdateReturn(updateAsset, c =>
+                case UpdateAsset c:
+                    return UpdateReturn(c, update =>
                     {
-                        GuardAsset.CanUpdate(c);
+                        GuardAsset.CanUpdate(update);
 
-                        Update(c);
+                        Update(update);
 
                         return Snapshot;
                     });
 
-                case MoveAsset moveAsset:
-                    return UpdateReturnAsync(moveAsset, async c =>
+                case MoveAsset c:
+                    return UpdateReturnAsync(c, async move =>
                     {
-                        await GuardAsset.CanMove(c, Snapshot, assetQuery);
+                        await GuardAsset.CanMove(move, Snapshot, assetQuery);
 
-                        Move(c);
+                        Move(move);
 
                         return Snapshot;
                     });
 
-                case DeleteAsset deleteAsset:
-                    return UpdateAsync(deleteAsset, async c =>
+                case DeleteAsset c:
+                    return UpdateAsync(c, async delete =>
                     {
-                        await GuardAsset.CanDelete(c, Snapshot, contentRepository);
+                        await GuardAsset.CanDelete(delete, Snapshot, contentRepository);
 
-                        await assetTags.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, null, Snapshot.Tags);
+                        await NormalizeTagsAsync(Snapshot.AppId.Id, null);
 
-                        Delete(c);
+                        Delete(delete);
                     });
                 default:
                     throw new NotSupportedException();
             }
         }
 
-        private async Task<HashSet<string>> NormalizeTagsAsync(DomainId appId, HashSet<string> tags)
+        private async Task<HashSet<string>> NormalizeTagsAsync(DomainId appId, HashSet<string>? tags)
         {
             var normalized = await assetTags.NormalizeTagsAsync(appId, TagGroups.Assets, tags, Snapshot.Tags);
 

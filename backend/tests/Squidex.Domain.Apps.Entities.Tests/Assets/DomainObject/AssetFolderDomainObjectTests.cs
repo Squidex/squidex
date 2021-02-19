@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             return result;
         }
 
-        private async Task<object?> PublishAsync(AssetFolderCommand command)
+        private async Task<object> PublishAsync(AssetFolderCommand command)
         {
             var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command));
 

@@ -68,15 +68,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                             SimpleMapper.Map(e, this);
 
-                            FileName = e.FileName;
-
-                            if (string.IsNullOrWhiteSpace(e.Slug))
+                            if (string.IsNullOrWhiteSpace(Slug))
                             {
-                                Slug = e.FileName.ToAssetSlug();
-                            }
-                            else
-                            {
-                                Slug = e.Slug;
+                                Slug = FileName.ToAssetSlug();
                             }
 
                             TotalSize += e.FileSize;
@@ -86,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             return true;
                         }
 
-                    case AssetUpdated e:
+                    case AssetUpdated e when Is.Change(e.FileHash, FileHash):
                         {
                             SimpleMapper.Map(e, this);
 

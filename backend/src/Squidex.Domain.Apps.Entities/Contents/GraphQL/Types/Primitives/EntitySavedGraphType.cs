@@ -7,11 +7,10 @@
 
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    internal sealed class EntitySavedGraphType : ObjectGraphType<EntitySavedResult>
+    internal sealed class EntitySavedGraphType : ObjectGraphType<IEntityWithVersion>
     {
         public static readonly IGraphType Nullable = new EntitySavedGraphType();
 
@@ -34,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 
         private static IFieldResolver ResolveVersion()
         {
-            return Resolvers.Sync<EntitySavedResult, long>(x => x.Version);
+            return Resolvers.Sync<IEntityWithVersion, long>(x => x.Version);
         }
     }
 }

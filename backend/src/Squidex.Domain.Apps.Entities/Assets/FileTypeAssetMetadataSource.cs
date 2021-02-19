@@ -14,15 +14,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class FileTypeAssetMetadataSource : IAssetMetadataSource
     {
-        public Task EnhanceAsync(UploadAssetCommand command, HashSet<string>? tags)
+        public Task EnhanceAsync(UploadAssetCommand command)
         {
-            if (tags != null)
+            if (command.Tags != null)
             {
                 var extension = command.File?.FileName?.FileType();
 
                 if (!string.IsNullOrWhiteSpace(extension))
                 {
-                    tags.Add($"type/{extension.ToLowerInvariant()}");
+                    command.Tags.Add($"type/{extension.ToLowerInvariant()}");
                 }
             }
 

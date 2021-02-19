@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(4));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
 
@@ -238,7 +238,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(5));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.Null(sut.Snapshot.Plan);
 
@@ -303,7 +303,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(4));
+            result.ShouldBeEquivalent(None.Value);
 
             A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid, A<string?>._))
                 .MustNotHaveHappened();
@@ -668,7 +668,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(4));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsArchived);
 
@@ -746,11 +746,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return result;
         }
 
-        private async Task<object?> PublishAsync(AppCommand command)
+        private async Task<object> PublishAsync(AppCommand command)
         {
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            return result;
+            return result.Payload;
         }
     }
 }

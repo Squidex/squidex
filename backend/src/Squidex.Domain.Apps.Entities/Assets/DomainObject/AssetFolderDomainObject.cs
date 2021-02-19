@@ -50,46 +50,46 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 Equals(assetFolderCommand.AssetFolderId, Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
-                case CreateAssetFolder createAssetFolder:
-                    return CreateReturnAsync(createAssetFolder, async c =>
+                case CreateAssetFolder c:
+                    return CreateReturnAsync(c, async create =>
                     {
-                        await GuardAssetFolder.CanCreate(c, assetQuery);
+                        await GuardAssetFolder.CanCreate(create, assetQuery);
 
-                        Create(c);
+                        Create(create);
 
                         return Snapshot;
                     });
 
-                case MoveAssetFolder moveAssetFolder:
-                    return UpdateReturnAsync(moveAssetFolder, async c =>
+                case MoveAssetFolder c:
+                    return UpdateReturnAsync(c, async move =>
                     {
-                        await GuardAssetFolder.CanMove(c, Snapshot, assetQuery);
+                        await GuardAssetFolder.CanMove(move, Snapshot, assetQuery);
 
-                        Move(c);
+                        Move(move);
 
                         return Snapshot;
                     });
 
-                case RenameAssetFolder renameAssetFolder:
-                    return UpdateReturn(renameAssetFolder, c =>
+                case RenameAssetFolder c:
+                    return UpdateReturn(c, rename =>
                     {
-                        GuardAssetFolder.CanRename(c);
+                        GuardAssetFolder.CanRename(rename);
 
-                        Rename(c);
+                        Rename(rename);
 
                         return Snapshot;
                     });
 
-                case DeleteAssetFolder deleteAssetFolder:
-                    return Update(deleteAssetFolder, c =>
+                case DeleteAssetFolder c:
+                    return Update(c, delete =>
                     {
-                        GuardAssetFolder.CanDelete(c);
+                        GuardAssetFolder.CanDelete(delete);
 
-                        Delete(c);
+                        Delete(delete);
                     });
 
                 default:

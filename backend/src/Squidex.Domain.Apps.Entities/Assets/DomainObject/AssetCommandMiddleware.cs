@@ -48,12 +48,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public override async Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            var tempFile = context.ContextId.ToString();
-
             switch (context.Command)
             {
                 case CreateAsset createAsset:
                     {
+                        var tempFile = context.ContextId.ToString();
+
                         try
                         {
                             await EnrichWithHashAndUploadAsync(createAsset, tempFile);
@@ -77,7 +77,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                                 }
                             }
 
-                            await UploadAsync(context, tempFile, createAsset, createAsset.Tags, true, next);
+                            await EnrichWithMetadataAsync(createAsset);
+
+                            await base.HandleAsync(context, next);
                         }
                         finally
                         {
@@ -91,11 +93,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 case UpdateAsset updateAsset:
                     {
+                        var tempFile = context.ContextId.ToString();
+
                         try
                         {
                             await EnrichWithHashAndUploadAsync(updateAsset, tempFile);
+                            await EnrichWithMetadataAsync(updateAsset);
 
-                            await UploadAsync(context, tempFile, updateAsset, null, false, next);
+                            await base.HandleAsync(context, next);
                         }
                         finally
                         {
@@ -108,46 +113,31 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     }
 
                 default:
-                    await HandleCoreAsync(context, false, next);
+                    await base.HandleAsync(context, next);
                     break;
             }
         }
 
-        private async Task UploadAsync(CommandContext context, string tempFile, UploadAssetCommand command, HashSet<string>? tags, bool created,
-            NextDelegate next)
+        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
         {
-            await EnrichWithMetadataAsync(command, tags);
+            var payload = await base.EnrichResultAsync(context, result);
 
-            var asset = await HandleCoreAsync(context, created, next);
-
-            if (asset != null)
+            if (payload is IAssetEntity asset)
             {
-                await assetFileStore.CopyAsync(tempFile, command.AppId.Id, command.AssetId, asset.FileVersion);
-            }
-        }
-
-        private async Task<IEnrichedAssetEntity?> HandleCoreAsync(CommandContext context, bool created,
-            NextDelegate next)
-        {
-            await base.HandleAsync(context, next);
-
-            if (context.PlainResult is IAssetEntity asset && !(context.PlainResult is IEnrichedAssetEntity))
-            {
-                var enriched = await assetEnricher.EnrichAsync(asset, contextProvider.Context);
-
-                if (created)
+                if (result.IsChanged && context.Command is UploadAssetCommand)
                 {
-                    context.Complete(new AssetCreatedResult(enriched, false));
-                }
-                else
-                {
-                    context.Complete(enriched);
+                    var tempFile = context.ContextId.ToString();
+
+                    await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion);
                 }
 
-                return enriched;
+                if (payload is not IEnrichedAssetEntity)
+                {
+                    payload = await assetEnricher.EnrichAsync(asset, contextProvider.Context);
+                }
             }
 
-            return null;
+            return payload;
         }
 
         private async Task EnrichWithHashAndUploadAsync(UploadAssetCommand command, string tempFile)
@@ -163,11 +153,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
         }
 
-        private async Task EnrichWithMetadataAsync(UploadAssetCommand command, HashSet<string>? tags)
+        private async Task EnrichWithMetadataAsync(UploadAssetCommand command)
         {
             foreach (var metadataSource in assetMetadataSources)
             {
-                await metadataSource.EnhanceAsync(command, tags);
+                await metadataSource.EnhanceAsync(command);
             }
         }
     }

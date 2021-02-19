@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -317,11 +317,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             return result;
         }
 
-        private async Task<object?> PublishAsync(AssetCommand command)
+        private async Task<object> PublishAsync(AssetCommand command)
         {
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            return result;
+            return result.Payload;
         }
     }
 }

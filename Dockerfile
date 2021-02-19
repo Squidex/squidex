@@ -36,7 +36,7 @@ RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --co
 #
 # Stage 2, Build Frontend
 #
-FROM buildkite/puppeteer:latest as frontend
+FROM buildkite/puppeteer:5.2.1 as frontend
 
 WORKDIR /src
 

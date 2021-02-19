@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.Commands
             return base.OnActivateAsync(key);
         }
 
-        public async Task<J<object?>> ExecuteAsync(J<CommandRequest> request)
+        public async Task<J<CommandResult>> ExecuteAsync(J<CommandRequest> request)
         {
             request.Value.ApplyContext();
 

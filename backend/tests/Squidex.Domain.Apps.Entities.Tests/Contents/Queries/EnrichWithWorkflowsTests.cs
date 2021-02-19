@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var content = new ContentEntity { SchemaId = schemaId };
 
             A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
-                .Returns(Task.FromResult<StatusInfo>(null!));
+                .Returns(Task.FromResult<StatusInfo?>(null!));
 
             var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
 

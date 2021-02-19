@@ -734,7 +734,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -804,7 +804,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.Null(sut.Snapshot.NewVersion);
 
@@ -883,11 +883,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return CreateCommand(command);
         }
 
-        private async Task<object?> PublishAsync(ContentCommand command)
+        private async Task<object> PublishAsync(ContentCommand command)
         {
             var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
-            return result;
+            return result.Payload;
         }
     }
 }

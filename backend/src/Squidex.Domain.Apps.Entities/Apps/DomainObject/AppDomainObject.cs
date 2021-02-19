@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return command is AppUpdateCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {

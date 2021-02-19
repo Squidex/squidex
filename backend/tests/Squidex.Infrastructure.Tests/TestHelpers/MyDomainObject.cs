@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Commands;
@@ -20,7 +21,7 @@ namespace Squidex.Infrastructure.TestHelpers
         {
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
@@ -51,9 +52,9 @@ namespace Squidex.Infrastructure.TestHelpers
 
                         return "UPDATED";
                     });
+                default:
+                    throw new NotSupportedException();
             }
-
-            return Task.FromResult<object?>(null);
         }
     }
 

@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -232,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         {
             var result = await sut.ExecuteAsync(CreateRuleCommand(command));
 
-            return result;
+            return result.Payload;
         }
     }
 }

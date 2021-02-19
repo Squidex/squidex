@@ -91,7 +91,7 @@ namespace Squidex.Web.CommandMiddlewares
             var command = new CreateContent();
             var context = Ctx(command);
 
-            context.Complete(new EntitySavedResult(17));
+            context.Complete(None.Value);
 
             await sut.HandleAsync(context);
 

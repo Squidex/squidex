@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 Equals(contentCommand.ContentId, Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
