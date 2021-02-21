@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
@@ -19,6 +20,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
         public UpsertContent()
         {
             ContentId = DomainId.NewGuid();
+        }
+
+        public CreateContent AsCreate()
+        {
+            return SimpleMapper.Map(this, new CreateContent());
+        }
+
+        public ChangeContentStatus AsChange(Status status)
+        {
+            return SimpleMapper.Map(this, new ChangeContentStatus { Status = status });
         }
     }
 }

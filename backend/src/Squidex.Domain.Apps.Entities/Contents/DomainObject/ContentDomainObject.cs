@@ -69,19 +69,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         }
                         else
                         {
-                            var create = SimpleMapper.Map(c, new CreateContent());
-
-                            await CreateAsync(create);
+                            await CreateAsync(c.AsCreate());
                         }
 
                         if (Is.OptionalChange(Snapshot.EditingStatus, c.Status))
                         {
-                            var changeStatus = SimpleMapper.Map(c, new ChangeContentStatus
-                            {
-                                Status = c.Status.Value
-                            });
-
-                            await ChangeStatusAsync(changeStatus);
+                            await ChangeStatusAsync(c.AsChange(c.Status.Value));
                         }
 
                         return Snapshot;
@@ -94,14 +87,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                         await CreateAsync(c);
 
-                        if (c.Status != null && c.Status != Snapshot.Status)
+                        if (Is.OptionalChange(Snapshot.EditingStatus, c.Status))
                         {
-                            var changeStatus = SimpleMapper.Map(c, new ChangeContentStatus
-                            {
-                                Status = c.Status.Value
-                            });
-
-                            await ChangeStatusAsync(changeStatus);
+                            await ChangeStatusAsync(c.AsChange(c.Status.Value));
                         }
 
                         return Snapshot;
