@@ -146,6 +146,7 @@ namespace Squidex.Infrastructure
         public static readonly Language OJ = AddLanguage("oj", "Ojibwa");
         public static readonly Language OM = AddLanguage("om", "Oromo");
         public static readonly Language OR = AddLanguage("or", "Oriya");
+        public static readonly Language PA = AddLanguage("pa", "Punjabi");
         public static readonly Language PI = AddLanguage("pi", "Pali");
         public static readonly Language PL = AddLanguage("pl", "Polish");
         public static readonly Language PS = AddLanguage("ps", "Pushto");
@@ -518,6 +519,7 @@ namespace Squidex.Infrastructure
         public static readonly Language OromoEthiopia = AddLanguage("om-ET", "Oromo (Ethiopia)");
         public static readonly Language OromoKenya = AddLanguage("om-KE", "Oromo (Kenya)");
         public static readonly Language OdiaIndia = AddLanguage("or-IN", "Odia (India)");
+        public static readonly Language PunjabiIndia = AddLanguage("pa-IN", "Punjabi (India)");
         public static readonly Language PolishPoland = AddLanguage("pl-PL", "Polish (Poland)");
         public static readonly Language PashtoAfghanistan = AddLanguage("ps-AF", "Pashto (Afghanistan)");
         public static readonly Language PortugueseAngola = AddLanguage("pt-AO", "Portuguese (Angola)");
