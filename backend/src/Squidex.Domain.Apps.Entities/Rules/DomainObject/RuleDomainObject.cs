@@ -77,8 +77,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         return Snapshot;
                     });
 
-                case EnableRule enableRule:
-                    return UpdateReturn(enableRule, c =>
+                case EnableRule enable:
+                    return UpdateReturn(enable, c =>
                     {
                         GuardRule.CanEnable(c);
 
@@ -87,8 +87,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         return Snapshot;
                     });
 
-                case DisableRule disableRule:
-                    return UpdateReturn(disableRule, c =>
+                case DisableRule disable:
+                    return UpdateReturn(disable, c =>
                     {
                         GuardRule.CanDisable(c);
 
@@ -97,10 +97,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         return Snapshot;
                     });
 
-                case DeleteRule deleteRule:
-                    return Update(deleteRule, c =>
+                case DeleteRule delete:
+                    return Update(delete, c =>
                     {
-                        GuardRule.CanDelete(deleteRule);
+                        GuardRule.CanDelete(delete);
 
                         Delete(c);
                     });

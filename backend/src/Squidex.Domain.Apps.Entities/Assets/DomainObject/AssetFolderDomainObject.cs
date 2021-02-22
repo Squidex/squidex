@@ -64,32 +64,32 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         return Snapshot;
                     });
 
-                case MoveAssetFolder c:
-                    return UpdateReturnAsync(c, async move =>
+                case MoveAssetFolder move:
+                    return UpdateReturnAsync(move, async c =>
                     {
-                        await GuardAssetFolder.CanMove(move, Snapshot, assetQuery);
+                        await GuardAssetFolder.CanMove(c, Snapshot, assetQuery);
 
-                        Move(move);
+                        Move(c);
 
                         return Snapshot;
                     });
 
-                case RenameAssetFolder c:
-                    return UpdateReturn(c, rename =>
+                case RenameAssetFolder rename:
+                    return UpdateReturn(rename, c =>
                     {
-                        GuardAssetFolder.CanRename(rename);
+                        GuardAssetFolder.CanRename(c);
 
-                        Rename(rename);
+                        Rename(c);
 
                         return Snapshot;
                     });
 
-                case DeleteAssetFolder c:
-                    return Update(c, delete =>
+                case DeleteAssetFolder delete:
+                    return Update(delete, c =>
                     {
-                        GuardAssetFolder.CanDelete(delete);
+                        GuardAssetFolder.CanDelete(c);
 
-                        Delete(delete);
+                        Delete(c);
                     });
 
                 default:

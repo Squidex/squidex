@@ -89,14 +89,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         break;
                     }
 
-                case UpdateAsset updateAsset:
+                case UploadAssetCommand upload:
                     {
                         var tempFile = context.ContextId.ToString();
 
                         try
                         {
-                            await EnrichWithHashAndUploadAsync(updateAsset, tempFile);
-                            await EnrichWithMetadataAsync(updateAsset);
+                            await EnrichWithHashAndUploadAsync(upload, tempFile);
+                            await EnrichWithMetadataAsync(upload);
 
                             await base.HandleAsync(context, next);
                         }
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         {
                             await assetFileStore.DeleteAsync(tempFile);
 
-                            updateAsset.File.Dispose();
+                            upload.File.Dispose();
                         }
 
                         break;

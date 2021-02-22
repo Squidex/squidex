@@ -68,8 +68,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             switch (command)
             {
-                case CreateApp createApp:
-                    return CreateReturn(createApp, c =>
+                case CreateApp create:
+                    return CreateReturn(create, c =>
                     {
                         GuardApp.CanCreate(c);
 
@@ -78,8 +78,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         return Snapshot;
                     });
 
-                case UpdateApp updateApp:
-                    return UpdateReturn(updateApp, c =>
+                case UpdateApp update:
+                    return UpdateReturn(update, c =>
                     {
                         GuardApp.CanUpdate(c);
 
@@ -304,8 +304,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                     });
 
-                case ArchiveApp archiveApp:
-                    return UpdateAsync(archiveApp, async c =>
+                case ArchiveApp archive:
+                    return UpdateAsync(archive, async c =>
                     {
                         await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
 

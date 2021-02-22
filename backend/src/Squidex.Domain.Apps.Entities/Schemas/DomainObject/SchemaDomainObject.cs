@@ -71,8 +71,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case SynchronizeSchema synchronizeSchema:
-                    return UpdateReturn(synchronizeSchema, c =>
+                case SynchronizeSchema synchronize:
+                    return UpdateReturn(synchronize, c =>
                     {
                         GuardSchema.CanSynchronize(c);
 
@@ -161,8 +161,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case UpdateSchema updateSchema:
-                    return UpdateReturn(updateSchema, c =>
+                case UpdateSchema update:
+                    return UpdateReturn(update, c =>
                     {
                         GuardSchema.CanUpdate(c);
 
@@ -171,8 +171,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case PublishSchema publishSchema:
-                    return UpdateReturn(publishSchema, c =>
+                case PublishSchema publish:
+                    return UpdateReturn(publish, c =>
                     {
                         GuardSchema.CanPublish(c);
 
@@ -181,8 +181,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case UnpublishSchema unpublishSchema:
-                    return UpdateReturn(unpublishSchema, c =>
+                case UnpublishSchema unpublish:
+                    return UpdateReturn(unpublish, c =>
                     {
                         GuardSchema.CanUnpublish(c);
 

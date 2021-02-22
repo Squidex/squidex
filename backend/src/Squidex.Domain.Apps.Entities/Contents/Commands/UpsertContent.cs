@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public sealed class UpsertContent : UpdateContent, ISchemaCommand
+    public sealed class UpsertContent : ContentDataCommand, ISchemaCommand
     {
         public Status? Status { get; set; }
 
@@ -25,6 +25,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
         public CreateContent AsCreate()
         {
             return SimpleMapper.Map(this, new CreateContent());
+        }
+
+        public UpdateContent AsUpdate()
+        {
+            return SimpleMapper.Map(this, new UpdateContent());
         }
 
         public ChangeContentStatus AsChange(Status status)

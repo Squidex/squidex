@@ -66,52 +66,66 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             switch (command)
             {
+                case UpsertAsset upsert:
+                    return UpsertReturnAsync(upsert, async c =>
+                    {
+                        if (Version > EtagVersion.Empty)
+                        {
+                            UpdateCore(c.AsUpdate());
+                        }
+                        else
+                        {
+                            await CreateCore(c.AsCreate());
+                        }
+
+                        if (Is.Change(c.ParentId, Snapshot.ParentId))
+                        {
+                            await MoveCore(c.AsMove());
+                        }
+
+                        return Snapshot;
+                    });
+
                 case CreateAsset c:
                     return CreateReturnAsync(c, async create =>
                     {
-                        await GuardAsset.CanCreate(create, assetQuery);
+                        await CreateCore(create);
 
-                        if (create.Tags != null)
+                        if (Is.Change(c.ParentId, Snapshot.ParentId))
                         {
-                            create.Tags = await NormalizeTagsAsync(create.AppId.Id, create.Tags);
+                            await MoveCore(c.AsMove());
                         }
-
-                        Create(create);
 
                         return Snapshot;
                     });
 
-                case AnnotateAsset c:
-                    return UpdateReturnAsync(c, async annotate =>
+                case AnnotateAsset annotate:
+                    return UpdateReturnAsync(annotate, async c =>
                     {
-                        GuardAsset.CanAnnotate(annotate);
+                        GuardAsset.CanAnnotate(c);
 
-                        if (annotate.Tags != null)
+                        if (c.Tags != null)
                         {
-                            annotate.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, annotate.Tags);
+                            c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
                         }
 
-                        Annotate(annotate);
+                        Annotate(c);
 
                         return Snapshot;
                     });
 
-                case UpdateAsset c:
-                    return UpdateReturn(c, update =>
+                case UpdateAsset update:
+                    return UpdateReturn(update, update =>
                     {
-                        GuardAsset.CanUpdate(update);
-
                         Update(update);
 
                         return Snapshot;
                     });
 
-                case MoveAsset c:
-                    return UpdateReturnAsync(c, async move =>
+                case MoveAsset move:
+                    return UpdateReturnAsync(move, async c =>
                     {
-                        await GuardAsset.CanMove(move, Snapshot, assetQuery);
-
-                        Move(move);
+                        await MoveCore(c);
 
                         return Snapshot;
                     });
@@ -128,6 +142,32 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 default:
                     throw new NotSupportedException();
             }
+        }
+
+        private async Task CreateCore(CreateAsset create)
+        {
+            GuardAsset.CanCreate(create);
+
+            if (create.Tags != null)
+            {
+                create.Tags = await NormalizeTagsAsync(create.AppId.Id, create.Tags);
+            }
+
+            Create(create);
+        }
+
+        private async Task MoveCore(MoveAsset c)
+        {
+            await GuardAsset.CanMove(c, Snapshot, assetQuery);
+
+            Move(c);
+        }
+
+        private void UpdateCore(UpdateAsset update)
+        {
+            GuardAsset.CanUpdate(update);
+
+            Update(update);
         }
 
         private async Task<HashSet<string>> NormalizeTagsAsync(DomainId appId, HashSet<string>? tags)
