@@ -16,13 +16,13 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class BulkUpdateDto
+    public sealed class BulkUpdateContentsDto
     {
         /// <summary>
         /// The contents to update or insert.
         /// </summary>
         [LocalizedRequired]
-        public BulkUpdateJobDto[]? Jobs { get; set; }
+        public BulkUpdateContentsJobDto[]? Jobs { get; set; }
 
         /// <summary>
         /// True to automatically publish the content.

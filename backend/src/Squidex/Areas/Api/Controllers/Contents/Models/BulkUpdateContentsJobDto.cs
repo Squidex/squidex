@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public class BulkUpdateJobDto
+    public class BulkUpdateContentsJobDto
     {
         /// <summary>
         /// An optional query to identify the content to update.

@@ -74,10 +74,13 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<AssetsBulkUpdateCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<BulkUpdateCommandMiddleware>()
+            services.AddSingletonAs<ContentsBulkUpdateCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<ContentCommandMiddleware>()

@@ -374,7 +374,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The import request.</param>
         /// <returns>
-        /// 201 => Contents created.
+        /// 200 => Contents created.
         /// 400 => Content request not valid.
         /// 404 => Content references, schema or app not found.
         /// </returns>
@@ -394,7 +394,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromImportResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -406,9 +406,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The bulk update request.</param>
         /// <returns>
-        /// 201 => Contents created.
-        /// 400 => Content request not valid.
-        /// 404 => Content references, schema or app not found.
+        /// 201 => Contents created, update or delete.
+        /// 400 => Contents request not valid.
+        /// 404 => Contents references, schema or app not found.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
@@ -418,14 +418,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContents)]
         [ApiCosts(5)]
-        public async Task<IActionResult> BulkContents(string app, string name, [FromBody] BulkUpdateDto request)
+        public async Task<IActionResult> BulkContents(string app, string name, [FromBody] BulkUpdateContentsDto request)
         {
             var command = request.ToCommand();
 
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromImportResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -438,7 +438,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="id">The id of the content item to update.</param>
         /// <param name="request">The request parameters.</param>
         /// <returns>
-        /// 200 => Content updated.
+        /// 200 => Content created or updated.
         /// 400 => Content request not valid.
         /// 404 => Content references, schema or app not found.
         /// </returns>

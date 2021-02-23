@@ -5,17 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure;
-
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class BulkUpdateResultItem
+    public enum BulkUpdateType
     {
-        public DomainId? ContentId { get; set; }
-
-        public int JobIndex { get; set; }
-
-        public Exception? Exception { get; set; }
+        Annotate,
+        Move,
+        Delete
     }
 }

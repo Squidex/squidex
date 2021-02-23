@@ -7,7 +7,7 @@
 
 using System.Collections.Generic;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities
 {
     public sealed class BulkUpdateResult : List<BulkUpdateResultItem>
     {

@@ -5,35 +5,32 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class UpsertAsset : UploadAssetCommand
+    public sealed class BulkUpdateJob
     {
+        public BulkUpdateType Type { get; set; }
+
+        public DomainId Id { get; set; }
+
         public DomainId ParentId { get; set; }
 
         public string? ParentPath { get; set; }
 
-        public UpsertAsset()
-        {
-            AssetId = DomainId.NewGuid();
-        }
+        public string? FileName { get; set; }
 
-        public CreateAsset AsCreate()
-        {
-            return SimpleMapper.Map(this, new CreateAsset());
-        }
+        public string? Slug { get; set; }
 
-        public UpdateAsset AsUpdate()
-        {
-            return SimpleMapper.Map(this, new UpdateAsset());
-        }
+        public bool? IsProtected { get; set; }
 
-        public MoveAsset AsMove()
-        {
-            return SimpleMapper.Map(this, new MoveAsset());
-        }
+        public HashSet<string> Tags { get; set; }
+
+        public AssetMetadata? Metadata { get; set; }
+
+        public long ExpectedVersion { get; set; } = EtagVersion.Any;
     }
 }

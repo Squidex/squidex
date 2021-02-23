@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -207,6 +208,66 @@ namespace Squidex.Areas.Api.Controllers.Assets
         }
 
         /// <summary>
+        /// Bulk update assets.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="request">The bulk update request.</param>
+        /// <returns>
+        /// 201 => Assets created, update or delete.
+        /// 400 => Assets request not valid.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpPost]
+        [Route("apps/{app}/assets/bulk")]
+        [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssets)]
+        [ApiCosts(5)]
+        public async Task<IActionResult> BulkContents(string app, [FromBody] BulkUpdateAssetsDto request)
+        {
+            var command = request.ToCommand();
+
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<BulkUpdateResult>();
+            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Upsert an asset.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="parentId">The optional parent folder id.</param>
+        /// <param name="file">The file to upload.</param>
+        /// <param name="id">The optional custom asset id.</param>
+        /// <returns>
+        /// 201 => Asset created or updated.
+        /// 400 => Asset request not valid.
+        /// 413 => Asset exceeds the maximum upload size.
+        /// 404 => App not found.
+        /// </returns>
+        /// <remarks>
+        /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and is required correctly.
+        /// </remarks>
+        [HttpPost]
+        [Route("apps/{app}/assets/{id}")]
+        [ProducesResponseType(typeof(AssetDto), 201)]
+        [AssetRequestSizeLimit]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PostAsset(string app, DomainId id, [FromQuery] DomainId parentId, IFormFile file)
+        {
+            var assetFile = await CheckAssetFileAsync(file);
+
+            var command = new UpsertAsset { File = assetFile, ParentId = parentId };
+
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Replace asset content.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -280,7 +341,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetParent(string app, DomainId id, [FromBody] MoveAssetItemDto request)
+        public async Task<IActionResult> PutAssetParent(string app, DomainId id, [FromBody] MoveAssetDto request)
         {
             var command = request.ToCommand(id);
 
