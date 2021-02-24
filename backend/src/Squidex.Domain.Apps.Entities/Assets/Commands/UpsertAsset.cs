@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
     public sealed class UpsertAsset : UploadAssetCommand
     {
-        public DomainId ParentId { get; set; }
+        public DomainId? ParentId { get; set; }
 
         public string? ParentPath { get; set; }
 
@@ -31,9 +31,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
             return SimpleMapper.Map(this, new UpdateAsset());
         }
 
-        public MoveAsset AsMove()
+        public MoveAsset AsMove(DomainId parentId)
         {
-            return SimpleMapper.Map(this, new MoveAsset());
+            return SimpleMapper.Map(this, new MoveAsset { ParentId = parentId });
         }
     }
 }

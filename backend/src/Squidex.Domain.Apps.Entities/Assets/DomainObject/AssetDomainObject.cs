@@ -78,9 +78,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             await CreateCore(c.AsCreate());
                         }
 
-                        if (Is.Change(c.ParentId, Snapshot.ParentId))
+                        if (Is.OptionalChange(Snapshot.ParentId, c.ParentId))
                         {
-                            await MoveCore(c.AsMove());
+                            await MoveCore(c.AsMove(c.ParentId.Value));
                         }
 
                         return Snapshot;
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         await CreateCore(create);
 
-                        if (Is.Change(c.ParentId, Snapshot.ParentId))
+                        if (Is.Change(Snapshot.ParentId, c.ParentId))
                         {
                             await MoveCore(c.AsMove());
                         }

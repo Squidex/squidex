@@ -176,7 +176,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 {
                     var tempFile = context.ContextId.ToString();
 
-                    await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion);
+                    try
+                    {
+                        await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion);
+                    }
+                    catch (AssetAlreadyExistsException) when (context.Command is not UpsertAsset)
+                    {
+                        throw;
+                    }
                 }
 
                 if (payload is not IEnrichedAssetEntity)

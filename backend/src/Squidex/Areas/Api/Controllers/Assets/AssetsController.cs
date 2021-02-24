@@ -242,7 +242,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="file">The file to upload.</param>
         /// <param name="id">The optional custom asset id.</param>
         /// <returns>
-        /// 201 => Asset created or updated.
+        /// 200 => Asset created or updated.
         /// 400 => Asset request not valid.
         /// 413 => Asset exceeds the maximum upload size.
         /// 404 => App not found.
@@ -252,15 +252,15 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/assets/{id}")]
-        [ProducesResponseType(typeof(AssetDto), 201)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, DomainId id, [FromQuery] DomainId parentId, IFormFile file)
+        public async Task<IActionResult> PostUpsertAsset(string app, DomainId id, [FromQuery] DomainId? parentId, IFormFile file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
-            var command = new UpsertAsset { File = assetFile, ParentId = parentId };
+            var command = new UpsertAsset { File = assetFile, ParentId = parentId, AssetId = id };
 
             var response = await InvokeCommandAsync(command);
 

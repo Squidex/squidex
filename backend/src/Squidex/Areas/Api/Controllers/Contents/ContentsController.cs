@@ -450,7 +450,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpsert)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, DomainId id, UpsertContentDto request)
+        public async Task<IActionResult> PostUpsertContent(string app, string name, DomainId id, UpsertContentDto request)
         {
             var command = request.ToCommand(id);
 
