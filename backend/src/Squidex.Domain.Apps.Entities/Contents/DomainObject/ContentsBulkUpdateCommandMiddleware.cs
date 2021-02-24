@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             switch (job.Type)
             {
-                case BulkUpdateType.Create:
+                case BulkUpdateContentType.Create:
                     {
                         var command = new CreateContent();
 
@@ -202,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return command;
                     }
 
-                case BulkUpdateType.Update:
+                case BulkUpdateContentType.Update:
                     {
                         var command = new UpdateContent();
 
@@ -210,7 +210,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return command;
                     }
 
-                case BulkUpdateType.Upsert:
+                case BulkUpdateContentType.Upsert:
                     {
                         var command = new UpsertContent();
 
@@ -218,7 +218,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return command;
                     }
 
-                case BulkUpdateType.Patch:
+                case BulkUpdateContentType.Patch:
                     {
                         var command = new PatchContent();
 
@@ -226,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return command;
                     }
 
-                case BulkUpdateType.Validate:
+                case BulkUpdateContentType.Validate:
                     {
                         var command = new ValidateContent();
 
@@ -234,7 +234,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return command;
                     }
 
-                case BulkUpdateType.ChangeStatus:
+                case BulkUpdateContentType.ChangeStatus:
                     {
                         var command = new ChangeContentStatus { Status = job.Status ?? Status.Draft };
 
@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return command;
                     }
 
-                case BulkUpdateType.Delete:
+                case BulkUpdateContentType.Delete:
                     {
                         var command = new DeleteContent();
 
@@ -297,7 +297,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 return existing.Select(x => x.Id).ToArray();
             }
 
-            if (task.Job.Type == BulkUpdateType.Create || task.Job.Type == BulkUpdateType.Upsert)
+            if (task.Job.Type == BulkUpdateContentType.Create || task.Job.Type == BulkUpdateContentType.Upsert)
             {
                 return new[] { DomainId.NewGuid() };
             }

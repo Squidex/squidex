@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             CreateTestData(true);
 
-            var command = BulkCommand(BulkUpdateType.ChangeStatus);
+            var command = BulkCommand(BulkUpdateContentType.ChangeStatus);
 
             var result = await PublishAsync(command);
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query)))
                 .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
 
-            var command = BulkCommand(BulkUpdateType.ChangeStatus, query);
+            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, query);
 
             var result = await PublishAsync(command);
 
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query)))
                 .Returns(ResultList.CreateFrom(1, CreateContent(id)));
 
-            var command = BulkCommand(BulkUpdateType.Upsert, query: query, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
 
             var result = await PublishAsync(command);
 
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContent(id1),
                     CreateContent(id2)));
 
-            var command = BulkCommand(BulkUpdateType.Upsert, query: query, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
 
             command.Jobs![0].ExpectedCount = 2;
 
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (_, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Upsert, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, data: data);
 
             var result = await PublishAsync(command);
 
@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default)))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (_, data, query) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Upsert, query: query, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
 
             var result = await PublishAsync(command);
 
@@ -201,7 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Single(result, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
             A.CallTo(() => commandBus.PublishAsync(
-                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId.ToString().Length == 36)))
+                    A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default)))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Upsert, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, id: id, data: data);
 
             var result = await PublishAsync(command);
 
@@ -231,7 +231,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(true);
 
-            var command = BulkCommand(BulkUpdateType.Upsert, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Upsert, id: id, data: data);
 
             var result = await PublishAsync(command);
 
@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Create, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Create, id: id, data: data);
 
             var result = await PublishAsync(command);
 
@@ -269,7 +269,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Create, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Create, id: id, data: data);
 
             var result = await PublishAsync(command);
 
@@ -287,7 +287,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Update, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Update, id: id, data: data);
 
             var result = await PublishAsync(command);
 
@@ -306,7 +306,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Update, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Update, id: id, data: data);
 
             var result = await PublishAsync(command);
 
@@ -324,7 +324,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Patch, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Patch, id: id, data: data);
 
             var result = await PublishAsync(command);
 
@@ -343,7 +343,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, data, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Delete, id: id, data: data);
+            var command = BulkCommand(BulkUpdateContentType.Delete, id: id, data: data);
 
             var result = await PublishAsync(command);
 
@@ -361,7 +361,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, _, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.ChangeStatus, id: id);
+            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, id: id);
 
             var result = await PublishAsync(command);
 
@@ -381,7 +381,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, _, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.ChangeStatus, id: id, dueTime: time);
+            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, id: id, dueTime: time);
 
             var result = await PublishAsync(command);
 
@@ -399,7 +399,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, _, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.ChangeStatus, id: id);
+            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, id: id);
 
             var result = await PublishAsync(command);
 
@@ -417,7 +417,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, _, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Validate, id: id);
+            var command = BulkCommand(BulkUpdateContentType.Validate, id: id);
 
             var result = await PublishAsync(command);
 
@@ -436,7 +436,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, _, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Validate, id: id);
+            var command = BulkCommand(BulkUpdateContentType.Validate, id: id);
 
             var result = await PublishAsync(command);
 
@@ -454,7 +454,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, _, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Delete, id: id);
+            var command = BulkCommand(BulkUpdateContentType.Delete, id: id);
 
             var result = await PublishAsync(command);
 
@@ -473,7 +473,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, _, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateType.Delete, id: id);
+            var command = BulkCommand(BulkUpdateContentType.Delete, id: id);
 
             var result = await PublishAsync(command);
 
@@ -493,7 +493,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return (context.PlainResult as BulkUpdateResult)!;
         }
 
-        private BulkUpdateContents BulkCommand(BulkUpdateType type, Query<IJsonValue>? query = null,
+        private BulkUpdateContents BulkCommand(BulkUpdateContentType type, Query<IJsonValue>? query = null,
             DomainId? id = null, ContentData? data = null, Instant? dueTime = null)
         {
             return new BulkUpdateContents

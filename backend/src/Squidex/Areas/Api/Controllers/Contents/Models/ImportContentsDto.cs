@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         {
             var result = SimpleMapper.Map(this, new BulkUpdateContents());
 
-            result.Jobs = Datas?.Select(x => new BulkUpdateJob { Type = BulkUpdateType.Create, Data = x }).ToArray();
+            result.Jobs = Datas?.Select(x => new BulkUpdateJob { Type = BulkUpdateContentType.Create, Data = x }).ToArray();
 
             if (result.Jobs != null && Publish)
             {

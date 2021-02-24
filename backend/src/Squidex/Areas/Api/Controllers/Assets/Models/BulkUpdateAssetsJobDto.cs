@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The update type.
         /// </summary>
-        public BulkUpdateType Type { get; set; }
+        public BulkUpdateAssetType Type { get; set; }
 
         /// <summary>
         /// The parent folder id.

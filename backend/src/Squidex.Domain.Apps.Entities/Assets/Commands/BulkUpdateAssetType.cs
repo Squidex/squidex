@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public enum BulkUpdateType
+    public enum BulkUpdateAssetType
     {
         Annotate,
         Move,

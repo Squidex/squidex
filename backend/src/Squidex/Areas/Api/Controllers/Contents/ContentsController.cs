@@ -418,7 +418,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContents)]
         [ApiCosts(5)]
-        public async Task<IActionResult> BulkContents(string app, string name, [FromBody] BulkUpdateContentsDto request)
+        public async Task<IActionResult> BulkUpdateContents(string app, string name, [FromBody] BulkUpdateContentsDto request)
         {
             var command = request.ToCommand();
 

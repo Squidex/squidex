@@ -213,7 +213,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="app">The name of the app.</param>
         /// <param name="request">The bulk update request.</param>
         /// <returns>
-        /// 201 => Assets created, update or delete.
+        /// 200 => Assets created, update or delete.
         /// 400 => Assets request not valid.
         /// 404 => App not found.
         /// </returns>
@@ -222,7 +222,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssets)]
         [ApiCosts(5)]
-        public async Task<IActionResult> BulkContents(string app, [FromBody] BulkUpdateAssetsDto request)
+        public async Task<IActionResult> BulkUpdateAssets(string app, [FromBody] BulkUpdateAssetsDto request)
         {
             var command = request.ToCommand();
 

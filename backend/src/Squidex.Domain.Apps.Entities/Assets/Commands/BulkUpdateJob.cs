@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
     public sealed class BulkUpdateJob
     {
-        public BulkUpdateType Type { get; set; }
+        public BulkUpdateAssetType Type { get; set; }
 
         public DomainId Id { get; set; }
 

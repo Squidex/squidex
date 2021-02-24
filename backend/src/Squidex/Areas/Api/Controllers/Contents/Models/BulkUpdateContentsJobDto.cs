@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The update type.
         /// </summary>
-        public BulkUpdateType Type { get; set; }
+        public BulkUpdateContentType Type { get; set; }
 
         /// <summary>
         /// The optional schema id or name.

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public Instant? DueTime { get; set; }
 
-        public BulkUpdateType Type { get; set; }
+        public BulkUpdateContentType Type { get; set; }
 
         public ContentData? Data { get; set; }
 

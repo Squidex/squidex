@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             switch (job.Type)
             {
-                case BulkUpdateType.Annotate:
+                case BulkUpdateAssetType.Annotate:
                     {
                         var command = new AnnotateAsset();
 
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         return command;
                     }
 
-                case BulkUpdateType.Move:
+                case BulkUpdateAssetType.Move:
                     {
                         var command = new MoveAsset
                         {
@@ -185,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         return command;
                     }
 
-                case BulkUpdateType.Delete:
+                case BulkUpdateAssetType.Delete:
                     {
                         var command = new DeleteAsset();
 

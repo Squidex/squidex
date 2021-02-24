@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public enum BulkUpdateType
+    public enum BulkUpdateContentType
     {
         Upsert,
         ChangeStatus,
