@@ -196,7 +196,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 {
                     await assetFileStore.UploadAsync(tempFile, hashStream);
 
-                    command.FileHash = hashStream.GetHashStringAndReset();
+                    var hash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
+
+                    command.FileHash = hash;
                 }
             }
         }

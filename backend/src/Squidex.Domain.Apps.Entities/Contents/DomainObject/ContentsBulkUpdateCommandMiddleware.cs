@@ -258,6 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private async Task EnrichAsync<T>(BulkTask task, T command, string permissionId) where T : ContentCommand
         {
             SimpleMapper.Map(task.Command, command);
+            SimpleMapper.Map(task.Job, command);
 
             if (!string.IsNullOrWhiteSpace(task.Job.Schema))
             {

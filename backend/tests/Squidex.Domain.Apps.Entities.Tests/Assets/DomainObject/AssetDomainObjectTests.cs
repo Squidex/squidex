@@ -88,6 +88,61 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
+        public async Task Upsert_should_create_events_and_set_intitial_state_when_not_found()
+        {
+            var command = new UpsertAsset { File = file, FileHash = "NewHash" };
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(0, sut.Snapshot.FileVersion);
+            Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetCreated
+                    {
+                        FileName = file.FileName,
+                        FileSize = file.FileSize,
+                        FileHash = command.FileHash,
+                        FileVersion = 0,
+                        Metadata = new AssetMetadata(),
+                        MimeType = file.MimeType,
+                        Tags = new HashSet<string>(),
+                        Slug = file.FileName.ToAssetSlug()
+                    })
+                );
+        }
+
+        [Fact]
+        public async Task Upsert_should_create_events_and_update_file_state_when_found()
+        {
+            var command = new UpsertAsset { File = file, FileHash = "NewHash" };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(1, sut.Snapshot.FileVersion);
+            Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetUpdated
+                    {
+                        FileSize = file.FileSize,
+                        FileHash = command.FileHash,
+                        FileVersion = 1,
+                        Metadata = new AssetMetadata(),
+                        MimeType = file.MimeType
+                    })
+                );
+        }
+
+        [Fact]
         public async Task Update_should_create_events_and_update_file_state()
         {
             var command = new UpdateAsset { File = file, FileHash = "NewHash" };

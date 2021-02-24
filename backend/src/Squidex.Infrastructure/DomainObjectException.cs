@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 namespace Squidex.Infrastructure
 {
     [Serializable]
-    public class DomainObjectException : Exception
+    public class DomainObjectException : DomainException
     {
         public string Id { get; }
 

@@ -175,11 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 case BulkUpdateAssetType.Move:
                     {
-                        var command = new MoveAsset
-                        {
-                            ParentId = task.Job.ParentId,
-                            ParentPath = task.Job.ParentPath
-                        };
+                        var command = new MoveAsset();
 
                         Enrich(task, command, Permissions.AppAssetsUpdate);
                         return command;
@@ -189,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         var command = new DeleteAsset();
 
-                        Enrich(task, command, Permissions.AppAssetsUpdate);
+                        Enrich(task, command, Permissions.AppAssetsDelete);
                         return command;
                     }
 
@@ -201,6 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private void Enrich<T>(BulkTask task, T command, string permissionId) where T : AssetCommand
         {
             SimpleMapper.Map(task.Command, command);
+            SimpleMapper.Map(task.Job, command);
 
             if (!contextProvider.Context.Allows(permissionId))
             {

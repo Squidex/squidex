@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities
 
             action(builder);
 
-            return builder.Build();
+            return builder.Update();
         }
 
         public Context Clone(Action<ICloneBuilder> action)
