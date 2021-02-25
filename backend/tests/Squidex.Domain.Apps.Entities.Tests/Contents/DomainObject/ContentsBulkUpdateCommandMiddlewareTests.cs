@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly Instant dueTime = Instant.FromDateTimeUtc(DateTime.UtcNow);
+        private readonly Instant time = Instant.FromDateTimeUtc(DateTime.UtcNow);
         private readonly ContentsBulkUpdateCommandMiddleware sut;
 
         public ContentsBulkUpdateCommandMiddlewareTests()
@@ -380,14 +380,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var (id, _, _) = CreateTestData(false);
 
-            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, id: id, dueTime: dueTime);
+            var command = BulkCommand(BulkUpdateContentType.ChangeStatus, id: id, dueTime: time);
 
             var result = await PublishAsync(command);
 
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
-            A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == dueTime)))
+            A.CallTo(() => commandBus.PublishAsync(A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time)))
                 .MustHaveHappened();
         }
 

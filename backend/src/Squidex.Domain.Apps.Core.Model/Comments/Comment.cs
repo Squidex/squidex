@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Comments
 {
-    public sealed record Comment(DomainId Id, Instant Time, RefToken User, string Text, Uri? Url)
+    public sealed record Comment(DomainId Id, Instant Time, RefToken User, string Text, Uri? Url = null)
     {
     }
 }
