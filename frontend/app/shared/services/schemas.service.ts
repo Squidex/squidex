@@ -178,7 +178,7 @@ export class SchemaDetailsDto extends SchemaDto {
                 if (source.hasOwnProperty(key) && exclude.indexOf(key) < 0 && key.indexOf('can') !== 0) {
                     const value = source[key];
 
-                    if (value) {
+                    if (!Types.isUndefined(value) && !Types.isNull(value)) {
                         clone[key] = value;
                     }
                 }
