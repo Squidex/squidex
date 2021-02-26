@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.History
                 return;
             }
 
-            var settings = new NotificationSettingsDto
+            var settings = new Dictionary<string, NotificationSettingDto>
             {
                 [Providers.WebPush] = new NotificationSettingDto
                 {
