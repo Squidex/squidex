@@ -54,8 +54,8 @@ namespace TestSuite
                 AppName = appName,
                 ClientId = clientId,
                 ClientSecret = clientSecret,
-                ReadResponseAsString = true,
                 Configurator = AcceptAllCertificatesConfigurator.Instance,
+                ReadResponseAsString = true,
                 Url = serviceURl
             });
         }

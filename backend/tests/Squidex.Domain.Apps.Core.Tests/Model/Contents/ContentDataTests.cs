@@ -6,35 +6,12 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents
 {
     public class ContentDataTests
     {
-        [Fact]
-        public void Should_remove_null_values_from_name_model_when_cleaning()
-        {
-            var input =
-                new ContentData()
-                    .AddField("field1", null)
-                    .AddField("field2",
-                        new ContentFieldData()
-                            .AddLocalized("en", 2)
-                            .AddLocalized("it", JsonValue.Null));
-
-            var actual = input.ToCleaned();
-
-            var expected =
-                new ContentData()
-                    .AddField("field2",
-                        new ContentFieldData()
-                            .AddLocalized("en", 2));
-
-            Assert.Equal(expected, actual);
-        }
-
         [Fact]
         public void Should_return_same_content_if_merging_same_references()
         {

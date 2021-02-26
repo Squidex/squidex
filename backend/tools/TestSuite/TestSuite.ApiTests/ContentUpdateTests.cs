@@ -390,6 +390,32 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_update_item_to_null()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { String = "initial" }, true);
+
+
+                // STEP 2: Update the item and ensure that the data has changed.
+                await _.Contents.UpdateAsync(content.Id, new TestEntityData { String = null });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Null(updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
         public async Task Should_patch_item()
         {
             TestEntity content = null;
@@ -405,6 +431,32 @@ namespace TestSuite.ApiTests
                 var updated = await _.Contents.GetAsync(content.Id);
 
                 Assert.Equal(2, updated.Data.Number);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_patch_item_to_null()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { String = "initial" }, true);
+
+
+                // STEP 2: Update the item and ensure that the data has changed.
+                await _.Contents.PatchAsync(content.Id, new { @string = new { iv = (object)null } });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Null(updated.Data.String);
             }
             finally
             {

@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
@@ -83,31 +82,6 @@ namespace Squidex.Domain.Apps.Core.Contents
         public ContentData MergeInto(ContentData target)
         {
             return Merge(target, this);
-        }
-
-        public ContentData ToCleaned()
-        {
-            var target = new ContentData();
-
-            foreach (var (fieldName, fieldValue) in ValidValues)
-            {
-                if (fieldValue != null)
-                {
-                    var resultValue = new ContentFieldData();
-
-                    foreach (var (key, value) in fieldValue.Where(x => x.Value.Type != JsonValueType.Null))
-                    {
-                        resultValue[key] = value;
-                    }
-
-                    if (resultValue.Count > 0)
-                    {
-                        target[fieldName] = resultValue;
-                    }
-                }
-            }
-
-            return target;
         }
 
         public override bool Equals(object? obj)

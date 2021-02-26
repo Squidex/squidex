@@ -361,7 +361,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] ContentData request, [FromQuery] bool publish = false, [FromQuery] DomainId? id = null)
         {
-            var command = new CreateContent { Data = request.ToCleaned(), Publish = publish };
+            var command = new CreateContent { Data = request, Publish = publish };
 
             if (id != null && id.Value != default && !string.IsNullOrWhiteSpace(id.Value.ToString()))
             {
@@ -458,7 +458,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, DomainId id, [FromBody] ContentData request, [FromQuery] bool publish = false)
         {
-            var command = new UpsertContent { ContentId = id, Data = request.ToCleaned(), Publish = publish };
+            var command = new UpsertContent { ContentId = id, Data = request, Publish = publish };
 
             var response = await InvokeCommandAsync(command);
 
@@ -487,7 +487,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, DomainId id, [FromBody] ContentData request)
         {
-            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
+            var command = new UpdateContent { ContentId = id, Data = request };
 
             var response = await InvokeCommandAsync(command);
 
@@ -516,7 +516,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, DomainId id, [FromBody] ContentData request)
         {
-            var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
+            var command = new PatchContent { ContentId = id, Data = request };
 
             var response = await InvokeCommandAsync(command);
 
