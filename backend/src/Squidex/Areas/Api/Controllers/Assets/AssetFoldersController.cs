@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/assets/folders", Order = -1)]
-        [ProducesResponseType(typeof(AssetsDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AssetFoldersDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] DomainId parentId)
@@ -81,7 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/assets/folders", Order = -1)]
-        [ProducesResponseType(typeof(AssetDto), 201)]
+        [ProducesResponseType(typeof(AssetFoldersDto), 201)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
@@ -107,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
-        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AssetFoldersDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
@@ -133,7 +133,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/folders/{id}/parent", Order = -1)]
-        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AssetFoldersDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
