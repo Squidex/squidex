@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         public DomainId UniqueId
         {
-            get { return DocumentId; }
+            get => DocumentId;
         }
     }
 }

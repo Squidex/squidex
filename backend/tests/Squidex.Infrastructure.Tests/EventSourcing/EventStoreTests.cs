@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         protected T Sut
         {
-            get { return sut.Value; }
+            get => sut.Value;
         }
 
         protected abstract int SubscriptionDelayInMs { get; }

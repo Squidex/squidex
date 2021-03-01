@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
         [IgnoreDataMember]
         public DomainId AggregateId
         {
-            get { return DomainId.Combine(AppId, ContentId); }
+            get => DomainId.Combine(AppId, ContentId);
         }
     }
 }

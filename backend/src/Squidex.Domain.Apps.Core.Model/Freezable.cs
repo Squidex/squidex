@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core
         [IgnoreDuringEquals]
         public bool IsFrozen
         {
-            get { return isFrozen; }
+            get => isFrozen;
         }
 
         protected void CheckIfFrozen()

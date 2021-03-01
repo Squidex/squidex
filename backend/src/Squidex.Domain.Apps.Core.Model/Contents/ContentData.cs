@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Contents
     {
         public IEnumerable<KeyValuePair<string, ContentFieldData?>> ValidValues
         {
-            get { return this.Where(x => x.Value != null); }
+            get => this.Where(x => x.Value != null);
         }
 
         public ContentData()

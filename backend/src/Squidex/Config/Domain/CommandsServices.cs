@@ -115,8 +115,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<UsageTrackerCommandMiddleware>()
                 .As<ICommandMiddleware>();
-
-            services.AddSingleton(typeof(IEventEnricher<>), typeof(DefaultEventEnricher<>));
         }
     }
 }

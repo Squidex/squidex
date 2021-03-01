@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure
             [IgnoreDataMember]
             public DomainId Calculated
             {
-                get { return DomainId.Combine(Id0, Id1.Id); }
+                get => DomainId.Combine(Id0, Id1.Id);
             }
 
             public DomainId Id0 { get; set; }

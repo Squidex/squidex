@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Commands
 
         public bool IsCompleted
         {
-            get { return PlainResult != null; }
+            get => PlainResult != null;
         }
 
         public CommandContext(ICommand command, ICommandBus commandBus)

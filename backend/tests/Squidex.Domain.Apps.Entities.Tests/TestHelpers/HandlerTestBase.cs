@@ -43,19 +43,19 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected NamedId<DomainId> AppNamedId
         {
-            get { return NamedId.Of(AppId, AppName); }
+            get => NamedId.Of(AppId, AppName);
         }
 
         protected NamedId<DomainId> SchemaNamedId
         {
-            get { return NamedId.Of(SchemaId, SchemaName); }
+            get => NamedId.Of(SchemaId, SchemaName);
         }
 
         protected abstract DomainId Id { get; }
 
         public IStore<DomainId> Store
         {
-            get { return store; }
+            get => store;
         }
 
         public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = Enumerable.Empty<Envelope<IEvent>>();
@@ -68,11 +68,17 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             A.CallTo(() => store.WithEventSourcing(A<Type>._, Id, A<HandleEvent>._))
                 .Returns(persistence);
 
-            A.CallTo(() => persistenceWithState.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
+            A.CallTo(() => persistenceWithState.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
                 .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
                 .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
+
+            A.CallTo(() => persistenceWithState.DeleteAsync())
+                .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
+
+            A.CallTo(() => persistence.DeleteAsync())
+                .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
         }
 
         protected CommandContext CreateCommandContext<TCommand>(TCommand command) where TCommand : SquidexCommand
@@ -89,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return context;
         }
 
-        protected async Task<object> PublishIdempotentAsync<T>(DomainObjectBase<T> domainObject, IAggregateCommand command) where T : class, IDomainState<T>, new()
+        protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : class, IDomainState<T>, new()
         {
             var result = await domainObject.ExecuteAsync(command);
 

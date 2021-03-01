@@ -61,6 +61,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public AssetMetadata? Metadata { get; set; }
 
         /// <summary>
+        /// True to delete the asset permanently.
+        /// </summary>
+        public bool Permanent { get; set; }
+
+        /// <summary>
         /// The expected version.
         /// </summary>
         public long ExpectedVersion { get; set; } = EtagVersion.Any;

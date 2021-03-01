@@ -22,12 +22,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public bool IsPaused
         {
-            get { return IsStopped && string.IsNullOrWhiteSpace(Error); }
+            get => IsStopped && string.IsNullOrWhiteSpace(Error);
         }
 
         public bool IsFailed
         {
-            get { return IsStopped && !string.IsNullOrWhiteSpace(Error); }
+            get => IsStopped && !string.IsNullOrWhiteSpace(Error);
         }
 
         public EventConsumerState()

@@ -18,22 +18,22 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         public int BatchSize
         {
-            get { return 1000; }
+            get => 1000;
         }
 
         public int BatchDelay
         {
-            get { return 1000; }
+            get => 1000;
         }
 
         public string Name
         {
-            get { return GetType().Name; }
+            get => GetType().Name;
         }
 
         public string EventsFilter
         {
-            get { return "^asset-"; }
+            get => "^asset-";
         }
 
         public Task On(Envelope<IEvent> @event)

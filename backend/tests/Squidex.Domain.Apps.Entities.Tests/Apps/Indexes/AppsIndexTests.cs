@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_return_null_if_app_not_created()
         {
-            CreateApp(EtagVersion.NotFound);
+            CreateApp(EtagVersion.Empty);
 
             var actual1 = await sut.GetAppAsync(appId.Id, true);
             var actual2 = await sut.GetAppAsync(appId.Id, true);

@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         protected override DomainId Id
         {
-            get { return DomainId.Combine(AppId, contentId); }
+            get => DomainId.Combine(AppId, contentId);
         }
 
         public ContentDomainObjectTests()
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecuteCreateAsync();
             await ExecuteDeleteAsync();
 
-            await Assert.ThrowsAsync<DomainException>(ExecuteUpdateAsync);
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(ExecuteUpdateAsync);
         }
 
         [Fact]
@@ -137,8 +137,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
+            Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
-            Assert.Same(data, sut.Snapshot.CurrentVersion.Data);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Same(data, sut.Snapshot.CurrentVersion.Data);
+            Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
 
             LastEvents
@@ -183,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Same(data, sut.Snapshot.CurrentVersion.Data);
+            Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Archived, sut.Snapshot.Status);
 
             LastEvents
@@ -196,6 +196,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 .MustHaveHappened();
             A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Create_should_recreate_deleted_content()
+        {
+            var command = new CreateContent { Data = data };
+
+            await ExecuteCreateAsync();
+            await ExecuteDeleteAsync();
+
+            await PublishAsync(command);
+        }
+
+        [Fact]
+        public async Task Create_should_recreate_permanently_deleted_content()
+        {
+            var command = new CreateContent { Data = data };
+
+            await ExecuteCreateAsync();
+            await ExecuteDeleteAsync(true);
+
+            await PublishAsync(command);
         }
 
         [Fact]
@@ -215,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Same(data, sut.Snapshot.CurrentVersion.Data);
+            Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
 
             LastEvents
@@ -238,7 +260,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Same(data, sut.Snapshot.CurrentVersion.Data);
+            Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
 
             LastEvents
@@ -261,7 +283,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Same(data, sut.Snapshot.CurrentVersion.Data);
+            Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
             Assert.Equal(Status.Archived, sut.Snapshot.Status);
 
             LastEvents
@@ -344,6 +366,38 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 .MustHaveHappened();
             A.CallTo(() => scriptEngine.TransformAsync(ScriptContext(otherData, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions()))
                 .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Upsert_should_recreate_deleted_content()
+        {
+            var command = new UpsertContent { Data = data };
+
+            await ExecuteCreateAsync();
+            await ExecuteDeleteAsync();
+
+            await PublishAsync(command);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
+                );
+        }
+
+        [Fact]
+        public async Task Upsert_should_recreate_permanently_deleted_content()
+        {
+            var command = new UpsertContent { Data = data };
+
+            await ExecuteCreateAsync();
+            await ExecuteDeleteAsync(true);
+
+            await PublishAsync(command);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
+                );
         }
 
         [Fact]
@@ -747,6 +801,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
+        public async Task Delete_should_not_create_events_if_permanent()
+        {
+            await ExecuteCreateAsync();
+
+            var command = new DeleteContent { Permanent = true };
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(None.Value);
+
+            Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
+                );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Draft), "<delete-script>", ScriptOptions()))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Delete_should_throw_exception_if_referenced_by_other_item()
         {
             await ExecuteCreateAsync();
@@ -833,9 +909,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return PublishAsync(new ChangeContentStatus { Status = status, DueTime = dueTime });
         }
 
-        private Task ExecuteDeleteAsync()
+        private Task ExecuteDeleteAsync(bool permanent = false)
         {
-            return PublishAsync(CreateContentCommand(new DeleteContent()));
+            return PublishAsync(CreateContentCommand(new DeleteContent { Permanent = permanent }));
         }
 
         private Task ExecutePublishAsync()

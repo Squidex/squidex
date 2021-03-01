@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         protected override DomainId Id
         {
-            get { return contentId; }
+            get => contentId;
         }
 
         public ContentCommandMiddlewareTests()

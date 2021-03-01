@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public JsonValueType Type
         {
-            get { return JsonValueType.Null; }
+            get => JsonValueType.Null;
         }
 
         private JsonNull()

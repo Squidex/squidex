@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.Commands
             this.store = store;
         }
 
-        public virtual async Task RebuildAsync<T, TState>(string filter, CancellationToken ct) where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
+        public virtual async Task RebuildAsync<T, TState>(string filter, CancellationToken ct) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
             await store.GetSnapshotStore<TState>().ClearAsync();
 
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Commands
             }, ct);
         }
 
-        public virtual async Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, CancellationToken ct = default) where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
+        public virtual async Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
             Guard.NotNull(source, nameof(source));
 
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.Commands
             }, ct);
         }
 
-        private async Task InsertManyAsync<T, TState>(IdSource source, CancellationToken ct = default) where T : DomainObjectBase<TState> where TState : class, IDomainState<TState>, new()
+        private async Task InsertManyAsync<T, TState>(IdSource source, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
             var worker = new ActionBlock<DomainId>(async id =>
             {

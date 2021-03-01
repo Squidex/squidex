@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         protected override DomainId Id
         {
-            get { return DomainId.Combine(AppId, assetId); }
+            get => DomainId.Combine(AppId, assetId);
         }
 
         public AssetCommandMiddlewareTests()

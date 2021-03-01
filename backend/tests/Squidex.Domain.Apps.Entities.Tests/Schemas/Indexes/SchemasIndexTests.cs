@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_return_empty_schemas_if_schema_not_created()
         {
-            var (schema, _) = SetupSchema(EtagVersion.NotFound);
+            var (schema, _) = SetupSchema(EtagVersion.Empty);
 
             A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<DomainId> { schema.Id });

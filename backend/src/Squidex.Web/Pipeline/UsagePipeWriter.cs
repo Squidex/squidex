@@ -19,7 +19,7 @@ namespace Squidex.Web.Pipeline
 
         public long BytesWritten
         {
-            get { return bytesWritten; }
+            get => bytesWritten;
         }
 
         public UsagePipeWriter(PipeWriter inner)

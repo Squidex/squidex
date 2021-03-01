@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         private string Id
         {
-            get { return commentsId.ToString(); }
+            get => commentsId.ToString();
         }
 
         public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = Enumerable.Empty<Envelope<IEvent>>();

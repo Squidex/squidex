@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public ISchemaEntity Schema
         {
-            get { return schema; }
+            get => schema;
         }
 
         public async Task LoadAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, bool optimized)

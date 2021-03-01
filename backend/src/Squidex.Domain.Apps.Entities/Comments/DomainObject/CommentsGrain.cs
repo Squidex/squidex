@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         private long Version
         {
-            get { return version; }
+            get => version;
         }
 
         public CommentsGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter)

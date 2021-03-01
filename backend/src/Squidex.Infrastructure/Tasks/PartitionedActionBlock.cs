@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public Task Completion
         {
-            get { return Task.WhenAll(workers.Select(x => x.Completion)); }
+            get => Task.WhenAll(workers.Select(x => x.Completion));
         }
 
         public PartitionedActionBlock(Func<TInput, Task> action, Func<TInput, long> partitioner)

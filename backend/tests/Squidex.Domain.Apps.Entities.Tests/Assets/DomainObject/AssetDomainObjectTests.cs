@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         protected override DomainId Id
         {
-            get { return assetId; }
+            get => assetId;
         }
 
         public AssetDomainObjectTests()
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             await ExecuteCreateAsync();
             await ExecuteDeleteAsync();
 
-            await Assert.ThrowsAsync<DomainException>(ExecuteUpdateAsync);
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(ExecuteUpdateAsync);
         }
 
         [Fact]
@@ -85,6 +85,28 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         Slug = file.FileName.ToAssetSlug()
                     })
                 );
+        }
+
+        [Fact]
+        public async Task Create_should_recreate_deleted_content()
+        {
+            var command = new CreateAsset { File = file, FileHash = "NewHash" };
+
+            await ExecuteCreateAsync();
+            await ExecuteDeleteAsync();
+
+            await PublishAsync(command);
+        }
+
+        [Fact]
+        public async Task Create_should_recreate_permanently_deleted_content()
+        {
+            var command = new CreateAsset { File = file, FileHash = "NewHash" };
+
+            await ExecuteCreateAsync();
+            await ExecuteDeleteAsync(true);
+
+            await PublishAsync(command);
         }
 
         [Fact]
@@ -302,6 +324,24 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
+        public async Task Delete_should_not_create_events_if_permanent()
+        {
+            var command = new DeleteAsset { Permanent = true };
+
+            await ExecuteCreateAsync();
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
+                .Returns(true);
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(None.Value);
+
+            Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
+            Assert.Empty(LastEvents);
+        }
+
+        [Fact]
         public async Task Delete_should_throw_exception_if_referenced_by_other_item()
         {
             var command = new DeleteAsset { CheckReferrers = true };
@@ -337,9 +377,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             return PublishAsync(new UpdateAsset { File = file, FileHash = "456" });
         }
 
-        private Task ExecuteDeleteAsync()
+        private Task ExecuteDeleteAsync(bool permanent = false)
         {
-            return PublishAsync(new DeleteAsset());
+            return PublishAsync(new DeleteAsset { Permanent = permanent });
         }
 
         private T CreateAssetEvent<T>(T @event) where T : AssetEvent

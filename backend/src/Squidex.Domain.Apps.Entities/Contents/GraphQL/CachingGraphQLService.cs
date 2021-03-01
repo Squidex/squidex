@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public IServiceProvider Services
         {
-            get { return serviceProvider; }
+            get => serviceProvider;
         }
 
         public CachingGraphQLService(IBackgroundCache cache, ISchemasHash schemasHash, IServiceProvider serviceProvider, IOptions<GraphQLOptions> options)

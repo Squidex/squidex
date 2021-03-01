@@ -27,12 +27,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public int ReadEvents
         {
-            get { return readEvents; }
+            get => readEvents;
         }
 
         public int ReadAttachments
         {
-            get { return readAttachments; }
+            get => readAttachments;
         }
 
         public BackupReader(IJsonSerializer serializer, Stream stream)

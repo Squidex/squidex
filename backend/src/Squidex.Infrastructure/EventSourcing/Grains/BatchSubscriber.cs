@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public object? Sender
         {
-            get { return eventSubscription.Sender!; }
+            get => eventSubscription.Sender!;
         }
 
         private sealed class Job

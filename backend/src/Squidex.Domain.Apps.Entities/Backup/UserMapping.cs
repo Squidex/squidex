@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public RefToken Initiator
         {
-            get { return initiator; }
+            get => initiator;
         }
 
         public UserMapping(RefToken initiator)

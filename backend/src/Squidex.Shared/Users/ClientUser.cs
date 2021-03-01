@@ -20,22 +20,22 @@ namespace Squidex.Shared.Users
 
         public string Id
         {
-            get { return token.Identifier; }
+            get => token.Identifier;
         }
 
         public string Email
         {
-            get { return token.ToString(); }
+            get => token.ToString();
         }
 
         public bool IsLocked
         {
-            get { return false; }
+            get => false;
         }
 
         public IReadOnlyList<Claim> Claims
         {
-            get { return claims; }
+            get => claims;
         }
 
         public object Identity => throw new System.NotImplementedException();

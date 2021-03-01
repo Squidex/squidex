@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public string Name
         {
-            get { return GetType().Name; }
+            get => GetType().Name;
         }
 
         public RuleEnqueuer(IAppProvider appProvider, IMemoryCache cache, ILocalCache localCache,

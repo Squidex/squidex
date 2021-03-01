@@ -42,17 +42,17 @@ namespace Squidex.Web
 
         protected Resources Resources
         {
-            get { return resources.Value; }
+            get => resources.Value;
         }
 
         protected Context Context
         {
-            get { return HttpContext.Context(); }
+            get => HttpContext.Context();
         }
 
         protected DomainId AppId
         {
-            get { return App.Id; }
+            get => App.Id;
         }
 
         protected ApiController(ICommandBus commandBus)

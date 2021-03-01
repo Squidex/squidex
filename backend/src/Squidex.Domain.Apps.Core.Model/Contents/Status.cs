@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public string Name
         {
-            get { return name ?? "Unknown"; }
+            get => name ?? "Unknown";
         }
 
         public Status(string? name)

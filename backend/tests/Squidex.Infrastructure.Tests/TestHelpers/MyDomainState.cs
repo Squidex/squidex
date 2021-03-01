@@ -10,9 +10,11 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.TestHelpers
 {
-    public sealed class MyDomainState : IDomainState<MyDomainState>
+    public sealed record MyDomainState : IDomainState<MyDomainState>
     {
         public const long Unchanged = 13;
+
+        public bool IsDeleted { get; set; }
 
         public long Version { get; set; }
 
@@ -20,19 +22,24 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public MyDomainState Apply(Envelope<IEvent> @event)
         {
-            var value = @event.To<ValueChanged>().Payload.Value;
-
-            if (value == Unchanged)
+            switch (@event.Payload)
             {
-                return this;
+                case ValueChanged valueChanged when (valueChanged.Value != Unchanged):
+                    return this with { Value = valueChanged.Value };
+                case Deleted when (!IsDeleted):
+                    return this with { IsDeleted = true };
             }
 
-            return new MyDomainState { Value = value };
+            return this;
         }
     }
 
     public sealed class ValueChanged : IEvent
     {
         public long Value { get; set; }
+    }
+
+    public sealed class Deleted : IEvent
+    {
     }
 }

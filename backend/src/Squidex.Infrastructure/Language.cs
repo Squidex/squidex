@@ -34,14 +34,14 @@ namespace Squidex.Infrastructure
 
         public static IReadOnlyCollection<Language> AllLanguages
         {
-            get { return AllLanguagesField.Values; }
+            get => AllLanguagesField.Values;
         }
 
         public string Iso2Code { get; }
 
         public string EnglishName
         {
-            get { return AllLanguagesNames.GetOrDefault(Iso2Code) ?? string.Empty; }
+            get => AllLanguagesNames.GetOrDefault(Iso2Code) ?? string.Empty;
         }
 
         private Language(string iso2Code)

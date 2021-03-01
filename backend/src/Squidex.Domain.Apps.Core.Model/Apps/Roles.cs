@@ -62,22 +62,22 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public int CustomCount
         {
-            get { return inner.Count; }
+            get => inner.Count;
         }
 
         public Role this[string name]
         {
-            get { return inner[name]; }
+            get => inner[name];
         }
 
         public IEnumerable<Role> Custom
         {
-            get { return inner.Values; }
+            get => inner.Values;
         }
 
         public IEnumerable<Role> All
         {
-            get { return inner.Values.Union(Defaults.Values); }
+            get => inner.Values.Union(Defaults.Values);
         }
 
         private Roles(ImmutableDictionary<string, Role> roles)

@@ -27,6 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 
         public bool? IsProtected { get; set; }
 
+        public bool Permanent { get; set; }
+
         public HashSet<string> Tags { get; set; }
 
         public AssetMetadata? Metadata { get; set; }

@@ -28,12 +28,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public string Name
         {
-            get { return GetType().Name; }
+            get => GetType().Name;
         }
 
         public string EventsFilter
         {
-            get { return "^assetFolder-"; }
+            get => "^assetFolder-";
         }
 
         public RecursiveDeleter(

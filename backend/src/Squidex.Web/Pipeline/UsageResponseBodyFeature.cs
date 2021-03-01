@@ -22,17 +22,17 @@ namespace Squidex.Web.Pipeline
 
         public long BytesWritten
         {
-            get { return bytesWritten + usageStream.BytesWritten + usageWriter.BytesWritten; }
+            get => bytesWritten + usageStream.BytesWritten + usageWriter.BytesWritten;
         }
 
         public Stream Stream
         {
-            get { return usageStream; }
+            get => usageStream;
         }
 
         public PipeWriter Writer
         {
-            get { return usageWriter; }
+            get => usageWriter;
         }
 
         public UsageResponseBodyFeature(IHttpResponseBodyFeature inner)

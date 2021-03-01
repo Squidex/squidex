@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         protected override DomainId Id
         {
-            get { return DomainId.Combine(AppId, assetFolderId); }
+            get => DomainId.Combine(AppId, assetFolderId);
         }
 
         public AssetFolderDomainObjectTests()
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             await ExecuteCreateAsync();
             await ExecuteDeleteAsync();
 
-            await Assert.ThrowsAsync<DomainException>(ExecuteUpdateAsync);
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(ExecuteUpdateAsync);
         }
 
         [Fact]

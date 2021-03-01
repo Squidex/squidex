@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         protected override DomainId Id
         {
-            get { return AppId; }
+            get => AppId;
         }
 
         public AppDomainObjectTests()
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             await ExecuteCreateAsync();
             await ExecuteArchiveAsync();
 
-            await Assert.ThrowsAsync<DomainException>(ExecuteAttachClientAsync);
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(ExecuteAttachClientAsync);
         }
 
         [Fact]

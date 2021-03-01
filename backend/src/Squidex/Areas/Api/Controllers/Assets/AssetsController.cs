@@ -356,6 +356,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset to delete.</param>
         /// <param name="checkReferrers">True to check referrers of this asset.</param>
+        /// <param name="permanent">True to delete the asset permanently.</param>
         /// <returns>
         /// 204 => Asset deleted.
         /// 404 => Asset or app not found.
@@ -364,9 +365,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/{id}/")]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteAsset(string app, DomainId id, [FromQuery] bool checkReferrers = false)
+        public async Task<IActionResult> DeleteAsset(string app, DomainId id,
+            [FromQuery] bool checkReferrers = false,
+            [FromQuery] bool permanent = false)
         {
-            await CommandBus.PublishAsync(new DeleteAsset { AssetId = id, CheckReferrers = checkReferrers });
+            await CommandBus.PublishAsync(new DeleteAsset { AssetId = id, CheckReferrers = checkReferrers, Permanent = false });
 
             return NoContent();
         }

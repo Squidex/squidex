@@ -18,27 +18,34 @@ namespace Squidex.Infrastructure.States
     internal class Persistence<TSnapshot, TKey> : IPersistence<TSnapshot> where TKey : notnull
     {
         private readonly TKey ownerKey;
-        private readonly Type ownerType;
         private readonly ISnapshotStore<TSnapshot, TKey> snapshotStore;
-        private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
-        private readonly IEventEnricher<TKey> eventEnricher;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly PersistenceMode persistenceMode;
         private readonly HandleSnapshot<TSnapshot>? applyState;
         private readonly HandleEvent? applyEvent;
+        private readonly Lazy<string> streamName;
         private long versionSnapshot = EtagVersion.Empty;
         private long versionEvents = EtagVersion.Empty;
         private long version = EtagVersion.Empty;
 
         public long Version
         {
-            get { return version; }
+            get => version;
+        }
+
+        private bool UseSnapshots
+        {
+            get => (persistenceMode & PersistenceMode.Snapshots) == PersistenceMode.Snapshots;
+        }
+
+        private bool UseEventSourcing
+        {
+            get => (persistenceMode & PersistenceMode.EventSourcing) == PersistenceMode.EventSourcing;
         }
 
         public Persistence(TKey ownerKey, Type ownerType,
             IEventStore eventStore,
-            IEventEnricher<TKey> eventEnricher,
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<TSnapshot, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
@@ -47,15 +54,27 @@ namespace Squidex.Infrastructure.States
             HandleEvent? applyEvent)
         {
             this.ownerKey = ownerKey;
-            this.ownerType = ownerType;
             this.applyState = applyState;
             this.applyEvent = applyEvent;
             this.eventStore = eventStore;
-            this.eventEnricher = eventEnricher;
             this.eventDataFormatter = eventDataFormatter;
             this.persistenceMode = persistenceMode;
             this.snapshotStore = snapshotStore;
-            this.streamNameResolver = streamNameResolver;
+
+            streamName = new Lazy<string>(() => streamNameResolver.GetStreamName(ownerType, ownerKey.ToString()!));
+        }
+
+        public async Task DeleteAsync()
+        {
+            if (UseSnapshots)
+            {
+                await snapshotStore.RemoveAsync(ownerKey);
+            }
+
+            if (UseEventSourcing)
+            {
+                await eventStore.DeleteStreamAsync(streamName.Value);
+            }
         }
 
         public async Task ReadAsync(long expectedVersion = EtagVersion.Any)
@@ -63,8 +82,15 @@ namespace Squidex.Infrastructure.States
             versionSnapshot = EtagVersion.Empty;
             versionEvents = EtagVersion.Empty;
 
-            await ReadSnapshotAsync();
-            await ReadEventsAsync();
+            if (UseSnapshots)
+            {
+                await ReadSnapshotAsync();
+            }
+
+            if (UseEventSourcing)
+            {
+                await ReadEventsAsync();
+            }
 
             UpdateVersion();
 
@@ -83,130 +109,97 @@ namespace Squidex.Infrastructure.States
 
         private async Task ReadSnapshotAsync()
         {
-            if (UseSnapshots())
+            var (state, position) = await snapshotStore.ReadAsync(ownerKey);
+
+            // Treat all negative values as not-found (empty).
+            position = Math.Max(position, EtagVersion.Empty);
+
+            versionSnapshot = position;
+            versionEvents = position;
+
+            if (applyState != null && position >= 0)
             {
-                var (state, position) = await snapshotStore.ReadAsync(ownerKey);
-
-                if (position < EtagVersion.Empty)
-                {
-                    position = EtagVersion.Empty;
-                }
-
-                versionSnapshot = position;
-                versionEvents = position;
-
-                if (applyState != null && position >= 0)
-                {
-                    applyState(state);
-                }
+                applyState(state);
             }
         }
 
         private async Task ReadEventsAsync()
         {
-            if (UseEventSourcing())
+            var events = await eventStore.QueryAsync(streamName.Value, versionEvents + 1);
+
+            var isStopped = false;
+
+            foreach (var @event in events)
             {
-                var events = await eventStore.QueryAsync(GetStreamName(), versionEvents + 1);
+                var newVersion = versionEvents + 1;
 
-                foreach (var @event in events)
+                if (@event.EventStreamNumber != newVersion)
                 {
-                    versionEvents++;
+                    throw new InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
+                }
 
-                    if (@event.EventStreamNumber != versionEvents)
-                    {
-                        throw new InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
-                    }
-
+                // Skip the parsing for performance reasons if we are not interested, but continue reading to get the version.
+                if (!isStopped)
+                {
                     var parsedEvent = eventDataFormatter.ParseIfKnown(@event);
 
                     if (applyEvent != null && parsedEvent != null)
                     {
-                        applyEvent(parsedEvent);
+                        isStopped = !applyEvent(parsedEvent);
                     }
                 }
+
+                versionEvents++;
             }
         }
 
         public async Task WriteSnapshotAsync(TSnapshot state)
         {
-            var newVersion = UseEventSourcing() ? versionEvents : versionSnapshot + 1;
+            var oldVersion = versionSnapshot;
 
-            if (newVersion != versionSnapshot)
+            if (oldVersion == EtagVersion.Empty && UseEventSourcing)
             {
-                await snapshotStore.WriteAsync(ownerKey, state, versionSnapshot, newVersion);
-
-                versionSnapshot = newVersion;
+                oldVersion = (versionEvents - 1);
             }
+
+            var newVersion = UseEventSourcing ? versionEvents : oldVersion + 1;
+
+            if (newVersion == versionSnapshot)
+            {
+                return;
+            }
+
+            await snapshotStore.WriteAsync(ownerKey, state, oldVersion, newVersion);
+
+            versionSnapshot = newVersion;
 
             UpdateVersion();
         }
 
-        public async Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> events)
+        public async Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events)
         {
-            Guard.NotNull(events, nameof(events));
+            Guard.NotEmpty(events, nameof(events));
 
-            var eventArray = events.ToArray();
+            var oldVersion = EtagVersion.Any;
 
-            if (eventArray.Length > 0)
+            if (UseEventSourcing)
             {
-                var expectedVersion = UseEventSourcing() ? version : EtagVersion.Any;
-
-                var commitId = Guid.NewGuid();
-
-                foreach (var @event in eventArray)
-                {
-                    eventEnricher.Enrich(@event, ownerKey);
-                }
-
-                var eventStream = GetStreamName();
-                var eventData = GetEventData(eventArray, commitId);
-
-                try
-                {
-                    await eventStore.AppendAsync(commitId, eventStream, expectedVersion, eventData);
-                }
-                catch (WrongEventVersionException ex)
-                {
-                    throw new InconsistentStateException(ex.CurrentVersion, ex.ExpectedVersion, ex);
-                }
-
-                versionEvents += eventArray.Length;
+                oldVersion = versionEvents;
             }
 
-            UpdateVersion();
-        }
+            var eventCommitId = Guid.NewGuid();
+            var eventData = events.Select(x => eventDataFormatter.ToEventData(x, eventCommitId, true)).ToArray();
 
-        public async Task DeleteAsync()
-        {
-            if (UseEventSourcing())
+            try
             {
-                await eventStore.DeleteStreamAsync(GetStreamName());
+                await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData);
+            }
+            catch (WrongEventVersionException ex)
+            {
+                throw new InconsistentStateException(ex.CurrentVersion, ex.ExpectedVersion, ex);
             }
 
-            if (UseSnapshots())
-            {
-                await snapshotStore.RemoveAsync(ownerKey);
-            }
-        }
-
-        private EventData[] GetEventData(Envelope<IEvent>[] events, Guid commitId)
-        {
-            return events.Select(x => eventDataFormatter.ToEventData(x, commitId, true)).ToArray();
-        }
-
-        private string GetStreamName()
-        {
-            return streamNameResolver.GetStreamName(ownerType, ownerKey.ToString()!);
-        }
-
-        private bool UseSnapshots()
-        {
-            return persistenceMode == PersistenceMode.Snapshots || persistenceMode == PersistenceMode.SnapshotsAndEventSourcing;
-        }
-
-        private bool UseEventSourcing()
-        {
-            return persistenceMode == PersistenceMode.EventSourcing || persistenceMode == PersistenceMode.SnapshotsAndEventSourcing;
+            versionEvents += eventData.Length;
         }
 
         private void UpdateVersion()

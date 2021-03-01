@@ -53,6 +53,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public string? Schema { get; set; }
 
         /// <summary>
+        /// True to delete the content permanently.
+        /// </summary>
+        public bool Permanent { get; set; }
+
+        /// <summary>
         /// The number of expected items. Set it to a higher number to update multiple items when a query is defined.
         /// </summary>
         public long ExpectedCount { get; set; } = 1;

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private IContentQueryService ContentQuery
         {
-            get { return contentQuery.Value; }
+            get => contentQuery.Value;
         }
 
         public ContentEnricher(IEnumerable<IContentEnricherStep> steps, Lazy<IContentQueryService> contentQuery)

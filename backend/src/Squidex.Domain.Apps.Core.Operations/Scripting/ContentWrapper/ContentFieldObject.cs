@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
         public ContentFieldData? FieldData
         {
-            get { return fieldData; }
+            get => fieldData;
         }
 
         public override bool Extensible => true;

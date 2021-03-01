@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.States
 
         Task DeleteAsync();
 
-        Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> events);
+        Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events);
 
         Task WriteSnapshotAsync(TState state);
 

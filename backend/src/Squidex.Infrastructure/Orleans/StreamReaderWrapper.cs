@@ -17,17 +17,17 @@ namespace Squidex.Infrastructure.Orleans
 
         public override bool CanRead
         {
-            get { return true; }
+            get => true;
         }
 
         public override bool CanSeek
         {
-            get { return false; }
+            get => false;
         }
 
         public override bool CanWrite
         {
-            get { return false; }
+            get => false;
         }
 
         public override long Length

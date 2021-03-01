@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public DomainId UniqueId
         {
-            get { return DomainId.Combine(AppId, Id); }
+            get => DomainId.Combine(AppId, Id);
         }
     }
 }

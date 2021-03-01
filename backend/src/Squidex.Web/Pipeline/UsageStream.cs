@@ -21,22 +21,22 @@ namespace Squidex.Web.Pipeline
 
         public long BytesWritten
         {
-            get { return bytesWritten; }
+            get => bytesWritten;
         }
 
         public override bool CanRead
         {
-            get { return false; }
+            get => false;
         }
 
         public override bool CanSeek
         {
-            get { return false; }
+            get => false;
         }
 
         public override bool CanWrite
         {
-            get { return inner.CanWrite; }
+            get => inner.CanWrite;
         }
 
         public override long Length

@@ -23,7 +23,7 @@ namespace Squidex.Web.Services
 
         public LocalizedString this[string name]
         {
-            get { return this[name, null!]; }
+            get => this[name, null!];
         }
 
         public LocalizedString this[string name, params object[] arguments]

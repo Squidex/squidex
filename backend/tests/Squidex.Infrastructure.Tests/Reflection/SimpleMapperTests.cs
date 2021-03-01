@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Reflection
         {
             public T P1
             {
-                set { Debug.WriteLine(value); }
+                set => Debug.WriteLine(value);
             }
         }
 

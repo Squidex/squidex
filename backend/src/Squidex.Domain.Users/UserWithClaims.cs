@@ -19,17 +19,17 @@ namespace Squidex.Domain.Users
 
         public string Id
         {
-            get { return Identity.Id; }
+            get => Identity.Id;
         }
 
         public string Email
         {
-            get { return Identity.Email; }
+            get => Identity.Email;
         }
 
         public bool IsLocked
         {
-            get { return Identity.LockoutEnd > DateTime.UtcNow; }
+            get => Identity.LockoutEnd > DateTime.UtcNow;
         }
 
         public IReadOnlyList<Claim> Claims { get; }

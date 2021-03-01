@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         protected override DomainId Id
         {
-            get { return ruleId; }
+            get => ruleId;
         }
 
         public RuleCommandMiddlewareTests()

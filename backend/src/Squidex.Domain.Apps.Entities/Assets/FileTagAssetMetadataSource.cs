@@ -28,12 +28,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             public string Name
             {
-                get { return file.FileName; }
+                get => file.FileName;
             }
 
             public Stream ReadStream
             {
-                get { return file.OpenRead(); }
+                get => file.OpenRead();
             }
 
             public Stream WriteStream

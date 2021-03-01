@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         protected override DomainId Id
         {
-            get { return appId.Id; }
+            get => appId.Id;
         }
 
         public AppCommandMiddlewareTests()

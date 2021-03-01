@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public IEnumerable<Language> Fallbacks
         {
-            get { return fallbacks; }
+            get => fallbacks;
         }
 
         public LanguageConfig(bool isOptional = false, params Language[]? fallbacks)

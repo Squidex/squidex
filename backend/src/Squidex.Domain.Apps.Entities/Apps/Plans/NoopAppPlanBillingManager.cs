@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
     {
         public bool HasPortal
         {
-            get { return false; }
+            get => false;
         }
 
         public Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<DomainId> appId, string? planId, string? referer)

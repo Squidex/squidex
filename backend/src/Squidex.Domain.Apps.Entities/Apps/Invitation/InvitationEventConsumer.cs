@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public string Name
         {
-            get { return "NotificationEmailSender"; }
+            get => "NotificationEmailSender";
         }
 
         public string EventsFilter

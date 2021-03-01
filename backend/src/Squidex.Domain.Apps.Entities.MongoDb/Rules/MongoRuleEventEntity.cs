@@ -72,12 +72,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         DomainId IEntity.Id
         {
-            get { return DocumentId; }
+            get => DocumentId;
         }
 
         DomainId IEntity.UniqueId
         {
-            get { return DocumentId; }
+            get => DocumentId;
         }
     }
 }

@@ -17,22 +17,22 @@ namespace Squidex.Infrastructure.Orleans
 
         public override bool CanRead
         {
-            get { return false; }
+            get => false;
         }
 
         public override bool CanSeek
         {
-            get { return false; }
+            get => false;
         }
 
         public override bool CanWrite
         {
-            get { return true; }
+            get => true;
         }
 
         public override long Length
         {
-            get { return writer.CurrentOffset; }
+            get => writer.CurrentOffset;
         }
 
         public override long Position

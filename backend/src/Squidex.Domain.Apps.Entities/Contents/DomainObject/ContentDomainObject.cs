@@ -23,7 +23,7 @@ using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
-    public sealed partial class ContentDomainObject : LogSnapshotDomainObject<ContentDomainObject.State>
+    public sealed partial class ContentDomainObject : DomainObject<ContentDomainObject.State>
     {
         private readonly ContentOperationContext context;
 
@@ -34,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Guard.NotNull(context, nameof(context));
 
             this.context = context;
+
+            Capacity = int.MaxValue;
         }
 
         protected override bool IsDeleted()
@@ -44,6 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         protected override bool CanAcceptCreation(ICommand command)
         {
             return command is CreateContent || command is UpsertContent;
+        }
+
+        protected override bool CanRecreate()
+        {
+            return true;
         }
 
         protected override bool CanAccept(ICommand command)
@@ -63,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         await LoadContext(c, c.OptimizeValidation);
 
-                        if (Version > EtagVersion.Empty)
+                        if (Version > EtagVersion.Empty && !IsDeleted())
                         {
                             await UpdateCore(c.AsUpdate(), x => c.Data, false);
                         }
@@ -184,26 +191,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return Snapshot;
                     });
 
+                case DeleteContent deleteContent when (deleteContent.Permanent):
+                    return DeletePermanentAsync(deleteContent, async c =>
+                    {
+                        await DeleteCore(c);
+                    });
+
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        await LoadContext(c, false);
-
-                        await GuardContent.CanDelete(c, Snapshot, context.Repository, context.Schema);
-
-                        if (!c.DoNotScript)
-                        {
-                            await context.ExecuteScriptAsync(s => s.Delete,
-                                new ScriptVars
-                                {
-                                    Operation = "Delete",
-                                    Data = Snapshot.Data,
-                                    Status = Snapshot.EditingStatus,
-                                    StatusOld = default
-                                });
-                        }
-
-                        Delete(c);
+                        await DeleteCore(c);
                     });
 
                 default:
@@ -322,6 +319,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                 Update(c, dataNew);
             }
+        }
+
+        private async Task DeleteCore(DeleteContent c)
+        {
+            await LoadContext(c, false);
+
+            await GuardContent.CanDelete(c, Snapshot, context.Repository, context.Schema);
+
+            if (!c.DoNotScript)
+            {
+                await context.ExecuteScriptAsync(s => s.Delete,
+                    new ScriptVars
+                    {
+                        Operation = "Delete",
+                        Data = Snapshot.Data,
+                        Status = Snapshot.EditingStatus,
+                        StatusOld = default
+                    });
+            }
+
+            Delete(c);
         }
 
         private void Create(CreateContent command, ContentData data, Status status)

@@ -26,17 +26,17 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public string Master
         {
-            get { return master; }
+            get => master;
         }
 
         public IEnumerable<string> AllKeys
         {
-            get { return languages.Keys; }
+            get => languages.Keys;
         }
 
         public IReadOnlyDictionary<string, LanguageConfig> Languages
         {
-            get { return languages; }
+            get => languages;
         }
 
         public LanguagesConfig(Dictionary<string, LanguageConfig> languages, string master)

@@ -19,7 +19,6 @@ namespace Squidex.Infrastructure.States
     public class PersistenceEventSourcingTests
     {
         private readonly string key = Guid.NewGuid().ToString();
-        private readonly IEventEnricher<string> eventEnricher = A.Fake<IEventEnricher<string>>();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
@@ -38,7 +37,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => streamNameResolver.GetStreamName(None.Type, key))
                 .Returns(key);
 
-            sut = new Store<string>(eventStore, eventEnricher, eventDataFormatter, services, streamNameResolver);
+            sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
         }
 
         [Fact]
@@ -49,12 +48,28 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(event1, event2);
 
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithEventSourcing(None.Type, key, persistedEvents.Write);
 
             await persistence.ReadAsync();
 
             Assert.Equal(persistedEvents.ToArray(), new[] { event1, event2 });
+        }
+
+        [Fact]
+        public async Task Should_read_until_stopped()
+        {
+            var event1 = new MyEvent();
+            var event2 = new MyEvent();
+
+            SetupEventStore(event1, event2);
+
+            var persistedEvents = Save.Events(1);
+            var persistence = sut.WithEventSourcing(None.Type, key, persistedEvents.Write);
+
+            await persistence.ReadAsync();
+
+            Assert.Equal(persistedEvents.ToArray(), new[] { event1 });
         }
 
         [Fact]
@@ -68,8 +83,8 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => eventDataFormatter.ParseIfKnown(storedEvent))
                 .Returns(null);
 
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithEventSourcing(None.Type, key, persistedEvents.Write);
 
             await persistence.ReadAsync();
 
@@ -85,9 +100,9 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3, 2);
 
-            var persistedState = -1;
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistedState = Save.Snapshot(-1);
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
             await persistence.ReadAsync();
 
@@ -103,9 +118,9 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3, 0, 3);
 
-            var persistedState = -1;
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistedState = Save.Snapshot(-1);
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => persistence.ReadAsync());
         }
@@ -118,9 +133,9 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3, 4, 3);
 
-            var persistedState = -1;
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistedState = Save.Snapshot(-1);
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => persistence.ReadAsync());
         }
@@ -130,8 +145,8 @@ namespace Squidex.Infrastructure.States
         {
             SetupEventStore(0);
 
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithEventSourcing(None.Type, key, persistedEvents.Write);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => persistence.ReadAsync(1));
         }
@@ -141,8 +156,8 @@ namespace Squidex.Infrastructure.States
         {
             SetupEventStore(3);
 
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithEventSourcing(None.Type, key, persistedEvents.Write);
 
             await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.ReadAsync(1));
         }
@@ -155,9 +170,9 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(0);
 
-            var persistedState = -1;
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistedState = Save.Snapshot(-1);
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
             await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.ReadAsync(1));
         }
@@ -167,20 +182,20 @@ namespace Squidex.Infrastructure.States
         {
             SetupEventStore(0);
 
-            var persistedState = -1;
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistedState = Save.Snapshot(-1);
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
             await persistence.ReadAsync();
         }
 
         [Fact]
-        public async Task Should_write_to_store_with_previous_version()
+        public async Task Should_write_events_to_store()
         {
             SetupEventStore(3);
 
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithEventSourcing(None.Type, key, persistedEvents.Write);
 
             await persistence.ReadAsync();
 
@@ -191,8 +206,9 @@ namespace Squidex.Infrastructure.States
                 .MustHaveHappened();
             A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key, 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
-            A.CallTo(() => eventEnricher.Enrich(A<Envelope<IEvent>>._, key))
-                .MustHaveHappenedTwiceExactly();
+
+            A.CallTo(() => snapshotStore.WriteAsync(A<string>._, A<int>._, A<long>._, A<long>._))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -207,12 +223,84 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_write_snapshot_to_store()
+        {
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((2, 2L));
+
+            SetupEventStore(3);
+
+            var persistedState = Save.Snapshot(-1);
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
+
+            await persistence.ReadAsync();
+
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
+            await persistence.WriteSnapshotAsync(4);
+
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
+            await persistence.WriteSnapshotAsync(5);
+
+            A.CallTo(() => snapshotStore.WriteAsync(key, 4, 2, 3))
+                .MustHaveHappened();
+            A.CallTo(() => snapshotStore.WriteAsync(key, 5, 3, 4))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_write_snapshot_to_store_when_not_read_before()
+        {
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((default, EtagVersion.Empty));
+
+            SetupEventStore(3);
+
+            var persistedState = Save.Snapshot(-1);
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
+
+            await persistence.ReadAsync();
+
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
+            await persistence.WriteSnapshotAsync(4);
+
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
+            await persistence.WriteSnapshotAsync(5);
+
+            A.CallTo(() => snapshotStore.WriteAsync(key, 4, 2, 3))
+                .MustHaveHappened();
+            A.CallTo(() => snapshotStore.WriteAsync(key, 5, 3, 4))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_write_snapshot_to_store_when_not_changed()
+        {
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((0, 2));
+
+            SetupEventStore(3);
+
+            var persistedState = Save.Snapshot(-1);
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
+
+            await persistence.ReadAsync();
+
+            await persistence.WriteSnapshotAsync(4);
+
+            A.CallTo(() => snapshotStore.WriteAsync(key, A<int>._, A<long>._, A<long>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_wrap_exception_when_writing_to_store_with_previous_version()
         {
             SetupEventStore(3);
 
-            var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithEventSourcing(None.Type, key, persistedEvents.Write);
 
             await persistence.ReadAsync();
 

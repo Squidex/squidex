@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
         [IgnoreDataMember]
         public override DomainId AggregateId
         {
-            get { return DomainId.Combine(AppId, SchemaId); }
+            get => DomainId.Combine(AppId, SchemaId);
         }
 
         public CreateSchema()

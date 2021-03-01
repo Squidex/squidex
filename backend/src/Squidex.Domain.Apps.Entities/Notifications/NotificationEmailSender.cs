@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         public bool IsActive
         {
-            get { return true; }
+            get => true;
         }
 
         public NotificationEmailSender(
