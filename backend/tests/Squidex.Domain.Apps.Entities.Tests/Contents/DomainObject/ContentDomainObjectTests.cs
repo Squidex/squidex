@@ -812,11 +812,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             result.ShouldBeEquivalent(None.Value);
 
             Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
-                );
+            Assert.Empty(LastEvents);
 
             A.CallTo(() => scriptEngine.ExecuteAsync(ScriptContext(data, null, Status.Draft), "<delete-script>", ScriptOptions()))
                 .MustHaveHappened();

@@ -69,10 +69,10 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
                 .Returns(persistence);
 
             A.CallTo(() => persistenceWithState.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
-                .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
+                .Invokes((IReadOnlyList<Envelope<IEvent>> events) => LastEvents = events);
 
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
-                .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
+                .Invokes((IReadOnlyList<Envelope<IEvent>> events) => LastEvents = events);
 
             A.CallTo(() => persistenceWithState.DeleteAsync())
                 .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
