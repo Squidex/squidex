@@ -35,6 +35,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string? ContentSidebarUrl { get; set; }
 
         /// <summary>
+        /// The url to the editor plugin.
+        /// </summary>
+        public string? ContentEditorUrl { get; set; }
+
+        /// <summary>
         /// True to validate the content items on publish.
         /// </summary>
         public bool ValidateOnPublish { get; set; }

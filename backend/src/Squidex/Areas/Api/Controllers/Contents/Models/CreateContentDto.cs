@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
         public CreateContent ToCommand()
         {
-            var command = new CreateContent { Data = Data?.ToCleaned()! };
+            var command = new CreateContent { Data = Data! };
 
             if (Id != null && Id.Value != default && !string.IsNullOrWhiteSpace(Id.Value.ToString()))
             {

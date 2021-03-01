@@ -481,7 +481,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, DomainId id, [FromBody] ContentData request)
         {
-            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
+            var command = new UpdateContent { ContentId = id, Data = request };
 
             var response = await InvokeCommandAsync(command);
 
@@ -510,7 +510,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, DomainId id, [FromBody] ContentData request)
         {
-            var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
+            var command = new PatchContent { ContentId = id, Data = request };
 
             var response = await InvokeCommandAsync(command);
 

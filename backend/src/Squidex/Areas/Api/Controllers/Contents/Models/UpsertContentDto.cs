@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
         public UpsertContent ToCommand(DomainId id)
         {
-            var command = new UpsertContent { Data = Data?.ToCleaned()!, ContentId = id };
+            var command = new UpsertContent { Data = Data!, ContentId = id };
 
             if (Status != null)
             {

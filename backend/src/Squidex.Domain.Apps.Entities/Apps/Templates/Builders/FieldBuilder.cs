@@ -64,16 +64,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public FieldBuilder ShowInList()
         {
-            schema.FieldsInReferences ??= new FieldNames();
-            schema.FieldsInReferences.Add(field.Name);
+            schema.FieldsInLists ??= new FieldNames();
+            schema.FieldsInLists.Add(field.Name);
 
             return this;
         }
 
         public FieldBuilder ShowInReferences()
         {
-            schema.FieldsInLists ??= new FieldNames();
-            schema.FieldsInLists.Add(field.Name);
+            schema.FieldsInReferences ??= new FieldNames();
+            schema.FieldsInReferences.Add(field.Name);
 
             return this;
         }

@@ -95,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             {
                 var data = flat ? dataFlatSchema : dataSchema;
 
-                return ContentJsonSchemaBuilder.BuildSchema(displayName, dataFlatSchema, true);
+                return ContentJsonSchemaBuilder.BuildSchema(displayName, data, true);
             });
 
             var path = $"/content/{AppName}/{schema.Name}";
