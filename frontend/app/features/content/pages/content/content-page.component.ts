@@ -209,6 +209,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
         if (content) {
             this.contentsState.deleteMany([content]);
+
+            this.back();
         }
     }
 
