@@ -38,6 +38,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
         }
 
+        public async Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
+        {
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+            return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, data, user);
+        }
+
         public async Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
@@ -64,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return true;
         }
 
-        public async Task<StatusInfo> GetInfoAsync(IContentEntity content, Status status)
+        public async Task<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
@@ -73,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return new StatusInfo(status, GetColor(step));
             }
 
-            return new StatusInfo(status, StatusColors.Draft);
+            return null;
         }
 
         public async Task<Status> GetInitialStatusAsync(ISchemaEntity schema)

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [IgnoreDuringEquals]
         public bool IsDefault
         {
-            get { return Roles.IsDefault(this); }
+            get => Roles.IsDefault(this);
         }
 
         public Role(string name, PermissionSet permissions, JsonObject properties)

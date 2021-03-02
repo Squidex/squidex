@@ -19,15 +19,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public DomainId? Id { get; set; }
 
-        public Status Status { get; set; }
+        public Status? Status { get; set; }
 
         public Instant? DueTime { get; set; }
 
-        public BulkUpdateType Type { get; set; }
+        public BulkUpdateContentType Type { get; set; }
 
         public ContentData? Data { get; set; }
 
         public string? Schema { get; set; }
+
+        public bool Permanent { get; set; }
 
         public long ExpectedCount { get; set; } = 1;
 

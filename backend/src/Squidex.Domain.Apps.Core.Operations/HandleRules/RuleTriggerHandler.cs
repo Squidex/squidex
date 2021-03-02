@@ -25,12 +25,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public Type TriggerType
         {
-            get { return typeof(TTrigger); }
+            get => typeof(TTrigger);
         }
 
         public virtual bool CanCreateSnapshotEvents
         {
-            get { return false; }
+            get => false;
         }
 
         public virtual async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEvents(TTrigger trigger, DomainId appId)

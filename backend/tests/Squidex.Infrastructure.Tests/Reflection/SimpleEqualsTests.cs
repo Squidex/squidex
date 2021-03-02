@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Reflection
 
             public int ReadOnly
             {
-                set { Debug.WriteLine(value); }
+                set => Debug.WriteLine(value);
             }
         }
 

@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
     {
         public override long Partition
         {
-            get { return 0; }
+            get => 0;
         }
     }
 }

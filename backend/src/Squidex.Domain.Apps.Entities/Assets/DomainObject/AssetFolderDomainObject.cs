@@ -50,22 +50,22 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 Equals(assetFolderCommand.AssetFolderId, Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
-                case CreateAssetFolder createAssetFolder:
-                    return CreateReturnAsync(createAssetFolder, async c =>
+                case CreateAssetFolder c:
+                    return CreateReturnAsync(c, async create =>
                     {
-                        await GuardAssetFolder.CanCreate(c, assetQuery);
+                        await GuardAssetFolder.CanCreate(create, assetQuery);
 
-                        Create(c);
+                        Create(create);
 
                         return Snapshot;
                     });
 
-                case MoveAssetFolder moveAssetFolder:
-                    return UpdateReturnAsync(moveAssetFolder, async c =>
+                case MoveAssetFolder move:
+                    return UpdateReturnAsync(move, async c =>
                     {
                         await GuardAssetFolder.CanMove(c, Snapshot, assetQuery);
 
@@ -74,8 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         return Snapshot;
                     });
 
-                case RenameAssetFolder renameAssetFolder:
-                    return UpdateReturn(renameAssetFolder, c =>
+                case RenameAssetFolder rename:
+                    return UpdateReturn(rename, c =>
                     {
                         GuardAssetFolder.CanRename(c);
 
@@ -84,8 +84,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         return Snapshot;
                     });
 
-                case DeleteAssetFolder deleteAssetFolder:
-                    return Update(deleteAssetFolder, c =>
+                case DeleteAssetFolder delete:
+                    return Update(delete, c =>
                     {
                         GuardAssetFolder.CanDelete(c);
 
@@ -97,33 +97,29 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
         }
 
-        public void Create(CreateAssetFolder command)
+        private void Create(CreateAssetFolder command)
         {
             Raise(command, new AssetFolderCreated());
         }
 
-        public void Move(MoveAssetFolder command)
+        private void Move(MoveAssetFolder command)
         {
             Raise(command, new AssetFolderMoved());
         }
 
-        public void Rename(RenameAssetFolder command)
+        private void Rename(RenameAssetFolder command)
         {
             Raise(command, new AssetFolderRenamed());
         }
 
-        public void Delete(DeleteAssetFolder command)
+        private void Delete(DeleteAssetFolder command)
         {
             Raise(command, new AssetFolderDeleted());
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
         {
-            SimpleMapper.Map(command, @event);
-
-            @event.AppId ??= Snapshot.AppId;
-
-            RaiseEvent(Envelope.Create(@event));
+            RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
         }
     }
 }

@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task TransformAsync_should_throw_when_script_failed()
+        public async Task TransformAsync_should_throw_exception_when_script_failed()
         {
             var content = new ContentData();
             var context = new ScriptVars { Data = content };

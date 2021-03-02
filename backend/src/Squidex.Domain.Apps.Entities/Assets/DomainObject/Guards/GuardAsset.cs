@@ -22,14 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             Guard.NotNull(command, nameof(command));
         }
 
-        public static Task CanCreate(CreateAsset command, IAssetQueryService assetQuery)
+        public static void CanCreate(CreateAsset command)
         {
             Guard.NotNull(command, nameof(command));
-
-            return Validate.It(async e =>
-            {
-                await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, e);
-            });
         }
 
         public static Task CanMove(MoveAsset command, IAssetEntity asset, IAssetQueryService assetQuery)

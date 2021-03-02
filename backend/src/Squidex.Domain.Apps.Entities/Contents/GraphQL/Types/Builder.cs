@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public SharedTypes SharedTypes
         {
-            get { return sharedTypes; }
+            get => sharedTypes;
         }
 
         static Builder()

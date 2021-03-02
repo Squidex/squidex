@@ -496,8 +496,8 @@
   <data name="contents.singletonNotDeletable" xml:space="preserve">
     <value>Singleton-inhoud kan niet worden verwijderd.</value>
   </data>
-  <data name="contents.statusSchedulingNotInFuture" xml:space="preserve">
-    <value>De tijd moet in de toekomst liggen.</value>
+  <data name="contents.statusNotValid" xml:space="preserve">
+    <value>Status is not defined in the workflow.</value>
   </data>
   <data name="contents.statusTransitionNotAllowed" xml:space="preserve">
     <value>Kan status niet wijzigen van {oldStatus} in {newStatus}.</value>
@@ -631,7 +631,7 @@
   <data name="contents.validation.wordsBetween" xml:space="preserve">
     <value>Moet tussen {min} en {max} woord (en) bevatten.</value>
   </data>
-  <data name="contents.workflowErorPublishing" xml:space="preserve">
+  <data name="contents.workflowErrorPublishing" xml:space="preserve">
     <value>Contentworkflow verhindert publiceren.</value>
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">

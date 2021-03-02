@@ -5,16 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class DefaultEventEnricher<TKey> : IEventEnricher<TKey>
+    public sealed record AssetDuplicate(IEnrichedAssetEntity Asset)
     {
-        public virtual void Enrich(Envelope<IEvent> @event, TKey key)
-        {
-            if (key is DomainId domainId)
-            {
-                @event.SetAggregateId(domainId);
-            }
-        }
     }
 }

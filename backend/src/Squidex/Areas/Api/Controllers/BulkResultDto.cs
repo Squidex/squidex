@@ -5,13 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Microsoft.AspNetCore.Http;
-using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Contents.Models
+namespace Squidex.Areas.Api.Controllers
 {
     public sealed class BulkResultDto
     {
@@ -26,15 +27,21 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public int JobIndex { get; set; }
 
         /// <summary>
-        /// The id of the content that has been handled successfully or not.
+        /// The id of the entity that has been handled successfully or not.
         /// </summary>
-        public DomainId? ContentId { get; set; }
+        public DomainId? Id { get; set; }
 
-        public static BulkResultDto FromImportResult(BulkUpdateResultItem result, HttpContext httpContext)
+        /// <summary>
+        /// The id of the entity that has been handled successfully or not.
+        /// </summary>
+        [Obsolete("Use Id instead.")]
+        public DomainId? ContentId => Id;
+
+        public static BulkResultDto FromBulkResult(BulkUpdateResultItem result, HttpContext httpContext)
         {
             var error = result.Exception?.ToErrorDto(httpContext).Error;
 
-            return SimpleMapper.Map(result, new BulkResultDto { Error = error });
+            return SimpleMapper.Map(result, new BulkResultDto { Error = error, Id = result.Id });
         }
     }
 }

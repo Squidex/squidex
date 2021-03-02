@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public class BulkUpdateJobDto
+    public class BulkUpdateContentsJobDto
     {
         /// <summary>
         /// An optional query to identify the content to update.
@@ -33,9 +33,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public ContentData? Data { get; set; }
 
         /// <summary>
-        /// The new status when the type is set to 'ChangeStatus'.
+        /// The new status when the type is set to 'ChangeStatus' or 'Upsert'.
         /// </summary>
-        public Status Status { get; set; }
+        public Status? Status { get; set; }
 
         /// <summary>
         /// The due time.
@@ -45,12 +45,17 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The update type.
         /// </summary>
-        public BulkUpdateType Type { get; set; }
+        public BulkUpdateContentType Type { get; set; }
 
         /// <summary>
         /// The optional schema id or name.
         /// </summary>
         public string? Schema { get; set; }
+
+        /// <summary>
+        /// True to delete the content permanently.
+        /// </summary>
+        public bool Permanent { get; set; }
 
         /// <summary>
         /// The number of expected items. Set it to a higher number to update multiple items when a query is defined.

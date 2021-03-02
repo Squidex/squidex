@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = FakeCommand("NoExtension");
 
-            await sut.EnhanceAsync(command, null);
+            await sut.EnhanceAsync(command);
 
             Assert.Equal(AssetType.Unknown, command.Type);
         }
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = Command("SamplePNGImage_100kbmb.png");
 
-            await sut.EnhanceAsync(command, null);
+            await sut.EnhanceAsync(command);
 
             Assert.Equal(AssetType.Image, command.Type);
 
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = Command("SampleAudio_0.4mb.mp3");
 
-            await sut.EnhanceAsync(command, null);
+            await sut.EnhanceAsync(command);
 
             Assert.Equal(AssetType.Audio, command.Type);
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = Command("SampleVideo_1280x720_1mb.mp4");
 
-            await sut.EnhanceAsync(command, null);
+            await sut.EnhanceAsync(command);
 
             Assert.Equal(AssetType.Video, command.Type);
 

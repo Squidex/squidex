@@ -104,12 +104,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         public DomainId AssetId
         {
-            get { return Id; }
+            get => Id;
         }
 
         public DomainId UniqueId
         {
-            get { return DocumentId; }
+            get => DocumentId;
         }
     }
 }

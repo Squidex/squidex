@@ -41,12 +41,12 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 
         public bool IsImage
         {
-            get { return AssetType == AssetType.Image; }
+            get => AssetType == AssetType.Image;
         }
 
         public override long Partition
         {
-            get { return Id.GetHashCode(); }
+            get => Id.GetHashCode();
         }
     }
 }

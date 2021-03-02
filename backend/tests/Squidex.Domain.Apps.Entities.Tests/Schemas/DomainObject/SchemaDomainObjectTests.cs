@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
         protected override DomainId Id
         {
-            get { return DomainId.Combine(AppId, SchemaId); }
+            get => DomainId.Combine(AppId, SchemaId);
         }
 
         public SchemaDomainObjectTests()
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             await ExecuteCreateAsync();
             await ExecuteDeleteAsync();
 
-            await Assert.ThrowsAsync<DomainException>(ExecutePublishAsync);
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(ExecutePublishAsync);
         }
 
         [Fact]
@@ -317,7 +317,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -783,11 +783,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             return result;
         }
 
-        private async Task<object?> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
+        private async Task<object> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
         {
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            return result;
+            return result.Payload;
         }
     }
 }

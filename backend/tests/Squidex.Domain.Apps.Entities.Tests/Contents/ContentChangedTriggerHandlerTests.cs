@@ -119,6 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async Task Should_create_enriched_events(ContentEvent @event, EnrichedContentEventType type)
         {
             @event.AppId = appId;
+            @event.SchemaId = schemaMatch;
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
@@ -135,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_enrich_with_old_data_when_updated()
         {
-            var @event = new ContentUpdated { AppId = appId, ContentId = DomainId.NewGuid() };
+            var @event = new ContentUpdated { AppId = appId, ContentId = DomainId.NewGuid(), SchemaId = schemaMatch };
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 

@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public DomainId UniqueId
         {
-            get { return DocumentId; }
+            get => DocumentId;
         }
     }
 }

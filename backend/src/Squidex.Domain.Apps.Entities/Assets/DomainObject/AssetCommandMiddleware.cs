@@ -19,6 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
         private readonly IAssetFileStore assetFileStore;
+        private readonly IAssetFolderResolver assetFolderResolver;
         private readonly IAssetEnricher assetEnricher;
         private readonly IAssetQueryService assetQuery;
         private readonly IContextProvider contextProvider;
@@ -28,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             IGrainFactory grainFactory,
             IAssetEnricher assetEnricher,
             IAssetFileStore assetFileStore,
+            IAssetFolderResolver assetFolderResolver,
             IAssetQueryService assetQuery,
             IContextProvider contextProvider,
             IEnumerable<IAssetMetadataSource> assetMetadataSources)
@@ -35,25 +37,27 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             Guard.NotNull(assetEnricher, nameof(assetEnricher));
             Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(assetQuery, nameof(assetQuery));
+            Guard.NotNull(assetFolderResolver, nameof(assetFolderResolver));
             Guard.NotNull(assetMetadataSources, nameof(assetMetadataSources));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(contextProvider, nameof(contextProvider));
 
-            this.assetFileStore = assetFileStore;
             this.assetEnricher = assetEnricher;
-            this.assetQuery = assetQuery;
+            this.assetFileStore = assetFileStore;
+            this.assetFolderResolver = assetFolderResolver;
             this.assetMetadataSources = assetMetadataSources;
+            this.assetQuery = assetQuery;
             this.contextProvider = contextProvider;
         }
 
         public override async Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            var tempFile = context.ContextId.ToString();
-
             switch (context.Command)
             {
                 case CreateAsset createAsset:
                     {
+                        var tempFile = context.ContextId.ToString();
+
                         try
                         {
                             await EnrichWithHashAndUploadAsync(createAsset, tempFile);
@@ -68,16 +72,25 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                                 if (existing != null)
                                 {
-                                    var result = new AssetCreatedResult(existing, true);
-
-                                    context.Complete(result);
+                                    context.Complete(new AssetDuplicate(existing));
 
                                     await next(context);
                                     return;
                                 }
                             }
 
-                            await UploadAsync(context, tempFile, createAsset, createAsset.Tags, true, next);
+                            if (!string.IsNullOrWhiteSpace(createAsset.ParentPath))
+                            {
+                                createAsset.ParentId =
+                                    await assetFolderResolver.ResolveOrCreateAsync(
+                                        contextProvider.Context,
+                                        context.CommandBus,
+                                        createAsset.ParentPath);
+                            }
+
+                            await EnrichWithMetadataAsync(createAsset);
+
+                            await base.HandleAsync(context, next);
                         }
                         finally
                         {
@@ -89,63 +102,97 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         break;
                     }
 
-                case UpdateAsset updateAsset:
+                case MoveAsset move:
                     {
-                        try
+                        if (!string.IsNullOrWhiteSpace(move.ParentPath))
                         {
-                            await EnrichWithHashAndUploadAsync(updateAsset, tempFile);
-
-                            await UploadAsync(context, tempFile, updateAsset, null, false, next);
+                            move.ParentId =
+                                await assetFolderResolver.ResolveOrCreateAsync(
+                                    contextProvider.Context,
+                                    context.CommandBus,
+                                    move.ParentPath);
                         }
-                        finally
+
+                        await base.HandleAsync(context, next);
+
+                        break;
+                    }
+
+                case UpsertAsset upsert:
+                    {
+                        if (!string.IsNullOrWhiteSpace(upsert.ParentPath))
                         {
-                            await assetFileStore.DeleteAsync(tempFile);
-
-                            updateAsset.File.Dispose();
+                            upsert.ParentId =
+                                await assetFolderResolver.ResolveOrCreateAsync(
+                                    contextProvider.Context,
+                                    context.CommandBus,
+                                    upsert.ParentPath);
                         }
+
+                        await UploadAndHandleAsync(context, next, upsert);
+
+                        break;
+                    }
+
+                case UpdateAsset upload:
+                    {
+                        await UploadAndHandleAsync(context, next, upload);
 
                         break;
                     }
 
                 default:
-                    await HandleCoreAsync(context, false, next);
+                    await base.HandleAsync(context, next);
                     break;
             }
         }
 
-        private async Task UploadAsync(CommandContext context, string tempFile, UploadAssetCommand command, HashSet<string>? tags, bool created, NextDelegate next)
+        private async Task UploadAndHandleAsync(CommandContext context, NextDelegate next, UploadAssetCommand upload)
         {
-            await EnrichWithMetadataAsync(command, tags);
+            var tempFile = context.ContextId.ToString();
 
-            var asset = await HandleCoreAsync(context, created, next);
-
-            if (asset != null)
+            try
             {
-                await assetFileStore.CopyAsync(tempFile, command.AppId.Id, command.AssetId, asset.FileVersion);
+                await EnrichWithHashAndUploadAsync(upload, tempFile);
+                await EnrichWithMetadataAsync(upload);
+
+                await base.HandleAsync(context, next);
+            }
+            finally
+            {
+                await assetFileStore.DeleteAsync(tempFile);
+
+                upload.File.Dispose();
             }
         }
 
-        private async Task<IEnrichedAssetEntity?> HandleCoreAsync(CommandContext context, bool created, NextDelegate next)
+        protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
         {
-            await base.HandleAsync(context, next);
+            var payload = await base.EnrichResultAsync(context, result);
 
-            if (context.PlainResult is IAssetEntity asset && !(context.PlainResult is IEnrichedAssetEntity))
+            if (payload is IAssetEntity asset)
             {
-                var enriched = await assetEnricher.EnrichAsync(asset, contextProvider.Context);
-
-                if (created)
+                if (result.IsChanged && context.Command is UploadAssetCommand)
                 {
-                    context.Complete(new AssetCreatedResult(enriched, false));
-                }
-                else
-                {
-                    context.Complete(enriched);
+                    var tempFile = context.ContextId.ToString();
+
+                    try
+                    {
+                        await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion);
+                    }
+                    catch (AssetAlreadyExistsException) when (context.Command is not UpsertAsset)
+                    {
+                        throw;
+                    }
                 }
 
-                return enriched;
+                if (payload is not IEnrichedAssetEntity)
+                {
+                    payload = await assetEnricher.EnrichAsync(asset, contextProvider.Context);
+                }
             }
 
-            return null;
+            return payload;
         }
 
         private async Task EnrichWithHashAndUploadAsync(UploadAssetCommand command, string tempFile)
@@ -156,16 +203,18 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 {
                     await assetFileStore.UploadAsync(tempFile, hashStream);
 
-                    command.FileHash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
+                    var hash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
+
+                    command.FileHash = hash;
                 }
             }
         }
 
-        private async Task EnrichWithMetadataAsync(UploadAssetCommand command, HashSet<string>? tags)
+        private async Task EnrichWithMetadataAsync(UploadAssetCommand command)
         {
             foreach (var metadataSource in assetMetadataSources)
             {
-                await metadataSource.EnhanceAsync(command, tags);
+                await metadataSource.EnhanceAsync(command);
             }
         }
     }

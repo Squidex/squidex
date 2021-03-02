@@ -24,7 +24,7 @@ using IAssetTagService = Squidex.Domain.Apps.Core.Tags.ITagService;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
-    public sealed partial class AssetDomainObject : LogSnapshotDomainObject<AssetDomainObject.State>
+    public sealed partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
     {
         private readonly IContentRepository contentRepository;
         private readonly IAssetTagService assetTags;
@@ -43,11 +43,18 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             this.assetTags = assetTags;
             this.assetQuery = assetQuery;
             this.contentRepository = contentRepository;
+
+            Capacity = int.MaxValue;
         }
 
         protected override bool IsDeleted()
         {
             return Snapshot.IsDeleted;
+        }
+
+        protected override bool CanRecreate()
+        {
+            return true;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -62,27 +69,45 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 Equals(assetCommand.AssetId, Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
-                case CreateAsset createAsset:
-                    return CreateReturnAsync(createAsset, async c =>
+                case UpsertAsset upsert:
+                    return UpsertReturnAsync(upsert, async c =>
                     {
-                        await GuardAsset.CanCreate(c, assetQuery);
-
-                        if (c.Tags != null)
+                        if (Version > EtagVersion.Empty && !IsDeleted())
                         {
-                            c.Tags = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
+                            UpdateCore(c.AsUpdate());
+                        }
+                        else
+                        {
+                            await CreateCore(c.AsCreate());
                         }
 
-                        Create(c);
+                        if (Is.OptionalChange(Snapshot.ParentId, c.ParentId))
+                        {
+                            await MoveCore(c.AsMove(c.ParentId.Value));
+                        }
 
                         return Snapshot;
                     });
 
-                case AnnotateAsset annotateAsset:
-                    return UpdateReturnAsync(annotateAsset, async c =>
+                case CreateAsset c:
+                    return CreateReturnAsync(c, async create =>
+                    {
+                        await CreateCore(create);
+
+                        if (Is.Change(Snapshot.ParentId, c.ParentId))
+                        {
+                            await MoveCore(c.AsMove());
+                        }
+
+                        return Snapshot;
+                    });
+
+                case AnnotateAsset c:
+                    return UpdateReturnAsync(c, async c =>
                     {
                         GuardAsset.CanAnnotate(c);
 
@@ -96,48 +121,81 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         return Snapshot;
                     });
 
-                case UpdateAsset updateAsset:
-                    return UpdateReturn(updateAsset, c =>
+                case UpdateAsset update:
+                    return UpdateReturn(update, update =>
                     {
-                        GuardAsset.CanUpdate(c);
-
-                        Update(c);
+                        Update(update);
 
                         return Snapshot;
                     });
 
-                case MoveAsset moveAsset:
-                    return UpdateReturnAsync(moveAsset, async c =>
+                case MoveAsset move:
+                    return UpdateReturnAsync(move, async c =>
                     {
-                        await GuardAsset.CanMove(c, Snapshot, assetQuery);
-
-                        Move(c);
+                        await MoveCore(c);
 
                         return Snapshot;
                     });
 
-                case DeleteAsset deleteAsset:
-                    return UpdateAsync(deleteAsset, async c =>
+                case DeleteAsset delete when (delete.Permanent):
+                    return DeletePermanentAsync(delete, async c =>
                     {
-                        await GuardAsset.CanDelete(c, Snapshot, contentRepository);
+                        await DeleteCore(c);
+                    });
 
-                        await assetTags.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, null, Snapshot.Tags);
-
-                        Delete(c);
+                case DeleteAsset delete:
+                    return UpdateAsync(delete, async c =>
+                    {
+                        await DeleteCore(c);
                     });
                 default:
                     throw new NotSupportedException();
             }
         }
 
-        private async Task<HashSet<string>> NormalizeTagsAsync(DomainId appId, HashSet<string> tags)
+        private async Task CreateCore(CreateAsset create)
+        {
+            GuardAsset.CanCreate(create);
+
+            if (create.Tags != null)
+            {
+                create.Tags = await NormalizeTagsAsync(create.AppId.Id, create.Tags);
+            }
+
+            Create(create);
+        }
+
+        private async Task MoveCore(MoveAsset move)
+        {
+            await GuardAsset.CanMove(move, Snapshot, assetQuery);
+
+            Move(move);
+        }
+
+        private void UpdateCore(UpdateAsset update)
+        {
+            GuardAsset.CanUpdate(update);
+
+            Update(update);
+        }
+
+        private async Task DeleteCore(DeleteAsset delete)
+        {
+            await GuardAsset.CanDelete(delete, Snapshot, contentRepository);
+
+            await NormalizeTagsAsync(Snapshot.AppId.Id, null);
+
+            Delete(delete);
+        }
+
+        private async Task<HashSet<string>> NormalizeTagsAsync(DomainId appId, HashSet<string>? tags)
         {
             var normalized = await assetTags.NormalizeTagsAsync(appId, TagGroups.Assets, tags, Snapshot.Tags);
 
             return new HashSet<string>(normalized.Values);
         }
 
-        public void Create(CreateAsset command)
+        private void Create(CreateAsset command)
         {
             Raise(command, new AssetCreated
             {
@@ -149,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             });
         }
 
-        public void Update(UpdateAsset command)
+        private void Update(UpdateAsset command)
         {
             Raise(command, new AssetUpdated
             {
@@ -159,28 +217,24 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             });
         }
 
-        public void Annotate(AnnotateAsset command)
+        private void Annotate(AnnotateAsset command)
         {
             Raise(command, new AssetAnnotated());
         }
 
-        public void Move(MoveAsset command)
+        private void Move(MoveAsset command)
         {
             Raise(command, new AssetMoved());
         }
 
-        public void Delete(DeleteAsset command)
+        private void Delete(DeleteAsset command)
         {
             Raise(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize });
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
         {
-            SimpleMapper.Map(command, @event);
-
-            @event.AppId ??= Snapshot.AppId;
-
-            RaiseEvent(Envelope.Create(@event));
+            RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
         }
     }
 }

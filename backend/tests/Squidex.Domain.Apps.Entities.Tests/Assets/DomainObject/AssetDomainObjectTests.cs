@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Log;
 using Xunit;
 
@@ -36,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         protected override DomainId Id
         {
-            get { return assetId; }
+            get => assetId;
         }
 
         public AssetDomainObjectTests()
@@ -45,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._))
-                .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x)!));
+                .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? new Dictionary<string, string>()));
 
             sut = new AssetDomainObject(Store, A.Dummy<ISemanticLog>(), tagService, assetQuery, contentRepository);
             sut.Setup(Id);
@@ -57,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             await ExecuteCreateAsync();
             await ExecuteDeleteAsync();
 
-            await Assert.ThrowsAsync<DomainException>(ExecuteUpdateAsync);
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(ExecuteUpdateAsync);
         }
 
         [Fact]
@@ -84,6 +83,83 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         MimeType = file.MimeType,
                         Tags = new HashSet<string>(),
                         Slug = file.FileName.ToAssetSlug()
+                    })
+                );
+        }
+
+        [Fact]
+        public async Task Create_should_recreate_deleted_content()
+        {
+            var command = new CreateAsset { File = file, FileHash = "NewHash" };
+
+            await ExecuteCreateAsync();
+            await ExecuteDeleteAsync();
+
+            await PublishAsync(command);
+        }
+
+        [Fact]
+        public async Task Create_should_recreate_permanently_deleted_content()
+        {
+            var command = new CreateAsset { File = file, FileHash = "NewHash" };
+
+            await ExecuteCreateAsync();
+            await ExecuteDeleteAsync(true);
+
+            await PublishAsync(command);
+        }
+
+        [Fact]
+        public async Task Upsert_should_create_events_and_set_intitial_state_when_not_found()
+        {
+            var command = new UpsertAsset { File = file, FileHash = "NewHash" };
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(0, sut.Snapshot.FileVersion);
+            Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetCreated
+                    {
+                        FileName = file.FileName,
+                        FileSize = file.FileSize,
+                        FileHash = command.FileHash,
+                        FileVersion = 0,
+                        Metadata = new AssetMetadata(),
+                        MimeType = file.MimeType,
+                        Tags = new HashSet<string>(),
+                        Slug = file.FileName.ToAssetSlug()
+                    })
+                );
+        }
+
+        [Fact]
+        public async Task Upsert_should_create_events_and_update_file_state_when_found()
+        {
+            var command = new UpsertAsset { File = file, FileHash = "NewHash" };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(1, sut.Snapshot.FileVersion);
+            Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetUpdated
+                    {
+                        FileSize = file.FileSize,
+                        FileHash = command.FileHash,
+                        FileVersion = 1,
+                        Metadata = new AssetMetadata(),
+                        MimeType = file.MimeType
                     })
                 );
         }
@@ -237,7 +313,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -245,6 +321,24 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetDeleted { DeletedSize = 2048 })
                 );
+        }
+
+        [Fact]
+        public async Task Delete_should_not_create_events_if_permanent()
+        {
+            var command = new DeleteAsset { Permanent = true };
+
+            await ExecuteCreateAsync();
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
+                .Returns(true);
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(None.Value);
+
+            Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
+            Assert.Empty(LastEvents);
         }
 
         [Fact]
@@ -275,53 +369,43 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private Task ExecuteCreateAsync()
         {
-            return PublishAsync(new CreateAsset { File = file });
+            return PublishAsync(new CreateAsset { File = file, FileHash = "123" });
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return PublishAsync(new UpdateAsset { File = file });
+            return PublishAsync(new UpdateAsset { File = file, FileHash = "456" });
         }
 
-        private Task ExecuteDeleteAsync()
+        private Task ExecuteDeleteAsync(bool permanent = false)
         {
-            return PublishAsync(new DeleteAsset());
+            return PublishAsync(new DeleteAsset { Permanent = permanent });
         }
 
-        protected T CreateAssetEvent<T>(T @event) where T : AssetEvent
+        private T CreateAssetEvent<T>(T @event) where T : AssetEvent
         {
             @event.AssetId = assetId;
 
             return CreateEvent(@event);
         }
 
-        protected T CreateAssetCommand<T>(T command) where T : AssetCommand
+        private T CreateAssetCommand<T>(T command) where T : AssetCommand
         {
             command.AssetId = assetId;
 
             return CreateCommand(command);
         }
 
-        private async Task<object?> PublishIdempotentAsync(AssetCommand command)
+        private Task<object> PublishIdempotentAsync(AssetCommand command)
         {
-            var result = await PublishAsync(command);
-
-            var previousSnapshot = sut.Snapshot;
-            var previousVersion = sut.Snapshot.Version;
-
-            await PublishAsync(command);
-
-            Assert.Same(previousSnapshot, sut.Snapshot);
-            Assert.Equal(previousVersion, sut.Snapshot.Version);
-
-            return result;
+            return PublishIdempotentAsync(sut, CreateAssetCommand(command));
         }
 
-        private async Task<object?> PublishAsync(AssetCommand command)
+        private async Task<object> PublishAsync(AssetCommand command)
         {
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            return result;
+            return result.Payload;
         }
     }
 }

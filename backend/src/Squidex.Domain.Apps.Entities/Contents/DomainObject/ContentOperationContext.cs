@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public ISchemaEntity Schema
         {
-            get { return schema; }
+            get => schema;
         }
 
         public async Task LoadAsync(NamedId<DomainId> appId, NamedId<DomainId> schemaId, ContentCommand command, bool optimized)
@@ -118,11 +118,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return Task.CompletedTask;
         }
 
-        public async Task ValidateInputAsync(ContentData data, bool publish)
+        public async Task ValidateInputAsync(ContentData data)
         {
             var validator =
                 new ContentValidator(Partition(),
-                    validationContext.AsPublishing(publish), validators, log);
+                    validationContext, validators, log);
 
             await validator.ValidateInputAsync(data);
 

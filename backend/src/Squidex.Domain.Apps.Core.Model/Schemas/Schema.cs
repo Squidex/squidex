@@ -30,72 +30,72 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string Name
         {
-            get { return name; }
+            get => name;
         }
 
         public string Category
         {
-            get { return category; }
+            get => category;
         }
 
         public bool IsPublished
         {
-            get { return isPublished; }
+            get => isPublished;
         }
 
         public bool IsSingleton
         {
-            get { return isSingleton; }
+            get => isSingleton;
         }
 
         public IReadOnlyList<RootField> Fields
         {
-            get { return fields.Ordered; }
+            get => fields.Ordered;
         }
 
         public IReadOnlyDictionary<long, RootField> FieldsById
         {
-            get { return fields.ById; }
+            get => fields.ById;
         }
 
         public IReadOnlyDictionary<string, RootField> FieldsByName
         {
-            get { return fields.ByName; }
+            get => fields.ByName;
         }
 
         public IReadOnlyDictionary<string, string> PreviewUrls
         {
-            get { return previewUrls; }
+            get => previewUrls;
         }
 
         public FieldCollection<RootField> FieldCollection
         {
-            get { return fields; }
+            get => fields;
         }
 
         public FieldRules FieldRules
         {
-            get { return fieldRules; }
+            get => fieldRules;
         }
 
         public FieldNames FieldsInLists
         {
-            get { return fieldsInLists; }
+            get => fieldsInLists;
         }
 
         public FieldNames FieldsInReferences
         {
-            get { return fieldsInReferences; }
+            get => fieldsInReferences;
         }
 
         public SchemaScripts Scripts
         {
-            get { return scripts; }
+            get => scripts;
         }
 
         public SchemaProperties Properties
         {
-            get { return properties; }
+            get => properties;
         }
 
         public Schema(string name, SchemaProperties? properties = null, bool isSingleton = false)

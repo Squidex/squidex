@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities
     {
         private static readonly IReadOnlyDictionary<string, string> EmptyHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        public IReadOnlyDictionary<string, string> Headers { get; }
+        public IReadOnlyDictionary<string, string> Headers { get; private set; }
 
         public ClaimsPermissions UserPermissions { get; }
 
@@ -91,6 +91,13 @@ namespace Squidex.Domain.Apps.Entities
                 return context;
             }
 
+            public Context Update()
+            {
+                context.Headers = headers ?? context.Headers;
+
+                return context;
+            }
+
             public void Remove(string key)
             {
                 headers ??= new Dictionary<string, string>(context.Headers, StringComparer.OrdinalIgnoreCase);
@@ -102,6 +109,15 @@ namespace Squidex.Domain.Apps.Entities
                 headers ??= new Dictionary<string, string>(context.Headers, StringComparer.OrdinalIgnoreCase);
                 headers[key] = value;
             }
+        }
+
+        public Context Change(Action<ICloneBuilder> action)
+        {
+            var builder = new HeaderBuilder(this);
+
+            action(builder);
+
+            return builder.Update();
         }
 
         public Context Clone(Action<ICloneBuilder> action)

@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_all_apps_from_user_permissions()
         {
-            var (expected, _) = SetupApp();
+            var (expected, _) = CreateApp();
 
             A.CallTo(() => indexByName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new[] { appId.Name })))
                 .Returns(new List<DomainId> { appId.Id });
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_all_apps_from_user()
         {
-            var (expected, _) = SetupApp();
+            var (expected, _) = CreateApp();
 
             A.CallTo(() => indexForUser.GetIdsAsync())
                 .Returns(new List<DomainId> { appId.Id });
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_combined_apps()
         {
-            var (expected, _) = SetupApp();
+            var (expected, _) = CreateApp();
 
             A.CallTo(() => indexByName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new[] { appId.Name })))
                 .Returns(new List<DomainId> { appId.Id });
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_all_apps()
         {
-            var (expected, _) = SetupApp();
+            var (expected, _) = CreateApp();
 
             A.CallTo(() => indexByName.GetIdsAsync())
                 .Returns(new List<DomainId> { appId.Id });
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_app_by_name()
         {
-            var (expected, _) = SetupApp();
+            var (expected, _) = CreateApp();
 
             A.CallTo(() => indexByName.GetIdAsync(appId.Name))
                 .Returns(appId.Id);
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_app_by_name_and_id_if_cached_before()
         {
-            var (expected, _) = SetupApp();
+            var (expected, _) = CreateApp();
 
             A.CallTo(() => indexByName.GetIdAsync(appId.Name))
                 .Returns(appId.Id);
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_app_by_id()
         {
-            var (expected, _) = SetupApp();
+            var (expected, _) = CreateApp();
 
             var actual1 = await sut.GetAppAsync(appId.Id, false);
             var actual2 = await sut.GetAppAsync(appId.Id, false);
@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_resolve_app_by_id_and_name_if_cached_before()
         {
-            var (expected, _) = SetupApp();
+            var (expected, _) = CreateApp();
 
             var actual1 = await sut.GetAppAsync(appId.Id, true);
             var actual2 = await sut.GetAppAsync(appId.Id, true);
@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_return_null_if_app_archived()
         {
-            SetupApp(isArchived: true);
+            CreateApp(isArchived: true);
 
             var actual1 = await sut.GetAppAsync(appId.Id, true);
             var actual2 = await sut.GetAppAsync(appId.Id, true);
@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_return_null_if_app_not_created()
         {
-            SetupApp(EtagVersion.NotFound);
+            CreateApp(EtagVersion.Empty);
 
             var actual1 = await sut.GetAppAsync(appId.Id, true);
             var actual2 = await sut.GetAppAsync(appId.Id, true);
@@ -345,7 +345,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_add_app_to_index_when_contributor_assigned()
         {
-            SetupApp();
+            CreateApp();
 
             var command = new AssignContributor { AppId = appId, ContributorId = userId };
 
@@ -362,7 +362,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_update_index_when_app_is_updated()
         {
-            var (_, appGrain) = SetupApp();
+            var (_, appGrain) = CreateApp();
 
             var command = new UpdateApp { AppId = appId };
 
@@ -379,7 +379,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_update_index_with_result_when_app_is_updated()
         {
-            var (app, appGrain) = SetupApp();
+            var (app, appGrain) = CreateApp();
 
             var command = new UpdateApp { AppId = appId };
 
@@ -396,7 +396,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_remove_from_user_index_when_contributor_removed()
         {
-            SetupApp();
+            CreateApp();
 
             var command = new RemoveContributor { AppId = appId, ContributorId = userId };
 
@@ -413,7 +413,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_remove_app_from_indexes_when_app_gets_archived()
         {
-            SetupApp(isArchived: true);
+            CreateApp(isArchived: true);
 
             var command = new ArchiveApp { AppId = appId };
 
@@ -433,7 +433,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_also_remove_app_from_client_index_when_created_by_client()
         {
-            SetupApp(fromClient: true);
+            CreateApp(fromClient: true);
 
             var command = new ArchiveApp { AppId = appId };
 
@@ -513,41 +513,41 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .MustHaveHappened();
         }
 
-        private (IAppEntity, IAppGrain) SetupApp(long version = 0, bool fromClient = false, bool isArchived = false)
+        private (IAppEntity, IAppGrain) CreateApp(long version = 0, bool fromClient = false, bool isArchived = false)
         {
-            var appEntity = A.Fake<IAppEntity>();
+            var app = A.Fake<IAppEntity>();
 
-            A.CallTo(() => appEntity.Id)
+            A.CallTo(() => app.Id)
                 .Returns(appId.Id);
-            A.CallTo(() => appEntity.Name)
+            A.CallTo(() => app.Name)
                 .Returns(appId.Name);
-            A.CallTo(() => appEntity.Version)
+            A.CallTo(() => app.Version)
                 .Returns(version);
-            A.CallTo(() => appEntity.IsArchived)
+            A.CallTo(() => app.IsArchived)
                 .Returns(isArchived);
-            A.CallTo(() => appEntity.Contributors)
+            A.CallTo(() => app.Contributors)
                 .Returns(AppContributors.Empty.Assign(userId, Role.Owner));
 
             if (fromClient)
             {
-                A.CallTo(() => appEntity.CreatedBy)
+                A.CallTo(() => app.CreatedBy)
                     .Returns(ClientActor());
             }
             else
             {
-                A.CallTo(() => appEntity.CreatedBy)
+                A.CallTo(() => app.CreatedBy)
                     .Returns(UserActor());
             }
 
             var appGrain = A.Fake<IAppGrain>();
 
             A.CallTo(() => appGrain.GetStateAsync())
-                .Returns(J.Of(appEntity));
+                .Returns(J.Of(app));
 
             A.CallTo(() => grainFactory.GetGrain<IAppGrain>(appId.Id.ToString(), null))
                 .Returns(appGrain);
 
-            return (appEntity, appGrain);
+            return (app, appGrain);
         }
 
         private CreateApp Create(string name)

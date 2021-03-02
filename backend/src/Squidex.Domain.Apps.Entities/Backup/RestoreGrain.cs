@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private RestoreJob CurrentJob
         {
-            get { return state.Value.Job; }
+            get => state.Value.Job;
         }
 
         public RestoreGrain(

@@ -25,6 +25,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             throw new NotSupportedException();
         }
 
+        Task<(ContentDomainObject.State Value, long Version)> ISnapshotStore<ContentDomainObject.State, DomainId>.ReadAsync(DomainId key)
+        {
+            return Task.FromResult<(ContentDomainObject.State, long Version)>((null!, EtagVersion.Empty));
+        }
+
         async Task ISnapshotStore<ContentDomainObject.State, DomainId>.ClearAsync()
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
@@ -40,21 +45,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 await collectionAll.RemoveAsync(key);
                 await collectionPublished.RemoveAsync(key);
-            }
-        }
-
-        async Task<(ContentDomainObject.State Value, long Version)> ISnapshotStore<ContentDomainObject.State, DomainId>.ReadAsync(DomainId key)
-        {
-            using (Profiler.TraceMethod<MongoContentRepository>())
-            {
-                var contentEntity = await collectionAll.FindAsync(key);
-
-                if (contentEntity != null)
-                {
-                    return (SimpleMapper.Map(contentEntity, new ContentDomainObject.State()), contentEntity.Version);
-                }
-
-                return (null!, EtagVersion.NotFound);
             }
         }
 

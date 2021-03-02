@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 var appGrain = A.Fake<IAppGrain>();
 
                 A.CallTo(() => appGrain.GetStateAsync())
-                    .ReturnsLazily(() => CreateEntity().AsJ());
+                    .ReturnsLazily(() => CreateApp().AsJ());
 
                 A.CallTo(() => GrainFactory.GetGrain<IAppGrain>(AppId.Id.ToString(), null))
                     .Returns(appGrain);
@@ -77,23 +77,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                     .MustHaveHappenedANumberOfTimesMatching(x => x == count);
             }
 
-            private IAppEntity CreateEntity()
+            private IAppEntity CreateApp()
             {
-                var appEntity = A.Fake<IAppEntity>();
+                var app = A.Fake<IAppEntity>();
 
-                A.CallTo(() => appEntity.Id)
+                A.CallTo(() => app.Id)
                     .Returns(AppId.Id);
 
-                A.CallTo(() => appEntity.Name)
+                A.CallTo(() => app.Name)
                     .Returns(AppId.Name);
 
-                A.CallTo(() => appEntity.Version)
+                A.CallTo(() => app.Version)
                     .Returns(version);
 
-                A.CallTo(() => appEntity.Contributors)
+                A.CallTo(() => app.Contributors)
                     .Returns(new AppContributors(contributors.ToDictionary()));
 
-                return appEntity;
+                return app;
             }
         }
 

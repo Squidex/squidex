@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public IReadOnlyCollection<string> AllTypes
         {
-            get { return schemas.Value.Keys; }
+            get => schemas.Value.Keys;
         }
 
         public EventJsonSchemaGenerator(JsonSchemaGenerator schemaGenerator)

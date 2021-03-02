@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -20,7 +21,6 @@ namespace Squidex.Web.CommandMiddlewares
     public class EnrichWithActorCommandMiddlewareTests
     {
         private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
-        private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly EnrichWithActorCommandMiddleware sut;
 
@@ -35,10 +35,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_throw_security_exception_when_no_subject_or_client_is_found()
         {
-            var command = new CreateContent();
-            var context = Ctx(command);
-
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.HandleAsync(context));
+            await Assert.ThrowsAsync<DomainForbiddenException>(() => HandleAsync(new CreateContent()));
         }
 
         [Fact]
@@ -47,25 +44,21 @@ namespace Squidex.Web.CommandMiddlewares
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(null!);
 
-            var command = new CreateContent();
-            var context = Ctx(command);
+            var context =
+                await HandleAsync(
+                    new CreateContent());
 
-            await sut.HandleAsync(context);
-
-            Assert.Null(command.Actor);
+            Assert.Null(((SquidexCommand)context.Command).Actor);
         }
 
         [Fact]
         public async Task Should_assign_actor_from_subject()
         {
-            httpContext.User = CreatePrincipal(OpenIdClaims.Subject, "me");
+            httpContext.User = CreatePrincipal(OpenIdClaims.Subject, "my-user");
 
-            var command = new CreateContent();
-            var context = Ctx(command);
+            var context = await HandleAsync(new CreateContent());
 
-            await sut.HandleAsync(context);
-
-            Assert.Equal(RefToken.User("me"), command.Actor);
+            Assert.Equal(RefToken.User("my-user"), ((SquidexCommand)context.Command).Actor);
         }
 
         [Fact]
@@ -73,12 +66,9 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
 
-            var command = new CreateContent();
-            var context = Ctx(command);
+            var context = await HandleAsync(new CreateContent());
 
-            await sut.HandleAsync(context);
-
-            Assert.Equal(RefToken.Client("my-client"), command.Actor);
+            Assert.Equal(RefToken.Client("my-client"), ((SquidexCommand)context.Command).Actor);
         }
 
         [Fact]
@@ -86,17 +76,20 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
 
-            var command = new CreateContent { Actor = RefToken.User("me") };
-            var context = Ctx(command);
+            var customActor = RefToken.User("me");
 
-            await sut.HandleAsync(context);
+            var context = await HandleAsync(new CreateContent { Actor = customActor });
 
-            Assert.Equal(RefToken.User("me"), command.Actor);
+            Assert.Equal(customActor, ((SquidexCommand)context.Command).Actor);
         }
 
-        private CommandContext Ctx(ICommand command)
+        private async Task<CommandContext> HandleAsync(ICommand command)
         {
-            return new CommandContext(command, commandBus);
+            var commandContext = new CommandContext(command, A.Fake<ICommandBus>());
+
+            await sut.HandleAsync(commandContext);
+
+            return commandContext;
         }
 
         private static ClaimsPrincipal CreatePrincipal(string claimType, string claimValue)

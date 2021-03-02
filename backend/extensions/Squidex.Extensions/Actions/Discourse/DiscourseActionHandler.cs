@@ -37,12 +37,12 @@ namespace Squidex.Extensions.Actions.Discourse
                 ["title"] = await FormatAsync(action.Title, @event)
             };
 
-            if (action.Topic.HasValue)
+            if (action.Topic != null)
             {
                 json.Add("topic_id", action.Topic.Value);
             }
 
-            if (action.Category.HasValue)
+            if (action.Category != null)
             {
                 json.Add("category", action.Category.Value);
             }
@@ -58,7 +58,7 @@ namespace Squidex.Extensions.Actions.Discourse
             };
 
             var description =
-                action.Topic.HasValue ?
+                action.Topic != null ?
                 DescriptionCreateTopic :
                 DescriptionCreatePost;
 

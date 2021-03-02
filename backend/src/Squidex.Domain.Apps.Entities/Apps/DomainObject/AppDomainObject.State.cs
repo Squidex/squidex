@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             [IgnoreDataMember]
             public DomainId UniqueId
             {
-                get { return Id; }
+                get => Id;
             }
 
             public override bool ApplyEvent(IEvent @event)

@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Uri ServiceUri
         {
-            get { return documentClient.ServiceEndpoint; }
+            get => documentClient.ServiceEndpoint;
         }
 
         public CosmosDbEventStore(DocumentClient documentClient, string masterKey, string database, IJsonSerializer jsonSerializer)

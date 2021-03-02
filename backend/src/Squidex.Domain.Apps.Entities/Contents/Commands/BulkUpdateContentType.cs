@@ -1,17 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public static class EntityCreatedResult
+    public enum BulkUpdateContentType
     {
-        public static EntityCreatedResult<T> Create<T>(T idOrValue, long version)
-        {
-            return new EntityCreatedResult<T>(idOrValue, version);
-        }
+        Upsert,
+        ChangeStatus,
+        Create,
+        Delete,
+        Patch,
+        Update,
+        Validate
     }
 }

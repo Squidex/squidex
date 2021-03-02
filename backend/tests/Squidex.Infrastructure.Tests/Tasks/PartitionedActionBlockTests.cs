@@ -34,6 +34,8 @@ namespace Squidex.Infrastructure.Tasks
                 random.Next(10);
 
                 lists[x.P].Add(x.V);
+
+                return Task.CompletedTask;
             }, x => x.P, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 100,

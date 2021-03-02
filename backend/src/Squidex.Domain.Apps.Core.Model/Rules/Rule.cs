@@ -20,22 +20,22 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         public string Name
         {
-            get { return name; }
+            get => name;
         }
 
         public RuleTrigger Trigger
         {
-            get { return trigger; }
+            get => trigger;
         }
 
         public RuleAction Action
         {
-            get { return action; }
+            get => action;
         }
 
         public bool IsEnabled
         {
-            get { return isEnabled; }
+            get => isEnabled;
         }
 
         public Rule(RuleTrigger trigger, RuleAction action)

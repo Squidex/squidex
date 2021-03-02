@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             result.StatusColor = await GetColorAsync(content, content.Status, cache);
 
-            if (content.NewStatus.HasValue)
+            if (content.NewStatus != null)
             {
                 result.NewStatusColor = await GetColorAsync(content, content.NewStatus.Value, cache);
             }

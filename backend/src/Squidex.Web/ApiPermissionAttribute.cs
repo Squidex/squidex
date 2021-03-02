@@ -21,7 +21,7 @@ namespace Squidex.Web
 
         public IEnumerable<string> PermissionIds
         {
-            get { return permissionIds; }
+            get => permissionIds;
         }
 
         public ApiPermissionAttribute(params string[] ids)

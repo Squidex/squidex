@@ -8,7 +8,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -32,7 +31,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private readonly ISchemaEntity schema;
         private readonly ISchemaEntity singleton;
         private readonly ClaimsPrincipal user = Mocks.FrontendUser();
-        private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
         private readonly RefToken actor = RefToken.User("123");
 
         public GuardContentTests()
@@ -45,61 +43,43 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_data_is_null()
+        public void CanCreate_should_throw_exception_if_data_is_null()
         {
             var command = new CreateContent();
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanCreate(command, workflow, schema),
+            ValidationAssert.Throws(() => GuardContent.CanCreate(command, schema),
                 new ValidationError("Data is required.", "Data"));
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_singleton()
+        public void CanCreate_should_throw_exception_if_singleton()
         {
             var command = new CreateContent { Data = new ContentData() };
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanCreate(command, workflow, singleton));
+            Assert.Throws<DomainException>(() => GuardContent.CanCreate(command, singleton));
         }
 
         [Fact]
-        public async Task CanCreate_should_not_throw_exception_if_singleton_and_id_is_schema_id()
+        public void CanCreate_should_not_throw_exception_if_singleton_and_id_is_schema_id()
         {
             var command = new CreateContent { Data = new ContentData(), ContentId = schema.Id };
 
-            await GuardContent.CanCreate(command, workflow, schema);
+            GuardContent.CanCreate(command, schema);
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_publishing_not_allowed()
-        {
-            SetupCanCreatePublish(false);
-
-            var command = new CreateContent { Data = new ContentData(), Publish = true };
-
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanCreate(command, workflow, schema));
-        }
-
-        [Fact]
-        public async Task CanCreate_should_not_throw_exception_if_publishing_allowed()
-        {
-            SetupCanCreatePublish(true);
-
-            var command = new CreateContent { Data = new ContentData(), Publish = true };
-
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanCreate(command, workflow, schema));
-        }
-
-        [Fact]
-        public async Task CanCreate_should_not_throw_exception_if_data_is_not_null()
+        public void CanCreate_should_not_throw_exception_if_data_is_not_null()
         {
             var command = new CreateContent { Data = new ContentData() };
 
-            await GuardContent.CanCreate(command, workflow, schema);
+            GuardContent.CanCreate(command, schema);
         }
 
         [Fact]
         public async Task CanUpdate_should_throw_exception_if_data_is_null()
         {
+            SetupCanUpdate(true);
+
             var content = CreateContent(Status.Draft);
 
             var command = CreateCommand(new UpdateContent());
@@ -121,6 +101,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
+        public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it_but_check_is_disabled()
+        {
+            SetupCanUpdate(false);
+
+            var content = CreateContent(Status.Draft);
+
+            var command = CreateCommand(new UpdateContent { Data = new ContentData(), DoNotValidateWorkflow = true });
+
+            await GuardContent.CanUpdate(command, content, workflow);
+        }
+
+        [Fact]
         public async Task CanUpdate_should_not_throw_exception_if_data_is_not_null()
         {
             SetupCanUpdate(true);
@@ -133,43 +125,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanPatch_should_throw_exception_if_data_is_null()
-        {
-            SetupCanUpdate(true);
-
-            var content = CreateContent(Status.Draft);
-
-            var command = CreateCommand(new PatchContent());
-
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanPatch(command, content, workflow),
-                new ValidationError("Data is required.", "Data"));
-        }
-
-        [Fact]
-        public async Task CanPatch_should_throw_exception_if_workflow_blocks_it()
-        {
-            SetupCanUpdate(false);
-
-            var content = CreateContent(Status.Draft);
-
-            var command = CreateCommand(new PatchContent { Data = new ContentData() });
-
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanPatch(command, content, workflow));
-        }
-
-        [Fact]
-        public async Task CanPatch_should_not_throw_exception_if_data_is_not_null()
-        {
-            SetupCanUpdate(true);
-
-            var content = CreateContent(Status.Draft);
-
-            var command = CreateCommand(new PatchContent { Data = new ContentData() });
-
-            await GuardContent.CanPatch(command, content, workflow);
-        }
-
-        [Fact]
         public async Task CanChangeStatus_should_throw_exception_if_singleton()
         {
             var content = CreateContent(Status.Published);
@@ -177,20 +132,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             var command = CreateCommand(new ChangeContentStatus { Status = Status.Draft });
 
             await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, singleton));
-        }
-
-        [Fact]
-        public async Task CanChangeStatus_should_throw_exception_if_due_date_in_past()
-        {
-            var content = CreateContent(Status.Draft);
-
-            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast });
-
-            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
-                .Returns(true);
-
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
-                new ValidationError("Due time must be in the future.", "DueTime"));
         }
 
         [Fact]
@@ -208,6 +149,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
+        public async Task CanChangeStatus_should_throw_exception_if_status_valid()
+        {
+            var content = CreateContent(Status.Draft);
+
+            var command = CreateCommand(new ChangeContentStatus { Status = new Status("Invalid"), DoNotValidateWorkflow = true });
+
+            A.CallTo(() => workflow.GetInfoAsync(content, command.Status))
+                .Returns(Task.FromResult<StatusInfo?>(null));
+
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
+                new ValidationError("Status is not defined in the workflow.", "Status"));
+        }
+
+        [Fact]
         public async Task CanChangeStatus_should_throw_exception_if_referenced()
         {
             var content = CreateContent(Status.Published);
@@ -218,6 +173,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 .Returns(true);
 
             await Assert.ThrowsAsync<ValidationException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema));
+        }
+
+        [Fact]
+        public async Task CanChangeStatus_should_not_throw_exception_if_status_flow_not_valid_but_check_disabled()
+        {
+            var content = CreateContent(Status.Draft);
+
+            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published, DoNotValidateWorkflow = true });
+
+            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
+                .Returns(false);
+
+            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema);
         }
 
         [Fact]
@@ -368,12 +336,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             A.CallTo(() => workflow.CanUpdateAsync(A<IContentEntity>._, A<Status>._, user))
                 .Returns(canUpdate);
-        }
-
-        private void SetupCanCreatePublish(bool canCreate)
-        {
-            A.CallTo(() => workflow.CanPublishOnCreateAsync(schema, A<ContentData>._, user))
-                .Returns(canCreate);
         }
 
         private T CreateCommand<T>(T command) where T : ContentCommand

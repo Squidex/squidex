@@ -27,12 +27,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public int WrittenEvents
         {
-            get { return writtenEvents; }
+            get => writtenEvents;
         }
 
         public int WrittenAttachments
         {
-            get { return writtenAttachments; }
+            get => writtenAttachments;
         }
 
         public BackupWriter(IJsonSerializer serializer, Stream stream, bool keepOpen = false, BackupVersion version = BackupVersion.V2)

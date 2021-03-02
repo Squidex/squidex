@@ -114,10 +114,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             }
             else
             {
-                var (bySchema, byApp) =
-                    await AsyncHelper.WhenAll(
-                        SearchBySchemaAsync(queryText, app, filter, scope, LimitHalf),
-                        SearchByAppAsync(queryText, app, scope, LimitHalf));
+                var (bySchema, byApp) = await AsyncHelper.WhenAll(
+                    SearchBySchemaAsync(queryText, app, filter, scope, LimitHalf),
+                    SearchByAppAsync(queryText, app, scope, LimitHalf));
 
                 return bySchema.Union(byApp).Distinct().ToList();
             }

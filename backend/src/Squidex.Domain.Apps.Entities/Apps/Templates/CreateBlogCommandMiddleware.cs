@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .AddField("text",
                             new ContentFieldData()
                                 .AddInvariant("Just created a blog with Squidex. I love it!")),
-                Publish = true
+                Status = Status.Published
             });
         }
 
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .AddField("text",
                             new ContentFieldData()
                                 .AddInvariant("I love Squidex and SciFi!")),
-                Publish = true
+                Status = Status.Published
             });
         }
 

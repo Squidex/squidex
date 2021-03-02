@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
         [IgnoreDataMember]
         public override DomainId AggregateId
         {
-            get { return AppId; }
+            get => AppId;
         }
 
         public CreateApp()

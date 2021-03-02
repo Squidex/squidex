@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Json.Objects
     {
         public override JsonValueType Type
         {
-            get { return JsonValueType.String; }
+            get => JsonValueType.String;
         }
 
         internal JsonString(string value)

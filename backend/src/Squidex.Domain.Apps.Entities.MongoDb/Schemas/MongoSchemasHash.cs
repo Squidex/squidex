@@ -24,22 +24,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
     {
         public int BatchSize
         {
-            get { return 1000; }
+            get => 1000;
         }
 
         public int BatchDelay
         {
-            get { return 500; }
+            get => 500;
         }
 
         public string Name
         {
-            get { return GetType().Name; }
+            get => GetType().Name;
         }
 
         public string EventsFilter
         {
-            get { return "^(app-|schema-)"; }
+            get => "^(app-|schema-)";
         }
 
         public MongoSchemasHash(IMongoDatabase database, bool setup = false)

@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public long Version
         {
-            get { return persistence.Version; }
+            get => persistence.Version;
         }
 
         public GrainState(IGrainActivationContext context)

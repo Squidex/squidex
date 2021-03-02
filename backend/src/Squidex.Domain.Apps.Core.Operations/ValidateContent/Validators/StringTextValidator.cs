@@ -52,11 +52,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     stringValue = transform(stringValue);
                 }
 
-                if (minWords.HasValue || maxWords.HasValue)
+                if (minWords != null || maxWords != null)
                 {
                     var words = stringValue.WordCount();
 
-                    if (minWords.HasValue && maxWords.HasValue)
+                    if (minWords != null && maxWords != null)
                     {
                         if (minWords == maxWords && minWords != words)
                         {
@@ -81,11 +81,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
                 }
 
-                if (minCharacters.HasValue || maxCharacters.HasValue)
+                if (minCharacters != null || maxCharacters != null)
                 {
                     var characters = stringValue.CharacterCount();
 
-                    if (minCharacters.HasValue && maxCharacters.HasValue)
+                    if (minCharacters != null && maxCharacters != null)
                     {
                         if (minCharacters == maxCharacters && minCharacters != characters)
                         {

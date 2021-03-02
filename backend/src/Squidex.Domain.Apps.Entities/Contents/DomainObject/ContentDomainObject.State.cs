@@ -31,31 +31,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             [IgnoreDataMember]
             public DomainId UniqueId
             {
-                get { return DomainId.Combine(AppId, Id); }
+                get => DomainId.Combine(AppId, Id);
             }
 
             [IgnoreDataMember]
             public ContentData Data
             {
-                get { return NewVersion?.Data ?? CurrentVersion.Data; }
+                get => NewVersion?.Data ?? CurrentVersion.Data;
             }
 
             [IgnoreDataMember]
             public Status EditingStatus
             {
-                get { return NewStatus ?? Status; }
+                get => NewStatus ?? Status;
             }
 
             [IgnoreDataMember]
             public Status Status
             {
-                get { return CurrentVersion.Status; }
+                get => CurrentVersion.Status;
             }
 
             [IgnoreDataMember]
             public Status? NewStatus
             {
-                get { return NewVersion?.Status; }
+                get => NewVersion?.Status;
             }
 
             public override bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)

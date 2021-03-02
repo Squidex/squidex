@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public IReadOnlyList<T> Ordered
         {
-            get { return fieldsOrdered; }
+            get => fieldsOrdered;
         }
 
         public IReadOnlyDictionary<long, T> ById

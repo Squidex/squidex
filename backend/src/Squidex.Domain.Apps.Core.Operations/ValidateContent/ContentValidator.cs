@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IReadOnlyCollection<ValidationError> Errors
         {
-            get { return errors; }
+            get => errors;
         }
 
         public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories, ISemanticLog log)

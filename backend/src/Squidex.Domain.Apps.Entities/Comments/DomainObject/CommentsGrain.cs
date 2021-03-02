@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         private long Version
         {
-            get { return version; }
+            get => version;
         }
 
         public CommentsGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter)
@@ -59,14 +59,14 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             }
         }
 
-        public async Task<J<object>> ExecuteAsync(J<CommentsCommand> command)
+        public async Task<J<CommandResult>> ExecuteAsync(J<CommentsCommand> command)
         {
             var result = await ExecuteAsync(command.Value);
 
             return result.AsJ();
         }
 
-        private Task<object> ExecuteAsync(CommentsCommand command)
+        private Task<CommandResult> ExecuteAsync(CommentsCommand command)
         {
             switch (command)
             {
@@ -76,8 +76,6 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                         GuardComments.CanCreate(c);
 
                         Create(c);
-
-                        return EntityCreatedResult.Create(createComment.CommentId, Version);
                     });
 
                 case UpdateComment updateComment:
@@ -86,8 +84,6 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                         GuardComments.CanUpdate(c, Key, events);
 
                         Update(c);
-
-                        return new EntitySavedResult(Version);
                     });
 
                 case DeleteComment deleteComment:
@@ -96,8 +92,6 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                         GuardComments.CanDelete(c, Key, events);
 
                         Delete(c);
-
-                        return new EntitySavedResult(Version);
                     });
 
                 default:
@@ -105,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
             }
         }
 
-        private async Task<object> Upsert<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : CommentsCommand
+        private async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : CommentsCommand
         {
             Guard.NotNull(command, nameof(command));
             Guard.NotNull(handler, nameof(handler));
@@ -115,11 +109,11 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 throw new DomainObjectVersionException(Key, Version, command.ExpectedVersion);
             }
 
-            var prevVersion = version;
+            var previousVersion = version;
 
             try
             {
-                var result = handler(command);
+                handler(command);
 
                 if (uncommittedEvents.Count > 0)
                 {
@@ -127,16 +121,16 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
                     var eventData = uncommittedEvents.Select(x => eventDataFormatter.ToEventData(x, commitId)).ToList();
 
-                    await eventStore.AppendAsync(commitId, streamName, prevVersion, eventData);
+                    await eventStore.AppendAsync(commitId, streamName, previousVersion, eventData);
                 }
 
                 events.AddRange(uncommittedEvents);
 
-                return result;
+                return new CommandResult(DomainId.Create(Key), Version, previousVersion);
             }
             catch
             {
-                version = prevVersion;
+                version = previousVersion;
 
                 throw;
             }

@@ -68,7 +68,10 @@ namespace Squidex.Extensions.Actions.CreateContent
                 ruleJob.Actor = userEvent.Actor;
             }
 
-            ruleJob.Publish = action.Publish;
+            if (action.Publish)
+            {
+                ruleJob.Status = Status.Published;
+            }
 
             return (Description, ruleJob);
         }

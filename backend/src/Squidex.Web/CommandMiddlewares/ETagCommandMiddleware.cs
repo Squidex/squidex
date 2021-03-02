@@ -54,9 +54,9 @@ namespace Squidex.Web.CommandMiddlewares
 
             await next(context);
 
-            if (context.PlainResult is EntitySavedResult result)
+            if (context.PlainResult is CommandResult result)
             {
-                SetResponsEtag(httpContext, result.Version);
+                SetResponsEtag(httpContext, result.NewVersion);
             }
             else if (context.PlainResult is IEntityWithVersion entity)
             {

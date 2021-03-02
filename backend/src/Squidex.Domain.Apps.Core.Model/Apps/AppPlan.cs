@@ -7,22 +7,11 @@
 
 using Squidex.Infrastructure;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed record AppPlan
+    public sealed record AppPlan(RefToken Owner, string PlanId)
     {
-        public RefToken Owner { get; }
-
-        public string PlanId { get; }
-
-        public AppPlan(RefToken owner, string planId)
-        {
-            Guard.NotNull(owner, nameof(owner));
-            Guard.NotNullOrEmpty(planId, nameof(planId));
-
-            Owner = owner;
-
-            PlanId = planId;
-        }
     }
 }

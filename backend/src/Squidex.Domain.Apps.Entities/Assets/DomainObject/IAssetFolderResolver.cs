@@ -5,16 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+using System.Threading.Tasks;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
+
+namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
-    public enum BulkUpdateType
+    public interface IAssetFolderResolver
     {
-        Upsert,
-        ChangeStatus,
-        Create,
-        Delete,
-        Patch,
-        Update,
-        Validate
+        Task<DomainId> ResolveOrCreateAsync(Context context, ICommandBus commandBus, string path);
     }
 }

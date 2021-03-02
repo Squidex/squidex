@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Log;
 using Xunit;
 
@@ -27,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         protected override DomainId Id
         {
-            get { return DomainId.Combine(AppId, assetFolderId); }
+            get => DomainId.Combine(AppId, assetFolderId);
         }
 
         public AssetFolderDomainObjectTests()
@@ -45,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             await ExecuteCreateAsync();
             await ExecuteDeleteAsync();
 
-            await Assert.ThrowsAsync<DomainException>(ExecuteUpdateAsync);
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(ExecuteUpdateAsync);
         }
 
         [Fact]
@@ -112,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -137,40 +136,30 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             return PublishAsync(new DeleteAssetFolder());
         }
 
-        protected T CreateAssetFolderEvent<T>(T @event) where T : AssetFolderEvent
+        private T CreateAssetFolderEvent<T>(T @event) where T : AssetFolderEvent
         {
             @event.AssetFolderId = assetFolderId;
 
             return CreateEvent(@event);
         }
 
-        protected T CreateAssetFolderCommand<T>(T command) where T : AssetFolderCommand
+        private T CreateAssetFolderCommand<T>(T command) where T : AssetFolderCommand
         {
             command.AssetFolderId = assetFolderId;
 
             return CreateCommand(command);
         }
 
-        private async Task<object?> PublishIdempotentAsync(AssetFolderCommand command)
+        private Task<object> PublishIdempotentAsync(AssetFolderCommand command)
         {
-            var result = await PublishAsync(command);
-
-            var previousSnapshot = sut.Snapshot;
-            var previousVersion = sut.Snapshot.Version;
-
-            await PublishAsync(command);
-
-            Assert.Same(previousSnapshot, sut.Snapshot);
-            Assert.Equal(previousVersion, sut.Snapshot.Version);
-
-            return result;
+            return PublishIdempotentAsync(sut, CreateAssetFolderCommand(command));
         }
 
-        private async Task<object?> PublishAsync(AssetFolderCommand command)
+        private async Task<object> PublishAsync(AssetFolderCommand command)
         {
             var result = await sut.ExecuteAsync(CreateAssetFolderCommand(command));
 
-            return result;
+            return result.Payload;
         }
     }
 }

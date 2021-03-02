@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public IReadOnlyDictionary<string, RuleActionDefinition> Actions
         {
-            get { return actionTypes; }
+            get => actionTypes;
         }
 
         public RuleRegistry(IEnumerable<RuleActionRegistration>? registrations = null)

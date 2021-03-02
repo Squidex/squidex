@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        public async Task EnhanceAsync(UploadAssetCommand command, HashSet<string>? tags)
+        public async Task EnhanceAsync(UploadAssetCommand command)
         {
             if (command.Type == AssetType.Unknown || command.Type == AssetType.Image)
             {
@@ -96,23 +96,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 }
             }
 
-            if (command.Type == AssetType.Image && tags != null)
+            if (command.Type == AssetType.Image && command.Tags != null)
             {
-                tags.Add("image");
+                command.Tags.Add("image");
 
                 var wh = command.Metadata.GetPixelWidth() + command.Metadata.GetPixelWidth();
 
                 if (wh > 2000)
                 {
-                    tags.Add("image/large");
+                    command.Tags.Add("image/large");
                 }
                 else if (wh > 1000)
                 {
-                    tags.Add("image/medium");
+                    command.Tags.Add("image/medium");
                 }
                 else
                 {
-                    tags.Add("image/small");
+                    command.Tags.Add("image/small");
                 }
             }
         }

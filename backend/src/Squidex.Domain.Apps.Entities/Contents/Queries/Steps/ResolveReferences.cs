@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private IContentQueryService ContentQuery
         {
-            get { return contentQuery.Value; }
+            get => contentQuery.Value;
         }
 
         public ResolveReferences(Lazy<IContentQueryService> contentQuery, IRequestCache requestCache)

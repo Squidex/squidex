@@ -22,12 +22,12 @@ namespace Squidex.Infrastructure
 
         public bool IsClient
         {
-            get { return Type == RefTokenType.Client; }
+            get => Type == RefTokenType.Client;
         }
 
         public bool IsUser
         {
-            get { return Type == RefTokenType.Subject; }
+            get => Type == RefTokenType.Subject;
         }
 
         public RefToken(RefTokenType type, string identifier)

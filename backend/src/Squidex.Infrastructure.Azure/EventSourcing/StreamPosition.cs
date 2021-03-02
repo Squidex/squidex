@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public bool IsEndOfCommit
         {
-            get { return CommitOffset == CommitSize - 1; }
+            get => CommitOffset == CommitSize - 1;
         }
 
         public StreamPosition(long timestamp, long commitOffset, long commitSize)

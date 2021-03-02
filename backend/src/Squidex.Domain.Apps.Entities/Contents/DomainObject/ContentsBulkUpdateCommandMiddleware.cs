@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -22,9 +23,9 @@ using Squidex.Shared;
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 #pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
-    public sealed class BulkUpdateCommandMiddleware : ICommandMiddleware
+    public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContextProvider contextProvider;
@@ -35,7 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private sealed record BulkTask(
             ICommandBus Bus,
-            Context Context,
             string Schema,
             int JobIndex,
             BulkUpdateJob Job,
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
         }
 
-        public BulkUpdateCommandMiddleware(IContentQueryService contentQuery, IContextProvider contextProvider)
+        public ContentsBulkUpdateCommandMiddleware(IContentQueryService contentQuery, IContextProvider contextProvider)
         {
             Guard.NotNull(contentQuery, nameof(contentQuery));
             Guard.NotNull(contextProvider, nameof(contextProvider));
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         PropagateCompletion = true
                     });
 
-                    var requestContext = contextProvider.Context.Clone(b => b
+                    contextProvider.Context.Change(b => b
                         .WithoutContentEnrichment()
                         .WithoutCleanup()
                         .WithUnpublished(true)
@@ -94,7 +94,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var task = new BulkTask(
                             context.CommandBus,
-                            requestContext,
                             requestedSchema,
                             i,
                             bulkUpdates.Jobs[i],
@@ -137,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             task.Results.Add(new BulkUpdateResultItem
             {
-                ContentId = id,
+                Id = id,
                 JobIndex = task.JobIndex,
                 Exception = exception
             });
@@ -160,7 +159,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     try
                     {
-                        var command = await CreateCommandAsync(id, task);
+                        var command = await CreateCommandAsync(task);
+
+                        command.ContentId = id;
 
                         commands.Add(new BulkTaskCommand(task, id, command));
                     }
@@ -168,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         task.Results.Add(new BulkUpdateResultItem
                         {
-                            ContentId = id,
+                            Id = id,
                             JobIndex = task.JobIndex,
                             Exception = ex
                         });
@@ -187,65 +188,65 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return commands;
         }
 
-        private async Task<ICommand> CreateCommandAsync(DomainId id, BulkTask task)
+        private async Task<ContentCommand> CreateCommandAsync(BulkTask task)
         {
             var job = task.Job;
 
             switch (job.Type)
             {
-                case BulkUpdateType.Create:
+                case BulkUpdateContentType.Create:
                     {
-                        var command = new CreateContent { Data = job.Data! };
+                        var command = new CreateContent();
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsCreate);
+                        await EnrichAsync(task, command, Permissions.AppContentsCreate);
                         return command;
                     }
 
-                case BulkUpdateType.Update:
+                case BulkUpdateContentType.Update:
                     {
-                        var command = new UpdateContent { Data = job.Data! };
+                        var command = new UpdateContent();
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdateOwn);
+                        await EnrichAsync(task, command, Permissions.AppContentsUpdateOwn);
                         return command;
                     }
 
-                case BulkUpdateType.Upsert:
+                case BulkUpdateContentType.Upsert:
                     {
-                        var command = new UpsertContent { Data = job.Data! };
+                        var command = new UpsertContent();
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsUpsert);
+                        await EnrichAsync(task, command, Permissions.AppContentsUpsert);
                         return command;
                     }
 
-                case BulkUpdateType.Patch:
+                case BulkUpdateContentType.Patch:
                     {
-                        var command = new PatchContent { Data = job.Data! };
+                        var command = new PatchContent();
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdateOwn);
+                        await EnrichAsync(task, command, Permissions.AppContentsUpdateOwn);
                         return command;
                     }
 
-                case BulkUpdateType.Validate:
+                case BulkUpdateContentType.Validate:
                     {
                         var command = new ValidateContent();
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsReadOwn);
+                        await EnrichAsync(task, command, Permissions.AppContentsReadOwn);
                         return command;
                     }
 
-                case BulkUpdateType.ChangeStatus:
+                case BulkUpdateContentType.ChangeStatus:
                     {
-                        var command = new ChangeContentStatus { Status = job.Status, DueTime = job.DueTime };
+                        var command = new ChangeContentStatus { Status = job.Status ?? Status.Draft };
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsUpdateOwn);
+                        await EnrichAsync(task, command, Permissions.AppContentsChangeStatusOwn);
                         return command;
                     }
 
-                case BulkUpdateType.Delete:
+                case BulkUpdateContentType.Delete:
                     {
                         var command = new DeleteContent();
 
-                        await EnrichAsync(id, task, command, Permissions.AppContentsDeleteOwn);
+                        await EnrichAsync(task, command, Permissions.AppContentsDeleteOwn);
                         return command;
                     }
 
@@ -254,20 +255,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task EnrichAsync<TCommand>(DomainId id, BulkTask task, TCommand command, string permissionId) where TCommand : ContentCommand
+        private async Task EnrichAsync<T>(BulkTask task, T command, string permissionId) where T : ContentCommand
         {
             SimpleMapper.Map(task.Command, command);
-
-            command.ContentId = id;
+            SimpleMapper.Map(task.Job, command);
 
             if (!string.IsNullOrWhiteSpace(task.Job.Schema))
             {
-                var schema = await contentQuery.GetSchemaOrThrowAsync(task.Context, task.Schema);
+                var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, task.Schema);
 
                 command.SchemaId = schema.NamedId();
             }
 
-            if (!task.Context.Allows(permissionId, command.SchemaId.Name))
+            if (!contextProvider.Context.Allows(permissionId, command.SchemaId.Name))
             {
                 throw new DomainForbiddenException("Forbidden");
             }
@@ -288,7 +288,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 task.Job.Query.Take = task.Job.ExpectedCount;
 
-                var existing = await contentQuery.QueryAsync(task.Context, task.Schema, Q.Empty.WithJsonQuery(task.Job.Query));
+                var existing = await contentQuery.QueryAsync(contextProvider.Context, task.Schema, Q.Empty.WithJsonQuery(task.Job.Query));
 
                 if (existing.Total > task.Job.ExpectedCount)
                 {
@@ -298,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return existing.Select(x => x.Id).ToArray();
             }
 
-            if (task.Job.Type == BulkUpdateType.Create || task.Job.Type == BulkUpdateType.Upsert)
+            if (task.Job.Type == BulkUpdateContentType.Create || task.Job.Type == BulkUpdateContentType.Upsert)
             {
                 return new[] { DomainId.NewGuid() };
             }

@@ -10,7 +10,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public delegate void HandleEvent(Envelope<IEvent> @event);
+    public delegate bool HandleEvent(Envelope<IEvent> @event);
 
     public delegate void HandleSnapshot<in T>(T state);
 

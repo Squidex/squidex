@@ -13,6 +13,6 @@ namespace Squidex.Infrastructure.Commands
 {
     public interface IDomainObjectGrain : IGrainWithStringKey
     {
-        Task<J<object?>> ExecuteAsync(J<CommandRequest> request);
+        Task<J<CommandResult>> ExecuteAsync(J<CommandRequest> request);
     }
 }

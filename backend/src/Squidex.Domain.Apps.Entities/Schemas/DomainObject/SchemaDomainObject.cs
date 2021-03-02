@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                 Equals(schemaCommand.SchemaId?.Id, Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                     {
                         GuardSchemaField.CanAdd(c, Snapshot.SchemaDef);
 
-                        Add(c);
+                        AddField(c);
 
                         return Snapshot;
                     });
@@ -71,8 +71,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case SynchronizeSchema synchronizeSchema:
-                    return UpdateReturn(synchronizeSchema, c =>
+                case SynchronizeSchema synchronize:
+                    return UpdateReturn(synchronize, c =>
                     {
                         GuardSchema.CanSynchronize(c);
 
@@ -161,8 +161,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case UpdateSchema updateSchema:
-                    return UpdateReturn(updateSchema, c =>
+                case UpdateSchema update:
+                    return UpdateReturn(update, c =>
                     {
                         GuardSchema.CanUpdate(c);
 
@@ -171,8 +171,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case PublishSchema publishSchema:
-                    return UpdateReturn(publishSchema, c =>
+                case PublishSchema publish:
+                    return UpdateReturn(publish, c =>
                     {
                         GuardSchema.CanPublish(c);
 
@@ -181,8 +181,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case UnpublishSchema unpublishSchema:
-                    return UpdateReturn(unpublishSchema, c =>
+                case UnpublishSchema unpublish:
+                    return UpdateReturn(unpublish, c =>
                     {
                         GuardSchema.CanUnpublish(c);
 
@@ -254,7 +254,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             }
         }
 
-        public void Synchronize(SynchronizeSchema command)
+        private void Synchronize(SynchronizeSchema command)
         {
             var options = new SchemaSynchronizationOptions
             {
@@ -273,97 +273,97 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             }
         }
 
-        public void Create(CreateSchema command)
+        private void Create(CreateSchema command)
         {
             Raise(command, new SchemaCreated { SchemaId = NamedId.Of(command.SchemaId, command.Name), Schema = command.BuildSchema() });
         }
 
-        public void Add(AddField command)
+        private void AddField(AddField command)
         {
             Raise(command, new FieldAdded { FieldId = CreateFieldId(command) });
         }
 
-        public void UpdateField(UpdateField command)
+        private void UpdateField(UpdateField command)
         {
             Raise(command, new FieldUpdated());
         }
 
-        public void LockField(LockField command)
+        private void LockField(LockField command)
         {
             Raise(command, new FieldLocked());
         }
 
-        public void HideField(HideField command)
+        private void HideField(HideField command)
         {
             Raise(command, new FieldHidden());
         }
 
-        public void ShowField(ShowField command)
+        private void ShowField(ShowField command)
         {
             Raise(command, new FieldShown());
         }
 
-        public void DisableField(DisableField command)
+        private void DisableField(DisableField command)
         {
             Raise(command, new FieldDisabled());
         }
 
-        public void EnableField(EnableField command)
+        private void EnableField(EnableField command)
         {
             Raise(command, new FieldEnabled());
         }
 
-        public void DeleteField(DeleteField command)
+        private void DeleteField(DeleteField command)
         {
             Raise(command, new FieldDeleted());
         }
 
-        public void Reorder(ReorderFields command)
+        private void Reorder(ReorderFields command)
         {
             Raise(command, new SchemaFieldsReordered());
         }
 
-        public void Publish(PublishSchema command)
+        private void Publish(PublishSchema command)
         {
             Raise(command, new SchemaPublished());
         }
 
-        public void Unpublish(UnpublishSchema command)
+        private void Unpublish(UnpublishSchema command)
         {
             Raise(command, new SchemaUnpublished());
         }
 
-        public void ConfigureScripts(ConfigureScripts command)
+        private void ConfigureScripts(ConfigureScripts command)
         {
             Raise(command, new SchemaScriptsConfigured());
         }
 
-        public void ConfigureFieldRules(ConfigureFieldRules command)
+        private void ConfigureFieldRules(ConfigureFieldRules command)
         {
             Raise(command, new SchemaFieldRulesConfigured { FieldRules = command.ToFieldRules() });
         }
 
-        public void ChangeCategory(ChangeCategory command)
+        private void ChangeCategory(ChangeCategory command)
         {
             Raise(command, new SchemaCategoryChanged());
         }
 
-        public void ConfigurePreviewUrls(ConfigurePreviewUrls command)
+        private void ConfigurePreviewUrls(ConfigurePreviewUrls command)
         {
             Raise(command, new SchemaPreviewUrlsConfigured());
         }
 
-        public void ConfigureUIFields(ConfigureUIFields command)
+        private void ConfigureUIFields(ConfigureUIFields command)
         {
             Raise(command, new SchemaUIFieldsConfigured());
         }
 
-        public void Update(UpdateSchema command)
+        private void Update(UpdateSchema command)
         {
             Raise(command, new SchemaUpdated());
         }
 
-        public void Delete(DeleteSchema command)
+        private void Delete(DeleteSchema command)
         {
             Raise(command, new SchemaDeleted());
         }
@@ -374,7 +374,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             NamedId<long>? GetFieldId(long? id)
             {
-                if (id.HasValue && Snapshot.SchemaDef.FieldsById.TryGetValue(id.Value, out var field))
+                if (id != null && Snapshot.SchemaDef.FieldsById.TryGetValue(id.Value, out var field))
                 {
                     return field.NamedId();
                 }
@@ -384,7 +384,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             if (command is ParentFieldCommand parentField && @event is ParentFieldEvent parentFieldEvent)
             {
-                if (parentField.ParentFieldId.HasValue)
+                if (parentField.ParentFieldId != null)
                 {
                     if (Snapshot.SchemaDef.FieldsById.TryGetValue(parentField.ParentFieldId.Value, out var field))
                     {

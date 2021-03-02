@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
                 Filter.Eq(x => x.IsDeleted, false)
             };
 
-            if (parentId.HasValue)
+            if (parentId != null)
             {
                 if (parentId == DomainId.Empty)
                 {

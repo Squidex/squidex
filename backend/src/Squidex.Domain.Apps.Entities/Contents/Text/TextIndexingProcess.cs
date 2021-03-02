@@ -26,27 +26,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public int BatchSize
         {
-            get { return 1000; }
+            get => 1000;
         }
 
         public int BatchDelay
         {
-            get { return 1000; }
+            get => 1000;
         }
 
         public string Name
         {
-            get { return "TextIndexer5"; }
+            get => "TextIndexer5";
         }
 
         public string EventsFilter
         {
-            get { return "^content-"; }
+            get => "^content-";
         }
 
         public ITextIndex TextIndex
         {
-            get { return textIndex; }
+            get => textIndex;
         }
 
         private sealed class Updates

@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     ContentId = contentId,
                     DoNotScript = true,
                     DoNotValidate = true,
-                    Publish = true,
-                    SchemaId = schemaId
+                    SchemaId = schemaId,
+                    Status = Status.Published
                 };
 
                 SimpleMapper.Map(createSchema, content);

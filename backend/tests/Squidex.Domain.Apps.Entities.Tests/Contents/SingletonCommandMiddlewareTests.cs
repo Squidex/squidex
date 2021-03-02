@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Commands;
@@ -30,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => commandBus.PublishAsync(A<CreateContent>.That.Matches(x => x.Publish)))
+            A.CallTo(() => commandBus.PublishAsync(A<CreateContent>.That.Matches(x => x.Status == Status.Published)))
                 .MustHaveHappened();
         }
 

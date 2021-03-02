@@ -21,12 +21,12 @@ namespace Squidex.Shared
 
         public static IReadOnlyList<string> ForAppsNonSchema
         {
-            get { return ForAppsNonSchemaList; }
+            get => ForAppsNonSchemaList;
         }
 
         public static IReadOnlyList<string> ForAppsSchema
         {
-            get { return ForAppsSchemaList; }
+            get => ForAppsSchemaList;
         }
 
         public const string All = "squidex.*";

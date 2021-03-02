@@ -21,32 +21,32 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public long Id
         {
-            get { return fieldId; }
+            get => fieldId;
         }
 
         public string Name
         {
-            get { return fieldName; }
+            get => fieldName;
         }
 
         public bool IsLocked
         {
-            get { return isLocked; }
+            get => isLocked;
         }
 
         public bool IsHidden
         {
-            get { return isHidden; }
+            get => isHidden;
         }
 
         public bool IsDisabled
         {
-            get { return isDisabled; }
+            get => isDisabled;
         }
 
         public Partitioning Partitioning
         {
-            get { return partitioning; }
+            get => partitioning;
         }
 
         public abstract FieldProperties RawProperties { get; }

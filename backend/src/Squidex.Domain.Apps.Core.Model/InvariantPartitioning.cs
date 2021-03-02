@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core
 
         public string Master
         {
-            get { return Key; }
+            get => Key;
         }
 
         public IEnumerable<string> AllKeys

@@ -5,10 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing
+using System.Collections.Generic;
+
+namespace Squidex.Domain.Apps.Entities
 {
-    public interface IEventEnricher<in T>
+    public sealed class BulkUpdateResult : List<BulkUpdateResultItem>
     {
-        void Enrich(Envelope<IEvent> @event, T key);
+        public BulkUpdateResult()
+        {
+        }
+
+        public BulkUpdateResult(IEnumerable<BulkUpdateResultItem> source)
+            : base(source)
+        {
+        }
     }
 }

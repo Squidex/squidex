@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Claims;
+using System.Linq;
 using System.Threading.Tasks;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
@@ -22,63 +21,50 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class GuardContent
     {
-        public static async Task CanCreate(CreateContent command, IContentWorkflow contentWorkflow, ISchemaEntity schema)
+        public static void CanCreate(CreateContent command, ISchemaEntity schema)
         {
             Guard.NotNull(command, nameof(command));
 
-            if (schema.SchemaDef.IsSingleton && command.ContentId != schema.Id)
+            if (schema.SchemaDef.IsSingleton)
             {
-                throw new DomainException(T.Get("contents.singletonNotCreatable"));
+                if (command.ContentId != schema.Id)
+                {
+                    throw new DomainException(T.Get("contents.singletonNotCreatable"));
+                }
             }
 
-            if (command.Publish && !await contentWorkflow.CanPublishOnCreateAsync(schema, command.Data, command.User))
+            Validate.It(e =>
             {
-                throw new DomainException(T.Get("contents.workflowErorPublishing"));
+                if (command.Data == null)
+                {
+                    e(Not.Defined(nameof(command.Data)), nameof(command.Data));
+                }
+            });
+        }
+
+        public static async Task CanUpdate(UpdateContent command, IContentEntity content, IContentWorkflow contentWorkflow)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            CheckPermission(content, command, Permissions.AppContentsUpdate, Permissions.AppContentsUpsert);
+
+            if (!command.DoNotValidateWorkflow)
+            {
+                var status = content.NewStatus ?? content.Status;
+
+                if (!await contentWorkflow.CanUpdateAsync(content, status, command.User))
+                {
+                    throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
+                }
             }
 
             Validate.It(e =>
             {
-                ValidateData(command, e);
+                if (command.Data == null)
+                {
+                    e(Not.Defined(nameof(command.Data)), nameof(command.Data));
+                }
             });
-        }
-
-        public static async Task CanUpdate(UpdateContent command,
-            IContentEntity content,
-            IContentWorkflow contentWorkflow)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            CheckPermission(content, command, Permissions.AppContentsUpdate);
-
-            Validate.It(e =>
-            {
-                ValidateData(command, e);
-            });
-
-            await ValidateCanUpdate(content, contentWorkflow, command.User);
-        }
-
-        public static async Task CanPatch(PatchContent command,
-            IContentEntity content,
-            IContentWorkflow contentWorkflow)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            CheckPermission(content, command, Permissions.AppContentsUpdate);
-
-            Validate.It(e =>
-            {
-                ValidateData(command, e);
-            });
-
-            await ValidateCanUpdate(content, contentWorkflow, command.User);
-        }
-
-        public static void CanValidate(ValidateContent command, IContentEntity content)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            CheckPermission(content, command, Permissions.AppContentsRead);
         }
 
         public static void CanDeleteDraft(DeleteContentDraft command, IContentEntity content)
@@ -105,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
-        public static Task CanChangeStatus(ChangeContentStatus command,
+        public static async Task CanChangeStatus(ChangeContentStatus command,
             IContentEntity content,
             IContentWorkflow contentWorkflow,
             IContentRepository contentRepository,
@@ -113,42 +99,51 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            CheckPermission(content, command, Permissions.AppContentsChangeStatus);
+            CheckPermission(content, command, Permissions.AppContentsChangeStatus, Permissions.AppContentsUpsert);
+
+            var newStatus = command.Status;
 
             if (schema.SchemaDef.IsSingleton)
             {
-                if (content.NewStatus == null || command.Status != Status.Published)
+                if (content.NewStatus == null || newStatus != Status.Published)
                 {
                     throw new DomainException(T.Get("contents.singletonNotChangeable"));
                 }
 
-                return Task.CompletedTask;
+                return;
             }
 
-            return Validate.It(async e =>
+            var oldStatus = content.NewStatus ?? content.Status;
+
+            if (oldStatus == Status.Published && command.CheckReferrers)
             {
-                var status = content.NewStatus ?? content.Status;
+                var hasReferrer = await contentRepository.HasReferrersAsync(content.AppId.Id, command.ContentId, SearchScope.Published);
 
-                if (!await contentWorkflow.CanMoveToAsync(content, status, command.Status, command.User))
+                if (hasReferrer)
                 {
-                    var values = new { oldStatus = status, newStatus = command.Status };
-
-                    e(T.Get("contents.statusTransitionNotAllowed", values), nameof(command.Status));
+                    throw new DomainException(T.Get("contents.referenced"));
                 }
+            }
 
-                if (content.Status == Status.Published && command.CheckReferrers)
+            await Validate.It(async e =>
+            {
+                if (!command.DoNotValidateWorkflow)
                 {
-                    var hasReferrer = await contentRepository.HasReferrersAsync(content.AppId.Id, command.ContentId, SearchScope.Published);
-
-                    if (hasReferrer)
+                    if (!await contentWorkflow.CanMoveToAsync(content, oldStatus, newStatus, command.User))
                     {
-                        throw new DomainException(T.Get("contents.referenced"));
+                        var values = new { oldStatus, newStatus };
+
+                        e(T.Get("contents.statusTransitionNotAllowed", values), "Status");
                     }
                 }
-
-                if (command.DueTime.HasValue && command.DueTime.Value < SystemClock.Instance.GetCurrentInstant())
+                else
                 {
-                    e(T.Get("contents.statusSchedulingNotInFuture"), nameof(command.DueTime));
+                    var info = await contentWorkflow.GetInfoAsync(content, newStatus);
+
+                    if (info == null)
+                    {
+                        e(T.Get("contents.statusNotValid"), "Status");
+                    }
                 }
             });
         }
@@ -178,32 +173,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
-        private static void ValidateData(ContentDataCommand command, AddValidation e)
+        public static void CanValidate(ValidateContent command, IContentEntity content)
         {
-            if (command.Data == null)
-            {
-                e(Not.Defined(nameof(command.Data)), nameof(command.Data));
-            }
+            Guard.NotNull(command, nameof(command));
+
+            CheckPermission(content, command, Permissions.AppContentsRead);
         }
 
-        private static async Task ValidateCanUpdate(IContentEntity content, IContentWorkflow contentWorkflow, ClaimsPrincipal? user)
-        {
-            var status = content.NewStatus ?? content.Status;
-
-            if (!await contentWorkflow.CanUpdateAsync(content, status, user))
-            {
-                throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
-            }
-        }
-
-        public static void CheckPermission(IContentEntity content, ContentCommand command, string permission)
+        public static void CheckPermission(IContentEntity content, ContentCommand command, params string[] permissions)
         {
             if (Equals(content.CreatedBy, command.Actor) || command.User == null)
             {
                 return;
             }
 
-            if (!command.User.Allows(permission, content.AppId.Name, content.SchemaId.Name))
+            if (permissions.All(x => !command.User.Allows(x, content.AppId.Name, content.SchemaId.Name)))
             {
                 throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }

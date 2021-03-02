@@ -5,9 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+using Squidex.Infrastructure;
+
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public abstract class ContentUpdateCommand : ContentDataCommand
+    public sealed class BulkUpdateAssets : SquidexCommand, IAppCommand
     {
+        public NamedId<DomainId> AppId { get; set; }
+
+        public BulkUpdateJob[]? Jobs { get; set; }
     }
 }

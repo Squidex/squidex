@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Json.Objects
     {
         public JsonValueType Type
         {
-            get { return JsonValueType.Array; }
+            get => JsonValueType.Array;
         }
 
         public JsonArray()
