@@ -139,7 +139,7 @@ All content fields are single values.
 Go to: [REDOC_LINK_SIMPLE]</value>
   </data>
   <data name="OpenApiSchemaBody" xml:space="preserve">
-    <value>The data of the content to be created or updated.
+    <value>The data of the content.
             
 Please note that each field is an object with one entry per language. 
 If the field is not localizable you must use `iv` (invariant language) as a key.

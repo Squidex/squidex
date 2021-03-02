@@ -76,7 +76,7 @@ namespace Squidex.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The data of the content to be created or updated.
+        ///   Looks up a localized string similar to The data of the content.
         ///            
         ///Please note that each field is an object with one entry per language. 
         ///If the field is not localizable you must use `iv` (invariant language) as a key.
