@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
@@ -277,6 +278,26 @@ namespace TestSuite.ApiTests
             });
 
             Assert.Single(assets_1.Items, x => x.Id == asset_1.Id);
+        }
+
+        [Fact]
+        public async Task Should_move_asset_to_folder_by_path()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Move dynamically
+            var asset_2 = await _.Assets.PutAssetParentAsync(_.AppName, asset_1.Id, new MoveAssetDto
+            {
+                ParentPath = "path/to/folder"
+            });
+
+
+            // STEP 3: Get folder
+            var folder_1 = await _.Assets.GetAssetFoldersAsync(_.AppName, asset_2.ParentId);
+
+            Assert.Equal("path/to/folder", string.Join("/", folder_1.Path.Select(x => x.FolderName)));
         }
 
         [Fact, Trait("Category", "NotAutomated")]
