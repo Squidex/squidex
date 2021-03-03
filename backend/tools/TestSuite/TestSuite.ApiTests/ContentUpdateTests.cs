@@ -505,21 +505,61 @@ namespace TestSuite.ApiTests
             }
         }
 
-        [Fact]
-        public async Task Should_delete_item()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_delete_item(bool permanent)
         {
             // STEP 1: Create a new item.
             var content = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, true);
 
 
             // STEP 2: Delete the item.
-            await _.Contents.DeleteAsync(content.Id);
+            await _.Contents.DeleteAsync(content.Id, permanent);
 
 
             // STEP 3: Retrieve all items and ensure that the deleted item does not exist.
             var updated = await _.Contents.GetAsync();
 
             Assert.DoesNotContain(updated.Items, x => x.Id == content.Id);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_recreate_delete_item(bool permanent)
+        {
+            // STEP 1: Create a new item.
+            var content_1 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, true);
+
+
+            // STEP 2: Delete the item.
+            await _.Contents.DeleteAsync(content_1.Id, permanent);
+
+
+            // STEP 3: Recreate the item with the same id.
+            var content_2 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, content_1.Id, true);
+
+            Assert.Equal(Status.Published, content_2.Status);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_recreate_delete_item_with_upsert(bool permanent)
+        {
+            // STEP 1: Create a new item.
+            var content_1 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, true);
+
+
+            // STEP 2: Delete the item.
+            await _.Contents.DeleteAsync(content_1.Id, permanent);
+
+
+            // STEP 3: Recreate the item with the same id.
+            var content_2 = await _.Contents.UpsertAsync(content_1.Id, new TestEntityData { Number = 2 }, true);
+
+            Assert.Equal(Status.Published, content_2.Status);
         }
     }
 }

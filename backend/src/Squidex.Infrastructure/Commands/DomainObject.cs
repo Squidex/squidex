@@ -182,6 +182,8 @@ namespace Squidex.Infrastructure.Commands
                     if (persistence != null)
                     {
                         await persistence.DeleteAsync();
+
+                        Setup(uniqueId);
                     }
 
                     snapshots.Clear();
