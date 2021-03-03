@@ -205,22 +205,6 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_delete_asset()
-        {
-            // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
-
-
-            // STEP 2: Delete asset
-            await _.Assets.DeleteAssetAsync(_.AppName, asset_1.Id);
-
-            // Should return 404 when asset deleted.
-            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id));
-
-            Assert.Equal(404, ex.StatusCode);
-        }
-
-        [Fact]
         public async Task Should_query_asset_by_metadata()
         {
             // STEP 1: Create asset
@@ -324,6 +308,43 @@ namespace TestSuite.ApiTests
             var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id));
 
             Assert.Equal(404, ex.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Should_delete_asset(bool permanent)
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Delete asset
+            await _.Assets.DeleteAssetAsync(_.AppName, asset_1.Id, permanent: permanent);
+
+            // Should return 404 when asset deleted.
+            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id));
+
+            Assert.Equal(404, ex.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Should_recreate_asset(bool permanent)
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Delete asset
+            await _.Assets.DeleteAssetAsync(_.AppName, asset_1.Id, permanent: permanent);
+
+
+            // STEP 3: Recreate asset
+            var asset_2 = await _.UploadFileAsync("Assets/logo-wide.png", "image/png");
+
+            Assert.NotEqual(asset_1.FileSize, asset_2.FileSize);
         }
     }
 }
