@@ -39,6 +39,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Capacity = int.MaxValue;
         }
 
+        private Task LoadContext(ContentCommand command, bool optimize)
+        {
+            return context.LoadAsync(command.AppId, command.SchemaId, command, optimize);
+        }
+
         protected override bool IsDeleted()
         {
             return Snapshot.IsDeleted;
@@ -175,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                             if (c.DueTime > SystemClock.Instance.GetCurrentInstant())
                             {
-                                ScheduleStatus(c, c.DueTime.Value);
+                                ChangeStatusScheduled(c, c.DueTime.Value);
                             }
                             else
                             {
@@ -276,7 +281,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     });
 
                 // Just update the previous data event to improve performance and add less events.
-                var previousEvent = GetPreviousDataEvent();
+                var previousEvent =
+                    GetUncomittedEvents().Select(x => x.Payload)
+                        .OfType<ContentDataCommand>().FirstOrDefault();
 
                 if (previousEvent != null)
                 {
@@ -376,6 +383,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Raise(command, new ContentStatusChanged { Change = GetChange(command.Status) });
         }
 
+        private void ChangeStatusScheduled(ChangeContentStatus command, Instant dueTime)
+        {
+            Raise(command, new ContentStatusScheduled { DueTime = dueTime });
+        }
+
+        private void CancelChangeStatus(ChangeContentStatus command)
+        {
+            Raise(command, new ContentSchedulingCancelled());
+        }
+
         private void CreateDraft(CreateContentDraft command, Status status)
         {
             Raise(command, new ContentDraftCreated { Status = status });
@@ -389,16 +406,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private void DeleteDraft(DeleteContentDraft command)
         {
             Raise(command, new ContentDraftDeleted());
-        }
-
-        private void CancelChangeStatus(ChangeContentStatus command)
-        {
-            Raise(command, new ContentSchedulingCancelled());
-        }
-
-        private void ScheduleStatus(ChangeContentStatus command, Instant dueTime)
-        {
-            Raise(command, new ContentStatusScheduled { DueTime = dueTime });
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
@@ -420,16 +427,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             {
                 return StatusChange.Change;
             }
-        }
-
-        private ContentDataCommand? GetPreviousDataEvent()
-        {
-            return GetUncomittedEvents().Select(x => x.Payload).OfType<ContentDataCommand>().FirstOrDefault();
-        }
-
-        private Task LoadContext(ContentCommand command, bool optimize)
-        {
-            return context.LoadAsync(command.AppId, command.SchemaId, command, optimize);
         }
     }
 }
