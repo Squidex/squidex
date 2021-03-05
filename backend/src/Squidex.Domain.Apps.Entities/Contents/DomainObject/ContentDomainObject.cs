@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -270,7 +271,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                     if (!newData.Equals(Snapshot.Data))
                     {
-                        Update(c, newData);
+                        var existing =
+                            GetUncomittedEvents().Select(x => x.Payload)
+                                .OfType<ContentDataCommand>().LastOrDefault();
+
+                        if (existing != null)
+                        {
+                            existing.Data = newData;
+                        }
+                        else
+                        {
+                            Update(c, newData);
+                        }
                     }
                 }
 
