@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, forwardRef, HostListener, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, forwardRef, HostListener, Input, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Types } from '@app/framework/internal';
 
@@ -22,16 +22,38 @@ export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
 export class IndeterminateValueDirective implements ControlValueAccessor {
     private callChange = (_: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
+    private isChecked: boolean | null;
+
+    @Input()
+    public threeStates = true;
 
     constructor(
-        private readonly element: ElementRef,
+        private readonly element: ElementRef<HTMLInputElement>,
         private readonly renderer: Renderer2
     ) {
     }
 
-    @HostListener('change', ['$event.target.checked'])
-    public onChange(value: any) {
-        this.callChange(value);
+    @HostListener('click')
+    public onClick() {
+        let isChecked = this.isChecked;
+
+        if (this.threeStates) {
+            if (isChecked) {
+                isChecked = null;
+            } else if (isChecked === null) {
+                isChecked = false;
+            } else {
+                isChecked = true;
+            }
+        } else {
+            isChecked = !(isChecked === true);
+        }
+
+        if (isChecked !== this.isChecked) {
+            this.callChange(isChecked);
+        }
+
+        this.writeValue(isChecked);
     }
 
     @HostListener('blur')
@@ -47,6 +69,8 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
             this.renderer.setProperty(this.element.nativeElement, 'indeterminate', false);
             this.renderer.setProperty(this.element.nativeElement, 'checked', obj);
         }
+
+        this.isChecked = obj;
     }
 
     public setDisabledState(isDisabled: boolean): void {

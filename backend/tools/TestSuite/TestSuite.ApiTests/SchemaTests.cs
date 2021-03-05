@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
@@ -44,6 +45,45 @@ namespace TestSuite.ApiTests
 
             // Should provide new schema when apps are schemas.
             Assert.Contains(schemas.Items, x => x.Name == schemaName);
+        }
+
+        [Fact]
+        public async Task Should_create_schema_with_checkboxes()
+        {
+            var schemaName = $"schema-{Guid.NewGuid()}";
+
+            // STEP 1: Create schema
+            var createRequest = new CreateSchemaDto
+            {
+                Name = schemaName,
+                Fields = new List<UpsertSchemaFieldDto>
+                {
+                    new UpsertSchemaFieldDto
+                    {
+                        Name = "references",
+                        Partitioning = "invariant",
+                        Properties = new ReferencesFieldPropertiesDto
+                        {
+                            Editor = ReferencesFieldEditor.Checkboxes
+                        }
+                    },
+                    new UpsertSchemaFieldDto
+                    {
+                        Name = "tags",
+                        Partitioning = "invariant",
+                        Properties = new TagsFieldPropertiesDto
+                        {
+                            Editor = TagsFieldEditor.Checkboxes,
+                            AllowedValues = new List<string> { "value1" }
+                        }
+                    }
+                }
+            };
+
+            var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+
+            // Should return created schemas with correct name.
+            Assert.Equal(schemaName, schema.Name);
         }
 
         [Fact]

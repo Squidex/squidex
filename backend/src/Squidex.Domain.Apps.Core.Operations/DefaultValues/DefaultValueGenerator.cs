@@ -64,15 +64,10 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
                 return;
             }
 
-            if (!fieldData.TryGetValue(partitionKey, out var value) || ShouldApplyDefaultValue(field, value))
+            if (!fieldData.TryGetValue(partitionKey, out var value))
             {
                 fieldData.AddLocalized(partitionKey, defaultValue);
             }
-        }
-
-        private static bool ShouldApplyDefaultValue(IField field, IJsonValue value)
-        {
-            return value.Type == JsonValueType.Null || (field is IField<StringFieldProperties> && value is JsonString s && string.IsNullOrEmpty(s.Value));
         }
     }
 }

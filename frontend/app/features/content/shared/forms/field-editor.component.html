@@ -39,7 +39,7 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'Checkbox'">
                             <div class="custom-control custom-checkbox">
-                                <input class="custom-control-input" type="checkbox" [formControl]="editorControl" id="{{uniqueId}}" sqxIndeterminateValue>
+                                <input class="custom-control-input" type="checkbox" [formControl]="editorControl" id="{{uniqueId}}" sqxIndeterminateValue [threeStates]="!field.properties.isRequired">
                                 <label class="custom-control-label" for="{{uniqueId}}"></label>
                             </div>
                         </ng-container>

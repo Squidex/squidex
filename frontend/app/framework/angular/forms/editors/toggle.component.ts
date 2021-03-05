@@ -46,7 +46,7 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
         this.next({ isChecked });
     }
 
-    public changeState(event: MouseEvent) {
+    public changeState() {
         const isDisabled = this.snapshot.isDisabled;
 
         if (isDisabled) {
@@ -55,7 +55,7 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
 
         let isChecked = this.snapshot.isChecked;
 
-        if (this.threeStates && (event.ctrlKey || event.shiftKey)) {
+        if (this.threeStates) {
             if (isChecked) {
                 isChecked = null;
             } else if (isChecked === null) {

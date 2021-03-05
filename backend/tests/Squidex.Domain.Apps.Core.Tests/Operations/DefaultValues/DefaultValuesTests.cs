@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_also_enrich_with_default_values_when_string_is_empty()
+        public void Should_not_enrich_with_default_values_when_string_is_empty()
         {
             var data =
                 new ContentData()
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
-            Assert.Equal("en-string", data["my-string"]!["de"].ToString());
+            Assert.Equal(string.Empty, data["my-string"]!["de"].ToString());
             Assert.Equal("en-string", data["my-string"]!["en"].ToString());
         }
 
