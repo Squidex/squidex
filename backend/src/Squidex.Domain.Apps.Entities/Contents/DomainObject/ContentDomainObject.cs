@@ -94,7 +94,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                         await CreateCore(c);
 
-                        if (Is.OptionalChange(Snapshot.EditingStatus, c.Status))
+                        if (context.Schema.SchemaDef.IsSingleton)
+                        {
+                            ChangeStatus(c.AsChange(Status.Published));
+                        }
+                        else if (Is.OptionalChange(Snapshot.EditingStatus, c.Status))
                         {
                             await ChangeCore(c.AsChange(c.Status.Value));
                         }
