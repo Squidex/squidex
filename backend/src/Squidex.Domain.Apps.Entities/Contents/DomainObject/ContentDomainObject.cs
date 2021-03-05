@@ -258,6 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 return;
             }
 
+            // Check for script to skip cloning if no script configured.
             if (!c.DoNotScript && context.HasScript(c => c.Change))
             {
                 var change = GetChange(c.Status);
