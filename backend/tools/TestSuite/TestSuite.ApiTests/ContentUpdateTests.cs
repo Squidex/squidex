@@ -133,6 +133,63 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_create_null_text()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a content item with a text that caused a bug before.
+                content = await _.Contents.CreateAsync(new TestEntityData
+                {
+                    Localized = new Dictionary<string, string>
+                    {
+                        ["en"] = null
+                    }
+                }, true);
+
+
+                // STEP 2: Get the item and ensure that the text is the same.
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Null(updated.Data.Localized["en"]);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_default_text()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a content item with a text that caused a bug before.
+                content = await _.Contents.CreateAsync(new TestEntityData
+                {
+                    Localized = new Dictionary<string, string>()
+                }, true);
+
+
+                // STEP 2: Get the item and ensure that the text is the same.
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal("default", updated.Data.Localized["en"]);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
         public async Task Should_create_content_with_scripting()
         {
             TestEntity content = null;
