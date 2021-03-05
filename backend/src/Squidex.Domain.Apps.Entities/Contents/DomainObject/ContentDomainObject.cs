@@ -275,21 +275,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         StatusOld = Snapshot.EditingStatus
                     });
 
-                if (!newData.Equals(Snapshot.Data))
-                {
-                    // Just update the previous data event to improve performance and add less events.
-                    var existing =
-                        GetUncomittedEvents().Select(x => x.Payload)
-                            .OfType<ContentDataCommand>().FirstOrDefault();
+                // Just update the previous data event to improve performance and add less events.
+                var previousEvent = GetPreviousDataEvent();
 
-                    if (existing != null)
-                    {
-                        existing.Data = newData;
-                    }
-                    else
-                    {
-                        Update(c, newData);
-                    }
+                if (previousEvent != null)
+                {
+                    previousEvent.Data = newData;
+                }
+                else if (!newData.Equals(Snapshot.Data))
+                {
+                    Update(c, newData);
                 }
             }
 
@@ -301,13 +296,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             ChangeStatus(c);
         }
 
-        private async Task UpdateCore(UpdateContent c, Func<ContentData, ContentData> newDataFunc, bool partial)
+        private async Task UpdateCore(UpdateContent c, Func<ContentData, ContentData> update, bool partial)
         {
             await GuardContent.CanUpdate(c, Snapshot, context.Workflow);
 
-            var dataNew = newDataFunc(Snapshot.Data);
+            var newData = update(Snapshot.Data);
 
-            if (dataNew.Equals(Snapshot.Data))
+            if (newData.Equals(Snapshot.Data))
             {
                 return;
             }
@@ -326,11 +321,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotScript)
             {
-                dataNew = await context.ExecuteScriptAndTransformAsync(s => s.Update,
+                newData = await context.ExecuteScriptAndTransformAsync(s => s.Update,
                     new ScriptVars
                     {
                         Operation = "Update",
-                        Data = dataNew,
+                        Data = newData,
                         DataOld = Snapshot.Data,
                         Status = Snapshot.EditingStatus,
                         StatusOld = default
@@ -339,10 +334,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate)
             {
-                await context.ValidateContentAsync(dataNew);
+                await context.ValidateContentAsync(newData);
             }
 
-            Update(c, dataNew);
+            Update(c, newData);
         }
 
         private async Task DeleteCore(DeleteContent c)
@@ -425,6 +420,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             {
                 return StatusChange.Change;
             }
+        }
+
+        private ContentDataCommand? GetPreviousDataEvent()
+        {
+            return GetUncomittedEvents().Select(x => x.Payload).OfType<ContentDataCommand>().FirstOrDefault();
         }
 
         private Task LoadContext(ContentCommand command, bool optimize)
