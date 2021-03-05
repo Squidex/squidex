@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
                 events.AddRange(uncommittedEvents);
 
-                return new CommandResult(DomainId.Create(Key), Version, previousVersion);
+                return CommandResult.Empty(DomainId.Create(Key), Version, previousVersion);
             }
             catch
             {

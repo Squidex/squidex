@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 .Returns(grain);
 
             A.CallTo(() => grain.ExecuteAsync(A<J<CommentsCommand>>.That.Matches(x => x.Value == command)))
-                .Returns(new CommandResult(commentsId, 0, 0).AsJ());
+                .Returns(CommandResult.Empty(commentsId, 0, 0).AsJ());
 
             var isNextCalled = false;
 

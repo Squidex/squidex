@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.TestingHost;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 #pragma warning disable SA1133 // Do not combine attributes
@@ -54,6 +55,16 @@ namespace Squidex.Infrastructure.Commands
 
             Assert.Equal(culture.Name, sut.Culture);
             Assert.Equal(cultureUI.Name, sut.CultureUI);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize()
+        {
+            var sut = CommandRequest.Create(null!);
+
+            var serialized = sut.SerializeAndDeserialize();
+
+            Assert.Equal(sut, serialized);
         }
 
         [Fact, Trait("Category", "Dependencies")]

@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
     public class AppContributorsJsonTests
     {
         [Fact]
-        public void Should_serialize_and_deserialize()
+        public void #()
         {
             var contributors = AppContributors.Empty;
 

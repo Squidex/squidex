@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustNotHaveHappened();
 
-            Assert.Equal(new CommandResult(id, 0, EtagVersion.Empty), result);
+            Assert.Equal(CommandResult.Empty(id, 0, EtagVersion.Empty), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 0);
@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustHaveHappened();
 
-            Assert.Equal(new CommandResult(id, 2, 1), result);
+            Assert.Equal(CommandResult.Empty(id, 2, 1), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 2);
@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustHaveHappened();
 
-            Assert.Equal(new CommandResult(id, 2, 1), result);
+            Assert.Equal(CommandResult.Empty(id, 2, 1), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 2);
@@ -148,7 +148,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustNotHaveHappened();
 
-            Assert.Equal(new CommandResult(id, 1, 0), result);
+            Assert.Equal(CommandResult.Empty(id, 1, 0), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 8, 1);
@@ -168,7 +168,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(A<long>._))
                 .MustHaveHappenedOnceExactly();
 
-            Assert.Equal(new CommandResult(id, 1, 0), result);
+            Assert.Equal(CommandResult.Empty(id, 1, 0), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 8, 1);
@@ -299,7 +299,7 @@ namespace Squidex.Infrastructure.Commands
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = MyDomainState.Unchanged });
 
-            Assert.Equal(new CommandResult(id, 0, 0), result);
+            Assert.Equal(CommandResult.Empty(id, 0, 0), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 0);

@@ -15,9 +15,9 @@ namespace Squidex.Infrastructure.Commands
 
         public bool IsChanged => OldVersion != NewVersion;
 
-        public CommandResult(DomainId id, long newVersion, long oldVersion)
-            : this(id, newVersion, oldVersion, None.Value)
+        public static CommandResult Empty(DomainId id, long newVersion, long oldVersion)
         {
+            return new CommandResult(id, newVersion, oldVersion, None.Value);
         }
     }
 }

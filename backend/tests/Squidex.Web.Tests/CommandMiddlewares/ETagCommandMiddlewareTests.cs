@@ -74,7 +74,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_add_version_from_result_as_etag_to_response()
         {
-            var result = new CommandResult(DomainId.Empty, 17, 16);
+            var result = CommandResult.Empty(DomainId.Empty, 17, 16);
 
             await HandleAsync(new CreateContent(), result);
 

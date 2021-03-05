@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class None
+    public sealed record None
     {
         public static readonly Type Type = typeof(None);
 
