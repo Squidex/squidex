@@ -95,6 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                         await CreateCore(c);
 
+                        // Skip validation for singleton contents because it is published from command middleware.
                         if (context.Schema.SchemaDef.IsSingleton)
                         {
                             ChangeStatus(c.AsChange(Status.Published));
@@ -261,6 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             {
                 var change = GetChange(c.Status);
 
+                // Clone the data, so that we do not change it in cases of errors.
                 var data = Snapshot.Data.Clone();
 
                 var newData = await context.ExecuteScriptAndTransformAsync(s => s.Change,
@@ -274,6 +276,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                 if (!newData.Equals(Snapshot.Data))
                 {
+                    // Just update the previous data event to improve performance and add less events.
                     var existing =
                         GetUncomittedEvents().Select(x => x.Payload)
                             .OfType<ContentDataCommand>().FirstOrDefault();
