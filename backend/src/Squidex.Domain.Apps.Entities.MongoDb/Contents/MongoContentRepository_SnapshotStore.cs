@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
@@ -119,6 +120,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             if (schema != null)
             {
                 content.ReferencedIds = content.Data.GetReferencedIds(schema.SchemaDef);
+            }
+            else
+            {
+                content.ReferencedIds = new HashSet<DomainId>();
             }
 
             return content;

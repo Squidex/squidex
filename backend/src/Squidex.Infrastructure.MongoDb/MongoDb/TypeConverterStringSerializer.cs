@@ -35,14 +35,32 @@ namespace Squidex.Infrastructure.MongoDb
 
         public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
-            var value = context.Reader.ReadString();
+            if (context.Reader.CurrentBsonType == BsonType.Null)
+            {
+                context.Reader.ReadNull();
 
-            return (T)typeConverter.ConvertFromInvariantString(value);
+                return default!;
+            }
+            else
+            {
+                var value = context.Reader.ReadString();
+
+                return (T)typeConverter.ConvertFromInvariantString(value);
+            }
         }
 
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, T value)
         {
-            context.Writer.WriteString(value!.ToString());
+            var text = value?.ToString();
+
+            if (text != null)
+            {
+                context.Writer.WriteString(text);
+            }
+            else
+            {
+                context.Writer.WriteNull();
+            }
         }
     }
 }
