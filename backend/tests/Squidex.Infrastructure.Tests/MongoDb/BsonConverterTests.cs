@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
@@ -114,13 +115,10 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        private readonly TestObject source = TestObject.CreateWithValues();
-        private readonly JsonSerializer serializer = JsonSerializer.CreateDefault();
-
         [Fact]
         public void Should_write_problematic_object()
         {
-            var buggy = new
+            var source = new
             {
                 a = new
                 {
@@ -136,33 +134,69 @@ namespace Squidex.Infrastructure.MongoDb
                 }
             };
 
-            var stream = new MemoryStream();
+            var deserialized = SerializeAndDeserialize(source);
 
-            using (var writer = new BsonJsonWriter(new BsonBinaryWriter(stream)))
-            {
-                serializer.Serialize(writer, buggy);
-
-                writer.Flush();
-            }
-
-            stream.Position = 0;
-
-            using (var reader = new BsonJsonReader(new BsonBinaryReader(stream)))
-            {
-                var target = serializer.Deserialize(reader, buggy.GetType());
-
-                target.Should().BeEquivalentTo(buggy);
-            }
+            deserialized.Should().BeEquivalentTo(source);
         }
 
         [Fact]
         public void Should_serialize_with_reader_and_writer()
         {
+            var source = TestObject.CreateWithValues();
+
+            var deserialized = SerializeAndDeserialize(source);
+
+            deserialized.Should().BeEquivalentTo(source);
+        }
+
+        [Fact]
+        public void Should_deserialize_property_with_dollar()
+        {
+            var source = new Dictionary<string, int>
+            {
+                ["$key"] = 12
+            };
+
+            var deserialized = SerializeAndDeserialize(source);
+
+            deserialized.Should().BeEquivalentTo(source);
+        }
+
+        [Fact]
+        public void Should_deserialize_property_with_dot()
+        {
+            var source = new Dictionary<string, int>
+            {
+                ["type.of.value"] = 12
+            };
+
+            var deserialized = SerializeAndDeserialize(source);
+
+            deserialized.Should().BeEquivalentTo(source);
+        }
+
+        [Fact]
+        public void Should_deserialize_property_as_empty_string()
+        {
+            var source = new Dictionary<string, int>
+            {
+                [string.Empty] = 12
+            };
+
+            var deserialized = SerializeAndDeserialize(source);
+
+            deserialized.Should().BeEquivalentTo(source);
+        }
+
+        private static T SerializeAndDeserialize<T>(T value)
+        {
+            var serializer = JsonSerializer.CreateDefault();
+
             var stream = new MemoryStream();
 
             using (var writer = new BsonJsonWriter(new BsonBinaryWriter(stream)))
             {
-                serializer.Serialize(writer, source);
+                serializer.Serialize(writer, value);
 
                 writer.Flush();
             }
@@ -171,9 +205,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             using (var reader = new BsonJsonReader(new BsonBinaryReader(stream)))
             {
-                var target = serializer.Deserialize<TestObject>(reader);
-
-                target.Should().BeEquivalentTo(source);
+                return serializer.Deserialize<T>(reader)!;
             }
         }
     }

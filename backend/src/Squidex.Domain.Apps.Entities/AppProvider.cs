@@ -61,14 +61,19 @@ namespace Squidex.Domain.Apps.Entities
 
         public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false)
         {
-            var app = await localCache.GetOrCreateAsync(AppCacheKey(appId), () =>
+            var cacheKey = AppCacheKey(appId);
+
+            if (localCache.TryGetValue(cacheKey, out var cached) && cached is IAppEntity found)
             {
-                return indexForApps.GetAppAsync(appId, canCache);
-            });
+                return found;
+            }
+
+            var app = await indexForApps.GetAppAsync(appId, canCache);
 
             if (app != null)
             {
-                localCache.Add(AppCacheKey(app.Id), app);
+                localCache.Add(cacheKey, app);
+                localCache.Add(AppCacheKey(app.Name), app);
             }
 
             return app;
@@ -76,13 +81,18 @@ namespace Squidex.Domain.Apps.Entities
 
         public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false)
         {
-            var app = await localCache.GetOrCreateAsync(AppCacheKey(appName), () =>
+            var cacheKey = AppCacheKey(appName);
+
+            if (localCache.TryGetValue(cacheKey, out var cached) && cached is IAppEntity found)
             {
-                return indexForApps.GetAppByNameAsync(appName, canCache);
-            });
+                return found;
+            }
+
+            var app = await indexForApps.GetAppByNameAsync(appName, canCache);
 
             if (app != null)
             {
+                localCache.Add(cacheKey, app);
                 localCache.Add(AppCacheKey(app.Id), app);
             }
 
@@ -91,13 +101,18 @@ namespace Squidex.Domain.Apps.Entities
 
         public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false)
         {
-            var schema = await localCache.GetOrCreateAsync(SchemaCacheKey(appId, name), () =>
+            var cacheKey = SchemaCacheKey(appId, name);
+
+            if (localCache.TryGetValue(cacheKey, out var cached) && cached is ISchemaEntity found)
             {
-                return indexSchemas.GetSchemaByNameAsync(appId, name, canCache);
-            });
+                return found;
+            }
+
+            var schema = await indexSchemas.GetSchemaByNameAsync(appId, name, canCache);
 
             if (schema != null)
             {
+                localCache.Add(cacheKey, schema);
                 localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
             }
 
@@ -106,14 +121,19 @@ namespace Squidex.Domain.Apps.Entities
 
         public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false)
         {
-            var schema = await localCache.GetOrCreateAsync(SchemaCacheKey(appId, id), () =>
+            var cacheKey = SchemaCacheKey(appId, id);
+
+            if (localCache.TryGetValue(cacheKey, out var cached) && cached is ISchemaEntity found)
             {
-                return indexSchemas.GetSchemaAsync(appId, id, canCache);
-            });
+                return found;
+            }
+
+            var schema = await indexSchemas.GetSchemaAsync(appId, id, canCache);
 
             if (schema != null)
             {
-                localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
+                localCache.Add(cacheKey, schema);
+                localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
             }
 
             return schema;
@@ -126,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities
                 return indexForApps.GetAppsForUserAsync(userId, permissions);
             });
 
-            return apps.Where(x => !x.IsArchived).ToList();
+            return apps;
         }
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId)
@@ -136,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities
                 return indexSchemas.GetSchemasAsync(appId);
             });
 
-            return schemas.Where(x => !x.IsDeleted).ToList();
+            return schemas;
         }
 
         public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
@@ -146,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities
                 return indexRules.GetRulesAsync(appId);
             });
 
-            return rules.Where(x => !x.IsDeleted).ToList();
+            return rules.ToList();
         }
 
         private static string AppCacheKey(DomainId appId)

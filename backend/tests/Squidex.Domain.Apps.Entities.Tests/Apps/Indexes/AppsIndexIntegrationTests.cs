@@ -106,8 +106,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Theory]
-        [InlineData(3, 100, 300, false)]
-        [InlineData(3, 100, 102, true)]
+        [InlineData(3, 100, 400, false)]
+        [InlineData(3, 100, 202, true)]
         public async Task Should_distribute_and_cache_domain_objects(short numSilos, int numRuns, int expectedCounts, bool shouldBreak)
         {
             var env = new GrainEnvironment();

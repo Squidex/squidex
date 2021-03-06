@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             var source = new IdEntity<string> { Id = id.ToString() };
 
-            var result = SerializeAndDeserialize<IdEntity<string>, IdEntity<DomainId>>(source);
+            var result = SerializeAndDeserializeBson<IdEntity<string>, IdEntity<DomainId>>(source);
 
             Assert.Equal(result.Id.ToString(), id.ToString());
         }
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             var source = new StringEntity<Guid> { Id = id };
 
-            var result = SerializeAndDeserialize<StringEntity<Guid>, IdEntity<DomainId>>(source);
+            var result = SerializeAndDeserializeBson<StringEntity<Guid>, IdEntity<DomainId>>(source);
 
             Assert.Equal(result.Id.ToString(), id.ToString());
         }
@@ -64,12 +64,12 @@ namespace Squidex.Infrastructure.MongoDb
 
             var source = new IdEntity<Guid> { Id = id };
 
-            var result = SerializeAndDeserialize<IdEntity<Guid>, IdEntity<DomainId>>(source);
+            var result = SerializeAndDeserializeBson<IdEntity<Guid>, IdEntity<DomainId>>(source);
 
             Assert.Equal(result.Id.ToString(), id.ToString());
         }
 
-        public static TOut SerializeAndDeserialize<TIn, TOut>(TIn source)
+        private static TOut SerializeAndDeserializeBson<TIn, TOut>(TIn source)
         {
             var stream = new MemoryStream();
 

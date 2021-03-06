@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Bson;
+using System.IO;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Xunit;
@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public class TypeConverterStringSerializerTests
     {
-        public sealed record ValueHolder<T>
+        private sealed record ValueHolder<T>
         {
             public T Value { get; set; }
         }
@@ -92,16 +92,18 @@ namespace Squidex.Infrastructure.MongoDb
 
         private static T SerializeAndDeserializeBson<T>(T value)
         {
-            var document = new BsonDocument();
+            var stream = new MemoryStream();
 
-            using (var writer = new BsonDocumentWriter(document))
+            using (var writer = new BsonBinaryWriter(stream))
             {
                 BsonSerializer.Serialize(writer, value);
 
                 writer.Flush();
             }
 
-            using (var reader = new BsonDocumentReader(document))
+            stream.Position = 0;
+
+            using (var reader = new BsonBinaryReader(stream))
             {
                 var result = BsonSerializer.Deserialize<T>(reader);
 

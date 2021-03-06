@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         }
 
         [Fact]
-        public async Task Should_return_rule_if_deleted()
+        public async Task Should_return_empty_rules_if_rule_deleted()
         {
             var rule = SetupRule(0, true);
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
             var actual = await sut.GetRulesAsync(appId.Id);
 
-            Assert.Same(actual[0], rule);
+            Assert.Empty(actual);
         }
 
         [Fact]

@@ -31,8 +31,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
         {
             var rules = await rulesIndex.GetRulesAsync(context.App.Id);
 
-            rules.RemoveAll(x => x.IsDeleted);
-
             if (rules.Count > 0)
             {
                 var enriched = await ruleEnricher.EnrichAsync(rules, context);
