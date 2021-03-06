@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -36,6 +37,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             this.context = context;
 
             Capacity = int.MaxValue;
+        }
+
+        private Task LoadContext(ContentCommand command, bool optimize)
+        {
+            return context.LoadAsync(command.AppId, command.SchemaId, command, optimize);
         }
 
         protected override bool IsDeleted()
@@ -94,6 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                         await CreateCore(c);
 
+                        // Skip validation for singleton contents because it is published from command middleware.
                         if (context.Schema.SchemaDef.IsSingleton)
                         {
                             ChangeStatus(c.AsChange(Status.Published));
@@ -173,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                             if (c.DueTime > SystemClock.Instance.GetCurrentInstant())
                             {
-                                ScheduleStatus(c, c.DueTime.Value);
+                                ChangeStatusScheduled(c, c.DueTime.Value);
                             }
                             else
                             {
@@ -251,78 +258,93 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             await GuardContent.CanChangeStatus(c, Snapshot, context.Workflow, context.Repository, context.Schema);
 
-            if (c.Status != Snapshot.Status)
+            if (c.Status == Snapshot.Status)
             {
-                if (!c.DoNotScript && context.HasScript(c => c.Change))
-                {
-                    var change = GetChange(c.Status);
-
-                    var data = Snapshot.Data.Clone();
-
-                    var newData = await context.ExecuteScriptAndTransformAsync(s => s.Change,
-                        new ScriptVars
-                        {
-                            Operation = change.ToString(),
-                            Data = data,
-                            Status = c.Status,
-                            StatusOld = Snapshot.EditingStatus
-                        });
-
-                    if (!newData.Equals(Snapshot.Data))
-                    {
-                        Update(c, newData);
-                    }
-                }
-
-                if (!c.DoNotValidate && c.Status == Status.Published)
-                {
-                    await context.ValidateOnPublishAsync(Snapshot.Data);
-                }
-
-                ChangeStatus(c);
+                return;
             }
+
+            // Check for script to skip cloning if no script configured.
+            if (!c.DoNotScript && context.HasScript(c => c.Change))
+            {
+                var change = GetChange(c.Status);
+
+                // Clone the data, so that we do not change it in cases of errors.
+                var data = Snapshot.Data.Clone();
+
+                var newData = await context.ExecuteScriptAndTransformAsync(s => s.Change,
+                    new ScriptVars
+                    {
+                        Operation = change.ToString(),
+                        Data = data,
+                        Status = c.Status,
+                        StatusOld = Snapshot.EditingStatus
+                    });
+
+                // Just update the previous data event to improve performance and add less events.
+                var previousEvent =
+                    GetUncomittedEvents().Select(x => x.Payload)
+                        .OfType<ContentDataCommand>().FirstOrDefault();
+
+                if (previousEvent != null)
+                {
+                    previousEvent.Data = newData;
+                }
+                else if (!newData.Equals(Snapshot.Data))
+                {
+                    Update(c, newData);
+                }
+            }
+
+            if (!c.DoNotValidate && c.Status == Status.Published)
+            {
+                await context.ValidateOnPublishAsync(Snapshot.Data);
+            }
+
+            ChangeStatus(c);
         }
 
-        private async Task UpdateCore(UpdateContent c, Func<ContentData, ContentData> newDataFunc, bool partial)
+        private async Task UpdateCore(UpdateContent c, Func<ContentData, ContentData> update, bool partial)
         {
             await GuardContent.CanUpdate(c, Snapshot, context.Workflow);
 
-            var dataNew = newDataFunc(Snapshot.Data);
+            var newData = update(Snapshot.Data);
 
-            if (!dataNew.Equals(Snapshot.Data))
+            if (newData.Equals(Snapshot.Data))
             {
-                if (!c.DoNotValidate)
-                {
-                    if (partial)
-                    {
-                        await context.ValidateInputPartialAsync(c.Data);
-                    }
-                    else
-                    {
-                        await context.ValidateInputAsync(c.Data);
-                    }
-                }
-
-                if (!c.DoNotScript)
-                {
-                    dataNew = await context.ExecuteScriptAndTransformAsync(s => s.Update,
-                        new ScriptVars
-                        {
-                            Operation = "Update",
-                            Data = dataNew,
-                            DataOld = Snapshot.Data,
-                            Status = Snapshot.EditingStatus,
-                            StatusOld = default
-                        });
-                }
-
-                if (!c.DoNotValidate)
-                {
-                    await context.ValidateContentAsync(dataNew);
-                }
-
-                Update(c, dataNew);
+                return;
             }
+
+            if (!c.DoNotValidate)
+            {
+                if (partial)
+                {
+                    await context.ValidateInputPartialAsync(c.Data);
+                }
+                else
+                {
+                    await context.ValidateInputAsync(c.Data);
+                }
+            }
+
+            if (!c.DoNotScript)
+            {
+                newData = await context.ExecuteScriptAndTransformAsync(s => s.Update,
+                    new ScriptVars
+                    {
+                        Operation = "Update",
+                        Data = newData,
+                        DataOld = Snapshot.Data,
+                        Status = Snapshot.EditingStatus,
+                        StatusOld = default
+                    });
+            }
+
+            if (!c.DoNotValidate)
+            {
+                await context.ValidateContentAsync(newData);
+            }
+
+            Update(c, newData);
         }
 
         private async Task DeleteCore(DeleteContent c)
@@ -361,6 +383,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Raise(command, new ContentStatusChanged { Change = GetChange(command.Status) });
         }
 
+        private void ChangeStatusScheduled(ChangeContentStatus command, Instant dueTime)
+        {
+            Raise(command, new ContentStatusScheduled { DueTime = dueTime });
+        }
+
+        private void CancelChangeStatus(ChangeContentStatus command)
+        {
+            Raise(command, new ContentSchedulingCancelled());
+        }
+
         private void CreateDraft(CreateContentDraft command, Status status)
         {
             Raise(command, new ContentDraftCreated { Status = status });
@@ -374,16 +406,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private void DeleteDraft(DeleteContentDraft command)
         {
             Raise(command, new ContentDraftDeleted());
-        }
-
-        private void CancelChangeStatus(ChangeContentStatus command)
-        {
-            Raise(command, new ContentSchedulingCancelled());
-        }
-
-        private void ScheduleStatus(ChangeContentStatus command, Instant dueTime)
-        {
-            Raise(command, new ContentStatusScheduled { DueTime = dueTime });
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
@@ -405,11 +427,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             {
                 return StatusChange.Change;
             }
-        }
-
-        private Task LoadContext(ContentCommand command, bool optimize)
-        {
-            return context.LoadAsync(command.AppId, command.SchemaId, command, optimize);
         }
     }
 }
