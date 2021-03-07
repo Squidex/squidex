@@ -76,6 +76,7 @@ namespace Squidex
         {
             app.UseCookiePolicy();
 
+            app.UseDefaultPathBase();
             app.UseDefaultForwardRules();
 
             app.UseSquidexCacheKeys();

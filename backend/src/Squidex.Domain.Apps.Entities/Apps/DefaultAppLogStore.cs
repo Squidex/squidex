@@ -29,7 +29,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private const string FieldRequestMethod = "RequestMethod";
         private const string FieldRequestPath = "RequestPath";
         private const string FieldTimestamp = "Timestamp";
-        private readonly CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = "|" };
+        private static readonly CsvConfiguration CsvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            Delimiter = "|",
+            LeaveOpen = true,
+            LineBreakInQuotedFieldIsBadData = false
+        };
         private readonly IRequestLogStore requestLogStore;
 
         public DefaultAppLogStore(IRequestLogStore requestLogStore)
@@ -69,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var writer = new StreamWriter(stream, Encoding.UTF8, 4096, true);
             try
             {
-                using (var csv = new CsvWriter(writer, csvConfiguration, true))
+                using (var csv = new CsvWriter(writer, CsvConfiguration))
                 {
                     csv.WriteField(FieldTimestamp);
                     csv.WriteField(FieldRequestPath);
