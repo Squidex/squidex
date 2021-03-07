@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public class BsonConverterTests
+    public class BsonJsonSerializerTests
     {
         public class TestObject
         {
