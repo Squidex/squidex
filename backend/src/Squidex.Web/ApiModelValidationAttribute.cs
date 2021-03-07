@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Text;
 
 namespace Squidex.Web
 {
@@ -50,11 +51,18 @@ namespace Squidex.Web
                         }
                         else
                         {
+                            var properties = Array.Empty<string>();
+
+                            if (!string.IsNullOrWhiteSpace(key))
+                            {
+                                properties = new[] { key.ToCamelCase() };
+                            }
+
                             foreach (var error in value.Errors)
                             {
                                 if (!string.IsNullOrWhiteSpace(error.ErrorMessage) && ShouldExpose(error))
                                 {
-                                    errors.Add(new ValidationError(error.ErrorMessage));
+                                    errors.Add(new ValidationError(error.ErrorMessage, properties));
                                 }
                                 else if (error.Exception is JsonException jsonException)
                                 {

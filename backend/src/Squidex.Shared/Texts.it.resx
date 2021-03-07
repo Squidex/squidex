@@ -59,34 +59,34 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Il campo {name|lower} deve essere un URL assoluto.</value>
+    <value>Il campo '{name|lower}' deve essere un URL assoluto.</value>
   </data>
   <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Il campo {0} deve essere un URL assoluto.</value>
+    <value>Il campo '{0}' deve essere un URL assoluto.</value>
   </data>
   <data name="annotations_Compare" xml:space="preserve">
-    <value>Il campo {name|lower} deve essere uguale a {other|lower}.</value>
+    <value>Il campo '{name|lower}' deve essere uguale a {other|lower}.</value>
   </data>
   <data name="dotnet_annotations_Compare" xml:space="preserve">
-    <value>Il campo {0} deve essere uguale a {1}.</value>
+    <value>Il campo '{0}' deve essere uguale a {1}.</value>
   </data>
   <data name="annotations_EmailAddress" xml:space="preserve">
-    <value>Il campo {name|lower} non è un indirizzo email valido.</value>
+    <value>Il campo '{name|lower}' non è un indirizzo email valido.</value>
   </data>
   <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
-    <value>Il campo {0} non è un indirizzo email valido.</value>
+    <value>Il campo '{0}' non è un indirizzo email valido.</value>
   </data>
   <data name="annotations_Range" xml:space="preserve">
-    <value>Il campo {name|lower} deve essere tra {min} e {max}.</value>
+    <value>Il campo '{name|lower}' deve essere tra {min} e {max}.</value>
   </data>
   <data name="dotnet_annotations_Range" xml:space="preserve">
-    <value>Il campo {0} deve essere tra {1} e {2}.</value>
+    <value>Il campo '{0}' deve essere tra {1} e {2}.</value>
   </data>
   <data name="annotations_RegularExpression" xml:space="preserve">
-    <value>Il campo {name|lower} non è.</value>
+    <value>Il campo '{name|lower}' non è.</value>
   </data>
   <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
-    <value>Il campo {0} non è.</value>
+    <value>Il campo '{0}' non è.</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
     <value>Il campo è {name|lower} obbligatorio.</value>
@@ -95,16 +95,16 @@
     <value>Il campo è {0} obbligatorio.</value>
   </data>
   <data name="annotations_StringLength" xml:space="preserve">
-    <value>Il campo {name|lower} deve essere una stringa avente una lunghezza massima di {max}.</value>
+    <value>Il campo '{name|lower}' deve essere una stringa avente una lunghezza massima di {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLength" xml:space="preserve">
-    <value>Il campo {0} deve essere una stringa avente una lunghezza massima di {1}.</value>
+    <value>Il campo '{0}' deve essere una stringa avente una lunghezza massima di {1}.</value>
   </data>
   <data name="annotations_StringLengthMinimum" xml:space="preserve">
-    <value>Il campo {name|lower} deve essere una stringa avente lunghezza minima di {min} e massima di {max}.</value>
+    <value>Il campo '{name|lower}' deve essere una stringa avente lunghezza minima di {min} e massima di {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
-    <value>Il campo {0} deve essere una stringa avente lunghezza minima di {1} e massima di {2}.</value>
+    <value>Il campo '{0}' deve essere una stringa avente lunghezza minima di {1} e massima di {2}.</value>
   </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
     <value>Un client con lo stesso id esiste già.</value>
@@ -604,9 +604,6 @@
   <data name="contents.validation.pattern" xml:space="preserve">
     <value>Deve seguire il pattern.</value>
   </data>
-  <data name="contents.validation.reference" xml:space="preserve">
-    <value>La geolocalizzazione può avere come campi solamente come latitudine e longitudine.</value>
-  </data>
   <data name="contents.validation.referenceNotFound" xml:space="preserve">
     <value>Contiene un collegamento '{id}' non valido.</value>
   </data>
@@ -630,9 +627,6 @@
   </data>
   <data name="contents.validation.wordsBetween" xml:space="preserve">
     <value>Deve essere tra {min} e {max} parola(e).</value>
-  </data>
-  <data name="contents.workflowErrorPublishing" xml:space="preserve">
-    <value>Il workflow del contenuto impedisce la pubblicazione.</value>
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">
     <value>Il workflow non consente le modifiche per lo stato {status}</value>

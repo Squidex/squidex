@@ -59,52 +59,52 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Het veld {name|lower} moet een absolute URL zijn.</value>
+    <value>Het veld '{name|lower}' moet een absolute URL zijn.</value>
   </data>
   <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Het veld {0} moet een absolute URL zijn.</value>
+    <value>Het veld '{0}' moet een absolute URL zijn.</value>
   </data>
   <data name="annotations_Compare" xml:space="preserve">
-    <value>Het veld {name|lower} moet hetzelfde zijn als {other|lower}.</value>
+    <value>Het veld '{name|lower}' moet hetzelfde zijn als {other|lower}.</value>
   </data>
   <data name="dotnet_annotations_Compare" xml:space="preserve">
-    <value>Het veld {0} moet hetzelfde zijn als {1}.</value>
+    <value>Het veld '{0}' moet hetzelfde zijn als {1}.</value>
   </data>
   <data name="annotations_EmailAddress" xml:space="preserve">
-    <value>Het veld {name|lower} is geen geldig e-mailadres.</value>
+    <value>Het veld '{name|lower}' is geen geldig e-mailadres.</value>
   </data>
   <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
-    <value>Het veld {0} is geen geldig e-mailadres.</value>
+    <value>Het veld '{0}' is geen geldig e-mailadres.</value>
   </data>
   <data name="annotations_Range" xml:space="preserve">
-    <value>Het veld {name|lower} moet tussen {min} en {max} zijn.</value>
+    <value>Het veld '{name|lower}' moet tussen {min} en {max} zijn.</value>
   </data>
   <data name="dotnet_annotations_Range" xml:space="preserve">
-    <value>Het veld {0} moet tussen {1} en {2} zijn.</value>
+    <value>Het veld '{0}' moet tussen {1} en {2} zijn.</value>
   </data>
   <data name="annotations_RegularExpression" xml:space="preserve">
-    <value>Het veld {name|lower} is niet.</value>
+    <value>Het veld '{name|lower}' is niet.</value>
   </data>
   <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
-    <value>Het veld {0} is niet.</value>
+    <value>Het veld '{0}' is niet.</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
-    <value>Het veld {name|lower} is verplicht.</value>
+    <value>Het veld '{name|lower}' is verplicht.</value>
   </data>
   <data name="dotnet_annotations_Required" xml:space="preserve">
-    <value>Het veld {0} is verplicht.</value>
+    <value>Het veld '{0}' is verplicht.</value>
   </data>
   <data name="annotations_StringLength" xml:space="preserve">
-    <value>Het veld {name|lower} moet een string zijn met een maximale lengte van {max}.</value>
+    <value>Het veld '{name|lower}' moet een string zijn met een maximale lengte van {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLength" xml:space="preserve">
-    <value>Het veld {0} moet een string zijn met een maximale lengte van {1}.</value>
+    <value>Het veld '{0}' moet een string zijn met een maximale lengte van {1}.</value>
   </data>
   <data name="annotations_StringLengthMinimum" xml:space="preserve">
-    <value>Het veld {name|lower} moet een string zijn met een minimum lengte van {min} en een maximum lengte van {max}.</value>
+    <value>Het veld '{name|lower}' moet een string zijn met een minimum lengte van {min} en een maximum lengte van {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
-    <value>Het veld {0} moet een string zijn met een minimum lengte van {1} en een maximum lengte van {2}.</value>
+    <value>Het veld '{0}' moet een string zijn met een minimum lengte van {1} en een maximum lengte van {2}.</value>
   </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
     <value>Er bestaat al een client met dezelfde id.</value>
@@ -604,9 +604,6 @@
   <data name="contents.validation.pattern" xml:space="preserve">
     <value>Moet het patroon volgen.</value>
   </data>
-  <data name="contents.validation.reference" xml:space="preserve">
-    <value>Geolocation can only have latitude and longitude property.</value>
-  </data>
   <data name="contents.validation.referenceNotFound" xml:space="preserve">
     <value>Bevat ongeldige referentie '{id}'.</value>
   </data>
@@ -630,9 +627,6 @@
   </data>
   <data name="contents.validation.wordsBetween" xml:space="preserve">
     <value>Moet tussen {min} en {max} woord (en) bevatten.</value>
-  </data>
-  <data name="contents.workflowErrorPublishing" xml:space="preserve">
-    <value>Contentworkflow verhindert publiceren.</value>
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">
     <value>De werkstroom staat geen updates toe met status {status}</value>

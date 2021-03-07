@@ -21,6 +21,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
     /// Manages backups for apps.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Backups))]
+    [ApiModelValidation(true)]
     public class RestoreController : ApiController
     {
         private readonly IBackupService backupService;

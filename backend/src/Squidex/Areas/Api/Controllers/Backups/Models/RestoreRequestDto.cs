@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// The name of the app.
         /// </summary>
         [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// The url to the restore file.
