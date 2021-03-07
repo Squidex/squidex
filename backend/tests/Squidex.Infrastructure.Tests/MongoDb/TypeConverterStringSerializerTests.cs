@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.IO;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
@@ -21,16 +22,16 @@ namespace Squidex.Infrastructure.MongoDb
 
         public TypeConverterStringSerializerTests()
         {
-            TypeConverterStringSerializer<DomainId>.Register();
+            TypeConverterStringSerializer<TimeSpan>.Register();
             TypeConverterStringSerializer<RefToken>.Register();
         }
 
         [Fact]
         public void Should_serialize_struct()
         {
-            var source = new ValueHolder<DomainId>
+            var source = new ValueHolder<TimeSpan>
             {
-                Value = DomainId.NewGuid()
+                Value = TimeSpan.Zero
             };
 
             var deserialized = SerializeAndDeserializeBson(source);
@@ -41,9 +42,9 @@ namespace Squidex.Infrastructure.MongoDb
         [Fact]
         public void Should_serialize_nullable_struct()
         {
-            var source = new ValueHolder<DomainId?>
+            var source = new ValueHolder<TimeSpan?>
             {
-                Value = DomainId.NewGuid()
+                Value = TimeSpan.Zero
             };
 
             var deserialized = SerializeAndDeserializeBson(source);
@@ -54,7 +55,7 @@ namespace Squidex.Infrastructure.MongoDb
         [Fact]
         public void Should_serialize_nullable_null_struct()
         {
-            var source = new ValueHolder<DomainId?>
+            var source = new ValueHolder<TimeSpan?>
             {
                 Value = null
             };
