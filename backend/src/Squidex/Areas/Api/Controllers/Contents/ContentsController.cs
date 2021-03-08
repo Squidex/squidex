@@ -416,7 +416,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPost]
         [Route("content/{app}/{name}/bulk")]
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContents)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsReadOwn)]
         [ApiCosts(5)]
         public async Task<IActionResult> BulkUpdateContents(string app, string name, [FromBody] BulkUpdateContentsDto request)
         {

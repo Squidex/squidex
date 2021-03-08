@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         var command = new AnnotateAsset();
 
-                        Enrich(task, command, Permissions.AppAssetsUpdate);
+                        EnrichAndCheckPermission(task, command, Permissions.AppAssetsUpdate);
                         return command;
                     }
 
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         var command = new MoveAsset();
 
-                        Enrich(task, command, Permissions.AppAssetsUpdate);
+                        EnrichAndCheckPermission(task, command, Permissions.AppAssetsUpdate);
                         return command;
                     }
 
@@ -185,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         var command = new DeleteAsset();
 
-                        Enrich(task, command, Permissions.AppAssetsDelete);
+                        EnrichAndCheckPermission(task, command, Permissions.AppAssetsDelete);
                         return command;
                     }
 
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
         }
 
-        private void Enrich<T>(BulkTask task, T command, string permissionId) where T : AssetCommand
+        private void EnrichAndCheckPermission<T>(BulkTask task, T command, string permissionId) where T : AssetCommand
         {
             SimpleMapper.Map(task.Command, command);
             SimpleMapper.Map(task.Job, command);

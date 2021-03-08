@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var command = new CreateContent();
 
-                        await EnrichAsync(task, command, Permissions.AppContentsCreate);
+                        await EnrichAndCheckPermissionAsync(task, command, Permissions.AppContentsCreate);
                         return command;
                     }
 
@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var command = new UpdateContent();
 
-                        await EnrichAsync(task, command, Permissions.AppContentsUpdateOwn);
+                        await EnrichAndCheckPermissionAsync(task, command, Permissions.AppContentsUpdateOwn);
                         return command;
                     }
 
@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var command = new UpsertContent();
 
-                        await EnrichAsync(task, command, Permissions.AppContentsUpsert);
+                        await EnrichAndCheckPermissionAsync(task, command, Permissions.AppContentsUpsert);
                         return command;
                     }
 
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var command = new PatchContent();
 
-                        await EnrichAsync(task, command, Permissions.AppContentsUpdateOwn);
+                        await EnrichAndCheckPermissionAsync(task, command, Permissions.AppContentsUpdateOwn);
                         return command;
                     }
 
@@ -230,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var command = new ValidateContent();
 
-                        await EnrichAsync(task, command, Permissions.AppContentsReadOwn);
+                        await EnrichAndCheckPermissionAsync(task, command, Permissions.AppContentsReadOwn);
                         return command;
                     }
 
@@ -238,7 +238,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var command = new ChangeContentStatus { Status = job.Status ?? Status.Draft };
 
-                        await EnrichAsync(task, command, Permissions.AppContentsChangeStatusOwn);
+                        await EnrichAndCheckPermissionAsync(task, command, Permissions.AppContentsChangeStatusOwn);
                         return command;
                     }
 
@@ -246,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var command = new DeleteContent();
 
-                        await EnrichAsync(task, command, Permissions.AppContentsDeleteOwn);
+                        await EnrichAndCheckPermissionAsync(task, command, Permissions.AppContentsDeleteOwn);
                         return command;
                     }
 
@@ -255,7 +255,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
         }
 
-        private async Task EnrichAsync<T>(BulkTask task, T command, string permissionId) where T : ContentCommand
+        private async Task EnrichAndCheckPermissionAsync<T>(BulkTask task, T command, string permissionId) where T : ContentCommand
         {
             SimpleMapper.Map(task.Command, command);
             SimpleMapper.Map(task.Job, command);

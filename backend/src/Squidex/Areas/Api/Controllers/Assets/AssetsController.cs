@@ -220,7 +220,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpPost]
         [Route("apps/{app}/assets/bulk")]
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppAssets)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsRead)]
         [ApiCosts(5)]
         public async Task<IActionResult> BulkUpdateAssets(string app, [FromBody] BulkUpdateAssetsDto request)
         {
