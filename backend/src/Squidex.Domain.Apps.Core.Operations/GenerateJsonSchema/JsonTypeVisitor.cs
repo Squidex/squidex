@@ -9,7 +9,6 @@ using System;
 using System.Collections.ObjectModel;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
@@ -77,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            return SchemaBuilder.JsonProperty();
+            return SchemaBuilder.ObjectProperty(null);
         }
 
         public JsonSchemaProperty? Visit(IField<JsonFieldProperties> field, Args args)

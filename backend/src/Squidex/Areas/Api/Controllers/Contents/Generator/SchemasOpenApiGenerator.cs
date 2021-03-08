@@ -13,7 +13,6 @@ using NJsonSchema;
 using NSwag;
 using NSwag.Generation;
 using NSwag.Generation.Processors.Contexts;
-using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Hosting;

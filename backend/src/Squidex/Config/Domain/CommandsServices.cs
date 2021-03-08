@@ -23,7 +23,6 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Web.CommandMiddlewares;
 
 namespace Squidex.Config.Domain

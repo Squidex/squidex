@@ -11,7 +11,6 @@ using NJsonSchema;
 using NSwag;
 using NSwag.Generation;
 using Squidex.Areas.Api.Controllers.Contents.Models;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
