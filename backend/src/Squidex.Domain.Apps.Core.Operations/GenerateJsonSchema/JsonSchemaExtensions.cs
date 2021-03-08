@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -49,31 +49,10 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             foreach (var field in schema.Fields.ForApi(withHidden))
             {
                 var partitionObject = SchemaBuilder.Object();
-                var partitioning = partitionResolver(field.Partitioning);
 
-                foreach (var partitionKey in partitioning.AllKeys)
-                {
-                    var partitionItemProperty = JsonTypeVisitor.BuildProperty(field, schemaResolver, withHidden);
-
-                    if (partitionItemProperty != null)
-                    {
-                        var isOptional = partitioning.IsOptional(partitionKey);
-
-                        var name = partitioning.GetName(partitionKey);
-
-                        partitionItemProperty.Description = name;
-                        partitionItemProperty.SetRequired(field.RawProperties.IsRequired && !isOptional);
-
-                        partitionObject.Properties.Add(partitionKey, partitionItemProperty);
-                    }
-                }
-
-                if (partitionObject.Properties.Count > 0)
-                {
-                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}PropertyDto", () => partitionObject);
-
-                    jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyReference));
-                }
+                partitionObject.AdditionalPropertiesSchema = JsonTypeVisitor.BuildProperty(field, schemaResolver, withHidden);
+                var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}PropertyDto", () => partitionObject);
+                jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyReference));
             }
 
             return jsonSchema;

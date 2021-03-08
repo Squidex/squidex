@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -116,8 +116,23 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
                         }
                     }
 
+                    if (current.AdditionalPropertiesSchema?.Properties != null)
+                    {
+                        foreach (var (key, value) in current.AdditionalPropertiesSchema.Properties)
+                        {
+                            result.Add(key);
+
+                            AddProperties(value);
+                        }
+                    }
+
                     AddProperties(current.Item);
                     AddProperties(current.Reference);
+                    if (current.AdditionalPropertiesSchema is not null)
+                    {
+                        AddProperties(current.AdditionalPropertiesSchema.Item);
+                        AddProperties(current.AdditionalPropertiesSchema.Reference);
+                    }
                 }
             }
 
