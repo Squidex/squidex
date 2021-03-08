@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             foreach (var field in schema.Fields.ForApi())
             {
-                var property = JsonTypeVisitor.BuildProperty(field, false);
+                var property = JsonTypeVisitor.BuildProperty(field, null, false);
 
                 if (property != null)
                 {
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             foreach (var field in schema.Fields.ForApi(withHidden))
             {
-                var propertyItem = JsonTypeVisitor.BuildProperty(field, withHidden);
+                var propertyItem = JsonTypeVisitor.BuildProperty(field, null, withHidden);
 
                 if (propertyItem != null)
                 {
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 foreach (var partitionKey in partitioning.AllKeys)
                 {
-                    var propertyItem = JsonTypeVisitor.BuildProperty(field, withHidden);
+                    var propertyItem = JsonTypeVisitor.BuildProperty(field, null, withHidden);
 
                     if (propertyItem != null)
                     {
