@@ -196,15 +196,25 @@ namespace Squidex.Extensions.Actions.Kafka
                     return n.Value;
                 case JsonBoolean b:
                     return b.Value;
-                case JsonObject o:
+                case JsonObject o when (schema is MapSchema map):
                     {
-                        var recordSchema = (RecordSchema)schema;
-
-                        var result = new GenericRecord(recordSchema);
+                        var mapResult = new Dictionary<string, object>();
 
                         foreach (var (key, childValue) in o)
                         {
-                            if (recordSchema.TryGetField(key, out var field))
+                            mapResult.Add(key, GetValue(childValue, map.ValueSchema));
+                        }
+
+                        return mapResult;
+                    }
+
+                case JsonObject o when (schema is RecordSchema record):
+                    {
+                        var result = new GenericRecord(record);
+
+                        foreach (var (key, childValue) in o)
+                        {
+                            if (record.TryGetField(key, out var field))
                             {
                                 result.Add(key, GetValue(childValue, field.Schema));
                             }
@@ -213,15 +223,13 @@ namespace Squidex.Extensions.Actions.Kafka
                         return result;
                     }
 
-                case JsonArray a:
+                case JsonArray a when (schema is ArraySchema array):
                     {
-                        var arraySchema = (ArraySchema)schema;
-
                         var result = new List<object>();
 
                         foreach (var item in a)
                         {
-                            result.Add(GetValue(item, arraySchema.ItemSchema));
+                            result.Add(GetValue(item, array.ItemSchema));
                         }
 
                         return result.ToArray();
