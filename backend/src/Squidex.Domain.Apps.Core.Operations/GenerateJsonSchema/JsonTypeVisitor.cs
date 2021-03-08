@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            return SchemaBuilder.ObjectProperty(null);
+            return SchemaBuilder.ObjectProperty();
         }
 
         public JsonSchemaProperty? Visit(IField<JsonFieldProperties> field, Args args)

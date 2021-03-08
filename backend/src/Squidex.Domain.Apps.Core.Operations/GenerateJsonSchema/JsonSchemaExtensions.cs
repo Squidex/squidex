@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 if (propertyItem != null)
                 {
                     var property =
-                        SchemaBuilder.ObjectMapProperty(propertyItem)
+                        SchemaBuilder.ObjectProperty(propertyItem)
                             .SetDescription(field)
                             .SetRequired(field.RawProperties.IsRequired);
 
@@ -99,10 +99,10 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return jsonSchema;
         }
 
-        public static JsonSchemaProperty CreateProperty(IField field, JsonSchema? reference)
+        public static JsonSchemaProperty CreateProperty(IField field, JsonSchema reference)
         {
             var jsonProperty =
-                SchemaBuilder.ObjectProperty(reference)
+                SchemaBuilder.ReferenceProperty(reference)
                     .SetDescription(field)
                     .SetRequired(field.RawProperties.IsRequired);
 

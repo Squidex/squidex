@@ -56,14 +56,14 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 .SetRequired(isRequired);
         }
 
-        public static JsonSchemaProperty ObjectProperty(JsonSchema? reference, string? description = null, bool isRequired = false)
+        public static JsonSchemaProperty ReferenceProperty(JsonSchema reference, string? description = null, bool isRequired = false)
         {
             return new JsonSchemaProperty { Reference = reference }
                 .SetDescription(description)
                 .SetRequired(isRequired);
         }
 
-        public static JsonSchemaProperty ObjectMapProperty(JsonSchema? value, string? description = null, bool isRequired = false)
+        public static JsonSchemaProperty ObjectProperty(JsonSchema? value = null, string? description = null, bool isRequired = false)
         {
             return new JsonSchemaProperty { Type = JsonObjectType.Object, AdditionalPropertiesSchema = value }
                 .SetDescription(description)
