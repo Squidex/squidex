@@ -11,6 +11,7 @@ namespace Squidex.Infrastructure.Queries
     {
         Contains,
         Empty,
+        Exists,
         EndsWith,
         Equals,
         GreaterThan,

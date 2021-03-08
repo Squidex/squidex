@@ -31,6 +31,8 @@ namespace Squidex.Infrastructure.Queries
                     return $"contains({Path}, {Value})";
                 case CompareOperator.Empty:
                     return $"empty({Path})";
+                case CompareOperator.Exists:
+                    return $"exists({Path})";
                 case CompareOperator.EndsWith:
                     return $"endsWith({Path}, {Value})";
                 case CompareOperator.StartsWith:

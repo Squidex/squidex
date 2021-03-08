@@ -56,6 +56,16 @@ namespace Squidex.Infrastructure.Queries.OData
                 return ClrFilter.Empty(PropertyPathVisitor.Visit(fieldNode));
             }
 
+            if (string.Equals(nodeIn.Name, "empty", StringComparison.OrdinalIgnoreCase))
+            {
+                return ClrFilter.Empty(PropertyPathVisitor.Visit(fieldNode));
+            }
+
+            if (string.Equals(nodeIn.Name, "exists", StringComparison.OrdinalIgnoreCase))
+            {
+                return ClrFilter.Exists(PropertyPathVisitor.Visit(fieldNode));
+            }
+
             var valueNode = nodeIn.Parameters.ElementAt(1);
 
             if (string.Equals(nodeIn.Name, "endswith", StringComparison.OrdinalIgnoreCase))

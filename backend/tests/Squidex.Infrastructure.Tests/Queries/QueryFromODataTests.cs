@@ -355,6 +355,33 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_with_exists()
+        {
+            var i = _Q("$filter=exists(lastName)");
+            var o = _C("Filter: exists(lastName)");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_with_exists_to_true()
+        {
+            var i = _Q("$filter=exists(lastName) eq true");
+            var o = _C("Filter: exists(lastName)");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_with_exists_to_false()
+        {
+            var i = _Q("$filter=exists(lastName) eq false");
+            var o = _C("Filter: !(exists(lastName))");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_with_contains()
         {
             var i = _Q("$filter=contains(lastName, 'Duck')");

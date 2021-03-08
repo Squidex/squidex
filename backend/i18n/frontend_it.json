@@ -293,6 +293,7 @@
   "common.queryOperators.empty": "è vuoto",
   "common.queryOperators.endsWith": "finisce con",
   "common.queryOperators.eq": "è uguale a",
+  "common.queryOperators.exists": "exists",
   "common.queryOperators.ge": "è maggiore o uguale a",
   "common.queryOperators.gt": "è maggiore di",
   "common.queryOperators.le": "è minore o uguale a",

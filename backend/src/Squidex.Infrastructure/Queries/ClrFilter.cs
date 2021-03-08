@@ -86,6 +86,11 @@ namespace Squidex.Infrastructure.Queries
             return Binary(path, CompareOperator.Empty, null);
         }
 
+        public static CompareFilter<ClrValue> Exists(PropertyPath path)
+        {
+            return Binary(path, CompareOperator.Exists, null);
+        }
+
         public static CompareFilter<ClrValue> In(PropertyPath path, ClrValue value)
         {
             return Binary(path, CompareOperator.In, value);

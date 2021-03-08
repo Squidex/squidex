@@ -293,6 +293,7 @@
   "common.queryOperators.empty": "is leeg",
   "common.queryOperators.endsWith": "eindigt op",
   "common.queryOperators.eq": "is gelijk aan",
+  "common.queryOperators.exists": "exists",
   "common.queryOperators.ge": "is groter dan of gelijk aan",
   "common.queryOperators.gt": "is groter dan",
   "common.queryOperators.le": "is kleiner dan of is gelijk aan",

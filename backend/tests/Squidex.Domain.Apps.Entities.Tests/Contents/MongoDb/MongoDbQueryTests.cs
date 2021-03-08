@@ -202,8 +202,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_empty_test()
         {
-            var i = _F(ClrFilter.Empty("data/firstName/iv"));
-            var o = _C("{ '$or' : [{ 'do.firstName.iv' : { '$exists' : false } }, { 'do.firstName.iv' : null }, { 'do.firstName.iv' : '' }, { 'do.firstName.iv' : [] }] }");
+            var i = _F(ClrFilter.Empty("id"));
+            var o = _C("{ '$or' : [{ '_id' : { '$exists' : false } }, { '_id' : null }, { '_id' : '' }, { '_id' : [] }] }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_exists_test()
+        {
+            var i = _F(ClrFilter.Exists("data/firstName/iv"));
+            var o = _C("{ 'do.firstName.iv' : { '$exists' : true, '$ne' : null } }");
 
             Assert.Equal(o, i);
         }
