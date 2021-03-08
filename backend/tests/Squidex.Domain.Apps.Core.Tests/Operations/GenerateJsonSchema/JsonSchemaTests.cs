@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
             CheckFields(jsonSchema);
         }
 
-        private void CheckFields(JsonSchema jsonSchema, params string[] exclude)
+        private void CheckFields(JsonSchema jsonSchema)
         {
             var jsonProperties = AllPropertyNames(jsonSchema);
 
@@ -75,20 +75,14 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
                 {
                     foreach (var nested in array.Fields)
                     {
-                        if (!exclude.Contains(nested.Name))
-                        {
-                            CheckField(nested);
-                        }
+                        CheckField(nested);
                     }
                 }
             }
 
             foreach (var field in schema.Fields)
             {
-                if (!exclude.Contains(field.Name))
-                {
-                    CheckField(field);
-                }
+                CheckField(field);
             }
         }
 
