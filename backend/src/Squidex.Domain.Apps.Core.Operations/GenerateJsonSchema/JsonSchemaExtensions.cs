@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public static class JsonSchemaExtensions
     {
-        public static JsonSchema BuildFlatJsonSchema(this Schema schema, SchemaResolver schemaResolver, bool withHidden = false)
+        public static JsonSchema BuildFlatJsonSchema(this Schema schema, SchemaResolver schemaResolver)
         {
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
 
@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             var jsonSchema = SchemaBuilder.Object();
 
-            foreach (var field in schema.Fields.ForApi(withHidden))
+            foreach (var field in schema.Fields.ForApi())
             {
-                var property = JsonTypeVisitor.BuildProperty(field, schemaResolver, withHidden);
+                var property = JsonTypeVisitor.BuildProperty(field, false);
 
                 if (property != null)
                 {
@@ -37,52 +37,80 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return jsonSchema;
         }
 
-        public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver, SchemaResolver schemaResolver, bool withHidden = false)
+        public static JsonSchema BuildDynamicJsonSchema(this Schema schema, SchemaResolver schemaResolver, bool withHidden = false)
         {
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-
-            var schemaName = schema.TypeName();
 
             var jsonSchema = SchemaBuilder.Object();
 
             foreach (var field in schema.Fields.ForApi(withHidden))
             {
-                var partitionObject = SchemaBuilder.Object();
-                var partitioning = partitionResolver(field.Partitioning);
+                var propertyItem = JsonTypeVisitor.BuildProperty(field, withHidden);
 
-                foreach (var partitionKey in partitioning.AllKeys)
+                if (propertyItem != null)
                 {
-                    var partitionItemProperty = JsonTypeVisitor.BuildProperty(field, schemaResolver, withHidden);
+                    var property =
+                        SchemaBuilder.ObjectMapProperty(propertyItem)
+                            .SetDescription(field)
+                            .SetRequired(field.RawProperties.IsRequired);
 
-                    if (partitionItemProperty != null)
-                    {
-                        var isOptional = partitioning.IsOptional(partitionKey);
-
-                        var name = partitioning.GetName(partitionKey);
-
-                        partitionItemProperty.Description = name;
-                        partitionItemProperty.SetRequired(field.RawProperties.IsRequired && !isOptional);
-
-                        partitionObject.Properties.Add(partitionKey, partitionItemProperty);
-                    }
-                }
-
-                if (partitionObject.Properties.Count > 0)
-                {
-                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}PropertyDto", () => partitionObject);
-
-                    jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyReference));
+                    jsonSchema.Properties.Add(field.Name, property);
                 }
             }
 
             return jsonSchema;
         }
 
-        public static JsonSchemaProperty CreateProperty(IField field, JsonSchema reference)
+        public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver, bool withHidden = false)
         {
-            var jsonProperty = SchemaBuilder.ObjectProperty(reference);
+            Guard.NotNull(partitionResolver, nameof(partitionResolver));
 
+            var jsonSchema = SchemaBuilder.Object();
+
+            foreach (var field in schema.Fields.ForApi(withHidden))
+            {
+                var propertyObject = SchemaBuilder.Object();
+
+                var partitioning = partitionResolver(field.Partitioning);
+
+                foreach (var partitionKey in partitioning.AllKeys)
+                {
+                    var propertyItem = JsonTypeVisitor.BuildProperty(field, withHidden);
+
+                    if (propertyItem != null)
+                    {
+                        var isOptional = partitioning.IsOptional(partitionKey);
+
+                        var name = partitioning.GetName(partitionKey);
+
+                        propertyItem.SetDescription(name);
+                        propertyItem.SetRequired(field.RawProperties.IsRequired && !isOptional);
+
+                        propertyObject.Properties.Add(partitionKey, propertyItem);
+                    }
+                }
+
+                if (propertyObject.Properties.Count > 0)
+                {
+                    jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyObject));
+                }
+            }
+
+            return jsonSchema;
+        }
+
+        public static JsonSchemaProperty CreateProperty(IField field, JsonSchema? reference)
+        {
+            var jsonProperty =
+                SchemaBuilder.ObjectProperty(reference)
+                    .SetDescription(field)
+                    .SetRequired(field.RawProperties.IsRequired);
+
+            return jsonProperty;
+        }
+
+        private static JsonSchemaProperty SetDescription(this JsonSchemaProperty jsonProperty, IField field)
+        {
             if (!string.IsNullOrWhiteSpace(field.RawProperties.Hints))
             {
                 jsonProperty.Description = $"{field.Name} ({field.RawProperties.Hints})";
@@ -91,8 +119,6 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             {
                 jsonProperty.Description = field.Name;
             }
-
-            jsonProperty.SetRequired(field.RawProperties.IsRequired);
 
             return jsonProperty;
         }

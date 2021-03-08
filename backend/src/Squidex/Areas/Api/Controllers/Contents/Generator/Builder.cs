@@ -21,7 +21,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     internal sealed class Builder
     {
-        private readonly PartitionResolver partitionResolver;
+        private const string ResultTotal = "total";
+        private const string ResultItems = "items";
 
         public string AppName { get; }
 
@@ -34,8 +35,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             OpenApiSchemaResolver schemaResolver,
             OpenApiSchemaGenerator schemaGenerator)
         {
-            this.partitionResolver = app.PartitionResolver();
-
             Document = document;
 
             AppName = app.Name;
@@ -50,9 +49,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 return JsonSchema.CreateAnySchema();
             });
 
-            var contentSchema = ResolveSchema($"ContentDto", () =>
+            var contentSchema = ResolveSchema("ContentDto", () =>
             {
                 return ContentJsonSchemaBuilder.BuildSchema("Shared", dataSchema, true);
+            });
+
+            var contentsSchema = ResolveSchema("ContentResultDto", () =>
+            {
+                return BuildResult(contentSchema);
             });
 
             var path = $"/content/{AppName}";
@@ -60,6 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             var builder = new OperationsBuilder
             {
                 ContentSchema = contentSchema,
+                ContentsSchema = contentsSchema,
                 DataSchema = dataSchema,
                 Path = path,
                 Parent = this,
@@ -83,19 +88,27 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             var dataSchema = ResolveSchema($"{typeName}DataDto", () =>
             {
-                return schema.BuildJsonSchema(partitionResolver, ResolveSchema);
-            });
-
-            var dataFlatSchema = ResolveSchema($"{typeName}FlatDataDto", () =>
-            {
-                return schema.BuildFlatJsonSchema(ResolveSchema);
+                return schema.BuildDynamicJsonSchema(ResolveSchema);
             });
 
             var contentSchema = ResolveSchema($"{typeName}ContentDto", () =>
             {
-                var data = flat ? dataFlatSchema : dataSchema;
+                var contentDataSchema = dataSchema;
 
-                return ContentJsonSchemaBuilder.BuildSchema(displayName, data, true);
+                if (flat)
+                {
+                    contentDataSchema = ResolveSchema($"{typeName}FlatDataDto", () =>
+                    {
+                        return schema.BuildFlatJsonSchema(ResolveSchema);
+                    });
+                }
+
+                return ContentJsonSchemaBuilder.BuildSchema(displayName, contentDataSchema, true);
+            });
+
+            var contentsSchema = ResolveSchema($"{typeName}ContentResultDto", () =>
+            {
+                return BuildResult(contentSchema);
             });
 
             var path = $"/content/{AppName}/{schema.Name}";
@@ -103,6 +116,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             var builder = new OperationsBuilder
             {
                 ContentSchema = contentSchema,
+                ContentsSchema = contentsSchema,
                 DataSchema = dataSchema,
                 Path = path,
                 Parent = this,
@@ -125,6 +139,20 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return new JsonSchema
             {
                 Reference = Document.Definitions.GetOrAdd(name, x => factory())
+            };
+        }
+
+        private static JsonSchema BuildResult(JsonSchema contentSchema)
+        {
+            return new JsonSchema
+            {
+                AllowAdditionalProperties = false,
+                Properties =
+                {
+                    [ResultTotal] = SchemaBuilder.NumberProperty("The total number of content items.", true),
+                    [ResultItems] = SchemaBuilder.ArrayProperty(contentSchema, "The content items.", true)
+                },
+                Type = JsonObjectType.Object
             };
         }
     }

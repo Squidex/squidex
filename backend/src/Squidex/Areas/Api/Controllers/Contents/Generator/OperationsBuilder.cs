@@ -27,6 +27,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         public JsonSchema ContentSchema { get; init; }
 
+        public JsonSchema ContentsSchema { get; init; }
+
         public JsonSchema DataSchema { get; init; }
 
         public string FormatText(string text)
