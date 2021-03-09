@@ -13,7 +13,6 @@ using NJsonSchema;
 using NSwag;
 using NSwag.Generation;
 using NSwag.Generation.Processors.Contexts;
-using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Hosting;
@@ -82,28 +81,24 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private static void GenerateSharedOperations(OperationsBuilder builder)
         {
-            var contentsSchema = BuildResults(builder);
-
             builder.AddOperation(OpenApiOperationMethod.Get, "/")
                 .RequirePermission(Permissions.AppContentsReadOwn)
                 .Operation("Query")
                 .OperationSummary("Query contents across all schemas.")
                 .HasQuery("ids", JsonObjectType.String, "Comma-separated list of content IDs.")
-                .Responds(200, "Content items retrieved.", contentsSchema)
+                .Responds(200, "Content items retrieved.", builder.ContentsSchema)
                 .Responds(400, "Query not valid.");
         }
 
         private static void GenerateSchemaOperations(OperationsBuilder builder)
         {
-            var contentsSchema = BuildResults(builder);
-
             builder.AddOperation(OpenApiOperationMethod.Get, "/")
                 .RequirePermission(Permissions.AppContentsReadOwn)
                 .Operation("Query")
                 .OperationSummary("Query schema contents items.")
                 .Describe(Properties.Resources.OpenApiSchemaQuery)
                 .HasQueryOptions(true)
-                .Responds(200, "Content items retrieved.", contentsSchema)
+                .Responds(200, "Content items retrieved.", builder.ContentsSchema)
                 .Responds(400, "Query not valid.");
 
             builder.AddOperation(OpenApiOperationMethod.Get, "/{id}")
@@ -190,19 +185,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .OperationSummary("Delete a schema content item.")
                 .HasId()
                 .Responds(204, "Content item deleted");
-        }
-
-        private static JsonSchema BuildResults(OperationsBuilder builder)
-        {
-            return new JsonSchema
-            {
-                Properties =
-                {
-                    ["total"] = SchemaBuilder.NumberProperty("The total number of content items.", true),
-                    ["items"] = SchemaBuilder.ArrayProperty(builder.ContentSchema, "The content items.", true)
-                },
-                Type = JsonObjectType.Object
-            };
         }
 
         private OpenApiDocument CreateApiDocument(HttpContext context, IAppEntity app)

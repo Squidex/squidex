@@ -21,11 +21,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public readonly struct Args
         {
-            public readonly SchemaResolver SchemaResolver;
+            public readonly SchemaResolver? SchemaResolver;
 
             public readonly bool WithHiddenFields;
 
-            public Args(SchemaResolver schemaResolver, bool withHiddenFields)
+            public Args(SchemaResolver? schemaResolver, bool withHiddenFields)
             {
                 SchemaResolver = schemaResolver;
 
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
         }
 
-        public static JsonSchemaProperty? BuildProperty(IField field, SchemaResolver schemaResolver, bool withHiddenFields)
+        public static JsonSchemaProperty? BuildProperty(IField field, SchemaResolver? schemaResolver, bool withHiddenFields)
         {
             var args = new Args(schemaResolver, withHiddenFields);
 
@@ -81,30 +81,41 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            var reference = args.SchemaResolver("GeolocationDto", () =>
+            if (args.SchemaResolver != null)
             {
-                var geolocationSchema = SchemaBuilder.Object();
-
-                geolocationSchema.Format = GeoJson.Format;
-
-                geolocationSchema.Properties.Add("latitude", new JsonSchemaProperty
+                var reference = args.SchemaResolver("GeolocationDto", () =>
                 {
-                    Type = JsonObjectType.Number,
-                    Maximum = 90,
-                    Minimum = -90
-                }.SetRequired(true));
+                    var geolocationSchema = SchemaBuilder.Object();
 
-                geolocationSchema.Properties.Add("longitude", new JsonSchemaProperty
-                {
-                    Type = JsonObjectType.Number,
-                    Maximum = 180,
-                    Minimum = -180
-                }.SetRequired(true));
+                    geolocationSchema.Format = GeoJson.Format;
 
-                return geolocationSchema;
-            });
+                    geolocationSchema.Properties.Add("latitude", new JsonSchemaProperty
+                    {
+                        Type = JsonObjectType.Number,
+                        Maximum = 90,
+                        Minimum = -90
+                    }.SetRequired(false));
 
-            return SchemaBuilder.ObjectProperty(reference);
+                    geolocationSchema.Properties.Add("longitude", new JsonSchemaProperty
+                    {
+                        Type = JsonObjectType.Number,
+                        Maximum = 180,
+                        Minimum = -180
+                    }.SetRequired(false));
+
+                    return geolocationSchema;
+                });
+
+                return SchemaBuilder.ObjectProperty(reference);
+            }
+            else
+            {
+                var property = SchemaBuilder.ObjectProperty();
+
+                property.Format = GeoJson.Format;
+
+                return property;
+            }
         }
 
         public JsonSchemaProperty? Visit(IField<JsonFieldProperties> field, Args args)

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
@@ -25,38 +26,19 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var schemaResolver = new SchemaResolver((name, action) =>
-            {
-                return action();
-            });
+            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver());
 
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), schemaResolver);
-            var jsonProperties = AllPropertyNames(jsonSchema);
+            CheckFields(jsonSchema);
+        }
 
-            void CheckField(IField field)
-            {
-                if (!field.IsForApi())
-                {
-                    Assert.DoesNotContain(field.Name, jsonProperties);
-                }
-                else
-                {
-                    Assert.Contains(field.Name, jsonProperties);
-                }
+        [Fact]
+        public void Should_build_json_schema_with_resolver()
+        {
+            var schemaResolver = new SchemaResolver((name, action) => action());
 
-                if (field is IArrayField array)
-                {
-                    foreach (var nested in array.Fields)
-                    {
-                        CheckField(nested);
-                    }
-                }
-            }
+            var jsonSchema = schema.BuildDynamicJsonSchema(schemaResolver);
 
-            foreach (var field in schema.Fields)
-            {
-                CheckField(field);
-            }
+            CheckFields(jsonSchema);
         }
 
         [Fact]
@@ -70,6 +52,12 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
             });
 
             var jsonSchema = schema.BuildFlatJsonSchema(schemaResolver);
+
+            CheckFields(jsonSchema);
+        }
+
+        private void CheckFields(JsonSchema jsonSchema)
+        {
             var jsonProperties = AllPropertyNames(jsonSchema);
 
             void CheckField(IField field)
@@ -118,6 +106,8 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 
                     AddProperties(current.Item);
                     AddProperties(current.Reference);
+                    AddProperties(current.AdditionalItemsSchema);
+                    AddProperties(current.AdditionalPropertiesSchema);
                 }
             }
 

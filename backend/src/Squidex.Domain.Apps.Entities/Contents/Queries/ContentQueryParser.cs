@@ -235,7 +235,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private static JsonSchema BuildJsonSchema(Schema schema, IAppEntity app, bool withHiddenFields)
         {
-            var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), (n, action) => action(), withHiddenFields);
+            var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), withHiddenFields);
 
             return ContentJsonSchemaBuilder.BuildSchema(schema.DisplayName(), dataSchema);
         }
