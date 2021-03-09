@@ -88,7 +88,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 .subscribe(schema => {
                     this.schema = schema;
 
-                    this.contentForm = new EditContentForm(this.languages, this.schema, this.formContext.user);
+                    this.contentForm = new EditContentForm(this.languages, this.schema, this.formContext);
                 }));
 
         this.own(
@@ -96,9 +96,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 .subscribe(content => {
                     const isNewContent = isOtherContent(content, this.content);
 
-                    this.content = content;
+                    this.formContext['initialContent'] = content;
 
-                    this.formContext['initialContent'] = this.content;
+                    this.content = content;
+                    this.contentForm.setContext(this.formContext);
 
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
@@ -251,7 +252,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.contentsState.loadVersion(content, version)
                 .subscribe(dto => {
                     if (compare) {
-                        this.contentFormCompare = new EditContentForm(this.languages, this.schema, this.formContext.user);
+                        this.contentFormCompare = new EditContentForm(this.languages, this.schema, this.formContext);
 
                         this.contentFormCompare.load(dto.payload);
                         this.contentFormCompare.setEnabled(false);
