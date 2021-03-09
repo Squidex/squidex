@@ -77,6 +77,8 @@ namespace Squidex.Infrastructure.Queries
                     return CompareOperator.Empty;
                 case "exists":
                     return CompareOperator.Exists;
+                case "matchs":
+                    return CompareOperator.Matchs;
                 case "contains":
                     return CompareOperator.Contains;
                 case "endswith":

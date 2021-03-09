@@ -337,6 +337,15 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_with_matchs()
+        {
+            var i = _Q("$filter=matchs(lastName, 'Duck')");
+            var o = _C("Filter: matchs(lastName, 'Duck')");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_with_empty()
         {
             var i = _Q("$filter=empty(lastName)");

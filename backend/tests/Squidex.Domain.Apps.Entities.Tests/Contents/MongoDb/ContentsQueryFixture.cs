@@ -33,7 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         private readonly int numValues = 10000;
         private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
         private readonly IMongoDatabase mongoDatabase;
-        private readonly IMongoDatabase mongoDatabaseWildcard;
 
         public MongoContentRepository ContentRepository { get; }
 
@@ -55,7 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         public ContentsQueryFixture()
         {
             mongoDatabase = mongoClient.GetDatabase("QueryTests");
-            mongoDatabaseWildcard = mongoClient.GetDatabase("QueryTestsWildcard");
 
             SetupJson();
 

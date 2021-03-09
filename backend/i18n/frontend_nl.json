@@ -298,6 +298,7 @@
   "common.queryOperators.gt": "is groter dan",
   "common.queryOperators.le": "is kleiner dan of is gelijk aan",
   "common.queryOperators.lt": "is kleiner dan",
+  "common.queryOperators.matchs": "matchs",
   "common.queryOperators.ne": "is niet gelijk aan",
   "common.queryOperators.startsWith": "begint met",
   "common.refresh": "Vernieuwen",

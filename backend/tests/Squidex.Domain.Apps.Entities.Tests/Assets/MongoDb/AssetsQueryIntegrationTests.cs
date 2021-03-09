@@ -18,11 +18,11 @@ using F = Squidex.Infrastructure.Queries.ClrFilter;
 namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 {
     [Trait("Category", "Dependencies")]
-    public class AssetsQueryTests : IClassFixture<AssetsQueryFixture>
+    public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>
     {
         public AssetsQueryFixture _ { get; }
 
-        public AssetsQueryTests(AssetsQueryFixture fixture)
+        public AssetsQueryIntegrationTests(AssetsQueryFixture fixture)
         {
             _ = fixture;
         }

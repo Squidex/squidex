@@ -40,34 +40,7 @@ namespace Squidex.Infrastructure.Queries.OData
 
         public override ClrValue Visit(ConvertNode nodeIn)
         {
-            var value = ConstantVisitor.Visit(nodeIn.Source);
-
-            if (value == null)
-            {
-                return ClrValue.Null;
-            }
-
-            if (nodeIn.TypeReference == null)
-            {
-                throw new NotSupportedException();
-            }
-
-            if (nodeIn.TypeReference.Definition == BooleanType)
-            {
-                return bool.Parse(value.ToString()!);
-            }
-
-            if (nodeIn.TypeReference.Definition == GuidType)
-            {
-                return Guid.Parse(value.ToString()!);
-            }
-
-            if (nodeIn.TypeReference.Definition == DateTimeType || nodeIn.TypeReference.Definition == DateType)
-            {
-                return ParseInstant(value);
-            }
-
-            throw new NotSupportedException();
+            return nodeIn.Source.Accept(this);
         }
 
         public override ClrValue Visit(CollectionConstantNode nodeIn)

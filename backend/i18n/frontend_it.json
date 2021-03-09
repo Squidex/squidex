@@ -298,6 +298,7 @@
   "common.queryOperators.gt": "è maggiore di",
   "common.queryOperators.le": "è minore o uguale a",
   "common.queryOperators.lt": "è minore di",
+  "common.queryOperators.matchs": "matchs",
   "common.queryOperators.ne": "non è uguale a",
   "common.queryOperators.startsWith": "inizia con",
   "common.refresh": "Aggiorna",

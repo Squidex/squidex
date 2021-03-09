@@ -81,7 +81,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             if (query.Filter != null)
             {
-                query.Filter = AdaptionVisitor.AdaptFilter(query.Filter, appId);
+                query.Filter = AdaptionVisitor.AdaptFilter(query.Filter);
+            }
+
+            if (query.Filter != null)
+            {
+                query.Filter = AdaptIdVisitor.AdaptFilter(query.Filter, appId);
             }
 
             if (query.Sort != null)
@@ -94,7 +99,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public static FilterNode<ClrValue>? AdjustToModel(this FilterNode<ClrValue> filter, DomainId appId)
         {
-            return AdaptionVisitor.AdaptFilter(filter, appId);
+            var result = AdaptionVisitor.AdaptFilter(filter);
+
+            if (result != null)
+            {
+                result = AdaptIdVisitor.AdaptFilter(result, appId);
+            }
+
+            return result;
         }
     }
 }

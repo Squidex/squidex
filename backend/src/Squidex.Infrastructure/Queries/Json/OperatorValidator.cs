@@ -43,6 +43,7 @@ namespace Squidex.Infrastructure.Queries.Json
             CompareOperator.In,
             CompareOperator.LessThan,
             CompareOperator.LessThanOrEqual,
+            CompareOperator.Matchs,
             CompareOperator.NotEquals,
             CompareOperator.StartsWith
         };

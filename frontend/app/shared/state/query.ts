@@ -225,6 +225,7 @@ const CompareOperator: ReadonlyArray<FilterOperator> = [
 ];
 
 const StringOperators: ReadonlyArray<FilterOperator> = [
+    { name: 'i18n:common.queryOperators.matchs', value: 'matchs' },
     { name: 'i18n:common.queryOperators.startsWith', value: 'startsWith' },
     { name: 'i18n:common.queryOperators.endsWith', value: 'endsWith' },
     { name: 'i18n:common.queryOperators.contains', value: 'contains' }
