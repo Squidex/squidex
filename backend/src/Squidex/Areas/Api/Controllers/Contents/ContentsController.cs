@@ -606,8 +606,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to delete.</param>
-        /// <param name="checkReferrers">True to check referrers of this content.</param>
-        /// <param name="permanent">True to delete the asset permanently.</param>
+        /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 204 => Content deleted.
         /// 400 => Content cannot be deleted.
@@ -620,11 +619,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/{name}/{id}/")]
         [ApiPermissionOrAnonymous(Permissions.AppContentsDeleteOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteContent(string app, string name, DomainId id,
-            [FromQuery] bool checkReferrers = false,
-            [FromQuery] bool permanent = false)
+        public async Task<IActionResult> DeleteContent(string app, string name, DomainId id, DeleteContentDto request)
         {
-            var command = new DeleteContent { ContentId = id, CheckReferrers = checkReferrers, Permanent = permanent };
+            var command = request.ToCommand(id);
 
             await CommandBus.PublishAsync(command);
 

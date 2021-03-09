@@ -337,16 +337,31 @@ namespace TestSuite.ApiTests
         public async Task Should_delete_asset(bool permanent)
         {
             // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+            var asset = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
             // STEP 2: Delete asset
-            await _.Assets.DeleteAssetAsync(_.AppName, asset_1.Id, permanent: permanent);
+            await _.Assets.DeleteAssetAsync(_.AppName, asset.Id, permanent: permanent);
 
             // Should return 404 when asset deleted.
-            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id));
+            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset.Id));
 
             Assert.Equal(404, ex.StatusCode);
+
+
+            // STEP 3: Retrieve all items and ensure that the deleted item does not exist.
+            var updated = await _.Assets.GetAssetsAsync(_.AppName, (AssetQuery)null);
+
+            Assert.DoesNotContain(updated.Items, x => x.Id == asset.Id);
+
+
+            // STEP 4: Retrieve all deleted items and check if found.
+            var deleted = await _.Assets.GetAssetsAsync(_.AppName, new AssetQuery
+            {
+                Filter = "isDeleted eq true"
+            });
+
+            Assert.Equal(!permanent, deleted.Items.Any(x => x.Id == asset.Id));
         }
 
         [Theory]

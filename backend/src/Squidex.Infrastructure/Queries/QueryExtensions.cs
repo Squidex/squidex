@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 
 namespace Squidex.Infrastructure.Queries
@@ -23,7 +24,7 @@ namespace Squidex.Infrastructure.Queries
                 return false;
             }
 
-            var fields = new HashSet<string>();
+            var fields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             filter.AddFields(fields);
 

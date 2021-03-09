@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
                 Filter.Eq(x => x.IndexedAppId, appId)
             };
 
-            if (!query.HasFilterField("dl"))
+            if (!query.HasFilterField("IsDeleted"))
             {
                 filters.Add(Filter.Eq(x => x.IsDeleted, false));
             }

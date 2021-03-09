@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
@@ -579,6 +580,15 @@ namespace TestSuite.ApiTests
             var updated = await _.Contents.GetAsync();
 
             Assert.DoesNotContain(updated.Items, x => x.Id == content.Id);
+
+
+            // STEP 4: Retrieve all deleted items and check if found.
+            var deleted = await _.Contents.GetAsync(new ContentQuery
+            {
+                Filter = "isDeleted eq true"
+            }, QueryContext.Default.Unpublished(true));
+
+            Assert.Equal(!permanent, deleted.Items.Any(x => x.Id == content.Id));
         }
 
         [Theory]
