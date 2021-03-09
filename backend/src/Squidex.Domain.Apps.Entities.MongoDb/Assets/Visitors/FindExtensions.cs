@@ -42,9 +42,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
-                Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.Eq(x => x.IsDeleted, false)
+                Filter.Eq(x => x.IndexedAppId, appId)
             };
+
+            if (!query.HasFilterField("dl"))
+            {
+                filters.Add(Filter.Eq(x => x.IsDeleted, false));
+            }
 
             if (parentId != null)
             {

@@ -24,9 +24,6 @@ using Xunit;
 using ClrFilter = Squidex.Infrastructure.Queries.ClrFilter;
 using SortBuilder = Squidex.Infrastructure.Queries.SortBuilder;
 
-#pragma warning disable SA1300 // Element should begin with upper-case letter
-#pragma warning disable IDE1006 // Naming Styles
-
 namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 {
     public class AssetQueryTests
