@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public bool DoNotValidateWorkflow { get; set; }
 
         /// <summary>
-        /// True to check referrers of this content.
+        /// True to check referrers of deleted contents.
         /// </summary>
         public bool CheckReferrers { get; set; }
 

@@ -20,6 +20,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [LocalizedRequired]
         public BulkUpdateAssetsJobDto[]? Jobs { get; set; }
 
+        /// <summary>
+        /// True to check referrers of deleted assets.
+        /// </summary>
+        public bool CheckReferrers { get; set; }
+
         public BulkUpdateAssets ToCommand()
         {
             var result = SimpleMapper.Map(this, new BulkUpdateAssets());

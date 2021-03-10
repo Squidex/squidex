@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
     {
         public NamedId<DomainId> AppId { get; set; }
 
+        public bool CheckReferrers { get; set; }
+
         public BulkUpdateJob[]? Jobs { get; set; }
     }
 }

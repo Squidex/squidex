@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool DoNotScript { get; set; }
 
+        public bool CheckReferrers { get; set; }
+
         public bool OptimizeValidation { get; set; }
 
         public BulkUpdateJob[]? Jobs { get; set; }

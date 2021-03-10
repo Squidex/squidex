@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             ICommandBus Bus,
             string Schema,
             int JobIndex,
-            BulkUpdateJob Job,
+            BulkUpdateJob CommandJob,
             BulkUpdateContents Command,
             ConcurrentBag<BulkUpdateResultItem> Results
         )
@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task<ContentCommand> CreateCommandAsync(BulkTask task)
         {
-            var job = task.Job;
+            var job = task.CommandJob;
 
             switch (job.Type)
             {
@@ -258,9 +258,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private async Task EnrichAndCheckPermissionAsync<T>(BulkTask task, T command, string permissionId) where T : ContentCommand
         {
             SimpleMapper.Map(task.Command, command);
-            SimpleMapper.Map(task.Job, command);
+            SimpleMapper.Map(task.CommandJob, command);
 
-            if (!string.IsNullOrWhiteSpace(task.Job.Schema))
+            if (!string.IsNullOrWhiteSpace(task.CommandJob.Schema))
             {
                 var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, task.Schema);
 
@@ -277,20 +277,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task<DomainId[]> FindIdAsync(BulkTask task)
         {
-            var id = task.Job.Id;
+            var id = task.CommandJob.Id;
 
             if (id != null)
             {
                 return new[] { id.Value };
             }
 
-            if (task.Job.Query != null)
+            if (task.CommandJob.Query != null)
             {
-                task.Job.Query.Take = task.Job.ExpectedCount;
+                task.CommandJob.Query.Take = task.CommandJob.ExpectedCount;
 
-                var existing = await contentQuery.QueryAsync(contextProvider.Context, task.Schema, Q.Empty.WithJsonQuery(task.Job.Query));
+                var existing = await contentQuery.QueryAsync(contextProvider.Context, task.Schema, Q.Empty.WithJsonQuery(task.CommandJob.Query));
 
-                if (existing.Total > task.Job.ExpectedCount)
+                if (existing.Total > task.CommandJob.ExpectedCount)
                 {
                     throw new DomainException(T.Get("contents.bulkInsertQueryNotUnique"));
                 }
@@ -298,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 return existing.Select(x => x.Id).ToArray();
             }
 
-            if (task.Job.Type == BulkUpdateContentType.Create || task.Job.Type == BulkUpdateContentType.Upsert)
+            if (task.CommandJob.Type == BulkUpdateContentType.Create || task.CommandJob.Type == BulkUpdateContentType.Upsert)
             {
                 return new[] { DomainId.NewGuid() };
             }

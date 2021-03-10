@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private sealed record BulkTask(
             ICommandBus Bus,
             int JobIndex,
-            BulkUpdateJob Job,
+            BulkUpdateJob CommandJob,
             BulkUpdateAssets Command,
             ConcurrentBag<BulkUpdateResultItem> Results
         )
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private BulkTaskCommand? CreateCommand(BulkTask task)
         {
-            var id = task.Job.Id;
+            var id = task.CommandJob.Id;
 
             try
             {
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private AssetCommand CreateCommandCore(BulkTask task)
         {
-            var job = task.Job;
+            var job = task.CommandJob;
 
             switch (job.Type)
             {
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private void EnrichAndCheckPermission<T>(BulkTask task, T command, string permissionId) where T : AssetCommand
         {
             SimpleMapper.Map(task.Command, command);
-            SimpleMapper.Map(task.Job, command);
+            SimpleMapper.Map(task.CommandJob, command);
 
             if (!contextProvider.Context.Allows(permissionId))
             {
