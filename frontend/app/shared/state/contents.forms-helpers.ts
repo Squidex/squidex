@@ -89,7 +89,7 @@ export class CompiledRule {
         private readonly rule: FieldRule
     ) {
         try {
-            this.function = new Function(`return function(user, data, itemData) { return ${rule.condition} }`)();
+            this.function = new Function(`return function(user, ctx, data, itemData) { return ${rule.condition} }`)();
         } catch {
             this.function = () => false;
         }
@@ -97,7 +97,7 @@ export class CompiledRule {
 
     public eval(context: RuleContext) {
         try {
-            return this.function(context.user, context.data, context.itemData);
+            return this.function(context.user, context, context.data, context.itemData);
         } catch {
             return false;
         }

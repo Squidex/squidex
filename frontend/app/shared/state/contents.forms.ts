@@ -92,7 +92,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto,
-        private readonly user: any = {}, debounce = 100
+        private context: any, debounce = 100
     ) {
         super(new FormGroup({}));
 
@@ -184,6 +184,12 @@ export class EditContentForm extends Form<FormGroup, any> {
         this.updateState(this.value);
     }
 
+    public setContext(context?: any) {
+        this.context = context;
+
+        this.updateState(this.value);
+    }
+
     public submitCompleted(options?: { newValue?: any, noReset?: boolean }) {
         super.submitCompleted(options);
 
@@ -191,7 +197,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     private updateState(data: any) {
-        const context = { user: this.user, data };
+        const context = { ...this.context || {}, data };
 
         for (const field of Object.values(this.fields)) {
             field.updateState(context, { isDisabled: this.form.disabled });
