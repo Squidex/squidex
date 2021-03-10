@@ -69,7 +69,7 @@ namespace TestSuite.ApiTests
             // STEP 2: Create a content with a reference.
             var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
 
-            var contentB_1 = await _.Contents.CreateAsync(dataB, true);
+            await _.Contents.CreateAsync(dataB, true);
 
 
             // STEP 3: Try to delete with referrer check.
@@ -92,7 +92,7 @@ namespace TestSuite.ApiTests
             // STEP 2: Create a content with a reference.
             var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
 
-            var contentB_1 = await _.Contents.CreateAsync(dataB, true);
+            await _.Contents.CreateAsync(dataB, true);
 
 
             // STEP 3: Try to delete with referrer check.
