@@ -18,11 +18,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
     {
         private static readonly FilterDefinitionBuilder<MongoAssetEntity> Filter = Builders<MongoAssetEntity>.Filter;
 
-        public static ClrQuery AdjustToModel(this ClrQuery query)
+        public static ClrQuery AdjustToModel(this ClrQuery query, DomainId appId)
         {
             if (query.Filter != null)
             {
                 query.Filter = FirstPascalPathConverter<ClrValue>.Transform(query.Filter);
+            }
+
+            if (query.Filter != null)
+            {
+                query.Filter = AdaptIdVisitor.AdaptFilter(query.Filter, appId);
             }
 
             if (query.Sort != null)
@@ -37,9 +42,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
-                Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.Eq(x => x.IsDeleted, false)
+                Filter.Eq(x => x.IndexedAppId, appId)
             };
+
+            if (!query.HasFilterField("IsDeleted"))
+            {
+                filters.Add(Filter.Eq(x => x.IsDeleted, false));
+            }
 
             if (parentId != null)
             {

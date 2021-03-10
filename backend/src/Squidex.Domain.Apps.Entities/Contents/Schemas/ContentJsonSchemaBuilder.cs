@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public static class ContentJsonSchemaBuilder
     {
-        public static JsonSchema BuildSchema(string name, JsonSchema? dataSchema, bool extended = false)
+        public static JsonSchema BuildSchema(string name, JsonSchema? dataSchema, bool extended = false, bool withDeleted = false)
         {
             var jsonSchema = new JsonSchema
             {
@@ -27,6 +27,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 },
                 Type = JsonObjectType.Object
             };
+
+            if (withDeleted)
+            {
+                jsonSchema.Properties["isDeleted"] = SchemaBuilder.BooleanProperty("True when deleted.", false);
+            }
 
             if (extended)
             {

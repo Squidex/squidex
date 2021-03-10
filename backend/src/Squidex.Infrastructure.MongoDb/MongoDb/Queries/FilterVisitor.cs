@@ -56,13 +56,15 @@ namespace Squidex.Infrastructure.MongoDb.Queries
                 case CompareOperator.Empty:
                     return Filter.Or(
                         Filter.Exists(propertyName, false),
-                        Filter.Eq(propertyName, default(T)!),
-                        Filter.Eq(propertyName, string.Empty),
-                        Filter.Eq(propertyName, Array.Empty<T>()));
+                        Filter.Eq<object?>(propertyName, null),
+                        Filter.Eq<object?>(propertyName, string.Empty),
+                        Filter.Size(propertyName, 0));
                 case CompareOperator.Exists:
                     return Filter.And(
                         Filter.Exists(propertyName, true),
                         Filter.Ne<object?>(propertyName, null));
+                case CompareOperator.Matchs:
+                    return Filter.Regex(propertyName, BuildMatchRegex(nodeIn));
                 case CompareOperator.StartsWith:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => "^" + s));
                 case CompareOperator.Contains:
@@ -86,6 +88,30 @@ namespace Squidex.Infrastructure.MongoDb.Queries
             }
 
             throw new NotSupportedException();
+        }
+
+        private static BsonRegularExpression BuildMatchRegex(CompareFilter<ClrValue> node)
+        {
+            var value = node.Value.Value?.ToString();
+
+            if (value == null)
+            {
+                return new BsonRegularExpression("null", "i");
+            }
+
+            if (value.Length > 3 && (value[0] == '/' && value[^1] == '/' || value[^2] == '/'))
+            {
+                if (value[^1] == 'i')
+                {
+                    return new BsonRegularExpression(value[1..^2], "i");
+                }
+                else
+                {
+                    return new BsonRegularExpression(value[1..^1]);
+                }
+            }
+
+            return new BsonRegularExpression(value, "i");
         }
 
         private static BsonRegularExpression BuildRegex(CompareFilter<ClrValue> node, Func<string, string> formatter)

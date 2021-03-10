@@ -160,6 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             AddProperty("fileName", JsonObjectType.String);
             AddProperty("fileSize", JsonObjectType.Integer);
             AddProperty("fileVersion", JsonObjectType.Integer);
+            AddProperty("isDeleted", JsonObjectType.Boolean);
             AddProperty("isProtected", JsonObjectType.Boolean);
             AddProperty("lastModified", JsonObjectType.String, JsonFormatStrings.DateTime);
             AddProperty("lastModifiedBy", JsonObjectType.String);
@@ -196,6 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             AddProperty("createdBy", EdmPrimitiveTypeKind.String);
             AddProperty("fileHash", EdmPrimitiveTypeKind.String);
             AddProperty("fileName", EdmPrimitiveTypeKind.String);
+            AddProperty("isDeleted", EdmPrimitiveTypeKind.Boolean);
             AddProperty("isProtected", EdmPrimitiveTypeKind.Boolean);
             AddProperty("fileSize", EdmPrimitiveTypeKind.Int64);
             AddProperty("fileVersion", EdmPrimitiveTypeKind.Int64);

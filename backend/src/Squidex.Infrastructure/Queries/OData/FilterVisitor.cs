@@ -68,6 +68,13 @@ namespace Squidex.Infrastructure.Queries.OData
 
             var valueNode = nodeIn.Parameters.ElementAt(1);
 
+            if (string.Equals(nodeIn.Name, "matchs", StringComparison.OrdinalIgnoreCase))
+            {
+                var value = ConstantWithTypeVisitor.Visit(valueNode);
+
+                return ClrFilter.Matchs(PropertyPathVisitor.Visit(fieldNode), value);
+            }
+
             if (string.Equals(nodeIn.Name, "endswith", StringComparison.OrdinalIgnoreCase))
             {
                 var value = ConstantWithTypeVisitor.Visit(valueNode);

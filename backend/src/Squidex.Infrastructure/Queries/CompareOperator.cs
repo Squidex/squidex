@@ -19,6 +19,7 @@ namespace Squidex.Infrastructure.Queries
         In,
         LessThan,
         LessThanOrEqual,
+        Matchs,
         NotEquals,
         StartsWith
     }

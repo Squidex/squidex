@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     }
                     else
                     {
-                        var query = q.Query.AdjustToModel();
+                        var query = q.Query.AdjustToModel(appId);
 
                         var filter = query.BuildFilter(appId, parentId);
 

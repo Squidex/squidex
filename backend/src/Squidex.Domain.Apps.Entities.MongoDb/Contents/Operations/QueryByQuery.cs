@@ -201,18 +201,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return query.Sort?.All(x => x.Path.ToString() == "mt" && x.Order == SortOrder.Descending) == true;
         }
 
-        private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId schemaId, FilterNode<ClrValue>? filterNode)
+        private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId schemaId, FilterNode<ClrValue>? filter)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
                 Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.Eq(x => x.IndexedSchemaId, schemaId),
-                Filter.Ne(x => x.IsDeleted, true)
+                Filter.Eq(x => x.IndexedSchemaId, schemaId)
             };
 
-            if (filterNode != null)
+            if (filter?.HasField("dl") != true)
             {
-                filters.Add(filterNode.BuildFilter<MongoContentEntity>());
+                filters.Add(Filter.Ne(x => x.IsDeleted, true));
+            }
+
+            if (filter != null)
+            {
+                filters.Add(filter.BuildFilter<MongoContentEntity>());
             }
 
             return Filter.And(filters);
@@ -225,8 +229,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.In(x => x.IndexedSchemaId, schemaIds),
-                Filter.Ne(x => x.IsDeleted, true)
             };
+
+            if (query?.HasFilterField("dl") != true)
+            {
+                filters.Add(Filter.Ne(x => x.IsDeleted, true));
+            }
 
             if (query?.Filter != null)
             {

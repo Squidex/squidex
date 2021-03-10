@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
         private readonly EdmModel genericEdmModel = BuildEdmModel("Generic", "Content", new EdmModel(), null);
-        private readonly JsonSchema genericJsonSchema = ContentJsonSchemaBuilder.BuildSchema("Content", null);
+        private readonly JsonSchema genericJsonSchema = ContentJsonSchemaBuilder.BuildSchema("Content", null, false, true);
         private readonly IMemoryCache cache;
         private readonly IJsonSerializer jsonSerializer;
         private readonly ITextIndex textIndex;
@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), withHiddenFields);
 
-            return ContentJsonSchemaBuilder.BuildSchema(schema.DisplayName(), dataSchema);
+            return ContentJsonSchemaBuilder.BuildSchema(schema.DisplayName(), dataSchema, false, true);
         }
 
         private static EdmModel BuildEdmModel(Schema schema, IAppEntity app, bool withHiddenFields)
@@ -281,6 +281,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var entityType = new EdmEntityType(modelName, name);
 
             entityType.AddStructuralProperty("id", EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty("isDeleted", EdmPrimitiveTypeKind.Boolean);
             entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.DateTimeOffset);
             entityType.AddStructuralProperty("createdBy", EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty("lastModified", EdmPrimitiveTypeKind.DateTimeOffset);
