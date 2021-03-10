@@ -367,7 +367,7 @@ namespace TestSuite.ApiTests
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
-        public async Task Should_recreate_asset(bool permanent)
+        public async Task Should_recreate_deleted_asset(bool permanent)
         {
             // STEP 1: Create asset
             var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");

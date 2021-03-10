@@ -258,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             await GuardContent.CanChangeStatus(c, Snapshot, context.Workflow, context.Repository, context.Schema);
 
-            if (c.Status == Snapshot.Status)
+            if (c.Status == Snapshot.EditingStatus)
             {
                 return;
             }

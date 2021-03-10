@@ -56,8 +56,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var plan = app.Plan;
-
             Validate.It(e =>
             {
                 if (string.IsNullOrWhiteSpace(command.PlanId))
@@ -70,6 +68,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                 {
                     e(T.Get("apps.plans.notFound"), nameof(command.PlanId));
                 }
+
+                var plan = app.Plan;
 
                 if (!string.IsNullOrWhiteSpace(command.PlanId) && plan != null && !plan.Owner.Equals(command.Actor))
                 {

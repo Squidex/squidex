@@ -29,7 +29,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_published_item()
+        public async Task Should_return_published_content()
         {
             TestEntity content = null;
             try
@@ -55,7 +55,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_not_return_archived_item()
+        public async Task Should_not_return_archived_content()
         {
             TestEntity content = null;
             try
@@ -81,7 +81,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_not_return_unpublished_item()
+        public async Task Should_not_return_unpublished_content()
         {
             TestEntity content = null;
             try
@@ -294,7 +294,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_non_published_item()
+        public async Task Should_create_non_published_content()
         {
             TestEntity content = null;
             try
@@ -316,7 +316,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_published_item()
+        public async Task Should_create_published_content()
         {
             TestEntity content = null;
             try
@@ -338,7 +338,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_item_with_custom_id()
+        public async Task Should_create_content_with_custom_id()
         {
             var id = Guid.NewGuid().ToString();
 
@@ -360,7 +360,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_not_create_item_with_custom_id_twice()
+        public async Task Should_not_create_content_with_custom_id_twice()
         {
             var id = Guid.NewGuid().ToString();
 
@@ -388,7 +388,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_item_with_custom_id_and_upsert()
+        public async Task Should_create_content_with_custom_id_and_upsert()
         {
             var id = Guid.NewGuid().ToString();
 
@@ -422,7 +422,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_update_item()
+        public async Task Should_update_content()
         {
             TestEntity content = null;
             try
@@ -448,7 +448,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_update_item_to_null()
+        public async Task Should_update_content_to_null()
         {
             TestEntity content = null;
             try
@@ -474,7 +474,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_patch_item()
+        public async Task Should_patch_content()
         {
             TestEntity content = null;
             try
@@ -500,7 +500,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_patch_item_to_null()
+        public async Task Should_patch_content_to_null()
         {
             TestEntity content = null;
             try
@@ -542,17 +542,23 @@ namespace TestSuite.ApiTests
                 // STEP 3: Update the item and ensure that the data has not changed.
                 await _.Contents.PatchAsync(content.Id, new TestEntityData { Number = 2 });
 
-                var updated = await _.Contents.GetAsync(content.Id);
+                var updated_1 = await _.Contents.GetAsync(content.Id);
 
-                Assert.Equal(1, updated.Data.Number);
-                Assert.Null(updated.NewStatus);
+                Assert.Equal(1, updated_1.Data.Number);
 
 
                 // STEP 4: Get the unpublished version
                 var unpublished = await _.Contents.GetAsync(content.Id, QueryContext.Default.Unpublished());
 
                 Assert.Equal(2, unpublished.Data.Number);
-                Assert.Equal("Draft", unpublished.NewStatus);
+
+
+                // STEP 5: Publish draft and ensure that it has been updated.
+                await _.Contents.ChangeStatusAsync(content.Id, "Published");
+
+                var updated_2 = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, updated_2.Data.Number);
             }
             finally
             {
@@ -566,7 +572,7 @@ namespace TestSuite.ApiTests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task Should_delete_item(bool permanent)
+        public async Task Should_delete_content(bool permanent)
         {
             // STEP 1: Create a new item.
             var content = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, true);
@@ -594,7 +600,7 @@ namespace TestSuite.ApiTests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task Should_recreate_delete_item(bool permanent)
+        public async Task Should_recreate_deleted_content(bool permanent)
         {
             // STEP 1: Create a new item.
             var content_1 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, true);
@@ -613,7 +619,7 @@ namespace TestSuite.ApiTests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task Should_recreate_delete_item_with_upsert(bool permanent)
+        public async Task Should_recreate_deleted_content_with_upsert(bool permanent)
         {
             // STEP 1: Create a new item.
             var content_1 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, true);

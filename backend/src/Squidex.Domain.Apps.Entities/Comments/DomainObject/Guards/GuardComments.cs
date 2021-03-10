@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                    e(Not.Defined("Text"), nameof(command.Text));
+                    e(Not.Defined(nameof(command.Text)), nameof(command.Text));
                 }
             });
         }
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                    e(Not.Defined("Text"), nameof(command.Text));
+                    e(Not.Defined(nameof(command.Text)), nameof(command.Text));
                 }
             });
         }

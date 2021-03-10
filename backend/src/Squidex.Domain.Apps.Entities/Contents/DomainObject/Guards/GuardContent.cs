@@ -48,6 +48,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             CheckPermission(content, command, Permissions.AppContentsUpdate, Permissions.AppContentsUpsert);
 
+            Validate.It(e =>
+            {
+                if (command.Data == null)
+                {
+                    e(Not.Defined(nameof(command.Data)), nameof(command.Data));
+                }
+            });
+
             if (!command.DoNotValidateWorkflow)
             {
                 var status = content.NewStatus ?? content.Status;
@@ -57,14 +65,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                     throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
                 }
             }
-
-            Validate.It(e =>
-            {
-                if (command.Data == null)
-                {
-                    e(Not.Defined(nameof(command.Data)), nameof(command.Data));
-                }
-            });
         }
 
         public static void CanDeleteDraft(DeleteContentDraft command, IContentEntity content)
@@ -114,6 +114,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
 
             var oldStatus = content.NewStatus ?? content.Status;
+
+            if (command.Status == oldStatus)
+            {
+                return;
+            }
 
             if (oldStatus == Status.Published && command.CheckReferrers)
             {

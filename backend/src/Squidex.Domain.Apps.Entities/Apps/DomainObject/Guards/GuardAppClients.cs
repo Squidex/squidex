@@ -19,10 +19,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var clients = app.Clients;
-
             Validate.It(e =>
             {
+                var clients = app.Clients;
+
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
                     e(Not.Defined("ClientId"), nameof(command.Id));
@@ -38,9 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var clients = app.Clients;
-
-            GetClientOrThrow(clients, command.Id);
+            GetClientOrThrow(app.Clients, command.Id);
 
             Validate.It(e =>
             {
@@ -55,9 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var clients = app.Clients;
-
-            GetClientOrThrow(clients, command.Id);
+            GetClientOrThrow(app.Clients, command.Id);
 
             Validate.It(e =>
             {
