@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         }
 
         /// <summary>
-        /// Upload a new asset.
+        /// Create an asset folder.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="request">The asset folder object that needs to be added to the App.</param>
@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/assets/folders", Order = -1)]
-        [ProducesResponseType(typeof(AssetDto), 201)]
+        [ProducesResponseType(typeof(AssetFolderDto), 201)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         }
 
         /// <summary>
-        /// Updates the asset folder.
+        /// Update an asset folder.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset folder.</param>
@@ -105,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
-        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AssetFolderDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         }
 
         /// <summary>
-        /// Moves the asset folder.
+        /// Move an asset folder.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset folder.</param>
@@ -131,7 +131,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/folders/{id}/parent", Order = -1)]
-        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AssetFolderDto), StatusCodes.Status200OK)]
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]

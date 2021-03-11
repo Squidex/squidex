@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         }
 
         /// <summary>
-        /// Updates the comment.
+        /// Update a comment.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="commentsId">The id of the comments.</param>
@@ -118,7 +118,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         }
 
         /// <summary>
-        /// Deletes the comment.
+        /// Delete a comment.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="commentsId">The id of the comments.</param>

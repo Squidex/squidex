@@ -107,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Reorders the fields.
+        /// Reorder all fields.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
@@ -132,7 +132,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
-        /// Reorders the nested fields.
+        /// Reorder all nested fields.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
