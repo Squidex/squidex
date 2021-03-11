@@ -65,6 +65,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var schemaDef =
                 new Schema(schemaId.Name)
                     .Publish()
+                    .AddNumber(16, "2_numbers", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddNumber(17, "2-numbers", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddNumber(18, "content", Partitioning.Invariant,
+                        new NumberFieldProperties())
                     .AddJson(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties())
                     .AddString(2, "my-string", Partitioning.Language,
@@ -97,10 +103,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number")
                         .AddNumber(123, "nested_number"))
-                    .AddNumber(16, "2_numbers", Partitioning.Invariant,
-                        new NumberFieldProperties())
-                    .AddNumber(17, "2-numbers", Partitioning.Invariant,
-                        new NumberFieldProperties())
                     .SetScripts(new SchemaScripts { Query = "<query-script>" });
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
