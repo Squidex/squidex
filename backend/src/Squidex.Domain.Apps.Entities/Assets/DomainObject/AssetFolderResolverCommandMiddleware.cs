@@ -8,10 +8,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Caching;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using IAssetFolderCache = Squidex.Caching.ILocalCache;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
@@ -19,15 +19,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     {
         private static readonly char[] TrimChars = { '/', '\\' };
         private static readonly char[] SplitChars = { ' ', '/', '\\' };
-        private readonly ILocalCache localCache;
+        private readonly IAssetFolderCache assetFolders;
         private readonly IAssetQueryService assetQuery;
 
-        public AssetFolderResolverCommandMiddleware(ILocalCache localCache, IAssetQueryService assetQuery)
+        public AssetFolderResolverCommandMiddleware(IAssetFolderCache assetFolders, IAssetQueryService assetQuery)
         {
-            Guard.NotNull(localCache, nameof(localCache));
+            Guard.NotNull(assetFolders, nameof(assetFolders));
             Guard.NotNull(assetQuery, nameof(assetQuery));
 
-            this.localCache = localCache;
+            this.assetFolders = assetFolders;
             this.assetQuery = assetQuery;
         }
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             {
                 var subPath = string.Join('/', elements.Take(i));
 
-                if (localCache.TryGetValue(GetCacheKey(subPath), out var cached) && cached is DomainId id)
+                if (assetFolders.TryGetValue(GetCacheKey(subPath), out var cached) && cached is DomainId id)
                 {
                     currentId = id;
                     break;
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         var childPath = string.Join('/', elements.Take(i).Union(Enumerable.Repeat(child.FolderName, 1)));
 
-                        localCache.Add(GetCacheKey(childPath), child.Id);
+                        assetFolders.Add(GetCacheKey(childPath), child.Id);
                     }
 
                     foreach (var child in children)
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 var newPath = string.Join('/', elements.Take(i).Union(Enumerable.Repeat(name, 1)));
 
-                localCache.Add(GetCacheKey(newPath), currentId);
+                assetFolders.Add(GetCacheKey(newPath), currentId);
             }
 
             return currentId;

@@ -12,12 +12,13 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
+using IAssetFolderCache = Squidex.Caching.ILocalCache;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public class AssetFolderResolverCommandMiddlewareTests
     {
-        private readonly ILocalCache localCache = new AsyncLocalCache();
+        private readonly IAssetFolderCache assetFolders = new AsyncLocalCache();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -25,9 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetFolderResolverCommandMiddlewareTests()
         {
-            localCache.StartContext();
+            assetFolders.StartContext();
 
-            sut = new AssetFolderResolverCommandMiddleware(localCache, assetQuery);
+            sut = new AssetFolderResolverCommandMiddleware(assetFolders, assetQuery);
         }
 
         [Theory]
