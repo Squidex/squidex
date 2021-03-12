@@ -28,15 +28,20 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     {
         private readonly IContentRepository contentRepository;
         private readonly IAssetTagService assetTags;
+        private readonly IAssetQueryService assetQuery;
 
         public AssetDomainObject(IStore<DomainId> store, ISemanticLog log,
-            IAssetTagService assetTags, IContentRepository contentRepository)
+            IAssetTagService assetTags,
+            IAssetQueryService assetQuery,
+            IContentRepository contentRepository)
             : base(store, log)
         {
             Guard.NotNull(assetTags, nameof(assetTags));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.assetTags = assetTags;
+            this.assetQuery = assetQuery;
             this.contentRepository = contentRepository;
 
             Capacity = int.MaxValue;
@@ -82,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                         if (Is.OptionalChange(Snapshot.ParentId, c.ParentId))
                         {
-                            MoveCore(c.AsMove(c.ParentId.Value));
+                            await MoveCore(c.AsMove(c.ParentId.Value));
                         }
 
                         return Snapshot;
@@ -95,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                         if (Is.Change(Snapshot.ParentId, c.ParentId))
                         {
-                            MoveCore(c.AsMove());
+                            await MoveCore(c.AsMove());
                         }
 
                         return Snapshot;
@@ -125,9 +130,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     });
 
                 case MoveAsset move:
-                    return UpdateReturn(move, c =>
+                    return UpdateReturnAsync(move, async c =>
                     {
-                        MoveCore(c);
+                        await MoveCore(c);
 
                         return Snapshot;
                     });
@@ -160,9 +165,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             Create(create);
         }
 
-        private void MoveCore(MoveAsset move)
+        private async Task MoveCore(MoveAsset move)
         {
-            GuardAsset.CanMove(move);
+            await GuardAsset.CanMove(move, Snapshot, assetQuery);
 
             Move(move);
         }

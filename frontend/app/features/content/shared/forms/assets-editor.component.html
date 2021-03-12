@@ -26,6 +26,7 @@
                     [assetFile]="file"
                     [isDisabled]="snapshot.isDisabled"
                     [isCompact]="snapshot.isCompact"
+                    [folderPath]="folderPath"
                     (loadError)="removeLoadingAsset(file)"
                     (load)="addAsset(file, $event)">
                 </sqx-asset>

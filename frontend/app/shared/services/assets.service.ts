@@ -285,7 +285,7 @@ export class AssetsService {
         let url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
         if (parent?.parentPath) {
-            url += `?parentFolder=${parent.parentPath}`;
+            url += `?parentPath=${parent.parentPath}`;
         } else if (parent?.parentId) {
             url += `?parentId=${parent.parentId}`;
         }

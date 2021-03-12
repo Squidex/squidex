@@ -7,7 +7,6 @@
 
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Assets.Folders;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
@@ -26,25 +25,17 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         public static void CanCreate(CreateAsset command)
         {
             Guard.NotNull(command, nameof(command));
-
-            Validate.It(e =>
-            {
-                if (command.ParentId == FolderId.NotFound)
-                {
-                    e(T.Get("assets.folderNotFound"), nameof(MoveAsset.ParentId));
-                }
-            });
         }
 
-        public static void CanMove(MoveAsset command)
+        public static Task CanMove(MoveAsset command, IAssetEntity asset, IAssetQueryService assetQuery)
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(e =>
+            return Validate.It(async e =>
             {
-                if (command.ParentId == FolderId.NotFound)
+                if (command.ParentId != asset.ParentId)
                 {
-                    e(T.Get("assets.folderNotFound"), nameof(MoveAsset.ParentId));
+                    await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, e);
                 }
             });
         }
@@ -65,6 +56,19 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
                 if (hasReferrer)
                 {
                     throw new DomainException(T.Get("assets.referenced"));
+                }
+            }
+        }
+
+        private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, AddValidation e)
+        {
+            if (parentId != DomainId.Empty)
+            {
+                var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
+
+                if (path.Count == 0)
+                {
+                    e(T.Get("assets.folderNotFound"), nameof(MoveAsset.ParentId));
                 }
             }
         }

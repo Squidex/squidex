@@ -68,16 +68,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(DomainId appId, DomainId parentId)
-        {
-            using (Profiler.TraceMethod<AssetQueryService>())
-            {
-                var assetFolders = await assetFolderRepository.QueryAsync(appId, parentId);
-
-                return assetFolders;
-            }
-        }
-
         public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId)
         {
             using (Profiler.TraceMethod<AssetQueryService>())

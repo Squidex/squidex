@@ -79,9 +79,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<AssetFolderCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
             services.AddSingletonAs<ContentsBulkUpdateCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
@@ -92,6 +89,9 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<CommentsCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<GrainCommandMiddleware<AssetFolderCommand, IAssetFolderGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()

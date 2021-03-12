@@ -7,7 +7,6 @@
 
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Assets.Folders;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -16,26 +15,18 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 {
     public static class GuardAssetFolder
     {
-        public static void CanCreate(CreateAssetFolder command)
+        public static Task CanCreate(CreateAssetFolder command, IAssetQueryService assetQuery)
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(e =>
+            return Validate.It(async e =>
             {
                 if (string.IsNullOrWhiteSpace(command.FolderName))
                 {
                     e(Not.Defined(nameof(command.FolderName)), nameof(command.FolderName));
                 }
 
-                if (command.ParentId == FolderId.NotFound)
-                {
-                    e(T.Get("assets.folderNotFound"), nameof(CreateAssetFolder.ParentId));
-                }
-
-                if (command.ParentId == FolderId.NotValid)
-                {
-                    e(T.Get("assets.folderRecursion"), nameof(MoveAssetFolder.ParentId));
-                }
+                await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, DomainId.Empty, e);
             });
         }
 
@@ -52,20 +43,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             });
         }
 
-        public static void CanMove(MoveAssetFolder command)
+        public static Task CanMove(MoveAssetFolder command, IAssetFolderEntity assetFolder, IAssetQueryService assetQuery)
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(e =>
+            return Validate.It(async e =>
             {
-                if (command.ParentId == FolderId.NotFound)
+                if (command.ParentId != assetFolder.ParentId)
                 {
-                    e(T.Get("assets.folderNotFound"), nameof(CreateAssetFolder.ParentId));
-                }
-
-                if (command.ParentId == FolderId.NotValid)
-                {
-                    e(T.Get("assets.folderRecursion"), nameof(MoveAssetFolder.ParentId));
+                    await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, assetFolder.Id, e);
                 }
             });
         }
@@ -73,6 +59,29 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         public static void CanDelete(DeleteAssetFolder command)
         {
             Guard.NotNull(command, nameof(command));
+        }
+
+        private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, DomainId id, AddValidation e)
+        {
+            if (parentId != DomainId.Empty)
+            {
+                var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
+
+                if (path.Count == 0)
+                {
+                    e(T.Get("assets.folderNotFound"), nameof(MoveAssetFolder.ParentId));
+                }
+                else if (id != DomainId.Empty)
+                {
+                    var indexOfSelf = path.IndexOf(x => x.Id == id);
+                    var indexOfParent = path.IndexOf(x => x.Id == parentId);
+
+                    if (indexOfSelf >= 0 && indexOfParent > indexOfSelf)
+                    {
+                        e(T.Get("assets.folderRecursion"), nameof(MoveAssetFolder.ParentId));
+                    }
+                }
+            }
         }
     }
 }

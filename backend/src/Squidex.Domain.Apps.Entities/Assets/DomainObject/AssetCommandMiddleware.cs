@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Assets.Folders;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -80,7 +79,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                                 }
                             }
 
-                            await EnrichWithParentAsync(createAsset);
+                            if (!string.IsNullOrWhiteSpace(createAsset.ParentPath))
+                            {
+                                createAsset.ParentId =
+                                    await assetFolderResolver.ResolveOrCreateAsync(
+                                        contextProvider.Context,
+                                        context.CommandBus,
+                                        createAsset.ParentPath);
+                            }
+
                             await EnrichWithMetadataAsync(createAsset);
 
                             await base.HandleAsync(context, next);
@@ -97,7 +104,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 case MoveAsset move:
                     {
-                        await EnrichWithParentAsync(move);
+                        if (!string.IsNullOrWhiteSpace(move.ParentPath))
+                        {
+                            move.ParentId =
+                                await assetFolderResolver.ResolveOrCreateAsync(
+                                    contextProvider.Context,
+                                    context.CommandBus,
+                                    move.ParentPath);
+                        }
 
                         await base.HandleAsync(context, next);
 
@@ -106,7 +120,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 case UpsertAsset upsert:
                     {
-                        await EnrichWithParentAsync(upsert);
+                        if (!string.IsNullOrWhiteSpace(upsert.ParentPath))
+                        {
+                            upsert.ParentId =
+                                await assetFolderResolver.ResolveOrCreateAsync(
+                                    contextProvider.Context,
+                                    context.CommandBus,
+                                    upsert.ParentPath);
+                        }
 
                         await UploadAndHandleAsync(context, next, upsert);
 
@@ -124,35 +145,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     await base.HandleAsync(context, next);
                     break;
             }
-        }
-
-        private async Task EnrichWithParentAsync<T>(T command) where T : AssetCommand, IMoveAssetCommand
-        {
-            var request = new ResolveRequest(command.User!)
-            {
-                ParentId = command.ParentId,
-                ParentPath = command.ParentPath,
-                Create = true
-            };
-
-            command.ParentId = await assetFolderResolver.ResolveOrCreateAsync(command.AppId, request);
-        }
-
-        private async Task EnrichWithParentAsync(UpsertAsset command)
-        {
-            if (command.ParentId == null && string.IsNullOrWhiteSpace(command.ParentPath))
-            {
-                return;
-            }
-
-            var request = new ResolveRequest(command.User!)
-            {
-                ParentId = command.ParentId,
-                ParentPath = command.ParentPath,
-                Create = true
-            };
-
-            command.ParentId = await assetFolderResolver.ResolveOrCreateAsync(command.AppId, request);
         }
 
         private async Task UploadAndHandleAsync(CommandContext context, NextDelegate next, UploadAssetCommand upload)
