@@ -22,15 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDomainObject.State>
     {
-        private readonly IAssetQueryService assetQuery;
-
-        public AssetFolderDomainObject(IStore<DomainId> store, ISemanticLog log,
-            IAssetQueryService assetQuery)
+        public AssetFolderDomainObject(IStore<DomainId> store, ISemanticLog log)
             : base(store, log)
         {
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-
-            this.assetQuery = assetQuery;
         }
 
         protected override bool IsDeleted()
@@ -55,9 +49,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             switch (command)
             {
                 case CreateAssetFolder c:
-                    return CreateReturnAsync(c, async create =>
+                    return CreateReturn(c, create =>
                     {
-                        await GuardAssetFolder.CanCreate(create, assetQuery);
+                        GuardAssetFolder.CanCreate(create);
 
                         Create(create);
 
@@ -65,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     });
 
                 case MoveAssetFolder move:
-                    return UpdateReturnAsync(move, async c =>
+                    return CreateReturn(move, c =>
                     {
-                        await GuardAssetFolder.CanMove(c, Snapshot, assetQuery);
+                        GuardAssetFolder.CanMove(c);
 
                         Move(c);
 

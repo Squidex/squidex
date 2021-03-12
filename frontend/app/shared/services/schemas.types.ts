@@ -188,6 +188,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly resolveFirst: boolean;
     public readonly aspectHeight?: number;
     public readonly aspectWidth?: number;
+    public readonly folderPath?: string;
     public readonly maxHeight?: number;
     public readonly maxItems?: number;
     public readonly maxSize?: number;

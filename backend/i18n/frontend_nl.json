@@ -734,6 +734,8 @@
   "schemas.fieldTypes.assets.countMin": "Min. bestanden",
   "schemas.fieldTypes.assets.description": "Afbeeldingen, video's, documenten.",
   "schemas.fieldTypes.assets.fileExtensions": "Bestandsextensies",
+  "schemas.fieldTypes.assets.folderPath": "Folder path",
+  "schemas.fieldTypes.assets.folderPathHint": "The path to the asset folder where the new assets will be uploaded to. Will be created automatically",
   "schemas.fieldTypes.assets.mustBeImage": "Moet afbeelding zijn",
   "schemas.fieldTypes.assets.previewFileName": "Alleen bestandsnaam",
   "schemas.fieldTypes.assets.previewImage": "Alleen miniatuur- of bestandsnaam indien geen afbeelding",

@@ -228,11 +228,11 @@ describe('AssetsService', () => {
 
         let asset: AssetDto;
 
-        assetsService.postAssetFile('my-app', null!, 'parent1').subscribe(result => {
+        assetsService.postAssetFile('my-app', null!).subscribe(result => {
             asset = <AssetDto>result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?parentId=parent1');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
 
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -242,16 +242,35 @@ describe('AssetsService', () => {
         expect(asset!).toEqual(createAsset(12));
     }));
 
-    it('should make post without parent id to create asset',
+    it('should make post with parent id to create asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
         let asset: AssetDto;
 
-        assetsService.postAssetFile('my-app', null!).subscribe(result => {
+        assetsService.postAssetFile('my-app', null!, { parentId: 'parent1' }).subscribe(result => {
             asset = <AssetDto>result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?parentId=parent');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush(assetResponse(12));
+
+        expect(asset!).toEqual(createAsset(12));
+    }));
+
+    it('should make post with parent path to create asset',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        let asset: AssetDto;
+
+        assetsService.postAssetFile('my-app', null!, { parentId: 'parent1' }).subscribe(result => {
+            asset = <AssetDto>result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?parentPath=parent1');
 
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -267,13 +286,13 @@ describe('AssetsService', () => {
         let asset: AssetDto;
         let error: ErrorDto;
 
-        assetsService.postAssetFile('my-app', null!, 'parent1').subscribe(result => {
+        assetsService.postAssetFile('my-app', null!).subscribe(result => {
             asset = <AssetDto>result;
         }, e => {
             error = e;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?parentId=parent1');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
 
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();

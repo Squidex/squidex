@@ -138,17 +138,17 @@ export interface AnnotateAssetDto {
     readonly metadata?: { [key: string]: any };
 }
 
-export interface CreateAssetFolderDto {
-    readonly parentId?: string;
+export interface CreateAssetFolderDto extends AssetParentDto {
     readonly folderName: string;
+}
+
+export interface AssetParentDto {
+    readonly parentId?: string;
+    readonly parentPath?: string;
 }
 
 export interface RenameAssetFolderDto {
     readonly folderName: string;
-}
-
-export interface MoveAssetItemDto {
-    readonly parentId?: string;
 }
 
 export interface AssetQueryDto {
@@ -281,11 +281,13 @@ export class AssetsService {
             pretifyError('i18n:assets.loadFailed'));
     }
 
-    public postAssetFile(appName: string, file: Blob, parentId?: string): Observable<number | AssetDto> {
+    public postAssetFile(appName: string, file: Blob, parent?: AssetParentDto): Observable<number | AssetDto> {
         let url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
-        if (parentId) {
-            url += `?parentId=${parentId}`;
+        if (parent?.parentPath) {
+            url += `?parentFolder=${parent.parentPath}`;
+        } else if (parent?.parentId) {
+            url += `?parentId=${parent.parentId}`;
         }
 
         return HTTP.upload(this.http, 'POST', url, file).pipe(
@@ -396,7 +398,7 @@ export class AssetsService {
             pretifyError('i18n:assets.updateFolderFailed'));
     }
 
-    public putAssetItemParent(appName: string, resource: Resource, dto: MoveAssetItemDto, version: Version): Observable<Versioned<any>> {
+    public putAssetItemParent(appName: string, resource: Resource, dto: AssetParentDto, version: Version): Observable<Versioned<any>> {
         const link = resource._links['move'];
 
         const url = this.apiUrl.buildUrl(link.href);

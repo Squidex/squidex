@@ -30,7 +30,7 @@
                     </sqx-array-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Assets'">
-                    <sqx-assets-editor [formControl]="editorControl"></sqx-assets-editor>
+                    <sqx-assets-editor [formControl]="editorControl" [folderPath]="field.rawProperties.folderPath"></sqx-assets-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Boolean'">
                     <ng-container [ngSwitch]="field.rawProperties.editor">

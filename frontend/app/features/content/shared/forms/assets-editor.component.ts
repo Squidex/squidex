@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppsState, AssetDto, AssetsService, DialogModel, LocalStoreService, MessageBus, Settings, sorted, StatefulControlComponent, Types } from '@app/shared';
 
@@ -46,6 +46,9 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
+    @Input()
+    public folderPath?: string;
+
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,

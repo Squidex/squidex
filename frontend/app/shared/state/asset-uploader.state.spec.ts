@@ -57,7 +57,7 @@ describe('AssetUploaderState', () => {
 
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.postAssetFile(app, file, 'parent1'))
+        assetsService.setup(x => x.postAssetFile(app, file, { parentId: 'parent1' }))
             .returns(() => NEVER).verifiable();
 
         assetUploader.uploadFile(file, assetsState.object).subscribe();

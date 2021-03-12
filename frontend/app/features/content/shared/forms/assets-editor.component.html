@@ -47,6 +47,7 @@
                     (load)="addAsset(file, $event)"
                     (loadError)="removeLoadingAsset(file)"
                     [assetFile]="file"
+                    [folderPath]="folderPath"
                     [isCompact]="snapshot.isCompact"
                     [isDisabled]="snapshot.isDisabled"
                     [isListView]="true">

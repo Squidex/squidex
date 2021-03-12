@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class MoveAsset : AssetCommand
+    public sealed class MoveAsset : AssetCommand, IMoveAssetCommand
     {
         public DomainId ParentId { get; set; }
 
