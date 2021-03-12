@@ -1,51 +1,13 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: squidex-45
-  annotations:
-    iam.amazonaws.com/permitted: ".*"
----
-apiVersion: 'kubernetes-client.io/v1'
-kind: ExternalSecret
-metadata:
-  name: squidex
-  namespace: squidex-45
-spec:
-  backendType: secretsManager
-  data:
-    - key: ${SQUIDEX_45_SECRET}
-      name: mongo_connection_string
-      property: mongo_connection_string
-    - key: ${SQUIDEX_45_SECRET}
-      name: squidex_admin_password
-      property: squidex_admin_password
-    - key: ${SQUIDEX_45_SECRET}
-      name: google_auth_client_id
-      property: google_auth_client_id
-    - key: ${SQUIDEX_45_SECRET}
-      name: google_auth_secret
-      property: google_auth_secret
-    - key: squidex-user
-      name: iam_access_key
-      property: iam_access_key
-    - key: squidex-user
-      name: iam_secret_key
-      property: iam_secret_key
-    - key: squidex-user
-      name: email_smtp_password
-      property: email_smtp_password
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: squidex-v1
-  namespace: squidex-45
+  name: squidex
 spec:
   replicas: 1
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: squidex-v1
+      app: squidex
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -54,11 +16,11 @@ spec:
   template:
     metadata:
       labels:
-        app: squidex-v1
+        app: squidex
     spec:
       containers:
         - name: squidex
-          image: squidex/squidex:${SQUIDEX_45_VERSION_TAG}
+          image: squidex/squidex:4.5.1
           imagePullPolicy: Always
           resources:
             requests:
@@ -85,14 +47,20 @@ spec:
             - name: IDENTITY__ADMINRECREATE
               value: "true"
             - name: IDENTITY__ADMINEMAIL
-              value: "${SQUIDEX_45_ADMINEMAL}"
+              valueFrom:
+                secretKeyRef:
+                  name: squidex-params
+                  key: ADMIN_EMAIL
             - name: IDENTITY__ADMINPASSWORD
               valueFrom:
                 secretKeyRef:
                   name: squidex
                   key: squidex_admin_password
             - name: URLS__BASEURL
-              value: "https://${SQUIDEX_45_DOMAIN_NAME}"
+              valueFrom:
+                secretKeyRef:
+                  name: squidex-params
+                  key: DOMAIN
             - name: URLS__ENFORCEHTTPS
               value: "false"
             - name: HEALTHZ__GC__THRESHOLD
@@ -122,9 +90,12 @@ spec:
             - name: ASSETSTORE__TYPE
               value: "AmazonS3"
             - name: ASSETSTORE__AMAZONS3__BUCKET
-              value: "${SQUIDEX_45_ASSET_BUCKET}"
+              valueFrom:
+                secretKeyRef:
+                  name: squidex-params
+                  key: S3_BUCKET
             - name: ASSETSTORE__AMAZONS3__REGIONNAME
-              value: "${AWS_DEFAULT_REGION}"
+              value: "us-east-1"
             - name: ASSETSTORE__AMAZONS3__ACCESSKEY
               valueFrom:
                 secretKeyRef:
@@ -136,13 +107,11 @@ spec:
                   name: squidex
                   key: iam_secret_key
             - name: IDENTITY__GOOGLECLIENT
-              value: "${SQUIDEX_45_FASTLY_BETA_GOOGLE_CLIENT}"
               valueFrom:
                 secretKeyRef:
                   name: squidex
                   key: google_auth_client_id
             - name: IDENTITY__GOOGLESECRET
-              value: "${SQUIDEX_45_FASTLY_BETA_GOOGLE_SECRET}"
               valueFrom:
                 secretKeyRef:
                   name: squidex
@@ -150,15 +119,8 @@ spec:
             # Specifically Blanking out to deactive these options
             - name: IDENTITY__GITHUBCLIENT
               value: ""
-            - name: IDENTITY__GITHUBCLIENT
-              value: ""
             - name: IDENTITY__MICROSOFTCLIENT
               value: ""
-            - name: IDENTITY__MICROSOFTCLIENT
-              value: ""
-
-            # - name: CACHING__MAXSURROGATEKEYSSIZE
-            #   value: "0"
             - name: LOGGING__DATADOG
               value: "true"
             - name: DD_AGENT_HOST
@@ -181,45 +143,3 @@ spec:
             - name: EMAIL__SMTP__PORT
               value: "587"
       terminationGracePeriodSeconds: 30
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: squidex
-  namespace: squidex-45
-  labels:
-    name: squidex
-spec:
-  ports:
-    - port: 80
-      targetPort: 80
-  selector:
-    app: squidex-v1
-  type: NodePort
----
-kind: Ingress
-apiVersion: networking.k8s.io/v1beta1
-metadata:
-  namespace: squidex-45
-  name: squidex
-  annotations:
-    # use the shared ingress-nginx
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: "200m"
-    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
-    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,X-LANG,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,X-Api-Key,X-Device-Id,Access-Control-Allow-Origin"
-spec:
-  rules:
-    - host: ${SQUIDEX_45_DOMAIN_NAME}
-      http:
-        paths:
-        - path: /
-          backend:
-            serviceName: squidex
-            servicePort: 80
