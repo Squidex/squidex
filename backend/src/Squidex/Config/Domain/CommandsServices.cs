@@ -76,6 +76,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetsBulkUpdateCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<AssetFolderResolverCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 

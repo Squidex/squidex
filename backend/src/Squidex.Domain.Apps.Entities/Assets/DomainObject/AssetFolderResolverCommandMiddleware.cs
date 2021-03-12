@@ -15,14 +15,14 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
-    public sealed class AssetFolderResolver : IAssetFolderResolver
+    public sealed class AssetFolderResolverCommandMiddleware : ICommandMiddleware
     {
         private static readonly char[] TrimChars = { '/', '\\' };
         private static readonly char[] SplitChars = { ' ', '/', '\\' };
         private readonly ILocalCache localCache;
         private readonly IAssetQueryService assetQuery;
 
-        public AssetFolderResolver(ILocalCache localCache, IAssetQueryService assetQuery)
+        public AssetFolderResolverCommandMiddleware(ILocalCache localCache, IAssetQueryService assetQuery)
         {
             Guard.NotNull(localCache, nameof(localCache));
             Guard.NotNull(assetQuery, nameof(assetQuery));
@@ -31,11 +31,30 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             this.assetQuery = assetQuery;
         }
 
-        public async Task<DomainId> ResolveOrCreateAsync(Context context, ICommandBus commandBus, string path)
+        public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            Guard.NotNull(commandBus, nameof(commandBus));
-            Guard.NotNull(path, nameof(path));
+            switch (context.Command)
+            {
+                case IMoveAssetCommand move:
+                    if (!string.IsNullOrWhiteSpace(move.ParentPath))
+                    {
+                        move.ParentId = await ResolveOrCreateAsync(context.CommandBus, move.AppId.Id, move.ParentPath);
+                    }
 
+                    break;
+
+                case UpsertAsset upsert:
+                    if (!string.IsNullOrWhiteSpace(upsert.ParentPath))
+                    {
+                        upsert.ParentId = await ResolveOrCreateAsync(context.CommandBus, upsert.AppId.Id, upsert.ParentPath);
+                    }
+
+                    break;
+            }
+        }
+
+        private async Task<DomainId> ResolveOrCreateAsync(ICommandBus commandBus, DomainId appId, string path)
+        {
             path = path.Trim(TrimChars);
 
             var elements = path.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
@@ -60,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 }
             }
 
-            var creating = false;
+            var currentCreated = false;
 
             for (; i < elements.Length; i++)
             {
@@ -68,9 +87,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 var isResolved = false;
 
-                if (!creating)
+                if (!currentCreated)
                 {
-                    var children = await assetQuery.QueryAssetFoldersAsync(context, currentId);
+                    var children = await assetQuery.QueryAssetFoldersAsync(appId, currentId);
 
                     foreach (var child in children)
                     {
@@ -98,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     await commandBus.PublishAsync(command);
 
                     currentId = command.AssetFolderId;
-                    creating = true;
+                    currentCreated = true;
                 }
 
                 var newPath = string.Join('/', elements.Take(i).Union(Enumerable.Repeat(name, 1)));

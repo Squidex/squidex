@@ -735,7 +735,7 @@
   "schemas.fieldTypes.assets.description": "Images, videos, documents.",
   "schemas.fieldTypes.assets.fileExtensions": "File Extensions",
   "schemas.fieldTypes.assets.folderPath": "Folder path",
-  "schemas.fieldTypes.assets.folderPathHint": "The path to the asset folder where the new assets will be uploaded to. Will be created automatically",
+  "schemas.fieldTypes.assets.folderPathHint": "The path to the asset folder where the new assets will be uploaded to. Will be created automatically, but it can create duplicate folders. Therefore it is recommended to create the folder first.",
   "schemas.fieldTypes.assets.mustBeImage": "Must be Image",
   "schemas.fieldTypes.assets.previewFileName": "Only file name",
   "schemas.fieldTypes.assets.previewImage": "Only thumbnail or file name if not an image",
