@@ -172,10 +172,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Upload a new asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="parentId">The optional parent folder id.</param>
-        /// <param name="file">The file to upload.</param>
-        /// <param name="id">The optional custom asset id.</param>
-        /// <param name="duplicate">True to duplicate the asset, event if the file has been uploaded.</param>
+        /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 201 => Asset created.
         /// 400 => Asset request not valid.
@@ -191,16 +188,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, [FromQuery] DomainId parentId, IFormFile file, [FromQuery] DomainId? id = null, [FromQuery] bool duplicate = false)
+        public async Task<IActionResult> PostAsset(string app, CreateAssetDto request)
         {
-            var assetFile = await CheckAssetFileAsync(file);
-
-            var command = new CreateAsset { File = assetFile, ParentId = parentId, Duplicate = duplicate };
-
-            if (id != null && id.Value != default && !string.IsNullOrWhiteSpace(id.Value.ToString()))
-            {
-                command.AssetId = id.Value;
-            }
+            var command = request.ToCommand(await CheckAssetFileAsync(request.File));
 
             var response = await InvokeCommandAsync(command);
 
@@ -238,9 +228,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Upsert an asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="parentId">The optional parent folder id.</param>
-        /// <param name="file">The file to upload.</param>
         /// <param name="id">The optional custom asset id.</param>
+        /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 200 => Asset created or updated.
         /// 400 => Asset request not valid.
@@ -256,11 +245,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostUpsertAsset(string app, DomainId id, [FromQuery] DomainId? parentId, IFormFile file)
+        public async Task<IActionResult> PostUpsertAsset(string app, DomainId id, UpsertAssetDto request)
         {
-            var assetFile = await CheckAssetFileAsync(file);
-
-            var command = new UpsertAsset { File = assetFile, ParentId = parentId, AssetId = id };
+            var command = request.ToCommand(id, await CheckAssetFileAsync(request.File));
 
             var response = await InvokeCommandAsync(command);
 
@@ -289,9 +276,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetContent(string app, DomainId id, IFormFile file)
         {
-            var assetFile = await CheckAssetFileAsync(file);
-
-            var command = new UpdateAsset { File = assetFile, AssetId = id };
+            var command = new UpdateAsset { File = await CheckAssetFileAsync(file), AssetId = id };
 
             var response = await InvokeCommandAsync(command);
 
@@ -299,7 +284,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         }
 
         /// <summary>
-        /// Updates the asset.
+        /// Update an asset.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset.</param>
