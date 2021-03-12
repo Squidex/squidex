@@ -148,39 +148,38 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string this[IField field]
         {
-            get
-            {
-                return this[field.Name.ToCamelCase()];
-            }
+            get => GetName(field.Name.ToCamelCase(), false);
         }
 
         public string this[string name]
         {
-            get
+            get => GetName(name, true);
+        }
+
+        private string GetName(string name, bool isEntity)
+        {
+            Guard.NotNullOrEmpty(name, nameof(name));
+
+            if (!char.IsLetter(name[0]))
             {
-                Guard.NotNullOrEmpty(name, nameof(name));
-
-                if (!char.IsLetter(name[0]))
-                {
-                    name = "gql_" + name;
-                }
-                else if (name.Equals("Content", StringComparison.OrdinalIgnoreCase))
-                {
-                    name = $"{name}Entity";
-                }
-
-                // Avoid duplicate names.
-                if (!takenNames.TryGetValue(name, out var offset))
-                {
-                    takenNames[name] = 0;
-                    return name;
-                }
-
-                takenNames[name] = ++offset;
-
-                // Add + 1 to all offset for backwars compatibility.
-                return $"{name}{offset + 1}";
+                name = "gql_" + name;
             }
+            else if (name.Equals("Content", StringComparison.OrdinalIgnoreCase) && isEntity)
+            {
+                name = $"{name}Entity";
+            }
+
+            // Avoid duplicate names.
+            if (!takenNames.TryGetValue(name, out var offset))
+            {
+                takenNames[name] = 0;
+                return name;
+            }
+
+            takenNames[name] = ++offset;
+
+            // Add + 1 to all offset for backwars compatibility.
+            return $"{name}{offset + 1}";
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
         }
 
         /// <summary>
-        /// Deletes the notification.
+        /// Delete a notification.
         /// </summary>
         /// <param name="userId">The user id.</param>
         /// <param name="commentId">The id of the comment.</param>
