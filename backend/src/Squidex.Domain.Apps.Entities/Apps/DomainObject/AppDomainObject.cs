@@ -291,7 +291,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                         else
                         {
-                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId, c.Referer);
+                            var result =
+                                await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier,
+                                    Snapshot.NamedId(), c.PlanId, c.Referer);
 
                             switch (result)
                             {
