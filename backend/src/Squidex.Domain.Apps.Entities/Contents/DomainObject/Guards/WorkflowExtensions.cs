@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
@@ -17,20 +16,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
     {
         public static Task<Status> GetInitialStatusAsync(this OperationContext context)
         {
-            var contentWorkflow = context.Services.GetRequiredService<IContentWorkflow>();
+            var workflow = GetWorkflow(context);
 
-            return contentWorkflow.GetInitialStatusAsync(context.Schema);
+            return workflow.GetInitialStatusAsync(context.Schema);
         }
 
         public static async Task CheckTransitionAsync(this OperationContext context, Status status)
         {
             if (!context.SchemaDef.IsSingleton)
             {
-                var contentWorkflow = context.Services.GetRequiredService<IContentWorkflow>();
+                var workflow = GetWorkflow(context);
 
-                var oldStatus = context.Content.EditingStatus;
+                var oldStatus = context.Content.EditingStatus();
 
-                if (!await contentWorkflow.CanMoveToAsync(context.Content, oldStatus, status, context.User))
+                if (!await workflow.CanMoveToAsync(context.Content, oldStatus, status, context.User))
                 {
                     var values = new { oldStatus, newStatus = status };
 
@@ -44,9 +43,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             if (!context.SchemaDef.IsSingleton)
             {
-                var contentWorkflow = context.Services.GetRequiredService<IContentWorkflow>();
+                var workflow = GetWorkflow(context);
 
-                var statusInfo = await contentWorkflow.GetInfoAsync(context.Content, status);
+                var statusInfo = await workflow.GetInfoAsync(context.Content, status);
 
                 if (statusInfo == null)
                 {
@@ -60,15 +59,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             if (context.User != null)
             {
-                var contentWorkflow = context.Services.GetRequiredService<IContentWorkflow>();
+                var workflow = GetWorkflow(context);
 
-                var status = context.Content.EditingStatus;
+                var status = context.Content.EditingStatus();
 
-                if (!await contentWorkflow.CanUpdateAsync(context.Content, status, context.User))
+                if (!await workflow.CanUpdateAsync(context.Content, status, context.User))
                 {
                     throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
                 }
             }
+        }
+
+        private static IContentWorkflow GetWorkflow(OperationContext context)
+        {
+            return context.Resolve<IContentWorkflow>();
         }
     }
 }

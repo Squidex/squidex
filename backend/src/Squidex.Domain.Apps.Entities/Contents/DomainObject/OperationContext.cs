@@ -21,9 +21,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
     public sealed class OperationContext
     {
-        public List<ValidationError> Errors { get; } = new List<ValidationError>();
+        private readonly List<ValidationError> errors = new List<ValidationError>();
+        private readonly IServiceProvider serviceProvider;
 
-        public IServiceProvider Services { get; }
+        public ClaimsPrincipal? User { get; init; }
+
+        public RefToken Actor { get; init; }
 
         public IAppEntity App { get; init; }
 
@@ -31,13 +34,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public DomainId ContentId { get; init; }
 
-        public ClaimsPrincipal? User { get; init; }
+        public Func<IContentEntity> ContentProvider { get; init; }
 
-        public RefToken Actor { get; init; }
-
-        public Func<ContentDomainObject.State> ContentProvider { get; init; }
-
-        public ContentDomainObject.State Content
+        public IContentEntity Content
         {
             get => ContentProvider();
         }
@@ -51,10 +50,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
-            Services = serviceProvider;
+            this.serviceProvider = serviceProvider;
         }
 
-        public static async Task<OperationContext> CreateAsync(IServiceProvider services, ContentCommand command, Func<ContentDomainObject.State> snapshot)
+        public static async Task<OperationContext> CreateAsync(IServiceProvider services, ContentCommand command, Func<IContentEntity> snapshot)
         {
             var appProvider = services.GetRequiredService<IAppProvider>();
 
@@ -81,16 +80,42 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             };
         }
 
-        public void AddError(string message, params string[] propertyNames)
+        public T Resolve<T>()
         {
-            Errors.Add(new ValidationError(message, propertyNames));
+            return serviceProvider.GetRequiredService<T>();
+        }
+
+        public T? ResolveOptional<T>() where T : class
+        {
+            return serviceProvider.GetService(typeof(T)) as T;
+        }
+
+        public OperationContext AddError(string message, params string[] propertyNames)
+        {
+            errors.Add(new ValidationError(message, propertyNames));
+
+            return this;
+        }
+
+        public OperationContext AddError(ValidationError newError)
+        {
+            errors.Add(newError);
+
+            return this;
+        }
+
+        public OperationContext AddErrors(IEnumerable<ValidationError> newErrors)
+        {
+            errors.AddRange(newErrors);
+
+            return this;
         }
 
         public void ThrowOnErrors()
         {
-            if (Errors.Count > 0)
+            if (errors.Count > 0)
             {
-                throw new ValidationException(Errors);
+                throw new ValidationException(errors);
             }
         }
     }

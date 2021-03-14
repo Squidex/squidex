@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             IServiceProvider serviceProvider)
             : base(store, log)
         {
-            Infrastructure.Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             this.serviceProvider = serviceProvider;
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             await CreateCore(c.AsCreate(), operation);
                         }
 
-                        if (Is.OptionalChange(operation.Content.EditingStatus, c.Status))
+                        if (Is.OptionalChange(operation.Content.EditingStatus(), c.Status))
                         {
                             await ChangeCore(c.AsChange(c.Status.Value), operation);
                         }
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             operation.MustHavePermission(Permissions.AppContentsChangeStatusOwn);
             operation.MustNotChangeSingleton(c.Status);
 
-            if (c.Status == Snapshot.EditingStatus)
+            if (c.Status == Snapshot.EditingStatus())
             {
                 return;
             }
@@ -438,7 +438,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             {
                 return StatusChange.Published;
             }
-            else if (Snapshot.EditingStatus == Status.Published)
+            else if (Snapshot.EditingStatus() == Status.Published)
             {
                 return StatusChange.Unpublished;
             }

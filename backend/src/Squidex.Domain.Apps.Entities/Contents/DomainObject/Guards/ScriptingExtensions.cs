@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 
@@ -27,17 +26,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var scriptEngine = context.Services.GetRequiredService<IScriptEngine>();
-
-                var vars = new ScriptVars
+                var vars = Enrich(context, new ScriptVars
                 {
                     Operation = "Create",
                     Data = data,
+                    DataOld = default,
                     Status = status,
                     StatusOld = default
-                }.Enrich(context);
+                });
 
-                data = await scriptEngine.TransformAsync(vars, script, Options);
+                data = await GetScriptEngine(context).TransformAsync(vars, script, Options);
             }
 
             return data;
@@ -49,18 +47,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var scriptEngine = context.Services.GetRequiredService<IScriptEngine>();
-
-                var vars = new ScriptVars
+                var vars = Enrich(context, new ScriptVars
                 {
                     Operation = "Update",
                     Data = data,
                     DataOld = context.Content.Data,
-                    Status = context.Content.EditingStatus,
+                    Status = context.Content.EditingStatus(),
                     StatusOld = default
-                }.Enrich(context);
+                });
 
-                data = await scriptEngine.TransformAsync(vars, script, Options);
+                data = await GetScriptEngine(context).TransformAsync(vars, script, Options);
             }
 
             return data;
@@ -74,17 +70,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             {
                 var data = context.Content.Data.Clone();
 
-                var scriptEngine = context.Services.GetRequiredService<IScriptEngine>();
-
-                var vars = new ScriptVars
+                var vars = Enrich(context, new ScriptVars
                 {
                     Operation = change.ToString(),
                     Data = data,
+                    DataOld = default,
                     Status = status,
-                    StatusOld = context.Content.EditingStatus
-                }.Enrich(context);
+                    StatusOld = context.Content.EditingStatus()
+                });
 
-                return await scriptEngine.TransformAsync(vars, script, Options);
+                return await GetScriptEngine(context).TransformAsync(vars, script, Options);
             }
 
             return context.Content.Data;
@@ -96,21 +91,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var scriptEngine = context.Services.GetRequiredService<IScriptEngine>();
-
-                var vars = new ScriptVars
+                var vars = Enrich(context, new ScriptVars
                 {
                     Operation = "Delete",
                     Data = context.Content.Data,
-                    Status = context.Content.EditingStatus,
+                    DataOld = default,
+                    Status = context.Content.EditingStatus(),
                     StatusOld = default
-                }.Enrich(context);
+                });
 
-                await scriptEngine.ExecuteAsync(vars, script, Options);
+                await GetScriptEngine(context).ExecuteAsync(vars, script, Options);
             }
         }
 
-        private static ScriptVars Enrich(this ScriptVars vars, OperationContext context)
+        private static IScriptEngine GetScriptEngine(OperationContext context)
+        {
+            return context.Resolve<IScriptEngine>();
+        }
+
+        private static ScriptVars Enrich(OperationContext context, ScriptVars vars)
         {
             vars.ContentId = context.ContentId;
             vars.AppId = context.App.Id;

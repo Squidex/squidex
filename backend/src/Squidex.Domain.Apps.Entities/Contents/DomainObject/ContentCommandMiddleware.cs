@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         public ContentCommandMiddleware(IGrainFactory grainFactory, IContentEnricher contentEnricher, IContextProvider contextProvider)
             : base(grainFactory)
         {
-            Infrastructure.Guard.NotNull(contentEnricher, nameof(contentEnricher));
-            Infrastructure.Guard.NotNull(contextProvider, nameof(contextProvider));
+            Guard.NotNull(contentEnricher, nameof(contentEnricher));
+            Guard.NotNull(contextProvider, nameof(contextProvider));
 
             this.contentEnricher = contentEnricher;
             this.contextProvider = contextProvider;

@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.DefaultValues;
@@ -35,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static void MustCreateDraft(this OperationContext context)
         {
-            if (context.Content.EditingStatus != Status.Published)
+            if (context.Content.EditingStatus() != Status.Published)
             {
                 throw new DomainException(T.Get("contents.draftNotCreateForUnpublished"));
             }
@@ -45,8 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             if (data == null)
             {
-                context.AddError(Not.Defined(nameof(data)), nameof(data));
-                context.ThrowOnErrors();
+                context.AddError(Not.Defined(nameof(data)), nameof(data)).ThrowOnErrors();
             }
         }
 
@@ -56,8 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             await validator.ValidateInputAsync(data);
 
-            context.Errors.AddRange(validator.Errors);
-            context.ThrowOnErrors();
+            context.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
         public static async Task ValidateInputPartialAsync(this OperationContext context, ContentData data, bool optimize)
@@ -66,19 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             await validator.ValidateInputPartialAsync(data);
 
-            context.Errors.AddRange(validator.Errors);
-            context.ThrowOnErrors();
-        }
-
-        public static async Task ValidateContentAndInputAsync(this OperationContext context, ContentData data, bool optimize)
-        {
-            var validator = GetValidator(context, optimize);
-
-            await validator.ValidateInputAsync(data);
-            await validator.ValidateContentAsync(data);
-
-            context.Errors.AddRange(validator.Errors);
-            context.ThrowOnErrors();
+            context.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
         public static async Task ValidateContentAsync(this OperationContext context, ContentData data, bool optimize)
@@ -87,8 +72,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             await validator.ValidateContentAsync(data);
 
-            context.Errors.AddRange(validator.Errors);
-            context.ThrowOnErrors();
+            context.AddErrors(validator.Errors).ThrowOnErrors();
+        }
+
+        public static async Task ValidateContentAndInputAsync(this OperationContext operation, ContentData data, bool optimize)
+        {
+            var validator = GetValidator(operation, optimize);
+
+            await validator.ValidateInputAsync(data);
+            await validator.ValidateContentAsync(data);
+
+            operation.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
         public static void GenerateDefaultValues(this OperationContext context, ContentData data)
@@ -98,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static async Task CheckReferrersAsync(this OperationContext context)
         {
-            var contentRepository = context.Services.GetRequiredService<IContentRepository>();
+            var contentRepository = context.Resolve<IContentRepository>();
 
             var hasReferrer = await contentRepository.HasReferrersAsync(context.App.Id, context.ContentId, SearchScope.All);
 
@@ -110,12 +104,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         private static ContentValidator GetValidator(this OperationContext context, bool optimize)
         {
-            var serializer = context.Services.GetRequiredService<IJsonSerializer>();
-
-            var validators = context.Services.GetRequiredService<IEnumerable<IValidatorsFactory>>();
-
             var validationContext =
-                new ValidationContext(serializer,
+                new ValidationContext(context.Resolve<IJsonSerializer>(),
                     context.App.NamedId(),
                     context.Schema.NamedId(),
                     context.SchemaDef,
@@ -125,8 +115,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             var validator =
                 new ContentValidator(context.Partition(),
                     validationContext,
-                    validators,
-                    context.Services.GetRequiredService<ISemanticLog>());
+                    context.Resolve<IEnumerable<IValidatorsFactory>>(),
+                    context.Resolve<ISemanticLog>());
 
             return validator;
         }
