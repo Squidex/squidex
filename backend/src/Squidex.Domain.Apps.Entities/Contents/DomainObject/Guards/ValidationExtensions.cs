@@ -21,7 +21,7 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Log;
 
-namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Test
+namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class ValidationExtensions
     {
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Test
 
         public static void MustCreateDraft(this OperationContext context)
         {
-            if (context.Content.Status != Status.Published)
+            if (context.Content.EditingStatus != Status.Published)
             {
                 throw new DomainException(T.Get("contents.draftNotCreateForUnpublished"));
             }
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Test
             context.ThrowOnErrors();
         }
 
-        public static async Task ValidateInputPartialAsync(this OperationContext context, ContentData? data, bool optimize)
+        public static async Task ValidateInputPartialAsync(this OperationContext context, ContentData data, bool optimize)
         {
             var validator = GetValidator(context, optimize);
 

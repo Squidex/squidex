@@ -33,6 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public ClaimsPrincipal? User { get; init; }
 
+        public RefToken Actor { get; init; }
+
         public Func<ContentDomainObject.State> ContentProvider { get; init; }
 
         public ContentDomainObject.State Content
@@ -71,6 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return new OperationContext(services)
             {
                 App = app,
+                Actor = command.Actor,
                 ContentProvider = snapshot,
                 ContentId = command.ContentId,
                 Schema = schema,

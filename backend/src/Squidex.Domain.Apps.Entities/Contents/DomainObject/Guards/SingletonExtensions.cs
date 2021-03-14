@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Test
+namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class SingletonExtensions
     {

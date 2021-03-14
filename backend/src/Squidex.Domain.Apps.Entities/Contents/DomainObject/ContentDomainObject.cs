@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Contents.DomainObject.Test;
+using Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             IServiceProvider serviceProvider)
             : base(store, log)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Infrastructure.Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
             this.serviceProvider = serviceProvider;
 
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        operation.MustHavePermission(c, Permissions.AppContentsReadOwn);
+                        operation.MustHavePermission(Permissions.AppContentsReadOwn);
 
                         await operation.ValidateContentAndInputAsync(Snapshot.Data, false);
 
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        operation.MustHavePermission(c, Permissions.AppContentsVersionCreate);
+                        operation.MustHavePermission(Permissions.AppContentsVersionCreate);
                         operation.MustCreateDraft();
 
                         var status = await operation.GetInitialStatusAsync();
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        operation.MustHavePermission(c, Permissions.AppContentsVersionDelete);
+                        operation.MustHavePermission(Permissions.AppContentsVersionDelete);
                         operation.MustDeleteDraft();
 
                         DeleteDraft(c);
@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task ChangeCore(ChangeContentStatus c, OperationContext operation)
         {
-            operation.MustHavePermission(c, Permissions.AppContentsChangeStatusOwn);
+            operation.MustHavePermission(Permissions.AppContentsChangeStatusOwn);
             operation.MustNotChangeSingleton(c.Status);
 
             if (c.Status == Snapshot.EditingStatus)
@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task UpdateCore(UpdateContent c, OperationContext operation)
         {
-            operation.MustHavePermission(c, Permissions.AppContentsUpdate);
+            operation.MustHavePermission(Permissions.AppContentsUpdate);
             operation.MustHaveData(c.Data);
 
             if (!c.DoNotValidate)
@@ -311,7 +311,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidateWorkflow)
             {
-                await operation.MustCanUpdate();
+                await operation.CheckUpdateAsync();
             }
 
             var newData = c.Data;
@@ -336,7 +336,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task PatchCore(UpdateContent c, OperationContext operation)
         {
-            operation.MustHavePermission(c, Permissions.AppContentsUpdate);
+            operation.MustHavePermission(Permissions.AppContentsUpdate);
             operation.MustHaveData(c.Data);
 
             if (!c.DoNotValidate)
@@ -346,7 +346,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidateWorkflow)
             {
-                await operation.MustCanUpdate();
+                await operation.CheckUpdateAsync();
             }
 
             var newData = c.Data.MergeInto(Snapshot.Data);
@@ -371,7 +371,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task DeleteCore(DeleteContent c, OperationContext operation)
         {
-            operation.MustHavePermission(c, Permissions.AppContentsDeleteOwn);
+            operation.MustHavePermission(Permissions.AppContentsDeleteOwn);
             operation.MustNotDeleteSingleton();
 
             if (c.CheckReferrers)

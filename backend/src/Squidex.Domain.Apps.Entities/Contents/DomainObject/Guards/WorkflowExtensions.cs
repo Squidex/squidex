@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
-namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Test
+namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class WorkflowExtensions
     {
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Test
 
         public static async Task CheckTransitionAsync(this OperationContext context, Status status)
         {
-            if (context.User != null)
+            if (!context.SchemaDef.IsSingleton)
             {
                 var contentWorkflow = context.Services.GetRequiredService<IContentWorkflow>();
 
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Test
 
         public static async Task CheckStatusAsync(this OperationContext context, Status status)
         {
-            if (context.User != null)
+            if (!context.SchemaDef.IsSingleton)
             {
                 var contentWorkflow = context.Services.GetRequiredService<IContentWorkflow>();
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Test
             }
         }
 
-        public static async Task MustCanUpdate(this OperationContext context)
+        public static async Task CheckUpdateAsync(this OperationContext context)
         {
             if (context.User != null)
             {

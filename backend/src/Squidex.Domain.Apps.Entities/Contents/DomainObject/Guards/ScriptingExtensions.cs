@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 
-namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Test
+namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class ScriptingExtensions
     {
