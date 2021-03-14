@@ -172,11 +172,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 {
                     await assetFileStore.UploadAsync(tempFile, hashStream);
 
-                    var hash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
-
-                    command.FileHash = hash;
+                    command.FileHash = ComputeHash(command.File, hashStream);
                 }
             }
+        }
+
+        private static string ComputeHash(AssetFile file, HasherStream hashStream)
+        {
+            var steamHash = hashStream.GetHashStringAndReset();
+
+            return $"{steamHash}{file.FileName}{file.FileSize}".Sha256Base64();
         }
 
         private async Task EnrichWithMetadataAsync(UploadAssetCommand command)

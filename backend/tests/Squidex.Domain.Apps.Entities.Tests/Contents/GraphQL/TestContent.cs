@@ -32,6 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 gql_2Numbers2 {
                     iv
                 }
+                content {
+                    iv
+                }
                 myString {
                     de
                 }
@@ -92,6 +95,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("2-numbers",
                         new ContentFieldData()
                             .AddInvariant(23))
+                    .AddField("content",
+                        new ContentFieldData()
+                            .AddInvariant(24))
                     .AddField("my-number",
                         new ContentFieldData()
                             .AddInvariant(1.0))
@@ -207,6 +213,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 ["gql_2Numbers2"] = new
                 {
                     iv = 23.0
+                },
+                ["content"] = new
+                {
+                    iv = 24.0
                 },
                 ["myString"] = new
                 {

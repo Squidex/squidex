@@ -291,7 +291,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                         else
                         {
-                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId, c.Referer);
+                            var result =
+                                await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier,
+                                    Snapshot.NamedId(), c.PlanId, c.Referer);
 
                             switch (result)
                             {
@@ -481,11 +483,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return new AppCreated { Name = name };
         }
 
-        private static AppPatternAdded CreateInitialPattern(DomainId id, AppPattern pattern)
-        {
-            return new AppPatternAdded { PatternId = id, Name = pattern.Name, Pattern = pattern.Pattern, Message = pattern.Message };
-        }
-
         private static AppLanguageAdded CreateInitialLanguage()
         {
             return new AppLanguageAdded { Language = Language.EN };
@@ -494,6 +491,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private static AppContributorAssigned CreateInitialOwner(RefToken actor)
         {
             return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
+        }
+
+        private static AppPatternAdded CreateInitialPattern(DomainId id, AppPattern pattern)
+        {
+            return new AppPatternAdded
+            {
+                Name = pattern.Name,
+                PatternId = id,
+                Pattern = pattern.Pattern,
+                Message = pattern.Message
+            };
         }
     }
 }

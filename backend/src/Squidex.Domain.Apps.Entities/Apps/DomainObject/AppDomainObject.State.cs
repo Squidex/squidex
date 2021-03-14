@@ -74,73 +74,73 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
 
                     case AppImageUploaded e:
-                        return UpdateImage(e, ev => ev.Image);
+                        return UpdateImage(e, e => e.Image);
 
                     case AppImageRemoved e when Image != null:
-                        return UpdateImage(e, ev => null);
+                        return UpdateImage(e, e => null);
 
                     case AppPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
-                        return UpdatePlan(e, ev => ev.ToAppPlan());
+                        return UpdatePlan(e, e => e.ToAppPlan());
 
                     case AppPlanReset e when Plan != null:
-                        return UpdatePlan(e, ev => null);
+                        return UpdatePlan(e, e => null);
 
                     case AppContributorAssigned e:
-                        return UpdateContributors(e, (ev, c) => c.Assign(ev.ContributorId, ev.Role));
+                        return UpdateContributors(e, (e, c) => c.Assign(e.ContributorId, e.Role));
 
                     case AppContributorRemoved e:
-                        return UpdateContributors(e, (ev, c) => c.Remove(ev.ContributorId));
+                        return UpdateContributors(e, (e, c) => c.Remove(e.ContributorId));
 
                     case AppClientAttached e:
-                        return UpdateClients(e, (ev, c) => c.Add(ev.Id, ev.Secret));
+                        return UpdateClients(e, (e, c) => c.Add(e.Id, e.Secret));
 
                     case AppClientUpdated e:
-                        return UpdateClients(e, (ev, c) => c.Update(ev.Id, ev.Name, ev.Role, ev.ApiCallsLimit, ev.ApiTrafficLimit, ev.AllowAnonymous));
+                        return UpdateClients(e, (e, c) => c.Update(e.Id, e.Name, e.Role, e.ApiCallsLimit, e.ApiTrafficLimit, e.AllowAnonymous));
 
                     case AppClientRevoked e:
-                        return UpdateClients(e, (ev, c) => c.Revoke(ev.Id));
+                        return UpdateClients(e, (e, c) => c.Revoke(e.Id));
 
                     case AppWorkflowAdded e:
-                        return UpdateWorkflows(e, (ev, w) => w.Add(ev.WorkflowId, ev.Name));
+                        return UpdateWorkflows(e, (e, w) => w.Add(e.WorkflowId, e.Name));
 
                     case AppWorkflowUpdated e:
-                        return UpdateWorkflows(e, (ev, w) => w.Update(ev.WorkflowId, ev.Workflow));
+                        return UpdateWorkflows(e, (e, w) => w.Update(e.WorkflowId, e.Workflow));
 
                     case AppWorkflowDeleted e:
-                        return UpdateWorkflows(e, (ev, w) => w.Remove(ev.WorkflowId));
+                        return UpdateWorkflows(e, (e, w) => w.Remove(e.WorkflowId));
 
                     case AppPatternAdded e:
                         return UpdatePatterns(e, (ev, p) => p.Add(ev.PatternId, ev.Name, ev.Pattern, ev.Message));
 
                     case AppPatternDeleted e:
-                        return UpdatePatterns(e, (ev, p) => p.Remove(ev.PatternId));
+                        return UpdatePatterns(e, (e, p) => p.Remove(e.PatternId));
 
                     case AppPatternUpdated e:
-                        return UpdatePatterns(e, (ev, p) => p.Update(ev.PatternId, ev.Name, ev.Pattern, ev.Message));
+                        return UpdatePatterns(e, (e, p) => p.Update(e.PatternId, e.Name, e.Pattern, e.Message));
 
                     case AppRoleAdded e:
-                        return UpdateRoles(e, (ev, r) => r.Add(ev.Name));
+                        return UpdateRoles(e, (e, r) => r.Add(e.Name));
 
                     case AppRoleUpdated e:
-                        return UpdateRoles(e, (ev, r) => r.Update(ev.Name, ev.ToPermissions(), ev.Properties));
+                        return UpdateRoles(e, (e, r) => r.Update(e.Name, e.ToPermissions(), e.Properties));
 
                     case AppRoleDeleted e:
-                        return UpdateRoles(e, (ev, r) => r.Remove(ev.Name));
+                        return UpdateRoles(e, (e, r) => r.Remove(e.Name));
 
                     case AppLanguageAdded e:
-                        return UpdateLanguages(e, (ev, l) => l.Set(ev.Language));
+                        return UpdateLanguages(e, (e, l) => l.Set(e.Language));
 
                     case AppLanguageRemoved e:
-                        return UpdateLanguages(e, (ev, l) => l.Remove(ev.Language));
+                        return UpdateLanguages(e, (e, l) => l.Remove(e.Language));
 
                     case AppLanguageUpdated e:
-                        return UpdateLanguages(e, (ev, l) =>
+                        return UpdateLanguages(e, (e, l) =>
                         {
-                            l = l.Set(ev.Language, ev.IsOptional, ev.Fallback);
+                            l = l.Set(e.Language, e.IsOptional, e.Fallback);
 
-                            if (ev.IsMaster)
+                            if (e.IsMaster)
                             {
-                                l = Languages.MakeMaster(ev.Language);
+                                l = Languages.MakeMaster(e.Language);
                             }
 
                             return l;

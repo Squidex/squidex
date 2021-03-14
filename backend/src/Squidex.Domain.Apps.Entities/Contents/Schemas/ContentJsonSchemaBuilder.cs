@@ -44,7 +44,6 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             if (dataSchema != null)
             {
                 jsonSchema.Properties["data"] = SchemaBuilder.ReferenceProperty(dataSchema, $"The data of the {name}.", true);
-                jsonSchema.Properties["dataDraft"] = SchemaBuilder.ReferenceProperty(dataSchema, $"The draft data of the {name}.");
             }
 
             return jsonSchema;

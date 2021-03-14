@@ -293,7 +293,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             if (schemaType != null)
             {
                 entityType.AddStructuralProperty("data", new EdmComplexTypeReference(schemaType, false));
-                entityType.AddStructuralProperty("dataDraft", new EdmComplexTypeReference(schemaType, false));
 
                 model.AddElement(schemaType);
             }
