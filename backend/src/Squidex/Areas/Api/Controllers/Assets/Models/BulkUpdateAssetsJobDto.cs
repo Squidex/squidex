@@ -31,11 +31,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public DomainId ParentId { get; set; }
 
         /// <summary>
-        /// The optional path to the folder.
-        /// </summary>
-        public string? ParentPath { get; set; }
-
-        /// <summary>
         /// The new name of the asset.
         /// </summary>
         public string? FileName { get; set; }

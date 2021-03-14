@@ -26,7 +26,7 @@
                     [assetFile]="file"
                     [isDisabled]="snapshot.isDisabled"
                     [isCompact]="snapshot.isCompact"
-                    [folderPath]="folderPath"
+                    [folderId]="folderId"
                     (loadError)="removeLoadingAsset(file)"
                     (load)="addAsset(file, $event)">
                 </sqx-asset>
@@ -48,7 +48,7 @@
                     (load)="addAsset(file, $event)"
                     (loadError)="removeLoadingAsset(file)"
                     [assetFile]="file"
-                    [folderPath]="folderPath"
+                    [folderId]="folderId"
                     [isCompact]="snapshot.isCompact"
                     [isDisabled]="snapshot.isDisabled"
                     [isListView]="true">

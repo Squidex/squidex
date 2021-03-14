@@ -16,8 +16,6 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true
 };
 
-const NO_EMIT = { emitEvent: false };
-
 interface State {
     // The suggested item.
     suggestedItems: ReadonlyArray<any>;
@@ -26,7 +24,7 @@ interface State {
     suggestedIndex: number;
 
     // The selected item.
-    selectedItem?: number;
+    selectedItem?: any;
 
     // The current search query.
     query?: RegExp;
@@ -109,12 +107,10 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         if (changes['items']) {
             this.items = this.items || [];
 
-            this.resetSearch();
+            this.next({ suggestedItems: this.items });
 
-            this.next({
-                suggestedIndex: this.getSelectedIndex(this.value),
-                suggestedItems: this.items || []
-            });
+            this.selectSearch('');
+            this.selectIndex(this.getSelectedIndex(this.value), false);
         }
     }
 
@@ -142,9 +138,9 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         super.setDisabledState(isDisabled);
 
         if (isDisabled) {
-            this.queryInput.disable(NO_EMIT);
+            this.queryInput.disable({ emitEvent: false });
         } else {
-            this.queryInput.enable(NO_EMIT);
+            this.queryInput.enable({ emitEvent: false });
         }
     }
 
@@ -168,7 +164,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public open() {
         if (!this.dropdown.isOpen) {
-            this.resetSearch();
+            this.selectSearch('');
         }
 
         this.dropdown.show();
@@ -186,8 +182,8 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         this.dropdown.hide();
     }
 
-    private resetSearch() {
-        this.queryInput.setValue('');
+    private selectSearch(value: string) {
+        this.queryInput.setValue(value);
     }
 
     public selectPrevIndex() {

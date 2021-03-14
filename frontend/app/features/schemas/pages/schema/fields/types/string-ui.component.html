@@ -10,6 +10,7 @@
             </sqx-form-hint>
         </div>
     </div>
+    
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ 'schemas.field.editor' | sqxTranslate }}</label>
 
@@ -86,6 +87,7 @@
             </label>
         </div>
     </div>
+
     <div class="form-group row" [class.hidden]="hideAllowedValues | async">
         <label class="col-3 col-form-label">{{ 'schemas.field.allowedValues' | sqxTranslate }}</label>
 
@@ -93,6 +95,7 @@
             <sqx-tag-editor formControlName="allowedValues"></sqx-tag-editor>
         </div>
     </div>
+
     <div class="form-group row" [class.hidden]="hideInlineEditable | async">
         <div class="col-9 offset-3">
             <div class="custom-control custom-checkbox">
@@ -101,6 +104,18 @@
                     {{ 'schemas.field.inlineEditable' | sqxTranslate }}
                 </label>
             </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_folderId">{{ 'schemas.fieldTypes.string.folderId' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-asset-folder-dropdown formControlName="folderId"></sqx-asset-folder-dropdown>
+
+            <sqx-form-hint>
+                {{ 'schemas.fieldTypes.string.folderIdHint' | sqxTranslate }}
+            </sqx-form-hint>
         </div>
     </div>
 </div>

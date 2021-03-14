@@ -62,7 +62,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         return !!this.schemaId && !!this.languageField;
     }
 
-    public selectionControl = new FormControl('');
+    public control = new FormControl('');
 
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
         private readonly appsState: AppsState,
@@ -77,9 +77,9 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
         this.own(
-            value$(this.selectionControl)
+            value$(this.control)
                 .subscribe((value: ContentName) => {
-                    if (this.selectionControl.enabled) {
+                    if (this.control.enabled) {
                         if (value && value.id) {
                             if (this.mode === 'Single') {
                                 this.callChange(value.id);
@@ -112,22 +112,22 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
                         this.selectContent();
                     }, () => {
-                        this.selectionControl.disable(NO_EMIT);
+                        this.control.disable(NO_EMIT);
                     });
             } else {
-                this.selectionControl.disable(NO_EMIT);
+                this.control.disable(NO_EMIT);
             }
         }
     }
 
     public setDisabledState(isDisabled: boolean) {
-        if (isDisabled) {
-            this.selectionControl.disable(NO_EMIT);
-        } else if (this.isValid) {
-            this.selectionControl.enable(NO_EMIT);
-        }
-
         super.setDisabledState(isDisabled);
+
+        if (isDisabled) {
+            this.control.disable(NO_EMIT);
+        } else if (this.isValid) {
+            this.control.enable(NO_EMIT);
+        }
     }
 
     public writeValue(obj: any) {
@@ -147,11 +147,11 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     }
 
     private selectContent() {
-        this.selectionControl.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), NO_EMIT);
+        this.control.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), NO_EMIT);
     }
 
     private unselectContent() {
-        this.selectionControl.setValue(undefined, NO_EMIT);
+        this.control.setValue(undefined, NO_EMIT);
     }
 
     private createContentNames(contents: ReadonlyArray<ContentDto>): ReadonlyArray<ContentName> {

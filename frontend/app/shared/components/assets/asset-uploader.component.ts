@@ -29,7 +29,7 @@ export class AssetUploaderComponent {
 
     public addFiles(files: ReadonlyArray<File>) {
         for (const file of files) {
-            this.assetUploader.uploadFile(file, this.assetsState, this.assetsState);
+            this.assetUploader.uploadFile(file, this.assetsState);
         }
 
         this.modalMenu.show();

@@ -138,17 +138,16 @@ export interface AnnotateAssetDto {
     readonly metadata?: { [key: string]: any };
 }
 
-export interface CreateAssetFolderDto extends AssetParentDto {
+export interface CreateAssetFolderDto extends MoveAssetItemDto {
     readonly folderName: string;
-}
-
-export interface AssetParentDto {
-    readonly parentId?: string;
-    readonly parentPath?: string;
 }
 
 export interface RenameAssetFolderDto {
     readonly folderName: string;
+}
+
+export interface MoveAssetItemDto {
+    readonly parentId?: string;
 }
 
 export interface AssetQueryDto {
@@ -256,7 +255,7 @@ export class AssetsService {
         }
     }
 
-    public getAssetFolders(appName: string, parentId?: string): Observable<AssetFoldersDto> {
+    public getAssetFolders(appName: string, parentId: string): Observable<AssetFoldersDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders?parentId=${parentId}`);
 
         return this.http.get<{ total: number, items: any[], folders: any[], path: any[] } & Resource>(url).pipe(
@@ -281,13 +280,11 @@ export class AssetsService {
             pretifyError('i18n:assets.loadFailed'));
     }
 
-    public postAssetFile(appName: string, file: Blob, parent?: AssetParentDto): Observable<number | AssetDto> {
+    public postAssetFile(appName: string, file: Blob, parentId?: string): Observable<number | AssetDto> {
         let url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
-        if (parent?.parentPath) {
-            url += `?parentPath=${parent.parentPath}`;
-        } else if (parent?.parentId) {
-            url += `?parentId=${parent.parentId}`;
+        if (parentId) {
+            url += `?parentId=${parentId}`;
         }
 
         return HTTP.upload(this.http, 'POST', url, file).pipe(
@@ -398,7 +395,7 @@ export class AssetsService {
             pretifyError('i18n:assets.updateFolderFailed'));
     }
 
-    public putAssetItemParent(appName: string, resource: Resource, dto: AssetParentDto, version: Version): Observable<Versioned<any>> {
+    public putAssetItemParent(appName: string, resource: Resource, dto: MoveAssetItemDto, version: Version): Observable<Versioned<any>> {
         const link = resource._links['move'];
 
         const url = this.apiUrl.buildUrl(link.href);

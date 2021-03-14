@@ -12,7 +12,5 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
     public interface IMoveAssetCommand : IAppCommand
     {
         DomainId ParentId { get; set; }
-
-        string? ParentPath { get; set; }
     }
 }

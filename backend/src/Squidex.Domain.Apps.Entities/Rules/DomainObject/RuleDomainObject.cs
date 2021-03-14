@@ -80,8 +80,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                 case EnableRule enable:
                     return UpdateReturn(enable, c =>
                     {
-                        GuardRule.CanEnable(c);
-
                         Enable(c);
 
                         return Snapshot;
@@ -90,8 +88,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                 case DisableRule disable:
                     return UpdateReturn(disable, c =>
                     {
-                        GuardRule.CanDisable(c);
-
                         Disable(c);
 
                         return Snapshot;
@@ -100,8 +96,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                 case DeleteRule delete:
                     return Update(delete, c =>
                     {
-                        GuardRule.CanDelete(delete);
-
                         Delete(c);
                     });
 

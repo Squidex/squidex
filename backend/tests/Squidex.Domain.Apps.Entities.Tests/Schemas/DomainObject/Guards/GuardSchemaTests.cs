@@ -603,22 +603,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         }
 
         [Fact]
-        public void CanPublish_should_not_throw_exception()
-        {
-            var command = new PublishSchema();
-
-            GuardSchema.CanPublish(command);
-        }
-
-        [Fact]
-        public void CanUnpublish_should_not_throw_exception()
-        {
-            var command = new UnpublishSchema();
-
-            GuardSchema.CanUnpublish(command);
-        }
-
-        [Fact]
         public void CanReorder_should_throw_exception_if_field_ids_contains_invalid_id()
         {
             var command = new ReorderFields { FieldIds = new[] { 1L, 3L } };
@@ -676,22 +660,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             var command = new ConfigurePreviewUrls { PreviewUrls = new Dictionary<string, string>() };
 
             GuardSchema.CanConfigurePreviewUrls(command);
-        }
-
-        [Fact]
-        public void CanChangeCategory_should_not_throw_exception()
-        {
-            var command = new ChangeCategory();
-
-            GuardSchema.CanChangeCategory(command);
-        }
-
-        [Fact]
-        public void CanDelete_should_not_throw_exception()
-        {
-            var command = new DeleteSchema();
-
-            GuardSchema.CanDelete(command);
         }
 
         private CreateSchema CreateCommand(CreateSchema command)

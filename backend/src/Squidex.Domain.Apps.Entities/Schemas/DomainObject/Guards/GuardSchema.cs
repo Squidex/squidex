@@ -108,36 +108,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             });
         }
 
-        public static void CanPublish(PublishSchema command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanUnpublish(UnpublishSchema command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanUpdate(UpdateSchema command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanConfigureScripts(ConfigureScripts command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanChangeCategory(ChangeCategory command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanDelete(DeleteSchema command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
         private static void ValidateUpsert(IUpsertCommand command, AddValidation e)
         {
             if (command.Fields?.Length > 0)

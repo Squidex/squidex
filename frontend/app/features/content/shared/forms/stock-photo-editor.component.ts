@@ -15,8 +15,6 @@ export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true
 };
 
-const NO_EMIT = { emitEvent: false };
-
 interface State {
     // True when loading assets.
     isLoading?: boolean;
@@ -86,9 +84,9 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
         super.setDisabledState(isDisabled);
 
         if (isDisabled) {
-            this.stockPhotoSearch.disable(NO_EMIT);
+            this.stockPhotoSearch.disable({ emitEvent: false });
         } else {
-            this.stockPhotoSearch.enable(NO_EMIT);
+            this.stockPhotoSearch.enable({ emitEvent: false });
         }
     }
 

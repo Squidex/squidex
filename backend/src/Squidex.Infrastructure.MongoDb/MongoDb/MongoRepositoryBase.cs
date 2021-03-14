@@ -114,7 +114,9 @@ namespace Squidex.Infrastructure.MongoDb
             }
             catch (Exception ex)
             {
-                var error = new ConfigurationError($"MongoDb connection failed to connect to database {Database.DatabaseNamespace.DatabaseName}.");
+                var databaseName = Database.DatabaseNamespace.DatabaseName;
+
+                var error = new ConfigurationError($"MongoDb connection failed to connect to database {databaseName}.");
 
                 throw new ConfigurationException(error, ex);
             }

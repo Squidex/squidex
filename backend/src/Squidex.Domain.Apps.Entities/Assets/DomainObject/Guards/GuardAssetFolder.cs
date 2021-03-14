@@ -56,11 +56,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             });
         }
 
-        public static void CanDelete(DeleteAssetFolder command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
         private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, DomainId id, AddValidation e)
         {
             if (parentId != DomainId.Empty)

@@ -168,6 +168,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.resetState();
+
             this.queryInput.disable(NO_EMIT);
         } else {
             this.queryInput.enable(NO_EMIT);

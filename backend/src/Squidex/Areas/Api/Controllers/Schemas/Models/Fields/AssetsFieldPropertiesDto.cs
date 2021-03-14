@@ -30,9 +30,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public string[]? DefaultValue { get; set; }
 
         /// <summary>
-        /// The initial path to the folder.
+        /// The initial id to the folder.
         /// </summary>
-        public string? FolderPath { get; set; }
+        public string? FolderId { get; set; }
 
         /// <summary>
         /// The minimum allowed items for the field value.

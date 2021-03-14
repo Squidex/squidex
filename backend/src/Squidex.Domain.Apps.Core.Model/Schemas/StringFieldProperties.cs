@@ -22,6 +22,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string? PatternMessage { get; set; }
 
+        public string? FolderId { get; set; }
+
         public int? MinLength { get; set; }
 
         public int? MaxLength { get; set; }

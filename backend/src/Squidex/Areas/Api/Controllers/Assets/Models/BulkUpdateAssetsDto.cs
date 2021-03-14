@@ -25,6 +25,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public bool CheckReferrers { get; set; }
 
+        /// <summary>
+        /// True to turn off costly validation: Folder checks. Default: true.
+        /// </summary>
+        public bool OptimizeValidation { get; set; } = true;
+
         public BulkUpdateAssets ToCommand()
         {
             var result = SimpleMapper.Map(this, new BulkUpdateAssets());

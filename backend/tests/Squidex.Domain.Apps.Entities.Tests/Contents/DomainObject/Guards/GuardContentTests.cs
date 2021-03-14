@@ -1,377 +1,377 @@
-﻿// ==========================================================================
-//  Squidex Headless CMS
-// ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
-//  All rights reserved. Licensed under the MIT license.
-// ==========================================================================
-
-using System.Security.Claims;
-using System.Threading.Tasks;
-using FakeItEasy;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Validation;
-using Squidex.Shared;
-using Xunit;
-
-namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
-{
-    public class GuardContentTests : IClassFixture<TranslationsFixture>
-    {
-        private readonly IContentWorkflow workflow = A.Fake<IContentWorkflow>();
-        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-        private readonly ISchemaEntity schema;
-        private readonly ISchemaEntity singleton;
-        private readonly ClaimsPrincipal user = Mocks.FrontendUser();
-        private readonly RefToken actor = RefToken.User("123");
-
-        public GuardContentTests()
-        {
-            schema =
-                Mocks.Schema(appId, schemaId, new Schema(schemaId.Name));
-
-            singleton =
-                Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, isSingleton: true));
-        }
-
-        [Fact]
-        public void CanCreate_should_throw_exception_if_data_is_null()
-        {
-            var command = new CreateContent();
-
-            ValidationAssert.Throws(() => GuardContent.CanCreate(command, schema),
-                new ValidationError("Data is required.", "Data"));
-        }
-
-        [Fact]
-        public void CanCreate_should_throw_exception_if_singleton()
-        {
-            var command = new CreateContent { Data = new ContentData() };
-
-            Assert.Throws<DomainException>(() => GuardContent.CanCreate(command, singleton));
-        }
-
-        [Fact]
-        public void CanCreate_should_not_throw_exception_if_singleton_and_id_is_schema_id()
-        {
-            var command = new CreateContent { Data = new ContentData(), ContentId = schema.Id };
-
-            GuardContent.CanCreate(command, schema);
-        }
-
-        [Fact]
-        public void CanCreate_should_not_throw_exception_if_data_is_not_null()
-        {
-            var command = new CreateContent { Data = new ContentData() };
-
-            GuardContent.CanCreate(command, schema);
-        }
-
-        [Fact]
-        public async Task CanUpdate_should_throw_exception_if_data_is_null()
-        {
-            SetupCanUpdate(true);
-
-            var content = CreateContent(Status.Draft);
-
-            var command = CreateCommand(new UpdateContent());
-
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanUpdate(command, content, workflow),
-                new ValidationError("Data is required.", "Data"));
-        }
-
-        [Fact]
-        public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it()
-        {
-            SetupCanUpdate(false);
-
-            var content = CreateContent(Status.Draft);
+﻿//// ==========================================================================
+////  Squidex Headless CMS
+//// ==========================================================================
+////  Copyright (c) Squidex UG (haftungsbeschränkt)
+////  All rights reserved. Licensed under the MIT license.
+//// ==========================================================================
+
+//using System.Security.Claims;
+//using System.Threading.Tasks;
+//using FakeItEasy;
+//using Squidex.Domain.Apps.Core.Contents;
+//using Squidex.Domain.Apps.Core.Schemas;
+//using Squidex.Domain.Apps.Core.TestHelpers;
+//using Squidex.Domain.Apps.Entities.Contents.Commands;
+//using Squidex.Domain.Apps.Entities.Contents.Repositories;
+//using Squidex.Domain.Apps.Entities.Schemas;
+//using Squidex.Domain.Apps.Entities.TestHelpers;
+//using Squidex.Infrastructure;
+//using Squidex.Infrastructure.Validation;
+//using Squidex.Shared;
+//using Xunit;
+
+//namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
+//{
+//    public class GuardContentTests : IClassFixture<TranslationsFixture>
+//    {
+//        private readonly IContentWorkflow workflow = A.Fake<IContentWorkflow>();
+//        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
+//        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+//        private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
+//        private readonly ISchemaEntity schema;
+//        private readonly ISchemaEntity singleton;
+//        private readonly ClaimsPrincipal user = Mocks.FrontendUser();
+//        private readonly RefToken actor = RefToken.User("123");
+
+//        public GuardContentTests()
+//        {
+//            schema =
+//                Mocks.Schema(appId, schemaId, new Schema(schemaId.Name));
+
+//            singleton =
+//                Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, isSingleton: true));
+//        }
+
+//        [Fact]
+//        public void CanCreate_should_throw_exception_if_data_is_null()
+//        {
+//            var command = new CreateContent();
+
+//            ValidationAssert.Throws(() => GuardContent.CanCreate(command, schema),
+//                new ValidationError("Data is required.", "Data"));
+//        }
+
+//        [Fact]
+//        public void CanCreate_should_throw_exception_if_singleton()
+//        {
+//            var command = new CreateContent { Data = new ContentData() };
+
+//            Assert.Throws<DomainException>(() => GuardContent.CanCreate(command, singleton));
+//        }
+
+//        [Fact]
+//        public void CanCreate_should_not_throw_exception_if_singleton_and_id_is_schema_id()
+//        {
+//            var command = new CreateContent { Data = new ContentData(), ContentId = schema.Id };
+
+//            GuardContent.CanCreate(command, schema);
+//        }
+
+//        [Fact]
+//        public void CanCreate_should_not_throw_exception_if_data_is_not_null()
+//        {
+//            var command = new CreateContent { Data = new ContentData() };
+
+//            GuardContent.CanCreate(command, schema);
+//        }
+
+//        [Fact]
+//        public async Task CanUpdate_should_throw_exception_if_data_is_null()
+//        {
+//            SetupCanUpdate(true);
+
+//            var content = CreateContent(Status.Draft);
+
+//            var command = CreateCommand(new UpdateContent());
+
+//            await ValidationAssert.ThrowsAsync(() => GuardContent.CanUpdate(command, content, workflow),
+//                new ValidationError("Data is required.", "Data"));
+//        }
+
+//        [Fact]
+//        public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it()
+//        {
+//            SetupCanUpdate(false);
+
+//            var content = CreateContent(Status.Draft);
 
-            var command = CreateCommand(new UpdateContent { Data = new ContentData() });
+//            var command = CreateCommand(new UpdateContent { Data = new ContentData() });
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanUpdate(command, content, workflow));
-        }
+//            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanUpdate(command, content, workflow));
+//        }
 
-        [Fact]
-        public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it_but_check_is_disabled()
-        {
-            SetupCanUpdate(false);
+//        [Fact]
+//        public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it_but_check_is_disabled()
+//        {
+//            SetupCanUpdate(false);
 
-            var content = CreateContent(Status.Draft);
+//            var content = CreateContent(Status.Draft);
 
-            var command = CreateCommand(new UpdateContent { Data = new ContentData(), DoNotValidateWorkflow = true });
+//            var command = CreateCommand(new UpdateContent { Data = new ContentData(), DoNotValidateWorkflow = true });
 
-            await GuardContent.CanUpdate(command, content, workflow);
-        }
+//            await GuardContent.CanUpdate(command, content, workflow);
+//        }
 
-        [Fact]
-        public async Task CanUpdate_should_not_throw_exception_if_data_is_not_null()
-        {
-            SetupCanUpdate(true);
+//        [Fact]
+//        public async Task CanUpdate_should_not_throw_exception_if_data_is_not_null()
+//        {
+//            SetupCanUpdate(true);
 
-            var content = CreateContent(Status.Draft);
+//            var content = CreateContent(Status.Draft);
 
-            var command = CreateCommand(new UpdateContent { Data = new ContentData() });
+//            var command = CreateCommand(new UpdateContent { Data = new ContentData() });
 
-            await GuardContent.CanUpdate(command, content, workflow);
-        }
+//            await GuardContent.CanUpdate(command, content, workflow);
+//        }
 
-        [Fact]
-        public async Task CanChangeStatus_should_throw_exception_if_singleton()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public async Task CanChangeStatus_should_throw_exception_if_singleton()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var command = CreateCommand(new ChangeContentStatus { Status = Status.Draft });
+//            var command = CreateCommand(new ChangeContentStatus { Status = Status.Draft });
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, singleton));
-        }
+//            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, singleton));
+//        }
 
-        [Fact]
-        public async Task CanChangeStatus_should_throw_exception_if_status_flow_not_valid()
-        {
-            var content = CreateContent(Status.Draft);
+//        [Fact]
+//        public async Task CanChangeStatus_should_throw_exception_if_status_flow_not_valid()
+//        {
+//            var content = CreateContent(Status.Draft);
 
-            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published });
+//            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published });
 
-            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
-                .Returns(false);
+//            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
+//                .Returns(false);
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
-                new ValidationError("Cannot change status from Draft to Published.", "Status"));
-        }
+//            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
+//                new ValidationError("Cannot change status from Draft to Published.", "Status"));
+//        }
 
-        [Fact]
-        public async Task CanChangeStatus_should_throw_exception_if_status_valid()
-        {
-            var content = CreateContent(Status.Draft);
+//        [Fact]
+//        public async Task CanChangeStatus_should_throw_exception_if_status_valid()
+//        {
+//            var content = CreateContent(Status.Draft);
 
-            var command = CreateCommand(new ChangeContentStatus { Status = new Status("Invalid"), DoNotValidateWorkflow = true });
+//            var command = CreateCommand(new ChangeContentStatus { Status = new Status("Invalid"), DoNotValidateWorkflow = true });
 
-            A.CallTo(() => workflow.GetInfoAsync(content, command.Status))
-                .Returns(Task.FromResult<StatusInfo?>(null));
+//            A.CallTo(() => workflow.GetInfoAsync(content, command.Status))
+//                .Returns(Task.FromResult<StatusInfo?>(null));
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
-                new ValidationError("Status is not defined in the workflow.", "Status"));
-        }
+//            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema),
+//                new ValidationError("Status is not defined in the workflow.", "Status"));
+//        }
 
-        [Fact]
-        public async Task CanChangeStatus_should_throw_exception_if_referenced()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public async Task CanChangeStatus_should_throw_exception_if_referenced()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var command = CreateCommand(new ChangeContentStatus { Status = Status.Draft });
+//            var command = CreateCommand(new ChangeContentStatus { Status = Status.Draft });
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, content.Id, SearchScope.Published))
-                .Returns(true);
+//            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, content.Id, SearchScope.Published))
+//                .Returns(true);
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema));
-        }
+//            await Assert.ThrowsAsync<ValidationException>(() => GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema));
+//        }
 
-        [Fact]
-        public async Task CanChangeStatus_should_not_throw_exception_if_status_flow_not_valid_but_check_disabled()
-        {
-            var content = CreateContent(Status.Draft);
+//        [Fact]
+//        public async Task CanChangeStatus_should_not_throw_exception_if_status_flow_not_valid_but_check_disabled()
+//        {
+//            var content = CreateContent(Status.Draft);
 
-            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published, DoNotValidateWorkflow = true });
+//            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published, DoNotValidateWorkflow = true });
 
-            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
-                .Returns(false);
+//            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
+//                .Returns(false);
 
-            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema);
-        }
+//            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema);
+//        }
 
-        [Fact]
-        public async Task CanChangeStatus_should_not_throw_exception_if_singleton_is_published()
-        {
-            var content = CreateDraftContent(Status.Draft);
+//        [Fact]
+//        public async Task CanChangeStatus_should_not_throw_exception_if_singleton_is_published()
+//        {
+//            var content = CreateDraftContent(Status.Draft);
 
-            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published });
+//            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published });
 
-            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, singleton);
-        }
+//            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, singleton);
+//        }
 
-        [Fact]
-        public async Task CanChangeStatus_should_not_throw_exception_if_status_flow_valid()
-        {
-            var content = CreateContent(Status.Draft);
+//        [Fact]
+//        public async Task CanChangeStatus_should_not_throw_exception_if_status_flow_valid()
+//        {
+//            var content = CreateContent(Status.Draft);
 
-            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published });
+//            var command = CreateCommand(new ChangeContentStatus { Status = Status.Published });
 
-            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
-                .Returns(true);
+//            A.CallTo(() => workflow.CanMoveToAsync(content, content.Status, command.Status, user))
+//                .Returns(true);
 
-            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema);
-        }
+//            await GuardContent.CanChangeStatus(command, content, workflow, contentRepository, schema);
+//        }
 
-        [Fact]
-        public void CreateDraft_should_throw_exception_if_not_published()
-        {
-            var content = CreateContent(Status.Draft);
+//        [Fact]
+//        public void CreateDraft_should_throw_exception_if_not_published()
+//        {
+//            var content = CreateContent(Status.Draft);
 
-            var command = CreateCommand(new CreateContentDraft());
+//            var command = CreateCommand(new CreateContentDraft());
 
-            Assert.Throws<DomainException>(() => GuardContent.CanCreateDraft(command, content));
-        }
+//            Assert.Throws<DomainException>(() => GuardContent.CanCreateDraft(command, content));
+//        }
 
-        [Fact]
-        public void CreateDraft_should_not_throw_exception()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public void CreateDraft_should_not_throw_exception()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var command = CreateCommand(new CreateContentDraft());
+//            var command = CreateCommand(new CreateContentDraft());
 
-            GuardContent.CanCreateDraft(command, content);
-        }
+//            GuardContent.CanCreateDraft(command, content);
+//        }
 
-        [Fact]
-        public void CanDeleteDraft_should_throw_exception_if_no_draft_found()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public void CanDeleteDraft_should_throw_exception_if_no_draft_found()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var command = CreateCommand(new DeleteContentDraft());
+//            var command = CreateCommand(new DeleteContentDraft());
 
-            Assert.Throws<DomainException>(() => GuardContent.CanDeleteDraft(command, content));
-        }
+//            Assert.Throws<DomainException>(() => GuardContent.CanDeleteDraft(command, content));
+//        }
 
-        [Fact]
-        public void CanDeleteDraft_should_not_throw_exception()
-        {
-            var content = CreateDraftContent(Status.Draft);
+//        [Fact]
+//        public void CanDeleteDraft_should_not_throw_exception()
+//        {
+//            var content = CreateDraftContent(Status.Draft);
 
-            var command = CreateCommand(new DeleteContentDraft());
+//            var command = CreateCommand(new DeleteContentDraft());
 
-            GuardContent.CanDeleteDraft(command, content);
-        }
+//            GuardContent.CanDeleteDraft(command, content);
+//        }
 
-        [Fact]
-        public async Task CanDelete_should_throw_exception_if_singleton()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public async Task CanDelete_should_throw_exception_if_singleton()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var command = CreateCommand(new DeleteContent());
+//            var command = CreateCommand(new DeleteContent());
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanDelete(command, content, contentRepository, singleton));
-        }
+//            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanDelete(command, content, contentRepository, singleton));
+//        }
 
-        [Fact]
-        public async Task CanDelete_should_throw_exception_if_referenced()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public async Task CanDelete_should_throw_exception_if_referenced()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var command = CreateCommand(new DeleteContent { CheckReferrers = true });
+//            var command = CreateCommand(new DeleteContent { CheckReferrers = true });
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, content.Id, SearchScope.All))
-                .Returns(true);
+//            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, content.Id, SearchScope.All))
+//                .Returns(true);
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanDelete(command, content, contentRepository, schema));
-        }
+//            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanDelete(command, content, contentRepository, schema));
+//        }
 
-        [Fact]
-        public async Task CanDelete_should_not_throw_exception()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public async Task CanDelete_should_not_throw_exception()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var command = CreateCommand(new DeleteContent());
+//            var command = CreateCommand(new DeleteContent());
 
-            await GuardContent.CanDelete(command, content, contentRepository, schema);
-        }
+//            await GuardContent.CanDelete(command, content, contentRepository, schema);
+//        }
 
-        [Fact]
-        public void CheckPermission_should_not_throw_exception_if_content_is_from_current_user()
-        {
-            var content = CreateContent(status: Status.Published);
+//        [Fact]
+//        public void CheckPermission_should_not_throw_exception_if_content_is_from_current_user()
+//        {
+//            var content = CreateContent(status: Status.Published);
 
-            var command = CreateCommand(new DeleteContent());
+//            var command = CreateCommand(new DeleteContent());
 
-            GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete);
-        }
+//            GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete);
+//        }
 
-        [Fact]
-        public void CheckPermission_should_not_throw_exception_if_user_is_null()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public void CheckPermission_should_not_throw_exception_if_user_is_null()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var commandActor = RefToken.User("456");
-            var command = CreateCommand(new DeleteContent { Actor = commandActor });
+//            var commandActor = RefToken.User("456");
+//            var command = CreateCommand(new DeleteContent { Actor = commandActor });
 
-            command.User = null;
+//            command.User = null;
 
-            GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete);
-        }
+//            GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete);
+//        }
 
-        [Fact]
-        public void CheckPermission_should_not_throw_exception_if_content_is_from_another_user_but_user_has_permission()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public void CheckPermission_should_not_throw_exception_if_content_is_from_another_user_but_user_has_permission()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var permission = Permissions.ForApp(Permissions.AppContentsDelete, appId.Name, schemaId.Name).Id;
+//            var permission = Permissions.ForApp(Permissions.AppContentsDelete, appId.Name, schemaId.Name).Id;
 
-            var commandUser = Mocks.FrontendUser(permission: permission);
-            var commandActor = RefToken.User("456");
-            var command = CreateCommand(new DeleteContent { Actor = commandActor, User = commandUser });
+//            var commandUser = Mocks.FrontendUser(permission: permission);
+//            var commandActor = RefToken.User("456");
+//            var command = CreateCommand(new DeleteContent { Actor = commandActor, User = commandUser });
 
-            GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete);
-        }
+//            GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete);
+//        }
 
-        [Fact]
-        public void CheckPermission_should_exception_if_content_is_from_another_user_and_user_has_no_permission()
-        {
-            var content = CreateContent(Status.Published);
+//        [Fact]
+//        public void CheckPermission_should_exception_if_content_is_from_another_user_and_user_has_no_permission()
+//        {
+//            var content = CreateContent(Status.Published);
 
-            var commandActor = RefToken.User("456");
-            var command = CreateCommand(new DeleteContent { Actor = commandActor });
+//            var commandActor = RefToken.User("456");
+//            var command = CreateCommand(new DeleteContent { Actor = commandActor });
 
-            Assert.Throws<DomainForbiddenException>(() => GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete));
-        }
+//            Assert.Throws<DomainForbiddenException>(() => GuardContent.CheckPermission(content, command, Permissions.AppContentsDelete));
+//        }
 
-        private void SetupCanUpdate(bool canUpdate)
-        {
-            A.CallTo(() => workflow.CanUpdateAsync(A<IContentEntity>._, A<Status>._, user))
-                .Returns(canUpdate);
-        }
+//        private void SetupCanUpdate(bool canUpdate)
+//        {
+//            A.CallTo(() => workflow.CanUpdateAsync(A<IContentEntity>._, A<Status>._, user))
+//                .Returns(canUpdate);
+//        }
 
-        private T CreateCommand<T>(T command) where T : ContentCommand
-        {
-            if (command.Actor == null)
-            {
-                command.Actor = actor;
-            }
+//        private T CreateCommand<T>(T command) where T : ContentCommand
+//        {
+//            if (command.Actor == null)
+//            {
+//                command.Actor = actor;
+//            }
 
-            if (command.User == null)
-            {
-                command.User = user;
-            }
+//            if (command.User == null)
+//            {
+//                command.User = user;
+//            }
 
-            return command;
-        }
+//            return command;
+//        }
 
-        private IContentEntity CreateDraftContent(Status status)
-        {
-            return CreateContentCore(new ContentEntity { NewStatus = status });
-        }
+//        private IContentEntity CreateDraftContent(Status status)
+//        {
+//            return CreateContentCore(new ContentEntity { NewStatus = status });
+//        }
 
-        private IContentEntity CreateContent(Status status)
-        {
-            return CreateContentCore(new ContentEntity { Status = status });
-        }
+//        private IContentEntity CreateContent(Status status)
+//        {
+//            return CreateContentCore(new ContentEntity { Status = status });
+//        }
 
-        private IContentEntity CreateContentCore(ContentEntity content)
-        {
-            content.Id = DomainId.NewGuid();
-            content.AppId = appId;
-            content.Created = default;
-            content.CreatedBy = actor;
-            content.SchemaId = schemaId;
+//        private IContentEntity CreateContentCore(ContentEntity content)
+//        {
+//            content.Id = DomainId.NewGuid();
+//            content.AppId = appId;
+//            content.Created = default;
+//            content.CreatedBy = actor;
+//            content.SchemaId = schemaId;
 
-            return content;
-        }
-    }
-}
+//            return content;
+//        }
+//    }
+//}

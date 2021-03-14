@@ -48,7 +48,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public assetsState: AssetsState;
 
     @Input()
-    public folderPath?: string;
+    public folderId?: string;
 
     @Input()
     public removeMode = false;
@@ -88,7 +88,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         if (assetFile) {
             this.setProgress(1);
 
-            this.assetUploader.uploadFile(assetFile, this.assetsState, { parentPath: this.folderPath })
+            this.assetUploader.uploadFile(assetFile, this.assetsState, this.folderId)
                 .subscribe(dto => {
                     if (Types.isNumber(dto)) {
                         this.setProgress(dto);

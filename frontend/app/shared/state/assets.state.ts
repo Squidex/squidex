@@ -17,7 +17,7 @@ export type AssetPathItem = { id: string, folderName: string };
 
 export type TagsAvailable = { [name: string]: number };
 export type TagsSelected = { [name: string]: boolean };
-export type Tag = { name: string, count: number; };
+export type TagItem = { name: string, count: number; };
 
 export const ROOT_ITEM: AssetPathItem = { id: MathHelper.EMPTY_GUID, folderName: 'i18n:assets.specialFolder.root' };
 

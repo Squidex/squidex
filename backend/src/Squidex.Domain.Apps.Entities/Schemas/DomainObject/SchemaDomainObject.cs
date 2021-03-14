@@ -161,62 +161,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case UpdateSchema update:
-                    return UpdateReturn(update, c =>
-                    {
-                        GuardSchema.CanUpdate(c);
-
-                        Update(c);
-
-                        return Snapshot;
-                    });
-
-                case PublishSchema publish:
-                    return UpdateReturn(publish, c =>
-                    {
-                        GuardSchema.CanPublish(c);
-
-                        Publish(c);
-
-                        return Snapshot;
-                    });
-
-                case UnpublishSchema unpublish:
-                    return UpdateReturn(unpublish, c =>
-                    {
-                        GuardSchema.CanUnpublish(c);
-
-                        Unpublish(c);
-
-                        return Snapshot;
-                    });
-
                 case ConfigureFieldRules configureFieldRules:
                     return UpdateReturn(configureFieldRules, c =>
                     {
                         GuardSchema.CanConfigureFieldRules(c);
 
                         ConfigureFieldRules(c);
-
-                        return Snapshot;
-                    });
-
-                case ConfigureScripts configureScripts:
-                    return UpdateReturn(configureScripts, c =>
-                    {
-                        GuardSchema.CanConfigureScripts(c);
-
-                        ConfigureScripts(c);
-
-                        return Snapshot;
-                    });
-
-                case ChangeCategory changeCategory:
-                    return UpdateReturn(changeCategory, c =>
-                    {
-                        GuardSchema.CanChangeCategory(c);
-
-                        ChangeCategory(c);
 
                         return Snapshot;
                     });
@@ -241,11 +191,49 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
+                case ChangeCategory changeCategory:
+                    return UpdateReturn(changeCategory, c =>
+                    {
+                        ChangeCategory(c);
+
+                        return Snapshot;
+                    });
+
+                case UpdateSchema update:
+                    return UpdateReturn(update, c =>
+                    {
+                        Update(c);
+
+                        return Snapshot;
+                    });
+
+                case PublishSchema publish:
+                    return UpdateReturn(publish, c =>
+                    {
+                        Publish(c);
+
+                        return Snapshot;
+                    });
+
+                case UnpublishSchema unpublish:
+                    return UpdateReturn(unpublish, c =>
+                    {
+                        Unpublish(c);
+
+                        return Snapshot;
+                    });
+
+                case ConfigureScripts configureScripts:
+                    return UpdateReturn(configureScripts, c =>
+                    {
+                        ConfigureScripts(c);
+
+                        return Snapshot;
+                    });
+
                 case DeleteSchema deleteSchema:
                     return Update(deleteSchema, c =>
                     {
-                        GuardSchema.CanDelete(c);
-
                         Delete(c);
                     });
 

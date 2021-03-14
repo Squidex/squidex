@@ -87,8 +87,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 case DeleteAssetFolder delete:
                     return Update(delete, c =>
                     {
-                        GuardAssetFolder.CanDelete(c);
-
                         Delete(c);
                     });
 

@@ -34,6 +34,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public string? PatternMessage { get; set; }
 
         /// <summary>
+        /// The initial id to the folder when the control supports file uploads.
+        /// </summary>
+        public string? FolderId { get; set; }
+
+        /// <summary>
         /// The minimum allowed length for the field value.
         /// </summary>
         public int? MinLength { get; set; }

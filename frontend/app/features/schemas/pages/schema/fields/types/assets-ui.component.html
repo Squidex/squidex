@@ -32,13 +32,13 @@
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_folderPath">{{ 'schemas.fieldTypes.assets.folderPath' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_folderId">{{ 'schemas.fieldTypes.assets.folderId' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <input type="text" class="form-control" id="{{field.fieldId}}_folderPath" formControlName="folderPath" placeholder="path/top/folder">
+            <sqx-asset-folder-dropdown formControlName="folderId"></sqx-asset-folder-dropdown>
 
             <sqx-form-hint>
-                {{ 'schemas.fieldTypes.assets.folderPathHint' | sqxTranslate }}
+                {{ 'schemas.fieldTypes.assets.folderIdHint' | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>

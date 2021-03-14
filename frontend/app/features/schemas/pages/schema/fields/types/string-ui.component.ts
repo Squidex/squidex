@@ -43,6 +43,9 @@ export class StringUIComponent extends ResourceOwner implements OnInit {
         this.fieldForm.setControl('inlineEditable',
             new FormControl(this.properties.inlineEditable));
 
+        this.fieldForm.setControl('folderId',
+            new FormControl(this.properties.folderId));
+
         this.hideAllowedValues =
             value$<string>(this.fieldForm.controls['editor']).pipe(map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
 

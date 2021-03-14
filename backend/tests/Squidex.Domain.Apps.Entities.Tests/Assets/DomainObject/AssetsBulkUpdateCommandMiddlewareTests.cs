@@ -94,14 +94,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var id = DomainId.NewGuid();
 
-            var command = BulkCommand(BulkUpdateAssetType.Move, id, parentPath: "/path/to/folder");
+            var command = BulkCommand(BulkUpdateAssetType.Move, id);
 
             var result = await PublishAsync(command);
 
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
-            A.CallTo(() => commandBus.PublishAsync(A<MoveAsset>.That.Matches(x => x.AssetId == id && x.ParentPath == "/path/to/folder")))
+            A.CallTo(() => commandBus.PublishAsync(A<MoveAsset>.That.Matches(x => x.AssetId == id)))
                 .MustHaveHappened();
         }
 
@@ -169,8 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             return (context.PlainResult as BulkUpdateResult)!;
         }
 
-        private BulkUpdateAssets BulkCommand(BulkUpdateAssetType type, DomainId id,
-            string? parentPath = null, string? fileName = null)
+        private BulkUpdateAssets BulkCommand(BulkUpdateAssetType type, DomainId id, string? fileName = null)
         {
             return new BulkUpdateAssets
             {
@@ -181,7 +180,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         Type = type,
                         Id = id,
-                        ParentPath = parentPath,
                         FileName = fileName
                     }
                 }

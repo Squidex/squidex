@@ -47,7 +47,7 @@ interface State {
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
     @Input()
-    public folderPath?: string;
+    public folderId?: string;
 
     public assetsDialog = new DialogModel();
 

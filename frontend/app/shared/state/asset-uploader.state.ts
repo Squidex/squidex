@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { DialogService, MathHelper, State, Types } from '@app/framework';
 import { Observable, Subject } from 'rxjs';
 import { map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
-import { AssetDto, AssetParentDto, AssetsService } from './../services/assets.service';
+import { AssetDto, AssetsService } from './../services/assets.service';
 import { AppsState } from './apps.state';
 import { AssetsState } from './assets.state';
 
@@ -63,14 +63,8 @@ export class AssetUploaderState extends State<Snapshot> {
         }, 'Stopped');
     }
 
-    public uploadFile(file: File, target?: AssetsState, parent?: AssetParentDto): Observable<UploadResult> {
-        let finalParent = parent;
-
-        if (!parent?.parentId && !parent?.parentPath && target) {
-            finalParent = { parentId: target.parentId };
-        }
-
-        const stream = this.assetsService.postAssetFile(this.appName, file, finalParent);
+    public uploadFile(file: File, target?: AssetsState, parentId?: string): Observable<UploadResult> {
+        const stream = this.assetsService.postAssetFile(this.appName, file, parentId ?? target?.parentId);
 
         return this.upload(stream, MathHelper.guid(), file.name, asset  => {
             if (asset.isDuplicate) {

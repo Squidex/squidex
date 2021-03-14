@@ -188,7 +188,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly resolveFirst: boolean;
     public readonly aspectHeight?: number;
     public readonly aspectWidth?: number;
-    public readonly folderPath?: string;
+    public readonly folderId?: string;
     public readonly maxHeight?: number;
     public readonly maxItems?: number;
     public readonly maxSize?: number;
@@ -386,6 +386,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly editor: StringFieldEditor = 'Input';
     public readonly inlineEditable: boolean = false;
     public readonly isUnique: boolean = false;
+    public readonly folderId?: string;
     public readonly maxLength?: number;
     public readonly minLength?: number;
     public readonly maxWords?: number;

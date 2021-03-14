@@ -65,20 +65,5 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
                 }
             });
         }
-
-        public static void CanEnable(EnableRule command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanDisable(DisableRule command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanDelete(DeleteRule command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
     }
 }

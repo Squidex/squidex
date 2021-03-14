@@ -109,8 +109,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 case AnnotateAsset c:
                     return UpdateReturnAsync(c, async c =>
                     {
-                        GuardAsset.CanAnnotate(c);
-
                         if (c.Tags != null)
                         {
                             c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
@@ -155,8 +153,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private async Task CreateCore(CreateAsset create)
         {
-            GuardAsset.CanCreate(create);
-
             if (create.Tags != null)
             {
                 create.Tags = await NormalizeTagsAsync(create.AppId.Id, create.Tags);
@@ -165,18 +161,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             Create(create);
         }
 
+        private void UpdateCore(UpdateAsset update)
+        {
+            Update(update);
+        }
+
         private async Task MoveCore(MoveAsset move)
         {
             await GuardAsset.CanMove(move, Snapshot, assetQuery);
 
             Move(move);
-        }
-
-        private void UpdateCore(UpdateAsset update)
-        {
-            GuardAsset.CanUpdate(update);
-
-            Update(update);
         }
 
         private async Task DeleteCore(DeleteAsset delete)
@@ -202,7 +196,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 MimeType = command.File.MimeType,
                 FileName = command.File.FileName,
                 FileSize = command.File.FileSize,
-                FileVersion = 0,
                 Slug = command.File.FileName.ToAssetSlug()
             });
         }
