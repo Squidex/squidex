@@ -103,7 +103,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
 
             var result = new SetupVM
             {
-                BaseUrlConfigured = urlGenerator.BuildUrl(),
+                BaseUrlConfigured = urlGenerator.BuildUrl(string.Empty, false),
                 BaseUrlCurrent = $"{request.Scheme}://{request.Host}",
                 ErrorMessage = errorMessage,
                 EverybodyCanCreateApps = !uiOptions.OnlyAdminsCanCreateApps,

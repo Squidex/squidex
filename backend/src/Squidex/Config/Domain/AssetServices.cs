@@ -38,6 +38,12 @@ namespace Squidex.Config.Domain
                    .As<IEventConsumer>();
             }
 
+            if (config.GetValue<bool>("assets:deletePermanent"))
+            {
+                services.AddTransientAs<AssetPermanentDeleter>()
+                   .As<IEventConsumer>();
+            }
+
             services.AddTransientAs<AssetDomainObject>()
                 .AsSelf();
 
