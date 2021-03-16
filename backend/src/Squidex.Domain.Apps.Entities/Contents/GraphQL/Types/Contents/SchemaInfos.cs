@@ -144,6 +144,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
     internal sealed class Names
     {
+        // Reserver names that are used for other GraphQL types.
+        private static readonly HashSet<string> ReservedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Content",
+            "Asset",
+            "AssetResultDto",
+            "EntitySavedResultDto",
+            "JsonScalar"
+        };
         private readonly Dictionary<string, int> takenNames = new Dictionary<string, int>();
 
         public string this[IField field]
@@ -164,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 name = "gql_" + name;
             }
-            else if (name.Equals("Content", StringComparison.OrdinalIgnoreCase) && isEntity)
+            else if (ReservedNames.Contains(name) && isEntity)
             {
                 name = $"{name}Entity";
             }
