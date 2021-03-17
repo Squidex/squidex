@@ -14,6 +14,7 @@ using Jint.Runtime.Interop;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
+using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.Scripting
@@ -44,6 +45,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 case ClaimsPrincipal principal:
                     result = JintUser.Create(engine, principal);
                     return true;
+                case DomainId domainId:
+                    result = domainId.ToString();
+                    return true;
                 case Guid guid:
                     result = guid.ToString();
                     return true;
@@ -53,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 case Status status:
                     result = status.ToString();
                     return true;
-                case NamedContentData content:
+                case ContentData content:
                     result = new ContentDataObject(engine, content);
                     return true;
             }

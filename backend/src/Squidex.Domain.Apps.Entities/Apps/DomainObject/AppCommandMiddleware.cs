@@ -45,14 +45,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 await UploadAsync(uploadImage);
             }
 
-            await ExecuteCommandAsync(context);
+            await base.HandleAsync(context, next);
+        }
 
-            if (context.PlainResult is IAppEntity app)
+        protected override Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
+        {
+            if (result.Payload is IAppEntity app)
             {
                 contextProvider.Context.App = app;
             }
 
-            await next(context);
+            return base.EnrichResultAsync(context, result);
         }
 
         private async Task UploadAsync(UploadAppImage uploadImage)

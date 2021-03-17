@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -34,6 +34,11 @@ namespace Squidex.Extensions.Actions.AzureQueue
         [DataType(DataType.Text)]
         [Formattable]
         public string Queue { get; set; }
+
+        [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
+        public string Payload { get; set; }
 
         protected override IEnumerable<ValidationError> CustomValidate()
         {

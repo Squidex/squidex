@@ -7,8 +7,8 @@
 
 // tslint:disable: readonly-array
 
-import { FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { Form, Types, valueAll$ } from '@app/framework';
+import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { Form, Types, UndefinableFormArray, valueAll$ } from '@app/framework';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime, onErrorResumeNext } from 'rxjs/operators';
 import { AppLanguageDto } from './../services/app-languages.service';
@@ -92,7 +92,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto,
-        private readonly user: any = {}, debounce = 100
+        private context: any, debounce = 100
     ) {
         super(new FormGroup({}));
 
@@ -184,6 +184,12 @@ export class EditContentForm extends Form<FormGroup, any> {
         this.updateState(this.value);
     }
 
+    public setContext(context?: any) {
+        this.context = context;
+
+        this.updateState(this.value);
+    }
+
     public submitCompleted(options?: { newValue?: any, noReset?: boolean }) {
         super.submitCompleted(options);
 
@@ -191,7 +197,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     private updateState(data: any) {
-        const context = { user: this.user, data };
+        const context = { ...this.context || {}, data };
 
         for (const field of Object.values(this.fields)) {
             field.updateState(context, { isDisabled: this.form.disabled });
@@ -314,7 +320,7 @@ export class FieldValueForm extends AbstractContentForm<RootFieldDto, FormContro
     }
 }
 
-export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray> {
+export class FieldArrayForm extends AbstractContentForm<RootFieldDto, UndefinableFormArray> {
     private readonly item$ = new BehaviorSubject<ReadonlyArray<FieldArrayItemForm>>([]);
 
     public get itemChanges(): Observable<ReadonlyArray<FieldArrayItemForm>> {
@@ -347,6 +353,20 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
         this.items = [...this.items, child];
 
         this.form.push(child.form);
+    }
+
+    public unset() {
+        this.items = [];
+
+        super.unset();
+
+        this.form.clear();
+    }
+
+    public reset() {
+        this.items = [];
+
+        this.form.clear();
     }
 
     public removeItemAt(index: number) {
@@ -393,7 +413,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, FormArray>
     private static buildControl(field: RootFieldDto, isOptional: boolean) {
         const validators = FieldsValidators.create(field, isOptional);
 
-        return new FormArray([], validators);
+        return new UndefinableFormArray([], validators);
     }
 }
 

@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The reference data for the frontend UI.
         /// </summary>
-        public NamedContentData? ReferenceData { get; set; }
+        public ContentData? ReferenceData { get; set; }
 
         /// <summary>
         /// The date and time when the content item has been created.
@@ -149,7 +149,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 AddGetLink("previous", resources.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
             }
 
-            if (NewStatus.HasValue)
+            if (NewStatus != null)
             {
                 if (resources.CanDeleteContentVersion(schema))
                 {
@@ -180,7 +180,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             if (content.CanUpdate && resources.CanUpdateContent(schema))
             {
                 AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
-
                 AddPatchLink("patch", resources.Url<ContentsController>(x => nameof(x.PatchContent), values));
             }
 

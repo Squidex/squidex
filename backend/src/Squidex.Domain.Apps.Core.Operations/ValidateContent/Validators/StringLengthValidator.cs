@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {
-                if (minLength.HasValue && maxLength.HasValue)
+                if (minLength != null && maxLength != null)
                 {
                     if (minLength == maxLength && minLength != stringValue.Length)
                     {
@@ -44,12 +44,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 }
                 else
                 {
-                    if (minLength.HasValue && stringValue.Length < minLength)
+                    if (minLength != null && stringValue.Length < minLength)
                     {
                         addError(context.Path, T.Get("contents.validation.minLength", new { min = minLength }));
                     }
 
-                    if (maxLength.HasValue && stringValue.Length > maxLength)
+                    if (maxLength != null && stringValue.Length > maxLength)
                     {
                         addError(context.Path, T.Get("contents.validation.maxLength", new { max = maxLength }));
                     }

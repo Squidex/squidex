@@ -12,5 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
     public sealed class MoveAsset : AssetCommand
     {
         public DomainId ParentId { get; set; }
+
+        public string? ParentPath { get; set; }
     }
 }

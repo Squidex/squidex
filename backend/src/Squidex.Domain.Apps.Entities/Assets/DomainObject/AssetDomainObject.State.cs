@@ -49,13 +49,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             [IgnoreDataMember]
             public DomainId AssetId
             {
-                get { return Id; }
+                get => Id;
             }
 
             [IgnoreDataMember]
             public DomainId UniqueId
             {
-                get { return DomainId.Combine(AppId, Id); }
+                get => DomainId.Combine(AppId, Id);
             }
 
             public override bool ApplyEvent(IEvent @event)
@@ -68,15 +68,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                             SimpleMapper.Map(e, this);
 
-                            FileName = e.FileName;
-
-                            if (string.IsNullOrWhiteSpace(e.Slug))
+                            if (string.IsNullOrWhiteSpace(Slug))
                             {
-                                Slug = e.FileName.ToAssetSlug();
-                            }
-                            else
-                            {
-                                Slug = e.Slug;
+                                Slug = FileName.ToAssetSlug();
                             }
 
                             TotalSize += e.FileSize;
@@ -86,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             return true;
                         }
 
-                    case AssetUpdated e:
+                    case AssetUpdated e when Is.Change(e.FileHash, FileHash):
                         {
                             SimpleMapper.Map(e, this);
 
@@ -122,14 +116,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                                 hasChanged = true;
                             }
 
-                            if (Is.OptionalChange(Tags, e.Tags))
+                            if (Is.OptionalSetChange(Tags, e.Tags))
                             {
                                 Tags = e.Tags;
 
                                 hasChanged = true;
                             }
 
-                            if (Is.OptionalChange(Metadata, e.Metadata))
+                            if (Is.OptionalMapChange(Metadata, e.Metadata))
                             {
                                 Metadata = e.Metadata;
 
@@ -150,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             return true;
                         }
 
-                    case AssetDeleted _:
+                    case AssetDeleted:
                         {
                             IsDeleted = true;
 

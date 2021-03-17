@@ -18,22 +18,22 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public IReadOnlyList<NestedField> Fields
         {
-            get { return fields.Ordered; }
+            get => fields.Ordered;
         }
 
         public IReadOnlyDictionary<long, NestedField> FieldsById
         {
-            get { return fields.ById; }
+            get => fields.ById;
         }
 
         public IReadOnlyDictionary<string, NestedField> FieldsByName
         {
-            get { return fields.ByName; }
+            get => fields.ByName;
         }
 
         public FieldCollection<NestedField> FieldCollection
         {
-            get { return fields; }
+            get => fields;
         }
 
         public ArrayField(long id, string name, Partitioning partitioning, ArrayFieldProperties? properties = null, IFieldSettings? settings = null)

@@ -17,12 +17,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public T Properties
         {
-            get { return properties; }
+            get => properties;
         }
 
         public override FieldProperties RawProperties
         {
-            get { return properties; }
+            get => properties;
         }
 
         public RootField(long id, string name, Partitioning partitioning, T? properties = null, IFieldSettings? settings = null)

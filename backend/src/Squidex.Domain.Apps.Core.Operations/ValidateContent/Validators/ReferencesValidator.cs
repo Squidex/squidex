@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             this.properties = properties;
 
-            if (isRequired || properties.MinItems.HasValue || properties.MaxItems.HasValue)
+            if (isRequired || properties.MinItems != null || properties.MaxItems != null)
             {
                 collectionValidator = new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             var foundIds = new List<DomainId>();
 
-            if (value is ICollection<DomainId> contentIds && contentIds.Count > 0)
+            if (value is ICollection<DomainId> { Count: > 0 } contentIds)
             {
                 var references = await checkReferences(contentIds.ToHashSet());
                 var index = 0;

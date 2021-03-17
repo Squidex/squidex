@@ -25,12 +25,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IMongoCollection<BsonDocument> RawCollection
         {
-            get { return Database.GetCollection<BsonDocument>(CollectionName()); }
+            get => Database.GetCollection<BsonDocument>(CollectionName());
         }
 
         public IMongoCollection<MongoEventCommit> TypedCollection
         {
-            get { return Collection; }
+            get => Collection;
         }
 
         public bool CanUseChangeStreams { get; private set; }

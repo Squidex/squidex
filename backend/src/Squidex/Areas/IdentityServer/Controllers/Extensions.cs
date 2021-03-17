@@ -22,6 +22,11 @@ namespace Squidex.Areas.IdentityServer.Controllers
         {
             var externalLogin = await signInManager.GetExternalLoginInfoAsync(expectedXsrf);
 
+            if (externalLogin == null)
+            {
+                throw new InvalidOperationException("Request from external provider cannot be handled.");
+            }
+
             var email = externalLogin.Principal.GetEmail();
 
             if (string.IsNullOrWhiteSpace(email))

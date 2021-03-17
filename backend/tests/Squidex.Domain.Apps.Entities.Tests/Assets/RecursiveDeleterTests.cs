@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class RecursiveDeleterTests
     {
-        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAssetFolderRepository assetFolderRepository = A.Fake<IAssetFolderRepository>();
@@ -33,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public RecursiveDeleterTests()
         {
-            typeNameRegistry.Map(typeof(AssetFolderDeleted));
+            var typeNameRegistry = new TypeNameRegistry().Map(typeof(AssetFolderDeleted));
 
             sut = new RecursiveDeleter(commandBus, assetRepository, assetFolderRepository, typeNameRegistry, log);
         }

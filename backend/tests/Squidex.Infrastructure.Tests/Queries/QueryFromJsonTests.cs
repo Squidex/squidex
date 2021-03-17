@@ -24,6 +24,7 @@ namespace Squidex.Infrastructure.Queries
         {
             ("Contains", "contains", "contains($FIELD, $VALUE)"),
             ("Empty", "empty", "empty($FIELD)"),
+            ("Exists", "exists", "exists($FIELD)"),
             ("EndsWith", "endswith", "endsWith($FIELD, $VALUE)"),
             ("Equals", "eq", "$FIELD == $VALUE"),
             ("GreaterThanOrEqual", "ge", "$FIELD >= $VALUE"),
@@ -95,7 +96,7 @@ namespace Squidex.Infrastructure.Queries
                 Reference = new JsonSchema
                 {
                     Format = GeoJson.Format
-                },
+                }
             };
 
             Schema.Properties["stringArray"] = new JsonSchemaProperty
@@ -241,25 +242,30 @@ namespace Squidex.Infrastructure.Queries
 
         public class Geo
         {
+            private static bool ValidOperator(string op)
+            {
+                return op == "lt" || op == "exists";
+            }
+
             public static IEnumerable<object[]> ValidTests()
             {
                 var value = new { longitude = 10, latitude = 20, distance = 30 };
 
-                return BuildFlatTests("geo", x => x == "lt", value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
+                return BuildFlatTests("geo", ValidOperator, value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
             }
 
             public static IEnumerable<object[]> ValidRefTests()
             {
                 var value = new { longitude = 10, latitude = 20, distance = 30 };
 
-                return BuildFlatTests("geoRef", x => x == "lt", value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
+                return BuildFlatTests("geoRef", ValidOperator, value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
             }
 
             public static IEnumerable<object[]> InvalidTests()
             {
                 var value = new { longitude = 10, latitude = 20, distance = 30 };
 
-                return BuildInvalidOperatorTests("geo", x => x == "lt", value);
+                return BuildInvalidOperatorTests("geo", ValidOperator, value);
             }
 
             [Theory]
@@ -308,18 +314,23 @@ namespace Squidex.Infrastructure.Queries
 
         public class Number
         {
+            private static bool ValidOperator(string op)
+            {
+                return op.Length == 2 || op == "exists";
+            }
+
             public static IEnumerable<object[]> ValidTests()
             {
                 const int value = 12;
 
-                return BuildTests("number", x => x.Length == 2, value, $"{value}");
+                return BuildTests("number", ValidOperator, value, $"{value}");
             }
 
             public static IEnumerable<object[]> InvalidTests()
             {
                 const int value = 12;
 
-                return BuildInvalidOperatorTests("number", x => x.Length == 2, $"{value}");
+                return BuildInvalidOperatorTests("number", ValidOperator, $"{value}");
             }
 
             public static IEnumerable<object[]> ValidInTests()
@@ -367,18 +378,23 @@ namespace Squidex.Infrastructure.Queries
 
         public class Boolean
         {
+            private static bool ValidOperator(string op)
+            {
+                return op == "eq" || op == "ne" || op == "exists";
+            }
+
             public static IEnumerable<object[]> ValidTests()
             {
                 const bool value = true;
 
-                return BuildTests("boolean", x => x == "eq" || x == "ne", value, $"{value}");
+                return BuildTests("boolean", ValidOperator, value, $"{value}");
             }
 
             public static IEnumerable<object[]> InvalidTests()
             {
                 const bool value = true;
 
-                return BuildInvalidOperatorTests("boolean", x => x == "eq" || x == "ne", value);
+                return BuildInvalidOperatorTests("boolean", ValidOperator, value);
             }
 
             public static IEnumerable<object[]> ValidInTests()
@@ -426,11 +442,16 @@ namespace Squidex.Infrastructure.Queries
 
         public class Array
         {
-            public static IEnumerable<object[]> ValiedTests()
+            private static bool ValidOperator(string op)
+            {
+                return op == "eq" || op == "ne" || op == "empty" || op == "exists";
+            }
+
+            public static IEnumerable<object[]> ValidTests()
             {
                 const string value = "Hello";
 
-                return BuildTests("stringArray", x => x == "eq" || x == "ne" || x == "empty", value, $"'{value}'");
+                return BuildTests("stringArray", ValidOperator, value, $"'{value}'");
             }
 
             public static IEnumerable<object[]> ValidInTests()
@@ -441,7 +462,7 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Theory]
-            [MemberData(nameof(ValiedTests))]
+            [MemberData(nameof(ValidTests))]
             public void Should_parse_array_filter(string field, string op, string value, string expected)
             {
                 var json = new { path = field, op, value };

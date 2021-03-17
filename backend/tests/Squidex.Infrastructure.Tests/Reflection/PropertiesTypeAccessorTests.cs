@@ -31,12 +31,12 @@ namespace Squidex.Infrastructure.Reflection
 
             public int Read
             {
-                get { return target; }
+                get => target;
             }
 
             public int Write
             {
-                set { target = value; }
+                set => target = value;
             }
         }
 

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
@@ -68,6 +69,20 @@ namespace TestSuite.ApiTests
             var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id));
 
             Assert.Equal(409, ex.StatusCode);
+        }
+
+        [Fact]
+        public async Task Should_not_create_very_big_asset()
+        {
+            // STEP 1: Create small asset
+            await _.UploadFileAsync(1_000_000);
+
+
+            // STEP 2: Create big asset
+            var ex = await Assert.ThrowsAnyAsync<Exception>(() => _.UploadFileAsync(10_000_000));
+
+            // Client library cannot catch this exception properly.
+            Assert.True(ex is HttpRequestException || ex is SquidexManagementException);
         }
 
         [Fact]
@@ -191,22 +206,6 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_delete_asset()
-        {
-            // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
-
-
-            // STEP 2: Delete asset
-            await _.Assets.DeleteAssetAsync(_.AppName, asset_1.Id);
-
-            // Should return 404 when asset deleted.
-            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id));
-
-            Assert.Equal(404, ex.StatusCode);
-        }
-
-        [Fact]
         public async Task Should_query_asset_by_metadata()
         {
             // STEP 1: Create asset
@@ -281,6 +280,26 @@ namespace TestSuite.ApiTests
             Assert.Single(assets_1.Items, x => x.Id == asset_1.Id);
         }
 
+        [Fact]
+        public async Task Should_move_asset_to_folder_by_path()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Move dynamically
+            var asset_2 = await _.Assets.PutAssetParentAsync(_.AppName, asset_1.Id, new MoveAssetDto
+            {
+                ParentPath = "path/to/folder"
+            });
+
+
+            // STEP 3: Get folder
+            var folder_1 = await _.Assets.GetAssetFoldersAsync(_.AppName, asset_2.ParentId);
+
+            Assert.Equal("path/to/folder", string.Join("/", folder_1.Path.Select(x => x.FolderName)));
+        }
+
         [Fact, Trait("Category", "NotAutomated")]
         public async Task Should_delete_recursively()
         {
@@ -307,9 +326,61 @@ namespace TestSuite.ApiTests
             // STEP 5: Wait for recursive deleter to delete the asset.
             await Task.Delay(5000);
 
-            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id.ToString()));
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset_1.Id));
 
             Assert.Equal(404, ex.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Should_delete_asset(bool permanent)
+        {
+            // STEP 1: Create asset
+            var asset = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Delete asset
+            await _.Assets.DeleteAssetAsync(_.AppName, asset.Id, permanent: permanent);
+
+            // Should return 404 when asset deleted.
+            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset.Id));
+
+            Assert.Equal(404, ex.StatusCode);
+
+
+            // STEP 3: Retrieve all items and ensure that the deleted item does not exist.
+            var updated = await _.Assets.GetAssetsAsync(_.AppName, (AssetQuery)null);
+
+            Assert.DoesNotContain(updated.Items, x => x.Id == asset.Id);
+
+
+            // STEP 4: Retrieve all deleted items and check if found.
+            var deleted = await _.Assets.GetAssetsAsync(_.AppName, new AssetQuery
+            {
+                Filter = "isDeleted eq true"
+            });
+
+            Assert.Equal(!permanent, deleted.Items.Any(x => x.Id == asset.Id));
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Should_recreate_deleted_asset(bool permanent)
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Delete asset
+            await _.Assets.DeleteAssetAsync(_.AppName, asset_1.Id, permanent: permanent);
+
+
+            // STEP 3: Recreate asset
+            var asset_2 = await _.UploadFileAsync("Assets/logo-wide.png", "image/png");
+
+            Assert.NotEqual(asset_1.FileSize, asset_2.FileSize);
         }
     }
 }

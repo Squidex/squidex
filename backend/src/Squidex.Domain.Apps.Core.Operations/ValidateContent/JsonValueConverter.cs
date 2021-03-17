@@ -6,16 +6,13 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.IO;
-using GeoJSON.Net;
-using GeoJSON.Net.Geometry;
 using NodaTime.Text;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
-using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -109,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (args.Value.Type == JsonValueType.String)
             {
-                var parseResult = InstantPattern.General.Parse(args.Value.ToString());
+                var parseResult = InstantPattern.ExtendedIso.Parse(args.Value.ToString());
 
                 if (!parseResult.Success)
                 {
@@ -124,54 +121,19 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            if (args.Value is JsonObject geoObject)
+            var result = GeoJsonValue.TryParse(args.Value, args.JsonSerializer, out var value);
+
+            switch (result)
             {
-                try
-                {
-                    using (var stream = new MemoryStream())
-                    {
-                        args.JsonSerializer.Serialize(args.Value, stream, true);
-
-                        stream.Position = 0;
-
-                        var geoJson = args.JsonSerializer.Deserialize<GeoJSONObject>(stream);
-
-                        return (geoJson, null);
-                    }
-                }
-                catch
-                {
-                    if (geoObject.TryGetValue<JsonNumber>("latitude", out var lat))
-                    {
-                        if (!lat.Value.IsBetween(-90, 90))
-                        {
-                            return (null, new JsonError(T.Get("contents.invalidGeolocationLatitude")));
-                        }
-                    }
-                    else
-                    {
-                        return (null, new JsonError(T.Get("contents.invalidGeolocation")));
-                    }
-
-                    if (geoObject.TryGetValue<JsonNumber>("longitude", out var lon))
-                    {
-                        if (!lon.Value.IsBetween(-180, 180))
-                        {
-                            return (null, new JsonError(T.Get("contents.invalidGeolocationLongitude")));
-                        }
-                    }
-                    else
-                    {
-                        return (null, new JsonError(T.Get("contents.invalidGeolocation")));
-                    }
-
-                    var position = new Point(new Position(lat.Value, lon.Value));
-
-                    return (position, null);
-                }
+                case GeoJsonParseResult.InvalidLatitude:
+                    return (null, new JsonError(T.Get("contents.invalidGeolocationLatitude")));
+                case GeoJsonParseResult.InvalidLongitude:
+                    return (null, new JsonError(T.Get("contents.invalidGeolocationLongitude")));
+                case GeoJsonParseResult.InvalidValue:
+                    return (null, new JsonError(T.Get("contents.invalidGeolocation")));
+                default:
+                    return (value, null);
             }
-
-            return (null, new JsonError(T.Get("contents.invalidGeolocation")));
         }
 
         public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field, Args args)
@@ -211,11 +173,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                 foreach (var item in array)
                 {
-                    if (item is JsonNull)
-                    {
-                        result.Add(null);
-                    }
-                    else if (item is JsonString s)
+                    if (item is JsonString s && !string.IsNullOrWhiteSpace(s.Value))
                     {
                         result.Add(s.Value);
                     }

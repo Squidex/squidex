@@ -15,12 +15,12 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 
         public DomainId Id
         {
-            get { return SchemaId.Id; }
+            get => SchemaId.Id;
         }
 
         public override long Partition
         {
-            get { return SchemaId.GetHashCode(); }
+            get => SchemaId.GetHashCode();
         }
     }
 }

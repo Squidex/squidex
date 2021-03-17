@@ -5,6 +5,7 @@
     }
 
     &-edit {
+        @include absolute(0, 0, null, null);
         color: $color-border-dark;
         cursor: pointer;
         padding: .6rem .25rem;
@@ -14,6 +15,7 @@
         display: inline;
         font-size: 1.2rem;
         font-weight: normal;
+        padding-right: 1.75rem;
     }
 
     &-view {

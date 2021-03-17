@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public sealed class Result
     {
-        public Exception? Exception { get; private set; }
+        public Exception? Exception { get; private init; }
 
         public string? Dump { get; private set; }
 

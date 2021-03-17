@@ -44,6 +44,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
+    public confirmPreview = () => {
+        return this.checkPendingChangesBeforePreview();
+    }
+
     constructor(apiUrl: ApiUrlConfig, authService: AuthService, appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly autoSaveService: AutoSaveService,
@@ -84,7 +88,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 .subscribe(schema => {
                     this.schema = schema;
 
-                    this.contentForm = new EditContentForm(this.languages, this.schema, this.formContext.user);
+                    this.contentForm = new EditContentForm(this.languages, this.schema, this.formContext);
                 }));
 
         this.own(
@@ -92,9 +96,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 .subscribe(content => {
                     const isNewContent = isOtherContent(content, this.content);
 
-                    this.content = content;
+                    this.formContext['initialContent'] = content;
 
-                    this.formContext['initialContent'] = this.content;
+                    this.content = content;
+                    this.contentForm.setContext(this.formContext);
 
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
@@ -205,26 +210,30 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
         if (content) {
             this.contentsState.deleteMany([content]);
+
+            this.back();
         }
+    }
+
+    public checkPendingChangesBeforePreview() {
+        return this.checkPendingChanges('i18n:contents.pendingChangesTextToPreview');
     }
 
     public checkPendingChangesBeforeClose() {
-        if (this.content && !this.content.canUpdate) {
-            return of(true);
-        }
-
-        return this.contentForm.hasChanged() ?
-            this.dialogs.confirm('i18n:contents.pendingChangesTitle', 'i18n:contents.pendingChangesTextToClose') :
-            of(true);
+        return this.checkPendingChanges('i18n:contents.pendingChangesTextToClose');
     }
 
     public checkPendingChangesBeforeChangingStatus() {
+        return this.checkPendingChanges('i18n:contents.pendingChangesTextToChange');
+    }
+
+    private checkPendingChanges(text: string) {
         if (this.content && !this.content.canUpdate) {
             return of(true);
         }
 
         return this.contentForm.hasChanged() ?
-            this.dialogs.confirm('i18n:contents.pendingChangesTitle', 'i18n:contents.pendingChangesTextToChange') :
+            this.dialogs.confirm('i18n:contents.pendingChangesTitle', text) :
             of(true);
     }
 
@@ -243,7 +252,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.contentsState.loadVersion(content, version)
                 .subscribe(dto => {
                     if (compare) {
-                        this.contentFormCompare = new EditContentForm(this.languages, this.schema, this.formContext.user);
+                        this.contentFormCompare = new EditContentForm(this.languages, this.schema, this.formContext);
 
                         this.contentFormCompare.load(dto.payload);
                         this.contentFormCompare.setEnabled(false);

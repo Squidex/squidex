@@ -4,9 +4,11 @@
     </ng-container>
 
     <ng-container content>
-        <div>
-            <iframe #iframe scrolling="no" width="100%"></iframe>
-        </div>
+        <sqx-content-extension
+            [url]="url | async"
+            [content]="contentsState.selectedContent | async"
+            [contentSchema]="schemasState.selectedSchema | async">
+        </sqx-content-extension>
     </ng-container>
 </sqx-panel>
 

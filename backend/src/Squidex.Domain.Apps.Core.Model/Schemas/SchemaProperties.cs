@@ -18,6 +18,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string? ContentSidebarUrl { get; set; }
 
+        public string? ContentEditorUrl { get; set; }
+
         public bool ValidateOnPublish { get; set; }
     }
 }

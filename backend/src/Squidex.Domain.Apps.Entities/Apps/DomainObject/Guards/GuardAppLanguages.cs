@@ -19,17 +19,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var languages = app.Languages;
-
             Validate.It(e =>
             {
+                var languages = app.Languages;
                 var language = command.Language;
 
                 if (language == null)
                 {
                     e(Not.Defined(nameof(command.Language)), nameof(command.Language));
                 }
-                else if (languages.Contains(language))
+                else if (app.Languages.Contains(command.Language))
                 {
                     e(T.Get("apps.languages.languageAlreadyAdded"));
                 }
@@ -40,10 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var languages = app.Languages;
-
             Validate.It(e =>
             {
+                var languages = app.Languages;
                 var language = command.Language;
 
                 if (language == null)
@@ -66,10 +64,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var languages = app.Languages;
-
             Validate.It(e =>
             {
+                var languages = app.Languages;
                 var language = command.Language;
 
                 if (language == null)

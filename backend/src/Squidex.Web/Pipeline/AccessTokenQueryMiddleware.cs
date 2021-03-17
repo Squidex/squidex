@@ -26,7 +26,7 @@ namespace Squidex.Web.Pipeline
 
             if (HasNoAuthHeader(request) && request.Query.TryGetValue("access_token", out var token))
             {
-                request.Headers[HeaderNames.Authorization] = token;
+                request.Headers[HeaderNames.Authorization] = $"Bearer {token}";
             }
 
             return next(context);

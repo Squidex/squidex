@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_convert_data_and_data_draft_when_frontend_user()
         {
-            var content = CreateContent(new NamedContentData());
+            var content = CreateContent(new ContentData());
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
@@ -74,16 +74,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var content = CreateContent(source);
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("references",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array(id2)))
+                            .AddInvariant(JsonValue.Array(id2)))
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array()))
+                            .AddInvariant(JsonValue.Array()))
                     .AddField("array",
                         new ContentFieldData()
-                            .AddJsonValue(
+                            .AddInvariant(
                                 JsonValue.Array(
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array(id2)))));
@@ -112,16 +112,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var content = CreateContent(source);
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("references",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array()))
+                            .AddInvariant(JsonValue.Array()))
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddJsonValue(JsonValue.Array()))
+                            .AddInvariant(JsonValue.Array()))
                     .AddField("array",
                         new ContentFieldData()
-                            .AddJsonValue(
+                            .AddInvariant(
                                 JsonValue.Array(
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array()))));
@@ -139,24 +139,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Equal(expected, content.Data);
         }
 
-        private static NamedContentData BuildTestData(DomainId id1, DomainId id2)
+        private static ContentData BuildTestData(DomainId id1, DomainId id2)
         {
-            return new NamedContentData()
+            return new ContentData()
                 .AddField("references",
                     new ContentFieldData()
-                        .AddJsonValue(JsonValue.Array(id1, id2)))
+                        .AddInvariant(JsonValue.Array(id1, id2)))
                 .AddField("assets",
                     new ContentFieldData()
-                        .AddJsonValue(JsonValue.Array(id1)))
+                        .AddInvariant(JsonValue.Array(id1)))
                 .AddField("array",
                     new ContentFieldData()
-                        .AddJsonValue(
+                        .AddInvariant(
                             JsonValue.Array(
                                 JsonValue.Object()
                                     .Add("nested", JsonValue.Array(id1, id2)))));
         }
 
-        private ContentEntity CreateContent(NamedContentData data)
+        private ContentEntity CreateContent(ContentData data)
         {
             return new ContentEntity
             {

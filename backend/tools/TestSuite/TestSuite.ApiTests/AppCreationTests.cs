@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
@@ -35,7 +37,7 @@ namespace TestSuite.ApiTests
 
             var app = await _.Apps.PostAppAsync(createRequest);
 
-            // Should return create app with correct name.
+            // Should return created app with correct name.
             Assert.Equal(appName, app.Name);
 
 
@@ -61,7 +63,38 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_remove_app()
+        public async Task Should_create_app_with_anonymous_access()
+        {
+            var appName = Guid.NewGuid().ToString();
+
+            // STEP 1: Create app
+            var createRequest = new CreateAppDto { Name = appName };
+
+            var app = await _.Apps.PostAppAsync(createRequest);
+
+            // Should return create app with correct name.
+            Assert.Equal(appName, app.Name);
+
+
+            // STEP 2: Make the client anonymous.
+            var request = new UpdateClientDto
+            {
+                AllowAnonymous = true, Role = "Owner"
+            };
+
+            await _.Apps.PutClientAsync(appName, "default", request);
+
+
+            // STEP 3: Check anonymous permission
+            var url = $"{_.ClientManager.Options.Url}/api/apps/{appName}/contributors";
+
+            var response = await new HttpClient().GetAsync(url);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Should_archive_app()
         {
             var appName = Guid.NewGuid().ToString();
 
@@ -78,6 +111,25 @@ namespace TestSuite.ApiTests
 
             // Should not provide deleted app when apps are queried.
             Assert.DoesNotContain(apps, x => x.Name == appName);
+        }
+
+        [Fact]
+        public async Task Should_recreate_after_archived()
+        {
+            var appName = Guid.NewGuid().ToString();
+
+            // STEP 1: Create app
+            var createRequest = new CreateAppDto { Name = appName };
+
+            await _.Apps.PostAppAsync(createRequest);
+
+
+            // STEP 2: Archive app
+            await _.Apps.DeleteAppAsync(appName);
+
+
+            // STEP 3: Create app again
+            await _.Apps.PostAppAsync(createRequest);
         }
     }
 }

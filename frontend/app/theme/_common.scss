@@ -216,6 +216,61 @@ body {
 }
 
 //
+// Status Icon
+//
+.status-icon {
+    & {
+        @include circle-icon(2rem);
+        background: $color-border;
+        border: 0;
+        color: $color-dark-foreground;
+        display: inline-block;
+    }
+
+    &-sm {
+        @include circle-icon(1.6rem);
+    }
+
+    &-lg {
+        @include circle-icon(2.8rem);
+    }
+
+    &-pending {
+        color: inherit;
+    }
+
+    &-warning {
+        background: $color-theme-orange;
+    }
+
+    &-failed {
+        background: $color-theme-error;
+    }
+
+    &-success {
+        background: $color-theme-green;
+    }
+}
+
+//
+// ACE
+//
+// sass-lint:disable class-name-format
+.ace_tooltip {
+    background: $color-dark-foreground;
+    border: 1px solid $color-input;
+    border-radius: 0;
+    font-size: 14px;
+    max-width: 300px;
+    min-width: 100px;
+    white-space: pre-wrap;
+
+    hr {
+        margin: .5rem 0;
+    }
+}
+
+//
 // Animations
 //
 .spin {

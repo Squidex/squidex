@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var plan = new AppPlan(new RefToken("user", "Me"), "free");
+            var plan = new AppPlan(RefToken.Client("Me"), "free");
 
             var serialized = plan.SerializeAndDeserialize();
 

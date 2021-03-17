@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         public ImmutableQueue<string> Path { get; private set; } = ImmutableQueue<string>.Empty;
 
-        public IJsonSerializer JsonSerializer { get; private set; }
+        public IJsonSerializer JsonSerializer { get; }
 
         public DomainId ContentId { get; }
 
@@ -32,6 +32,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             : base(appId, schemaId, schema)
         {
             JsonSerializer = jsonSerializer;
+
             ContentId = contentId;
         }
 

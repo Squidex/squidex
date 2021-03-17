@@ -105,16 +105,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private static bool HasPermission(Context context, string schemaName)
         {
-            var permission = Permissions.ForApp(Permissions.AppContentsRead, context.App.Name, schemaName);
-
-            return context.Permissions.Allows(permission);
+            return context.UserPermissions.Allows(Permissions.AppContentsReadOwn, context.App.Name, schemaName);
         }
 
         private static string FormatName(IEnrichedContentEntity content, string masterLanguage)
         {
             var sb = new StringBuilder();
 
-            IJsonValue? GetValue(NamedContentData? data, RootField field)
+            IJsonValue? GetValue(ContentData? data, RootField field)
             {
                 if (data != null && data.TryGetValue(field.Name, out var fieldValue) && fieldValue != null)
                 {

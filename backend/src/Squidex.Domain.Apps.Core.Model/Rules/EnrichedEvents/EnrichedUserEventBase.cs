@@ -9,6 +9,8 @@ using System.Runtime.Serialization;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
+#pragma warning disable CA1822 // Mark members as static
+
 namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
     public abstract class EnrichedUserEventBase : EnrichedEvent
@@ -17,5 +19,10 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 
         [IgnoreDataMember]
         public IUser? User { get; set; }
+
+        public bool ShouldSerializeUser()
+        {
+            return false;
+        }
     }
 }

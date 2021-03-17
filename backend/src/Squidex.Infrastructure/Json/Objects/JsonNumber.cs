@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Json.Objects
     {
         public override JsonValueType Type
         {
-            get { return JsonValueType.Number; }
+            get => JsonValueType.Number;
         }
 
         internal JsonNumber(double value)

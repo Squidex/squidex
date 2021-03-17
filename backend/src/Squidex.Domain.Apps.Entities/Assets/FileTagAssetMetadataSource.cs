@@ -28,12 +28,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             public string Name
             {
-                get { return file.FileName; }
+                get => file.FileName;
             }
 
             public Stream ReadStream
             {
-                get { return file.OpenRead(); }
+                get => file.OpenRead();
             }
 
             public Stream WriteStream
@@ -52,14 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        public Task EnhanceAsync(UploadAssetCommand command, HashSet<string>? tags)
-        {
-            Enhance(command);
-
-            return Task.CompletedTask;
-        }
-
-        private static void Enhance(UploadAssetCommand command)
+        public Task EnhanceAsync(UploadAssetCommand command)
         {
             try
             {
@@ -67,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     if (file.Properties == null)
                     {
-                        return;
+                        return Task.CompletedTask;
                     }
 
                     var type = file.Properties.MediaTypes;
@@ -146,10 +139,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     TryAddString("description", file.Properties.Description);
                 }
+
+                return Task.CompletedTask;
             }
             catch
             {
-                return;
+                return Task.CompletedTask;
             }
         }
 

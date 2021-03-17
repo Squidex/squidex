@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var rule = (await grainFactory.GetGrain<IRuleGrain>(id.ToString()).GetStateAsync()).Value;
 
-            if (rule.Version <= EtagVersion.Empty)
+            if (rule.Version <= EtagVersion.Empty || rule.IsDeleted)
             {
                 return null;
             }

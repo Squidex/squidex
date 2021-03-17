@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
@@ -14,13 +14,18 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
     {
         public DomainId ParentId { get; set; }
 
-        public HashSet<string> Tags { get; set; } = new HashSet<string>();
+        public string? ParentPath { get; set; }
 
         public bool Duplicate { get; set; }
 
         public CreateAsset()
         {
             AssetId = DomainId.NewGuid();
+        }
+
+        public MoveAsset AsMove()
+        {
+            return SimpleMapper.Map(this, new MoveAsset());
         }
     }
 }

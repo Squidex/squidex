@@ -21,12 +21,12 @@ namespace Squidex.Shared
 
         public static IReadOnlyList<string> ForAppsNonSchema
         {
-            get { return ForAppsNonSchemaList; }
+            get => ForAppsNonSchemaList;
         }
 
         public static IReadOnlyList<string> ForAppsSchema
         {
-            get { return ForAppsSchemaList; }
+            get => ForAppsSchemaList;
         }
 
         public const string All = "squidex.*";
@@ -137,12 +137,19 @@ namespace Squidex.Shared
 
         public const string AppContents = "squidex.apps.{app}.contents.{name}";
         public const string AppContentsRead = "squidex.apps.{app}.contents.{name}.read";
+        public const string AppContentsReadOwn = "squidex.apps.{app}.contents.{name}.read.own";
         public const string AppContentsCreate = "squidex.apps.{app}.contents.{name}.create";
         public const string AppContentsUpdate = "squidex.apps.{app}.contents.{name}.update";
+        public const string AppContentsUpdateOwn = "squidex.apps.{app}.contents.{name}.update.own";
+        public const string AppContentsChangeStatus = "squidex.apps.{app}.contents.{name}.changestatus";
+        public const string AppContentsChangeStatusOwn = "squidex.apps.{app}.contents.{name}.changestatus.own";
         public const string AppContentsUpsert = "squidex.apps.{app}.contents.{name}.upsert";
         public const string AppContentsVersionCreate = "squidex.apps.{app}.contents.{name}.version.create";
+        public const string AppContentsVersionCreateOwn = "squidex.apps.{app}.contents.{name}.version.create.own";
         public const string AppContentsVersionDelete = "squidex.apps.{app}.contents.{name}.version.delete";
+        public const string AppContentsVersionDeleteOwn = "squidex.apps.{app}.contents.{name}.version.delete.own";
         public const string AppContentsDelete = "squidex.apps.{app}.contents.{name}.delete";
+        public const string AppContentsDeleteOwn = "squidex.apps.{app}.contents.{name}.delete.own";
 
         static Permissions()
         {
@@ -167,18 +174,18 @@ namespace Squidex.Shared
             }
         }
 
+        public static bool Allows(this PermissionSet permissions, string id, string app = Permission.Any, string schema = Permission.Any)
+        {
+            var permission = ForApp(id, app, schema);
+
+            return permissions.Allows(permission);
+        }
+
         public static Permission ForApp(string id, string app = Permission.Any, string schema = Permission.Any)
         {
             Guard.NotNull(id, nameof(id));
 
             return new Permission(id.Replace("{app}", app ?? Permission.Any).Replace("{name}", schema ?? Permission.Any));
-        }
-
-        public static PermissionSet ToAppPermissions(this PermissionSet permissions, string app)
-        {
-            var matching = permissions.Where(x => x.StartsWith($"squidex.apps.{app}"));
-
-            return new PermissionSet(matching);
         }
 
         public static string[] ToAppNames(this PermissionSet permissions)

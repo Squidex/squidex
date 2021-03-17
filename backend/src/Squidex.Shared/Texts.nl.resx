@@ -59,52 +59,52 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Het veld {name|lower} moet een absolute URL zijn.</value>
+    <value>Het veld '{name|lower}' moet een absolute URL zijn.</value>
   </data>
   <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Het veld {0} moet een absolute URL zijn.</value>
+    <value>Het veld '{0}' moet een absolute URL zijn.</value>
   </data>
   <data name="annotations_Compare" xml:space="preserve">
-    <value>Het veld {name|lower} moet hetzelfde zijn als {other|lower}.</value>
+    <value>Het veld '{name|lower}' moet hetzelfde zijn als {other|lower}.</value>
   </data>
   <data name="dotnet_annotations_Compare" xml:space="preserve">
-    <value>Het veld {0} moet hetzelfde zijn als {1}.</value>
+    <value>Het veld '{0}' moet hetzelfde zijn als {1}.</value>
   </data>
   <data name="annotations_EmailAddress" xml:space="preserve">
-    <value>Het veld {name|lower} is geen geldig e-mailadres.</value>
+    <value>Het veld '{name|lower}' is geen geldig e-mailadres.</value>
   </data>
   <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
-    <value>Het veld {0} is geen geldig e-mailadres.</value>
+    <value>Het veld '{0}' is geen geldig e-mailadres.</value>
   </data>
   <data name="annotations_Range" xml:space="preserve">
-    <value>Het veld {name|lower} moet tussen {min} en {max} zijn.</value>
+    <value>Het veld '{name|lower}' moet tussen {min} en {max} zijn.</value>
   </data>
   <data name="dotnet_annotations_Range" xml:space="preserve">
-    <value>Het veld {0} moet tussen {1} en {2} zijn.</value>
+    <value>Het veld '{0}' moet tussen {1} en {2} zijn.</value>
   </data>
   <data name="annotations_RegularExpression" xml:space="preserve">
-    <value>Het veld {name|lower} is niet.</value>
+    <value>Het veld '{name|lower}' is niet.</value>
   </data>
   <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
-    <value>Het veld {0} is niet.</value>
+    <value>Het veld '{0}' is niet.</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
-    <value>Het veld {name|lower} is verplicht.</value>
+    <value>Het veld '{name|lower}' is verplicht.</value>
   </data>
   <data name="dotnet_annotations_Required" xml:space="preserve">
-    <value>Het veld {0} is verplicht.</value>
+    <value>Het veld '{0}' is verplicht.</value>
   </data>
   <data name="annotations_StringLength" xml:space="preserve">
-    <value>Het veld {name|lower} moet een string zijn met een maximale lengte van {max}.</value>
+    <value>Het veld '{name|lower}' moet een string zijn met een maximale lengte van {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLength" xml:space="preserve">
-    <value>Het veld {0} moet een string zijn met een maximale lengte van {1}.</value>
+    <value>Het veld '{0}' moet een string zijn met een maximale lengte van {1}.</value>
   </data>
   <data name="annotations_StringLengthMinimum" xml:space="preserve">
-    <value>Het veld {name|lower} moet een string zijn met een minimum lengte van {min} en een maximum lengte van {max}.</value>
+    <value>Het veld '{name|lower}' moet een string zijn met een minimum lengte van {min} en een maximum lengte van {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
-    <value>Het veld {0} moet een string zijn met een minimum lengte van {1} en een maximum lengte van {2}.</value>
+    <value>Het veld '{0}' moet een string zijn met een minimum lengte van {1} en een maximum lengte van {2}.</value>
   </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
     <value>Er bestaat al een client met dezelfde id.</value>
@@ -220,6 +220,9 @@
   <data name="common.contributorId" xml:space="preserve">
     <value>Bijdrager-ID of e-mailadres</value>
   </data>
+  <data name="common.critical" xml:space="preserve">
+    <value>Critial</value>
+  </data>
   <data name="common.data" xml:space="preserve">
     <value>Gegevens</value>
   </data>
@@ -234,6 +237,9 @@
   </data>
   <data name="common.email" xml:space="preserve">
     <value>E-mail</value>
+  </data>
+  <data name="common.errorNoPermission" xml:space="preserve">
+    <value>You do not have the necessary permission.</value>
   </data>
   <data name="common.field" xml:space="preserve">
     <value>Veld</value>
@@ -421,11 +427,17 @@
   <data name="common.signup" xml:space="preserve">
     <value>Aanmelden</value>
   </data>
+  <data name="common.success" xml:space="preserve">
+    <value>Success</value>
+  </data>
   <data name="common.text" xml:space="preserve">
     <value>Tekst</value>
   </data>
   <data name="common.trigger" xml:space="preserve">
     <value>Trigger</value>
+  </data>
+  <data name="common.warning" xml:space="preserve">
+    <value>Warning</value>
   </data>
   <data name="common.workflow" xml:space="preserve">
     <value>Workflow</value>
@@ -484,8 +496,8 @@
   <data name="contents.singletonNotDeletable" xml:space="preserve">
     <value>Singleton-inhoud kan niet worden verwijderd.</value>
   </data>
-  <data name="contents.statusSchedulingNotInFuture" xml:space="preserve">
-    <value>De tijd moet in de toekomst liggen.</value>
+  <data name="contents.statusNotValid" xml:space="preserve">
+    <value>Status is not defined in the workflow.</value>
   </data>
   <data name="contents.statusTransitionNotAllowed" xml:space="preserve">
     <value>Kan status niet wijzigen van {oldStatus} in {newStatus}.</value>
@@ -615,9 +627,6 @@
   </data>
   <data name="contents.validation.wordsBetween" xml:space="preserve">
     <value>Moet tussen {min} en {max} woord (en) bevatten.</value>
-  </data>
-  <data name="contents.workflowErorPublishing" xml:space="preserve">
-    <value>Contentworkflow verhindert publiceren.</value>
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">
     <value>De werkstroom staat geen updates toe met status {status}</value>
@@ -891,6 +900,72 @@
   </data>
   <data name="security.passwordStolen" xml:space="preserve">
     <value>Dit wachtwoord is eerder verschenen bij een datalek en mag nooit worden gebruikt. Als je het ooit eerder hebt gebruikt, verander het dan!</value>
+  </data>
+  <data name="setup.createUser.button" xml:space="preserve">
+    <value>Create User</value>
+  </data>
+  <data name="setup.createUser.confirmPassword" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="setup.createUser.failure" xml:space="preserve">
+    <value>Neither password authentication nor an external authentication provider such as Google is configured. Please check your settings and logs.</value>
+  </data>
+  <data name="setup.createUser.headline" xml:space="preserve">
+    <value>Admin User</value>
+  </data>
+  <data name="setup.createUser.headlineCreate" xml:space="preserve">
+    <value>Create Admin User</value>
+  </data>
+  <data name="setup.createUser.loginHint" xml:space="preserve">
+    <value>You have configured at least one external authentication provider such as Google. Just go to the login page and login to become administrator.</value>
+  </data>
+  <data name="setup.createUser.loginLink" xml:space="preserve">
+    <value>Go to Login Page.</value>
+  </data>
+  <data name="setup.createUser.separator" xml:space="preserve">
+    <value>OR</value>
+  </data>
+  <data name="setup.headline" xml:space="preserve">
+    <value>Installation</value>
+  </data>
+  <data name="setup.hint" xml:space="preserve">
+    <value>You are seeing this screen because no user exists yet. After a user is created, you are not able to use this screen again.</value>
+  </data>
+  <data name="setup.madeBy" xml:space="preserve">
+    <value>Proudly made by</value>
+  </data>
+  <data name="setup.madeByCopyright" xml:space="preserve">
+    <value>Sebastian Stehle and Contributors, 2016-2021</value>
+  </data>
+  <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
+    <value>With your setup, only admins can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=false&lt;/code&gt; as environment variable.</value>
+  </data>
+  <data name="setup.ruleAppCreation.warningAll" xml:space="preserve">
+    <value>With your setup, every user can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=true&lt;/code&gt; as environment variable.</value>
+  </data>
+  <data name="setup.ruleFolder.warning" xml:space="preserve">
+    <value>You are using the &lt;strong&gt;folder asset store&lt;/strong&gt; where all assets are stored in the file system. Please remember to include the asset folder into your backup strategy and map it to a volume, if you are using Docker.</value>
+  </data>
+  <data name="setup.ruleFtp.warning" xml:space="preserve">
+    <value>You are using the &lt;strong&gt;FTP asset store&lt;/strong&gt;. It is not recommended to use this storage type because of bad performance.</value>
+  </data>
+  <data name="setup.ruleHttps.failure" xml:space="preserve">
+    <value> You are not accessing the site over https. If this warning is not correct then Squidex cannot detect https mode, because your instance is behind a reverse proxy such as nginx. Ensure that http headers are forwarded properly, via the &lt;code&gt;X-Forwarded-*&lt;/code&gt; headers.</value>
+  </data>
+  <data name="setup.ruleHttps.success" xml:space="preserve">
+    <value>Congratulations, you are accessing your Squidex installation over a secure connection (https).</value>
+  </data>
+  <data name="setup.rules.headline" xml:space="preserve">
+    <value>System Checklist</value>
+  </data>
+  <data name="setup.ruleUrl.failure" xml:space="preserve">
+    <value>You should access Squidex only over one one canonical URL and configure this URL over the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;.</value>
+  </data>
+  <data name="setup.ruleUrl.success" xml:space="preserve">
+    <value>Congratulations the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable is configured properly.</value>
+  </data>
+  <data name="setup.title" xml:space="preserve">
+    <value>Installation</value>
   </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>Deze bewerking is niet toegestaan, je account is mogelijk vergrendeld.</value>

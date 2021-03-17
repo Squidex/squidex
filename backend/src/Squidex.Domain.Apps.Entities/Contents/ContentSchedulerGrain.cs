@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     }
                     catch (DomainObjectNotFoundException)
                     {
-                        await contentRepository.ResetScheduledAsync(content.Id);
+                        await contentRepository.ResetScheduledAsync(content.UniqueId);
                     }
                     catch (Exception ex)
                     {

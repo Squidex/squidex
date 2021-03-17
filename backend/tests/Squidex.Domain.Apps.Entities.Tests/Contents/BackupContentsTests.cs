@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_write_asset_urls()
         {
-            var me = new RefToken(RefTokenType.Subject, "123");
+            var me = RefToken.User("123");
 
             var assetsUrl = "https://old.squidex.com/api/assets/";
             var assetsUrlApp = "https://old.squidex.com/api/assets/my-app";
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_replace_asset_url_in_content()
         {
-            var me = new RefToken(RefTokenType.Subject, "123");
+            var me = RefToken.User("123");
 
             var newAssetsUrl = "https://new.squidex.com/api/assets";
             var newAssetsUrlApp = "https://old.squidex.com/api/assets/my-new-app";
@@ -99,36 +99,36 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 });
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("asset",
                         new ContentFieldData()
-                            .AddValue("en", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")
-                            .AddValue("it", $"Asset: {oldAssetsUrl}/my-asset.jpg."))
+                            .AddLocalized("en", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")
+                            .AddLocalized("it", $"Asset: {oldAssetsUrl}/my-asset.jpg."))
                     .AddField("assetsInArray",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddLocalized("iv",
                                 JsonValue.Array(
                                     $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")))
                     .AddField("assetsInObj",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddLocalized("iv",
                                 JsonValue.Object()
                                     .Add("asset", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")));
 
             var updateData =
-                new NamedContentData()
+                new ContentData()
                     .AddField("asset",
                         new ContentFieldData()
-                            .AddValue("en", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")
-                            .AddValue("it", $"Asset: {newAssetsUrl}/my-asset.jpg."))
+                            .AddLocalized("en", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")
+                            .AddLocalized("it", $"Asset: {newAssetsUrl}/my-asset.jpg."))
                     .AddField("assetsInArray",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddLocalized("iv",
                                 JsonValue.Array(
                                     $"Asset: {newAssetsUrlApp}/my-asset.jpg.")))
                     .AddField("assetsInObj",
                         new ContentFieldData()
-                            .AddValue("iv",
+                            .AddLocalized("iv",
                                 JsonValue.Object()
                                     .Add("asset", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")));
 
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_restore_states_for_all_contents()
         {
-            var me = new RefToken(RefTokenType.Subject, "123");
+            var me = RefToken.User("123");
 
             var schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
             var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");

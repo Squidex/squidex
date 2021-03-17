@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     return (Map(existing), existing.Version);
                 }
 
-                return (null!, EtagVersion.NotFound);
+                return (null!, EtagVersion.Empty);
             }
         }
 

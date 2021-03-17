@@ -64,12 +64,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return command is AppUpdateCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
-                case CreateApp createApp:
-                    return CreateReturn(createApp, c =>
+                case CreateApp create:
+                    return CreateReturn(create, c =>
                     {
                         GuardApp.CanCreate(c);
 
@@ -78,8 +78,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         return Snapshot;
                     });
 
-                case UpdateApp updateApp:
-                    return UpdateReturn(updateApp, c =>
+                case UpdateApp update:
+                    return UpdateReturn(update, c =>
                     {
                         GuardApp.CanUpdate(c);
 
@@ -291,11 +291,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                         else
                         {
-                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId, c.Referer);
+                            var result =
+                                await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier,
+                                    Snapshot.NamedId(), c.PlanId, c.Referer);
 
                             switch (result)
                             {
-                                case PlanChangedResult _:
+                                case PlanChangedResult:
                                     ChangePlan(c);
                                     break;
                             }
@@ -304,8 +306,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                     });
 
-                case ArchiveApp archiveApp:
-                    return UpdateAsync(archiveApp, async c =>
+                case ArchiveApp archive:
+                    return UpdateAsync(archive, async c =>
                     {
                         await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
 
@@ -322,7 +324,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return appPlansProvider.GetPlanForApp(Snapshot).Plan;
         }
 
-        public void Create(CreateApp command)
+        private void Create(CreateApp command)
         {
             var appId = NamedId.Of(command.AppId, command.Name);
 
@@ -332,7 +334,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 CreateInitialLanguage()
             };
 
-            if (command.Actor.IsSubject)
+            if (command.Actor.IsUser)
             {
                 events.Add(CreateInitialOwner(command.Actor));
             }
@@ -350,7 +352,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             }
         }
 
-        public void ChangePlan(ChangePlan command)
+        private void ChangePlan(ChangePlan command)
         {
             if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId))
             {
@@ -362,107 +364,107 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             }
         }
 
-        public void Update(UpdateApp command)
+        private void Update(UpdateApp command)
         {
             Raise(command, new AppUpdated());
         }
 
-        public void UpdateClient(UpdateClient command)
+        private void UpdateClient(UpdateClient command)
         {
             Raise(command, new AppClientUpdated());
         }
 
-        public void UploadImage(UploadAppImage command)
+        private void UploadImage(UploadAppImage command)
         {
             Raise(command, new AppImageUploaded { Image = new AppImage(command.File.MimeType) });
         }
 
-        public void RemoveImage(RemoveAppImage command)
+        private void RemoveImage(RemoveAppImage command)
         {
             Raise(command, new AppImageRemoved());
         }
 
-        public void UpdateLanguage(UpdateLanguage command)
+        private void UpdateLanguage(UpdateLanguage command)
         {
             Raise(command, new AppLanguageUpdated());
         }
 
-        public void AssignContributor(AssignContributor command, bool isAdded)
+        private void AssignContributor(AssignContributor command, bool isAdded)
         {
             Raise(command, new AppContributorAssigned { IsAdded = isAdded });
         }
 
-        public void RemoveContributor(RemoveContributor command)
+        private void RemoveContributor(RemoveContributor command)
         {
             Raise(command, new AppContributorRemoved());
         }
 
-        public void AttachClient(AttachClient command)
+        private void AttachClient(AttachClient command)
         {
             Raise(command, new AppClientAttached());
         }
 
-        public void RevokeClient(RevokeClient command)
+        private void RevokeClient(RevokeClient command)
         {
             Raise(command, new AppClientRevoked());
         }
 
-        public void AddWorkflow(AddWorkflow command)
+        private void AddWorkflow(AddWorkflow command)
         {
             Raise(command, new AppWorkflowAdded());
         }
 
-        public void UpdateWorkflow(UpdateWorkflow command)
+        private void UpdateWorkflow(UpdateWorkflow command)
         {
             Raise(command, new AppWorkflowUpdated());
         }
 
-        public void DeleteWorkflow(DeleteWorkflow command)
+        private void DeleteWorkflow(DeleteWorkflow command)
         {
             Raise(command, new AppWorkflowDeleted());
         }
 
-        public void AddLanguage(AddLanguage command)
+        private void AddLanguage(AddLanguage command)
         {
             Raise(command, new AppLanguageAdded());
         }
 
-        public void RemoveLanguage(RemoveLanguage command)
+        private void RemoveLanguage(RemoveLanguage command)
         {
             Raise(command, new AppLanguageRemoved());
         }
 
-        public void AddPattern(AddPattern command)
+        private void AddPattern(AddPattern command)
         {
             Raise(command, new AppPatternAdded());
         }
 
-        public void DeletePattern(DeletePattern command)
+        private void DeletePattern(DeletePattern command)
         {
             Raise(command, new AppPatternDeleted());
         }
 
-        public void UpdatePattern(UpdatePattern command)
+        private void UpdatePattern(UpdatePattern command)
         {
             Raise(command, new AppPatternUpdated());
         }
 
-        public void AddRole(AddRole command)
+        private void AddRole(AddRole command)
         {
             Raise(command, new AppRoleAdded());
         }
 
-        public void DeleteRole(DeleteRole command)
+        private void DeleteRole(DeleteRole command)
         {
             Raise(command, new AppRoleDeleted());
         }
 
-        public void UpdateRole(UpdateRole command)
+        private void UpdateRole(UpdateRole command)
         {
             Raise(command, new AppRoleUpdated());
         }
 
-        public void ArchiveApp(ArchiveApp command)
+        private void ArchiveApp(ArchiveApp command)
         {
             Raise(command, new AppArchived());
         }
@@ -481,11 +483,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return new AppCreated { Name = name };
         }
 
-        private static AppPatternAdded CreateInitialPattern(DomainId id, AppPattern pattern)
-        {
-            return new AppPatternAdded { PatternId = id, Name = pattern.Name, Pattern = pattern.Pattern, Message = pattern.Message };
-        }
-
         private static AppLanguageAdded CreateInitialLanguage()
         {
             return new AppLanguageAdded { Language = Language.EN };
@@ -494,6 +491,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private static AppContributorAssigned CreateInitialOwner(RefToken actor)
         {
             return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
+        }
+
+        private static AppPatternAdded CreateInitialPattern(DomainId id, AppPattern pattern)
+        {
+            return new AppPatternAdded
+            {
+                Name = pattern.Name,
+                PatternId = id,
+                Pattern = pattern.Pattern,
+                Message = pattern.Message
+            };
         }
     }
 }

@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 if (app != null)
                 {
-                    await CacheItAsync(app, false);
+                    await CacheItAsync(app);
                 }
 
                 return app;
@@ -223,11 +223,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
                 if (context.IsCompleted && context.Command is AppCommand appCommand)
                 {
-                    var app = await GetAppCoreAsync(appCommand.AggregateId);
+                    var app = context.PlainResult as IAppEntity;
+
+                    if (app == null)
+                    {
+                        app = await GetAppCoreAsync(appCommand.AggregateId, true);
+                    }
 
                     if (app != null)
                     {
-                        await CacheItAsync(app, true);
+                        await InvalidateItAsync(app);
 
                         switch (context.Command)
                         {
@@ -239,7 +244,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                                 await RemoveContributorAsync(removeContributor);
                                 break;
 
-                            case ArchiveApp _:
+                            case ArchiveApp:
                                 await ArchiveAppAsync(app);
                                 break;
                         }
@@ -285,6 +290,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 await Index(contributorId).RemoveAsync(app.Id);
             }
+
+            if (app.CreatedBy.IsClient || !app.Contributors.ContainsKey(app.CreatedBy.Identifier))
+            {
+                await Index(app.CreatedBy.Identifier).RemoveAsync(app.Id);
+            }
         }
 
         private IAppsByNameIndexGrain Index()
@@ -297,11 +307,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return grainFactory.GetGrain<IAppsByUserIndexGrain>(id);
         }
 
-        private async Task<IAppEntity?> GetAppCoreAsync(DomainId id)
+        private async Task<IAppEntity?> GetAppCoreAsync(DomainId id, bool allowArchived = false)
         {
             var app = (await grainFactory.GetGrain<IAppGrain>(id.ToString()).GetStateAsync()).Value;
 
-            if (app.Version <= EtagVersion.Empty)
+            if (app.Version <= EtagVersion.Empty || (app.IsArchived && !allowArchived))
             {
                 return null;
             }
@@ -319,11 +329,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return $"{typeof(AppsIndex)}_Apps_Name_{name}";
         }
 
-        private Task CacheItAsync(IAppEntity app, bool publish)
+        private Task InvalidateItAsync(IAppEntity app)
+        {
+            return grainCache.RemoveAsync(
+                GetCacheKey(app.Id),
+                GetCacheKey(app.Name));
+        }
+
+        private Task CacheItAsync(IAppEntity app)
         {
             return Task.WhenAll(
-                grainCache.AddAsync(GetCacheKey(app.Id), app, CacheDuration, publish),
-                grainCache.AddAsync(GetCacheKey(app.Name), app, CacheDuration, publish));
+                grainCache.AddAsync(GetCacheKey(app.Id), app, CacheDuration),
+                grainCache.AddAsync(GetCacheKey(app.Name), app, CacheDuration));
         }
     }
 }

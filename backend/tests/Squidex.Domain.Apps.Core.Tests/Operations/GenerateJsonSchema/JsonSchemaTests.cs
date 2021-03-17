@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
@@ -25,7 +26,38 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema { Reference = s });
+            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver());
+
+            CheckFields(jsonSchema);
+        }
+
+        [Fact]
+        public void Should_build_json_schema_with_resolver()
+        {
+            var schemaResolver = new SchemaResolver((name, action) => action());
+
+            var jsonSchema = schema.BuildDynamicJsonSchema(schemaResolver);
+
+            CheckFields(jsonSchema);
+        }
+
+        [Fact]
+        public void Should_build_flat_json_schema()
+        {
+            var languagesConfig = LanguagesConfig.English.Set(Language.DE);
+
+            var schemaResolver = new SchemaResolver((name, action) =>
+            {
+                return action();
+            });
+
+            var jsonSchema = schema.BuildFlatJsonSchema(schemaResolver);
+
+            CheckFields(jsonSchema);
+        }
+
+        private void CheckFields(JsonSchema jsonSchema)
+        {
             var jsonProperties = AllPropertyNames(jsonSchema);
 
             void CheckField(IField field)
@@ -54,16 +86,6 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
             }
         }
 
-        [Fact]
-        public void Should_build_data_schema()
-        {
-            var languagesConfig = LanguagesConfig.English.Set(Language.DE);
-
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema { Reference = s });
-
-            Assert.NotNull(jsonSchema);
-        }
-
         private static HashSet<string> AllPropertyNames(JsonSchema schema)
         {
             var result = new HashSet<string>();
@@ -84,6 +106,8 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 
                     AddProperties(current.Item);
                     AddProperties(current.Reference);
+                    AddProperties(current.AdditionalItemsSchema);
+                    AddProperties(current.AdditionalPropertiesSchema);
                 }
             }
 

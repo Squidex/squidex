@@ -58,12 +58,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public DomainId AssetId
         {
-            get { return Id; }
+            get => Id;
         }
 
         public DomainId UniqueId
         {
-            get { return DomainId.Combine(AppId, Id); }
+            get => DomainId.Combine(AppId, Id);
         }
     }
 }

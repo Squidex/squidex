@@ -24,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
             this.grainFactory = grainFactory;
         }
 
-        public void Extend(ExecutionContext context, bool async)
+        public void Extend(ExecutionContext context)
         {
-            if (context.TryGetValue("appId", out var temp) && temp is DomainId appId)
+            if (context.TryGetValue<DomainId>(nameof(ScriptVars.AppId), out var appId))
             {
                 var engine = context.Engine;
 

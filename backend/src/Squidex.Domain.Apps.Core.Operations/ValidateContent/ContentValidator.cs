@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IReadOnlyCollection<ValidationError> Errors
         {
-            get { return errors; }
+            get => errors;
         }
 
         public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories, ISemanticLog log)
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             errors.Add(new ValidationError(message, pathString));
         }
 
-        public Task ValidateInputPartialAsync(NamedContentData data)
+        public Task ValidateInputPartialAsync(ContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return validator.ValidateAsync(data, context, AddError);
         }
 
-        public Task ValidateInputAsync(NamedContentData data)
+        public Task ValidateInputAsync(ContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return validator.ValidateAsync(data, context, AddError);
         }
 
-        public Task ValidateContentAsync(NamedContentData data)
+        public Task ValidateContentAsync(ContentData data)
         {
             Guard.NotNull(data, nameof(data));
 

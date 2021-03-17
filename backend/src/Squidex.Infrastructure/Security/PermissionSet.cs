@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Security
 
         public int Count
         {
-            get { return permissions.Count; }
+            get => permissions.Count;
         }
 
         public PermissionSet(params Permission[] permissions)

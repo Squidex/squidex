@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public bool TryGetCallable(Engine engine, object reference, out JsValue value)
         {
-            value = new ClrFunctionInstance(engine, "anonymous", (thisObj, values) => thisObj);
+            value = new ClrFunctionInstance(engine, "anonymous", (thisObj, _) => thisObj);
 
             return true;
         }

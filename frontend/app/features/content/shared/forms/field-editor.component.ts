@@ -88,6 +88,6 @@ export class FieldEditorComponent implements OnChanges {
     }
 
     public unset() {
-        this.formModel.form.setValue(undefined);
+        this.formModel.unset();
     }
 }

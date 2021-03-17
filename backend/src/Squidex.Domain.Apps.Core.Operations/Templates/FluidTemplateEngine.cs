@@ -45,6 +45,8 @@ namespace Squidex.Domain.Apps.Core.Templates
                     FluidValue.SetTypeMapping(type, x => new StringValue(x.ToString()));
                 }
 
+                FluidValue.SetTypeMapping<RefTokenType>(x => new StringValue(x.ToString().ToLowerInvariant()));
+
                 globalTypes.Register<NamedId<DomainId>>();
                 globalTypes.Register<NamedId<Guid>>();
                 globalTypes.Register<NamedId<string>>();

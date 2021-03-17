@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public RefToken Initiator
         {
-            get { return initiator; }
+            get => initiator;
         }
 
         public UserMapping(RefToken initiator)
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Guard.NotNull(token, nameof(token));
 
-            if (!token.IsSubject)
+            if (!token.IsUser)
             {
                 return;
             }
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (!userMap.ContainsKey(userId))
             {
-                userMap[userId] = new RefToken(RefTokenType.Subject, userId);
+                userMap[userId] = RefToken.User(userId);
             }
         }
 
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 if (user != null)
                 {
-                    userMap[userId] = new RefToken(RefTokenType.Subject, user.Id);
+                    userMap[userId] = RefToken.User(user.Id);
                 }
             }
         }
@@ -87,19 +87,22 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Guard.NotNullOrEmpty(userId, nameof(userId));
 
+            result = initiator;
+
             if (userMap.TryGetValue(userId, out var mapped))
             {
                 result = mapped;
                 return true;
             }
 
-            result = initiator;
             return false;
         }
 
         public bool TryMap(RefToken token, out RefToken result)
         {
             Guard.NotNull(token, nameof(token));
+
+            result = initiator;
 
             if (token.IsClient)
             {
@@ -113,7 +116,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 return true;
             }
 
-            result = initiator;
             return false;
         }
     }

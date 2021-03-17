@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities
     {
         public RefToken Actor { get; set; }
 
-        public ClaimsPrincipal User { get; set; }
+        public ClaimsPrincipal? User { get; set; }
 
         public bool FromRule { get; set; }
 

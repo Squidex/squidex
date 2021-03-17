@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
         public ContentFieldObject? ContentField
         {
-            get { return contentField; }
+            get => contentField;
         }
 
         public ContentDataProperty(ContentDataObject contentData, ContentFieldObject? contentField = null)

@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
         private readonly EdmModel genericEdmModel = BuildEdmModel("Generic", "Content", new EdmModel(), null);
-        private readonly JsonSchema genericJsonSchema = BuildJsonSchema("Content", null);
+        private readonly JsonSchema genericJsonSchema = ContentJsonSchemaBuilder.BuildSchema("Content", null, false, true);
         private readonly IMemoryCache cache;
         private readonly IJsonSerializer jsonSerializer;
         private readonly ITextIndex textIndex;
@@ -63,14 +63,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             using (Profiler.TraceMethod<ContentQueryParser>())
             {
-                var query = ParseQuery(context, q, schema);
+                var query = ParseClrQuery(context, q, schema);
 
                 await TransformFilterAsync(query, context, schema);
 
                 WithSorting(query);
                 WithPaging(query);
 
-                q = q!.WithQuery(query);
+                q = q.WithQuery(query);
+
+                if (context.ShouldSkipTotal())
+                {
+                    q = q.WithoutTotal();
+                }
 
                 return q;
             }
@@ -113,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private ClrQuery ParseQuery(Context context, Q q, ISchemaEntity? schema)
+        private ClrQuery ParseClrQuery(Context context, Q q, ISchemaEntity? schema)
         {
             var query = q.Query;
 
@@ -230,36 +235,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private static JsonSchema BuildJsonSchema(Schema schema, IAppEntity app, bool withHiddenFields)
         {
-            var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), (n, s) => s, withHiddenFields);
+            var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), withHiddenFields);
 
-            return BuildJsonSchema(schema.DisplayName(), dataSchema);
-        }
-
-        private static JsonSchema BuildJsonSchema(string name, JsonSchema? dataSchema)
-        {
-            var schema = new JsonSchema
-            {
-                Properties =
-                {
-                    [nameof(IContentEntity.Id).ToCamelCase()] = SchemaBuilder.StringProperty($"The id of the {name} content.", true),
-                    [nameof(IContentEntity.Version).ToCamelCase()] = SchemaBuilder.NumberProperty($"The version of the {name}.", true),
-                    [nameof(IContentEntity.Created).ToCamelCase()] = SchemaBuilder.DateTimeProperty($"The date and time when the {name} content has been created.", true),
-                    [nameof(IContentEntity.CreatedBy).ToCamelCase()] = SchemaBuilder.StringProperty($"The user that has created the {name} content.", true),
-                    [nameof(IContentEntity.LastModified).ToCamelCase()] = SchemaBuilder.DateTimeProperty($"The date and time when the {name} content has been modified last.", true),
-                    [nameof(IContentEntity.LastModifiedBy).ToCamelCase()] = SchemaBuilder.StringProperty($"The user that has updated the {name} content last.", true),
-                    [nameof(IContentEntity.NewStatus).ToCamelCase()] = SchemaBuilder.StringProperty($"The new status of the content.", false),
-                    [nameof(IContentEntity.Status).ToCamelCase()] = SchemaBuilder.StringProperty($"The status of the content.", true)
-                },
-                Type = JsonObjectType.Object
-            };
-
-            if (dataSchema != null)
-            {
-                schema.Properties["data"] = SchemaBuilder.ObjectProperty(dataSchema, $"The data of the {name}.", true);
-                schema.Properties["dataDraft"] = SchemaBuilder.ObjectProperty(dataSchema, $"The draft data of the {name}.");
-            }
-
-            return schema;
+            return ContentJsonSchemaBuilder.BuildSchema(schema.DisplayName(), dataSchema, false, true);
         }
 
         private static EdmModel BuildEdmModel(Schema schema, IAppEntity app, bool withHiddenFields)
@@ -302,19 +280,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var entityType = new EdmEntityType(modelName, name);
 
-            entityType.AddStructuralProperty(nameof(IContentEntity.Id).ToCamelCase(), EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty(nameof(IContentEntity.Created).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);
-            entityType.AddStructuralProperty(nameof(IContentEntity.CreatedBy).ToCamelCase(), EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty(nameof(IContentEntity.LastModified).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);
-            entityType.AddStructuralProperty(nameof(IContentEntity.LastModifiedBy).ToCamelCase(), EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty(nameof(IContentEntity.NewStatus).ToCamelCase(), EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty(nameof(IContentEntity.Status).ToCamelCase(), EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty(nameof(IContentEntity.Version).ToCamelCase(), EdmPrimitiveTypeKind.Int32);
+            entityType.AddStructuralProperty("id", EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty("isDeleted", EdmPrimitiveTypeKind.Boolean);
+            entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.DateTimeOffset);
+            entityType.AddStructuralProperty("createdBy", EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty("lastModified", EdmPrimitiveTypeKind.DateTimeOffset);
+            entityType.AddStructuralProperty("lastModifiedBy", EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty("newStatus", EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty("status", EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty("version", EdmPrimitiveTypeKind.Int32);
 
             if (schemaType != null)
             {
                 entityType.AddStructuralProperty("data", new EdmComplexTypeReference(schemaType, false));
-                entityType.AddStructuralProperty("dataDraft", new EdmComplexTypeReference(schemaType, false));
 
                 model.AddElement(schemaType);
             }

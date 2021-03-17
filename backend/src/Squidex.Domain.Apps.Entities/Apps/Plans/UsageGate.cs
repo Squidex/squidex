@@ -54,21 +54,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
             var (plan, _) = appPlansProvider.GetPlanForApp(app);
 
-            if (plan.MaxApiCalls > 0 || plan.BlockingApiCalls > 0)
+            var limit = plan.MaxApiCalls;
+
+            if (limit > 0 || plan.BlockingApiCalls > 0)
             {
                 var usage = await apiUsageTracker.GetMonthCallsAsync(appId.ToString(), today, null);
 
-                if (IsAboutToBeLocked(today, plan.MaxApiCalls, usage) && !HasNotifiedBefore(app.Id))
+                if (IsOver10Percent(limit, usage) && IsAboutToBeLocked(today, limit, usage) && !HasNotifiedBefore(app.Id))
                 {
-                    var users = app.Contributors.Where(x => x.Value == Role.Owner).Select(x => x.Key).ToArray();
-
                     var notification = new UsageNotification
                     {
                         AppId = appId,
                         AppName = app.Name,
                         Usage = usage,
-                        UsageLimit = plan.MaxApiCalls,
-                        Users = users
+                        UsageLimit = limit,
+                        Users = GetUsers(app)
                     };
 
                     GetGrain().NotifyAsync(notification).Forget();
@@ -95,6 +95,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         private bool TrackNotified(DomainId appId)
         {
             return memoryCache.Set(appId, true, TimeSpan.FromHours(1));
+        }
+
+        private static string[] GetUsers(IAppEntity app)
+        {
+            return app.Contributors.Where(x => x.Value == Role.Owner).Select(x => x.Key).ToArray();
+        }
+
+        private static bool IsOver10Percent(long limit, long usage)
+        {
+            return usage > limit * 0.1;
         }
 
         private static bool IsAboutToBeLocked(DateTime today, long limit, long usage)

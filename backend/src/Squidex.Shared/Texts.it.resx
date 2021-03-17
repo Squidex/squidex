@@ -59,34 +59,34 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Il campo {name|lower} deve essere un URL assoluto.</value>
+    <value>Il campo '{name|lower}' deve essere un URL assoluto.</value>
   </data>
   <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
-    <value>Il campo {0} deve essere un URL assoluto.</value>
+    <value>Il campo '{0}' deve essere un URL assoluto.</value>
   </data>
   <data name="annotations_Compare" xml:space="preserve">
-    <value>Il campo {name|lower} deve essere uguale a {other|lower}.</value>
+    <value>Il campo '{name|lower}' deve essere uguale a {other|lower}.</value>
   </data>
   <data name="dotnet_annotations_Compare" xml:space="preserve">
-    <value>Il campo {0} deve essere uguale a {1}.</value>
+    <value>Il campo '{0}' deve essere uguale a {1}.</value>
   </data>
   <data name="annotations_EmailAddress" xml:space="preserve">
-    <value>Il campo {name|lower} non è un indirizzo email valido.</value>
+    <value>Il campo '{name|lower}' non è un indirizzo email valido.</value>
   </data>
   <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
-    <value>Il campo {0} non è un indirizzo email valido.</value>
+    <value>Il campo '{0}' non è un indirizzo email valido.</value>
   </data>
   <data name="annotations_Range" xml:space="preserve">
-    <value>Il campo {name|lower} deve essere tra {min} e {max}.</value>
+    <value>Il campo '{name|lower}' deve essere tra {min} e {max}.</value>
   </data>
   <data name="dotnet_annotations_Range" xml:space="preserve">
-    <value>Il campo {0} deve essere tra {1} e {2}.</value>
+    <value>Il campo '{0}' deve essere tra {1} e {2}.</value>
   </data>
   <data name="annotations_RegularExpression" xml:space="preserve">
-    <value>Il campo {name|lower} non è.</value>
+    <value>Il campo '{name|lower}' non è.</value>
   </data>
   <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
-    <value>Il campo {0} non è.</value>
+    <value>Il campo '{0}' non è.</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
     <value>Il campo è {name|lower} obbligatorio.</value>
@@ -95,16 +95,16 @@
     <value>Il campo è {0} obbligatorio.</value>
   </data>
   <data name="annotations_StringLength" xml:space="preserve">
-    <value>The field {name|lower} must be a string with a maximum length of {max}.</value>
+    <value>Il campo '{name|lower}' deve essere una stringa avente una lunghezza massima di {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLength" xml:space="preserve">
-    <value>The field {0} must be a string with a maximum length of {1}.</value>
+    <value>Il campo '{0}' deve essere una stringa avente una lunghezza massima di {1}.</value>
   </data>
   <data name="annotations_StringLengthMinimum" xml:space="preserve">
-    <value>The field {name|lower} must be a string with a minimum length of {min} and a maximum length of {max}.</value>
+    <value>Il campo '{name|lower}' deve essere una stringa avente lunghezza minima di {min} e massima di {max}.</value>
   </data>
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
-    <value>The field {0} must be a string with a minimum length of {1} and a maximum length of {2}.</value>
+    <value>Il campo '{0}' deve essere una stringa avente lunghezza minima di {1} e massima di {2}.</value>
   </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
     <value>Un client con lo stesso id esiste già.</value>
@@ -179,19 +179,19 @@
     <value>La risorsa è collegata ad un contenuto pertanto non può essere cancellata.</value>
   </data>
   <data name="backups.alreadyRunning" xml:space="preserve">
-    <value>E' in esecuzione una altro processo di backup.</value>
+    <value>È in esecuzione una altro processo di backup.</value>
   </data>
   <data name="backups.maxReached" xml:space="preserve">
     <value>Non puoi avere più di {max} backup.</value>
   </data>
   <data name="backups.restoreRunning" xml:space="preserve">
-    <value>E' in esecuzione un'operazione di restore.</value>
+    <value>È in esecuzione un'operazione di restore.</value>
   </data>
   <data name="comments.noPermissions" xml:space="preserve">
     <value>Puoi solo accedere alle tue notifiche.</value>
   </data>
   <data name="comments.notUserComment" xml:space="preserve">
-    <value>E' stato creato un commento da un altro utente.</value>
+    <value>È stato creato un commento da un altro utente.</value>
   </data>
   <data name="common.action" xml:space="preserve">
     <value>Azione</value>
@@ -220,6 +220,9 @@
   <data name="common.contributorId" xml:space="preserve">
     <value>ID o Email del collaboratore</value>
   </data>
+  <data name="common.critical" xml:space="preserve">
+    <value>Critico</value>
+  </data>
   <data name="common.data" xml:space="preserve">
     <value>Data</value>
   </data>
@@ -234,6 +237,9 @@
   </data>
   <data name="common.email" xml:space="preserve">
     <value>Email</value>
+  </data>
+  <data name="common.errorNoPermission" xml:space="preserve">
+    <value>Non hai i permessi necessari.</value>
   </data>
   <data name="common.field" xml:space="preserve">
     <value>Campo</value>
@@ -353,7 +359,7 @@
     <value>Num. giorni</value>
   </data>
   <data name="common.odataFailure" xml:space="preserve">
-    <value>Fallito parsando la query: {message}</value>
+    <value>Fallito il parsing della query: {message}</value>
   </data>
   <data name="common.odataFilterNotValid" xml:space="preserve">
     <value>OData $filter condizione non valida: {message}</value>
@@ -421,11 +427,17 @@
   <data name="common.signup" xml:space="preserve">
     <value>Iscriviti</value>
   </data>
+  <data name="common.success" xml:space="preserve">
+    <value>Successo</value>
+  </data>
   <data name="common.text" xml:space="preserve">
     <value>Testo</value>
   </data>
   <data name="common.trigger" xml:space="preserve">
     <value>Trigger</value>
+  </data>
+  <data name="common.warning" xml:space="preserve">
+    <value>Warning</value>
   </data>
   <data name="common.workflow" xml:space="preserve">
     <value>Workflow</value>
@@ -446,7 +458,7 @@
     <value>Non c'è niente da eliminare.</value>
   </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
-    <value>Errore nel json, attesp un array di objects.</value>
+    <value>Errore nel json, atteso un array di objects.</value>
   </data>
   <data name="contents.invalidArrayOfStrings" xml:space="preserve">
     <value>Errore nel json, atteso un array di string.</value>
@@ -484,8 +496,8 @@
   <data name="contents.singletonNotDeletable" xml:space="preserve">
     <value>Il contenuto singleton non può essere eliminato.</value>
   </data>
-  <data name="contents.statusSchedulingNotInFuture" xml:space="preserve">
-    <value>L'ora deve essere futura.</value>
+  <data name="contents.statusNotValid" xml:space="preserve">
+    <value>Status is not defined in the workflow.</value>
   </data>
   <data name="contents.statusTransitionNotAllowed" xml:space="preserve">
     <value>Non è possibile cambiare stato da {oldStatus} a {newStatus}.</value>
@@ -530,7 +542,7 @@
     <value>Deve essere tra {min} e {max} elemento(i).</value>
   </data>
   <data name="contents.validation.max" xml:space="preserve">
-    <value>Deve esseer minore o uguale a {max}.</value>
+    <value>Deve essere minore o uguale a {max}.</value>
   </data>
   <data name="contents.validation.maxCharacters" xml:space="preserve">
     <value>Il testo non deve avere più di {max} carattere(i).</value>
@@ -566,7 +578,7 @@
     <value>La larghezza {width}px deve essere maggiore di {min}px.</value>
   </data>
   <data name="contents.validation.minItems" xml:space="preserve">
-    <value>Deve avere almento {min} elemento(i).</value>
+    <value>Deve avere almeno {min} elemento(i).</value>
   </data>
   <data name="contents.validation.minLength" xml:space="preserve">
     <value>Deve avere almeno {min} carattere(i).</value>
@@ -599,7 +611,7 @@
     <value>Contiene dei collegamenti '{id}' ad uno schema errato.</value>
   </data>
   <data name="contents.validation.regexTooSlow" xml:space="preserve">
-    <value>La Regex è troppo lenta.</value>
+    <value>La regular expression è troppo lenta.</value>
   </data>
   <data name="contents.validation.required" xml:space="preserve">
     <value>Il campo è obbligatorio.</value>
@@ -615,9 +627,6 @@
   </data>
   <data name="contents.validation.wordsBetween" xml:space="preserve">
     <value>Deve essere tra {min} e {max} parola(e).</value>
-  </data>
-  <data name="contents.workflowErorPublishing" xml:space="preserve">
-    <value>Il workflow del contenuto impedisce la pubblicazione.</value>
   </data>
   <data name="contents.workflowErrorUpdate" xml:space="preserve">
     <value>Il workflow non consente le modifiche per lo stato {status}</value>
@@ -647,10 +656,10 @@
     <value>La Password devono contenere almeno un numero ('0'-'9').</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresLower" xml:space="preserve">
-    <value>La passowrd deve avere almeno una lettera minuscola ('a'-'z').</value>
+    <value>La password deve avere almeno una lettera minuscola ('a'-'z').</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
-    <value>La passowrd deve avere almeno un carattere non alfanumerico.</value>
+    <value>La password deve avere almeno un carattere non alfanumerico.</value>
   </data>
   <data name="dotnet_identity_PasswordRequiresUniqueChars" xml:space="preserve">
     <value>La password deve essere composta almeno da {0} caratteri differenti.</value>
@@ -683,7 +692,7 @@
     <value>L'entità ({id}) non esiste.</value>
   </data>
   <data name="exceptions.domainObjectVersion" xml:space="preserve">
-    <value>L'entità ({id}) requested version {expectedVersion}, but found {currentVersion}.</value>
+    <value>L'entità ({id}) richiede la versione {expectedVersion}, ma è stata trovata {currentVersion}.</value>
   </data>
   <data name="history.apps.clientAdded" xml:space="preserve">
     <value>aggiunto client {[Id]} all'app</value>
@@ -731,10 +740,10 @@
     <value>ha aggiunto il ruolo {[Name]}</value>
   </data>
   <data name="history.apps.roleDeleted" xml:space="preserve">
-    <value>ha eliminato role {[Name]}</value>
+    <value>ha eliminato il ruolo {[Name]}</value>
   </data>
   <data name="history.apps.roleUpdated" xml:space="preserve">
-    <value>ha aggiornato role {[Name]}</value>
+    <value>ha aggiornato il ruolo {[Name]}</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
     <value>ha sostituito la risorsa.</value>
@@ -815,7 +824,7 @@
     <value>Il tuo indirizzo email è impostato su privato in Github. Impostalo come pubblico per poter utilizzare il login Github.</value>
   </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
-    <value>E' in esecuzione un'altra regola.</value>
+    <value>È in esecuzione un'altra regola.</value>
   </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Il valore predefinito calcolato e il valore predefinito non possono essere utilizzati insieme.</value>
@@ -857,16 +866,16 @@
     <value>Non è possibile annidare un campo di tipo array.</value>
   </data>
   <data name="schemas.references.resolveError" xml:space="preserve">
-    <value>E' possibile risolvere il nome del collegamento solamente quando il numero massimo di elementi è 1.</value>
+    <value>È possibile risolvere il nome del collegamento solamente quando il numero massimo di elementi è 1.</value>
   </data>
   <data name="schemas.string.inlineEditorError" xml:space="preserve">
-    <value>E' possibile la modifica in linea solamente per dropdown menu, slugs e campi di input.</value>
+    <value>È possibile la modifica in linea solamente per dropdown menu, slugs e campi di input.</value>
   </data>
   <data name="schemas.stringEditorsNeedAllowedValuesError" xml:space="preserve">
     <value>I Radio button e dropdown menu hanno bisogno che siano definiti dei valori.</value>
   </data>
   <data name="schemas.tags.editorNeedsAllowedValues" xml:space="preserve">
-    <value>Checkboxes e dropdown menu hanno bisogno che siano definiti dei valori.</value>
+    <value>Checkbox e dropdown menu hanno bisogno che siano definiti dei valori.</value>
   </data>
   <data name="schemas.uiFieldCannotBeDisabled" xml:space="preserve">
     <value>Il campo UI non può essere disabilitato.</value>
@@ -891,6 +900,72 @@
   </data>
   <data name="security.passwordStolen" xml:space="preserve">
     <value>Questa password risulta essere stata compromessa e non dovrebbe essere mai utilizzata. Se l'hai utilizzata in precedenza, cambiala!</value>
+  </data>
+  <data name="setup.createUser.button" xml:space="preserve">
+    <value>Nuovo utente</value>
+  </data>
+  <data name="setup.createUser.confirmPassword" xml:space="preserve">
+    <value>Conferma password</value>
+  </data>
+  <data name="setup.createUser.failure" xml:space="preserve">
+    <value>Non è stata configurata la password di autenticazione e nessun provider esterno di autenticazione come Google è stato configurato. Verifica per favore le tue impostazioni e i log.</value>
+  </data>
+  <data name="setup.createUser.headline" xml:space="preserve">
+    <value>Utente Amministratore</value>
+  </data>
+  <data name="setup.createUser.headlineCreate" xml:space="preserve">
+    <value>Create Admin User</value>
+  </data>
+  <data name="setup.createUser.loginHint" xml:space="preserve">
+    <value>Hai configurato almeno un provider di autenticazione esterno come Google. Basta andare alla pagina di accesso e accedere per diventare amministratore.</value>
+  </data>
+  <data name="setup.createUser.loginLink" xml:space="preserve">
+    <value>Vai alla pagina di Login.</value>
+  </data>
+  <data name="setup.createUser.separator" xml:space="preserve">
+    <value>O</value>
+  </data>
+  <data name="setup.headline" xml:space="preserve">
+    <value>Installazione</value>
+  </data>
+  <data name="setup.hint" xml:space="preserve">
+    <value>Vedi questa schermata perché non esiste ancora alcun utente. Dopo aver creato un utente, non sarà più possibile visualizzare questa schermata.</value>
+  </data>
+  <data name="setup.madeBy" xml:space="preserve">
+    <value>Orgogliosamente realizzato da</value>
+  </data>
+  <data name="setup.madeByCopyright" xml:space="preserve">
+    <value>Sebastian Stehle e Collaboratori, 2016-2021</value>
+  </data>
+  <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
+    <value>Con questa impostazione solamente gli amministratori possono creare nuove app. Se volessi cambiare questa impostazione utilizza &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=false&lt;/code&gt; come variabile d'ambiente.</value>
+  </data>
+  <data name="setup.ruleAppCreation.warningAll" xml:space="preserve">
+    <value>Con questa impostazione, ogni utente può creare nuove app. Se volessi cambiare questa impostazione utilizza &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=true&lt;/code&gt; come variabile d'ambiente.</value>
+  </data>
+  <data name="setup.ruleFolder.warning" xml:space="preserve">
+    <value>Stai usando &lt;strong&gt;la cartella delle risorse&lt;/strong&gt; dove tutte le risorse sono salvate all'interno del file system. Ricordati per favore di includere la cartella delle risorse all'interno della gestione dei backup e mappalo in un volume, se stai usando Docker.</value>
+  </data>
+  <data name="setup.ruleFtp.warning" xml:space="preserve">
+    <value>Stai usando &lt;strong&gt;FTP per salvare le risorse&lt;/strong&gt;. Questa impostazione non è consigliata in quanto l'utilizzo di questo tipo di storage peggiora le performance.</value>
+  </data>
+  <data name="setup.ruleHttps.failure" xml:space="preserve">
+    <value>Non stai accedendo al sito tramite https. Se questo avviso non è corretto, Squidex non può rilevare la modalità https, perché la tua istanza è dietro un reverse proxy come nginx. Assicurati che gli header http vengano inoltrati correttamente, tramite &lt;code&gt;X-Forwarded-*&lt;/code&gt;.</value>
+  </data>
+  <data name="setup.ruleHttps.success" xml:space="preserve">
+    <value>Congratulations, you are accessing your Squidex installation over a secure connection (https).</value>
+  </data>
+  <data name="setup.rules.headline" xml:space="preserve">
+    <value>Checklist di Sistema</value>
+  </data>
+  <data name="setup.ruleUrl.failure" xml:space="preserve">
+    <value>Dovresti accedere a Squidex solo con un URL canonico e configurare questo URL sulla variabile d'ambiente &lt;code&gt; URLS__BASEURL &lt;/code&gt;. Il base URL corrente &lt;code&gt; {actual} &lt;/code&gt; non corrisponde al base URL &lt;code&gt;{configured}&lt;/code&gt;.</value>
+  </data>
+  <data name="setup.ruleUrl.success" xml:space="preserve">
+    <value>Congratulazioni la variabile d'ambiente &lt;code&gt;URLS__BASEURL&lt;/code&gt;  è stata configurata correttamente.</value>
+  </data>
+  <data name="setup.title" xml:space="preserve">
+    <value>Installazione</value>
   </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>Questa operazione non è consentita, il tuo account potrebbe essere bloccato.</value>
@@ -929,7 +1004,7 @@
     <value>Acconsento</value>
   </data>
   <data name="users.deleteYourselfError" xml:space="preserve">
-    <value>You cannot delete yourself.</value>
+    <value>Non puoi cancellare te stesso.</value>
   </data>
   <data name="users.error.headline" xml:space="preserve">
     <value>Operazione non riuscita</value>
@@ -1118,7 +1193,7 @@
     <value>Lo step iniziale non può essere quello pubblico.</value>
   </data>
   <data name="workflows.publishedNotDefined" xml:space="preserve">
-    <value>Il Workflow deve avere uno step pubbico.</value>
+    <value>Il Workflow deve avere uno step pubblico.</value>
   </data>
   <data name="workflows.publishedStepNotFound" xml:space="preserve">
     <value>La Transition ha un obiettivo non valido.</value>

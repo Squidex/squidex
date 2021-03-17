@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
@@ -19,7 +20,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         public bool HasPasswordAuth { get; set; }
 
-        public bool HasPasswordAndExternal { get; set; }
+        public bool HasExternalLogin => ExternalProviders.Any();
 
         public IReadOnlyList<ExternalProvider> ExternalProviders { get; set; }
     }

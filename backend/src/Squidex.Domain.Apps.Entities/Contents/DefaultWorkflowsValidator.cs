@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 if (workflows.Values.Count(x => x.SchemaIds.Contains(schemaId)) > 1)
                 {
-                    var schema = await appProvider.GetSchemaAsync(appId, schemaId, false);
+                    var schema = await appProvider.GetSchemaAsync(appId, schemaId);
 
                     if (schema != null)
                     {

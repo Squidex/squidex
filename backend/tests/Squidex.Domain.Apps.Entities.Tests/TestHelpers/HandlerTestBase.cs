@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -16,6 +17,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
+using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
@@ -25,9 +27,9 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         private readonly IPersistence<TState> persistenceWithState = A.Fake<IPersistence<TState>>();
         private readonly IPersistence persistence = A.Fake<IPersistence>();
 
-        protected RefToken Actor { get; } = new RefToken(RefTokenType.Subject, "me");
+        protected RefToken Actor { get; } = RefToken.User("me");
 
-        protected RefToken ActorClient { get; } = new RefToken(RefTokenType.Client, "client");
+        protected RefToken ActorClient { get; } = RefToken.Client("client");
 
         protected DomainId AppId { get; } = DomainId.NewGuid();
 
@@ -41,19 +43,19 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected NamedId<DomainId> AppNamedId
         {
-            get { return NamedId.Of(AppId, AppName); }
+            get => NamedId.Of(AppId, AppName);
         }
 
         protected NamedId<DomainId> SchemaNamedId
         {
-            get { return NamedId.Of(SchemaId, SchemaName); }
+            get => NamedId.Of(SchemaId, SchemaName);
         }
 
         protected abstract DomainId Id { get; }
 
         public IStore<DomainId> Store
         {
-            get { return store; }
+            get => store;
         }
 
         public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = Enumerable.Empty<Envelope<IEvent>>();
@@ -66,16 +68,46 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             A.CallTo(() => store.WithEventSourcing(A<Type>._, Id, A<HandleEvent>._))
                 .Returns(persistence);
 
-            A.CallTo(() => persistenceWithState.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
-                .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
+            A.CallTo(() => persistenceWithState.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+                .Invokes((IReadOnlyList<Envelope<IEvent>> events) => LastEvents = events);
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>._))
-                .Invokes((IEnumerable<Envelope<IEvent>> events) => LastEvents = events);
+            A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
+                .Invokes((IReadOnlyList<Envelope<IEvent>> events) => LastEvents = events);
+
+            A.CallTo(() => persistenceWithState.DeleteAsync())
+                .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
+
+            A.CallTo(() => persistence.DeleteAsync())
+                .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
         }
 
-        protected CommandContext CreateContextForCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
+        protected CommandContext CreateCommandContext<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
             return new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
+        }
+
+        protected async Task<CommandContext> HandleAsync<TCommand>(ICommandMiddleware middleware, TCommand command) where TCommand : SquidexCommand
+        {
+            var context = new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
+
+            await middleware.HandleAsync(context);
+
+            return context;
+        }
+
+        protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : class, IDomainState<T>, new()
+        {
+            var result = await domainObject.ExecuteAsync(command);
+
+            var previousSnapshot = domainObject.Snapshot;
+            var previousVersion = domainObject.Snapshot.Version;
+
+            await domainObject.ExecuteAsync(command);
+
+            Assert.Same(previousSnapshot, domainObject.Snapshot);
+            Assert.Equal(previousVersion, domainObject.Snapshot.Version);
+
+            return result.Payload;
         }
 
         protected TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
@@ -83,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             command.ExpectedVersion = EtagVersion.Any;
             command.Actor ??= Actor;
 
-            if (command.User == null && command.Actor.IsSubject)
+            if (command.User == null && command.Actor.IsUser)
             {
                 command.User = User;
             }

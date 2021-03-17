@@ -40,33 +40,7 @@ namespace Squidex.Infrastructure.Queries.OData
 
         public override ClrValue Visit(ConvertNode nodeIn)
         {
-            if (nodeIn.TypeReference.Definition == BooleanType)
-            {
-                var value = ConstantVisitor.Visit(nodeIn.Source);
-
-                return bool.Parse(value.ToString()!);
-            }
-
-            if (nodeIn.TypeReference.Definition == GuidType)
-            {
-                var value = ConstantVisitor.Visit(nodeIn.Source);
-
-                return Guid.Parse(value.ToString()!);
-            }
-
-            if (nodeIn.TypeReference.Definition == DateTimeType || nodeIn.TypeReference.Definition == DateType)
-            {
-                var value = ConstantVisitor.Visit(nodeIn.Source);
-
-                return ParseInstant(value);
-            }
-
-            if (ConstantVisitor.Visit(nodeIn.Source) == null)
-            {
-                return ClrValue.Null;
-            }
-
-            throw new NotSupportedException();
+            return nodeIn.Source.Accept(this);
         }
 
         public override ClrValue Visit(CollectionConstantNode nodeIn)
@@ -116,6 +90,16 @@ namespace Squidex.Infrastructure.Queries.OData
 
         public override ClrValue Visit(ConstantNode nodeIn)
         {
+            if (nodeIn.Value == null)
+            {
+                return ClrValue.Null;
+            }
+
+            if (nodeIn.TypeReference == null)
+            {
+                throw new NotSupportedException();
+            }
+
             if (nodeIn.TypeReference.Definition == DateTimeType || nodeIn.TypeReference.Definition == DateType)
             {
                 return ParseInstant(nodeIn.Value);
@@ -176,7 +160,7 @@ namespace Squidex.Infrastructure.Queries.OData
                 return Instant.FromUtc(date.Year, date.Month, date.Day, 0, 0);
             }
 
-            var parseResult = InstantPattern.General.Parse(value.ToString()!);
+            var parseResult = InstantPattern.ExtendedIso.Parse(value.ToString()!);
 
             if (!parseResult.Success)
             {

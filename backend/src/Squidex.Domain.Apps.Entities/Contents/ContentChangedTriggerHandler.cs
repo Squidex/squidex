@@ -77,19 +77,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     @event.Payload.ContentId,
                     @event.Headers.EventStreamNumber());
 
-            if (content == null)
+            if (content != null)
             {
-                throw new DomainObjectNotFoundException(@event.Payload.ContentId.ToString());
+                SimpleMapper.Map(content, result);
             }
-
-            SimpleMapper.Map(content, result);
 
             switch (@event.Payload)
             {
-                case ContentCreated _:
+                case ContentCreated:
                     result.Type = EnrichedContentEventType.Created;
                     break;
-                case ContentDeleted _:
+                case ContentDeleted:
                     result.Type = EnrichedContentEventType.Deleted;
                     break;
 
@@ -111,27 +109,29 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         break;
                     }
 
-                case ContentUpdated _:
+                case ContentUpdated:
                     {
                         result.Type = EnrichedContentEventType.Updated;
 
-                        var previousContent =
-                            await contentLoader.GetAsync(
-                                content.AppId.Id,
-                                content.Id,
-                                content.Version - 1);
-
-                        if (previousContent == null)
+                        if (content != null)
                         {
-                            throw new DomainObjectNotFoundException(@event.Payload.ContentId.ToString());
+                            var previousContent =
+                                await contentLoader.GetAsync(
+                                    content.AppId.Id,
+                                    content.Id,
+                                    content.Version - 1);
+
+                            if (previousContent != null)
+                            {
+                                result.DataOld = previousContent.Data;
+                            }
                         }
 
-                        result.DataOld = previousContent.Data;
                         break;
                     }
             }
 
-            result.Name = $"{content.SchemaId.Name.ToPascalCase()}{result.Type}";
+            result.Name = $"{@event.Payload.SchemaId.Name.ToPascalCase()}{result.Type}";
 
             return result;
         }

@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Queries
 
         public long Top
         {
-            set { Take = value; }
+            set => Take = value;
         }
 
         public List<SortNode> Sort { get; set; } = new List<SortNode>();

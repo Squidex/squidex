@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(JsonValue.Array(JsonValue.Null), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "[1]: Field is required." });
+                new[] { "Invalid json type, expected array of strings." });
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(string.Empty), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "[1]: Field is required." });
+                new[] { "Invalid json type, expected array of strings." });
         }
 
         [Fact]

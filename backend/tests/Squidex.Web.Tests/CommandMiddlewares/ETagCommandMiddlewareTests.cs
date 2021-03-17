@@ -12,6 +12,7 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
 
@@ -20,7 +21,6 @@ namespace Squidex.Web.CommandMiddlewares
     public class ETagCommandMiddlewareTests
     {
         private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
-        private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly ETagCommandMiddleware sut;
 
@@ -38,12 +38,7 @@ namespace Squidex.Web.CommandMiddlewares
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(null!);
 
-            var command = new CreateContent();
-            var context = Ctx(command);
-
-            await sut.HandleAsync(context);
-
-            Assert.Null(command.Actor);
+            await HandleAsync(new CreateContent(), true);
         }
 
         [Fact]
@@ -51,12 +46,9 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.Request.Headers[HeaderNames.IfMatch] = "13";
 
-            var command = new CreateContent { ExpectedVersion = 1 };
-            var context = Ctx(command);
+            var context = await HandleAsync(new CreateContent { ExpectedVersion = 1 }, true);
 
-            await sut.HandleAsync(context);
-
-            Assert.Equal(1, context.Command.ExpectedVersion);
+            Assert.Equal(1, ((IAggregateCommand)context.Command).ExpectedVersion);
         }
 
         [Fact]
@@ -64,12 +56,9 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.Request.Headers[HeaderNames.IfMatch] = "13";
 
-            var command = new CreateContent();
-            var context = Ctx(command);
+            var context = await HandleAsync(new CreateContent(), true);
 
-            await sut.HandleAsync(context);
-
-            Assert.Equal(13, context.Command.ExpectedVersion);
+            Assert.Equal(13, ((IAggregateCommand)context.Command).ExpectedVersion);
         }
 
         [Fact]
@@ -77,23 +66,17 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.Request.Headers[HeaderNames.IfMatch] = "W/13";
 
-            var command = new CreateContent();
-            var context = Ctx(command);
+            var context = await HandleAsync(new CreateContent(), true);
 
-            await sut.HandleAsync(context);
-
-            Assert.Equal(13, context.Command.ExpectedVersion);
+            Assert.Equal(13, ((IAggregateCommand)context.Command).ExpectedVersion);
         }
 
         [Fact]
         public async Task Should_add_version_from_result_as_etag_to_response()
         {
-            var command = new CreateContent();
-            var context = Ctx(command);
+            var result = CommandResult.Empty(DomainId.Empty, 17, 16);
 
-            context.Complete(new EntitySavedResult(17));
-
-            await sut.HandleAsync(context);
+            await HandleAsync(new CreateContent(), result);
 
             Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
         }
@@ -101,19 +84,20 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_add_version_from_entity_as_etag_to_response()
         {
-            var command = new CreateContent();
-            var context = Ctx(command);
+            var result = new ContentEntity { Version = 17 };
 
-            context.Complete(new ContentEntity { Version = 17 });
-
-            await sut.HandleAsync(context);
+            await HandleAsync(new CreateContent(), result);
 
             Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
         }
 
-        private CommandContext Ctx(ICommand command)
+        private async Task<CommandContext> HandleAsync(ICommand command, object result)
         {
-            return new CommandContext(command, commandBus);
+            var commandContext = new CommandContext(command, A.Fake<ICommandBus>()).Complete(result);
+
+            await sut.HandleAsync(commandContext);
+
+            return commandContext;
         }
     }
 }

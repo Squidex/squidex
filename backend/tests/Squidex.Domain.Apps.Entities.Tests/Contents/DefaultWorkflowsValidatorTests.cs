@@ -30,10 +30,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var schema = Mocks.Schema(appId, schemaId, new Schema(schemaId.Name));
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
                 .Returns(schema);
 
             sut = new DefaultWorkflowsValidator(appProvider);

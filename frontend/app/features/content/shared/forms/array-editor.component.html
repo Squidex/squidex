@@ -32,6 +32,14 @@
                 <button type="button" class="btn btn-outline-success" [disabled]="isFull | async" (click)="addItem()">
                     {{ 'contents.arrayAddItem' | sqxTranslate }}
                 </button>
+                
+                <button type="button" class="btn btn-text-danger ml-2"
+                    (sqxConfirmClick)="clear()"
+                    confirmTitle="i18n:contents.arrayClearConfirmTitle"
+                    confirmText="i18n:contents.arrayClearConfirmText"
+                    confirmRememberKey="leaveApp">
+                    {{ 'contents.arrayClear' | sqxTranslate }}
+                </button>
             </div>
         
             <div class="col-auto" *ngIf="items.length > 0">

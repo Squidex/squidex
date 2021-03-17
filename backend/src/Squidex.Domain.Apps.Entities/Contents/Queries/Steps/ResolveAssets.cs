@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             {
                 foreach (var content in contents)
                 {
-                    content.ReferenceData ??= new NamedContentData();
+                    content.ReferenceData ??= new ContentData();
 
                     var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData())!;
 
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                                 requestCache.AddDependency(referencedAsset.UniqueId, referencedAsset.Version);
 
-                                fieldReference.AddJsonValue(partitionKey, array);
+                                fieldReference.AddLocalized(partitionKey, array);
                             }
                         }
                     }
@@ -118,7 +118,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 return EmptyAssets;
             }
 
-            var assets = await assetQuery.QueryAsync(context.Clone().WithoutAssetEnrichment(true), null, Q.Empty.WithIds(ids));
+            var queryContext = context.Clone(b => b
+                .WithoutAssetEnrichment(true)
+                .WithoutTotal());
+
+            var assets = await assetQuery.QueryAsync(queryContext, null, Q.Empty.WithIds(ids));
 
             return assets.ToLookup(x => x.Id);
         }
@@ -133,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private static bool ShouldEnrich(Context context)
         {
-            return context.IsFrontendClient && context.ShouldEnrichContent();
+            return context.IsFrontendClient && !context.ShouldSkipContentEnrichment();
         }
     }
 }

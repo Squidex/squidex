@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
@@ -40,10 +41,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_throw_exception_if_schema_not_found()
         {
-            var command = new CreateContent { AppId = appId };
-            var context = Ctx(command);
-
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.HandleAsync(context));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => HandleAsync(new CreateContent()));
         }
 
         [Fact]
@@ -51,12 +49,9 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schemaId));
 
-            var command = new CreateContent();
-            var context = Ctx(command);
+            var context = await HandleAsync(new CreateContent());
 
-            await sut.HandleAsync(context);
-
-            Assert.Equal(schemaId, command.SchemaId);
+            Assert.Equal(schemaId, ((ISchemaCommand)context.Command).SchemaId);
         }
 
         [Fact]
@@ -64,12 +59,9 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schemaId));
 
-            var command = new UpdateSchema();
-            var context = Ctx(command);
+            var context = await HandleAsync(new UpdateSchema());
 
-            await sut.HandleAsync(context);
-
-            Assert.Equal(schemaId, command.SchemaId);
+            Assert.Equal(schemaId, ((ISchemaCommand)context.Command).SchemaId);
         }
 
         [Fact]
@@ -77,12 +69,11 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schemaId));
 
-            var command = new CreateSchema { SchemaId = DomainId.NewGuid() };
-            var context = Ctx(command);
+            var customId = DomainId.NewGuid();
 
-            await sut.HandleAsync(context);
+            var context = await HandleAsync(new CreateSchema { SchemaId = customId });
 
-            Assert.NotEqual(schemaId.Id, command.SchemaId);
+            Assert.Equal(customId, ((CreateSchema)context.Command).SchemaId);
         }
 
         [Fact]
@@ -90,17 +81,22 @@ namespace Squidex.Web.CommandMiddlewares
         {
             httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schemaId));
 
-            var command = new CreateContent { SchemaId = NamedId.Of(DomainId.NewGuid(), "other-app") };
-            var context = Ctx(command);
+            var customId = NamedId.Of(DomainId.NewGuid(), "other-app");
 
-            await sut.HandleAsync(context);
+            var context = await HandleAsync(new CreateContent { SchemaId = customId });
 
-            Assert.NotEqual(schemaId, command.SchemaId);
+            Assert.Equal(customId, ((ISchemaCommand)context.Command).SchemaId);
         }
 
-        private CommandContext Ctx(ICommand command)
+        private async Task<CommandContext> HandleAsync(IAppCommand command)
         {
-            return new CommandContext(command, commandBus);
+            command.AppId = appId;
+
+            var commandContext = new CommandContext(command, A.Fake<ICommandBus>());
+
+            await sut.HandleAsync(commandContext);
+
+            return commandContext;
         }
     }
 }

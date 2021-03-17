@@ -32,7 +32,7 @@ namespace Squidex.Extensions.Validation
 
         public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value is NamedContentData data)
+            if (value is ContentData data)
             {
                 var validateableFields = context.Schema.Fields.Where(IsValidateableField);
 
@@ -62,7 +62,7 @@ namespace Squidex.Extensions.Validation
             }
         }
 
-        private static ClrValue TryGetValue(IRootField field, NamedContentData data)
+        private static ClrValue TryGetValue(IRootField field, ContentData data)
         {
             var value = JsonValue.Null;
 
@@ -76,19 +76,19 @@ namespace Squidex.Extensions.Validation
 
             switch (field.RawProperties)
             {
-                case BooleanFieldProperties _ when value is JsonBoolean boolean:
+                case BooleanFieldProperties when value is JsonBoolean boolean:
                     return boolean.Value;
-                case BooleanFieldProperties _ when value is JsonNull:
+                case BooleanFieldProperties when value is JsonNull:
                     return ClrValue.Null;
-                case NumberFieldProperties _ when value is JsonNumber number:
+                case NumberFieldProperties when value is JsonNumber number:
                     return number.Value;
-                case NumberFieldProperties _ when value is JsonNull:
+                case NumberFieldProperties when value is JsonNull:
                     return ClrValue.Null;
-                case StringFieldProperties _ when value is JsonString @string:
+                case StringFieldProperties when value is JsonString @string:
                     return @string.Value;
-                case StringFieldProperties _ when value is JsonNull:
+                case StringFieldProperties when value is JsonNull:
                     return ClrValue.Null;
-                case ReferencesFieldProperties _ when value is JsonArray array && array.FirstOrDefault() is JsonString @string:
+                case ReferencesFieldProperties when value is JsonArray array && array.FirstOrDefault() is JsonString @string:
                     return @string.Value;
             }
 

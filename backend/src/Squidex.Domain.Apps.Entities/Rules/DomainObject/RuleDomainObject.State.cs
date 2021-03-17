@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             [IgnoreDataMember]
             public DomainId UniqueId
             {
-                get { return DomainId.Combine(AppId, Id); }
+                get => DomainId.Combine(AppId, Id);
             }
 
             public override bool ApplyEvent(IEvent @event)
@@ -67,21 +67,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                             break;
                         }
 
-                    case RuleEnabled _:
+                    case RuleEnabled:
                         {
                             RuleDef = RuleDef.Enable();
 
                             break;
                         }
 
-                    case RuleDisabled _:
+                    case RuleDisabled:
                         {
                             RuleDef = RuleDef.Disable();
 
                             break;
                         }
 
-                    case RuleDeleted _:
+                    case RuleDeleted:
                         {
                             IsDeleted = true;
 

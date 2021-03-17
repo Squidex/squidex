@@ -20,37 +20,37 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public DomainId Id
         {
-            get { return item.Id; }
+            get => item.Id;
         }
 
         public Instant Created
         {
-            get { return item.Created; }
+            get => item.Created;
         }
 
         public RefToken Actor
         {
-            get { return item.Actor; }
+            get => item.Actor;
         }
 
         public long Version
         {
-            get { return item.Version; }
+            get => item.Version;
         }
 
         public string Channel
         {
-            get { return item.Channel; }
+            get => item.Channel;
         }
 
         public string EventType
         {
-            get { return item.EventType; }
+            get => item.EventType;
         }
 
         public string? Message
         {
-            get { return message.Value; }
+            get => message.Value;
         }
 
         public ParsedHistoryEvent(HistoryEvent item, IReadOnlyDictionary<string, string> texts)

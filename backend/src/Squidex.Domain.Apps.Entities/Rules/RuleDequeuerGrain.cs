@@ -144,11 +144,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private static RuleJobResult ComputeJobResult(RuleResult result, Instant? nextCall)
         {
-            if (result != RuleResult.Success && !nextCall.HasValue)
+            if (result != RuleResult.Success && nextCall == null)
             {
                 return RuleJobResult.Failed;
             }
-            else if (result != RuleResult.Success && nextCall.HasValue)
+            else if (result != RuleResult.Success && nextCall != null)
             {
                 return RuleJobResult.Retry;
             }

@@ -5,13 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL;
 using GraphQL.DataLoader;
-using GraphQL.Utilities;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
@@ -26,41 +23,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
         private static readonly List<IEnrichedContentEntity> EmptyContents = new List<IEnrichedContentEntity>();
-        private readonly IDataLoaderContextAccessor dataLoaderContextAccessor;
-        private readonly IServiceProvider resolver;
+        private readonly IDataLoaderContextAccessor dataLoaders;
 
         public IUrlGenerator UrlGenerator { get; }
 
         public ICommandBus CommandBus { get; }
 
-        public GraphQLExecutionContext(Context context, IServiceProvider resolver)
-            : base(context
-                    .WithoutCleanup()
-                    .WithoutContentEnrichment(),
-                resolver.GetRequiredService<IAssetQueryService>(),
-                resolver.GetRequiredService<IContentQueryService>())
+        public ISemanticLog Log { get; }
+
+        public override Context Context { get; }
+
+        public GraphQLExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery,
+            Context context,
+            IDataLoaderContextAccessor dataLoaders, ICommandBus commandBus, IUrlGenerator urlGenerator, ISemanticLog log)
+            : base(assetQuery, contentQuery)
         {
-            UrlGenerator = resolver.GetRequiredService<IUrlGenerator>();
+            this.dataLoaders = dataLoaders;
 
-            CommandBus = resolver.GetRequiredService<ICommandBus>();
+            CommandBus = commandBus;
 
-            dataLoaderContextAccessor = resolver.GetRequiredService<IDataLoaderContextAccessor>();
+            UrlGenerator = urlGenerator;
 
-            this.resolver = resolver;
+            Context = context.Clone(b => b
+                .WithoutCleanup()
+                .WithoutContentEnrichment());
+
+            Log = log;
         }
 
-        public void Setup(ExecutionOptions execution)
-        {
-            var loader = resolver.GetRequiredService<DataLoaderDocumentListener>();
-
-            execution.Listeners.Add(loader);
-            execution.FieldMiddleware.Use(Middlewares.Logging(resolver.GetRequiredService<ISemanticLog>()));
-            execution.FieldMiddleware.Use(Middlewares.Errors());
-
-            execution.UserContext = this;
-        }
-
-        public override async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
+        public async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
         {
             var dataLoader = GetAssetsLoader();
 
@@ -104,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private IDataLoader<DomainId, IEnrichedAssetEntity> GetAssetsLoader()
         {
-            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<DomainId, IEnrichedAssetEntity>(nameof(GetAssetsLoader),
+            return dataLoaders.Context.GetOrAddBatchLoader<DomainId, IEnrichedAssetEntity>(nameof(GetAssetsLoader),
                 async batch =>
                 {
                     var result = await GetReferencedAssetsAsync(new List<DomainId>(batch));
@@ -115,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private IDataLoader<DomainId, IEnrichedContentEntity> GetContentsLoader()
         {
-            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<DomainId, IEnrichedContentEntity>(nameof(GetContentsLoader),
+            return dataLoaders.Context.GetOrAddBatchLoader<DomainId, IEnrichedContentEntity>(nameof(GetContentsLoader),
                 async batch =>
                 {
                     var result = await GetReferencedContentsAsync(new List<DomainId>(batch));

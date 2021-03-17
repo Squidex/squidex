@@ -5,14 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using NJsonSchema;
+using NJsonSchema.Generation;
 using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
 using NSwag.Generation;
 using NSwag.Generation.Processors;
-using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
@@ -52,35 +54,73 @@ namespace Squidex.Areas.Api.Config.OpenApi
             services.AddSingletonAs<XmlResponseTypesProcessor>()
                 .As<IOperationProcessor>();
 
-            services.AddOpenApiDocument(settings =>
-            {
-                settings.ConfigureName();
-                settings.ConfigureSchemaSettings();
+            services.AddSingletonAs<JsonSchemaGenerator>()
+                .AsSelf();
 
-                settings.OperationProcessors.Add(new ODataQueryParamsProcessor("/apps/{app}/assets", "assets", false));
+            services.AddSingletonAs<OpenApiSchemaGenerator>()
+                .AsSelf();
+
+            services.AddSingleton(c =>
+            {
+                var settings = new JsonSchemaGeneratorSettings
+                {
+                    SerializerSettings = c.GetRequiredService<JsonSerializerSettings>()
+                };
+
+                ConfigureSchemaSettings(settings, true);
+
+                return settings;
             });
 
-            services.AddTransient<SchemasOpenApiGenerator>();
+            services.AddSingleton(c =>
+            {
+                var settings = new OpenApiDocumentGeneratorSettings
+                {
+                    SerializerSettings = c.GetRequiredService<JsonSerializerSettings>()
+                };
+
+                ConfigureSchemaSettings(settings, true);
+
+                foreach (var processor in c.GetRequiredService<IEnumerable<IDocumentProcessor>>())
+                {
+                    settings.DocumentProcessors.Add(processor);
+                }
+
+                return settings;
+            });
+
+            services.AddOpenApiDocument(settings =>
+            {
+                settings.Title = "Squidex API";
+
+                ConfigureSchemaSettings(settings);
+
+                settings.OperationProcessors.Add(new QueryParamsProcessor("/apps/{app}/assets"));
+            });
         }
 
-        public static void ConfigureName<T>(this T settings) where T : OpenApiDocumentGeneratorSettings
+        private static void ConfigureSchemaSettings(JsonSchemaGeneratorSettings settings, bool flatten = false)
         {
-            settings.Title = "Squidex API";
-        }
+            settings.AllowReferencesWithProperties = true;
 
-        public static void ConfigureSchemaSettings<T>(this T settings) where T : OpenApiDocumentGeneratorSettings
-        {
             settings.TypeMappers = new List<ITypeMapper>
             {
-                CreateStringMap<Instant>(JsonFormatStrings.DateTime),
-                CreateStringMap<Language>(),
                 CreateStringMap<DomainId>(),
+                CreateStringMap<Instant>(JsonFormatStrings.DateTime),
+                CreateStringMap<LocalDate>(JsonFormatStrings.Date),
+                CreateStringMap<LocalDateTime>(JsonFormatStrings.DateTime),
+                CreateStringMap<Language>(),
+                CreateStringMap<NamedId<DomainId>>(),
+                CreateStringMap<NamedId<Guid>>(),
+                CreateStringMap<NamedId<string>>(),
                 CreateStringMap<RefToken>(),
                 CreateStringMap<Status>(),
 
                 CreateObjectMap<JsonObject>(),
                 CreateObjectMap<AssetMetadata>()
             };
+
+            settings.FlattenInheritanceHierarchy = flatten;
         }
 
         private static ITypeMapper CreateObjectMap<T>()
@@ -91,7 +131,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
                 schema.AdditionalPropertiesSchema = new JsonSchema
                 {
-                    Description = "Any JSON type"
+                    Description = "Any"
                 };
             });
         }

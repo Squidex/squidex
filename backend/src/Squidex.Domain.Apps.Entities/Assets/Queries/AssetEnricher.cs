@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     requestCache.AddDependency(asset.UniqueId, asset.Version);
                 }
 
-                if (ShouldEnrich(context))
+                if (!context.ShouldSkipAssetEnrichment())
                 {
                     await EnrichTagsAsync(results);
 
@@ -133,11 +133,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var uniqueIds = group.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToHashSet();
 
             return await tagService.DenormalizeTagsAsync(group.Key, TagGroups.Assets, uniqueIds);
-        }
-
-        private static bool ShouldEnrich(Context context)
-        {
-            return context.ShouldEnrichAsset();
         }
     }
 }

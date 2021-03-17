@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         public static readonly GeoQueryTransformer Instance = new GeoQueryTransformer();
 
-        public struct Args
+        public readonly struct Args
         {
             public readonly ITextIndex TextIndex;
 

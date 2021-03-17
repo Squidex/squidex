@@ -41,13 +41,13 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         public void Should_enrich_with_default_values()
         {
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddValue("de", "de-string"))
+                            .AddLocalized("de", "de-string"))
                     .AddField("my-number",
                         new ContentFieldData()
-                            .AddValue("iv", 456));
+                            .AddInvariant(456));
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
@@ -62,20 +62,20 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_also_enrich_with_default_values_when_string_is_empty()
+        public void Should_not_enrich_with_default_values_when_string_is_empty()
         {
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddValue("de", string.Empty))
+                            .AddLocalized("de", string.Empty))
                     .AddField("my-number",
                         new ContentFieldData()
-                            .AddValue("iv", 456));
+                            .AddInvariant(456));
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
-            Assert.Equal("en-string", data["my-string"]!["de"].ToString());
+            Assert.Equal(string.Empty, data["my-string"]!["de"].ToString());
             Assert.Equal("en-string", data["my-string"]!["en"].ToString());
         }
 

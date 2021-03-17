@@ -148,6 +148,10 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
         this.sendDisabled();
     }
 
+    public reset() {
+        this.sendInit();
+    }
+
     private sendInit() {
         this.sendMessage('init', { context: this.context || {} });
     }

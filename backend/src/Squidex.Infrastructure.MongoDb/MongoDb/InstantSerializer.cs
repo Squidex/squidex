@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public bool IsDiscriminatorCompatibleWithObjectSerializer
         {
-            get { return true; }
+            get => true;
         }
 
         public override Instant Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)

@@ -18,7 +18,7 @@ namespace Migrations
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 24;
+        private const int CurrentVersion = 25;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -96,12 +96,6 @@ namespace Migrations
                 }
                 else
                 {
-                    // Version 17: Rename slug field.
-                    if (version < 17)
-                    {
-                        yield return serviceProvider.GetService<RenameAssetSlugField>();
-                    }
-
                     // Version 20: Rename slug field.
                     if (version < 20)
                     {
@@ -117,17 +111,16 @@ namespace Migrations
                 }
 
                 // Version 21: Introduce content drafts V2.
-                if (version < 21)
+                // Version 25: Convert content ids to names.
+                if (version < 25)
                 {
                     yield return serviceProvider.GetRequiredService<RebuildContents>();
                 }
-                else
+
+                // Version 16: Introduce file name slugs for assets.
+                if (version < 16)
                 {
-                    // Version 22: Introduce domain id.
-                    if (version < 22)
-                    {
-                        yield return serviceProvider.GetRequiredService<ConvertDocumentIds>().ForContents();
-                    }
+                    yield return serviceProvider.GetRequiredService<CreateAssetSlugs>();
                 }
             }
 
@@ -135,12 +128,6 @@ namespace Migrations
             if (version < 13)
             {
                 yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
-            }
-
-            // Version 16: Introduce file name slugs for assets.
-            if (version < 16)
-            {
-                yield return serviceProvider.GetRequiredService<CreateAssetSlugs>();
             }
 
             // Version 19: Unify indexes.

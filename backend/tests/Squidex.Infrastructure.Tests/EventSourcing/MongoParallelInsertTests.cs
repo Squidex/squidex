@@ -120,7 +120,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             public sealed override int MaximumConcurrencyLevel
             {
-                get { return maxDegreeOfParallelism; }
+                get => maxDegreeOfParallelism;
             }
 
             protected sealed override IEnumerable<Task> GetScheduledTasks()

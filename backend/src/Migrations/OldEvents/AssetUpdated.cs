@@ -37,7 +37,7 @@ namespace Migrations.OldEvents
 
             result.Metadata = new AssetMetadata();
 
-            if (IsImage && PixelWidth.HasValue && PixelHeight.HasValue)
+            if (IsImage && PixelWidth != null && PixelHeight != null)
             {
                 result.Type = AssetType.Image;
 

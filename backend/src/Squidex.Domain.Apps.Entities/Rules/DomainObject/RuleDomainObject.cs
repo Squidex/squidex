@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                 ruleCommand.RuleId.Equals(Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
@@ -77,8 +77,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         return Snapshot;
                     });
 
-                case EnableRule enableRule:
-                    return UpdateReturn(enableRule, c =>
+                case EnableRule enable:
+                    return UpdateReturn(enable, c =>
                     {
                         GuardRule.CanEnable(c);
 
@@ -87,8 +87,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         return Snapshot;
                     });
 
-                case DisableRule disableRule:
-                    return UpdateReturn(disableRule, c =>
+                case DisableRule disable:
+                    return UpdateReturn(disable, c =>
                     {
                         GuardRule.CanDisable(c);
 
@@ -97,10 +97,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                         return Snapshot;
                     });
 
-                case DeleteRule deleteRule:
-                    return Update(deleteRule, c =>
+                case DeleteRule delete:
+                    return Update(delete, c =>
                     {
-                        GuardRule.CanDelete(deleteRule);
+                        GuardRule.CanDelete(delete);
 
                         Delete(c);
                     });
@@ -125,38 +125,34 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             await ruleEnqueuer.EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
         }
 
-        public void Create(CreateRule command)
+        private void Create(CreateRule command)
         {
             Raise(command, new RuleCreated());
         }
 
-        public void Update(UpdateRule command)
+        private void Update(UpdateRule command)
         {
             Raise(command, new RuleUpdated());
         }
 
-        public void Enable(EnableRule command)
+        private void Enable(EnableRule command)
         {
             Raise(command, new RuleEnabled());
         }
 
-        public void Disable(DisableRule command)
+        private void Disable(DisableRule command)
         {
             Raise(command, new RuleDisabled());
         }
 
-        public void Delete(DeleteRule command)
+        private void Delete(DeleteRule command)
         {
             Raise(command, new RuleDeleted());
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
         {
-            SimpleMapper.Map(command, @event);
-
-            @event.AppId ??= Snapshot.AppId;
-
-            RaiseEvent(Envelope.Create(@event));
+            RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
         }
     }
 }

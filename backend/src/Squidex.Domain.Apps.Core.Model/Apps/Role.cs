@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
@@ -40,8 +39,6 @@ namespace Squidex.Domain.Apps.Core.Apps
         public const string Owner = "Owner";
         public const string Reader = "Reader";
 
-        public static readonly ReadOnlyCollection<string> EmptyProperties = new ReadOnlyCollection<string>(new List<string>());
-
         public PermissionSet Permissions { get; }
 
         public JsonObject Properties { get; }
@@ -49,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [IgnoreDuringEquals]
         public bool IsDefault
         {
-            get { return Roles.IsDefault(this); }
+            get => Roles.IsDefault(this);
         }
 
         public Role(string name, PermissionSet permissions, JsonObject properties)

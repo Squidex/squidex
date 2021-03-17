@@ -52,11 +52,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     stringValue = transform(stringValue);
                 }
 
-                if (minWords.HasValue || maxWords.HasValue)
+                if (minWords != null || maxWords != null)
                 {
                     var words = stringValue.WordCount();
 
-                    if (minWords.HasValue && maxWords.HasValue)
+                    if (minWords != null && maxWords != null)
                     {
                         if (minWords == maxWords && minWords != words)
                         {
@@ -69,23 +69,23 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
                     else
                     {
-                        if (minWords.HasValue && words < minWords)
+                        if (words < minWords)
                         {
                             addError(context.Path, T.Get("contents.validation.minWords", new { min = minWords }));
                         }
 
-                        if (maxWords.HasValue && words > maxWords)
+                        if (words > maxWords)
                         {
                             addError(context.Path, T.Get("contents.validation.maxWords", new { max = maxWords }));
                         }
                     }
                 }
 
-                if (minCharacters.HasValue || maxCharacters.HasValue)
+                if (minCharacters != null || maxCharacters != null)
                 {
                     var characters = stringValue.CharacterCount();
 
-                    if (minCharacters.HasValue && maxCharacters.HasValue)
+                    if (minCharacters != null && maxCharacters != null)
                     {
                         if (minCharacters == maxCharacters && minCharacters != characters)
                         {
@@ -98,12 +98,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
                     else
                     {
-                        if (minCharacters.HasValue && characters < minCharacters)
+                        if (characters < minCharacters)
                         {
                             addError(context.Path, T.Get("contents.validation.minNormalCharacters", new { min = minCharacters }));
                         }
 
-                        if (maxCharacters.HasValue && characters > maxCharacters)
+                        if (characters > maxCharacters)
                         {
                             addError(context.Path, T.Get("contents.validation.maxCharacters", new { max = maxCharacters }));
                         }

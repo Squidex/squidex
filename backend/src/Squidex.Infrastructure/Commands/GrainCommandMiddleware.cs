@@ -34,11 +34,18 @@ namespace Squidex.Infrastructure.Commands
             {
                 var result = await ExecuteCommandAsync(typedCommand);
 
-                context.Complete(result);
+                var payload = await EnrichResultAsync(context, result);
+
+                context.Complete(payload);
             }
         }
 
-        private async Task<object?> ExecuteCommandAsync(TCommand typedCommand)
+        protected virtual Task<object> EnrichResultAsync(CommandContext context, CommandResult result)
+        {
+            return Task.FromResult(result.Payload is None ? result : result.Payload);
+        }
+
+        private async Task<CommandResult> ExecuteCommandAsync(TCommand typedCommand)
         {
             var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId.ToString());
 

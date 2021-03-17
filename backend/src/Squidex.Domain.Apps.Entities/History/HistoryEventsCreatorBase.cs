@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public IReadOnlyDictionary<string, string> Texts
         {
-            get { return texts; }
+            get => texts;
         }
 
         protected HistoryEventsCreatorBase(TypeNameRegistry typeNameRegistry)

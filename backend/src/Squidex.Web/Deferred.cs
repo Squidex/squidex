@@ -17,7 +17,7 @@ namespace Squidex.Web
 
         public Task<object> Value
         {
-            get { return value.Value; }
+            get => value.Value;
         }
 
         private Deferred(Func<Task<object>> value)

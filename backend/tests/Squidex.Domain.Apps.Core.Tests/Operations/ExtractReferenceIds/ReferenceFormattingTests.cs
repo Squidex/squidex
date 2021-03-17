@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [Fact]
         public void Should_return_default_value_if_no_value_found()
         {
-            var data = new NamedContentData();
+            var data = new ContentData();
 
             var schema = CreateNoRefSchema();
 
@@ -85,19 +85,19 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                 .AddString(3, "non-ref", Partitioning.Invariant);
         }
 
-        private static NamedContentData CreateData()
+        private static ContentData CreateData()
         {
-            return new NamedContentData()
+            return new ContentData()
                 .AddField("ref1",
                     new ContentFieldData()
-                        .AddValue("en", "EN")
-                        .AddValue("de", "DE"))
+                        .AddLocalized("en", "EN")
+                        .AddLocalized("de", "DE"))
                 .AddField("ref2",
                     new ContentFieldData()
-                        .AddValue("iv", 12))
+                        .AddInvariant(12))
                 .AddField("non-ref",
                     new ContentFieldData()
-                        .AddValue("iv", "Ignored"));
+                        .AddInvariant("Ignored"));
         }
     }
 }

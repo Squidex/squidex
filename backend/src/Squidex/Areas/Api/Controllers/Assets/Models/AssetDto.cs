@@ -136,7 +136,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [Obsolete("Use Type instead")]
         public bool IsImage
         {
-            get { return Type == AssetType.Image; }
+            get => Type == AssetType.Image;
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [Obsolete("Use Metdata instead")]
         public int? PixelWidth
         {
-            get { return Metadata.GetPixelWidth(); }
+            get => Metadata.GetPixelWidth();
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [Obsolete("Use Metdata instead")]
         public int? PixelHeight
         {
-            get { return Metadata.GetPixelHeight(); }
+            get => Metadata.GetPixelHeight();
         }
 
         public static AssetDto FromAsset(IEnrichedAssetEntity asset, Resources resources, bool isDuplicate = false)

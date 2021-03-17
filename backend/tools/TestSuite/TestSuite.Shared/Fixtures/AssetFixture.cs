@@ -49,7 +49,7 @@ namespace TestSuite.Fixtures
 
             using (var stream = fileInfo.OpenRead())
             {
-                var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo), asset.MimeType);
+                var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo.Extension), asset.MimeType);
 
                 return await Assets.PutAssetContentAsync(AppName, asset.Id, upload);
             }
@@ -61,15 +61,41 @@ namespace TestSuite.Fixtures
 
             using (var stream = fileInfo.OpenRead())
             {
-                var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo), mimeType);
+                var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo.Extension), mimeType);
 
                 return await Assets.PostAssetAsync(AppName, parentId, id, true, upload);
             }
         }
 
-        private static string RandomName(FileInfo fileInfo)
+        public async Task<AssetDto> UploadFileAsync(int size, string fileName = null, string parentId = null, string id = null)
         {
-            var fileName = $"{Guid.NewGuid()}{fileInfo.Extension}";
+            using (var stream = RandomAsset(size))
+            {
+                var upload = new FileParameter(stream, fileName ?? RandomName(".txt"), "text/csv");
+
+                return await Assets.PostAssetAsync(AppName, parentId, id, true, upload);
+            }
+        }
+
+        private static MemoryStream RandomAsset(int length)
+        {
+            var stream = new MemoryStream(length);
+
+            var random = new Random();
+
+            for (var i = 0; i < length; i++)
+            {
+                stream.WriteByte((byte)random.Next());
+            }
+
+            stream.Position = 0;
+
+            return stream;
+        }
+
+        private static string RandomName(string extension)
+        {
+            var fileName = $"{Guid.NewGuid()}{extension}";
 
             return fileName;
         }

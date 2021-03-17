@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
             IArrayField? arrayField = null;
 
-            if (command.ParentFieldId.HasValue)
+            if (command.ParentFieldId != null)
             {
                 arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value, false);
             }

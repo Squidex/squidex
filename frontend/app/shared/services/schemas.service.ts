@@ -105,6 +105,8 @@ export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
     'Require'
 ];
 
+export type SchemaCompletions = ReadonlyArray<{ name: string, description: string }>;
+
 export class SchemaDetailsDto extends SchemaDto {
     public readonly contentFields: ReadonlyArray<RootFieldDto>;
 
@@ -176,7 +178,7 @@ export class SchemaDetailsDto extends SchemaDto {
                 if (source.hasOwnProperty(key) && exclude.indexOf(key) < 0 && key.indexOf('can') !== 0) {
                     const value = source[key];
 
-                    if (value) {
+                    if (!Types.isUndefined(value) && !Types.isNull(value)) {
                         clone[key] = value;
                     }
                 }
@@ -325,6 +327,7 @@ export class SchemaPropertiesDto {
         public readonly hints?: string,
         public readonly contentsSidebarUrl?: string,
         public readonly contentSidebarUrl?: string,
+        public readonly contentEditorUrl?: string,
         public readonly validateOnPublish?: boolean,
         public readonly tags?: ReadonlyArray<string>
     ) {
@@ -369,6 +372,7 @@ export interface UpdateSchemaDto {
     readonly hints?: string;
     readonly contentsSidebarUrl?: string;
     readonly contentSidebarUrl?: string;
+    readonly contentEditorUrl?: string;
     readonly validateOnPublish?: boolean;
     readonly tags?: ReadonlyArray<string>;
 }
@@ -696,6 +700,12 @@ export class SchemasService {
             }),
             pretifyError('i18n:schemas.deleteFailed'));
     }
+
+    public getCompletions(appName: string, schemaName: string): Observable<SchemaCompletions> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion`);
+
+        return this.http.get<SchemaCompletions>(url);
+    }
 }
 
 function parseSchemas(response: any) {
@@ -745,6 +755,7 @@ function parseProperties(response: any) {
         response.hints,
         response.contentsSidebarUrl,
         response.contentSidebarUrl,
+        response.contentEditorUrl,
         response.validateOnPublish,
         response.tags);
 }

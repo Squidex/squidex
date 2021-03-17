@@ -23,6 +23,13 @@ namespace Squidex.Config.Web
 {
     public static class WebExtensions
     {
+        public static IApplicationBuilder UseSquidexCacheKeys(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<CachingKeysMiddleware>();
+
+            return app;
+        }
+
         public static IApplicationBuilder UseSquidexLocalCache(this IApplicationBuilder app)
         {
             app.UseMiddleware<LocalCacheMiddleware>();

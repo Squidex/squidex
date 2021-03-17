@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.History
                 return;
             }
 
-            var settings = new NotificationSettingsDto
+            var settings = new Dictionary<string, NotificationSettingDto>
             {
                 [Providers.WebPush] = new NotificationSettingDto
                 {
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.History
                 FullName = user.Claims.DisplayName(),
                 PreferredLanguage = "en",
                 PreferredTimezone = null,
-                Settings = settings,
+                Settings = settings
             };
 
             if (user.Email.IsEmail())
@@ -149,8 +149,14 @@ namespace Squidex.Domain.Apps.Entities.History
                             };
 
                             publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
-                            publishRequest.Preformatted = new NotificationFormattingDto();
-                            publishRequest.Preformatted.Subject["en"] = comment.Text;
+
+                            publishRequest.Preformatted = new NotificationFormattingDto
+                            {
+                                Subject =
+                                {
+                                    ["en"] = comment.Text
+                                }
+                            };
 
                             if (comment.Url?.IsAbsoluteUri == true)
                             {
@@ -267,7 +273,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
         private static void SetUser(AppEvent appEvent, PublishDto publishRequest)
         {
-            if (appEvent.Actor.IsSubject)
+            if (appEvent.Actor.IsUser)
             {
                 publishRequest.CreatorId = appEvent.Actor.Identifier;
             }

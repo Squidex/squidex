@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public RangeValidator(TValue? min, TValue? max)
         {
-            if (min.HasValue && max.HasValue && min.Value.CompareTo(max.Value) > 0)
+            if (min != null && max != null && min.Value.CompareTo(max.Value) > 0)
             {
                 throw new ArgumentException("Min value must be greater than max value.", nameof(min));
             }
@@ -29,9 +29,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
-            if (value != null && value is TValue typedValue)
+            if (value is TValue typedValue)
             {
-                if (min.HasValue && max.HasValue)
+                if (min != null && max != null)
                 {
                     if (Equals(min, max) && Equals(min.Value, max.Value))
                     {
@@ -44,12 +44,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 }
                 else
                 {
-                    if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
+                    if (min != null && typedValue.CompareTo(min.Value) < 0)
                     {
                         addError(context.Path, T.Get("contents.validation.min", new { min }));
                     }
 
-                    if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
+                    if (max != null && typedValue.CompareTo(max.Value) > 0)
                     {
                         addError(context.Path, T.Get("contents.validation.max", new { max }));
                     }

@@ -6,12 +6,16 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
@@ -78,20 +82,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchema(string app, string name)
         {
-            ISchemaEntity? schema;
+            var schema = await GetSchemaAsync(name);
 
-            if (Guid.TryParse(name, out var guid))
-            {
-                var schemaId = DomainId.Create(guid);
-
-                schema = await appProvider.GetSchemaAsync(AppId, schemaId, false);
-            }
-            else
-            {
-                schema = await appProvider.GetSchemaAsync(AppId, name);
-            }
-
-            if (schema == null || schema.IsDeleted)
+            if (schema == null)
             {
                 return NotFound();
             }
@@ -344,6 +337,42 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             await CommandBus.PublishAsync(new DeleteSchema());
 
             return NoContent();
+        }
+
+        [HttpGet]
+        [Route("apps/{app}/schemas/{name}/completion")]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        [OpenApiIgnore]
+        public async Task<IActionResult> GetScriptCompletiong(string app, string name)
+        {
+            var schema = await GetSchemaAsync(name);
+
+            if (schema == null)
+            {
+                return NotFound();
+            }
+
+            var completer = new ScriptingCompletion();
+            var completion = completer.GetCompletion(schema.SchemaDef, App.PartitionResolver());
+
+            var result = completion.Select(x => new { x.Name, x.Description });
+
+            return Ok(result);
+        }
+
+        private Task<ISchemaEntity?> GetSchemaAsync(string name)
+        {
+            if (Guid.TryParse(name, out var guid))
+            {
+                var schemaId = DomainId.Create(guid);
+
+                return appProvider.GetSchemaAsync(AppId, schemaId);
+            }
+            else
+            {
+                return appProvider.GetSchemaAsync(AppId, name);
+            }
         }
 
         private async Task<SchemaDetailsDto> InvokeCommandAsync(ICommand command)

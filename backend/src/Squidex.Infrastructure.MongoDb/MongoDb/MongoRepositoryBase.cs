@@ -48,12 +48,12 @@ namespace Squidex.Infrastructure.MongoDb
 
         protected IMongoDatabase Database
         {
-            get { return mongoDatabase; }
+            get => mongoDatabase;
         }
 
         static MongoRepositoryBase()
         {
-            RefTokenSerializer.Register();
+            TypeConverterStringSerializer<RefToken>.Register();
 
             InstantSerializer.Register();
 

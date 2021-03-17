@@ -1,7 +1,7 @@
 #
 # Stage 1, Build Backend
 #
-FROM mcr.microsoft.com/dotnet/sdk:5.0 as backend
+FROM mcr.microsoft.com/dotnet/sdk:5.0.102-ca-patch-buster-slim as backend
 
 ARG SQUIDEX__VERSION=4.0.0
 
@@ -36,7 +36,7 @@ RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --co
 #
 # Stage 2, Build Frontend
 #
-FROM buildkite/puppeteer:latest as frontend
+FROM buildkite/puppeteer:5.2.1 as frontend
 
 WORKDIR /src
 

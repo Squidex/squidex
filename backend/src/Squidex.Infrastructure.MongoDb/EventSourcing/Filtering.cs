@@ -12,11 +12,6 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     internal static class Filtering
     {
-        public static string CreateIndexPath(string property)
-        {
-            return $"Events.Metadata.{property}";
-        }
-
         public static FilterDefinition<MongoEventCommit> ByPosition(StreamPosition streamPosition)
         {
             if (streamPosition.IsEndOfCommit)

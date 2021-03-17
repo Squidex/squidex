@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public IReadOnlyList<T> Ordered
         {
-            get { return fieldsOrdered; }
+            get => fieldsOrdered;
         }
 
         public IReadOnlyDictionary<long, T> ById
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            if (!(newField is T))
+            if (newField is not T)
             {
                 throw new InvalidOperationException($"Field must be of type {typeof(T)}");
             }

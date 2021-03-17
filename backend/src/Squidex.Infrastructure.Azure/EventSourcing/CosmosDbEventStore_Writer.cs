@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             return documentClient.QueryAsync(collectionUri, query, commit =>
             {
-                var documentUri = UriFactory.CreateDocumentUri(databaseId, Constants.Collection, commit.Id.ToString());
+                var documentUri = UriFactory.CreateDocumentUri(DatabaseId, Constants.Collection, commit.Id.ToString());
 
                 return documentClient.DeleteDocumentAsync(documentUri, deleteOptions);
             });

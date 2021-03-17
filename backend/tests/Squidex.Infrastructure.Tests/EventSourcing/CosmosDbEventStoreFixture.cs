@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             client = new DocumentClient(new Uri(EmulatorUri), EmulatorKey, TestUtils.DefaultSettings());
 
-            EventStore = new CosmosDbEventStore(client, EmulatorKey, "Test", TestUtils.DefaultSettings());
+            EventStore = new CosmosDbEventStore(client, EmulatorKey, "Test", TestUtils.DefaultSerializer);
             EventStore.InitializeAsync().Wait();
         }
 

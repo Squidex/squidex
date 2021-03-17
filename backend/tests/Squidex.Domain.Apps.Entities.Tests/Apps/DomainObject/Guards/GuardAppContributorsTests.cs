@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         [Fact]
         public async Task CanAssign_should_throw_exception_if_user_is_actor()
         {
-            var command = new AssignContributor { ContributorId = "3", Role = Role.Editor, Actor = new RefToken("user", "3") };
+            var command = new AssignContributor { ContributorId = "3", Role = Role.Editor, Actor = RefToken.User("3") };
 
             await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(command, App(contributors_0), users, appPlan));
         }

@@ -22,12 +22,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         Type IRuleActionHandler.ActionType
         {
-            get { return typeof(TAction); }
+            get => typeof(TAction);
         }
 
         Type IRuleActionHandler.DataType
         {
-            get { return typeof(TData); }
+            get => typeof(TData);
         }
 
         protected RuleActionHandler(RuleEventFormatter formatter)

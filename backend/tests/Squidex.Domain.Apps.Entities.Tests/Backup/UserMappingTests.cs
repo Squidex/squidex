@@ -10,7 +10,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 using Xunit;
@@ -132,12 +131,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private static RefToken Client(string identifier)
         {
-            return new RefToken(RefTokenType.Client, identifier);
+            return RefToken.Client(identifier);
         }
 
         private static RefToken Subject(string identifier)
         {
-            return new RefToken(RefTokenType.Subject, identifier);
+            return RefToken.User(identifier);
         }
     }
 }

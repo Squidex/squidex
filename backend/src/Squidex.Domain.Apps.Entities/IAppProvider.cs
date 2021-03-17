@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities
 
         Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions);
 
-        Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool allowDeleted, bool canCache = false);
+        Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false);
 
         Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false);
 

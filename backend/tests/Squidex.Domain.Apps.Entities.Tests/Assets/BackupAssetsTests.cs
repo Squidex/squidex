@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly RefToken actor = new RefToken(RefTokenType.Subject, "123");
+        private readonly RefToken actor = RefToken.User("123");
         private readonly BackupAssets sut;
 
         public BackupAssetsTests()

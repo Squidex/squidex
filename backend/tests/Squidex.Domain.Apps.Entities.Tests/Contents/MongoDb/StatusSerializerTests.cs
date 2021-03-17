@@ -5,46 +5,71 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Bson;
+using System.IO;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.MongoDb.Contents;
+using Squidex.Infrastructure.MongoDb;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 {
     public sealed class StatusSerializerTests
     {
-        private sealed class TestObject
+        private sealed record ValueHolder<T>
         {
-            public Status Status { get; set; }
+            public T Value { get; set; }
+        }
+
+        public StatusSerializerTests()
+        {
+            TypeConverterStringSerializer<Status>.Register();
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_status()
         {
-            StatusSerializer.Register();
-
-            var source = new TestObject
+            var source = new ValueHolder<Status>
             {
-                Status = Status.Published
+                Value = Status.Published
             };
 
-            var document = new BsonDocument();
+            var deserialized = SerializeAndDeserializeBson(source);
 
-            using (var writer = new BsonDocumentWriter(document))
+            Assert.Equal(source, deserialized);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_default_status()
+        {
+            var source = new ValueHolder<Status>
             {
-                BsonSerializer.Serialize(writer, source);
+                Value = default
+            };
+
+            var deserialized = SerializeAndDeserializeBson(source);
+
+            Assert.Equal(source, deserialized);
+        }
+
+        private static T SerializeAndDeserializeBson<T>(T value)
+        {
+            var stream = new MemoryStream();
+
+            using (var writer = new BsonBinaryWriter(stream))
+            {
+                BsonSerializer.Serialize(writer, value);
 
                 writer.Flush();
             }
 
-            using (var reader = new BsonDocumentReader(document))
-            {
-                var result = BsonSerializer.Deserialize<TestObject>(reader);
+            stream.Position = 0;
 
-                Assert.Equal(source.Status, result.Status);
+            using (var reader = new BsonBinaryReader(stream))
+            {
+                var result = BsonSerializer.Deserialize<T>(reader);
+
+                return result;
             }
         }
     }

@@ -176,7 +176,7 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_create_array()
         {
-            var json = JsonValue.Array(1, "2");
+            var json = JsonValue.Array<object>(1, "2");
 
             Assert.Equal("[1, \"2\"]", json.ToJsonString());
             Assert.Equal("[1, \"2\"]", json.ToString());
@@ -185,7 +185,7 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_create_array_from_source()
         {
-            var json = JsonValue.Array(1, "2");
+            var json = JsonValue.Array<object>(1, "2");
 
             var copy = new JsonArray(json);
 

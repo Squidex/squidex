@@ -16,8 +16,8 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Log;
@@ -34,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
     public sealed class AssetContentController : ApiController
     {
         private readonly IAssetFileStore assetFileStore;
-        private readonly IAssetRepository assetRepository;
+        private readonly IAssetQueryService assetQuery;
         private readonly IAssetLoader assetLoader;
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
@@ -42,14 +42,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
         public AssetContentController(
             ICommandBus commandBus,
             IAssetFileStore assetFileStore,
-            IAssetRepository assetRepository,
+            IAssetQueryService assetQuery,
             IAssetLoader assetLoader,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator)
             : base(commandBus)
         {
             this.assetFileStore = assetFileStore;
-            this.assetRepository = assetRepository;
+            this.assetQuery = assetQuery;
             this.assetLoader = assetLoader;
             this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="app">The name of the app.</param>
         /// <param name="idOrSlug">The id or slug of the asset.</param>
         /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
-        /// <param name="queries">The query string parameters.</param>
+        /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 200 => Asset found and content or (resized) image returned.
         /// 404 => Asset or app not found.
@@ -72,23 +72,25 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermission]
         [ApiCosts(0.5)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, [FromQuery] AssetContentQueryDto queries, string? more = null)
+        public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, AssetContentQueryDto request, string? more = null)
         {
-            var asset = await assetRepository.FindAssetAsync(AppId, DomainId.Create(idOrSlug));
+            var requestContext = Context.Clone(b => b.WithoutAssetEnrichment());
+
+            var asset = await assetQuery.FindAsync(requestContext, DomainId.Create(idOrSlug));
 
             if (asset == null)
             {
-                asset = await assetRepository.FindAssetBySlugAsync(AppId, idOrSlug);
+                asset = await assetQuery.FindBySlugAsync(requestContext, idOrSlug);
             }
 
-            return await DeliverAssetAsync(asset, queries);
+            return await DeliverAssetAsync(requestContext, asset, request);
         }
 
         /// <summary>
         /// Get the asset content.
         /// </summary>
         /// <param name="id">The id of the asset.</param>
-        /// <param name="queries">The query string parameters.</param>
+        /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 200 => Asset found and content or (resized) image returned.
         /// 404 => Asset or app not found.
@@ -100,16 +102,18 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(0.5)]
         [AllowAnonymous]
         [Obsolete("Use overload with app name")]
-        public async Task<IActionResult> GetAssetContent(DomainId id, [FromQuery] AssetContentQueryDto queries)
+        public async Task<IActionResult> GetAssetContent(DomainId id, AssetContentQueryDto request)
         {
-            var asset = await assetRepository.FindAssetAsync(id);
+            var requestContext = Context.Clone(b => b.WithoutAssetEnrichment());
 
-            return await DeliverAssetAsync(asset, queries);
+            var asset = await assetQuery.FindGlobalAsync(requestContext, id);
+
+            return await DeliverAssetAsync(requestContext, asset, request);
         }
 
-        private async Task<IActionResult> DeliverAssetAsync(IAssetEntity? asset, AssetContentQueryDto queries)
+        private async Task<IActionResult> DeliverAssetAsync(Context context, IAssetEntity? asset, AssetContentQueryDto request)
         {
-            queries ??= new AssetContentQueryDto();
+            request ??= new AssetContentQueryDto();
 
             if (asset == null)
             {
@@ -118,14 +122,22 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (asset.IsProtected && !Resources.CanReadAssets)
             {
-                Response.Headers[HeaderNames.CacheControl] = $"public,max-age=0";
+                Response.Headers[HeaderNames.CacheControl] = "public,max-age=0";
 
                 return StatusCode(403);
             }
 
-            if (asset != null && queries.Version > EtagVersion.Any && asset.Version != queries.Version)
+            if (asset != null && request.Version > EtagVersion.Any && asset.Version != request.Version)
             {
-                asset = await assetLoader.GetAsync(asset.AppId.Id, asset.Id, queries.Version);
+                if (context.App != null)
+                {
+                    asset = await assetQuery.FindAsync(context, asset.Id, request.Version);
+                }
+                else
+                {
+                    // Fallback for old endpoint. Does not set the surrogate key.
+                    asset = await assetLoader.GetAsync(asset.AppId.Id, asset.Id, request.Version);
+                }
             }
 
             if (asset == null)
@@ -133,15 +145,15 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return NotFound();
             }
 
-            var resizeOptions = queries.ToResizeOptions(asset);
+            var resizeOptions = request.ToResizeOptions(asset);
 
             FileCallback callback;
 
             Response.Headers[HeaderNames.ETag] = asset.FileVersion.ToString();
 
-            if (queries.CacheDuration > 0)
+            if (request.CacheDuration > 0)
             {
-                Response.Headers[HeaderNames.CacheControl] = $"public,max-age={queries.CacheDuration}";
+                Response.Headers[HeaderNames.CacheControl] = $"public,max-age={request.CacheDuration}";
             }
 
             var contentLength = (long?)null;
@@ -152,7 +164,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 {
                     var resizedAsset = $"{asset.AppId.Id}_{asset.Id}_{asset.FileVersion}_{resizeOptions}";
 
-                    if (queries.ForceResize)
+                    if (request.ForceResize)
                     {
                         await ResizeAsync(asset, bodyStream, resizedAsset, resizeOptions, true, ct);
                     }
@@ -186,7 +198,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 FileDownloadName = asset.FileName,
                 FileSize = contentLength,
                 LastModified = asset.LastModified.ToDateTimeOffset(),
-                SendInline = queries.Download != 1
+                SendInline = request.Download != 1
             };
         }
 

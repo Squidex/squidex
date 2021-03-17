@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Queries.OData
         {
             var top = query.ParseTop();
 
-            if (top.HasValue)
+            if (top != null)
             {
                 result.Take = top.Value;
             }
@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Queries.OData
         {
             var skip = query.ParseSkip();
 
-            if (skip.HasValue)
+            if (skip != null)
             {
                 result.Skip = skip.Value;
             }

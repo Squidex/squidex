@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             {
                 var from = GetFromDate(today, target.NumDays);
 
-                if (!target.Triggered.HasValue || target.Triggered < from)
+                if (target.Triggered == null || target.Triggered < from)
                 {
                     var costs = await usageTracker.GetMonthCallsAsync(target.AppId.Id.ToString(), today, null);
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         private static DateTime GetFromDate(DateTime today, int? numDays)
         {
-            if (numDays.HasValue)
+            if (numDays != null)
             {
                 return today.AddDays(-numDays.Value).AddDays(1);
             }

@@ -57,18 +57,21 @@ namespace Squidex.Extensions.Actions.CreateContent
 
             var json = await FormatAsync(action.Data, @event);
 
-            ruleJob.Data = jsonSerializer.Deserialize<NamedContentData>(json);
+            ruleJob.Data = jsonSerializer.Deserialize<ContentData>(json);
 
             if (!string.IsNullOrEmpty(action.Client))
             {
-                ruleJob.Actor = new RefToken(RefTokenType.Client, action.Client);
+                ruleJob.Actor = RefToken.Client(action.Client);
             }
             else if (@event is EnrichedUserEventBase userEvent)
             {
                 ruleJob.Actor = userEvent.Actor;
             }
 
-            ruleJob.Publish = action.Publish;
+            if (action.Publish)
+            {
+                ruleJob.Status = Status.Published;
+            }
 
             return (Description, ruleJob);
         }

@@ -73,27 +73,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 @event.Payload.AssetId,
                 @event.Headers.EventStreamNumber());
 
-            if (asset == null)
+            if (asset != null)
             {
-                throw new DomainObjectNotFoundException(@event.Payload.AssetId.ToString());
+                SimpleMapper.Map(asset, result);
+
+                result.AssetType = asset.Type;
             }
-
-            SimpleMapper.Map(asset, result);
-
-            result.AssetType = asset.Type;
 
             switch (@event.Payload)
             {
-                case AssetCreated _:
+                case AssetCreated:
                     result.Type = EnrichedAssetEventType.Created;
                     break;
-                case AssetAnnotated _:
+                case AssetAnnotated:
                     result.Type = EnrichedAssetEventType.Annotated;
                     break;
-                case AssetUpdated _:
+                case AssetUpdated:
                     result.Type = EnrichedAssetEventType.Updated;
                     break;
-                case AssetDeleted _:
+                case AssetDeleted:
                     result.Type = EnrichedAssetEventType.Deleted;
                     break;
             }

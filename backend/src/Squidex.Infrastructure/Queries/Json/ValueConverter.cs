@@ -288,7 +288,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
             switch (value)
             {
-                case JsonNull _:
+                case JsonNull:
                     return true;
                 case JsonNumber jsonNumber:
                     result = jsonNumber.Value;

@@ -18,7 +18,7 @@ namespace Squidex.Web
 
             if (context == null)
             {
-                context = RequestContext.Anonymous();
+                context = RequestContext.Anonymous(null!);
 
                 httpContext.Features.Set(context);
             }

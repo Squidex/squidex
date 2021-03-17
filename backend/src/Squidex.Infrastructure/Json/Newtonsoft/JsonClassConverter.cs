@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             return ReadValue(reader, objectType, serializer);
         }
 
-        protected abstract T ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer);
+        protected abstract T? ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer);
 
         public sealed override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {

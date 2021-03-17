@@ -67,11 +67,24 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("created")]
         [InlineData("createdNullable")]
         [InlineData("properties/datetime")]
-        [InlineData("properties/nested/dateime")]
+        [InlineData("properties/nested/datetime")]
         public void Should_parse_filter_when_type_is_datetime(string field)
         {
             var i = _Q($"$filter={field} eq 1988-01-19T12:00:00Z");
             var o = _C($"Filter: {field} == 1988-01-19T12:00:00Z");
+
+            Assert.Equal(o, i);
+        }
+
+        [Theory]
+        [InlineData("created")]
+        [InlineData("createdNullable")]
+        [InlineData("properties/datetime")]
+        [InlineData("properties/nested/datetime")]
+        public void Should_parse_filter_when_type_is_datetime_and_value_is_null(string field)
+        {
+            var i = _Q($"$filter={field} eq null");
+            var o = _C($"Filter: {field} == null");
 
             Assert.Equal(o, i);
         }
@@ -129,6 +142,19 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(o, i);
         }
 
+        [Theory]
+        [InlineData("id")]
+        [InlineData("idNullable")]
+        [InlineData("properties/uid")]
+        [InlineData("properties/nested/guid")]
+        public void Should_parse_filter_when_type_is_guid_and_value_is_null(string field)
+        {
+            var i = _Q($"$filter={field} eq null");
+            var o = _C($"Filter: {field} == null");
+
+            Assert.Equal(o, i);
+        }
+
         [Fact]
         public void Should_parse_filter_when_type_is_guid_list()
         {
@@ -178,6 +204,19 @@ namespace Squidex.Infrastructure.Queries
         {
             var i = _Q($"$filter={field} eq true");
             var o = _C($"Filter: {field} == True");
+
+            Assert.Equal(o, i);
+        }
+
+        [Theory]
+        [InlineData("isComicFigure")]
+        [InlineData("isComicFigureNullable")]
+        [InlineData("properties/boolean")]
+        [InlineData("properties/nested/boolean")]
+        public void Should_parse_filter_when_type_is_boolean_and_value_is_null(string field)
+        {
+            var i = _Q($"$filter={field} eq null");
+            var o = _C($"Filter: {field} == null");
 
             Assert.Equal(o, i);
         }
@@ -298,6 +337,15 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_with_matchs()
+        {
+            var i = _Q("$filter=matchs(lastName, 'Duck')");
+            var o = _C("Filter: matchs(lastName, 'Duck')");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_with_empty()
         {
             var i = _Q("$filter=empty(lastName)");
@@ -311,6 +359,33 @@ namespace Squidex.Infrastructure.Queries
         {
             var i = _Q("$filter=empty(lastName) eq true");
             var o = _C("Filter: empty(lastName)");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_with_exists()
+        {
+            var i = _Q("$filter=exists(lastName)");
+            var o = _C("Filter: exists(lastName)");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_with_exists_to_true()
+        {
+            var i = _Q("$filter=exists(lastName) eq true");
+            var o = _C("Filter: exists(lastName)");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_with_exists_to_false()
+        {
+            var i = _Q("$filter=exists(lastName) eq false");
+            var o = _C("Filter: !(exists(lastName))");
 
             Assert.Equal(o, i);
         }

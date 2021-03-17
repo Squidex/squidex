@@ -21,6 +21,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         Task<IEnrichedAssetEntity?> FindByHashAsync(Context context, string hash, string fileName, long fileSize);
 
-        Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id);
+        Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, long version = EtagVersion.Any);
+
+        Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug);
+
+        Task<IEnrichedAssetEntity?> FindGlobalAsync(Context context, DomainId id);
     }
 }

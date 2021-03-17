@@ -9,8 +9,6 @@ namespace Squidex.Infrastructure
 {
     public static class EtagVersion
     {
-        public const long NotFound = long.MinValue;
-
         public const long Auto = -3;
 
         public const long Any = -2;

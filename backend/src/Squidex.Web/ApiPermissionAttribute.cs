@@ -21,7 +21,7 @@ namespace Squidex.Web
 
         public IEnumerable<string> PermissionIds
         {
-            get { return permissionIds; }
+            get => permissionIds;
         }
 
         public ApiPermissionAttribute(params string[] ids)
@@ -35,7 +35,7 @@ namespace Squidex.Web
         {
             if (permissionIds.Length > 0)
             {
-                var permissions = context.HttpContext.Context().Permissions;
+                var permissions = context.HttpContext.Context().UserPermissions;
 
                 var hasPermission = false;
 
@@ -57,9 +57,7 @@ namespace Squidex.Web
                             schema = Permission.Any;
                         }
 
-                        var permission = Permissions.ForApp(id, app, schema);
-
-                        if (permissions.Allows(permission))
+                        if (permissions.Allows(id, app, schema))
                         {
                             hasPermission = true;
                             break;

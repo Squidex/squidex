@@ -16,12 +16,14 @@ namespace Squidex.Infrastructure.Queries.Json
         private static readonly CompareOperator[] BooleanOperators =
         {
             CompareOperator.Equals,
+            CompareOperator.Exists,
             CompareOperator.In,
             CompareOperator.NotEquals
         };
         private static readonly CompareOperator[] NumberOperators =
         {
             CompareOperator.Equals,
+            CompareOperator.Exists,
             CompareOperator.LessThan,
             CompareOperator.LessThanOrEqual,
             CompareOperator.GreaterThan,
@@ -33,6 +35,7 @@ namespace Squidex.Infrastructure.Queries.Json
         {
             CompareOperator.Contains,
             CompareOperator.Empty,
+            CompareOperator.Exists,
             CompareOperator.EndsWith,
             CompareOperator.Equals,
             CompareOperator.GreaterThan,
@@ -40,19 +43,22 @@ namespace Squidex.Infrastructure.Queries.Json
             CompareOperator.In,
             CompareOperator.LessThan,
             CompareOperator.LessThanOrEqual,
+            CompareOperator.Matchs,
             CompareOperator.NotEquals,
             CompareOperator.StartsWith
         };
         private static readonly CompareOperator[] ArrayOperators =
         {
             CompareOperator.Empty,
+            CompareOperator.Exists,
             CompareOperator.Equals,
             CompareOperator.In,
             CompareOperator.NotEquals
         };
         private static readonly CompareOperator[] GeoOperators =
         {
-            CompareOperator.LessThan
+            CompareOperator.LessThan,
+            CompareOperator.Exists,
         };
 
         public static bool IsAllowedOperator(JsonSchema schema, CompareOperator compareOperator)

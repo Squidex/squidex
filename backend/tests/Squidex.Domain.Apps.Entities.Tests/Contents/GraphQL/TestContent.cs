@@ -32,8 +32,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 gql_2Numbers2 {
                     iv
                 }
+                content {
+                    iv
+                }
                 myString {
                     de
+                }
+                myString2 {
+                    iv
                 }
                 myNumber {
                     iv
@@ -68,65 +74,71 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
             }";
 
-        public static IEnrichedContentEntity Create(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId id, DomainId refId, DomainId assetId, NamedContentData? data = null)
+        public static IEnrichedContentEntity Create(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId id, DomainId refId, DomainId assetId, ContentData? data = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
             data ??=
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddValue("de", "value"))
+                            .AddLocalized("de", "value"))
+                    .AddField("my-string2",
+                        new ContentFieldData()
+                            .AddInvariant(null))
                     .AddField("my-assets",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(assetId.ToString())))
+                            .AddInvariant(JsonValue.Array(assetId.ToString())))
                     .AddField("2_numbers",
                         new ContentFieldData()
-                            .AddValue("iv", 22))
+                            .AddInvariant(22))
                     .AddField("2-numbers",
                         new ContentFieldData()
-                            .AddValue("iv", 23))
+                            .AddInvariant(23))
+                    .AddField("content",
+                        new ContentFieldData()
+                            .AddInvariant(24))
                     .AddField("my-number",
                         new ContentFieldData()
-                            .AddValue("iv", 1.0))
+                            .AddInvariant(1.0))
                     .AddField("my_number",
                         new ContentFieldData()
-                            .AddValue("iv", 2.0))
+                            .AddInvariant(null))
                     .AddField("my-boolean",
                         new ContentFieldData()
-                            .AddValue("iv", true))
+                            .AddInvariant(true))
                     .AddField("my-datetime",
                         new ContentFieldData()
-                            .AddValue("iv", now))
+                            .AddInvariant(now))
                     .AddField("my-tags",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array("tag1", "tag2")))
+                            .AddInvariant(JsonValue.Array("tag1", "tag2")))
                     .AddField("my-references",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(refId.ToString())))
+                            .AddInvariant(JsonValue.Array(refId.ToString())))
                     .AddField("my-union",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(refId.ToString())))
+                            .AddInvariant(JsonValue.Array(refId.ToString())))
                     .AddField("my-geolocation",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Object().Add("latitude", 10).Add("longitude", 20)))
+                            .AddInvariant(JsonValue.Object().Add("latitude", 10).Add("longitude", 20)))
                     .AddField("my-json",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Object().Add("value", 1)))
+                            .AddInvariant(JsonValue.Object().Add("value", 1)))
                     .AddField("my-localized",
                         new ContentFieldData()
-                            .AddValue("de-DE", "de-DE"))
+                            .AddLocalized("de-DE", "de-DE"))
                     .AddField("my-array",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(
+                            .AddInvariant(JsonValue.Array(
                                 JsonValue.Object()
-                                    .Add("nested-boolean", true)
                                     .Add("nested-number", 10)
-                                    .Add("nested_number", 11),
+                                    .Add("nested_number", null)
+                                    .Add("nested-boolean", true),
                                 JsonValue.Object()
-                                    .Add("nested-boolean", false)
                                     .Add("nested-number", 20)
-                                    .Add("nested_number", 21))));
+                                    .Add("nested_number", null)
+                                    .Add("nested-boolean", false))));
 
             var content = new ContentEntity
             {
@@ -134,9 +146,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 AppId = appId,
                 Version = 1,
                 Created = now,
-                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
+                CreatedBy = RefToken.User("user1"),
                 LastModified = now,
-                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
+                LastModifiedBy = RefToken.User("user2"),
                 Data = data,
                 SchemaId = schemaId,
                 Status = Status.Draft,
@@ -151,19 +163,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var now = SystemClock.Instance.GetCurrentInstant();
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField(field,
                         new ContentFieldData()
-                            .AddValue("iv", value));
+                            .AddInvariant(value));
 
             var content = new ContentEntity
             {
                 Id = id,
                 Version = 1,
                 Created = now,
-                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
+                CreatedBy = RefToken.User("user1"),
                 LastModified = now,
-                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
+                LastModifiedBy = RefToken.User("user2"),
                 Data = data,
                 SchemaId = schemaId,
                 Status = Status.Draft,
@@ -196,23 +208,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 ["gql_2Numbers"] = new
                 {
-                    iv = 22
+                    iv = 22.0
                 },
                 ["gql_2Numbers2"] = new
                 {
-                    iv = 23
+                    iv = 23.0
+                },
+                ["content"] = new
+                {
+                    iv = 24.0
                 },
                 ["myString"] = new
                 {
                     de = "value"
                 },
+                ["myString2"] = new
+                {
+                    iv = (object?)null
+                },
                 ["myNumber"] = new
                 {
-                    iv = 1
+                    iv = 1.0
                 },
                 ["myNumber2"] = new
                 {
-                    iv = 2
+                    iv = (object?)null
                 },
                 ["myBoolean"] = new
                 {
@@ -255,14 +275,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         new
                         {
-                            nestedNumber = 10,
-                            nestedNumber2 = 11,
+                            nestedNumber = 10.0,
+                            nestedNumber2 = (object?)null,
                             nestedBoolean = true
                         },
                         new
                         {
-                            nestedNumber = 20,
-                            nestedNumber2 = 21,
+                            nestedNumber = 20.0,
+                            nestedNumber2 = (object?)null,
                             nestedBoolean = false
                         }
                     }

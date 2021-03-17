@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -22,11 +23,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
     public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
     {
+        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext;
         private readonly AppCommandMiddleware sut;
 
         public sealed class MyCommand : SquidexCommand
@@ -35,15 +37,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         protected override DomainId Id
         {
-            get { return appId.Id; }
+            get => appId.Id;
         }
 
         public AppCommandMiddlewareTests()
         {
+            requestContext = Context.Anonymous(Mocks.App(appId));
+
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            sut = new AppCommandMiddleware(A.Fake<IGrainFactory>(), appImageStore, assetThumbnailGenerator, contextProvider);
+            sut = new AppCommandMiddleware(grainFactory, appImageStore, assetThumbnailGenerator, contextProvider);
         }
 
         [Fact]
@@ -51,12 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var result = A.Fake<IAppEntity>();
 
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
-
-            context.Complete(result);
-
-            await sut.HandleAsync(context);
+            await HandleAsync(new UpdateApp(), result);
 
             Assert.Same(result, requestContext.App);
         }
@@ -66,13 +65,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var file = new NoopAssetFile();
 
-            var command = CreateCommand(new UploadAppImage { AppId = appId, File = file });
-            var context = CreateContextForCommand(command);
-
             A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._))
                 .Returns(new ImageInfo(100, 100, false));
 
-            await sut.HandleAsync(context);
+            await HandleAsync(new UploadAppImage { File = file }, None.Value);
 
             A.CallTo(() => appImageStore.UploadAsync(appId.Id, A<Stream>._, A<CancellationToken>._))
                 .MustHaveHappened();
@@ -81,17 +77,29 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         [Fact]
         public async Task Should_throw_exception_when_file_to_upload_is_not_an_image()
         {
-            var stream = new MemoryStream();
-
             var file = new NoopAssetFile();
 
-            var command = CreateCommand(new UploadAppImage { AppId = appId, File = file });
-            var context = CreateContextForCommand(command);
+            var command = new UploadAppImage { File = file };
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._))
                 .Returns(Task.FromResult<ImageInfo?>(null));
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            await Assert.ThrowsAsync<ValidationException>(() => HandleAsync(sut, command));
+        }
+
+        private Task<CommandContext> HandleAsync(AppUpdateCommand command, object result)
+        {
+            command.AppId = appId;
+
+            var grain = A.Fake<IAppGrain>();
+
+            A.CallTo(() => grain.ExecuteAsync(A<J<CommandRequest>>._))
+                .Returns(new CommandResult(command.AggregateId, 1, 0, result));
+
+            A.CallTo(() => grainFactory.GetGrain<IAppGrain>(command.AggregateId.ToString(), null))
+                .Returns(grain);
+
+            return HandleAsync(sut, command);
         }
     }
 }

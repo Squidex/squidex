@@ -5,18 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FakeItEasy;
+using GraphQL;
 using GraphQL.DataLoader;
+using GraphQL.Execution;
+using GraphQL.NewtonsoftJson;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Squidex.Caching;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -24,30 +30,33 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
 using Squidex.Log;
+using Squidex.Shared;
 using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public class GraphQLTestBase
+    public class GraphQLTestBase : IClassFixture<TranslationsFixture>
     {
-        protected readonly IAppEntity app;
+        protected readonly IJsonSerializer serializer =
+            TestUtils.CreateSerializer(TypeNameHandling.None,
+                new ExecutionResultJsonConverter(new ErrorInfoProvider()));
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-        protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
         protected readonly ISchemaEntity schema;
         protected readonly ISchemaEntity schemaRef1;
         protected readonly ISchemaEntity schemaRef2;
         protected readonly ISchemaEntity schemaInvalidName;
+        protected readonly IAppEntity app;
         protected readonly Context requestContext;
         protected readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         protected readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         protected readonly NamedId<DomainId> schemaRefId1 = NamedId.Of(DomainId.NewGuid(), "my-ref-schema1");
         protected readonly NamedId<DomainId> schemaRefId2 = NamedId.Of(DomainId.NewGuid(), "my-ref-schema2");
         protected readonly NamedId<DomainId> schemaInvalidNameId = NamedId.Of(DomainId.NewGuid(), "content");
-        protected readonly IGraphQLService sut;
+        protected readonly CachingGraphQLService sut;
 
         public GraphQLTestBase()
         {
@@ -56,40 +65,44 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var schemaDef =
                 new Schema(schemaId.Name)
                     .Publish()
+                    .AddNumber(16, "2_numbers", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddNumber(17, "2-numbers", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddNumber(18, "content", Partitioning.Invariant,
+                        new NumberFieldProperties())
                     .AddJson(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties())
                     .AddString(2, "my-string", Partitioning.Language,
                         new StringFieldProperties())
-                    .AddNumber(3, "my-number", Partitioning.Invariant,
-                        new NumberFieldProperties())
-                    .AddNumber(4, "my_number", Partitioning.Invariant,
-                        new NumberFieldProperties())
-                    .AddAssets(5, "my-assets", Partitioning.Invariant,
-                        new AssetsFieldProperties())
-                    .AddBoolean(6, "my-boolean", Partitioning.Invariant,
-                        new BooleanFieldProperties())
-                    .AddDateTime(7, "my-datetime", Partitioning.Invariant,
-                        new DateTimeFieldProperties())
-                    .AddReferences(8, "my-references", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = schemaRefId1.Id })
-                    .AddReferences(81, "my-union", Partitioning.Invariant,
-                        new ReferencesFieldProperties())
-                    .AddReferences(9, "my-invalid", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
-                    .AddGeolocation(10, "my-geolocation", Partitioning.Invariant,
-                        new GeolocationFieldProperties())
-                    .AddTags(11, "my-tags", Partitioning.Invariant,
-                        new TagsFieldProperties())
-                    .AddString(12, "my-localized", Partitioning.Language,
+                    .AddString(3, "my-string2", Partitioning.Invariant,
                         new StringFieldProperties())
-                    .AddArray(13, "my-array", Partitioning.Invariant, f => f
+                    .AddString(4, "my-localized", Partitioning.Language,
+                        new StringFieldProperties())
+                    .AddNumber(5, "my-number", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddNumber(6, "my_number", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddAssets(7, "my-assets", Partitioning.Invariant,
+                        new AssetsFieldProperties())
+                    .AddBoolean(8, "my-boolean", Partitioning.Invariant,
+                        new BooleanFieldProperties())
+                    .AddDateTime(9, "my-datetime", Partitioning.Invariant,
+                        new DateTimeFieldProperties())
+                    .AddReferences(10, "my-references", Partitioning.Invariant,
+                        new ReferencesFieldProperties { SchemaId = schemaRefId1.Id })
+                    .AddReferences(11, "my-union", Partitioning.Invariant,
+                        new ReferencesFieldProperties())
+                    .AddReferences(12, "my-invalid", Partitioning.Invariant,
+                        new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
+                    .AddGeolocation(13, "my-geolocation", Partitioning.Invariant,
+                        new GeolocationFieldProperties())
+                    .AddTags(14, "my-tags", Partitioning.Invariant,
+                        new TagsFieldProperties())
+                    .AddArray(15, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number")
                         .AddNumber(123, "nested_number"))
-                    .AddNumber(14, "2_numbers", Partitioning.Invariant,
-                        new NumberFieldProperties())
-                    .AddNumber(15, "2-numbers", Partitioning.Invariant,
-                        new NumberFieldProperties())
                     .SetScripts(new SchemaScripts { Query = "<query-script>" });
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
@@ -120,69 +133,79 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = CreateSut();
         }
 
-        protected void AssertResult(object expected, (bool HasErrors, object Response) result, bool checkErrors = true)
+        protected void AssertResult(object expected, ExecutionResult result)
         {
-            if (checkErrors && result.HasErrors)
-            {
-                throw new InvalidOperationException(Serialize(result));
-            }
-
-            var resultJson = serializer.Serialize(result.Response, true);
+            var resultJson = serializer.Serialize(result, true);
             var expectJson = serializer.Serialize(expected, true);
 
             Assert.Equal(expectJson, resultJson);
         }
 
-        private string Serialize((bool HasErrors, object Response) result)
+        protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, string? permissionId = null)
         {
-            return serializer.Serialize(result);
+            var context = requestContext;
+
+            if (permissionId != null)
+            {
+                var permission = Permissions.ForApp(permissionId, app.Name, schemaId.Name).Id;
+
+                context = new Context(Mocks.FrontendUser(permission: permission), app);
+            }
+
+            return ExcecuteAsync(options, context);
         }
 
-        public sealed class TestServiceProvider : IServiceProvider
+        private Task<ExecutionResult> ExcecuteAsync(ExecutionOptions options, Context context)
         {
-            private readonly Dictionary<Type, object> services;
+            options.UserContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context);
 
-            public TestServiceProvider(GraphQLTestBase testBase)
+            var listener = sut.Services.GetService<DataLoaderDocumentListener>();
+
+            if (listener != null)
             {
-                var appProvider = A.Fake<IAppProvider>();
-
-                A.CallTo(() => appProvider.GetSchemasAsync(testBase.appId.Id))
-                    .Returns(new List<ISchemaEntity>
-                    {
-                        testBase.schema,
-                        testBase.schemaRef1,
-                        testBase.schemaRef2,
-                        testBase.schemaInvalidName
-                    });
-
-                var dataLoaderContext = new DataLoaderContextAccessor();
-
-                services = new Dictionary<Type, object>
-                {
-                    [typeof(IAppProvider)] = appProvider,
-                    [typeof(IAssetQueryService)] = testBase.assetQuery,
-                    [typeof(ICommandBus)] = testBase.commandBus,
-                    [typeof(IContentQueryService)] = testBase.contentQuery,
-                    [typeof(IDataLoaderContextAccessor)] = dataLoaderContext,
-                    [typeof(IOptions<AssetOptions>)] = Options.Create(new AssetOptions()),
-                    [typeof(IOptions<ContentOptions>)] = Options.Create(new ContentOptions()),
-                    [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
-                    [typeof(IUrlGenerator)] = new FakeUrlGenerator(),
-                    [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext)
-                };
+                options.Listeners.Add(listener);
             }
 
-            public object GetService(Type serviceType)
-            {
-                return services.GetOrDefault(serviceType);
-            }
+            return sut.ExecuteAsync(options);
         }
 
         private CachingGraphQLService CreateSut()
         {
-            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+            var cache = new BackgroundCache(new MemoryCache(Options.Create(new MemoryCacheOptions())));
 
-            return new CachingGraphQLService(cache, new TestServiceProvider(this));
+            var appProvider = A.Fake<IAppProvider>();
+
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+                .Returns(new List<ISchemaEntity>
+                {
+                    schema,
+                    schemaRef1,
+                    schemaRef2,
+                    schemaInvalidName
+                });
+
+            var dataLoaderContext = (IDataLoaderContextAccessor)new DataLoaderContextAccessor();
+            var dataLoaderListener = new DataLoaderDocumentListener(dataLoaderContext);
+
+            var services =
+                new ServiceCollection()
+                    .AddMemoryCache()
+                    .AddTransient<GraphQLExecutionContext>()
+                    .AddSingleton(A.Fake<ISemanticLog>())
+                    .AddSingleton(appProvider)
+                    .AddSingleton(assetQuery)
+                    .AddSingleton(commandBus)
+                    .AddSingleton(contentQuery)
+                    .AddSingleton(dataLoaderContext)
+                    .AddSingleton(dataLoaderListener)
+                    .AddSingleton<SharedTypes>()
+                    .AddSingleton<IUrlGenerator,
+                        FakeUrlGenerator>()
+                    .BuildServiceProvider();
+
+            var schemasHash = A.Fake<ISchemasHash>();
+
+            return new CachingGraphQLService(cache, schemasHash, services, Options.Create(new GraphQLOptions()));
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 var appGrain = A.Fake<IAppGrain>();
 
                 A.CallTo(() => appGrain.GetStateAsync())
-                    .ReturnsLazily(() => CreateEntity().AsJ());
+                    .ReturnsLazily(() => CreateApp().AsJ());
 
                 A.CallTo(() => GrainFactory.GetGrain<IAppGrain>(AppId.Id.ToString(), null))
                     .Returns(appGrain);
@@ -77,23 +77,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                     .MustHaveHappenedANumberOfTimesMatching(x => x == count);
             }
 
-            private IAppEntity CreateEntity()
+            private IAppEntity CreateApp()
             {
-                var appEntity = A.Fake<IAppEntity>();
+                var app = A.Fake<IAppEntity>();
 
-                A.CallTo(() => appEntity.Id)
+                A.CallTo(() => app.Id)
                     .Returns(AppId.Id);
 
-                A.CallTo(() => appEntity.Name)
+                A.CallTo(() => app.Name)
                     .Returns(AppId.Name);
 
-                A.CallTo(() => appEntity.Version)
+                A.CallTo(() => app.Version)
                     .Returns(version);
 
-                A.CallTo(() => appEntity.Contributors)
+                A.CallTo(() => app.Contributors)
                     .Returns(new AppContributors(contributors.ToDictionary()));
 
-                return appEntity;
+                return app;
             }
         }
 
@@ -106,8 +106,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Theory]
-        [InlineData(3, 100, 300, false)]
-        [InlineData(3, 100, 102, true)]
+        [InlineData(3, 100, 400, false)]
+        [InlineData(3, 100, 202, true)]
         public async Task Should_distribute_and_cache_domain_objects(short numSilos, int numRuns, int expectedCounts, bool shouldBreak)
         {
             var env = new GrainEnvironment();
@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 }
 
                 var creatorId = Guid.NewGuid().ToString();
-                var creatorToken = new RefToken(RefTokenType.Subject, creatorId);
+                var creatorToken = RefToken.User(creatorId);
                 var createCommand = new CreateApp { Actor = creatorToken, AppId = appId.Id };
 
                 var commandContext = new CommandContext(createCommand, A.Fake<ICommandBus>());

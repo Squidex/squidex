@@ -24,17 +24,17 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public int BatchSize
         {
-            get { return 1000; }
+            get => 1000;
         }
 
         public int BatchDelay
         {
-            get { return 1000; }
+            get => 1000;
         }
 
         public string Name
         {
-            get { return GetType().Name; }
+            get => GetType().Name;
         }
 
         public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators, NotifoService notifo)

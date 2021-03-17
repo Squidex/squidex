@@ -174,7 +174,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public IQueryable<IdentityUser> Users
         {
-            get { return Collection.AsQueryable(); }
+            get => Collection.AsQueryable();
         }
 
         public bool IsId(string id)

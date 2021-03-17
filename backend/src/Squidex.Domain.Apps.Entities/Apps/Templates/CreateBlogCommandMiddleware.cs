@@ -57,14 +57,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 SchemaId = postsId,
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("title",
                             new ContentFieldData()
-                                .AddValue("My first post with Squidex"))
+                                .AddInvariant("My first post with Squidex"))
                         .AddField("text",
                             new ContentFieldData()
-                                .AddValue("Just created a blog with Squidex. I love it!")),
-                Publish = true
+                                .AddInvariant("Just created a blog with Squidex. I love it!")),
+                Status = Status.Published
             });
         }
 
@@ -76,14 +76,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 SchemaId = pagesId,
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("title",
                             new ContentFieldData()
-                                .AddValue("About Me"))
+                                .AddInvariant("About Me"))
                         .AddField("text",
                             new ContentFieldData()
-                                .AddValue("I love Squidex and SciFi!")),
-                Publish = true
+                                .AddInvariant("I love Squidex and SciFi!")),
+                Status = Status.Published
             });
         }
 

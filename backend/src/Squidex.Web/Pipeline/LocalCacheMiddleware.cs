@@ -8,22 +8,19 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Caching;
-using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline
 {
-    public sealed class LocalCacheMiddleware : IMiddleware
+    public sealed class LocalCacheMiddleware
     {
-        private readonly ILocalCache localCache;
+        private readonly RequestDelegate next;
 
-        public LocalCacheMiddleware(ILocalCache localCache)
+        public LocalCacheMiddleware(RequestDelegate next)
         {
-            Guard.NotNull(localCache, nameof(localCache));
-
-            this.localCache = localCache;
+            this.next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public async Task InvokeAsync(HttpContext context, ILocalCache localCache)
         {
             using (localCache.StartContext())
             {

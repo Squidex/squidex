@@ -27,14 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             SchemaProvider = schemaProvider;
         }
 
-        public static Task<IEnumerable<ValidationError>> ValidateAsync(DomainId appId, RuleTrigger action, IAppProvider appProvider)
+        public static Task<IEnumerable<ValidationError>> ValidateAsync(DomainId appId, RuleTrigger trigger, IAppProvider appProvider)
         {
-            Guard.NotNull(action, nameof(action));
+            Guard.NotNull(trigger, nameof(trigger));
             Guard.NotNull(appProvider, nameof(appProvider));
 
-            var visitor = new RuleTriggerValidator(x => appProvider.GetSchemaAsync(appId, x, false));
+            var visitor = new RuleTriggerValidator(x => appProvider.GetSchemaAsync(appId, x));
 
-            return action.Accept(visitor);
+            return trigger.Accept(visitor);
         }
 
         public Task<IEnumerable<ValidationError>> Visit(CommentTrigger trigger)
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
         {
             var errors = new List<ValidationError>();
 
-            if (trigger.NumDays.HasValue && (trigger.NumDays < 1 || trigger.NumDays > 30))
+            if (trigger.NumDays != null && (trigger.NumDays < 1 || trigger.NumDays > 30))
             {
                 errors.Add(new ValidationError(Not.Between(nameof(trigger.NumDays), 1, 30), nameof(trigger.NumDays)));
             }
@@ -101,7 +101,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
         {
             if (await SchemaProvider(schema.SchemaId) == null)
             {
-                return new ValidationError(T.Get("schemas.notFoundId", new { id = schema.SchemaId }), nameof(ContentChangedTriggerV2.Schemas));
+                return new ValidationError(T.Get("schemas.notFoundId", new { id = schema.SchemaId }),
+                    nameof(ContentChangedTriggerV2.Schemas));
             }
 
             return null;

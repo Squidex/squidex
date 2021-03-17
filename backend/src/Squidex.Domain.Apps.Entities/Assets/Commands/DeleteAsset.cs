@@ -10,5 +10,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
     public sealed class DeleteAsset : AssetCommand
     {
         public bool CheckReferrers { get; set; }
+
+        public bool Permanent { get; set; }
     }
 }

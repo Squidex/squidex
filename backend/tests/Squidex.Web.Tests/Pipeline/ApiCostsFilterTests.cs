@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Xunit;
@@ -109,7 +110,7 @@ namespace Squidex.Web.Pipeline
 
         private void SetupApp()
         {
-            httpContext.Context().App = appEntity;
+            httpContext.Features.Set(Context.Anonymous(appEntity));
         }
     }
 }

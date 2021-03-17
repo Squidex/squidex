@@ -47,6 +47,15 @@ namespace TestSuite.Model
                         {
                             IsRequired = false
                         }
+                    },
+                    new UpsertSchemaFieldDto
+                    {
+                        Name = TestEntityData.LocalizedField,
+                        Partitioning = "language",
+                        Properties = new StringFieldPropertiesDto
+                        {
+                            DefaultValue = "default"
+                        }
                     }
                 },
                 Scripts = new SchemaScriptsDto
@@ -66,11 +75,15 @@ namespace TestSuite.Model
 
     public sealed class TestEntityData
     {
+        public static readonly string LocalizedField = nameof(Localized).ToLowerInvariant();
+
         public static readonly string StringField = nameof(String).ToLowerInvariant();
 
         public static readonly string NumberField = nameof(Number).ToLowerInvariant();
 
         public static readonly string GeoField = nameof(Geo).ToLowerInvariant();
+
+        public Dictionary<string, string> Localized { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
         public int Number { get; set; }

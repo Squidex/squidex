@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public RefToken Initiator
         {
-            get { return UserMapping.Initiator; }
+            get => UserMapping.Initiator;
         }
 
         protected BackupContextBase(DomainId appId, IUserMapping userMapping)

@@ -1,5 +1,66 @@
 # Changelog
 
+## 5.6.0 - 2020-02-27
+
+### Features
+
+* **API**: Endpoint to provide JSON schemas for all rule events.
+* **API**: Better support for OpenAPI code generators.
+* **API**: Fix total calculation in same hot paths.
+* **API**: Performance improvements to the GraphQL endpoint.
+* **API**: Performance improvements to reduce memory usage.
+* **Contents**: Pujabi as new language.
+* **Contents**: New scripting methods: `getReferences` and `getAssets`
+* **Contents**: New flat data API description.
+* **Infrastructure**: Simplified serializers to migrate to System.Text.Json when possible.
+* **Permissions**: New permissions to only give access to contents created by the user.
+* **Rules**: Custom payloads for AuzureQueue rules.
+* **UI**: Editor extensions.
+* **UI**: Delay tooltip a little bit.
+* **UI**: Drag and drop of multiple files and folders.
+* **UI**: Simply autocompletion for scripting.
+
+### Bugfixes
+
+* **Assets**: Fix surrogate keys for asset endpoint.
+* **Contents**: Null fixesd for Odata.
+* **UI**: Show all properties when exporting schemas.
+* **UI**: Shortcut for new asset folder fixed.
+* **UI**: Max height for language dropdown.
+* **UI**: Fix custom editor in nested forms.
+* **UI**: Fix reset button for assets.
+* **Usages**: Fix usage notifications.
+
+## 5.5.0 - 2021-01-24
+
+### Features
+
+* **Admin**: Better user management in the backend.
+* **Admin**: Possible to delete users now.
+* **Backend**: Reduce memory allocations in the backend.
+* **Backend**: Better tests for replicated caches.
+* **Notifo**: Update to newer notifo REST service.
+* **Contents**: Geolocation fields also accept GeoJson objects now.
+* **Contents**: Support for Geo queries with the full text index. You need to rerun the full text indexer for old geolocation fields.
+* **Contents**: Reference specific content version in GraphQL endpoint.
+* **UI**: Change the default of date editors to local mode instead of UTC.
+* **UI**: Better support for SVG images in the rich text and markdown editor.
+* **UI**: Integrated video player for assets.
+* **UI**: Integrated document viewer for documents like Word and PowerPoint.
+* **UI**: Fixed default value handling.
+* **UI**: Better sorting of schemas in custom Roles.
+
+### Bugfixes
+
+* **Assets**: Fixed a bug where the wrong version was used when referencing assets.
+* **Assets**: Fixed a critical bug in the backend to not deliver protected assets when an old version without that protection was queried.
+* **UI**: Fix quick nav after migration to newer Angular version.
+* **UI**: Fixed a layer in the OpenStreetMap editor to use https instead of http.
+* **UI**: Fixed array sorting in the UI.
+* **UI**: Fixed a bug that was causing the folders not to show up properly.
+* **Identity**: Fix the config management for external OIDC providers.
+* **Events**: Fix event consumers for older mongo installations (< 4.0 ).
+
 ## 5.4.0 - 2020-12-28
 
 ### Features

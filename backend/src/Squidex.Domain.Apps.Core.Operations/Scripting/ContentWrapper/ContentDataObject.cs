@@ -20,14 +20,14 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
     public sealed class ContentDataObject : ObjectInstance
     {
-        private readonly NamedContentData contentData;
+        private readonly ContentData contentData;
         private HashSet<string> fieldsToDelete;
         private Dictionary<string, PropertyDescriptor> fieldProperties;
         private bool isChanged;
 
         public override bool Extensible => true;
 
-        public ContentDataObject(Engine engine, NamedContentData contentData)
+        public ContentDataObject(Engine engine, ContentData contentData)
             : base(engine)
         {
             this.contentData = contentData;
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             isChanged = true;
         }
 
-        public bool TryUpdate(out NamedContentData result)
+        public bool TryUpdate(out ContentData result)
         {
             result = contentData;
 

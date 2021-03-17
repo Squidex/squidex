@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Log;
 using Xunit;
@@ -29,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         protected override DomainId Id
         {
-            get { return DomainId.Combine(AppId, ruleId); }
+            get => DomainId.Combine(AppId, ruleId);
         }
 
         public sealed class TestAction : RuleAction
@@ -49,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             await ExecuteCreateAsync();
             await ExecuteDeleteAsync();
 
-            await Assert.ThrowsAsync<DomainException>(ExecuteDisableAsync);
+            await Assert.ThrowsAsync<DomainObjectDeletedException>(ExecuteDisableAsync);
         }
 
         [Fact]
@@ -81,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             var result = await PublishIdempotentAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
@@ -142,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             var result = await PublishAsync(command);
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(None.Value);
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -183,14 +182,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             return PublishAsync(new DeleteRule());
         }
 
-        protected T CreateRuleEvent<T>(T @event) where T : RuleEvent
+        private T CreateRuleEvent<T>(T @event) where T : RuleEvent
         {
             @event.RuleId = ruleId;
 
             return CreateEvent(@event);
         }
 
-        protected T CreateRuleCommand<T>(T command) where T : RuleCommand
+        private T CreateRuleCommand<T>(T command) where T : RuleCommand
         {
             command.RuleId = ruleId;
 
@@ -200,7 +199,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         private static CreateRule MakeCreateCommand()
         {
             var newTrigger = new ContentChangedTriggerV2();
-            var newAction = new TestAction { Value = 123 };
+
+            var newAction = new TestAction
+            {
+                Value = 123
+            };
 
             return new CreateRule { Trigger = newTrigger, Action = newAction };
         }
@@ -208,31 +211,25 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         private static UpdateRule MakeUpdateCommand()
         {
             var newTrigger = new ContentChangedTriggerV2 { HandleAll = true };
-            var newAction = new TestAction { Value = 456 };
+
+            var newAction = new TestAction
+            {
+                Value = 456
+            };
 
             return new UpdateRule { Trigger = newTrigger, Action = newAction, Name = "NewName" };
         }
 
-        private async Task<object?> PublishIdempotentAsync(RuleCommand command)
+        private Task<object> PublishIdempotentAsync(RuleCommand command)
         {
-            var result = await PublishAsync(command);
-
-            var previousSnapshot = sut.Snapshot;
-            var previousVersion = sut.Snapshot.Version;
-
-            await PublishAsync(command);
-
-            Assert.Same(previousSnapshot, sut.Snapshot);
-            Assert.Equal(previousVersion, sut.Snapshot.Version);
-
-            return result;
+            return PublishIdempotentAsync(sut, CreateRuleCommand(command));
         }
 
         private async Task<object?> PublishAsync(RuleCommand command)
         {
             var result = await sut.ExecuteAsync(CreateRuleCommand(command));
 
-            return result;
+            return result.Payload;
         }
     }
 }

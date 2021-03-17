@@ -29,11 +29,18 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexAssets(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<AssetOptions>(config, "assets");
+            services.Configure<AssetOptions>(config,
+                "assets");
 
             if (config.GetValue<bool>("assets:deleteRecursive"))
             {
                 services.AddTransientAs<RecursiveDeleter>()
+                   .As<IEventConsumer>();
+            }
+
+            if (config.GetValue<bool>("assets:deletePermanent"))
+            {
+                services.AddTransientAs<AssetPermanentDeleter>()
                    .As<IEventConsumer>();
             }
 
@@ -63,6 +70,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
+
+            services.AddSingletonAs<AssetFolderResolver>()
+                .As<IAssetFolderResolver>();
 
             services.AddSingletonAs<AssetLoader>()
                 .As<IAssetLoader>();

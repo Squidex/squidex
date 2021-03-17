@@ -16,7 +16,6 @@ using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
 
-#pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
 namespace TestSuite.ApiTests
@@ -439,6 +438,56 @@ namespace TestSuite.ApiTests
             var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
 
             Assert.Equal(998, value);
+        }
+
+        [Fact]
+        public async Task Should_batch_query_items_with_graphql()
+        {
+            var query1 = new
+            {
+                query = @"
+                    query ContentsQuery($filter: String!) {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
+                            id,
+                            data {
+                                number {
+                                    iv
+                                }
+                            }
+                        }
+                    }",
+                variables = new
+                {
+                    filter = @"data/number/iv gt 3 and data/number/iv lt 7"
+                }
+            };
+
+            var query2 = new
+            {
+                query = @"
+                    query ContentsQuery($filter: String!) {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
+                            id,
+                            data {
+                                number {
+                                    iv
+                                }
+                            }
+                        }
+                    }",
+                variables = new
+                {
+                    filter = @"data/number/iv gt 4 and data/number/iv lt 7"
+                }
+            };
+
+            var results = await _.Contents.GraphQlAsync<QueryResult>(new[] { query1, query2 });
+
+            var items1 = results.ElementAt(0).Data.Items;
+            var items2 = results.ElementAt(1).Data.Items;
+
+            Assert.Equal(items1.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
+            Assert.Equal(items2.Select(x => x.Data.Number).ToArray(), new[] { 5, 6 });
         }
 
         [Fact]

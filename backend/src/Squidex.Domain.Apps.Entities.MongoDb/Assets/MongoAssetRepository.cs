@@ -97,7 +97,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                                 .ToListAsync();
                         long assetTotal = assetEntities.Count;
 
-                        if (assetTotal >= q.Query.Take || q.Query.Skip > 0)
+                        if (q.NoTotal)
+                        {
+                            assetTotal = -1;
+                        }
+                        else if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
                             assetTotal = await Collection.Find(filter).CountDocumentsAsync();
                         }
@@ -106,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     }
                     else
                     {
-                        var query = q.Query.AdjustToModel();
+                        var query = q.Query.AdjustToModel(appId);
 
                         var filter = query.BuildFilter(appId, parentId);
 
@@ -118,7 +122,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                                 .ToListAsync();
                         long assetTotal = assetEntities.Count;
 
-                        if (assetTotal >= q.Query.Take || q.Query.Skip > 0)
+                        if (q.NoTotal)
+                        {
+                            assetTotal = -1;
+                        }
+                        else if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
                             assetTotal = await Collection.Find(filter).CountDocumentsAsync();
                         }
@@ -161,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, string hash, string fileName, long fileSize)
+        public async Task<IAssetEntity?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {

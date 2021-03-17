@@ -32,6 +32,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     private valueChanged = new Subject();
     private value = '';
     private modelist: any;
+    private completions: ReadonlyArray<{ name: string, value: string }> = [];
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
@@ -50,6 +51,15 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
 
     @Input()
     public height = 0;
+
+    @Input()
+    public set completion(value: ReadonlyArray<{ name: string, description: string }> | undefined) {
+        if (value) {
+            this.completions = value.map(({ name, description }) => ({ value: name, name, meta: 'context', description }));
+        } else {
+            this.completions = [];
+        }
+    }
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
@@ -111,7 +121,8 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
 
         Promise.all([
             this.resourceLoader.loadLocalScript('dependencies/ace/ace.js'),
-            this.resourceLoader.loadLocalScript('dependencies/ace/ext/modelist.js')
+            this.resourceLoader.loadLocalScript('dependencies/ace/ext/modelist.js'),
+            this.resourceLoader.loadLocalScript('dependencies/ace/ext/language_tools.js')
         ]).then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
@@ -124,8 +135,35 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             this.setValue(this.value);
             this.setMode();
 
+            const langTools = ace.require('ace/ext/language_tools');
+
+            if (langTools) {
+                this.aceEditor.setOptions({
+                    enableBasicAutocompletion: true,
+                    enableSnippets: true,
+                    enableLiveAutocompletion: true
+                });
+
+                const previous = this.aceEditor.completers;
+
+                this.aceEditor.completers = [
+                    previous[0], {
+                        getCompletions: (editor: any, session: any, pos: any, prefix: any, callback: any) => {
+                            callback(null, this.completions);
+                        },
+                        getDocTooltip: (item: any) => {
+                            if (item.meta  === 'context' && item.description) {
+                                item.docHTML = `<b>${item.value}</b><hr></hr>${item.description}`;
+                            }
+                        },
+                        identifierRegexps: [/[a-zA-Z_0-9\$\-\.\u00A2-\u2000\u2070-\uFFFF]/]
+                    }
+                ];
+            }
+
             this.aceEditor.on('blur', () => {
                 this.changeValue();
+
                 this.callTouched();
             });
 

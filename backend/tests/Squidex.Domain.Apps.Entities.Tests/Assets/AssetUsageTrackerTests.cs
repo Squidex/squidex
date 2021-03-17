@@ -81,17 +81,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         (dateFrom.AddDays(0), new Counters
                         {
                             ["TotalSize"] = 128,
-                            ["TotalAssets"] = 2,
+                            ["TotalAssets"] = 2
                         }),
                         (dateFrom.AddDays(1), new Counters
                         {
                             ["TotalSize"] = 256,
-                            ["TotalAssets"] = 3,
+                            ["TotalAssets"] = 3
                         }),
                         (dateFrom.AddDays(2), new Counters
                         {
                             ["TotalSize"] = 512,
-                            ["TotalAssets"] = 4,
+                            ["TotalAssets"] = 4
                         })
                     }
                 });
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 new AssetStats(dateFrom.AddDays(0), 2, 128),
                 new AssetStats(dateFrom.AddDays(1), 3, 256),
-                new AssetStats(dateFrom.AddDays(2), 4, 512),
+                new AssetStats(dateFrom.AddDays(2), 4, 512)
             });
         }
 

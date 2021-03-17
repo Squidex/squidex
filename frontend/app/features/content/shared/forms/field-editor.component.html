@@ -9,7 +9,7 @@
 
 	<div>
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
-            <sqx-iframe-editor [url]="field.properties.editorUrl"
+            <sqx-iframe-editor [url]="field.properties.editorUrl" #editor
                 [context]="formContext"
                 [formControl]="editorControl"
                 [formValue]="form.valueChanges | async"
@@ -22,6 +22,7 @@
                 <ng-container *ngSwitchCase="'Array'">
                     <sqx-array-editor
                         [canUnset]="canUnset"
+                        [form]="form"
                         [formModel]="formModel"
                         [formContext]="formContext"
                         [language]="language"
@@ -38,7 +39,7 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'Checkbox'">
                             <div class="custom-control custom-checkbox">
-                                <input class="custom-control-input" type="checkbox" [formControl]="editorControl" id="{{uniqueId}}" sqxIndeterminateValue>
+                                <input class="custom-control-input" type="checkbox" [formControl]="editorControl" id="{{uniqueId}}" sqxIndeterminateValue [threeStates]="!field.properties.isRequired">
                                 <label class="custom-control-label" for="{{uniqueId}}"></label>
                             </div>
                         </ng-container>

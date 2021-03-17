@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             [IgnoreDataMember]
             public DomainId UniqueId
             {
-                get { return DomainId.Combine(AppId, Id); }
+                get => DomainId.Combine(AppId, Id);
             }
 
             public override bool ApplyEvent(IEvent @event)
@@ -118,14 +118,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                             break;
                         }
 
-                    case SchemaPublished _:
+                    case SchemaPublished:
                         {
                             SchemaDef = SchemaDef.Publish();
 
                             break;
                         }
 
-                    case SchemaUnpublished _:
+                    case SchemaUnpublished:
                         {
                             SchemaDef = SchemaDef.Unpublish();
 
@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                             break;
                         }
 
-                    case SchemaDeleted _:
+                    case SchemaDeleted:
                         {
                             IsDeleted = true;
 

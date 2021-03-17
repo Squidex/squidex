@@ -24,16 +24,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetRepository assetRepository;
         private readonly IAssetFolderRepository assetFolderRepository;
         private readonly ISemanticLog log;
-        private readonly string folderDeletedType;
+        private readonly string? folderDeletedType;
 
         public string Name
         {
-            get { return GetType().Name; }
+            get => GetType().Name;
         }
 
         public string EventsFilter
         {
-            get { return "^assetFolder-"; }
+            get => "^assetFolder-";
         }
 
         public RecursiveDeleter(
@@ -46,7 +46,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Guard.NotNull(commandBus, nameof(commandBus));
             Guard.NotNull(assetRepository, nameof(assetRepository));
             Guard.NotNull(assetFolderRepository, nameof(assetFolderRepository));
-            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
             Guard.NotNull(log, nameof(log));
 
             this.commandBus = commandBus;
@@ -54,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetFolderRepository = assetFolderRepository;
             this.log = log;
 
-            folderDeletedType = typeNameRegistry.GetName<AssetFolderDeleted>();
+            folderDeletedType = typeNameRegistry?.GetName<AssetFolderDeleted>();
         }
 
         public bool Handles(StoredEvent @event)

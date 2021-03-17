@@ -12,19 +12,19 @@ namespace Squidex.Infrastructure.Commands
 {
     public static class Is
     {
-        public static bool Change(DomainId oldValue, DomainId newValue)
+        public static bool Change<T>(T oldValue, T newValue)
         {
             return !Equals(oldValue, newValue);
         }
 
-        public static bool Change(string? oldValue, string? newValue)
+        public static bool OptionalChange<T>(T oldValue, [NotNullWhen(true)] T? newValue) where T : struct
         {
-            return !Equals(oldValue, newValue);
+            return newValue != null && !Equals(oldValue, newValue.Value);
         }
 
-        public static bool OptionalChange(bool oldValue, [NotNullWhen(true)] bool? newValue)
+        public static bool OptionalChange<T>(T oldValue, [NotNullWhen(true)] T? newValue) where T : class
         {
-            return newValue.HasValue && oldValue != newValue.Value;
+            return newValue != null && !Equals(oldValue, newValue);
         }
 
         public static bool OptionalChange(string oldValue, [NotNullWhen(true)] string? newValue)
@@ -32,12 +32,12 @@ namespace Squidex.Infrastructure.Commands
             return !string.IsNullOrWhiteSpace(newValue) && !string.Equals(oldValue, newValue);
         }
 
-        public static bool OptionalChange<T>(ISet<T> oldValue, [NotNullWhen(true)] ISet<T>? newValue)
+        public static bool OptionalSetChange<T>(ISet<T> oldValue, [NotNullWhen(true)] ISet<T>? newValue)
         {
             return newValue != null && !newValue.SetEquals(oldValue);
         }
 
-        public static bool OptionalChange<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> oldValue, [NotNullWhen(true)] IReadOnlyDictionary<TKey, TValue>? newValue) where TKey : notnull
+        public static bool OptionalMapChange<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> oldValue, [NotNullWhen(true)] IReadOnlyDictionary<TKey, TValue>? newValue) where TKey : notnull
         {
             return newValue != null && !newValue.EqualsDictionary(oldValue);
         }

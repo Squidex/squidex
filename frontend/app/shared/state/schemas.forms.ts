@@ -237,6 +237,7 @@ export class EditSchemaForm extends Form<FormGroup, UpdateSchemaDto, SchemaPrope
             ],
             contentsSidebarUrl: '',
             contentSidebarUrl: '',
+            contentEditorUrl: '',
             validateOnPublish: false,
             tags: []
         }));

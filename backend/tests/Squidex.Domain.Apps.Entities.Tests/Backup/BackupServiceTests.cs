@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly DomainId backupId = DomainId.NewGuid();
-        private readonly RefToken actor = new RefToken(RefTokenType.Subject, "me");
+        private readonly RefToken actor = RefToken.User("me");
         private readonly BackupService sut;
 
         public BackupServiceTests()
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             A.CallTo(() => grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id, null))
                 .Returns(grain);
 
-            var initiator = new RefToken(RefTokenType.Subject, "me");
+            var initiator = RefToken.User("me");
 
             var restoreUrl = new Uri("http://squidex.io");
             var restoreAppName = "New App";

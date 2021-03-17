@@ -89,7 +89,7 @@ export class CompiledRule {
         private readonly rule: FieldRule
     ) {
         try {
-            this.function = new Function(`return function(user, data, itemData) { return ${rule.condition} }`)();
+            this.function = new Function(`return function(user, ctx, data, itemData) { return ${rule.condition} }`)();
         } catch {
             this.function = () => false;
         }
@@ -97,7 +97,7 @@ export class CompiledRule {
 
     public eval(context: RuleContext) {
         try {
-            return this.function(context.user, context.data, context.itemData);
+            return this.function(context.user, context, context.data, context.itemData);
         } catch {
             return false;
         }
@@ -162,6 +162,10 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         }
 
         this.updateCustomState(context, state);
+    }
+
+    public unset() {
+        this.form.setValue(undefined);
     }
 
     protected updateCustomState(_context: RuleContext, _state: AbstractContentFormState) {

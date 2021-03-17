@@ -33,22 +33,22 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public IEnumerable<string> Keys
         {
-            get { return inner.Keys; }
+            get => inner.Keys;
         }
 
         public IEnumerable<IJsonValue> Values
         {
-            get { return inner.Values; }
+            get => inner.Values;
         }
 
         public int Count
         {
-            get { return inner.Count; }
+            get => inner.Count;
         }
 
         public JsonValueType Type
         {
-            get { return JsonValueType.Object; }
+            get => JsonValueType.Object;
         }
 
         public JsonObject()

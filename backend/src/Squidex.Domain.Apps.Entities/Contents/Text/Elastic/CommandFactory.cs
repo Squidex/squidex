@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 index = new
                 {
                     _id = upsert.DocId,
-                    _index = indexName,
+                    _index = indexName
                 }
             });
 
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 update = new
                 {
                     _id = update.DocId,
-                    _index = indexName,
+                    _index = indexName
                 }
             });
 
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 delete = new
                 {
                     _id = delete.DocId,
-                    _index = indexName,
+                    _index = indexName
                 }
             });
         }

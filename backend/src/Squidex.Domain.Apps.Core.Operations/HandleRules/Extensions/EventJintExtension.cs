@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
             this.urlGenerator = urlGenerator;
         }
 
-        public void Extend(ExecutionContext context, bool async)
+        public void Extend(ExecutionContext context)
         {
             context.Engine.SetValue("contentAction", new EventDelegate(() =>
             {

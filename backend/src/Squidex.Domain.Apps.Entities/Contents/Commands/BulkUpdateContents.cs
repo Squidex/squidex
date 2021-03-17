@@ -19,7 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool DoNotValidate { get; set; }
 
+        public bool DoNotValidateWorkflow { get; set; }
+
         public bool DoNotScript { get; set; }
+
+        public bool CheckReferrers { get; set; }
 
         public bool OptimizeValidation { get; set; }
 

@@ -7,7 +7,8 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { EditScriptsForm, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { AppsState, EditScriptsForm, SchemaCompletions, SchemaDetailsDto, SchemasService, SchemasState } from '@app/shared';
+import { EMPTY, Observable } from 'rxjs';
 
 @Component({
     selector: 'sqx-schema-scripts-form',
@@ -18,15 +19,18 @@ export class SchemaScriptsFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDetailsDto;
 
-    public selectedField = 'query';
+    public schemaScript = 'query';
+    public schemaCompletions: Observable<SchemaCompletions> = EMPTY;
 
     public editForm = new EditScriptsForm(this.formBuilder);
 
     public isEditable = false;
 
     constructor(
+        private readonly appsState: AppsState,
         private readonly formBuilder: FormBuilder,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
+        private readonly schemasService: SchemasService
     ) {
     }
 
@@ -35,10 +39,12 @@ export class SchemaScriptsFormComponent implements OnChanges {
 
         this.editForm.load(this.schema.scripts);
         this.editForm.setEnabled(this.isEditable);
+
+        this.schemaCompletions = this.schemasService.getCompletions(this.appsState.appName, this.schema.name);
     }
 
     public selectField(field: string) {
-        this.selectedField = field;
+        this.schemaScript = field;
     }
 
     public saveSchema() {

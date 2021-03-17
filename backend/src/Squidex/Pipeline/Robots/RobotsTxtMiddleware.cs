@@ -8,29 +8,28 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Squidex.Infrastructure;
 
 namespace Squidex.Pipeline.Robots
 {
-    public sealed class RobotsTxtMiddleware : IMiddleware
+    public sealed class RobotsTxtMiddleware
     {
-        private readonly RobotsTxtOptions robotsTxtOptions;
+        private readonly RequestDelegate next;
 
-        public RobotsTxtMiddleware(IOptions<RobotsTxtOptions> robotsTxtOptions)
+        public RobotsTxtMiddleware(RequestDelegate next)
         {
-            Guard.NotNull(robotsTxtOptions, nameof(robotsTxtOptions));
-
-            this.robotsTxtOptions = robotsTxtOptions.Value;
+            this.next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public async Task InvokeAsync(HttpContext context, IOptions<RobotsTxtOptions> robotsTxtOptions)
         {
-            if (CanServeRequest(context.Request) && !string.IsNullOrWhiteSpace(robotsTxtOptions.Text))
+            var text = robotsTxtOptions.Value.Text;
+
+            if (CanServeRequest(context.Request) && !string.IsNullOrWhiteSpace(text))
             {
                 context.Response.ContentType = "text/plain";
                 context.Response.StatusCode = 200;
 
-                await context.Response.WriteAsync(robotsTxtOptions.Text);
+                await context.Response.WriteAsync(text);
             }
             else
             {

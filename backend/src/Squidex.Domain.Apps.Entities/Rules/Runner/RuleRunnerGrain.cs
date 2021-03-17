@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         {
             var job = state.Value;
 
-            if (job.RuleId.HasValue && currentJobToken == null)
+            if (job.RuleId != null && currentJobToken == null)
             {
                 if (state.Value.FromSnapshots && continues)
                 {

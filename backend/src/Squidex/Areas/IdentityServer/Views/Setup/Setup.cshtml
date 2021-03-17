@@ -1,0 +1,201 @@
+﻿@model Squidex.Areas.IdentityServer.Controllers.Setup.SetupVM
+
+@{
+    ViewBag.ThemeColor = "gray";
+    ViewBag.ThemeSize = "profile-lg";
+
+    ViewBag.Title = T.Get("setup.title");
+
+    void RenderValidation(string field)
+    {
+        @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+        {
+            <div class="errors-container">
+                <span class="errors">Html.ValidationMessage(field)</span>
+            </div>
+        }
+    }
+
+    void RenderRuleAsSuccess(string message)
+    {
+        <div class="row mt-4">
+            <div class="col-auto">
+                <div class="status-icon status-icon-success mt-2">
+                    <i class="icon-checkmark"></i>
+                </div>
+            </div>
+
+            <div class="col">
+                <div>
+                    @Html.Raw(message)
+                </div>
+            </div>
+        </div>
+    }
+
+    void RenderRuleAsCritical(string message)
+    {
+        <div class="row mt-4">
+            <div class="col-auto">
+                <div class="status-icon status-icon-failed mt-2">
+                    <i class="icon-exclamation"></i>
+                </div>
+            </div>
+
+            <div class="col">
+                <div>
+                    <strong>@T.Get("common.critical")</strong>: @Html.Raw(message)
+                </div>
+            </div>
+        </div>
+    }
+
+    void RenderRuleAsWarning(string message)
+    {
+        <div class="row mt-4">
+            <div class="col-auto">
+                <div class="status-icon status-icon-warning mt-2">
+                    <i class="icon-exclamation"></i>
+                </div>
+            </div>
+
+            <div class="col">
+                <div>
+                    <strong>@T.Get("common.warning")</strong>: @Html.Raw(message)
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div class="card">
+    <div class="card-body">
+        <h1>@T.Get("setup.headline")</h1>
+
+        <img style="height: 250px" class="mt-2 mb-2" src="@Url.RootContentUrl("~/squid.svg?title=Welcome&text=Welcome%20to%20the%20Installation%20Process&face=happy")" />
+
+        <small class="form-text text-muted mt-2 mb-2">@T.Get("setup.hint")</small>
+
+        <div class="profile-section">
+            <h2>@T.Get("setup.rules.headline")</h2>
+
+            @if (Model.IsValidHttps)
+            {
+                RenderRuleAsSuccess(T.Get("setup.ruleHttps.success"));
+            }
+            else
+            {
+                RenderRuleAsCritical(T.Get("setup.ruleHttps.failure"));
+            }
+
+            @if (Model.BaseUrlConfigured == Model.BaseUrlCurrent)
+            {
+                RenderRuleAsSuccess(T.Get("setup.ruleUrl.success"));
+            }
+            else
+            {
+                RenderRuleAsCritical(T.Get("setup.ruleUrl.failure", new { actual = Model.BaseUrlCurrent, configured = Model.BaseUrlConfigured }));
+            }
+
+            @if (Model.EverybodyCanCreateApps)
+            {
+                RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAdmins"));
+            }
+            else
+            {
+                RenderRuleAsWarning(T.Get("setup.ruleAppCreation.warningAll"));
+            }
+
+            @if (Model.IsAssetStoreFtp)
+            {
+                RenderRuleAsWarning(T.Get("setup.ruleFtp.warning"));
+            }
+
+            @if (Model.IsAssetStoreFile)
+            {
+                RenderRuleAsWarning(T.Get("setup.ruleFolder.warning"));
+            }
+        </div>
+
+        <hr />
+
+        <div class="profile-section">
+            <h2>@T.Get("setup.createUser.headline")</h2>
+
+            @if (Model.HasExternalLogin)
+            {
+                <div>
+                    <small class="form-text text-muted mt-2 mb-2">@T.Get("setup.createUser.loginHint")</small>
+
+                    <div class="mt-3">
+                        <a class="btn btn-primary" asp-controller="Account" asp-action="Login">
+                            @T.Get("setup.createUser.loginLink")
+                        </a>
+                    </div>
+                </div>
+            }
+
+            @if (Model.HasExternalLogin && Model.HasPasswordAuth)
+            {
+                <div class="profile-separator">
+                    <div class="profile-separator-text">@T.Get("setup.createUser.separator")</div>
+                </div>
+            }
+
+            @if (Model.HasPasswordAuth)
+            {
+                <h3>@T.Get("setup.createUser.headlineCreate")</h3>
+
+                @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                {
+                    <div class="form-alert form-alert-error">
+                        @Model.ErrorMessage
+                    </div>
+                }
+
+                <form class="profile-form" asp-controller="Setup" asp-action="Setup" method="post">
+                    <div class="form-group">
+                        <label for="email">@T.Get("common.email")</label>
+
+                        @{ RenderValidation("Email"); }
+
+                        <input type="text" class="form-control" name="email" id="email" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">@T.Get("common.password")</label>
+
+                        @{ RenderValidation("Password"); }
+
+                        <input type="password" class="form-control" name="password" id="password" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordConfirm">@T.Get("setup.createUser.confirmPassword")</label>
+
+                        @{ RenderValidation("PasswordConfirm"); }
+
+                        <input type="password" class="form-control" name="passwordConfirm" id="passwordConfirm" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">@T.Get("setup.createUser.button")</button>
+                    </div>
+                </form>
+            }
+
+            @if (!Model.HasExternalLogin && !Model.HasPasswordAuth)
+            {
+                <div>
+                    @T.Get("setup.createUser.failure")
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4 mb-2">
+    <small class="text-muted">
+        @T.Get("setup.madeBy")<br />@T.Get("setup.madeByCopyright")
+    </small>
+</div>

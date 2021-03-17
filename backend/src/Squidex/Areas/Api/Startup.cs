@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Squidex.Areas.Api.Config;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Web;
+using Squidex.Web.Pipeline;
 
 namespace Squidex.Areas.Api
 {
@@ -19,6 +20,8 @@ namespace Squidex.Areas.Api
             app.Map(Constants.ApiPrefix, appApi =>
             {
                 appApi.UseMiddleware<IdentityServerPathMiddleware>();
+
+                appApi.UseAccessTokenQueryString();
 
                 appApi.UseRouting();
 

@@ -76,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         public async Task<IActionResult> GetApps()
         {
             var userOrClientId = HttpContext.User.UserOrClientId()!;
-            var userPermissions = Resources.Permissions;
+            var userPermissions = Resources.Context.UserPermissions;
 
             var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions);
 

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
@@ -28,7 +29,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_return_published_item()
+        public async Task Should_return_published_content()
         {
             TestEntity content = null;
             try
@@ -54,7 +55,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_not_return_archived_item()
+        public async Task Should_not_return_archived_content()
         {
             TestEntity content = null;
             try
@@ -80,7 +81,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_not_return_unpublished_item()
+        public async Task Should_not_return_unpublished_content()
         {
             TestEntity content = null;
             try
@@ -122,6 +123,63 @@ namespace TestSuite.ApiTests
                 var updated = await _.Contents.GetAsync(content.Id);
 
                 Assert.Equal(text, updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_null_text()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a content item with a text that caused a bug before.
+                content = await _.Contents.CreateAsync(new TestEntityData
+                {
+                    Localized = new Dictionary<string, string>
+                    {
+                        ["en"] = null
+                    }
+                }, true);
+
+
+                // STEP 2: Get the item and ensure that the text is the same.
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Null(updated.Data.Localized["en"]);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_default_text()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a content item with a text that caused a bug before.
+                content = await _.Contents.CreateAsync(new TestEntityData
+                {
+                    Localized = new Dictionary<string, string>()
+                }, true);
+
+
+                // STEP 2: Get the item and ensure that the text is the same.
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal("default", updated.Data.Localized["en"]);
             }
             finally
             {
@@ -236,7 +294,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_non_published_item()
+        public async Task Should_create_non_published_content()
         {
             TestEntity content = null;
             try
@@ -258,7 +316,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_published_item()
+        public async Task Should_create_published_content()
         {
             TestEntity content = null;
             try
@@ -280,7 +338,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_item_with_custom_id()
+        public async Task Should_create_content_with_custom_id()
         {
             var id = Guid.NewGuid().ToString();
 
@@ -302,7 +360,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_not_create_item_with_custom_id_twice()
+        public async Task Should_not_create_content_with_custom_id_twice()
         {
             var id = Guid.NewGuid().ToString();
 
@@ -330,7 +388,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_item_with_custom_id_and_upsert()
+        public async Task Should_create_content_with_custom_id_and_upsert()
         {
             var id = Guid.NewGuid().ToString();
 
@@ -364,7 +422,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_update_item()
+        public async Task Should_update_content()
         {
             TestEntity content = null;
             try
@@ -390,7 +448,33 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_patch_item()
+        public async Task Should_update_content_to_null()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { String = "initial" }, true);
+
+
+                // STEP 2: Update the item and ensure that the data has changed.
+                await _.Contents.UpdateAsync(content.Id, new TestEntityData { String = null });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Null(updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_patch_content()
         {
             TestEntity content = null;
             try
@@ -416,20 +500,139 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_delete_item()
+        public async Task Should_patch_content_to_null()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { String = "initial" }, true);
+
+
+                // STEP 2: Update the item and ensure that the data has changed.
+                await _.Contents.PatchAsync(content.Id, new { @string = new { iv = (object)null } });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Null(updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_create_draft_version()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, true);
+
+
+                // STEP 2: Create draft.
+                content = await _.Contents.CreateDraftAsync(content.Id);
+
+
+                // STEP 3: Update the item and ensure that the data has not changed.
+                await _.Contents.PatchAsync(content.Id, new TestEntityData { Number = 2 });
+
+                var updated_1 = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(1, updated_1.Data.Number);
+
+
+                // STEP 4: Get the unpublished version
+                var unpublished = await _.Contents.GetAsync(content.Id, QueryContext.Default.Unpublished());
+
+                Assert.Equal(2, unpublished.Data.Number);
+
+
+                // STEP 5: Publish draft and ensure that it has been updated.
+                await _.Contents.ChangeStatusAsync(content.Id, "Published");
+
+                var updated_2 = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, updated_2.Data.Number);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_delete_content(bool permanent)
         {
             // STEP 1: Create a new item.
             var content = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, true);
 
 
             // STEP 2: Delete the item.
-            await _.Contents.DeleteAsync(content.Id);
+            await _.Contents.DeleteAsync(content.Id, permanent);
 
 
             // STEP 3: Retrieve all items and ensure that the deleted item does not exist.
             var updated = await _.Contents.GetAsync();
 
             Assert.DoesNotContain(updated.Items, x => x.Id == content.Id);
+
+
+            // STEP 4: Retrieve all deleted items and check if found.
+            var deleted = await _.Contents.GetAsync(new ContentQuery
+            {
+                Filter = "isDeleted eq true"
+            }, QueryContext.Default.Unpublished(true));
+
+            Assert.Equal(!permanent, deleted.Items.Any(x => x.Id == content.Id));
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_recreate_deleted_content(bool permanent)
+        {
+            // STEP 1: Create a new item.
+            var content_1 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, true);
+
+
+            // STEP 2: Delete the item.
+            await _.Contents.DeleteAsync(content_1.Id, permanent);
+
+
+            // STEP 3: Recreate the item with the same id.
+            var content_2 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, content_1.Id, true);
+
+            Assert.Equal(Status.Published, content_2.Status);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_recreate_deleted_content_with_upsert(bool permanent)
+        {
+            // STEP 1: Create a new item.
+            var content_1 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, true);
+
+
+            // STEP 2: Delete the item.
+            await _.Contents.DeleteAsync(content_1.Id, permanent);
+
+
+            // STEP 3: Recreate the item with the same id.
+            var content_2 = await _.Contents.UpsertAsync(content_1.Id, new TestEntityData { Number = 2 }, true);
+
+            Assert.Equal(Status.Published, content_2.Status);
         }
     }
 }

@@ -11,6 +11,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule, UnsetContentGuard } from '@app/shared';
 import { ArrayEditorComponent, ArrayItemComponent, ArraySectionComponent, AssetsEditorComponent, CommentsPageComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentListCellDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthPipe, ContentPageComponent, ContentReferencesComponent, ContentsColumnsPipe, ContentSectionComponent, ContentSelectorComponent, ContentSelectorItemComponent, ContentsFiltersPageComponent, ContentsPageComponent, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
+import { ContentExtensionComponent } from './shared/content-extension.component';
 
 const routes: Routes = [
     {
@@ -91,20 +92,21 @@ const routes: Routes = [
         ContentCreatorComponent,
         ContentEditorComponent,
         ContentEventComponent,
+        ContentExtensionComponent,
         ContentFieldComponent,
         ContentHistoryPageComponent,
         ContentListCellDirective,
         ContentListFieldComponent,
         ContentListHeaderComponent,
         ContentListWidthPipe,
-        ContentsColumnsPipe,
         ContentPageComponent,
+        ContentReferencesComponent,
+        ContentsColumnsPipe,
         ContentSectionComponent,
         ContentSelectorComponent,
         ContentSelectorItemComponent,
         ContentsFiltersPageComponent,
         ContentsPageComponent,
-        ContentReferencesComponent,
         ContentStatusComponent,
         ContentValueComponent,
         ContentValueEditorComponent,

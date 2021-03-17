@@ -117,7 +117,7 @@ namespace Squidex.Domain.Users
             var provider = "my-provider";
             var providerKey = "key";
 
-            var identity = CreateIdentity(found: false);
+            CreateIdentity(found: false);
 
             A.CallTo(() => userManager.FindByLoginAsync(provider, providerKey))
                 .Returns(Task.FromResult<IdentityUser>(null!));
@@ -202,7 +202,7 @@ namespace Squidex.Domain.Users
 
             var values = new UserValues
             {
-                Consent = true,
+                Consent = true
             };
 
             SetupCreation(identity, 1);
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Users
 
             var values = new UserValues
             {
-                Consent = true,
+                Consent = true
             };
 
             SetupCreation(identity, 0);
@@ -238,7 +238,7 @@ namespace Squidex.Domain.Users
 
             var values = new UserValues
             {
-                Consent = true,
+                Consent = true
             };
 
             SetupCreation(identity, 0);
@@ -256,7 +256,7 @@ namespace Squidex.Domain.Users
 
             var values = new UserValues
             {
-                Consent = true,
+                Consent = true
             };
 
             SetupCreation(identity, 1);

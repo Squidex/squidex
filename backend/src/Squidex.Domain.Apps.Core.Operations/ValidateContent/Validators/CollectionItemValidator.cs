@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
-            if (value is ICollection items && items.Count > 0)
+            if (value is ICollection { Count: > 0 } items)
             {
                 var innerTasks = new List<Task>();
                 var index = 1;

@@ -15,11 +15,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryById : OperationBase
     {
-        public QueryById(DataConverter dataConverter)
-            : base(dataConverter)
-        {
-        }
-
         public async Task<IContentEntity?> QueryAsync(ISchemaEntity schema, DomainId id)
         {
             Guard.NotNull(schema, nameof(schema));
@@ -36,8 +31,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 {
                     return null;
                 }
-
-                contentEntity?.ParseData(schema.SchemaDef, DataConverter);
             }
 
             return contentEntity;

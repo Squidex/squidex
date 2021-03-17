@@ -19,7 +19,18 @@ namespace Squidex.Infrastructure.Queries.OData
             CustomUriFunctions.AddCustomUriFunction("empty",
                 new FunctionSignatureWithReturnType(
                     EdmCoreModel.Instance.GetBoolean(false),
-                    EdmCoreModel.Instance.GetString(true)));
+                    EdmCoreModel.Instance.GetUntyped()));
+
+            CustomUriFunctions.AddCustomUriFunction("exists",
+                new FunctionSignatureWithReturnType(
+                    EdmCoreModel.Instance.GetBoolean(false),
+                    EdmCoreModel.Instance.GetUntyped()));
+
+            CustomUriFunctions.AddCustomUriFunction("matchs",
+                new FunctionSignatureWithReturnType(
+                    EdmCoreModel.Instance.GetBoolean(false),
+                    EdmCoreModel.Instance.GetString(false),
+                    EdmCoreModel.Instance.GetString(false)));
 
             CustomUriFunctions.AddCustomUriFunction("distanceto",
                 new FunctionSignatureWithReturnType(

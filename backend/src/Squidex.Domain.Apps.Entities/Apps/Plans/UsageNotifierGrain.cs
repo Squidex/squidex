@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
@@ -19,10 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 {
     public sealed class UsageNotifierGrain : GrainOfString, IUsageNotifierGrain
     {
-        private static readonly TimeSpan TimeBetweenNotifications = TimeSpan.FromHours(12);
+        private static readonly TimeSpan TimeBetweenNotifications = TimeSpan.FromDays(3);
         private readonly IGrainState<State> state;
         private readonly INotificationSender notificationSender;
         private readonly IUserResolver userResolver;
+        private readonly IClock clock;
 
         [CollectionName("UsageNotifications")]
         public sealed class State
@@ -30,20 +32,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             public Dictionary<DomainId, DateTime> NotificationsSent { get; } = new Dictionary<DomainId, DateTime>();
         }
 
-        public UsageNotifierGrain(IGrainState<State> state, INotificationSender notificationSender, IUserResolver userResolver)
+        public UsageNotifierGrain(IGrainState<State> state, INotificationSender notificationSender, IUserResolver userResolver, IClock clock)
         {
             Guard.NotNull(state, nameof(state));
             Guard.NotNull(notificationSender, nameof(notificationSender));
             Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(clock, nameof(clock));
 
             this.state = state;
             this.notificationSender = notificationSender;
             this.userResolver = userResolver;
+            this.clock = clock;
         }
 
         public async Task NotifyAsync(UsageNotification notification)
         {
-            var now = DateTime.UtcNow;
+            if (!notificationSender.IsActive)
+            {
+                return;
+            }
+
+            var now = clock.GetCurrentInstant().ToDateTimeUtc();
 
             if (!HasBeenSentBefore(notification.AppId, now))
             {
@@ -73,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             {
                 var elapsed = now - lastSent;
 
-                return elapsed > TimeBetweenNotifications;
+                return elapsed < TimeBetweenNotifications;
             }
 
             return false;

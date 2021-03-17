@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public virtual IEnumerable<Type> SupportedTypes
         {
-            get { return supportedTypes; }
+            get => supportedTypes;
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         {
             switch (value)
             {
-                case JsonNull _:
+                case JsonNull:
                     writer.WriteNull();
                     break;
                 case JsonBoolean s:

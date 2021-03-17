@@ -6,26 +6,18 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using GeoJSON.Net;
-using GeoJSON.Net.Geometry;
-using Microsoft.Extensions.ObjectPool;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public static class Extensions
     {
-        private static readonly ObjectPool<StringBuilder> StringBuilderPool =
-            new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
-
-        private static readonly ObjectPool<MemoryStream> MemoryStreamPool =
-            new DefaultObjectPool<MemoryStream>(new DefaultPooledObjectPolicy<MemoryStream>());
-
-        public static Dictionary<string, GeoJSONObject>? ToGeo(this NamedContentData data, IJsonSerializer jsonSerializer)
+        public static Dictionary<string, GeoJSONObject>? ToGeo(this ContentData data, IJsonSerializer jsonSerializer)
         {
             Dictionary<string, GeoJSONObject>? result = null;
 
@@ -35,9 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     foreach (var (key, jsonValue) in value)
                     {
-                        var geoJson = GetGeoJson(jsonSerializer, jsonValue);
-
-                        if (geoJson != null)
+                        if (GeoJsonValue.TryParse(jsonValue, jsonSerializer, out var geoJson) == GeoJsonParseResult.Success)
                         {
                             result ??= new Dictionary<string, GeoJSONObject>();
                             result[$"{field}.{key}"] = geoJson;
@@ -49,40 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return result;
         }
 
-        private static GeoJSONObject? GetGeoJson(IJsonSerializer jsonSerializer, IJsonValue value)
-        {
-            if (value is JsonObject geoObject)
-            {
-                var stream = MemoryStreamPool.Get();
-
-                try
-                {
-                    stream.Position = 0;
-
-                    jsonSerializer.Serialize(geoObject, stream, true);
-
-                    stream.Position = 0;
-
-                    return jsonSerializer.Deserialize<GeoJSONObject>(stream, null, true);
-                }
-                catch
-                {
-                    if (geoObject.TryGetValue<JsonNumber>("latitude", out var lat) &&
-                        geoObject.TryGetValue<JsonNumber>("longitude", out var lon))
-                    {
-                        return new Point(new Position(lat.Value, lon.Value));
-                    }
-                }
-                finally
-                {
-                    MemoryStreamPool.Return(stream);
-                }
-            }
-
-            return null;
-        }
-
-        public static Dictionary<string, string>? ToTexts(this NamedContentData data)
+        public static Dictionary<string, string>? ToTexts(this ContentData data)
         {
             Dictionary<string, string>? result = null;
 
@@ -115,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     foreach (var (_, sb) in languages)
                     {
-                        StringBuilderPool.Return(sb);
+                        DefaultPools.StringBuilder.Return(sb);
                     }
                 }
             }
@@ -151,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 if (!languages.TryGetValue(language, out var sb))
                 {
-                    sb = StringBuilderPool.Get();
+                    sb = DefaultPools.StringBuilder.Get();
 
                     languages[language] = sb;
                 }

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Xunit;
@@ -21,11 +22,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext;
         private readonly RuleEnricher sut;
 
         public RuleEnricherTests()
         {
+            requestContext = Context.Anonymous(Mocks.App(appId));
+
             sut = new RuleEnricher(ruleEventRepository, requestCache);
         }
 

@@ -30,7 +30,8 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexRules(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<RuleOptions>(config, "rules");
+            services.Configure<RuleOptions>(config,
+                "rules");
 
             services.AddTransientAs<RuleDomainObject>()
                 .AsSelf();
@@ -47,8 +48,17 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
+            services.AddSingletonAs<AssetsFluidExtension>()
+                .As<IFluidExtension>();
+
+            services.AddSingletonAs<AssetsJintExtension>()
+                .As<IJintExtension>();
+
             services.AddSingletonAs<ReferencesFluidExtension>()
                 .As<IFluidExtension>();
+
+            services.AddSingletonAs<ReferencesJintExtension>()
+                .As<IJintExtension>();
 
             services.AddSingletonAs<ManualTriggerHandler>()
                 .As<IRuleTriggerHandler>();
@@ -70,6 +80,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IRuleEnqueuer>().As<IEventConsumer>();
+
+            services.AddSingletonAs<EventJsonSchemaGenerator>()
+                .AsSelf();
 
             services.AddSingletonAs<RuleRegistry>()
                 .As<ITypeProvider>().AsSelf();

@@ -18,11 +18,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryScheduled : OperationBase
     {
-        public QueryScheduled(DataConverter dataConverter)
-            : base(dataConverter)
-        {
-        }
-
         protected override Task PrepareAsync(CancellationToken ct = default)
         {
             var index =
@@ -37,8 +32,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             Guard.NotNull(callback, nameof(callback));
 
-            return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true)
-                .Not(x => x.DataByIds)
+            return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true).Not(x => x.Data)
                 .ForEachAsync(c =>
                 {
                     callback(c);

@@ -14,12 +14,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public EnvelopeHeaders Headers
         {
-            get { return headers; }
+            get => headers;
         }
 
         public T Payload
         {
-            get { return payload; }
+            get => payload;
         }
 
         public Envelope(T payload, EnvelopeHeaders? headers = null)

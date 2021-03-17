@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             {
                 DefaultValues = new LocalizedValue<string[]?>
                 {
-                    ["iv"] = new string[] { "A", "B", "C" }
+                    ["iv"] = new[] { "A", "B", "C" }
                 }
             };
 
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             {
                 DefaultValues = new LocalizedValue<string[]?>
                 {
-                    ["iv"] = new string[] { "A", "B", "C" }
+                    ["iv"] = new[] { "A", "B", "C" }
                 }
             };
 

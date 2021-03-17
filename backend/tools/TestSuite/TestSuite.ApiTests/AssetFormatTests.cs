@@ -12,7 +12,7 @@ using TestSuite.Fixtures;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
-#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace TestSuite.ApiTests
 {

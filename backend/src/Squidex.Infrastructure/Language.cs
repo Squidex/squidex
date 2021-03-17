@@ -7,11 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Squidex.Infrastructure
 {
+    [TypeConverter(typeof(LanguageTypeConverter))]
     public partial record Language
     {
         private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase);
@@ -32,14 +34,14 @@ namespace Squidex.Infrastructure
 
         public static IReadOnlyCollection<Language> AllLanguages
         {
-            get { return AllLanguagesField.Values; }
+            get => AllLanguagesField.Values;
         }
 
         public string Iso2Code { get; }
 
         public string EnglishName
         {
-            get { return AllLanguagesNames.GetOrDefault(Iso2Code) ?? string.Empty; }
+            get => AllLanguagesNames.GetOrDefault(Iso2Code) ?? string.Empty;
         }
 
         private Language(string iso2Code)

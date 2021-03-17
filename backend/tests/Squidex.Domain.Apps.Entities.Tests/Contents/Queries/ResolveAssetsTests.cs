@@ -88,7 +88,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { doc2.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id)))
+            A.CallTo(() => assetQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id)))
                 .Returns(ResultList.CreateFrom(4, doc1, doc2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
@@ -119,29 +120,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     new[] { doc2.Id, doc1.Id })
             };
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id, img1.Id, img2.Id)))
+            A.CallTo(() => assetQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id, img1.Id, img2.Id)))
                 .Returns(ResultList.CreateFrom(4, img1, img2, doc1, doc2));
 
             await sut.EnrichAsync(requestContext, contents, schemaProvider);
 
             Assert.Equal(
-                new NamedContentData()
+                new ContentData()
                     .AddField("asset1",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array($"url/to/{img1.Id}", img1.FileName)))
+                            .AddLocalized("iv", JsonValue.Array($"url/to/{img1.Id}", img1.FileName)))
                     .AddField("asset2",
                         new ContentFieldData()
-                            .AddValue("en", JsonValue.Array($"url/to/{img2.Id}", img2.FileName))),
+                            .AddLocalized("en", JsonValue.Array($"url/to/{img2.Id}", img2.FileName))),
                 contents[0].ReferenceData);
 
             Assert.Equal(
-                new NamedContentData()
+                new ContentData()
                     .AddField("asset1",
                         new ContentFieldData()
-                            .AddValue("iv", JsonValue.Array(doc1.FileName)))
+                            .AddLocalized("iv", JsonValue.Array(doc1.FileName)))
                     .AddField("asset2",
                         new ContentFieldData()
-                            .AddValue("en", JsonValue.Array(doc2.FileName))),
+                            .AddLocalized("en", JsonValue.Array(doc2.FileName))),
                 contents[1].ReferenceData);
         }
 
@@ -171,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
             };
 
-            var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).WithoutContentEnrichment(true);
+            var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).Clone(b => b.WithoutContentEnrichment(true));
 
             await sut.EnrichAsync(ctx, contents, schemaProvider);
 
@@ -212,7 +214,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             Assert.NotNull(contents[0].ReferenceData);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>.That.Matches(x => !x.ShouldEnrichAsset()), null, A<Q>.That.HasIds(id1)))
+            A.CallTo(() => assetQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(id1)))
                 .MustHaveHappened();
         }
 
@@ -221,13 +224,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return new ContentEntity
             {
                 Data =
-                    new NamedContentData()
+                    new ContentData()
                         .AddField("asset1",
                             new ContentFieldData()
-                                .AddJsonValue("iv", JsonValue.Array(assets1.Select(x => x.ToString()).ToArray())))
+                                .AddLocalized("iv", JsonValue.Array(assets1.Select(x => x.ToString()))))
                         .AddField("asset2",
                             new ContentFieldData()
-                                .AddJsonValue("en", JsonValue.Array(assets2.Select(x => x.ToString()).ToArray()))),
+                                .AddLocalized("en", JsonValue.Array(assets2.Select(x => x.ToString())))),
                 SchemaId = schemaId
             };
         }

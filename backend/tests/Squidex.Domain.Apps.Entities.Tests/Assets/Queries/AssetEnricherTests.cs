@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private readonly IAssetMetadataSource assetMetadataSource1 = A.Fake<IAssetMetadataSource>();
         private readonly IAssetMetadataSource assetMetadataSource2 = A.Fake<IAssetMetadataSource>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly Context requestContext;
         private readonly AssetEnricher sut;
 
         public AssetEnricherTests()
@@ -34,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 assetMetadataSource1,
                 assetMetadataSource2
             };
+
+            requestContext = Context.Anonymous(Mocks.App(appId));
 
             sut = new AssetEnricher(tagService, assetMetadataSources, requestCache);
         }
@@ -97,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            var result = await sut.EnrichAsync(source, requestContext.Clone().WithoutAssetEnrichment());
+            var result = await sut.EnrichAsync(source, requestContext.Clone(b => b.WithoutAssetEnrichment()));
 
             Assert.Null(result.TagNames);
         }

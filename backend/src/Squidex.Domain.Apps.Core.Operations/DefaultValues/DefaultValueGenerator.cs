@@ -28,13 +28,13 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             this.partitionResolver = partitionResolver;
         }
 
-        public void Enrich(NamedContentData data)
+        public void Enrich(ContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
             foreach (var field in schema.Fields)
             {
-                var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
+                var fieldData = data.GetOrCreate(field.Name, _ => new ContentFieldData());
 
                 if (fieldData != null)
                 {
@@ -64,15 +64,10 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
                 return;
             }
 
-            if (!fieldData.TryGetValue(partitionKey, out var value) || ShouldApplyDefaultValue(field, value))
+            if (!fieldData.ContainsKey(partitionKey))
             {
-                fieldData.AddJsonValue(partitionKey, defaultValue);
+                fieldData.AddLocalized(partitionKey, defaultValue);
             }
-        }
-
-        private static bool ShouldApplyDefaultValue(IField field, IJsonValue value)
-        {
-            return value.Type == JsonValueType.Null || (field is IField<StringFieldProperties> && value is JsonString s && string.IsNullOrEmpty(s.Value));
         }
     }
 }

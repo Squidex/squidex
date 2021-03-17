@@ -52,33 +52,35 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.FromResult(Status.Draft);
         }
 
-        public Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
-        {
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal user)
+        public Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
         {
             var result = Flow.TryGetValue(status, out var step) && step.Transitions.Any(x => x.Status == next);
 
             return Task.FromResult(result);
         }
 
-        public Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal user)
+        public Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
+        {
+            var result = Flow.TryGetValue(status, out var step) && step.Transitions.Any(x => x.Status == next);
+
+            return Task.FromResult(result);
+        }
+
+        public Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
         {
             var result = status != Status.Archived;
 
             return Task.FromResult(result);
         }
 
-        public Task<StatusInfo> GetInfoAsync(IContentEntity content, Status status)
+        public Task<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
         {
-            var result = Flow[status].Info;
+            var result = Flow.GetValueOrDefault(status).Info;
 
-            return Task.FromResult(result);
+            return Task.FromResult<StatusInfo?>(result);
         }
 
-        public Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal user)
+        public Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
         {
             var result = Flow.TryGetValue(status, out var step) ? step.Transitions : Array.Empty<StatusInfo>();
 

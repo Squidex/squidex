@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure;
 
@@ -18,20 +17,18 @@ namespace Squidex.Areas.IdentityServer.Controllers.Error
     public sealed class ErrorController : IdentityServerController
     {
         private readonly IIdentityServerInteractionService interaction;
-        private readonly SignInManager<IdentityUser> signInManager;
 
-        public ErrorController(IIdentityServerInteractionService interaction, SignInManager<IdentityUser> signInManager)
+        public ErrorController(IIdentityServerInteractionService interaction)
         {
             this.interaction = interaction;
-            this.signInManager = signInManager;
         }
 
         [Route("error/")]
         public async Task<IActionResult> Error(string? errorId = null)
         {
-            await signInManager.SignOutAsync();
+            await SignInManager.SignOutAsync();
 
-            var vm = new ErrorViewModel();
+            var vm = new ErrorVM();
 
             if (!string.IsNullOrWhiteSpace(errorId))
             {

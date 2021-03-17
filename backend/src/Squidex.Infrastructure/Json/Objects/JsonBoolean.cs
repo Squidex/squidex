@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public override JsonValueType Type
         {
-            get { return JsonValueType.Boolean; }
+            get => JsonValueType.Boolean;
         }
 
         private JsonBoolean(bool value)

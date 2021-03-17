@@ -80,10 +80,5 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
                 await Collection.BulkWriteAsync(writes);
             }
         }
-
-        public Task RemoveAsync(DomainId appId)
-        {
-            return Collection.DeleteManyAsync(x => x.AppId == appId);
-        }
     }
 }

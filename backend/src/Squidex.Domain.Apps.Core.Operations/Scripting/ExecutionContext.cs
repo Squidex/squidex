@@ -15,26 +15,19 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public delegate bool ExceptionHandler(Exception exception);
-
-    public sealed class ExecutionContext : Dictionary<string, object>
+    public sealed class ExecutionContext : ScriptContext
     {
-        private readonly ExceptionHandler? exceptionHandler;
+        private Func<Exception, bool>? completion;
 
         public Engine Engine { get; }
 
-        public CancellationToken CancellationToken { get; }
+        public CancellationToken CancellationToken { get; private set; }
 
         public bool IsAsync { get; private set; }
 
-        internal ExecutionContext(Engine engine, CancellationToken cancellationToken, ExceptionHandler? exceptionHandler = null)
-            : base(StringComparer.OrdinalIgnoreCase)
+        internal ExecutionContext(Engine engine)
         {
             Engine = engine;
-
-            CancellationToken = cancellationToken;
-
-            this.exceptionHandler = exceptionHandler;
         }
 
         public void MarkAsync()
@@ -44,10 +37,34 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public void Fail(Exception exception)
         {
-            exceptionHandler?.Invoke(exception);
+            completion?.Invoke(exception);
         }
 
-        public void AddVariables(ScriptVars vars, ScriptOptions options)
+        public ExecutionContext ExtendAsync(IEnumerable<IJintExtension> extensions, Func<Exception, bool> completion, CancellationToken ct)
+        {
+            CancellationToken = ct;
+
+            this.completion = completion;
+
+            foreach (var extension in extensions)
+            {
+                extension.ExtendAsync(this);
+            }
+
+            return this;
+        }
+
+        public ExecutionContext Extend(IEnumerable<IJintExtension> extensions)
+        {
+            foreach (var extension in extensions)
+            {
+                extension.Extend(this);
+            }
+
+            return this;
+        }
+
+        public ExecutionContext Extend(ScriptVars vars, ScriptOptions options)
         {
             var engine = Engine;
 
@@ -86,6 +103,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
 
             engine.SetValue("async", true);
+
+            return this;
         }
     }
 }

@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -35,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
         private readonly IMongoDatabase mongoDatabase;
 
-        public IContentRepository ContentRepository { get; }
+        public MongoContentRepository ContentRepository { get; }
 
         public NamedId<DomainId>[] AppIds { get; } =
         {
@@ -58,91 +57,96 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             SetupJson();
 
-            var contentRepository =
+            var appProvider = CreateAppProvider();
+
+            ContentRepository =
                 new MongoContentRepository(
                     mongoDatabase,
-                    CreateAppProvider(),
-                    TestUtils.DefaultSerializer);
+                    appProvider, false);
 
             Task.Run(async () =>
             {
-                await contentRepository.InitializeAsync();
-
-                await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }");
-                await mongoDatabase.DropCollectionAsync("system.profile");
-
-                var collections = contentRepository.GetInternalCollections();
-
-                foreach (var collection in collections)
-                {
-                    var contentCount = await collection.Find(new BsonDocument()).CountDocumentsAsync();
-
-                    if (contentCount == 0)
-                    {
-                        var batch = new List<MongoContentEntity>();
-
-                        async Task ExecuteBatchAsync(MongoContentEntity? entity)
-                        {
-                            if (entity != null)
-                            {
-                                batch.Add(entity);
-                            }
-
-                            if ((entity == null || batch.Count >= 1000) && batch.Count > 0)
-                            {
-                                await collection.InsertManyAsync(batch);
-
-                                batch.Clear();
-                            }
-                        }
-
-                        foreach (var appId in AppIds)
-                        {
-                            foreach (var schemaId in SchemaIds)
-                            {
-                                for (var i = 0; i < numValues; i++)
-                                {
-                                    var data =
-                                        new IdContentData()
-                                            .AddField(1,
-                                                new ContentFieldData()
-                                                    .AddJsonValue(JsonValue.Create(i)))
-                                            .AddField(2,
-                                                new ContentFieldData()
-                                                    .AddJsonValue(JsonValue.Create(Lorem.Paragraph(200, 20))));
-
-                                    var content = new MongoContentEntity
-                                    {
-                                        DocumentId = DomainId.NewGuid(),
-                                        AppId = appId,
-                                        DataByIds = data,
-                                        IndexedAppId = appId.Id,
-                                        IndexedSchemaId = schemaId.Id,
-                                        IsDeleted = false,
-                                        SchemaId = schemaId,
-                                        Status = Status.Published
-                                    };
-
-                                    await ExecuteBatchAsync(content);
-                                }
-                            }
-                        }
-
-                        await ExecuteBatchAsync(null);
-                    }
-                }
-
-                await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 2 }");
+                await Task.WhenAll(
+                    SetupAsync(ContentRepository, mongoDatabase));
             }).Wait();
+        }
 
-            ContentRepository = contentRepository;
+        private async Task SetupAsync(MongoContentRepository contentRepository, IMongoDatabase database)
+        {
+            await contentRepository.InitializeAsync();
+
+            await database.RunCommandAsync<BsonDocument>("{ profile : 0 }");
+            await database.DropCollectionAsync("system.profile");
+
+            var collections = contentRepository.GetInternalCollections();
+
+            foreach (var collection in collections)
+            {
+                var contentCount = await collection.Find(new BsonDocument()).CountDocumentsAsync();
+
+                if (contentCount == 0)
+                {
+                    var batch = new List<MongoContentEntity>();
+
+                    async Task ExecuteBatchAsync(MongoContentEntity? entity)
+                    {
+                        if (entity != null)
+                        {
+                            batch.Add(entity);
+                        }
+
+                        if ((entity == null || batch.Count >= 1000) && batch.Count > 0)
+                        {
+                            await collection.InsertManyAsync(batch);
+
+                            batch.Clear();
+                        }
+                    }
+
+                    foreach (var appId in AppIds)
+                    {
+                        foreach (var schemaId in SchemaIds)
+                        {
+                            for (var i = 0; i < numValues; i++)
+                            {
+                                var data =
+                                    new ContentData()
+                                        .AddField("field1",
+                                            new ContentFieldData()
+                                                .AddInvariant(JsonValue.Create(i)))
+                                        .AddField("field2",
+                                            new ContentFieldData()
+                                                .AddInvariant(JsonValue.Create(Lorem.Paragraph(200, 20))));
+
+                                var content = new MongoContentEntity
+                                {
+                                    DocumentId = DomainId.NewGuid(),
+                                    AppId = appId,
+                                    Data = data,
+                                    IndexedAppId = appId.Id,
+                                    IndexedSchemaId = schemaId.Id,
+                                    IsDeleted = false,
+                                    SchemaId = schemaId,
+                                    Status = Status.Published
+                                };
+
+                                await ExecuteBatchAsync(content);
+                            }
+                        }
+                    }
+
+                    await ExecuteBatchAsync(null);
+                }
+            }
+
+            await database.RunCommandAsync<BsonDocument>("{ profile : 2 }");
         }
 
         private static IAppProvider CreateAppProvider()
         {
             var appProvider = A.Fake<IAppProvider>();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false))
                 .ReturnsLazily(x => Task.FromResult<ISchemaEntity?>(CreateSchema(x.GetArgument<DomainId>(0)!, x.GetArgument<DomainId>(1)!)));
 
             return appProvider;

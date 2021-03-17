@@ -37,11 +37,6 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
             return field.Accept(Instance, args);
         }
 
-        public IEdmTypeReference? CreateEdmType(IField field, Args args)
-        {
-            return field.Accept(this, args);
-        }
-
         public IEdmTypeReference? Visit(IArrayField field, Args args)
         {
             var (fieldEdmType, created) = args.Factory($"Data.{field.Name.ToPascalCase()}.Item");

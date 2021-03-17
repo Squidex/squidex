@@ -41,7 +41,7 @@ namespace Squidex.Extensions.Actions.Comment
 
                 if (!string.IsNullOrEmpty(action.Client))
                 {
-                    ruleJob.Actor = new RefToken(RefTokenType.Client, action.Client);
+                    ruleJob.Actor = RefToken.Client(action.Client);
                 }
                 else
                 {

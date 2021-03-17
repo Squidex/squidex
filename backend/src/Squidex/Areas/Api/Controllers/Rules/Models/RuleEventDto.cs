@@ -80,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
             AddPutLink("update", resources.Url<RulesController>(x => nameof(x.PutEvent), values));
 
-            if (NextAttempt.HasValue)
+            if (NextAttempt != null)
             {
                 AddDeleteLink("delete", resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));
             }

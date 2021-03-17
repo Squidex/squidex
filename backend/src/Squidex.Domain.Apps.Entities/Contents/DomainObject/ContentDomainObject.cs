@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -23,7 +24,7 @@ using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 {
-    public sealed partial class ContentDomainObject : LogSnapshotDomainObject<ContentDomainObject.State>
+    public sealed partial class ContentDomainObject : DomainObject<ContentDomainObject.State>
     {
         private readonly ContentOperationContext context;
 
@@ -34,6 +35,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Guard.NotNull(context, nameof(context));
 
             this.context = context;
+
+            Capacity = int.MaxValue;
+        }
+
+        private Task LoadContext(ContentCommand command, bool optimize)
+        {
+            return context.LoadAsync(command.AppId, command.SchemaId, command, optimize);
         }
 
         protected override bool IsDeleted()
@@ -43,7 +51,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         protected override bool CanAcceptCreation(ICommand command)
         {
-            return command is CreateContent;
+            return command is CreateContent || command is UpsertContent;
+        }
+
+        protected override bool CanRecreate()
+        {
+            return true;
         }
 
         protected override bool CanAccept(ICommand command)
@@ -54,90 +67,68 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 Equals(contentCommand.ContentId, Snapshot.Id);
         }
 
-        public override Task<object?> ExecuteAsync(IAggregateCommand command)
+        public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
-                case UpsertContent uspertContent:
-                    {
-                        if (Version > EtagVersion.Empty)
-                        {
-                            var updateContent = SimpleMapper.Map(uspertContent, new UpdateContent());
-
-                            return ExecuteAsync(updateContent);
-                        }
-                        else
-                        {
-                            var createContent = SimpleMapper.Map(uspertContent, new CreateContent());
-
-                            return ExecuteAsync(createContent);
-                        }
-                    }
-
-                case CreateContent createContent:
-                    return CreateReturnAsync(createContent, async c =>
+                case UpsertContent upsertContent:
+                    return UpsertReturnAsync(upsertContent, async c =>
                     {
                         await LoadContext(c, c.OptimizeValidation);
 
-                        await GuardContent.CanCreate(c, context.Workflow, context.Schema);
-
-                        var status = await context.GetInitialStatusAsync();
-
-                        if (!c.DoNotValidate)
+                        if (Version > EtagVersion.Empty && !IsDeleted())
                         {
-                            await context.ValidateInputAsync(c.Data, createContent.Publish);
+                            await UpdateCore(c.AsUpdate(), x => c.Data, false);
+                        }
+                        else
+                        {
+                            await CreateCore(c.AsCreate());
                         }
 
-                        if (!c.DoNotScript)
+                        if (Is.OptionalChange(Snapshot.EditingStatus, c.Status))
                         {
-                            c.Data = await context.ExecuteScriptAndTransformAsync(s => s.Create,
-                                new ScriptVars
-                                {
-                                    Operation = "Create",
-                                    Data = c.Data,
-                                    Status = status,
-                                    StatusOld = default
-                                });
+                            await ChangeCore(c.AsChange(c.Status.Value));
                         }
-
-                        await context.GenerateDefaultValuesAsync(c.Data);
-
-                        if (!c.DoNotValidate)
-                        {
-                            await context.ValidateContentAsync(c.Data);
-                        }
-
-                        if (!c.DoNotScript && c.Publish)
-                        {
-                            c.Data = await context.ExecuteScriptAndTransformAsync(s => s.Change,
-                                new ScriptVars
-                                {
-                                    Operation = "Published",
-                                    Data = c.Data,
-                                    Status = Status.Published,
-                                    StatusOld = default
-                                });
-                        }
-
-                        Create(c, status);
 
                         return Snapshot;
                     });
 
-                case ValidateContent validateContent:
-                    return UpdateReturnAsync(validateContent, async c =>
+                case CreateContent createContent:
+                    return CreateReturnAsync(createContent, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, false);
+
+                        await CreateCore(c);
+
+                        // Skip validation for singleton contents because it is published from command middleware.
+                        if (context.Schema.SchemaDef.IsSingleton)
+                        {
+                            ChangeStatus(c.AsChange(Status.Published));
+                        }
+                        else if (Is.OptionalChange(Snapshot.EditingStatus, c.Status))
+                        {
+                            await ChangeCore(c.AsChange(c.Status.Value));
+                        }
+
+                        return Snapshot;
+                    });
+
+                case ValidateContent validate:
+                    return UpdateReturnAsync(validate, async c =>
+                    {
+                        await LoadContext(c, false);
+
+                        GuardContent.CanValidate(c, Snapshot);
 
                         await context.ValidateContentAndInputAsync(Snapshot.Data);
 
                         return true;
                     });
 
-                case CreateContentDraft createContentDraft:
-                    return UpdateReturnAsync(createContentDraft, async c =>
+                case CreateContentDraft createDraft:
+                    return UpdateReturnAsync(createDraft, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, false);
 
                         GuardContent.CanCreateDraft(c, Snapshot);
 
@@ -148,10 +139,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return Snapshot;
                     });
 
-                case DeleteContentDraft deleteContentDraft:
-                    return UpdateReturnAsync(deleteContentDraft, async c =>
+                case DeleteContentDraft deleteDraft:
+                    return UpdateReturnAsync(deleteDraft, async c =>
                     {
-                        await LoadContext(c);
+                        await LoadContext(c, false);
 
                         GuardContent.CanDeleteDraft(c, Snapshot);
 
@@ -160,20 +151,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return Snapshot;
                     });
 
-                case UpdateContent updateContent:
-                    return UpdateReturnAsync(updateContent, async c =>
-                    {
-                        await GuardContent.CanUpdate(c, Snapshot, context.Workflow);
-
-                        return await UpdateAsync(c, x => c.Data, false);
-                    });
-
                 case PatchContent patchContent:
                     return UpdateReturnAsync(patchContent, async c =>
                     {
-                        await GuardContent.CanPatch(c, Snapshot, context.Workflow);
+                        await LoadContext(c, c.OptimizeValidation);
 
-                        return await UpdateAsync(c, c.Data.MergeInto, true);
+                        await UpdateCore(c, c.Data.MergeInto, true);
+
+                        return Snapshot;
+                    });
+
+                case UpdateContent updateContent:
+                    return UpdateReturnAsync(updateContent, async c =>
+                    {
+                        await LoadContext(c, c.OptimizeValidation);
+
+                        await UpdateCore(c, x => c.Data, false);
+
+                        return Snapshot;
                     });
 
                 case ChangeContentStatus changeContentStatus:
@@ -181,45 +176,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         try
                         {
-                            await LoadContext(c);
+                            await LoadContext(c, c.OptimizeValidation);
 
-                            await GuardContent.CanChangeStatus(c, Snapshot, context.Workflow, context.Repository, context.Schema);
-
-                            if (c.DueTime.HasValue)
+                            if (c.DueTime > SystemClock.Instance.GetCurrentInstant())
                             {
-                                ScheduleStatus(c, c.DueTime.Value);
+                                ChangeStatusScheduled(c, c.DueTime.Value);
                             }
                             else
                             {
-                                var change = GetChange(c.Status);
-
-                                if (!c.DoNotScript && context.HasScript(c => c.Change))
-                                {
-                                    var data = Snapshot.Data.Clone();
-
-                                    var newData = await context.ExecuteScriptAndTransformAsync(s => s.Change,
-                                        new ScriptVars
-                                        {
-                                            Operation = change.ToString(),
-                                            Data = data,
-                                            Status = c.Status,
-                                            StatusOld = Snapshot.EditingStatus
-                                        });
-
-                                    if (!newData.Equals(Snapshot.Data))
-                                    {
-                                        var command = SimpleMapper.Map(c, new UpdateContent { Data = newData });
-
-                                        Update(command, newData);
-                                    }
-                                }
-
-                                if (!c.DoNotValidate && change == StatusChange.Published)
-                                {
-                                    await context.ValidateOnPublishAsync(Snapshot.Data);
-                                }
-
-                                ChangeStatus(c, change);
+                                await ChangeCore(c);
                             }
                         }
                         catch (Exception)
@@ -237,26 +202,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return Snapshot;
                     });
 
+                case DeleteContent deleteContent when (deleteContent.Permanent):
+                    return DeletePermanentAsync(deleteContent, async c =>
+                    {
+                        await DeleteCore(c);
+                    });
+
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        await LoadContext(c);
-
-                        await GuardContent.CanDelete(c, Snapshot, context.Repository, context.Schema);
-
-                        if (!c.DoNotScript)
-                        {
-                            await context.ExecuteScriptAsync(s => s.Delete,
-                                new ScriptVars
-                                {
-                                    Operation = "Delete",
-                                    Data = Snapshot.Data,
-                                    Status = Snapshot.EditingStatus,
-                                    StatusOld = default
-                                });
-                        }
-
-                        Delete(c);
+                        await DeleteCore(c);
                     });
 
                 default:
@@ -264,107 +219,198 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
         }
 
-        private async Task<object> UpdateAsync(ContentUpdateCommand command, Func<NamedContentData, NamedContentData> newDataFunc, bool partial)
+        private async Task CreateCore(CreateContent c)
         {
-            var currentData = Snapshot.Data;
+            var status = await context.GetInitialStatusAsync();
 
-            var newData = newDataFunc(currentData!);
+            GuardContent.CanCreate(c, context.Schema);
 
-            if (!currentData!.Equals(newData))
+            var dataNew = c.Data;
+
+            if (!c.DoNotValidate)
             {
-                await LoadContext(command, command.OptimizeValidation);
-
-                if (!command.DoNotValidate)
-                {
-                    if (partial)
-                    {
-                        await context.ValidateInputPartialAsync(command.Data);
-                    }
-                    else
-                    {
-                        await context.ValidateInputAsync(command.Data, false);
-                    }
-                }
-
-                if (!command.DoNotScript)
-                {
-                    newData = await context.ExecuteScriptAndTransformAsync(s => s.Update,
-                        new ScriptVars
-                        {
-                            Operation = "Create",
-                            Data = newData,
-                            DataOld = currentData,
-                            Status = Snapshot.EditingStatus,
-                            StatusOld = default
-                        });
-                }
-
-                if (!command.DoNotValidate)
-                {
-                    await context.ValidateContentAsync(newData);
-                }
-
-                Update(command, newData);
+                await context.ValidateInputAsync(dataNew);
             }
 
-            return Snapshot;
-        }
-
-        public void Create(CreateContent command, Status status)
-        {
-            Raise(command, new ContentCreated { Status = status });
-
-            if (command.Publish)
+            if (!c.DoNotScript)
             {
-                var published = Status.Published;
-
-                Raise(command, new ContentStatusChanged { Status = published, Change = GetChange(published) });
+                dataNew = await context.ExecuteScriptAndTransformAsync(s => s.Create,
+                    new ScriptVars
+                    {
+                        Operation = "Create",
+                        Data = dataNew,
+                        Status = status,
+                        StatusOld = default
+                    });
             }
+
+            await context.GenerateDefaultValuesAsync(dataNew);
+
+            if (!c.DoNotValidate)
+            {
+                await context.ValidateContentAsync(dataNew);
+            }
+
+            Create(c, dataNew, status);
         }
 
-        public void CreateDraft(CreateContentDraft command, Status status)
+        private async Task ChangeCore(ChangeContentStatus c)
         {
-            Raise(command, new ContentDraftCreated { Status = status });
+            await GuardContent.CanChangeStatus(c, Snapshot, context.Workflow, context.Repository, context.Schema);
+
+            if (c.Status == Snapshot.EditingStatus)
+            {
+                return;
+            }
+
+            // Check for script to skip cloning if no script configured.
+            if (!c.DoNotScript && context.HasScript(c => c.Change))
+            {
+                var change = GetChange(c.Status);
+
+                // Clone the data, so that we do not change it in cases of errors.
+                var data = Snapshot.Data.Clone();
+
+                var newData = await context.ExecuteScriptAndTransformAsync(s => s.Change,
+                    new ScriptVars
+                    {
+                        Operation = change.ToString(),
+                        Data = data,
+                        Status = c.Status,
+                        StatusOld = Snapshot.EditingStatus
+                    });
+
+                // Just update the previous data event to improve performance and add less events.
+                var previousEvent =
+                    GetUncomittedEvents().Select(x => x.Payload)
+                        .OfType<ContentDataCommand>().FirstOrDefault();
+
+                if (previousEvent != null)
+                {
+                    previousEvent.Data = newData;
+                }
+                else if (!newData.Equals(Snapshot.Data))
+                {
+                    Update(c, newData);
+                }
+            }
+
+            if (!c.DoNotValidate && c.Status == Status.Published)
+            {
+                await context.ValidateOnPublishAsync(Snapshot.Data);
+            }
+
+            ChangeStatus(c);
         }
 
-        public void Delete(DeleteContent command)
+        private async Task UpdateCore(UpdateContent c, Func<ContentData, ContentData> update, bool partial)
         {
-            Raise(command, new ContentDeleted());
+            await GuardContent.CanUpdate(c, Snapshot, context.Workflow);
+
+            var newData = update(Snapshot.Data);
+
+            if (newData.Equals(Snapshot.Data))
+            {
+                return;
+            }
+
+            if (!c.DoNotValidate)
+            {
+                if (partial)
+                {
+                    await context.ValidateInputPartialAsync(c.Data);
+                }
+                else
+                {
+                    await context.ValidateInputAsync(c.Data);
+                }
+            }
+
+            if (!c.DoNotScript)
+            {
+                newData = await context.ExecuteScriptAndTransformAsync(s => s.Update,
+                    new ScriptVars
+                    {
+                        Operation = "Update",
+                        Data = newData,
+                        DataOld = Snapshot.Data,
+                        Status = Snapshot.EditingStatus,
+                        StatusOld = default
+                    });
+            }
+
+            if (!c.DoNotValidate)
+            {
+                await context.ValidateContentAsync(newData);
+            }
+
+            Update(c, newData);
         }
 
-        public void DeleteDraft(DeleteContentDraft command)
+        private async Task DeleteCore(DeleteContent c)
         {
-            Raise(command, new ContentDraftDeleted());
+            await LoadContext(c, false);
+
+            await GuardContent.CanDelete(c, Snapshot, context.Repository, context.Schema);
+
+            if (!c.DoNotScript)
+            {
+                await context.ExecuteScriptAsync(s => s.Delete,
+                    new ScriptVars
+                    {
+                        Operation = "Delete",
+                        Data = Snapshot.Data,
+                        Status = Snapshot.EditingStatus,
+                        StatusOld = default
+                    });
+            }
+
+            Delete(c);
         }
 
-        public void Update(ContentCommand command, NamedContentData data)
+        private void Create(CreateContent command, ContentData data, Status status)
+        {
+            Raise(command, new ContentCreated { Data = data, Status = status });
+        }
+
+        private void Update(ContentCommand command, ContentData data)
         {
             Raise(command, new ContentUpdated { Data = data });
         }
 
-        public void ChangeStatus(ChangeContentStatus command, StatusChange change)
+        private void ChangeStatus(ChangeContentStatus command)
         {
-            Raise(command, new ContentStatusChanged { Change = change });
+            Raise(command, new ContentStatusChanged { Change = GetChange(command.Status) });
         }
 
-        public void CancelChangeStatus(ChangeContentStatus command)
-        {
-            Raise(command, new ContentSchedulingCancelled());
-        }
-
-        public void ScheduleStatus(ChangeContentStatus command, Instant dueTime)
+        private void ChangeStatusScheduled(ChangeContentStatus command, Instant dueTime)
         {
             Raise(command, new ContentStatusScheduled { DueTime = dueTime });
         }
 
-        private void Raise<T, TEvent>(T command, TEvent @event) where TEvent : SchemaEvent where T : class
+        private void CancelChangeStatus(ChangeContentStatus command)
         {
-            SimpleMapper.Map(command, @event);
+            Raise(command, new ContentSchedulingCancelled());
+        }
 
-            @event.AppId ??= Snapshot.AppId;
-            @event.SchemaId ??= Snapshot.SchemaId;
+        private void CreateDraft(CreateContentDraft command, Status status)
+        {
+            Raise(command, new ContentDraftCreated { Status = status });
+        }
 
-            RaiseEvent(Envelope.Create(@event));
+        private void Delete(DeleteContent command)
+        {
+            Raise(command, new ContentDeleted());
+        }
+
+        private void DeleteDraft(DeleteContentDraft command)
+        {
+            Raise(command, new ContentDraftDeleted());
+        }
+
+        private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
+        {
+            RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
         }
 
         private StatusChange GetChange(Status status)
@@ -381,16 +427,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             {
                 return StatusChange.Change;
             }
-        }
-
-        private Task LoadContext(ContentCommand command, bool optimized = false)
-        {
-            return context.LoadAsync(Snapshot.AppId, Snapshot.SchemaId, command, optimized);
-        }
-
-        private Task LoadContext(CreateContent command, bool optimized = false)
-        {
-            return context.LoadAsync(command.AppId, command.SchemaId, command, optimized);
         }
     }
 }

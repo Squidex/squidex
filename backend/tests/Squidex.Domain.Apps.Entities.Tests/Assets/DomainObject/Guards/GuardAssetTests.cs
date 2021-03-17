@@ -26,34 +26,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
 
         [Fact]
-        public async Task CanCreate_should_not_throw_exception_when_folder_found()
-        {
-            var command = new CreateAsset { AppId = appId, ParentId = DomainId.NewGuid() };
-
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
-                .Returns(new List<IAssetFolderEntity> { AssetFolder() });
-
-            await GuardAsset.CanCreate(command, assetQuery);
-        }
-
-        [Fact]
-        public async Task CanCreate_should_throw_exception_when_folder_not_found()
-        {
-            var command = new CreateAsset { AppId = appId, ParentId = DomainId.NewGuid() };
-
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
-                .Returns(new List<IAssetFolderEntity>());
-
-            await ValidationAssert.ThrowsAsync(() => GuardAsset.CanCreate(command, assetQuery),
-                new ValidationError("Asset folder does not exist.", "ParentId"));
-        }
-
-        [Fact]
-        public async Task CanCreate_should_not_throw_exception_when_added_to_root()
+        public void CanCreate_should_not_throw_exception_when_added_to_root()
         {
             var command = new CreateAsset { AppId = appId };
 
-            await GuardAsset.CanCreate(command, assetQuery);
+            GuardAsset.CanCreate(command);
         }
 
         [Fact]

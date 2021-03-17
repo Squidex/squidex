@@ -9,7 +9,7 @@ assignees: ''
 
 Do NOT USE issues for 
 
-* Bug Reports
+* Bug reports
 * Hosting Questions
 * Feature Requests
 * anything that is not related to development.

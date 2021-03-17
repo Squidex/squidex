@@ -18,11 +18,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Domain.Users;
-using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
-using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -31,27 +29,18 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     public sealed class AccountController : IdentityServerController
     {
-        private readonly SignInManager<IdentityUser> signInManager;
         private readonly IUserService userService;
-        private readonly IUrlGenerator urlGenerator;
         private readonly MyIdentityOptions identityOptions;
-        private readonly ISemanticLog log;
         private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
-            SignInManager<IdentityUser> signInManager,
             IUserService userService,
-            IUrlGenerator urlGenerator,
             IOptions<MyIdentityOptions> identityOptions,
-            ISemanticLog log,
             IIdentityServerInteractionService interactions)
         {
             this.identityOptions = identityOptions.Value;
             this.interactions = interactions;
-            this.signInManager = signInManager;
-            this.urlGenerator = urlGenerator;
             this.userService = userService;
-            this.log = log;
         }
 
         [HttpGet]
@@ -139,7 +128,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/logout/")]
         public async Task<IActionResult> Logout(string logoutId)
         {
-            await signInManager.SignOutAsync();
+            await SignInManager.SignOutAsync();
 
             if (User.Identity?.IsAuthenticated == true)
             {
@@ -165,7 +154,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/logout-redirect/")]
         public async Task<IActionResult> LogoutRedirect()
         {
-            await signInManager.SignOutAsync();
+            await SignInManager.SignOutAsync();
 
             return RedirectToAction(nameof(LogoutCompleted));
         }
@@ -194,7 +183,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 return await LoginViewAsync(returnUrl, true, true);
             }
 
-            var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, true, true);
+            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, true, true);
 
             if (!result.Succeeded && result.IsLockedOut)
             {
@@ -214,14 +203,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         {
             var allowPasswordAuth = identityOptions.AllowPasswordAuth;
 
-            var externalProviders = await signInManager.GetExternalProvidersAsync();
+            var externalProviders = await SignInManager.GetExternalProvidersAsync();
 
             if (externalProviders.Count == 1 && !allowPasswordAuth)
             {
                 var provider = externalProviders[0].AuthenticationScheme;
 
                 var properties =
-                    signInManager.ConfigureExternalAuthenticationProperties(provider,
+                    SignInManager.ConfigureExternalAuthenticationProperties(provider,
                         Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
 
                 return Challenge(properties, provider);
@@ -230,10 +219,9 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             var vm = new LoginVM
             {
                 ExternalProviders = externalProviders,
-                IsLogin = isLogin,
                 IsFailed = isFailed,
+                IsLogin = isLogin,
                 HasPasswordAuth = allowPasswordAuth,
-                HasPasswordAndExternal = allowPasswordAuth && externalProviders.Any(),
                 ReturnUrl = returnUrl
             };
 
@@ -245,7 +233,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         public IActionResult External(string provider, string? returnUrl = null)
         {
             var properties =
-                signInManager.ConfigureExternalAuthenticationProperties(provider,
+                SignInManager.ConfigureExternalAuthenticationProperties(provider,
                     Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
 
             return Challenge(properties, provider);
@@ -255,14 +243,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/external-callback/")]
         public async Task<IActionResult> ExternalCallback(string? returnUrl = null)
         {
-            var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync();
+            var externalLogin = await SignInManager.GetExternalLoginInfoWithDisplayNameAsync();
 
             if (externalLogin == null)
             {
                 return RedirectToAction(nameof(Login));
             }
 
-            var result = await signInManager.ExternalLoginSignInAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, true);
+            var result = await SignInManager.ExternalLoginSignInAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, true);
 
             if (!result.Succeeded && result.IsLockedOut)
             {
@@ -349,7 +337,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         private async Task<(bool Success, bool Locked)> LoginAsync(UserLoginInfo externalLogin)
         {
-            var result = await signInManager.ExternalLoginSignInAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, true);
+            var result = await SignInManager.ExternalLoginSignInAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, true);
 
             return (result.Succeeded, result.IsLockedOut);
         }
@@ -359,18 +347,6 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             if (!string.IsNullOrWhiteSpace(context.PostLogoutRedirectUri))
             {
                 return Redirect(context.PostLogoutRedirectUri);
-            }
-            else
-            {
-                return Redirect("~/../");
-            }
-        }
-
-        private IActionResult RedirectToReturnUrl(string? returnUrl)
-        {
-            if (urlGenerator.IsAllowedHost(returnUrl) || interactions.IsValidReturnUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
             }
             else
             {

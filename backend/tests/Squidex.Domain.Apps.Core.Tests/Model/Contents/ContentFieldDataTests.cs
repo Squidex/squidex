@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var fieldData =
                 new ContentFieldData()
-                    .AddValue(12);
+                    .AddInvariant(12);
 
             var serialized = fieldData.SerializeAndDeserialize();
 
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var fieldData =
                 new ContentFieldData()
-                    .AddValue(12);
+                    .AddInvariant(12);
 
             var serialized = fieldData.SerializeAndDeserialize();
 
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var fieldData =
                 new ContentFieldData()
-                    .AddValue("en", 12);
+                    .AddLocalized("en", 12);
 
             var serialized = fieldData.SerializeAndDeserialize();
 
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var fieldData =
                 new ContentFieldData()
-                    .AddValue(Guid.NewGuid().ToString(), 12);
+                    .AddLocalized(Guid.NewGuid().ToString(), 12);
 
             var serialized = fieldData.SerializeAndDeserialize();
 

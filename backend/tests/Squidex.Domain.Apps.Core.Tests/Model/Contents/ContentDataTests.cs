@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents
@@ -14,60 +13,16 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
     public class ContentDataTests
     {
         [Fact]
-        public void Should_remove_null_values_from_name_model_when_cleaning()
-        {
-            var input =
-                new NamedContentData()
-                    .AddField("field1", null)
-                    .AddField("field2",
-                        new ContentFieldData()
-                            .AddValue("en", 2)
-                            .AddValue("it", JsonValue.Null));
-
-            var actual = input.ToCleaned();
-
-            var expected =
-                new NamedContentData()
-                    .AddField("field2",
-                        new ContentFieldData()
-                            .AddValue("en", 2));
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_remove_null_values_from_id_model_when_cleaning()
-        {
-            var input =
-                new IdContentData()
-                    .AddField(1, null)
-                    .AddField(2,
-                        new ContentFieldData()
-                            .AddValue("en", 2)
-                            .AddValue("it", null));
-
-            var actual = input.ToCleaned();
-
-            var expected =
-                new IdContentData()
-                    .AddField(2,
-                        new ContentFieldData()
-                            .AddValue("en", 2));
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
         public void Should_return_same_content_if_merging_same_references()
         {
             var source =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 1))
+                            .AddInvariant(1))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("de", 2));
+                            .AddLocalized("de", 2));
 
             var actual = source.MergeInto(source);
 
@@ -78,82 +33,38 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         public void Should_merge_two_name_models()
         {
             var lhs =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 1))
+                            .AddInvariant(1))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("de", 2)
-                            .AddValue("it", 2));
+                            .AddLocalized("de", 2)
+                            .AddLocalized("it", 2));
 
             var rhs =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("it", 3)
-                            .AddValue("en", 3))
+                            .AddLocalized("it", 3)
+                            .AddLocalized("en", 3))
                     .AddField("field3",
                         new ContentFieldData()
-                            .AddValue("iv", 4));
+                            .AddInvariant(4));
 
             var expected =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 1))
+                            .AddInvariant(1))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("it", 2)
-                            .AddValue("de", 2)
-                            .AddValue("en", 3))
+                            .AddLocalized("it", 2)
+                            .AddLocalized("de", 2)
+                            .AddLocalized("en", 3))
                     .AddField("field3",
                         new ContentFieldData()
-                            .AddValue("iv", 4));
-
-            var actual = lhs.MergeInto(rhs);
-
-            Assert.Equal(expected, actual);
-            Assert.NotSame(expected, rhs);
-            Assert.NotSame(expected, lhs);
-        }
-
-        [Fact]
-        public void Should_merge_two_id_models()
-        {
-            var lhs =
-                new IdContentData()
-                    .AddField(1,
-                        new ContentFieldData()
-                            .AddValue("iv", 1))
-                    .AddField(2,
-                        new ContentFieldData()
-                            .AddValue("de", 2)
-                            .AddValue("it", 2));
-
-            var rhs =
-                new IdContentData()
-                    .AddField(2,
-                        new ContentFieldData()
-                            .AddValue("it", 3)
-                            .AddValue("en", 3))
-                    .AddField(3,
-                        new ContentFieldData()
-                            .AddValue("iv", 4));
-
-            var expected =
-                new IdContentData()
-                    .AddField(1,
-                        new ContentFieldData()
-                            .AddValue("iv", 1))
-                    .AddField(2,
-                        new ContentFieldData()
-                            .AddValue("it", 2)
-                            .AddValue("de", 2)
-                            .AddValue("en", 3))
-                    .AddField(3,
-                        new ContentFieldData()
-                            .AddValue("iv", 4));
+                            .AddInvariant(4));
 
             var actual = lhs.MergeInto(rhs);
 
@@ -166,22 +77,22 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         public void Should_be_equal_when_data_have_same_structure()
         {
             var lhs =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 2))
+                            .AddInvariant(2))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddInvariant(2));
 
             var rhs =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 2))
+                            .AddInvariant(2))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddInvariant(2));
 
             Assert.True(lhs.Equals(rhs));
             Assert.True(lhs.Equals((object)rhs));
@@ -192,22 +103,22 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         public void Should_not_be_equal_when_data_have_not_same_structure()
         {
             var lhs =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("iv", 2))
+                            .AddInvariant(2))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddInvariant(2));
 
             var rhs =
-                new NamedContentData()
+                new ContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("en", 2))
+                            .AddLocalized("en", 2))
                     .AddField("field3",
                         new ContentFieldData()
-                            .AddValue("iv", 2));
+                            .AddInvariant(2));
 
             Assert.False(lhs.Equals(rhs));
             Assert.False(lhs.Equals((object)rhs));
@@ -219,11 +130,11 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var lhs =
                 new ContentFieldData()
-                    .AddValue("iv", 2);
+                    .AddInvariant(2);
 
             var rhs =
                 new ContentFieldData()
-                    .AddValue("iv", 2);
+                    .AddInvariant(2);
 
             Assert.True(lhs.Equals(rhs));
             Assert.True(lhs.Equals((object)rhs));
@@ -233,7 +144,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_clone_named_value_and_also_children()
         {
-            var source = new NamedContentData
+            var source = new ContentData
             {
                 ["field1"] = new ContentFieldData(),
                 ["field2"] = new ContentFieldData()

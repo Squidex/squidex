@@ -71,6 +71,11 @@ namespace Squidex.Infrastructure.Queries
             return Binary(path, CompareOperator.Contains, value);
         }
 
+        public static CompareFilter<ClrValue> Matchs(PropertyPath path, ClrValue value)
+        {
+            return Binary(path, CompareOperator.Matchs, value);
+        }
+
         public static CompareFilter<ClrValue> EndsWith(PropertyPath path, ClrValue value)
         {
             return Binary(path, CompareOperator.EndsWith, value);
@@ -84,6 +89,11 @@ namespace Squidex.Infrastructure.Queries
         public static CompareFilter<ClrValue> Empty(PropertyPath path)
         {
             return Binary(path, CompareOperator.Empty, null);
+        }
+
+        public static CompareFilter<ClrValue> Exists(PropertyPath path)
+        {
+            return Binary(path, CompareOperator.Exists, null);
         }
 
         public static CompareFilter<ClrValue> In(PropertyPath path, ClrValue value)

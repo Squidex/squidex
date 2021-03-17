@@ -66,7 +66,7 @@ namespace Squidex.Web.Pipeline
         {
             actionContext.RouteData.Values["name"] = schemaId.Id.ToString();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -82,7 +82,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -100,7 +100,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);

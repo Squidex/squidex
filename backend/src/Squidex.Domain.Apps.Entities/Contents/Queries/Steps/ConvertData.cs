@@ -61,14 +61,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 foreach (var content in group)
                 {
-                    content.Data = content.Data.ConvertName2Name(schema.SchemaDef, converters);
+                    content.Data = content.Data.Convert(schema.SchemaDef, converters);
                 }
             }
         }
 
         private async Task<ValueConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
         {
-            if (context.ShouldCleanup())
+            if (!context.ShouldSkipCleanup())
             {
                 var ids = new HashSet<DomainId>();
 

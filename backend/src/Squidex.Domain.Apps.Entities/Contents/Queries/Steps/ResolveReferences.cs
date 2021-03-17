@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         private IContentQueryService ContentQuery
         {
-            get { return contentQuery.Value; }
+            get => contentQuery.Value;
         }
 
         public ResolveReferences(Lazy<IContentQueryService> contentQuery, IRequestCache requestCache)
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             {
                 foreach (var content in contents)
                 {
-                    content.ReferenceData ??= new NamedContentData();
+                    content.ReferenceData ??= new ContentData();
 
                     var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData())!;
 
@@ -100,13 +100,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                                     var value = formatted.GetOrAdd(reference, x => Format(x, context, referencedSchema));
 
-                                    fieldReference.AddJsonValue(partition, value);
+                                    fieldReference.AddLocalized(partition, value);
                                 }
                                 else if (referencedContents.Count > 1)
                                 {
                                     var value = CreateFallback(context, referencedContents);
 
-                                    fieldReference.AddJsonValue(partition, value);
+                                    fieldReference.AddLocalized(partition, value);
                                 }
                             }
                         }
@@ -153,14 +153,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 return EmptyContents;
             }
 
-            var references = await ContentQuery.QueryAsync(context.Clone().WithoutContentEnrichment(true), Q.Empty.WithIds(ids));
+            var queryContext = context.Clone(b => b
+                .WithoutContentEnrichment(true)
+                .WithoutTotal());
+
+            var references = await ContentQuery.QueryAsync(queryContext, Q.Empty.WithIds(ids));
 
             return references.ToLookup(x => x.Id);
         }
 
         private static bool ShouldEnrich(Context context)
         {
-            return context.IsFrontendClient && context.ShouldEnrichContent();
+            return context.IsFrontendClient && !context.ShouldSkipContentEnrichment();
         }
     }
 }

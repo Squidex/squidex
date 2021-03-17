@@ -21,12 +21,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 
         Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId);
 
-        Task<IAssetEntity?> FindAssetAsync(DomainId appId, string hash, string fileName, long fileSize);
+        Task<IAssetEntity?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize);
+
+        Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug);
 
         Task<IAssetEntity?> FindAssetAsync(DomainId appId);
 
         Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id);
-
-        Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug);
     }
 }

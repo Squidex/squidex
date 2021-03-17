@@ -9,33 +9,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public abstract class ContentData<T> : Dictionary<T, ContentFieldData?>, IEquatable<ContentData<T>> where T : notnull
+    public sealed class ContentData : Dictionary<string, ContentFieldData?>, IEquatable<ContentData>
     {
-        public IEnumerable<KeyValuePair<T, ContentFieldData?>> ValidValues
+        public IEnumerable<KeyValuePair<string, ContentFieldData?>> ValidValues
         {
-            get { return this.Where(x => x.Value != null); }
+            get => this.Where(x => x.Value != null);
         }
 
-        protected ContentData(IEqualityComparer<T> comparer)
-            : base(comparer)
-        {
-        }
-
-        protected ContentData(ContentData<T> source, IEqualityComparer<T> comparer)
-            : base(source, comparer)
+        public ContentData()
+            : base(StringComparer.Ordinal)
         {
         }
 
-        protected ContentData(int capacity, IEqualityComparer<T> comparer)
-            : base(capacity, comparer)
+        public ContentData(ContentData source)
+            : base(source, StringComparer.Ordinal)
         {
         }
 
-        protected static TResult MergeTo<TResult>(TResult target, params TResult[] sources) where TResult : ContentData<T>
+        public ContentData(int capacity)
+            : base(capacity, StringComparer.Ordinal)
+        {
+        }
+
+        public ContentData AddField(string name, ContentFieldData? data)
+        {
+            Guard.NotNullOrEmpty(name, nameof(name));
+
+            this[name] = data;
+
+            return this;
+        }
+
+        private static ContentData MergeTo(ContentData target, params ContentData[] sources)
         {
             Guard.NotEmpty(sources, nameof(sources));
 
@@ -50,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                 {
                     if (contentFieldData != null)
                     {
-                        var fieldValue = target.GetOrAdd(key, x => new ContentFieldData());
+                        var fieldValue = target.GetOrAdd(key, _ => new ContentFieldData());
 
                         if (fieldValue != null)
                         {
@@ -66,35 +74,22 @@ namespace Squidex.Domain.Apps.Core.Contents
             return target;
         }
 
-        protected static TResult Clean<TResult>(TResult source, TResult target) where TResult : ContentData<T>
+        public static ContentData Merge(params ContentData[] contents)
         {
-            foreach (var fieldValue in source.ValidValues)
-            {
-                if (fieldValue.Value != null)
-                {
-                    var resultValue = new ContentFieldData();
+            return MergeTo(new ContentData(), contents);
+        }
 
-                    foreach (var (key, value) in fieldValue.Value.Where(x => x.Value.Type != JsonValueType.Null))
-                    {
-                        resultValue[key] = value;
-                    }
-
-                    if (resultValue.Count > 0)
-                    {
-                        target[fieldValue.Key] = resultValue;
-                    }
-                }
-            }
-
-            return target;
+        public ContentData MergeInto(ContentData target)
+        {
+            return Merge(target, this);
         }
 
         public override bool Equals(object? obj)
         {
-            return Equals(obj as ContentData<T>);
+            return Equals(obj as ContentData);
         }
 
-        public bool Equals(ContentData<T>? other)
+        public bool Equals(ContentData? other)
         {
             return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
         }
@@ -102,6 +97,23 @@ namespace Squidex.Domain.Apps.Core.Contents
         public override int GetHashCode()
         {
             return this.DictionaryHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value}"))}}}";
+        }
+
+        public ContentData Clone()
+        {
+            var clone = new ContentData(Count);
+
+            foreach (var (key, value) in this)
+            {
+                clone[key] = value?.Clone()!;
+            }
+
+            return clone;
         }
     }
 }

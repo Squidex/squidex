@@ -11,7 +11,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -19,7 +18,6 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
@@ -32,7 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public class ContentChangedTriggerHandlerTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly ILocalCache localCache = new AsyncLocalCache();
         private readonly IContentLoader contentLoader = A.Fake<IContentLoader>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -122,6 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async Task Should_create_enriched_events(ContentEvent @event, EnrichedContentEventType type)
         {
             @event.AppId = appId;
+            @event.SchemaId = schemaMatch;
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
@@ -138,12 +136,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_enrich_with_old_data_when_updated()
         {
-            var @event = new ContentUpdated { AppId = appId, ContentId = DomainId.NewGuid() };
+            var @event = new ContentUpdated { AppId = appId, ContentId = DomainId.NewGuid(), SchemaId = schemaMatch };
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            var dataNow = new NamedContentData();
-            var dataOld = new NamedContentData();
+            var dataNow = new ContentData();
+            var dataOld = new ContentData();
 
             A.CallTo(() => contentLoader.GetAsync(appId.Id, @event.ContentId, 12))
                 .Returns(new ContentEntity { AppId = appId, SchemaId = schemaMatch, Version = 12, Data = dataNow, Id = @event.ContentId });

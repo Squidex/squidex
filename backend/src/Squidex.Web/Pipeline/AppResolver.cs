@@ -13,10 +13,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
+using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
@@ -47,6 +49,13 @@ namespace Squidex.Web.Pipeline
 
                 if (app == null)
                 {
+                    var log = context.HttpContext.RequestServices?.GetService<ISemanticLog>();
+
+                    log?.LogWarning(w => w
+                        .WriteProperty("message", "Cannot find app with the given name.")
+                        .WriteProperty("appId", "404")
+                        .WriteProperty("appName", appName));
+
                     context.Result = new NotFoundResult();
                     return;
                 }
@@ -88,6 +97,13 @@ namespace Squidex.Web.Pipeline
                     }
                     else
                     {
+                        var log = context.HttpContext.RequestServices?.GetService<ISemanticLog>();
+
+                        log?.LogWarning(w => w
+                            .WriteProperty("message", "Authenticated user has no permission to access the app.")
+                            .WriteProperty("appId", app.Id.ToString())
+                            .WriteProperty("appName", appName));
+
                         context.Result = new NotFoundResult();
                     }
 
@@ -107,15 +123,17 @@ namespace Squidex.Web.Pipeline
 
         private static Context SetContext(HttpContext httpContext, IAppEntity app)
         {
-            var requestContext = new Context(httpContext.User, app);
-
-            foreach (var (key, value) in httpContext.Request.Headers)
-            {
-                if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
+            var requestContext =
+                new Context(httpContext.User, app).Clone(builder =>
                 {
-                    requestContext.Headers.Add(key, value.ToString());
-                }
-            }
+                    foreach (var (key, value) in httpContext.Request.Headers)
+                    {
+                        if (key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
+                        {
+                            builder.SetHeader(key, value.ToString());
+                        }
+                    }
+                });
 
             httpContext.Features.Set(requestContext);
 
@@ -124,7 +142,7 @@ namespace Squidex.Web.Pipeline
 
         private static bool HasPermission(string appName, Context requestContext)
         {
-            return requestContext.Permissions.Includes(Permissions.ForApp(Permissions.App, appName));
+            return requestContext.UserPermissions.Includes(Permissions.ForApp(Permissions.App, appName));
         }
 
         private static bool AllowAnonymous(ActionExecutingContext context)

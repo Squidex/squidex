@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
         public static IField GetFieldOrThrow(Schema schema, long fieldId, long? parentId, bool allowLocked)
         {
-            if (parentId.HasValue)
+            if (parentId != null)
             {
                 var arrayField = GetArrayFieldOrThrow(schema, parentId.Value, allowLocked);
 

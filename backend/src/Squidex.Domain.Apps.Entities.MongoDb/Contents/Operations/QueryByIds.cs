@@ -20,11 +20,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryByIds : OperationBase
     {
-        public QueryByIds(DataConverter dataConverter)
-            : base(dataConverter)
-        {
-        }
-
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids)
         {
             if (ids == null || ids.Count == 0)
@@ -53,21 +48,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             var contentEntities = await FindContentsAsync(q.Query, filter);
             var contentTotal = (long)contentEntities.Count;
 
-            if (contentEntities.Count > 0)
+            if (q.NoTotal)
             {
-                if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
-                {
-                    contentTotal = await Collection.Find(filter).CountDocumentsAsync();
-                }
-
-                var contentSchemas = schemas.ToDictionary(x => x.Id);
-
-                foreach (var content in contentEntities)
-                {
-                    var schema = contentSchemas[content.SchemaId.Id];
-
-                    content.ParseData(schema.SchemaDef, DataConverter);
-                }
+                contentTotal = -1;
+            }
+            else if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
+            {
+                contentTotal = await Collection.Find(filter).CountDocumentsAsync();
             }
 
             return ResultList.Create(contentTotal, contentEntities);

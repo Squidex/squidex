@@ -41,7 +41,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public static string AdjustBase(this string html, HttpContext httpContext)
         {
-            if (httpContext.Request.PathBase.HasValue)
+            if (httpContext.Request.PathBase != null)
             {
                 html = html.Replace("<base href=\"/\">", $"<base href=\"{httpContext.Request.PathBase}/\">");
             }

@@ -5,22 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
-using FluentAssertions;
 using Orleans;
 using Squidex.Assets;
-using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
-using Squidex.Log;
+using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
@@ -29,17 +23,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     {
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
+        private readonly IAssetFolderResolver assetFolderResolver = A.Fake<IAssetFolderResolver>();
         private readonly IAssetMetadataSource assetMetadataSource = A.Fake<IAssetMetadataSource>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
-        private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly DomainId assetId = DomainId.NewGuid();
-        private readonly AssetDomainObjectGrain asset;
-        private readonly AssetFile file;
-        private readonly Context requestContext = Context.Anonymous();
+        private readonly AssetFile file = new NoopAssetFile();
+        private readonly Context requestContext;
         private readonly AssetCommandMiddleware sut;
 
         public sealed class MyCommand : SquidexCommand
@@ -48,36 +39,25 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         protected override DomainId Id
         {
-            get { return DomainId.Combine(AppId, assetId); }
+            get => DomainId.Combine(AppId, assetId);
         }
 
         public AssetCommandMiddlewareTests()
         {
             file = new NoopAssetFile();
 
-            var assetDomainObject = new AssetDomainObject(Store, A.Dummy<ISemanticLog>(), tagService, assetQuery, contentRepository);
-
-            A.CallTo(() => serviceProvider.GetService(typeof(AssetDomainObject)))
-                .Returns(assetDomainObject);
-
-            asset = new AssetDomainObjectGrain(serviceProvider, null!);
-            asset.ActivateAsync(Id.ToString()).Wait();
+            requestContext = Context.Anonymous(Mocks.App(AppNamedId));
 
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntity>._, requestContext))
-                .ReturnsLazily(() => SimpleMapper.Map(asset.Snapshot, new AssetEntity()));
-
             A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._))
                 .Returns(Task.FromResult<IEnrichedAssetEntity?>(null));
-
-            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id.ToString(), null))
-                .Returns(asset);
 
             sut = new AssetCommandMiddleware(grainFactory,
                 assetEnricher,
                 assetFileStore,
+                assetFolderResolver,
                 assetQuery,
                 contextProvider, new[] { assetMetadataSource });
         }
@@ -85,12 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Should_not_invoke_enricher_for_other_result()
         {
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
-
-            context.Complete(12);
-
-            await sut.HandleAsync(context);
+            await HandleAsync(new AnnotateAsset(), 12);
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext))
                 .MustNotHaveHappened();
@@ -101,14 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var result = new AssetEntity();
 
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
-
-            context.Complete(result);
-
-            await sut.HandleAsync(context);
-
-            Assert.Same(result, context.Result<IEnrichedAssetEntity>());
+            var context =
+                await HandleAsync(new AnnotateAsset(),
+                    result);
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext))
                 .MustNotHaveHappened();
@@ -119,32 +89,28 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var result = A.Fake<IAssetEntity>();
 
-            var command = CreateCommand(new MyCommand());
-            var context = CreateContextForCommand(command);
-
-            context.Complete(result);
-
             var enriched = new AssetEntity();
 
             A.CallTo(() => assetEnricher.EnrichAsync(result, requestContext))
                 .Returns(enriched);
 
-            await sut.HandleAsync(context);
+            var context =
+                await HandleAsync(new AnnotateAsset(),
+                    result);
 
             Assert.Same(enriched, context.Result<IEnrichedAssetEntity>());
         }
 
         [Fact]
-        public async Task Create_should_create_domain_object()
+        public async Task Create_should_upload_file()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var result = CreateAsset();
 
-            await sut.HandleAsync(context);
+            var context =
+                await HandleAsync(new CreateAsset { File = file },
+                    result);
 
-            var result = context.Result<AssetCreatedResult>();
-
-            result.Asset.Should().BeEquivalentTo(asset.Snapshot, x => x.ExcludingMissingMembers());
+            Assert.Same(result, context.Result<IEnrichedAssetEntity>());
 
             AssertAssetHasBeenUploaded(0);
             AssertMetadataEnriched();
@@ -153,70 +119,58 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Create_should_calculate_hash()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var command = new CreateAsset { File = file };
 
-            await sut.HandleAsync(context);
+            await HandleAsync(command, CreateAsset());
 
             Assert.True(command.FileHash.Length > 10);
         }
 
         [Fact]
-        public async Task Create_should_return_duplicate_result_if_file_with_same_hash_found()
+        public async Task Create_should_resolve_path()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var folderId = DomainId.NewGuid();
 
-            SetupSameHashAsset(file.FileName, file.FileSize, out _);
+            var command = new CreateAsset { File = file, ParentPath = "path/to/folder" };
 
-            await sut.HandleAsync(context);
+            A.CallTo(() => assetFolderResolver.ResolveOrCreateAsync(requestContext, A<ICommandBus>._, "path/to/folder"))
+                .Returns(folderId);
 
-            var result = context.Result<AssetCreatedResult>();
+            await HandleAsync(command, CreateAsset());
 
-            Assert.True(result.IsDuplicate);
+            Assert.Equal(folderId, command.ParentId);
         }
 
         [Fact]
         public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file, Duplicate = true });
-            var context = CreateContextForCommand(command);
+            var result = CreateAsset();
 
             SetupSameHashAsset(file.FileName, file.FileSize, out _);
 
-            await sut.HandleAsync(context);
+            var context =
+                await HandleAsync(new CreateAsset { File = file, Duplicate = true },
+                    result);
 
-            var result = context.Result<AssetCreatedResult>();
-
-            Assert.False(result.IsDuplicate);
+            Assert.Same(result, context.Result<IEnrichedAssetEntity>());
         }
 
         [Fact]
-        public async Task Create_should_pass_through_duplicate()
+        public async Task Create_should_return_duplicate_result_if_file_with_same_hash_found()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
-
             SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
 
-            await sut.HandleAsync(context);
+            var context =
+                await HandleAsync(new CreateAsset { File = file },
+                    CreateAsset());
 
-            var result = context.Result<AssetCreatedResult>();
-
-            Assert.True(result.IsDuplicate);
-
-            result.Should().BeEquivalentTo(duplicate, x => x.ExcludingMissingMembers());
+            Assert.Same(duplicate, context.Result<AssetDuplicate>().Asset);
         }
 
         [Fact]
-        public async Task Update_should_update_domain_object()
+        public async Task Update_should_upload_file()
         {
-            var command = CreateCommand(new UpdateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
-
-            await ExecuteCreateAsync();
-
-            await sut.HandleAsync(context);
+            await HandleAsync(new UpdateAsset { File = file }, CreateAsset(1));
 
             AssertAssetHasBeenUploaded(1);
             AssertMetadataEnriched();
@@ -225,58 +179,67 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Update_should_calculate_hash()
         {
-            var command = CreateCommand(new UpdateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            var command = new UpdateAsset { File = file };
 
-            await ExecuteCreateAsync();
-
-            await sut.HandleAsync(context);
+            await HandleAsync(command, CreateAsset());
 
             Assert.True(command.FileHash.Length > 10);
         }
 
         [Fact]
-        public async Task Update_should_enrich_asset()
+        public async Task Upsert_should_upload_file()
         {
-            var command = CreateCommand(new UpdateAsset { AssetId = assetId, File = file });
-            var context = CreateContextForCommand(command);
+            await HandleAsync(new UpsertAsset { File = file }, CreateAsset(1));
 
-            await ExecuteCreateAsync();
-
-            await sut.HandleAsync(context);
-
-            var result = context.Result<IEnrichedAssetEntity>();
-
-            result.Should().BeEquivalentTo(asset.Snapshot, x => x.ExcludingMissingMembers());
+            AssertAssetHasBeenUploaded(1);
+            AssertMetadataEnriched();
         }
 
         [Fact]
-        public async Task AnnotateAsset_should_enrich_asset()
+        public async Task Upsert_should_calculate_hash()
         {
-            var command = CreateCommand(new AnnotateAsset { AssetId = assetId, FileName = "newName" });
-            var context = CreateContextForCommand(command);
+            var command = new UpsertAsset { File = file };
 
-            await ExecuteCreateAsync();
+            await HandleAsync(command, CreateAsset());
 
-            await sut.HandleAsync(context);
-
-            var result = context.Result<IEnrichedAssetEntity>();
-
-            result.Should().BeEquivalentTo(asset.Snapshot, x => x.ExcludingMissingMembers());
+            Assert.True(command.FileHash.Length > 10);
         }
 
-        private Task ExecuteCreateAsync()
+        [Fact]
+        public async Task Upsert_should_resolve_path()
         {
-            var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
+            var folderId = DomainId.NewGuid();
 
-            return asset.ExecuteAsync(CommandRequest.Create(command));
+            var command = new UpsertAsset { File = file, ParentPath = "path/to/folder" };
+
+            A.CallTo(() => assetFolderResolver.ResolveOrCreateAsync(requestContext, A<ICommandBus>._, "path/to/folder"))
+                .Returns(folderId);
+
+            await HandleAsync(command, CreateAsset());
+
+            Assert.Equal(folderId, command.ParentId);
         }
 
-        private void AssertAssetHasBeenUploaded(long version)
+        [Fact]
+        public async Task Move_should_resolve_path()
+        {
+            var folderId = DomainId.NewGuid();
+
+            var command = new MoveAsset { ParentPath = "path/to/folder" };
+
+            A.CallTo(() => assetFolderResolver.ResolveOrCreateAsync(requestContext, A<ICommandBus>._, "path/to/folder"))
+                .Returns(folderId);
+
+            await HandleAsync(command, CreateAsset());
+
+            Assert.Equal(folderId, command.ParentId);
+        }
+
+        private void AssertAssetHasBeenUploaded(long fileVersion)
         {
             A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, version, CancellationToken.None))
+            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, fileVersion, CancellationToken.None))
                 .MustHaveHappened();
             A.CallTo(() => assetFileStore.DeleteAsync(A<string>._))
                 .MustHaveHappened();
@@ -296,8 +259,30 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private void AssertMetadataEnriched()
         {
-            A.CallTo(() => assetMetadataSource.EnhanceAsync(A<UploadAssetCommand>._, A<HashSet<string>>._))
+            A.CallTo(() => assetMetadataSource.EnhanceAsync(A<UploadAssetCommand>._))
                 .MustHaveHappened();
+        }
+
+        private Task<CommandContext> HandleAsync(AssetCommand command, object result)
+        {
+            command.AssetId = assetId;
+
+            CreateCommand(command);
+
+            var grain = A.Fake<IAssetGrain>();
+
+            A.CallTo(() => grain.ExecuteAsync(A<J<CommandRequest>>._))
+                .Returns(new CommandResult(command.AggregateId, 1, 0, result));
+
+            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(command.AggregateId.ToString(), null))
+                .Returns(grain);
+
+            return HandleAsync(sut, command);
+        }
+
+        private IAssetEntity CreateAsset(long fileVersion = 0)
+        {
+            return new AssetEntity { AppId = AppNamedId, Id = assetId, FileVersion = fileVersion };
         }
     }
 }

@@ -46,10 +46,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NumberFieldProperties());
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("iv", 1000));
+                            .AddInvariant(1000));
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema, factory: validatorFactory);
 
@@ -77,10 +77,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NumberFieldProperties());
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("iv", 1000));
+                            .AddInvariant(1000));
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema, factory: validatorFactory);
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         public async Task Should_add_error_if_validating_data_with_unknown_field()
         {
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("unknown",
                         new ContentFieldData());
 
@@ -115,10 +115,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NumberFieldProperties { MaxValue = 100 });
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("iv", 1000));
+                            .AddInvariant(1000));
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -135,11 +135,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             schema = schema.AddNumber(1, "my-field", Partitioning.Invariant);
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("es", 1)
-                            .AddValue("it", 1));
+                            .AddLocalized("es", 1)
+                            .AddLocalized("it", 1));
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NumberFieldProperties { IsRequired = true });
 
             var data =
-                new NamedContentData();
+                new ContentData();
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NumberFieldProperties { IsRequired = true });
 
             var data =
-                new NamedContentData();
+                new ContentData();
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new StringFieldProperties { IsRequired = true });
 
             var data =
-                new NamedContentData();
+                new ContentData();
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -212,11 +212,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             schema = schema.AddNumber(1, "my-field", Partitioning.Language);
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("de", 1)
-                            .AddValue("ru", 1));
+                            .AddLocalized("de", 1)
+                            .AddLocalized("ru", 1));
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -240,10 +240,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new StringFieldProperties { IsRequired = true });
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("es", "value"));
+                            .AddLocalized("es", "value"));
 
             await data.ValidateAsync(optionalConfig.ToResolver(), errors, schema);
 
@@ -256,11 +256,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             schema = schema.AddNumber(1, "my-field", Partitioning.Language);
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("es", 1)
-                            .AddValue("it", 1));
+                            .AddLocalized("es", 1)
+                            .AddLocalized("it", 1));
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -276,7 +276,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         public async Task Should_add_error_if_validating_partial_data_with_unknown_field()
         {
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("unknown",
                         new ContentFieldData());
 
@@ -296,10 +296,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NumberFieldProperties { MaxValue = 100 });
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("iv", 1000));
+                            .AddInvariant(1000));
 
             await data.ValidatePartialAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -316,11 +316,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             schema = schema.AddNumber(1, "my-field", Partitioning.Invariant);
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("es", 1)
-                            .AddValue("it", 1));
+                            .AddLocalized("es", 1)
+                            .AddLocalized("it", 1));
 
             await data.ValidatePartialAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -339,7 +339,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NumberFieldProperties { IsRequired = true });
 
             var data =
-                new NamedContentData();
+                new ContentData();
 
             await data.ValidatePartialAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -353,7 +353,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NumberFieldProperties { IsRequired = true });
 
             var data =
-                new NamedContentData();
+                new ContentData();
 
             await data.ValidatePartialAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -366,11 +366,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             schema = schema.AddNumber(1, "my-field", Partitioning.Language);
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("de", 1)
-                            .AddValue("ru", 1));
+                            .AddLocalized("de", 1)
+                            .AddLocalized("ru", 1));
 
             await data.ValidatePartialAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -387,11 +387,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             schema = schema.AddNumber(1, "my-field", Partitioning.Language);
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("es", 1)
-                            .AddValue("it", 1));
+                            .AddLocalized("es", 1)
+                            .AddLocalized("it", 1));
 
             await data.ValidatePartialAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -410,10 +410,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 AddNumber(2, "my-nested", new NumberFieldProperties { IsRequired = true }));
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddJsonValue(
+                            .AddInvariant(
                                 JsonValue.Array(
                                     JsonValue.Object(),
                                     JsonValue.Object().Add("my-nested", 1),
@@ -435,7 +435,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             schema = schema.AddUI(2, "ui", Partitioning.Invariant);
 
             var data =
-                new NamedContentData();
+                new ContentData();
 
             await data.ValidateAsync(languagesConfig.ToResolver(), errors, schema);
 
@@ -449,10 +449,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 AddUI(2, "my-nested"));
 
             var data =
-                new NamedContentData()
+                new ContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddJsonValue(
+                            .AddInvariant(
                                 JsonValue.Array(
                                     JsonValue.Object())));
 

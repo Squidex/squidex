@@ -31,17 +31,17 @@ namespace Squidex.Infrastructure.Collections
 
         public IEnumerable<TKey> Keys
         {
-            get { return inner.Keys; }
+            get => inner.Keys;
         }
 
         public IEnumerable<TValue> Values
         {
-            get { return inner.Values; }
+            get => inner.Values;
         }
 
         public int Count
         {
-            get { return inner.Count; }
+            get => inner.Count;
         }
 
         public ImmutableDictionary()

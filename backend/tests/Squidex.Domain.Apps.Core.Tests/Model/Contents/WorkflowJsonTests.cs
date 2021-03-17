@@ -71,11 +71,11 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_verify_roles_mapping_in_workflow_transition()
         {
-            var source = new JsonWorkflowTransition { Expression = "expression_1", Role = "role_1" };
+            var source = new WorkflowTransitionSurrogate { Expression = "expression_1", Role = "role_1" };
 
             var serialized = source.SerializeAndDeserialize();
 
-            var result = serialized.ToTransition();
+            var result = serialized.ToSource();
 
             Assert.Equal(source.Role, result?.Roles?.Single());
         }

@@ -18,29 +18,36 @@ namespace Squidex.Areas.Api.Config.OpenApi
     {
         public void Process(DocumentProcessorContext context)
         {
-            foreach (var controllerType in context.ControllerTypes)
+            try
             {
-                var attribute = controllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>();
-
-                if (attribute != null)
+                foreach (var controllerType in context.ControllerTypes)
                 {
-                    var tag = context.Document.Tags.FirstOrDefault(x => x.Name == attribute.GroupName);
+                    var attribute = controllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>();
 
-                    if (tag != null)
+                    if (attribute != null)
                     {
-                        var description = controllerType.GetXmlDocsSummary();
+                        var tag = context.Document.Tags.FirstOrDefault(x => x.Name == attribute.GroupName);
 
-                        if (description != null)
+                        if (tag != null)
                         {
-                            tag.Description ??= string.Empty;
+                            var description = controllerType.GetXmlDocsSummary();
 
-                            if (!tag.Description.Contains(description))
+                            if (description != null)
                             {
-                                tag.Description += "\n\n" + description;
+                                tag.Description ??= string.Empty;
+
+                                if (!tag.Description.Contains(description))
+                                {
+                                    tag.Description += "\n\n" + description;
+                                }
                             }
                         }
                     }
                 }
+            }
+            finally
+            {
+                XmlDocs.ClearCache();
             }
         }
     }

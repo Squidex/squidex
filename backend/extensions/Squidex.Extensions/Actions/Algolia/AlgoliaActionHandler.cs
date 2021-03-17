@@ -84,8 +84,9 @@ namespace Squidex.Extensions.Actions.Algolia
                         json = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
                     }
 
-                    ruleJob.Content = json;
-                    ruleJob.Content["objectID"] = contentId;
+                    json["objectID"] = contentId;
+
+                    ruleJob.Content = json.ToString();
                 }
 
                 return (ruleDescription, ruleJob);
@@ -135,6 +136,6 @@ namespace Squidex.Extensions.Actions.Algolia
 
         public string IndexName { get; set; }
 
-        public JObject Content { get; set; }
+        public string Content { get; set; }
     }
 }

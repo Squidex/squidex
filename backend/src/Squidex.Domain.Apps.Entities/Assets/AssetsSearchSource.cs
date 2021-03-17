@@ -34,9 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var result = new SearchResults();
 
-            var permission = Permissions.ForApp(Permissions.AppAssetsRead, context.App.Name);
-
-            if (context.Permissions.Allows(permission))
+            if (context.UserPermissions.Allows(Permissions.AppAssetsRead, context.App.Name))
             {
                 var filter = ClrFilter.Contains("fileName", query);
 

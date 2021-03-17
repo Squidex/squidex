@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             [IgnoreDataMember]
             public DomainId UniqueId
             {
-                get { return DomainId.Combine(AppId, Id); }
+                get => DomainId.Combine(AppId, Id);
             }
 
             public override bool ApplyEvent(IEvent @event)
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             return true;
                         }
 
-                    case AssetFolderDeleted _:
+                    case AssetFolderDeleted:
                         {
                             IsDeleted = true;
 

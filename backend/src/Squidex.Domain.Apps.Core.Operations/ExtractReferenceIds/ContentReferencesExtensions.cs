@@ -16,25 +16,25 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ContentReferencesExtensions
     {
-        public static HashSet<DomainId> GetReferencedIds(this NamedContentData source, Schema schema, int referencesPerField = int.MaxValue)
+        public static HashSet<DomainId> GetReferencedIds(this ContentData source, Schema schema, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var result = new HashSet<DomainId>();
+            var ids = new HashSet<DomainId>();
 
-            AddReferencedIds(source, schema.Fields, result, referencesPerField);
+            AddReferencedIds(source, schema, ids, referencesPerField);
 
-            return result;
+            return ids;
         }
 
-        public static void AddReferencedIds(this NamedContentData source, Schema schema, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
+        public static void AddReferencedIds(this ContentData source, Schema schema, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(schema, nameof(schema));
 
             AddReferencedIds(source, schema.Fields, result, referencesPerField);
         }
 
-        public static void AddReferencedIds(this NamedContentData source, IEnumerable<IField> fields, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
+        public static void AddReferencedIds(this ContentData source, IEnumerable<IField> fields, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(fields, nameof(fields));
             Guard.NotNull(result, nameof(result));
@@ -45,21 +45,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             }
         }
 
-        public static void AddReferencedIds(this NamedContentData source, IField field, HashSet<DomainId> result, int referencesPerField = int.MaxValue)
-        {
-            Guard.NotNull(field, nameof(field));
-            Guard.NotNull(result, nameof(result));
-
-            if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
-            {
-                foreach (var partitionValue in fieldData)
-                {
-                    ReferencesExtractor.Extract(field, partitionValue.Value, result, referencesPerField);
-                }
-            }
-        }
-
-        private static void AddReferencedIds(NamedContentData source, HashSet<DomainId> result, int referencesPerField, IField field)
+        private static void AddReferencedIds(ContentData source, HashSet<DomainId> result, int referencesPerField, IField field)
         {
             if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
             {
@@ -82,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return result;
         }
 
-        public static JsonObject FormatReferences(this NamedContentData data, Schema schema, IFieldPartitioning partitioning, string separator = ", ")
+        public static JsonObject FormatReferences(this ContentData data, Schema schema, IFieldPartitioning partitioning, string separator = ", ")
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(partitioning, nameof(partitioning));
@@ -97,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return result;
         }
 
-        private static string FormatReferenceFields(this NamedContentData data, Schema schema, string partitionKey, string separator)
+        private static string FormatReferenceFields(this ContentData data, Schema schema, string partitionKey, string separator)
         {
             Guard.NotNull(schema, nameof(schema));
 

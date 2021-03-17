@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
@@ -39,9 +38,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                 try
                 {
-                    var (_, error) = JsonValueConverter.ConvertValue(field, value, jsonSerializer);
-
-                    if (error != null)
+                    if (!JsonValueValidator.IsValid(field, value, jsonSerializer))
                     {
                         return null;
                     }
@@ -49,36 +46,6 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 catch
                 {
                     return null;
-                }
-
-                return value;
-            };
-        }
-
-        public static ValueConverter DecodeJson(IJsonSerializer jsonSerializer)
-        {
-            return (value, field, parent) =>
-            {
-                if (field is IField<JsonFieldProperties> && value is JsonString s)
-                {
-                    var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(s.Value));
-
-                    return jsonSerializer.Deserialize<IJsonValue>(decoded);
-                }
-
-                return value;
-            };
-        }
-
-        public static ValueConverter EncodeJson(IJsonSerializer jsonSerializer)
-        {
-            return (value, field, parent) =>
-            {
-                if (value.Type != JsonValueType.Null && field is IField<JsonFieldProperties>)
-                {
-                    var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonSerializer.Serialize(value)));
-
-                    return JsonValue.Create(encoded);
                 }
 
                 return value;
@@ -159,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     {
                         foreach (var (fieldName, nestedValue) in nested.ToList())
                         {
-                            IJsonValue? newValue = nestedValue;
+                            var newValue = nestedValue;
 
                             if (arrayField.FieldsByName.TryGetValue(fieldName, out var nestedField))
                             {

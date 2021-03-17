@@ -34,6 +34,11 @@
                             {{ 'contents.contentTab.referencing' | sqxTranslate }}
                         </a>
                     </li>
+                    <li *ngIf="schema.properties.contentEditorUrl">
+                        <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'extension' }" [class.active]="tab === 'extension'">
+                            {{ 'common.extension' | sqxTranslate }}
+                        </a>
+                    </li>
                 </ul>
             </ng-container>
         </ng-container>
@@ -43,7 +48,7 @@
                 <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
 
                 <ng-container *ngIf="contentTab | async; let tab">
-                    <ng-container *ngIf="tab !== 'editor'">
+                    <ng-container *ngIf="tab === 'references' || tab === 'referencing'; else defaultHeader">
                         <button type="button" class="btn btn-primary ml-1" (click)="publish()">
                             {{ 'contents.publishAll' | sqxTranslate }}
                         </button>
@@ -53,11 +58,11 @@
                         </button>
                     </ng-container>
 
-                    <ng-container *ngIf="tab === 'editor'">
-                        <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>
+                    <ng-template #defaultHeader>
+                        <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
 
                         <ng-container *ngIf="content?.canDelete">
-                            <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
+                            <button type="button" class="btn btn-outline-secondary ml-2" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
                                 <i class="icon-dots"></i>
                             </button>
 
@@ -81,7 +86,7 @@
         
                             <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
                         </ng-container>
-                    </ng-container>
+                    </ng-template>
                 </ng-container>
             </ng-container>
 
@@ -112,6 +117,13 @@
                         <sqx-content-references mode="referencing"
                             [content]="content">
                         </sqx-content-references>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'extension'">
+                        <sqx-content-extension mode="referencing" *ngIf="schema.properties.contentEditorUrl && content"
+                            [content]="content" 
+                            [contentSchema]="schema"
+                            [url]="schema.properties.contentEditorUrl">
+                        </sqx-content-extension>
                     </ng-container>
                     <ng-container *ngSwitchDefault>
                         <sqx-content-editor

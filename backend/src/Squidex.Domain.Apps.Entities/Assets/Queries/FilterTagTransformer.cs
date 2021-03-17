@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private static readonly FilterTagTransformer Instance = new FilterTagTransformer();
 
-        public struct Args
+        public readonly struct Args
         {
             public readonly DomainId AppId;
 

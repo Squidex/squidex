@@ -31,31 +31,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             [IgnoreDataMember]
             public DomainId UniqueId
             {
-                get { return DomainId.Combine(AppId, Id); }
+                get => DomainId.Combine(AppId, Id);
             }
 
             [IgnoreDataMember]
-            public NamedContentData Data
+            public ContentData Data
             {
-                get { return NewVersion?.Data ?? CurrentVersion.Data; }
+                get => NewVersion?.Data ?? CurrentVersion.Data;
             }
 
             [IgnoreDataMember]
             public Status EditingStatus
             {
-                get { return NewStatus ?? Status; }
-            }
-
-            [IgnoreDataMember]
-            public Status Status
-            {
-                get { return CurrentVersion.Status; }
+                get => NewStatus ?? Status;
             }
 
             [IgnoreDataMember]
             public Status? NewStatus
             {
-                get { return NewVersion?.Status; }
+                get => NewVersion?.Status;
+            }
+
+            [IgnoreDataMember]
+            public Status Status
+            {
+                get => CurrentVersion.Status;
             }
 
             public override bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             break;
                         }
 
-                    case ContentDraftDeleted _:
+                    case ContentDraftDeleted:
                         {
                             NewVersion = null;
 
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             break;
                         }
 
-                    case ContentSchedulingCancelled _:
+                    case ContentSchedulingCancelled:
                         {
                             ScheduleJob = null;
 
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             break;
                         }
 
-                    case ContentDeleted _:
+                    case ContentDeleted:
                         {
                             IsDeleted = true;
 

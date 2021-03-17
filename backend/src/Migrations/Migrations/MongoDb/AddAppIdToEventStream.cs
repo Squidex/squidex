@@ -46,7 +46,7 @@ namespace Migrations.Migrations.MongoDb
 
             var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
             {
-                var updates = new List<WriteModel<BsonDocument>>();
+                var writes = new List<WriteModel<BsonDocument>>();
 
                 foreach (var document in batch)
                 {
@@ -92,13 +92,16 @@ namespace Migrations.Migrations.MongoDb
 
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].AsString);
 
-                    updates.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                    writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
                     {
                         IsUpsert = true
                     });
                 }
 
-                await collectionNew.BulkWriteAsync(updates, writeOptions);
+                if (writes.Count > 0)
+                {
+                    await collectionNew.BulkWriteAsync(writes, writeOptions);
+                }
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = Environment.ProcessorCount * 2,

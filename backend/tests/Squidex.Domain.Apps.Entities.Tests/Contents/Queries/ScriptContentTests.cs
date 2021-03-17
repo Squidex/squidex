@@ -87,12 +87,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
 
-            var oldData = new NamedContentData();
+            var oldData = new ContentData();
 
             var content = new ContentEntity { SchemaId = schemaWithScriptId, Data = oldData };
 
             A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", ScriptOptions()))
-                .Returns(new NamedContentData());
+                .Returns(new ContentData());
 
             await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
 

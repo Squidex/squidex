@@ -29,12 +29,12 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public string Name
         {
-            get { return eventPublisherName; }
+            get => eventPublisherName;
         }
 
         public string EventsFilter
         {
-            get { return eventsFilter; }
+            get => eventsFilter;
         }
 
         public RabbitMqEventConsumer(IJsonSerializer jsonSerializer, string eventPublisherName, string uri, string exchange, string eventsFilter)
