@@ -72,6 +72,11 @@ spec:
           ports:
             - containerPort: 80
           env:
+            - name: FASTLY__APIKEY
+              value: "${SQUIDEX_FASTLY_BETA_FASTLY_APIKEY}"
+            - name: FASTLY__SERVICEID
+              value: "${SQUIDEX_FASTLY_BETA_FASTLY_SERVICE_ID}"
+
             # The following can be set to create an admin user
             - name: IDENTITY__ADMINRECREATE
               value: "true"
@@ -113,7 +118,7 @@ spec:
             - name: ASSETSTORE__TYPE
               value: "AmazonS3"
             - name: ASSETSTORE__AMAZONS3__BUCKET
-              value: "${SQUIDEX_BETA_ASSET_BUCKET}"
+              value: "${SQUIDEX_FASTLY_BETA_ASSET_BUCKET}"
             - name: ASSETSTORE__AMAZONS3__REGIONNAME
               value: "${AWS_DEFAULT_REGION}"
             - name: ASSETSTORE__AMAZONS3__ACCESSKEY
@@ -126,8 +131,22 @@ spec:
                 secretKeyRef:
                   name: squidex
                   key: iam_secret_key
-            # - name: CACHING__MAXSURROGATEKEYSSIZE
-            #   value: "0"
+            - name: IDENTITY__GOOGLECLIENT
+              value: "${SQUIDEX_FASTLY_BETA_GOOGLE_CLIENT}"
+            - name: IDENTITY__GOOGLESECRET
+              value: "${SQUIDEX_FASTLY_BETA_GOOGLE_SECRET}"
+            - name: IDENTITY__GITHUBCLIENT
+              value: ""
+            - name: IDENTITY__GITHUBCLIENT
+              value: ""
+            - name: IDENTITY__MICROSOFTCLIENT
+              value: ""
+            - name: IDENTITY__MICROSOFTCLIENT
+              value: ""
+
+            - name: CACHING__MAXSURROGATEKEYSSIZE
+              value: "10000"
+
             - name: LOGGING__DATADOG
               value: "true"
             - name: DD_AGENT_HOST
