@@ -3,7 +3,7 @@ PROJECT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 STAGE ?= "dev"
 DOCKER_SERVER ?= 597764168253.dkr.ecr.us-east-1.amazonaws.com
 DOCKER_IMAGE ?= ${DOCKER_SERVER}/homer-squidex
-VERSION ?= 5.4.0
+VERSION ?= $(shell git branch --show-current)-$(shell git rev-parse --short HEAD)
 
 ifndef AWS_PROFILE
 $(error AWS_PROFILE is not set)
@@ -31,6 +31,7 @@ build: info
 # 	docker image prune -f
 
 deploy: build
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${DOCKER_SERVER}
 	docker tag ${DOCKER_IMAGE}:latest ${DOCKER_IMAGE}:${VERSION}
 	docker push ${DOCKER_IMAGE}:latest
 	docker push ${DOCKER_IMAGE}:${VERSION}

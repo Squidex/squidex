@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
         - name: squidex
-          image: homer-squidex/squidex:${SQUIDEX_FASTLY_BETA_VERSION_TAG}
+          image: 597764168253.dkr.ecr.us-east-1.amazonaws.com/homer-squidex:${SQUIDEX_FASTLY_BETA_VERSION_TAG}
           imagePullPolicy: Always
           resources:
             requests:
