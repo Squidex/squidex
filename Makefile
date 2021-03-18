@@ -1,13 +1,13 @@
 MODULE := "homer-squidex"
 PROJECT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-STAGE ?= "dev"
+STAGE ?= "prod"
 DOCKER_SERVER ?= 597764168253.dkr.ecr.us-east-1.amazonaws.com
 DOCKER_IMAGE ?= ${DOCKER_SERVER}/homer-squidex
 VERSION ?= $(shell git branch --show-current)-$(shell git rev-parse --short HEAD)
 
-ifndef AWS_PROFILE
-$(error AWS_PROFILE is not set)
-endif
+# ifndef AWS_PROFILE
+# $(error AWS_PROFILE is not set)
+# endif
 
 # Get account ID from AWS Account Id)
 # AWS_ACCOUNT_ID := $(shell $(SCRIPTS_DIR)/get_aws_account_id.sh)
@@ -30,20 +30,18 @@ build: info
 	docker build . -t "${DOCKER_IMAGE}"
 # 	docker image prune -f
 
-deploy: build
-	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${DOCKER_SERVER}
+deploy: build _login
 	docker tag ${DOCKER_IMAGE}:latest ${DOCKER_IMAGE}:${VERSION}
 	docker push ${DOCKER_IMAGE}:latest
 	docker push ${DOCKER_IMAGE}:${VERSION}
 
 
 _login:
-	AWS_PROFILE=homer-prod aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${DOCKER_SERVER}
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${DOCKER_SERVER}
 
 info:
 	@echo "   project dir: $(PROJECT_DIR)"
-	@echo "         stage: $(STAGE)"
-	@echo "   aws profile: $(AWS_PROFILE)"
+	@echo "   stage: $(STAGE)"
 	@echo "   docker image: $(DOCKER_IMAGE)"
 	@echo "   version: $(VERSION)"
 	@echo
