@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  Build and Push:
+  deploy:
 
     runs-on: ubuntu-latest
 
