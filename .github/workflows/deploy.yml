@@ -3,6 +3,8 @@ name: Docker Image CI
 on:
   push:
     branches: [ 5.6_homer ]
+    paths-ignore:
+      - README.md
 
   workflow_dispatch:
 

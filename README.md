@@ -1,3 +1,5 @@
+[![Docker Image CI](https://github.com/LearnWithHomer/squidex/actions/workflows/docker-image-gh-action.yml/badge.svg?branch=5.6_homer)](https://github.com/LearnWithHomer/squidex/actions/workflows/docker-image-gh-action.yml)
+
 ![Squidex Logo](https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-wide.png "Squidex")
 
 # What is Squidex?
