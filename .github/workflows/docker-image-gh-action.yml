@@ -4,6 +4,8 @@ on:
   push:
     branches: [ 5.6_homer ]
 
+  workflow_dispatch:
+
 jobs:
 
   build:
