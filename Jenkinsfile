@@ -31,7 +31,7 @@ pipeline {
             if (params.namespace == "content-v1"){
               full_image_name = "${upstream_image_name}:${upstream_image_tag}"
             }
-            full_image_name = "${image_name}:${tag}"
+            full_image_name = "${homer_image_name}:${tag}"
             cluster = params.cluster
             namespace = params.namespace
           }
