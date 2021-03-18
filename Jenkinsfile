@@ -27,7 +27,7 @@ pipeline {
     stage('Checkout') {
       steps {
           script {
-            git credentialsId: 'jenkins-aws-user', url: 'https://github.com/LearnWithHomer/squidex'
+            git branch:'5.6_homer', credentialsId: 'jenkins-aws-user', url: 'https://github.com/LearnWithHomer/squidex'
             if (params.namespace == "content-v1"){
               full_image_name = "${upstream_image_name}:${upstream_image_tag}"
             }
