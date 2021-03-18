@@ -34,6 +34,7 @@ deploy: build _login
 	docker tag ${DOCKER_IMAGE}:latest ${DOCKER_IMAGE}:${VERSION}
 	docker push ${DOCKER_IMAGE}:latest
 	docker push ${DOCKER_IMAGE}:${VERSION}
+	@echo "DOCKER_TAG=${VERSION}" >> $GITHUB_ENV
 
 
 _login:
