@@ -3,7 +3,7 @@ PROJECT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 STAGE ?= "prod"
 DOCKER_SERVER ?= 597764168253.dkr.ecr.us-east-1.amazonaws.com
 DOCKER_IMAGE ?= ${DOCKER_SERVER}/homer-squidex
-VERSION ?= $(shell git branch --show-current)-$(shell git rev-parse --short HEAD)
+VERSION ?= $(shell git branch --show-current)-$(shell git rev-parse --short HEAD)-TEST
 
 # ifndef AWS_PROFILE
 # $(error AWS_PROFILE is not set)
