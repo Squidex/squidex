@@ -51,9 +51,6 @@ pipeline {
 
 
     stage('Deploy'){
-      when {
-        expression {deploy}
-      }
       steps {
         script {
           homerKubernetes.deploy(namespace, cluster)
