@@ -43,7 +43,7 @@ pipeline {
         script {
           deploymentName = homerKubernetes.getDeploymentName()
           replicas = homerKubernetes.getReplicaCount(cluster, namespace, deploymentName)
-          homerKubernetes.updateDeploymentYaml(app, 'k8s/deployment.yaml')
+          homerKubernetes.updateDeploymentYaml(null, 'k8s/deployment.yaml', full_image_name)
           homerKubernetes.updateReplicaCount(replicas)
         }
       }
