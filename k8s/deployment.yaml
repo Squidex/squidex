@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: squidex
 spec:
-  replicas: 1
+  replicas: $REPLICA_COUNT
   revisionHistoryLimit: 2
   selector:
     matchLabels:
@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: squidex
-          image: squidex/squidex:4.5.1
+          image: $DOCKER_IMAGE
           imagePullPolicy: Always
           resources:
             requests:
