@@ -27,8 +27,8 @@ jobs:
       id: vars
       run: echo ::set-output name=VERSION::$(git branch --show-current)-$(git rev-parse --short HEAD)
 
-    # - name: Build and push the Squidex Docker Image
-    #   run: make deploy
+    - name: Build and push the Squidex Docker Image
+      run: make deploy
 
     - name: Create Release
       id: create_release
