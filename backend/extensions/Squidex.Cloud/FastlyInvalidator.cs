@@ -59,6 +59,7 @@ namespace Squidex.Cloud
             {
                 case AssetEvent c:
                     await InvalidateAsync(DomainId.Combine(c.AppId, c.AssetId));
+                    await InvalidateAsync(c.AssetId);
                     break;
                 case ContentEvent c:
                     await InvalidateAsync(c.ContentId);
