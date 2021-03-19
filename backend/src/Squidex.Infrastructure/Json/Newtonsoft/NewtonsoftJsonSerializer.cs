@@ -28,7 +28,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public string Serialize<T>(T value, bool intented)
         {
-            return JsonConvert.SerializeObject(value, intented ? Formatting.Indented : Formatting.None, settings);
+            var formatting = intented ? Formatting.Indented : Formatting.None;
+
+            return JsonConvert.SerializeObject(value, formatting, settings);
         }
 
         public void Serialize<T>(T value, Stream stream, bool leaveOpen = false)

@@ -11,7 +11,7 @@ using NodaTime.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    internal sealed class InstantGraphType : DateTimeGraphType
+    public sealed class InstantGraphType : DateTimeGraphType
     {
         public override object Serialize(object value)
         {
@@ -27,8 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
         {
             switch (value)
             {
-                case InstantValueNode timeValue:
-                    return timeValue.Value;
                 case StringValue stringValue:
                     return ParseValue(stringValue.Value);
                 default:

@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 if (fieldContext.Arguments.TryGetValue("path", out var path))
                 {
-                    source.Metadata.TryGetByPath(path as string, out var result);
+                    source.Metadata.TryGetByPath(path.Value as string, out var result);
 
                     return result;
                 }
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                     Name = "id",
                     Description = "The id of the asset (usually GUID).",
                     DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullDomainId
+                    ResolvedType = AllTypes.NonNullString
                 }
             };
 

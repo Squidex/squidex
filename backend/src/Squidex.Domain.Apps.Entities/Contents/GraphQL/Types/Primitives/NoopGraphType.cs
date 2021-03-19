@@ -10,7 +10,7 @@ using GraphQL.Types;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    internal sealed class NoopGraphType : ScalarGraphType
+    public sealed class NoopGraphType : ScalarGraphType
     {
         public NoopGraphType(string name)
         {
@@ -23,9 +23,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             Description = type.Description;
         }
 
-        public override object Serialize(object value)
+        public override object ParseLiteral(IValue value)
         {
-            return value;
+            return value.Value;
         }
 
         public override object ParseValue(object value)
@@ -33,9 +33,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             return value;
         }
 
-        public override object ParseLiteral(IValue value)
+        public override object Serialize(object value)
         {
-            return value.Value;
+            return value;
         }
     }
 }

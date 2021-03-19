@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             public static readonly ValueResolver Resolver = (value, fieldContext, context) =>
             {
-                if (fieldContext.Arguments.TryGetValue("path", out var p) && p is string path)
+                if (fieldContext.Arguments.TryGetValue("path", out var v) && v.Value is string path)
                 {
                     value.TryGetByPath(path, out var result);
 
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     Name = "id",
                     Description = "The id of the content (usually GUID).",
                     DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullDomainId
+                    ResolvedType = AllTypes.NonNullString
                 },
                 new QueryArgument(AllTypes.None)
                 {
@@ -214,8 +214,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsCreate, c =>
             {
-                var contentData = GetContentData(c);
                 var contentId = c.GetArgument<string?>("id");
+                var contentData = c.GetArgument<ContentData>("data");
                 var contentStatus = c.GetArgument<string?>("status");
 
                 var command = new CreateContent { Data = contentData };
@@ -249,7 +249,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Name = "id",
                         Description = "The id of the content (usually GUID).",
                         DefaultValue = null,
-                        ResolvedType = AllTypes.NonNullDomainId
+                        ResolvedType = AllTypes.NonNullString
                     },
                     new QueryArgument(AllTypes.None)
                     {
@@ -284,8 +284,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpsert, c =>
             {
-                var contentData = GetContentData(c);
                 var contentId = c.GetArgument<string>("id");
+                var contentData = c.GetArgument<ContentData>("data");
                 var contentStatus = c.GetArgument<string?>("status");
 
                 var id = DomainId.Create(contentId);
@@ -338,7 +338,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpdateOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
-                var contentData = GetContentData(c);
+                var contentData = c.GetArgument<ContentData>("data");
 
                 return new UpdateContent { ContentId = contentId, Data = contentData };
             });
@@ -377,7 +377,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpdateOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
-                var contentData = GetContentData(c);
+                var contentData = c.GetArgument<ContentData>("data");
 
                 return new PatchContent { ContentId = contentId, Data = contentData };
             });
@@ -392,7 +392,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     Name = "id",
                     Description = "The id of the content (usually GUID).",
                     DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullDomainId
+                    ResolvedType = AllTypes.NonNullString
                 },
                 new QueryArgument(AllTypes.None)
                 {
@@ -406,7 +406,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     Name = "dueTime",
                     Description = "When to change the status",
                     DefaultValue = null,
-                    ResolvedType = AllTypes.Date
+                    ResolvedType = AllTypes.DateTime
                 },
                 new QueryArgument(AllTypes.None)
                 {
@@ -436,7 +436,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     Name = "id",
                     Description = "The id of the content (usually GUID).",
                     DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullDomainId
+                    ResolvedType = AllTypes.NonNullString
                 },
                 new QueryArgument(AllTypes.None)
                 {
@@ -453,13 +453,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 return new DeleteContent { ContentId = contentId };
             });
-        }
-
-        private static ContentData GetContentData(IResolveFieldContext c)
-        {
-            var source = c.GetArgument<IDictionary<string, object>>("data");
-
-            return source.ToContentData((IComplexGraphType)c.FieldDefinition.Arguments.Find("data").Flatten());
         }
 
         private static IFieldResolver ResolveAsync(string permissionId, Func<IResolveFieldContext, ContentCommand> action)

@@ -13,6 +13,7 @@ using Fluid;
 using Fluid.Ast;
 using Fluid.Tags;
 using GraphQL.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Core.ValidateContent;

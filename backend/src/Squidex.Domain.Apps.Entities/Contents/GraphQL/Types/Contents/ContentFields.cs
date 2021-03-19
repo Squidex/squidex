@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType Created = new FieldType
         {
             Name = "created",
-            ResolvedType = AllTypes.NonNullDate,
+            ResolvedType = AllTypes.NonNullDateTime,
             Resolver = EntityResolvers.Created,
             Description = "The date and time when the content has been created."
         };
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType LastModified = new FieldType
         {
             Name = "lastModified",
-            ResolvedType = AllTypes.NonNullDate,
+            ResolvedType = AllTypes.NonNullDateTime,
             Resolver = EntityResolvers.LastModified,
             Description = "The date and time when the content has been modified last."
         };

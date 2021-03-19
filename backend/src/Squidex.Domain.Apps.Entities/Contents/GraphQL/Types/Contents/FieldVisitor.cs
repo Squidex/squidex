@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL;
@@ -19,8 +20,63 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
     internal sealed class FieldVisitor : IFieldVisitor<(IGraphType?, IFieldResolver?, QueryArguments?), FieldInfo>
     {
-        private static readonly IFieldResolver Noop = CreateValueResolver((value, fieldContext, contex) => value);
-        private static readonly IFieldResolver Json = CreateValueResolver(ContentActions.Json.Resolver);
+        private static readonly IFieldResolver JsonNoop = CreateValueResolver((value, fieldContext, contex) => value);
+        private static readonly IFieldResolver JsonPath = CreateValueResolver(ContentActions.Json.Resolver);
+
+        private static readonly IFieldResolver JsonBoolean = CreateValueResolver((value, fieldContext, contex) =>
+        {
+            switch (value)
+            {
+                case JsonBoolean b:
+                    return b.Value;
+                default:
+                    throw new NotSupportedException();
+            }
+        });
+
+        private static readonly IFieldResolver JsonDateTime = CreateValueResolver((value, fieldContext, contex) =>
+        {
+            switch (value)
+            {
+                case JsonString n:
+                    return n.Value;
+                default:
+                    throw new NotSupportedException();
+            }
+        });
+
+        private static readonly IFieldResolver JsonNumber = CreateValueResolver((value, fieldContext, contex) =>
+        {
+            switch (value)
+            {
+                case JsonNumber n:
+                    return n.Value;
+                default:
+                    throw new NotSupportedException();
+            }
+        });
+
+        private static readonly IFieldResolver JsonString = CreateValueResolver((value, fieldContext, contex) =>
+        {
+            switch (value)
+            {
+                case JsonString s:
+                    return s.Value;
+                default:
+                    throw new NotSupportedException();
+            }
+        });
+
+        private static readonly IFieldResolver JsonStrings = CreateValueResolver((value, fieldContext, contex) =>
+        {
+            switch (value)
+            {
+                case JsonArray a:
+                    return a.Select(x => x.ToString()).ToList();
+                default:
+                    throw new NotSupportedException();
+            }
+        });
 
         private static readonly IFieldResolver Assets = CreateValueResolver((value, _, context) =>
         {
@@ -46,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     new NonNullGraphType(
                         new NestedGraphType(builder, args)));
 
-            return (schemaFieldType, Noop, null);
+            return (schemaFieldType, JsonNoop, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field, FieldInfo args)
@@ -56,42 +112,42 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<BooleanFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Boolean, Noop, null);
+            return (AllTypes.Boolean, JsonBoolean, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Date, Noop, null);
+            return (AllTypes.DateTime, JsonDateTime, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<JsonFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Json, Json, ContentActions.Json.Arguments);
+            return (AllTypes.Json, JsonPath, ContentActions.Json.Arguments);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<GeolocationFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Json, Noop, null);
+            return (AllTypes.Json, JsonPath, ContentActions.Json.Arguments);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<NumberFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Float, Noop, null);
+            return (AllTypes.Float, JsonNumber, null);
+        }
+
+        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<StringFieldProperties> field, FieldInfo args)
+        {
+            return (AllTypes.String, JsonString, null);
+        }
+
+        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<TagsFieldProperties> field, FieldInfo args)
+        {
+            return (AllTypes.Strings, JsonStrings, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<ReferencesFieldProperties> field, FieldInfo args)
         {
             return ResolveReferences(field, args);
-        }
-
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<StringFieldProperties> field, FieldInfo args)
-        {
-            return (AllTypes.String, Noop, null);
-        }
-
-        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<TagsFieldProperties> field, FieldInfo args)
-        {
-            return (AllTypes.Strings, Noop, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<UIFieldProperties> field, FieldInfo args)

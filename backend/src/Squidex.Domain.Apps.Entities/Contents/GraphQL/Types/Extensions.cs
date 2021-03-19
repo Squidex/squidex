@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.ObjectPool;
-using GraphQLSchema = GraphQL.Types.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -27,11 +23,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 sb.Append('?');
 
-                foreach (var argument in context.Arguments)
+                foreach (var (key, value) in context.Arguments)
                 {
-                    var value = argument.Value?.ToString();
+                    var formatted = value.Value?.ToString();
 
-                    if (!string.IsNullOrWhiteSpace(value))
+                    if (!string.IsNullOrWhiteSpace(formatted))
                     {
                         if (sb.Length > 1)
                         {
@@ -39,9 +35,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         }
 
                         sb.Append('$');
-                        sb.Append(argument.Key);
+                        sb.Append(key);
                         sb.Append('=');
-                        sb.Append(value);
+                        sb.Append(formatted);
                     }
                 }
 
@@ -90,20 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private static FieldType WithMetadata(this FieldType field, string key, object value)
         {
-            if (field is MetadataProvider metadataProvider)
-            {
-                if (metadataProvider.Metadata is Dictionary<string, object> dict)
-                {
-                    dict[key] = value;
-                }
-                else
-                {
-                    metadataProvider.Metadata = new Dictionary<string, object>
-                    {
-                        [key] = value
-                    };
-                }
-            }
+            field.Metadata[key] = value;
 
             return field;
         }
@@ -121,78 +104,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             return type;
-        }
-
-        public static void CleanupMetadata(this GraphQLSchema schema)
-        {
-            var targets = new HashSet<IProvideMetadata>(ReferenceEqualityComparer.Instance);
-
-            foreach (var type in schema.AllTypes)
-            {
-                FindTargets(type, targets);
-            }
-
-            foreach (var target in targets.OfType<MetadataProvider>())
-            {
-                var metadata = target.Metadata;
-
-                if (metadata != null && metadata.Count == 0)
-                {
-                    target.Metadata = null;
-                }
-            }
-        }
-
-        private static void FindTargets(IGraphType type, HashSet<IProvideMetadata> targets)
-        {
-            if (type == null)
-            {
-                return;
-            }
-
-            if (targets.Add(type))
-            {
-                if (type is IComplexGraphType complexType)
-                {
-                    foreach (var field in complexType.Fields)
-                    {
-                        targets.Add(field);
-
-                        FindTargets(field.ResolvedType, targets);
-
-                        if (field.Arguments != null)
-                        {
-                            foreach (var argument in field.Arguments)
-                            {
-                                targets.Add(argument);
-
-                                FindTargets(argument.ResolvedType, targets);
-                            }
-                        }
-                    }
-
-                    if (type is IObjectGraphType { ResolvedInterfaces: { } } objectGraphType)
-                    {
-                        foreach (var @interface in objectGraphType.ResolvedInterfaces)
-                        {
-                            FindTargets(@interface, targets);
-                        }
-                    }
-
-                    if (type is IAbstractGraphType { PossibleTypes: { } } abstractGraphType)
-                    {
-                        foreach (var possibleType in abstractGraphType.PossibleTypes)
-                        {
-                            FindTargets(possibleType, targets);
-                        }
-                    }
-                }
-
-                if (type is IProvideResolvedType provideType)
-                {
-                    FindTargets(provideType.ResolvedType, targets);
-                }
-            }
         }
     }
 }
