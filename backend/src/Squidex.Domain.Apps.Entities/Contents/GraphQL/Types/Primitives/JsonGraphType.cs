@@ -7,20 +7,12 @@
 
 using System.Collections.Generic;
 using GraphQL.Language.AST;
-using GraphQL.Types;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    public sealed class JsonGraphType : ScalarGraphType
+    public sealed class JsonGraphType : JsonNoopGraphType
     {
-        public JsonGraphType()
-        {
-            Name = "JsonScalar";
-
-            Description = "Unstructured Json object";
-        }
-
         public override object Serialize(object value)
         {
             return value;

@@ -199,9 +199,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddSingleton(contentQuery)
                     .AddSingleton(dataLoaderContext)
                     .AddSingleton(dataLoaderListener)
-                    .AddSingleton<JsonGraphType>()
                     .AddSingleton<InstantGraphType>()
-                    .AddSingleton<NoopGraphType>()
+                    .AddSingleton<JsonGraphType>()
+                    .AddSingleton<JsonNoopGraphType>()
                     .AddSingleton<SharedTypes>()
                     .AddSingleton<IUrlGenerator,
                         FakeUrlGenerator>()

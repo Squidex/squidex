@@ -10,17 +10,13 @@ using GraphQL.Types;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    public sealed class NoopGraphType : ScalarGraphType
+    public class JsonNoopGraphType : ScalarGraphType
     {
-        public NoopGraphType(string name)
+        public JsonNoopGraphType()
         {
-            Name = name;
-        }
+            Name = "JsonScalar";
 
-        public NoopGraphType(IGraphType type)
-            : this(type.Name)
-        {
-            Description = type.Description;
+            Description = "Unstructured Json object";
         }
 
         public override object ParseLiteral(IValue value)

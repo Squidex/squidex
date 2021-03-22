@@ -36,7 +36,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<JsonGraphType>()
                 .AsSelf();
 
-            services.AddSingletonAs<NoopGraphType>()
+            services.AddSingletonAs<JsonNoopGraphType>()
                 .AsSelf();
 
             services.AddSingletonAs<CachingGraphQLService>()

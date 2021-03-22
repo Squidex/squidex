@@ -14,13 +14,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public static class AllTypes
     {
-        public static readonly Type None = typeof(NoopGraphType);
-
         public static readonly IGraphType Int = new IntGraphType();
 
         public static readonly IGraphType Long = new LongGraphType();
 
         public static readonly IGraphType Json = new JsonGraphType();
+
+        public static readonly IGraphType JsonNoop = new JsonNoopGraphType();
 
         public static readonly IGraphType Float = new FloatGraphType();
 
@@ -49,7 +49,5 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType NonNullDateTime = new NonNullGraphType(DateTime);
 
         public static readonly IGraphType NonNullAssetType = new NonNullGraphType(AssetType);
-
-        public static readonly IGraphType NoopJson = new NoopGraphType(Json);
     }
 }

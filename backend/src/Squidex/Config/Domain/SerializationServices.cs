@@ -134,6 +134,7 @@ namespace Squidex.Config.Domain
             builder.Services.AddSingleton<IDocumentWriter>(c =>
             {
                 var settings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.None);
+
                 var serializer = new NewtonsoftJsonSerializer(settings);
 
                 return new DefaultDocumentWriter(serializer);

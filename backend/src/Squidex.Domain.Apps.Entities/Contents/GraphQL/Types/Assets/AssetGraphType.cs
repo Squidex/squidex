@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "metadata",
                 Arguments = AssetActions.Metadata.Arguments,
-                ResolvedType = AllTypes.NoopJson,
+                ResolvedType = AllTypes.JsonNoop,
                 Resolver = AssetActions.Metadata.Resolver,
                 Description = "The asset metadata."
             });

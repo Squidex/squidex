@@ -19,12 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.String)
                 {
                     Name = "path",
                     Description = "The path to the json value",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.String
+                    DefaultValue = null
                 }
             };
 
@@ -45,12 +44,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.NonNullString)
                 {
                     Name = "id",
                     Description = "The id of the asset (usually GUID).",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullString
+                    DefaultValue = null
                 }
             };
 
@@ -66,33 +64,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.Int)
                 {
                     Name = "top",
                     Description = "Optional number of assets to take.",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.Int
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.Int)
                 {
                     Name = "skip",
                     Description = "Optional number of assets to skip.",
-                    DefaultValue = 0,
-                    ResolvedType = AllTypes.Int
+                    DefaultValue = 0
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.String)
                 {
                     Name = "filter",
                     Description = "Optional OData filter.",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.String
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.String)
                 {
                     Name = "orderby",
                     Description = "Optional OData order definition.",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.String
+                    DefaultValue = null
                 }
             };
 

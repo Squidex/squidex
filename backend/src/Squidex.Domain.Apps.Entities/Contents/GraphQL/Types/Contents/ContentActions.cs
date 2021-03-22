@@ -27,12 +27,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.String)
                 {
                     Name = "path",
                     Description = "The path to the json value",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.String
+                    DefaultValue = null
                 }
             };
 
@@ -51,12 +50,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public static readonly QueryArguments JsonPath = new QueryArguments
         {
-            new QueryArgument(AllTypes.None)
+            new QueryArgument(AllTypes.String)
             {
                 Name = "path",
                 Description = "The path to the json value",
-                DefaultValue = null,
-                ResolvedType = AllTypes.String
+                DefaultValue = null
             }
         };
 
@@ -64,19 +62,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.NonNullString)
                 {
                     Name = "id",
                     Description = "The id of the content (usually GUID).",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullString
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.Int)
                 {
                     Name = "version",
                     Description = "The optional version of the content to retrieve an older instance (not cached).",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.Int
+                    DefaultValue = null
                 }
             };
 
@@ -101,40 +97,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.Int)
                 {
                     Name = "top",
                     Description = "Optional number of contents to take.",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.Int
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.Int)
                 {
                     Name = "skip",
                     Description = "Optional number of contents to skip.",
-                    DefaultValue = 0,
-                    ResolvedType = AllTypes.Int
+                    DefaultValue = 0
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.String)
                 {
                     Name = "filter",
                     Description = "Optional OData filter.",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.String
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.String)
                 {
                     Name = "orderby",
                     Description = "Optional OData order definition.",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.String
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.String)
                 {
                     Name = "search",
                     Description = "Optional OData full text search.",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.String
+                    DefaultValue = null
                 }
             };
 
@@ -181,33 +172,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(new NonNullGraphType(inputType))
                     {
                         Name = "data",
                         Description = "The data for the content.",
-                        DefaultValue = null,
-                        ResolvedType = new NonNullGraphType(inputType)
+                        DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.Boolean)
                     {
                         Name = "publish",
                         Description = "Set to true to autopublish content on create.",
-                        DefaultValue = false,
-                        ResolvedType = AllTypes.Boolean
+                        DefaultValue = false
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.String)
                     {
                         Name = "status",
                         Description = "The initial status.",
-                        DefaultValue = null,
-                        ResolvedType = AllTypes.String
+                        DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.String)
                     {
                         Name = "id",
                         Description = "The optional custom content id.",
-                        DefaultValue = null,
-                        ResolvedType = AllTypes.String
+                        DefaultValue = null
                     }
                 };
             }
@@ -244,40 +231,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.NonNullString)
                     {
                         Name = "id",
                         Description = "The id of the content (usually GUID).",
-                        DefaultValue = null,
-                        ResolvedType = AllTypes.NonNullString
+                        DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(new NonNullGraphType(inputType))
                     {
                         Name = "data",
                         Description = "The data for the content.",
-                        DefaultValue = null,
-                        ResolvedType = new NonNullGraphType(inputType)
+                        DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.Boolean)
                     {
                         Name = "publish",
                         Description = "Set to true to autopublish content on create.",
-                        DefaultValue = false,
-                        ResolvedType = AllTypes.Boolean
+                        DefaultValue = false
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.String)
                     {
                         Name = "status",
                         Description = "The initial status.",
-                        DefaultValue = null,
-                        ResolvedType = AllTypes.String
+                        DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.Int)
                     {
                         Name = "expectedVersion",
                         Description = "The expected version",
-                        DefaultValue = EtagVersion.Any,
-                        ResolvedType = AllTypes.Int
+                        DefaultValue = EtagVersion.Any
                     }
                 };
             }
@@ -311,26 +293,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.String)
                     {
                         Name = "id",
                         Description = "The optional custom content id.",
-                        DefaultValue = null,
-                        ResolvedType = AllTypes.String
+                        DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(new NonNullGraphType(inputType))
                     {
                         Name = "data",
                         Description = "The data for the content.",
-                        DefaultValue = null,
-                        ResolvedType = new NonNullGraphType(inputType)
+                        DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.Int)
                     {
                         Name = "expectedVersion",
                         Description = "The expected version",
-                        DefaultValue = EtagVersion.Any,
-                        ResolvedType = AllTypes.Int
+                        DefaultValue = EtagVersion.Any
                     }
                 };
             }
@@ -350,26 +329,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.String)
                     {
                         Name = "id",
                         Description = "The optional custom content id.",
-                        DefaultValue = null,
-                        ResolvedType = AllTypes.String
+                        DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(new NonNullGraphType(inputType))
                     {
                         Name = "data",
                         Description = "The data for the content.",
-                        DefaultValue = null,
-                        ResolvedType = new NonNullGraphType(inputType)
+                        DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.None)
+                    new QueryArgument(AllTypes.Int)
                     {
                         Name = "expectedVersion",
                         Description = "The expected version",
-                        DefaultValue = EtagVersion.Any,
-                        ResolvedType = AllTypes.Int
+                        DefaultValue = EtagVersion.Any
                     }
                 };
             }
@@ -387,33 +363,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.NonNullString)
                 {
                     Name = "id",
                     Description = "The id of the content (usually GUID).",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullString
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.NonNullString)
                 {
                     Name = "status",
                     Description = "The new status",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullString
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.DateTime)
                 {
                     Name = "dueTime",
                     Description = "When to change the status",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.DateTime
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.Int)
                 {
                     Name = "expectedVersion",
                     Description = "The expected version",
-                    DefaultValue = EtagVersion.Any,
-                    ResolvedType = AllTypes.Int
+                    DefaultValue = EtagVersion.Any
                 }
             };
 
@@ -431,19 +403,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.NonNullString)
                 {
                     Name = "id",
                     Description = "The id of the content (usually GUID).",
-                    DefaultValue = null,
-                    ResolvedType = AllTypes.NonNullString
+                    DefaultValue = null
                 },
-                new QueryArgument(AllTypes.None)
+                new QueryArgument(AllTypes.Int)
                 {
                     Name = "expectedVersion",
                     Description = "The expected version",
-                    DefaultValue = EtagVersion.Any,
-                    ResolvedType = AllTypes.Int
+                    DefaultValue = EtagVersion.Any
                 }
             };
 
