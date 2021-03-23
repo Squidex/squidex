@@ -96,7 +96,7 @@ namespace Squidex.Extensions.Actions.Kafka
             {
                 await kafkaProducer.SendAsync(job, ct);
 
-                return Result.Success($"Event pushed to {job.TopicName} kafka topic.");
+                return Result.Success($"Event pushed to {job.TopicName} kafka topic with {job.MessageKey} message key.");
             }
             catch (Exception ex)
             {
