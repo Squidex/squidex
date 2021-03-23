@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
@@ -12,6 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class RestoreContext : BackupContextBase
     {
+        private string? appStream;
+
         public IBackupReader Reader { get; }
 
         public DomainId PreviousAppId { get; set; }
@@ -28,8 +31,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Reader = reader;
 
             PreviousAppId = previousAppId;
+        }
 
-            AppStream = $"app-{appId}";
+        public string GetStreamName(string streamName)
+        {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+
+            if (streamName.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
+            {
+                return appStream ??= $"app-{AppId}";
+            }
+
+            return streamName.Replace(PreviousAppId.ToString(), AppId.ToString());
         }
 
         public long GetStreamOffset(string streamName)

@@ -348,22 +348,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 if (handled)
                 {
-                    var newStream = stream;
+                    var streamName = restoreContext.GetStreamName(stream);
+                    var streamOffset = restoreContext.GetStreamOffset(streamName);
 
-                    if (newStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
-                    {
-                        newStream = restoreContext.AppStream;
-                    }
-                    else
-                    {
-                        newStream = stream.Replace(
-                            restoreContext.PreviousAppId.ToString(),
-                            restoreContext.AppId.ToString());
-                    }
-
-                    var offset = restoreContext.GetStreamOffset(newStream);
-
-                    commits.Add(EventCommit.Create(newStream, offset, @event, eventDataFormatter));
+                    commits.Add(EventCommit.Create(streamName, streamOffset, @event, eventDataFormatter));
                 }
             }
 
@@ -405,9 +393,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 appEvent.AppId = CurrentJob.AppId;
             }
 
-            if (@event.Headers.TryGet(CommonHeaders.AggregateId, out var aggregateId) && aggregateId is JsonString s)
+            if (@event.Headers.TryGet(CommonHeaders.AggregateId, out var value) && value is JsonString idString)
             {
-                var id = s.Value.Replace(
+                var id = idString.Value.Replace(
                     restoreContext.PreviousAppId.ToString(),
                     restoreContext.AppId.ToString());
 
