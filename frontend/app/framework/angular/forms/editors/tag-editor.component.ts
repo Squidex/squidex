@@ -20,8 +20,6 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 
 let CACHED_FONT: string;
 
-const NO_EMIT = { emitEvent: false };
-
 interface State {
     // True, when the item has the focus.
     hasFocus: boolean;
@@ -192,9 +190,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         super.setDisabledState(isDisabled);
 
         if (isDisabled) {
-            this.addInput.disable(NO_EMIT);
+            this.addInput.disable({ emitEvent: false });
         } else {
-            this.addInput.enable(NO_EMIT);
+            this.addInput.enable({ emitEvent: false });
         }
     }
 

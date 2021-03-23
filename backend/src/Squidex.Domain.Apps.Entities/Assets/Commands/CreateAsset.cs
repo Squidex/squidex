@@ -10,11 +10,9 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class CreateAsset : UploadAssetCommand
+    public sealed class CreateAsset : UploadAssetCommand, IMoveAssetCommand
     {
         public DomainId ParentId { get; set; }
-
-        public string? ParentPath { get; set; }
 
         public bool Duplicate { get; set; }
 

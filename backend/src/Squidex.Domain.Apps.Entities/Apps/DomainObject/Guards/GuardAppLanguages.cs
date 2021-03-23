@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                 }
                 else
                 {
-                    EnsureConfigExists(languages, language);
+                    CheckLanguageExists(languages, language);
 
                     if (languages.IsMaster(language))
                     {
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                 }
                 else
                 {
-                    EnsureConfigExists(languages, language);
+                    CheckLanguageExists(languages, language);
 
                     if (languages.IsMaster(language) || command.IsMaster)
                     {
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             });
         }
 
-        private static void EnsureConfigExists(LanguagesConfig languages, Language language)
+        private static void CheckLanguageExists(LanguagesConfig languages, Language language)
         {
             if (!languages.Contains(language))
             {

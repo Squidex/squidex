@@ -17,32 +17,24 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 {
     public static class GuardAsset
     {
-        public static void CanAnnotate(AnnotateAsset command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanCreate(CreateAsset command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
         public static Task CanMove(MoveAsset command, IAssetEntity asset, IAssetQueryService assetQuery)
         {
             Guard.NotNull(command, nameof(command));
 
             return Validate.It(async e =>
             {
-                if (command.ParentId != asset.ParentId)
+                var parentId = command.ParentId;
+
+                if (parentId != asset.ParentId && parentId != DomainId.Empty && !command.OptimizeValidation)
                 {
-                    await CheckPathAsync(command.AppId.Id, command.ParentId, assetQuery, e);
+                    var path = await assetQuery.FindAssetFolderAsync(command.AppId.Id, parentId);
+
+                    if (path.Count == 0)
+                    {
+                        e(T.Get("assets.folderNotFound"), nameof(MoveAsset.ParentId));
+                    }
                 }
             });
-        }
-
-        public static void CanUpdate(UpdateAsset command)
-        {
-            Guard.NotNull(command, nameof(command));
         }
 
         public static async Task CanDelete(DeleteAsset command, IAssetEntity asset, IContentRepository contentRepository)
@@ -56,19 +48,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
                 if (hasReferrer)
                 {
                     throw new DomainException(T.Get("assets.referenced"));
-                }
-            }
-        }
-
-        private static async Task CheckPathAsync(DomainId appId, DomainId parentId, IAssetQueryService assetQuery, AddValidation e)
-        {
-            if (parentId != DomainId.Empty)
-            {
-                var path = await assetQuery.FindAssetFolderAsync(appId, parentId);
-
-                if (path.Count == 0)
-                {
-                    e(T.Get("assets.folderNotFound"), nameof(MoveAsset.ParentId));
                 }
             }
         }

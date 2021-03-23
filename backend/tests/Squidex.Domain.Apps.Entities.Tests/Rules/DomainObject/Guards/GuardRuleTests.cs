@@ -123,30 +123,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             await GuardRule.CanUpdate(command, Rule(), appProvider);
         }
 
-        [Fact]
-        public void CanEnable_should_not_throw_exception()
-        {
-            var command = new EnableRule();
-
-            GuardRule.CanEnable(command);
-        }
-
-        [Fact]
-        public void CanDisable_should_not_throw_exception()
-        {
-            var command = new DisableRule();
-
-            GuardRule.CanDisable(command);
-        }
-
-        [Fact]
-        public void CanDelete_should_not_throw_exception()
-        {
-            var command = new DeleteRule();
-
-            GuardRule.CanDelete(command);
-        }
-
         private CreateRule CreateCommand(CreateRule command)
         {
             command.AppId = appId;

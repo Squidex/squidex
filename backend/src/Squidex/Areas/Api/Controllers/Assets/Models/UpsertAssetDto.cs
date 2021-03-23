@@ -28,12 +28,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public DomainId ParentId { get; set; }
 
         /// <summary>
-        /// The optional path to the parent folder.
-        /// </summary>
-        [FromQuery]
-        public string? ParentPath { get; set; }
-
-        /// <summary>
         /// True to duplicate the asset, event if the file has been uploaded.
         /// </summary>
         [FromQuery]

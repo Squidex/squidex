@@ -139,14 +139,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             GuardAssetFolder.CanRename(command);
         }
 
-        [Fact]
-        public void CanDelete_should_not_throw_exception()
-        {
-            var command = new DeleteAssetFolder { AppId = appId };
-
-            GuardAssetFolder.CanDelete(command);
-        }
-
         private IAssetFolderEntity AssetFolder(DomainId id = default, DomainId parentId = default)
         {
             var assetFolder = A.Fake<IAssetFolderEntity>();

@@ -41,12 +41,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
 
             [IgnoreDataMember]
-            public Status EditingStatus
-            {
-                get => NewStatus ?? Status;
-            }
-
-            [IgnoreDataMember]
             public Status? NewStatus
             {
                 get => NewVersion?.Status;

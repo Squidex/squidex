@@ -30,4 +30,16 @@
             </sqx-form-hint>
         </div>
     </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_folderId">{{ 'schemas.fieldTypes.assets.folderId' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-asset-folder-dropdown formControlName="folderId"></sqx-asset-folder-dropdown>
+
+            <sqx-form-hint>
+                {{ 'schemas.fieldTypes.assets.folderIdHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
 </div>

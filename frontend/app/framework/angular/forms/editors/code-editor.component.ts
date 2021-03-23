@@ -67,6 +67,12 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
         super(changeDetector, {});
     }
 
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['filePath'] || changes['mode']) {
+            this.setMode();
+        }
+    }
+
     public writeValue(obj: string) {
         if (this.valueMode === 'Json') {
             if (obj === null) {
@@ -100,12 +106,6 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public focus() {
         if (this.aceEditor) {
             this.aceEditor.focus();
-        }
-    }
-
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['filePath'] || changes['mode']) {
-            this.setMode();
         }
     }
 

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
@@ -37,6 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             cache.AddHeader(HeaderResolveFlow);
             cache.AddHeader(HeaderResolveUrls);
             cache.AddHeader(HeaderUnpublished);
+        }
+
+        public static Status EditingStatus(this IContentEntity content)
+        {
+            return content.NewStatus ?? content.Status;
         }
 
         public static SearchScope Scope(this Context context)

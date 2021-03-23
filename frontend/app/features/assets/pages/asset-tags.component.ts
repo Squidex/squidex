@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { Tag, TagsSelected } from '@app/shared';
+import { TagItem, TagsSelected } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-tags',
@@ -22,7 +22,7 @@ export class AssetTagsComponent {
     public toggle = new EventEmitter<string>();
 
     @Input()
-    public tags: ReadonlyArray<Tag>;
+    public tags: ReadonlyArray<TagItem>;
 
     @Input()
     public tagsSelected: TagsSelected;
@@ -31,11 +31,11 @@ export class AssetTagsComponent {
         return Object.keys(this.tagsSelected).length === 0;
     }
 
-    public isSelected(tag: Tag) {
+    public isSelected(tag: TagItem) {
         return this.tagsSelected[tag.name] === true;
     }
 
-    public trackByTag(_index: number, tag: Tag) {
+    public trackByTag(_index: number, tag: TagItem) {
         return tag.name;
     }
 }

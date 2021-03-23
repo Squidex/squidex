@@ -71,9 +71,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
 
-            services.AddSingletonAs<AssetFolderResolver>()
-                .As<IAssetFolderResolver>();
-
             services.AddSingletonAs<AssetLoader>()
                 .As<IAssetLoader>();
 

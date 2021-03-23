@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 import marked from 'marked';
@@ -34,6 +34,9 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     private simplemde: any;
     private value: string;
     private isDisabled = false;
+
+    @Input()
+    public folderId?: string;
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
@@ -240,7 +243,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
             }
         };
 
-        this.assetUploader.uploadFile(file)
+        this.assetUploader.uploadFile(file, undefined, this.folderId)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
                     replaceText(this.buildMarkup(asset));

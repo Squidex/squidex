@@ -63,10 +63,8 @@ export class AssetUploaderState extends State<Snapshot> {
         }, 'Stopped');
     }
 
-    public uploadFile(file: File, target?: AssetsState): Observable<UploadResult> {
-        const parentId = target?.parentId;
-
-        const stream = this.assetsService.postAssetFile(this.appName, file, parentId);
+    public uploadFile(file: File, target?: AssetsState, parentId?: string): Observable<UploadResult> {
+        const stream = this.assetsService.postAssetFile(this.appName, file, parentId ?? target?.parentId);
 
         return this.upload(stream, MathHelper.guid(), file.name, asset  => {
             if (asset.isDuplicate) {

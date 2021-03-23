@@ -1,0 +1,5 @@
+<sqx-dropdown [formControl]="control" [items]="snapshot.assetFolders" valueProperty="id" searchProperty="folderName">
+    <ng-template let-assetFolder="$implicit" let-context="context">
+        <span class="truncate">{{assetFolder.folderName | sqxTranslate | sqxHighlight:context}}</span>
+    </ng-template>
+</sqx-dropdown>

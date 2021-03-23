@@ -29,14 +29,14 @@ namespace Squidex.Infrastructure.Commands
             get => uniqueId;
         }
 
-        public long Version
-        {
-            get => snapshots.Version;
-        }
-
         public T Snapshot
         {
             get => snapshots.Current;
+        }
+
+        public long Version
+        {
+            get => snapshots.Version;
         }
 
         protected int Capacity

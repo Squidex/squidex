@@ -7,7 +7,7 @@
 
 // tslint:disable: prefer-for-of
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, LocalizerService, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 
@@ -32,6 +32,9 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
 
     @Output()
     public assetPluginClick = new EventEmitter<any>();
+
+    @Input()
+    public folderId: string;
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
@@ -238,7 +241,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
             this.tinyEditor.setContent(content);
         };
 
-        this.assetUploader.uploadFile(file)
+        this.assetUploader.uploadFile(file, undefined, this.folderId)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
                         replaceText(this.buildMarkup(asset));

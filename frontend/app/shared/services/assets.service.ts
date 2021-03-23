@@ -138,8 +138,7 @@ export interface AnnotateAssetDto {
     readonly metadata?: { [key: string]: any };
 }
 
-export interface CreateAssetFolderDto {
-    readonly parentId?: string;
+export interface CreateAssetFolderDto extends MoveAssetItemDto {
     readonly folderName: string;
 }
 
@@ -256,7 +255,7 @@ export class AssetsService {
         }
     }
 
-    public getAssetFolders(appName: string, parentId?: string): Observable<AssetFoldersDto> {
+    public getAssetFolders(appName: string, parentId: string): Observable<AssetFoldersDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders?parentId=${parentId}`);
 
         return this.http.get<{ total: number, items: any[], folders: any[], path: any[] } & Resource>(url).pipe(

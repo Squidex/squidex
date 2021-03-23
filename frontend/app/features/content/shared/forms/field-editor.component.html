@@ -30,7 +30,7 @@
                     </sqx-array-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Assets'">
-                    <sqx-assets-editor [formControl]="editorControl"></sqx-assets-editor>
+                    <sqx-assets-editor [formControl]="editorControl" [folderId]="field.rawProperties.folderId"></sqx-assets-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Boolean'">
                     <ng-container [ngSwitch]="field.rawProperties.editor">
@@ -46,13 +46,13 @@
                     </ng-container>
                 </ng-container>
                 <ng-container *ngSwitchCase="'DateTime'">
-                    <sqx-date-time-editor enforceTime="true" [mode]="field.rawProperties.editor" [formControl]="editorControl"></sqx-date-time-editor>
+                    <sqx-date-time-editor [formControl]="editorControl" [mode]="field.rawProperties.editor" enforceTime="true"></sqx-date-time-editor>
                 </ng-container>
 				<ng-container *ngSwitchCase="'Geolocation'">
 					<sqx-geolocation-editor [formControl]="editorControl"></sqx-geolocation-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Json'">
-					<sqx-code-editor height="350" [formControl]="editorControl" valueMode="Json"></sqx-code-editor>
+					<sqx-code-editor [formControl]="editorControl" valueMode="Json" height="350"></sqx-code-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Number'">
 					<ng-container [ngSwitch]="field.rawProperties.editor">
@@ -122,16 +122,16 @@
 							<input class="form-control" type="text" [formControl]="editorControl" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify">
 						</ng-container>
 						<ng-container *ngSwitchCase="'TextArea'">
-							<textarea class="form-control" [formControl]="editorControl" rows="5" [placeholder]="field.displayPlaceholder"></textarea>
+							<textarea class="form-control" [formControl]="editorControl" [placeholder]="field.displayPlaceholder" rows="5"></textarea>
 						</ng-container>
 						<ng-container *ngSwitchCase="'RichText'">
-							<sqx-rich-editor [formControl]="editorControl" #editor></sqx-rich-editor>
+							<sqx-rich-editor [formControl]="editorControl" #editor [folderId]="field.rawProperties.folderId"></sqx-rich-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Html'">
-							<sqx-code-editor height="350"  [formControl]="editorControl" mode="ace/mode/html"></sqx-code-editor>
+							<sqx-code-editor [formControl]="editorControl" #editor mode="ace/mode/html" height="350"  ></sqx-code-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Markdown'">
-							<sqx-markdown-editor [formControl]="editorControl"></sqx-markdown-editor>
+							<sqx-markdown-editor [formControl]="editorControl" #editor [folderId]="field.rawProperties.folderId"></sqx-markdown-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'StockPhoto'">
 							<sqx-stock-photo-editor [formControl]="editorControl"></sqx-stock-photo-editor>

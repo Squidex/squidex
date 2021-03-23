@@ -19,8 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 
         public DomainId ParentId { get; set; }
 
-        public string? ParentPath { get; set; }
-
         public string? FileName { get; set; }
 
         public string? Slug { get; set; }

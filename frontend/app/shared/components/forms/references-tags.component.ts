@@ -44,7 +44,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         return !!this.schemaId && !!this.language;
     }
 
-    public selectionControl = new FormControl([]);
+    public control = new FormControl([]);
 
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
         private readonly appsState: AppsState,
@@ -58,7 +58,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
         this.own(
-            this.selectionControl.valueChanges
+            this.control.valueChanges
                 .subscribe((value: string[]) => {
                     if (value && value.length > 0) {
                         this.callTouched();
@@ -97,16 +97,16 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
     public setDisabledState(isDisabled: boolean) {
         if (isDisabled) {
-            this.selectionControl.disable(NO_EMIT);
+            this.control.disable(NO_EMIT);
         } else if (this.isValid) {
-            this.selectionControl.enable(NO_EMIT);
+            this.control.enable(NO_EMIT);
         }
 
         super.setDisabledState(isDisabled);
     }
 
     public writeValue(obj: ReadonlyArray<string>) {
-        this.selectionControl.setValue(obj, NO_EMIT);
+        this.control.setValue(obj, NO_EMIT);
     }
 
     private resetConverterState() {
@@ -115,11 +115,11 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         if (this.isValid && this.contentItems && this.contentItems.length > 0) {
             converter = new ReferencesTagsConverter(this.language, this.contentItems, this.localizer);
 
-            this.selectionControl.enable(NO_EMIT);
+            this.control.enable(NO_EMIT);
         } else {
             converter = new ReferencesTagsConverter(null!, [], this.localizer);
 
-            this.selectionControl.disable(NO_EMIT);
+            this.control.disable(NO_EMIT);
         }
 
         this.next({ converter });

@@ -39,9 +39,6 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<ContentDomainObject>()
                 .AsSelf();
 
-            services.AddTransientAs<ContentOperationContext>()
-                .AsSelf();
-
             services.AddSingletonAs<DefaultValidatorsFactory>()
                 .As<IValidatorsFactory>();
 

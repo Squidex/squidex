@@ -207,6 +207,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
+        public async Task Should_query_asset_folders_with_appId()
+        {
+            var parentId = DomainId.NewGuid();
+
+            var assetFolders = ResultList.CreateFrom<IAssetFolderEntity>(10);
+
+            A.CallTo(() => assetFolderRepository.QueryAsync(appId.Id, parentId))
+                .Returns(assetFolders);
+
+            var result = await sut.QueryAssetFoldersAsync(appId.Id, parentId);
+
+            Assert.Same(assetFolders, result);
+        }
+
+        [Fact]
         public async Task Should_find_asset_folder_with_path()
         {
             var folderId1 = DomainId.NewGuid();

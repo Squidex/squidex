@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId);
 
+        Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(DomainId appId, DomainId parentId);
+
         Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId appId, DomainId id);
 
         Task<IEnrichedAssetEntity?> FindByHashAsync(Context context, string hash, string fileName, long fileSize);

@@ -18,6 +18,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string[]? DefaultValue { get; set; }
 
+        public string? FolderId { get; set; }
+
         public int? MinItems { get; set; }
 
         public int? MaxItems { get; set; }

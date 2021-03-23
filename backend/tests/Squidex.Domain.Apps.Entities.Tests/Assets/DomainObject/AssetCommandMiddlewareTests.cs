@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     {
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
-        private readonly IAssetFolderResolver assetFolderResolver = A.Fake<IAssetFolderResolver>();
         private readonly IAssetMetadataSource assetMetadataSource = A.Fake<IAssetMetadataSource>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
@@ -57,7 +56,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             sut = new AssetCommandMiddleware(grainFactory,
                 assetEnricher,
                 assetFileStore,
-                assetFolderResolver,
                 assetQuery,
                 contextProvider, new[] { assetMetadataSource });
         }
@@ -127,21 +125,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Create_should_resolve_path()
-        {
-            var folderId = DomainId.NewGuid();
-
-            var command = new CreateAsset { File = file, ParentPath = "path/to/folder" };
-
-            A.CallTo(() => assetFolderResolver.ResolveOrCreateAsync(requestContext, A<ICommandBus>._, "path/to/folder"))
-                .Returns(folderId);
-
-            await HandleAsync(command, CreateAsset());
-
-            Assert.Equal(folderId, command.ParentId);
-        }
-
-        [Fact]
         public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
         {
             var result = CreateAsset();
@@ -203,36 +186,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             await HandleAsync(command, CreateAsset());
 
             Assert.True(command.FileHash.Length > 10);
-        }
-
-        [Fact]
-        public async Task Upsert_should_resolve_path()
-        {
-            var folderId = DomainId.NewGuid();
-
-            var command = new UpsertAsset { File = file, ParentPath = "path/to/folder" };
-
-            A.CallTo(() => assetFolderResolver.ResolveOrCreateAsync(requestContext, A<ICommandBus>._, "path/to/folder"))
-                .Returns(folderId);
-
-            await HandleAsync(command, CreateAsset());
-
-            Assert.Equal(folderId, command.ParentId);
-        }
-
-        [Fact]
-        public async Task Move_should_resolve_path()
-        {
-            var folderId = DomainId.NewGuid();
-
-            var command = new MoveAsset { ParentPath = "path/to/folder" };
-
-            A.CallTo(() => assetFolderResolver.ResolveOrCreateAsync(requestContext, A<ICommandBus>._, "path/to/folder"))
-                .Returns(folderId);
-
-            await HandleAsync(command, CreateAsset());
-
-            Assert.Equal(folderId, command.ParentId);
         }
 
         private void AssertAssetHasBeenUploaded(long fileVersion)

@@ -19,7 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
         private readonly IAssetFileStore assetFileStore;
-        private readonly IAssetFolderResolver assetFolderResolver;
         private readonly IAssetEnricher assetEnricher;
         private readonly IAssetQueryService assetQuery;
         private readonly IContextProvider contextProvider;
@@ -29,7 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             IGrainFactory grainFactory,
             IAssetEnricher assetEnricher,
             IAssetFileStore assetFileStore,
-            IAssetFolderResolver assetFolderResolver,
             IAssetQueryService assetQuery,
             IContextProvider contextProvider,
             IEnumerable<IAssetMetadataSource> assetMetadataSources)
@@ -37,14 +35,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             Guard.NotNull(assetEnricher, nameof(assetEnricher));
             Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(assetFolderResolver, nameof(assetFolderResolver));
             Guard.NotNull(assetMetadataSources, nameof(assetMetadataSources));
             Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(contextProvider, nameof(contextProvider));
 
             this.assetEnricher = assetEnricher;
             this.assetFileStore = assetFileStore;
-            this.assetFolderResolver = assetFolderResolver;
             this.assetMetadataSources = assetMetadataSources;
             this.assetQuery = assetQuery;
             this.contextProvider = contextProvider;
@@ -79,15 +75,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                                 }
                             }
 
-                            if (!string.IsNullOrWhiteSpace(createAsset.ParentPath))
-                            {
-                                createAsset.ParentId =
-                                    await assetFolderResolver.ResolveOrCreateAsync(
-                                        contextProvider.Context,
-                                        context.CommandBus,
-                                        createAsset.ParentPath);
-                            }
-
                             await EnrichWithMetadataAsync(createAsset);
 
                             await base.HandleAsync(context, next);
@@ -104,15 +91,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 case MoveAsset move:
                     {
-                        if (!string.IsNullOrWhiteSpace(move.ParentPath))
-                        {
-                            move.ParentId =
-                                await assetFolderResolver.ResolveOrCreateAsync(
-                                    contextProvider.Context,
-                                    context.CommandBus,
-                                    move.ParentPath);
-                        }
-
                         await base.HandleAsync(context, next);
 
                         break;
@@ -120,15 +98,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 case UpsertAsset upsert:
                     {
-                        if (!string.IsNullOrWhiteSpace(upsert.ParentPath))
-                        {
-                            upsert.ParentId =
-                                await assetFolderResolver.ResolveOrCreateAsync(
-                                    contextProvider.Context,
-                                    context.CommandBus,
-                                    upsert.ParentPath);
-                        }
-
                         await UploadAndHandleAsync(context, next, upsert);
 
                         break;

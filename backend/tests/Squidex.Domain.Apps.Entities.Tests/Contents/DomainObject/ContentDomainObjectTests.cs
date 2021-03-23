@@ -8,6 +8,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -105,17 +106,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             patched = patch.MergeInto(data);
 
-            var validators = Enumerable.Repeat(new DefaultValidatorsFactory(), 1);
+            var log = A.Fake<ISemanticLog>();
 
-            var context = new ContentOperationContext(
-                appProvider,
-                validators,
-                contentWorkflow,
-                contentRepository,
-                TestUtils.DefaultSerializer,
-                scriptEngine, A.Fake<ISemanticLog>());
+            var serviceProvider =
+                new ServiceCollection()
+                    .AddSingleton(appProvider)
+                    .AddSingleton(log)
+                    .AddSingleton(contentWorkflow)
+                    .AddSingleton(contentRepository)
+                    .AddSingleton(scriptEngine)
+                    .AddSingleton(TestUtils.DefaultSerializer)
+                    .AddSingleton<IValidatorsFactory>(new DefaultValidatorsFactory())
+                    .BuildServiceProvider();
 
-            sut = new ContentDomainObject(Store, A.Dummy<ISemanticLog>(), context);
+            sut = new ContentDomainObject(Store, log, serviceProvider);
             sut.Setup(Id);
         }
 
@@ -770,7 +774,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             await ExecuteCreateAsync();
             await ExecuteChangeStatusAsync(Status.Published);
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.Published))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, contentId, SearchScope.All))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));

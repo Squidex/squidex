@@ -30,5 +30,8 @@ export class AssetsUIComponent implements OnInit {
 
         this.fieldForm.setControl('resolveFirst',
             new FormControl(this.properties.resolveFirst));
+
+        this.fieldForm.setControl('folderId',
+            new FormControl(this.properties.folderId));
     }
 }
