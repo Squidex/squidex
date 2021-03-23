@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         break;
 
                     case JsonObject obj:
-                        ReplaceAssetUrl(obj, FieldSetter);
+                        ReplaceAssetUrl(obj, JsonSetter);
                         break;
                 }
             }

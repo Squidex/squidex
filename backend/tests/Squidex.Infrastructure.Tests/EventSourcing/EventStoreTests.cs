@@ -112,6 +112,35 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
+        public async Task Should_append_event_unsafe()
+        {
+            var streamName = $"test-{Guid.NewGuid()}";
+
+            var events = new[]
+            {
+                new EventData("Type1", new EnvelopeHeaders(), "1"),
+                new EventData("Type2", new EnvelopeHeaders(), "2")
+            };
+
+            await Sut.AppendUnsafeAsync(new List<EventCommit>
+            {
+                new EventCommit(Guid.NewGuid(), streamName, -1, events)
+            });
+
+            var readEvents1 = await QueryAsync(streamName);
+            var readEvents2 = await QueryWithCallbackAsync(streamName);
+
+            var expected = new[]
+            {
+                new StoredEvent(streamName, "Position", 0, events[0]),
+                new StoredEvent(streamName, "Position", 1, events[1])
+            };
+
+            ShouldBeEquivalentTo(readEvents1, expected);
+            ShouldBeEquivalentTo(readEvents2, expected);
+        }
+
+        [Fact]
         public async Task Should_subscribe_to_events()
         {
             var streamName = $"test-{Guid.NewGuid()}";
