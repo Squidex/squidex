@@ -27,5 +27,13 @@ namespace Squidex.Infrastructure.EventSourcing
         Task DeleteStreamAsync(string streamName);
 
         IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null);
+
+        async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits)
+        {
+            foreach (var commit in commits)
+            {
+                await AppendAsync(commit.Id, commit.StreamName, commit.Offset, commit.Events);
+            }
+        }
     }
 }

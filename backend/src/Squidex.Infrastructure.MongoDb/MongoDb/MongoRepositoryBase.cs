@@ -21,6 +21,7 @@ namespace Squidex.Infrastructure.MongoDb
     {
         private const string CollectionFormat = "{0}Set";
 
+        protected static readonly BulkWriteOptions Unordered = new BulkWriteOptions { IsOrdered = true };
         protected static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
         protected static readonly ReplaceOptions UpsertReplace = new ReplaceOptions { IsUpsert = true };
         protected static readonly SortDefinitionBuilder<TEntity> Sort = Builders<TEntity>.Sort;

@@ -161,13 +161,13 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(command, nameof(command));
 
-            MatchingVersion(command);
-            MatchingCreateCommand(command);
-
             if (Version != EtagVersion.Empty && !(IsDeleted() && CanRecreate()))
             {
                 throw new DomainObjectConflictException(uniqueId.ToString());
             }
+
+            MatchingVersion(command);
+            MatchingCreateCommand(command);
         }
 
         private async Task EnsureCanUpdateAsync<TCommand>(TCommand command) where TCommand : ICommand
@@ -176,11 +176,11 @@ namespace Squidex.Infrastructure.Commands
 
             await EnsureLoadedAsync();
 
-            MatchingVersion(command);
-            MatchingCommand(command);
-
             NotDeleted();
             NotEmpty();
+
+            MatchingVersion(command);
+            MatchingCommand(command);
         }
 
         private async Task EnsureCanUpsertAsync<TCommand>(TCommand command) where TCommand : ICommand
@@ -188,6 +188,11 @@ namespace Squidex.Infrastructure.Commands
             Guard.NotNull(command, nameof(command));
 
             await EnsureLoadedAsync();
+
+            if (IsDeleted() && !CanRecreate())
+            {
+                throw new DomainObjectDeletedException(uniqueId.ToString());
+            }
 
             MatchingVersion(command);
 
@@ -199,11 +204,6 @@ namespace Squidex.Infrastructure.Commands
             {
                 MatchingCommand(command);
             }
-
-            if (IsDeleted() && !CanRecreate())
-            {
-                throw new DomainObjectDeletedException(uniqueId.ToString());
-            }
         }
 
         private async Task EnsureCanDeleteAsync<TCommand>(TCommand command) where TCommand : ICommand
@@ -212,10 +212,10 @@ namespace Squidex.Infrastructure.Commands
 
             await EnsureLoadedAsync();
 
+            NotEmpty();
+
             MatchingVersion(command);
             MatchingCommand(command);
-
-            NotEmpty();
         }
 
         private void NotDeleted()
