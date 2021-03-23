@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -198,6 +199,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddSingleton(contentQuery)
                     .AddSingleton(dataLoaderContext)
                     .AddSingleton(dataLoaderListener)
+                    .AddSingleton<InstantGraphType>()
+                    .AddSingleton<JsonGraphType>()
+                    .AddSingleton<JsonNoopGraphType>()
                     .AddSingleton<SharedTypes>()
                     .AddSingleton<IUrlGenerator,
                         FakeUrlGenerator>()

@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Web.Services;
 
 namespace Squidex.Config.Domain
@@ -27,6 +28,15 @@ namespace Squidex.Config.Domain
                 .As<IUrlGenerator>();
 
             services.AddSingletonAs<SharedTypes>()
+                .AsSelf();
+
+            services.AddSingletonAs<InstantGraphType>()
+                .AsSelf();
+
+            services.AddSingletonAs<JsonGraphType>()
+                .AsSelf();
+
+            services.AddSingletonAs<JsonNoopGraphType>()
                 .AsSelf();
 
             services.AddSingletonAs<CachingGraphQLService>()

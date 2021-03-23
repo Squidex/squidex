@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0))
                 .Throws(new AssetNotFoundException("fileName"));
 
-            await sut.On(Envelope.Create(@event).SetEventStreamNumber(2));;
+            await sut.On(Envelope.Create(@event).SetEventStreamNumber(2));
 
             A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1))
                 .MustHaveHappened();

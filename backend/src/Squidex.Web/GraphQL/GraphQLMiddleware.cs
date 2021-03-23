@@ -7,7 +7,6 @@
 
 using System.Threading.Tasks;
 using GraphQL.Server.Transports.AspNetCore;
-using GraphQL.Server.Transports.AspNetCore.Common;
 using Microsoft.AspNetCore.Http;
 
 namespace Squidex.Web.GraphQL
@@ -17,7 +16,7 @@ namespace Squidex.Web.GraphQL
         private static readonly RequestDelegate Noop = _ => Task.CompletedTask;
 
         public GraphQLMiddleware(IGraphQLRequestDeserializer deserializer)
-            : base(Noop, default, deserializer)
+            : base(Noop, deserializer)
         {
         }
     }

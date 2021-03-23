@@ -25,6 +25,11 @@ namespace Squidex.Infrastructure.Json.Objects
         {
         }
 
+        public JsonArray(int capacity)
+            : base(new List<IJsonValue>(capacity))
+        {
+        }
+
         public JsonArray(JsonArray source)
             : base(source.ToList())
         {

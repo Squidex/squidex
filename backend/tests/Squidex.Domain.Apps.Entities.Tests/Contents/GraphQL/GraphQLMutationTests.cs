@@ -68,7 +68,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             "createMySchemaContent"
                         }
                     }
-                }
+                },
+                data = (object?)null
             };
 
             AssertResult(expected, result);
@@ -209,7 +210,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             "updateMySchemaContent"
                         }
                     }
-                }
+                },
+                data = (object?)null
             };
 
             AssertResult(expected, result);
@@ -316,7 +318,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             "upsertMySchemaContent"
                         }
                     }
-                }
+                },
+                data = (object?)null
             };
 
             AssertResult(expected, result);
@@ -425,7 +428,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             "patchMySchemaContent"
                         }
                     }
-                }
+                },
+                data = (object?)null
             };
 
             AssertResult(expected, result);
@@ -532,7 +536,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             "changeMySchemaContent"
                         }
                     }
-                }
+                },
+                data = (object?)null
             };
 
             AssertResult(expected, result);
@@ -677,7 +682,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             "deleteMySchemaContent"
                         }
                     }
-                }
+                },
+                data = (object?)null
             };
 
             AssertResult(expected, result);

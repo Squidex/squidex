@@ -1,32 +1,37 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using GraphQL.Language.AST;
 using GraphQL.Types;
-using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    internal sealed class InstantConverter : IAstFromValueConverter
+    public class JsonNoopGraphType : ScalarGraphType
     {
-        public static readonly InstantConverter Instance = new InstantConverter();
-
-        private InstantConverter()
+        public JsonNoopGraphType()
         {
+            Name = "JsonScalar";
+
+            Description = "Unstructured Json object";
         }
 
-        public IValue Convert(object value, IGraphType type)
+        public override object ParseLiteral(IValue value)
         {
-            return new InstantValueNode((Instant)value);
+            return value.Value;
         }
 
-        public bool Matches(object value, IGraphType type)
+        public override object ParseValue(object value)
         {
-            return type is InstantGraphType;
+            return value;
+        }
+
+        public override object Serialize(object value)
+        {
+            return value;
         }
     }
 }

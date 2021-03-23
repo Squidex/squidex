@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             AddField(new FieldType
             {
                 Name = "created",
-                ResolvedType = AllTypes.NonNullDate,
+                ResolvedType = AllTypes.NonNullDateTime,
                 Resolver = EntityResolvers.Created,
                 Description = "The date and time when the asset has been created."
             });
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             AddField(new FieldType
             {
                 Name = "lastModified",
-                ResolvedType = AllTypes.NonNullDate,
+                ResolvedType = AllTypes.NonNullDateTime,
                 Resolver = EntityResolvers.LastModified,
                 Description = "The date and time when the asset has been modified last."
             });
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             {
                 Name = "metadata",
                 Arguments = AssetActions.Metadata.Arguments,
-                ResolvedType = AllTypes.NoopJson,
+                ResolvedType = AllTypes.JsonNoop,
                 Resolver = AssetActions.Metadata.Resolver,
                 Description = "The asset metadata."
             });

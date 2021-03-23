@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using GraphQL;
 using GraphQL.Resolvers;
@@ -16,10 +14,8 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 using GraphQLSchema = GraphQL.Types.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
@@ -28,31 +24,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     {
         private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new Dictionary<SchemaInfo, ContentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
-        private readonly SharedTypes sharedTypes;
         private readonly FieldVisitor fieldVisitor;
         private readonly FieldInputVisitor fieldInputVisitor;
         private readonly PartitionResolver partitionResolver;
 
-        public SharedTypes SharedTypes
-        {
-            get => sharedTypes;
-        }
+        public SharedTypes SharedTypes { get; }
 
         static Builder()
         {
-            ValueConverter.Register<JsonBoolean, bool>(x => x.Value);
-            ValueConverter.Register<JsonNumber, double>(x => x.Value);
-            ValueConverter.Register<JsonString, string>(x => x.Value);
-            ValueConverter.Register<JsonString, DateTimeOffset>(x => DateTimeOffset.Parse(x.Value, CultureInfo.InvariantCulture));
-
             ValueConverter.Register<string, DomainId>(DomainId.Create);
-
             ValueConverter.Register<string, Status>(x => new Status(x));
         }
 
         public Builder(IAppEntity app, SharedTypes sharedTypes)
         {
-            this.sharedTypes = sharedTypes;
+            SharedTypes = sharedTypes;
 
             partitionResolver = app.PartitionResolver();
 
@@ -77,10 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Query = new AppQueriesGraphType(this, schemaInfos)
             };
 
-            newSchema.RegisterValueConverter(JsonConverter.Instance);
-            newSchema.RegisterValueConverter(InstantConverter.Instance);
-
-            newSchema.RegisterType(sharedTypes.ContentInterface);
+            newSchema.RegisterType(SharedTypes.ContentInterface);
 
             if (schemas.Any())
             {
@@ -98,7 +81,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             newSchema.Initialize();
-            newSchema.CleanupMetadata();
 
             return newSchema;
         }

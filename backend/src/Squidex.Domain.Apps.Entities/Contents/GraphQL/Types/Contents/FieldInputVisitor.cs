@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IGraphType? Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Date;
+            return AllTypes.DateTime;
         }
 
         public IGraphType? Visit(IField<GeolocationFieldProperties> field, FieldInfo args)

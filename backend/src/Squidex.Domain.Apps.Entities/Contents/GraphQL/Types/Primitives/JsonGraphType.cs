@@ -5,20 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using GraphQL.Language.AST;
-using GraphQL.Types;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
-    internal sealed class JsonGraphType : ScalarGraphType
+    public sealed class JsonGraphType : JsonNoopGraphType
     {
-        public JsonGraphType()
-        {
-            Name = "JsonScalar";
-
-            Description = "Unstructured Json object";
-        }
-
         public override object Serialize(object value)
         {
             return value;
@@ -26,7 +20,46 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 
         public override object ParseValue(object value)
         {
-            return JsonConverter.ParseJson(value);
+            return ParseJson(value);
+        }
+
+        public static IJsonValue ParseJson(object value)
+        {
+            switch (value)
+            {
+                case ListValue listValue:
+                    return ParseJson(listValue.Value);
+
+                case ObjectValue objectValue:
+                    return ParseJson(objectValue.Value);
+
+                case IReadOnlyDictionary<string, object> dictionary:
+                    {
+                        var json = JsonValue.Object();
+
+                        foreach (var (key, inner) in dictionary)
+                        {
+                            json[key] = ParseJson(inner);
+                        }
+
+                        return json;
+                    }
+
+                case IEnumerable<object> list:
+                    {
+                        var array = JsonValue.Array();
+
+                        foreach (var item in list)
+                        {
+                            array.Add(ParseJson(item));
+                        }
+
+                        return array;
+                    }
+
+                default:
+                    return JsonValue.Create(value);
+            }
         }
 
         public override object ParseLiteral(IValue value)
@@ -37,6 +70,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             }
 
             return value;
+        }
+
+        public override IValue ToAST(object value)
+        {
+            return new JsonValueNode(ParseJson(value));
         }
     }
 }

@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query, OperationName = "IntrospectionQuery" });
 
-            var json = serializer.Serialize(result.Data, true);
+            var json = serializer.Serialize(result, true);
 
             Assert.NotEmpty(json);
         }

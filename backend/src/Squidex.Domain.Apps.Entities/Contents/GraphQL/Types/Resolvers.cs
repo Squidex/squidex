@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     executionContext.Log.LogWarning(ex, w => w
                         .WriteProperty("action", "resolveField")
                         .WriteProperty("status", "failed")
-                        .WriteProperty("field", context.FieldName));
+                        .WriteProperty("field", context.FieldDefinition.Name));
 
                     throw;
                 }
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     executionContext.Log.LogWarning(ex, w => w
                         .WriteProperty("action", "resolveField")
                         .WriteProperty("status", "failed")
-                        .WriteProperty("field", context.FieldName));
+                        .WriteProperty("field", context.FieldDefinition.Name));
 
                     throw;
                 }
