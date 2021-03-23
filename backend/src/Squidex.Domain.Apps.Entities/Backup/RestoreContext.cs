@@ -13,15 +13,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class RestoreContext : BackupContextBase
     {
+        private readonly Dictionary<string, long> streams = new Dictionary<string, long>(1000);
         private string? appStream;
 
         public IBackupReader Reader { get; }
 
         public DomainId PreviousAppId { get; set; }
-
-        public Dictionary<string, long> Streams { get; } = new Dictionary<string, long>(1000);
-
-        public string AppStream { get; }
 
         public RestoreContext(DomainId appId, IUserMapping userMapping, IBackupReader reader, DomainId previousAppId)
             : base(appId, userMapping)
@@ -49,12 +46,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
-            if (!Streams.TryGetValue(streamName, out var offset))
+            if (!streams.TryGetValue(streamName, out var offset))
             {
                 offset = EtagVersion.Empty;
             }
 
-            Streams[streamName] = offset + 1;
+            streams[streamName] = offset + 1;
 
             return offset;
         }
