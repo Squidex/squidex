@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using GraphQL.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             };
         }
 
-        public T Resolve<T>()
+        public T Resolve<T>() where T : notnull
         {
             return serviceProvider.GetRequiredService<T>();
         }
