@@ -15,6 +15,8 @@ using Squidex.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+
 namespace Squidex.Infrastructure.Commands
 {
     public delegate Task IdSource(Func<DomainId, Task> add);
@@ -24,6 +26,16 @@ namespace Squidex.Infrastructure.Commands
         private readonly ILocalCache localCache;
         private readonly IEventStore eventStore;
         private readonly IServiceProvider serviceProvider;
+
+        private static class Factory<T, TState> where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        {
+            private static readonly ObjectFactory ObjectFactory = ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(IPersistenceFactory<TState>) });
+
+            public static T Create(IServiceProvider serviceProvider, IPersistenceFactory<TState> persistenceFactory)
+            {
+                return (T)ObjectFactory(serviceProvider, new object[] { persistenceFactory });
+            }
+        }
 
         public Rebuilder(
             ILocalCache localCache,
@@ -43,7 +55,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var store = serviceProvider.GetRequiredService<IStore<TState>>();
 
-            await store.ClearAsync();
+            await store.ClearSnapshotsAsync();
 
             await InsertManyAsync<T, TState>(store, async target =>
             {
@@ -73,19 +85,17 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task InsertManyAsync<T, TState>(IStore<TState> store, IdSource source, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
-            var objectFactory = ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(IPersistenceFactory<TState>) });
-
             var worker = new ActionBlock<DomainId[]>(async ids =>
             {
-                await using (var context = store.WithBatchContext(typeof(TState)))
+                await using (var context = store.WithBatchContext(typeof(T)))
                 {
-                    var factory = new object[] { context };
+                    await context.LoadAsync(ids);
 
                     foreach (var id in ids)
                     {
                         try
                         {
-                            var domainObject = (T)objectFactory(serviceProvider, factory);
+                            var domainObject = Factory<T, TState>.Create(serviceProvider, context);
 
                             domainObject.Setup(id);
 

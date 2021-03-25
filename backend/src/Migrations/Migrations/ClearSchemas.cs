@@ -15,16 +15,16 @@ namespace Migrations.Migrations
 {
     public sealed class ClearSchemas : IMigration
     {
-        private readonly IStore<Guid> store;
+        private readonly IStore<SchemaDomainObject.State> store;
 
-        public ClearSchemas(IStore<Guid> store)
+        public ClearSchemas(IStore<SchemaDomainObject.State> store)
         {
             this.store = store;
         }
 
         public Task UpdateAsync()
         {
-            return store.ClearSnapshotsAsync<Guid, SchemaDomainObject.State>();
+            return store.ClearSnapshotsAsync();
         }
     }
 }

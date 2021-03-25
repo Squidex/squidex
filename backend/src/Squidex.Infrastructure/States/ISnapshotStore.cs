@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.States
     {
         Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion);
 
-        Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> values);
+        Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> snapshots);
 
         Task<(T Value, long Version)> ReadAsync(DomainId key);
 

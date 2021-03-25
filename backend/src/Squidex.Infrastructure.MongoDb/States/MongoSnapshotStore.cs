@@ -68,11 +68,11 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> values)
+        public Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> snapshots)
         {
             using (Profiler.TraceMethod<MongoSnapshotStore<T>>())
             {
-                var writes = values.Select(x => new InsertOneModel<MongoState<T>>(new MongoState<T>
+                var writes = snapshots.Select(x => new InsertOneModel<MongoState<T>>(new MongoState<T>
                 {
                     Doc = x.Value,
                     DocumentId = x.Key,

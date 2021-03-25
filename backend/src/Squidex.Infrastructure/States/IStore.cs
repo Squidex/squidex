@@ -14,6 +14,6 @@ namespace Squidex.Infrastructure.States
     {
         IBatchContext<T> WithBatchContext(Type owner);
 
-        Task ClearAsync();
+        Task ClearSnapshotsAsync();
     }
 }

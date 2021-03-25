@@ -64,14 +64,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version)> values)
+        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version)> snapshots)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
                 var entitiesPublished = new List<MongoContentEntity>();
                 var entitiesAll = new List<MongoContentEntity>();
 
-                foreach (var (_, value, version) in values)
+                foreach (var (_, value, version) in snapshots)
                 {
                     if (ShouldWritePublished(value))
                     {

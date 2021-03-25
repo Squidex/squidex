@@ -138,6 +138,8 @@ namespace Squidex.Config.Domain
             });
 
             services.AddSingleton(typeof(IStore<>), typeof(Store<>));
+
+            services.AddSingleton(typeof(IPersistenceFactory<>), typeof(Store<>));
         }
 
         private static IMongoClient GetClient(string configuration)

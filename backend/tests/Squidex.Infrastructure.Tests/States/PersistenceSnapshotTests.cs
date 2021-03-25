@@ -161,7 +161,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_call_snapshot_store_on_clear()
         {
-            await sut.ClearAsync();
+            await sut.ClearSnapshotsAsync();
 
             A.CallTo(() => snapshotStore.ClearAsync())
                 .MustHaveHappened();

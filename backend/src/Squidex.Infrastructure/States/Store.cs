@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.States
             this.streamNameResolver = streamNameResolver;
         }
 
-        public Task ClearAsync()
+        public Task ClearSnapshotsAsync()
         {
             return snapshotStore.ClearAsync();
         }

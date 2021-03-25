@@ -50,11 +50,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version)> values)
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version)> snapshots)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
-                var entities = values.Select(Map).ToList();
+                var entities = snapshots.Select(Map).ToList();
 
                 if (entities.Count == 0)
                 {
@@ -90,11 +90,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return entity;
         }
 
-        private static MongoAssetEntity Map((DomainId Key, AssetDomainObject.State Value, long Version) change)
+        private static MongoAssetEntity Map((DomainId Key, AssetDomainObject.State Value, long Version) snapshot)
         {
-            var entity = Map(change.Value);
+            var entity = Map(snapshot.Value);
 
-            entity.DocumentId = change.Key;
+            entity.DocumentId = snapshot.Key;
 
             return entity;
         }

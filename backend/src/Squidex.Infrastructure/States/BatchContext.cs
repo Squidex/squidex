@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -23,8 +24,8 @@ namespace Squidex.Infrastructure.States
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IStreamNameResolver streamNameResolver;
-        private readonly List<(DomainId Key, T Snapshot, long Version)> snapshots = new List<(DomainId Key, T Snapshot, long Version)>();
         private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> @events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
+        private List<(DomainId Key, T Snapshot, long Version)>? snapshots;
 
         internal BatchContext(
             Type owner,
@@ -42,6 +43,7 @@ namespace Squidex.Infrastructure.States
 
         internal void Add(DomainId key, T snapshot, long version)
         {
+            snapshots ??= new List<(DomainId Key, T Snapshot, long Version)>();
             snapshots.Add((key, snapshot, version));
         }
 
@@ -78,7 +80,14 @@ namespace Squidex.Infrastructure.States
 
         public Task CommitAsync()
         {
-            return snapshotStore.WriteManyAsync(snapshots);
+            var current = Interlocked.Exchange(ref snapshots, null!);
+
+            if (current == null || current.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            return snapshotStore.WriteManyAsync(current);
         }
 
         public IPersistence<T> WithEventSourcing(Type owner, DomainId key, HandleEvent? applyEvent)

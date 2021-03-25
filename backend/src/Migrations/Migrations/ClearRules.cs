@@ -23,7 +23,7 @@ namespace Migrations.Migrations
 
         public Task UpdateAsync()
         {
-            return store.ClearAsync();
+            return store.ClearSnapshotsAsync();
         }
     }
 }

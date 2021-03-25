@@ -27,8 +27,8 @@ namespace Squidex.Infrastructure.States
 
         public PersistenceEventSourcingTests()
         {
-            A.CallTo(() => streamNameResolver.GetStreamName(None.Type, key.ToString()))
-                .Returns(key.ToString());
+            A.CallTo(() => streamNameResolver.GetStreamName(None.Type, A<string>._))
+                .ReturnsLazily(x => x.GetArgument<string>(1)!);
 
             sut = new Store<int>(snapshotStore, eventStore, eventDataFormatter, streamNameResolver);
         }
@@ -36,8 +36,8 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_read_from_store()
         {
-            var event1 = new MyEvent();
-            var event2 = new MyEvent();
+            var event1 = new MyEvent { MyProperty = "event1" };
+            var event2 = new MyEvent { MyProperty = "event2" };
 
             SetupEventStore(event1, event2);
 
@@ -52,8 +52,8 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_read_until_stopped()
         {
-            var event1 = new MyEvent();
-            var event2 = new MyEvent();
+            var event1 = new MyEvent { MyProperty = "event1" };
+            var event2 = new MyEvent { MyProperty = "event2" };
 
             SetupEventStore(event1, event2);
 
@@ -350,7 +350,7 @@ namespace Squidex.Infrastructure.States
             foreach (var @event in events)
             {
                 var eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
-                var eventStored = new StoredEvent(i.ToString(), i.ToString(), i, eventData);
+                var eventStored = new StoredEvent(key.ToString(), i.ToString(), i, eventData);
 
                 eventsStored.Add(eventStored);
 
