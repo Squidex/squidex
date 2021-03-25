@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
@@ -42,7 +41,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IUserResolver userResolver;
         private readonly IGrainState<BackupRestoreState> state;
-        private RestoreContext restoreContext;
+        private RestoreContext runningContext;
+        private StreamMapper runningStreamMapper;
 
         private RestoreJob CurrentJob
         {
@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             using (Profiler.TraceMethod(handler.GetType(), nameof(IBackupHandler.RestoreAsync)))
                             {
-                                await handler.RestoreAsync(restoreContext);
+                                await handler.RestoreAsync(runningContext);
                             }
 
                             Log($"Restored {handler.Name}");
@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             using (Profiler.TraceMethod(handler.GetType(), nameof(IBackupHandler.CompleteRestoreAsync)))
                             {
-                                await handler.CompleteRestoreAsync(restoreContext);
+                                await handler.CompleteRestoreAsync(runningContext);
                             }
 
                             Log($"Completed {handler.Name}");
@@ -243,6 +243,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     CurrentJob.Stopped = clock.GetCurrentInstant();
 
                     await state.WriteAsync();
+
+                    runningStreamMapper = null!;
+                    runningContext = null!;
                 }
             }
         }
@@ -344,14 +347,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             foreach (var (stream, @event) in batch)
             {
-                var handled = await HandleEventAsync(reader, handlers, stream, @event);
+                var newStream = await HandleEventAsync(reader, handlers, stream, @event);
 
-                if (handled)
+                if (newStream != null)
                 {
-                    var streamName = restoreContext.GetStreamName(stream);
-                    var streamOffset = restoreContext.GetStreamOffset(streamName);
+                    var offset = runningStreamMapper.GetStreamOffset(newStream);
 
-                    commits.Add(EventCommit.Create(streamName, streamOffset, @event, eventDataFormatter));
+                    commits.Add(EventCommit.Create(newStream, offset, @event, eventDataFormatter));
                 }
             }
 
@@ -360,7 +362,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
         }
 
-        private async Task<bool> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
+        private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
         {
             if (@event.Payload is AppCreated appCreated)
             {
@@ -382,7 +384,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
             {
-                if (restoreContext.UserMapping.TryMap(squidexEvent.Actor, out var newUser))
+                if (runningContext.UserMapping.TryMap(squidexEvent.Actor, out var newUser))
                 {
                     squidexEvent.Actor = newUser;
                 }
@@ -393,26 +395,19 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 appEvent.AppId = CurrentJob.AppId;
             }
 
-            if (@event.Headers.TryGet(CommonHeaders.AggregateId, out var value) && value is JsonString idString)
-            {
-                var id = idString.Value.Replace(
-                    restoreContext.PreviousAppId.ToString(),
-                    restoreContext.AppId.ToString());
+            var (newStream, id) = runningStreamMapper.Map(stream);
 
-                var domainId = DomainId.Create(id);
-
-                @event.SetAggregateId(domainId);
-            }
+            @event.SetAggregateId(id);
 
             foreach (var handler in handlers)
             {
-                if (!await handler.RestoreEventAsync(@event, restoreContext))
+                if (!await handler.RestoreEventAsync(@event, runningContext))
                 {
-                    return false;
+                    return null;
                 }
             }
 
-            return true;
+            return newStream;
         }
 
         private async Task CreateContextAsync(IBackupReader reader, DomainId previousAppId)
@@ -428,7 +423,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Log("Created Users");
             }
 
-            restoreContext = new RestoreContext(CurrentJob.AppId.Id, userMapping, reader, previousAppId);
+            runningContext = new RestoreContext(CurrentJob.AppId.Id, userMapping, reader, previousAppId);
+            runningStreamMapper = new StreamMapper(runningContext);
         }
 
         private void Log(string message, bool replace = false)

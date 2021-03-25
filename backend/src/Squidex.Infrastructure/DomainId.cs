@@ -15,6 +15,7 @@ namespace Squidex.Infrastructure
     {
         private static readonly string EmptyString = Guid.Empty.ToString();
         public static readonly DomainId Empty = default;
+        public static readonly string IdSeparator = "--";
 
         private readonly string? id;
 
@@ -95,12 +96,12 @@ namespace Squidex.Infrastructure
 
         public static DomainId Combine(NamedId<DomainId> id1, DomainId id2)
         {
-            return new DomainId($"{id1.Id}--{id2}");
+            return new DomainId($"{id1.Id}{IdSeparator}{id2}");
         }
 
         public static DomainId Combine(DomainId id1, DomainId id2)
         {
-            return new DomainId($"{id1}--{id2}");
+            return new DomainId($"{id1}{IdSeparator}{id2}");
         }
     }
 }
