@@ -35,5 +35,17 @@ namespace Squidex.Infrastructure.EventSourcing
                 await AppendAsync(commit.Id, commit.StreamName, commit.Offset, commit.Events);
             }
         }
+
+        async Task<IReadOnlyDictionary<string, IReadOnlyList<StoredEvent>>> QueryManyAsync(IEnumerable<string> streamNames)
+        {
+            var result = new Dictionary<string, IReadOnlyList<StoredEvent>>();
+
+            foreach (var streamName in streamNames)
+            {
+                result[streamName] = await QueryAsync(streamName);
+            }
+
+            return result;
+        }
     }
 }

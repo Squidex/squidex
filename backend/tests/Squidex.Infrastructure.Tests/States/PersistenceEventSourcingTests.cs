@@ -18,26 +18,19 @@ namespace Squidex.Infrastructure.States
 {
     public class PersistenceEventSourcingTests
     {
-        private readonly string key = Guid.NewGuid().ToString();
+        private readonly DomainId key = DomainId.NewGuid();
+        private readonly ISnapshotStore<int> snapshotStore = A.Fake<ISnapshotStore<int>>();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IServiceProvider services = A.Fake<IServiceProvider>();
-        private readonly ISnapshotStore<int, string> snapshotStore = A.Fake<ISnapshotStore<int, string>>();
-        private readonly ISnapshotStore<None, string> snapshotStoreNone = A.Fake<ISnapshotStore<None, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
-        private readonly IStore<string> sut;
+        private readonly IStore<int> sut;
 
         public PersistenceEventSourcingTests()
         {
-            A.CallTo(() => services.GetService(typeof(ISnapshotStore<int, string>)))
-                .Returns(snapshotStore);
-            A.CallTo(() => services.GetService(typeof(ISnapshotStore<None, string>)))
-                .Returns(snapshotStoreNone);
+            A.CallTo(() => streamNameResolver.GetStreamName(None.Type, key.ToString()))
+                .Returns(key.ToString());
 
-            A.CallTo(() => streamNameResolver.GetStreamName(None.Type, key))
-                .Returns(key);
-
-            sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
+            sut = new Store<int>(snapshotStore, eventStore, eventDataFormatter, streamNameResolver);
         }
 
         [Fact]
@@ -77,7 +70,7 @@ namespace Squidex.Infrastructure.States
         {
             var storedEvent = new StoredEvent("1", "1", 0, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
-            A.CallTo(() => eventStore.QueryAsync(key, 0))
+            A.CallTo(() => eventStore.QueryAsync(key.ToString(), 0))
                 .Returns(new List<StoredEvent> { storedEvent });
 
             A.CallTo(() => eventDataFormatter.ParseIfKnown(storedEvent))
@@ -106,7 +99,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            A.CallTo(() => eventStore.QueryAsync(key, 3))
+            A.CallTo(() => eventStore.QueryAsync(key.ToString(), 3))
                 .MustHaveHappened();
         }
 
@@ -202,12 +195,12 @@ namespace Squidex.Infrastructure.States
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key.ToString(), 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key, 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key.ToString(), 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<string>._, A<int>._, A<long>._, A<long>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._))
                 .MustNotHaveHappened();
         }
 
@@ -218,7 +211,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key, EtagVersion.Empty, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key.ToString(), EtagVersion.Empty, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
         }
 
@@ -304,7 +297,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key.ToString(), 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .Throws(new WrongEventVersionException(1, 1));
 
             await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.WriteEventAsync(Envelope.Create(new MyEvent())));
@@ -317,7 +310,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.DeleteAsync();
 
-            A.CallTo(() => eventStore.DeleteStreamAsync(key))
+            A.CallTo(() => eventStore.DeleteStreamAsync(key.ToString()))
                 .MustHaveHappened();
 
             A.CallTo(() => snapshotStore.RemoveAsync(key))
@@ -327,11 +320,11 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_delete_events_and_snapshot_when_deleted()
         {
-            var persistence = sut.WithSnapshotsAndEventSourcing<int>(None.Type, key, null, null);
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, null, null);
 
             await persistence.DeleteAsync();
 
-            A.CallTo(() => eventStore.DeleteStreamAsync(key))
+            A.CallTo(() => eventStore.DeleteStreamAsync(key.ToString()))
                 .MustHaveHappened();
 
             A.CallTo(() => snapshotStore.RemoveAsync(key))
@@ -370,7 +363,7 @@ namespace Squidex.Infrastructure.States
                 i++;
             }
 
-            A.CallTo(() => eventStore.QueryAsync(key, readPosition))
+            A.CallTo(() => eventStore.QueryAsync(key.ToString(), readPosition))
                 .Returns(eventsStored);
         }
     }

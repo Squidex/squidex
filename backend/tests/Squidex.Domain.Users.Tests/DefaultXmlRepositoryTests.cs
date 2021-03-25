@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using FakeItEasy;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 using Xunit;
 
@@ -17,7 +18,7 @@ namespace Squidex.Domain.Users
 {
     public sealed class DefaultXmlRepositoryTests
     {
-        private readonly ISnapshotStore<DefaultXmlRepository.State, string> store = A.Fake<ISnapshotStore<DefaultXmlRepository.State, string>>();
+        private readonly ISnapshotStore<DefaultXmlRepository.State> store = A.Fake<ISnapshotStore<DefaultXmlRepository.State>>();
         private readonly DefaultXmlRepository sut;
 
         public DefaultXmlRepositoryTests()
@@ -54,7 +55,7 @@ namespace Squidex.Domain.Users
 
             sut.StoreElement(xml, "name");
 
-            A.CallTo(() => store.WriteAsync("name", A<DefaultXmlRepository.State>._, A<long>._, 0))
+            A.CallTo(() => store.WriteAsync(DomainId.Create("name"), A<DefaultXmlRepository.State>._, A<long>._, 0))
                 .MustHaveHappened();
         }
     }

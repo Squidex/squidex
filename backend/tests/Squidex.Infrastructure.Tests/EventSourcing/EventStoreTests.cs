@@ -62,8 +62,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var events = new[]
             {
-                new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2")
+                CreateEventData(1),
+                CreateEventData(2)
             };
 
             await Assert.ThrowsAsync<WrongEventVersionException>(() => Sut.AppendAsync(Guid.NewGuid(), streamName, 0, events));
@@ -76,8 +76,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var events = new[]
             {
-                new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2")
+                CreateEventData(1),
+                CreateEventData(2)
             };
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
@@ -92,8 +92,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var events = new[]
             {
-                new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2")
+                CreateEventData(1),
+                CreateEventData(2)
             };
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
@@ -112,14 +112,14 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
-        public async Task Should_append_event_unsafe()
+        public async Task Should_append_events_unsafe()
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
             var events = new[]
             {
-                new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2")
+                CreateEventData(1),
+                CreateEventData(2)
             };
 
             await Sut.AppendUnsafeAsync(new List<EventCommit>
@@ -147,8 +147,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var events = new[]
             {
-                new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2")
+                CreateEventData(1),
+                CreateEventData(2)
             };
 
             var readEvents = await QueryWithSubscriptionAsync(streamName, async () =>
@@ -172,8 +172,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var events1 = new[]
             {
-                new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2")
+                CreateEventData(1),
+                CreateEventData(2)
             };
 
             await QueryWithSubscriptionAsync(streamName, async () =>
@@ -183,8 +183,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var events2 = new[]
             {
-                new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2")
+                CreateEventData(1),
+                CreateEventData(2)
             };
 
             var readEventsFromPosition = await QueryWithSubscriptionAsync(streamName, async () =>
@@ -219,8 +219,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var events = new[]
             {
-                new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2")
+                CreateEventData(1),
+                CreateEventData(2)
             };
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
@@ -239,6 +239,45 @@ namespace Squidex.Infrastructure.EventSourcing
             ShouldBeEquivalentTo(readEvents2, expected);
         }
 
+        [Fact]
+        public async Task Should_read_multiple_streams()
+        {
+            var streamName1 = $"test-{Guid.NewGuid()}";
+            var streamName2 = $"test-{Guid.NewGuid()}";
+
+            var events1 = new[]
+            {
+                CreateEventData(1),
+                CreateEventData(2)
+            };
+
+            var events2 = new[]
+            {
+                CreateEventData(3),
+                CreateEventData(4)
+            };
+
+            await Sut.AppendAsync(Guid.NewGuid(), streamName1, events1);
+            await Sut.AppendAsync(Guid.NewGuid(), streamName2, events2);
+
+            var readEvents = await Sut.QueryManyAsync(new[] { streamName1, streamName2 });
+
+            var expected1 = new[]
+            {
+                new StoredEvent(streamName1, "Position", 0, events1[0]),
+                new StoredEvent(streamName1, "Position", 1, events1[1])
+            };
+
+            var expected2 = new[]
+            {
+                new StoredEvent(streamName2, "Position", 0, events2[0]),
+                new StoredEvent(streamName2, "Position", 1, events2[1])
+            };
+
+            ShouldBeEquivalentTo(readEvents[streamName1], expected1);
+            ShouldBeEquivalentTo(readEvents[streamName2], expected2);
+        }
+
         [Theory]
         [InlineData(30)]
         [InlineData(1000)]
@@ -250,7 +289,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             for (var i = 0; i < count; i++)
             {
-                events.Add(new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString()));
+                events.Add(CreateEventData(i));
             }
 
             for (var i = 0; i < events.Count / 2; i++)
@@ -285,8 +324,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var events = new[]
             {
-                new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2")
+                CreateEventData(1),
+                CreateEventData(2)
             };
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
@@ -301,6 +340,11 @@ namespace Squidex.Infrastructure.EventSourcing
         private Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long position = EtagVersion.Any)
         {
             return Sut.QueryAsync(streamName, position);
+        }
+
+        private static EventData CreateEventData(int i)
+        {
+            return new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString());
         }
 
         private async Task<IReadOnlyList<StoredEvent>?> QueryWithCallbackAsync(string? streamFilter = null, string? position = null)
@@ -370,9 +414,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static void ShouldBeEquivalentTo(IEnumerable<StoredEvent>? actual, params StoredEvent[] expected)
         {
-            var actualArray = actual?.Select(x => new StoredEvent(x.StreamName, "Position", x.EventStreamNumber, x.Data)).ToArray();
-
-            actualArray.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected, opts => opts.Excluding(x => x.EventPosition));
         }
     }
 }

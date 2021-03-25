@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -19,9 +21,9 @@ using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObject.State, DomainId>
+    public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObject.State>
     {
-        async Task<(AssetDomainObject.State Value, long Version)> ISnapshotStore<AssetDomainObject.State, DomainId>.ReadAsync(DomainId key)
+        async Task<(AssetDomainObject.State Value, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -38,19 +40,32 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State, DomainId>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
-                var entity = SimpleMapper.Map(value, new MongoAssetEntity());
-
-                entity.IndexedAppId = value.AppId.Id;
+                var entity = Map(value);
 
                 await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity);
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State, DomainId>.ReadAllAsync(Func<AssetDomainObject.State, long, Task> callback, CancellationToken ct)
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version)> values)
+        {
+            using (Profiler.TraceMethod<MongoAssetFolderRepository>())
+            {
+                var entities = values.Select(Map).ToList();
+
+                if (entities.Count == 0)
+                {
+                    return;
+                }
+
+                await Collection.InsertManyAsync(entities, InsertUnordered);
+            }
+        }
+
+        async Task ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(Func<AssetDomainObject.State, long, Task> callback, CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -58,12 +73,30 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State, DomainId>.RemoveAsync(DomainId key)
+        async Task ISnapshotStore<AssetDomainObject.State>.RemoveAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 await Collection.DeleteOneAsync(x => x.DocumentId == key);
             }
+        }
+
+        private static MongoAssetEntity Map(AssetDomainObject.State value)
+        {
+            var entity = SimpleMapper.Map(value, new MongoAssetEntity());
+
+            entity.IndexedAppId = value.AppId.Id;
+
+            return entity;
+        }
+
+        private static MongoAssetEntity Map((DomainId Key, AssetDomainObject.State Value, long Version) change)
+        {
+            var entity = Map(change.Value);
+
+            entity.DocumentId = change.Key;
+
+            return entity;
         }
 
         private static AssetDomainObject.State Map(MongoAssetEntity existing)

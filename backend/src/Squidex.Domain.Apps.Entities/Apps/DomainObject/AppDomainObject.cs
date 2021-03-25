@@ -31,12 +31,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
-        public AppDomainObject(IStore<DomainId> store, ISemanticLog log,
+        public AppDomainObject(IPersistenceFactory<State> persistence, ISemanticLog log,
             InitialPatterns initialPatterns,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
-            : base(store, log)
+            : base(persistence, log)
         {
             Guard.NotNull(initialPatterns, nameof(initialPatterns));
             Guard.NotNull(userResolver, nameof(userResolver));

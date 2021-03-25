@@ -95,12 +95,31 @@ namespace Squidex.Infrastructure.EventSourcing
                             Filter.Gte(EventStreamOffsetField, streamPosition - MaxCommitSize)))
                         .Sort(Sort.Ascending(TimestampField)).ToListAsync();
 
-                var result = new List<StoredEvent>();
+                var result = commits.SelectMany(x => x.Filtered(streamPosition)).ToList();
 
-                foreach (var commit in commits)
-                {
-                    result.AddRange(commit.Filtered(streamPosition));
-                }
+                return result;
+            }
+        }
+
+        public async Task<IReadOnlyDictionary<string, IReadOnlyList<StoredEvent>>> QueryManyAsync(IEnumerable<string> streamNames)
+        {
+            Guard.NotNull(streamNames, nameof(streamNames));
+
+            using (Profiler.TraceMethod<MongoEventStore>())
+            {
+                var position = EtagVersion.Empty;
+
+                var commits =
+                    await Collection.Find(
+                        Filter.And(
+                            Filter.In(EventStreamField, streamNames),
+                            Filter.Gte(EventStreamOffsetField, position)))
+                        .Sort(Sort.Ascending(TimestampField)).ToListAsync();
+
+                var result = commits.GroupBy(x => x.EventStream)
+                    .ToDictionary(
+                        x => x.Key,
+                        x => (IReadOnlyList<StoredEvent>)x.SelectMany(y => y.Filtered(position)).ToList());
 
                 return result;
             }

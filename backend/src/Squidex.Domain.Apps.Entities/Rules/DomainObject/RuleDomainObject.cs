@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         private readonly IAppProvider appProvider;
         private readonly IRuleEnqueuer ruleEnqueuer;
 
-        public RuleDomainObject(IStore<DomainId> store, ISemanticLog log,
+        public RuleDomainObject(IPersistenceFactory<State> factory, ISemanticLog log,
             IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
-            : base(store, log)
+            : base(factory, log)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(ruleEnqueuer, nameof(ruleEnqueuer));

@@ -53,7 +53,7 @@ namespace Squidex.Config.Domain
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
                     var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);
 
-                    services.AddSingleton(typeof(ISnapshotStore<,>), typeof(MongoSnapshotStore<,>));
+                    services.AddSingleton(typeof(ISnapshotStore<>), typeof(MongoSnapshotStore<>));
 
                     services.AddSingletonAs(c => GetClient(mongoConfiguration))
                         .As<IMongoClient>();
@@ -110,13 +110,13 @@ namespace Squidex.Config.Domain
                         .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
-                        .As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State, DomainId>>();
+                        .As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State>>();
 
                     services.AddSingletonAs<MongoAssetFolderRepository>()
-                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State, DomainId>>();
+                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State>>();
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName), false))
-                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State, DomainId>>();
+                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>();
 
                     services.AddSingletonAs<MongoSchemasHash>()
                         .AsOptional<ISchemasHash>().As<IEventConsumer>();

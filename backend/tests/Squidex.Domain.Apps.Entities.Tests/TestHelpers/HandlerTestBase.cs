@@ -23,9 +23,8 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
     public abstract class HandlerTestBase<TState>
     {
-        private readonly IStore<DomainId> store = A.Fake<IStore<DomainId>>();
-        private readonly IPersistence<TState> persistenceWithState = A.Fake<IPersistence<TState>>();
-        private readonly IPersistence persistence = A.Fake<IPersistence>();
+        private readonly IPersistenceFactory<TState> persistenceFactory = A.Fake<IStore<TState>>();
+        private readonly IPersistence<TState> persistence = A.Fake<IPersistence<TState>>();
 
         protected RefToken Actor { get; } = RefToken.User("me");
 
@@ -53,29 +52,23 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected abstract DomainId Id { get; }
 
-        public IStore<DomainId> Store
+        public IPersistenceFactory<TState> PersistenceFactory
         {
-            get => store;
+            get => persistenceFactory;
         }
 
         public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = Enumerable.Empty<Envelope<IEvent>>();
 
         protected HandlerTestBase()
         {
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(A<Type>._, Id, A<HandleSnapshot<TState>>._, A<HandleEvent>._))
-                .Returns(persistenceWithState);
-
-            A.CallTo(() => store.WithEventSourcing(A<Type>._, Id, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(A<Type>._, Id, A<HandleSnapshot<TState>>._, A<HandleEvent>._))
                 .Returns(persistence);
 
-            A.CallTo(() => persistenceWithState.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
-                .Invokes((IReadOnlyList<Envelope<IEvent>> events) => LastEvents = events);
+            A.CallTo(() => persistenceFactory.WithEventSourcing(A<Type>._, Id, A<HandleEvent>._))
+                .Returns(persistence);
 
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
                 .Invokes((IReadOnlyList<Envelope<IEvent>> events) => LastEvents = events);
-
-            A.CallTo(() => persistenceWithState.DeleteAsync())
-                .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
 
             A.CallTo(() => persistence.DeleteAsync())
                 .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());

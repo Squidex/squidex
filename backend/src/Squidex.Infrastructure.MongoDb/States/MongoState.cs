@@ -12,12 +12,12 @@ using Squidex.Infrastructure.MongoDb;
 namespace Squidex.Infrastructure.States
 {
     [BsonIgnoreExtraElements]
-    public sealed class MongoState<T, TKey> : IVersionedEntity<TKey>
+    public sealed class MongoState<T> : IVersionedEntity<DomainId>
     {
         [BsonId]
         [BsonElement]
         [BsonRepresentation(BsonType.String)]
-        public TKey DocumentId { get; set; }
+        public DomainId DocumentId { get; set; }
 
         [BsonRequired]
         [BsonElement]

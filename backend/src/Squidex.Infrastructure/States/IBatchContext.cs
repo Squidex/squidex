@@ -5,22 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public interface IPersistence<in TState>
+    public interface IBatchContext<T> : IAsyncDisposable, IPersistenceFactory<T>
     {
-        long Version { get; }
+        Task CommitAsync();
 
-        Task DeleteAsync();
-
-        Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events);
-
-        Task WriteSnapshotAsync(TState state);
-
-        Task ReadAsync(long expectedVersion = EtagVersion.Any);
+        Task LoadAsync(IEnumerable<DomainId> ids);
     }
 }

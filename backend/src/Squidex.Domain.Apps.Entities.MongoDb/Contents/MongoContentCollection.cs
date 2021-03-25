@@ -187,5 +187,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             return Collection.DeleteOneAsync(x => x.DocumentId == documentId);
         }
+
+        public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> entities)
+        {
+            if (entities.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            return Collection.InsertManyAsync(entities, InsertUnordered);
+        }
     }
 }

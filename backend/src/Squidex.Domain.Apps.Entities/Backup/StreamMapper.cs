@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {

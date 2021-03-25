@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Infrastructure.Migrations;
@@ -15,16 +14,16 @@ namespace Migrations.Migrations
 {
     public sealed class ClearRules : IMigration
     {
-        private readonly IStore<Guid> store;
+        private readonly IStore<RuleDomainObject.State> store;
 
-        public ClearRules(IStore<Guid> store)
+        public ClearRules(IStore<RuleDomainObject.State> store)
         {
             this.store = store;
         }
 
         public Task UpdateAsync()
         {
-            return store.ClearSnapshotsAsync<Guid, RuleDomainObject.State>();
+            return store.ClearAsync();
         }
     }
 }

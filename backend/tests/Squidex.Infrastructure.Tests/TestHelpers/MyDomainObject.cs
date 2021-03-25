@@ -24,8 +24,8 @@ namespace Squidex.Infrastructure.TestHelpers
             set => Capacity = value;
         }
 
-        public MyDomainObject(IStore<DomainId> store)
-           : base(store, A.Dummy<ISemanticLog>())
+        public MyDomainObject(IPersistenceFactory<MyDomainState> factory)
+           : base(factory, A.Dummy<ISemanticLog>())
         {
         }
 

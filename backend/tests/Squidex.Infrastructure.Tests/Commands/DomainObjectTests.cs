@@ -18,14 +18,14 @@ namespace Squidex.Infrastructure.Commands
 {
     public class DomainObjectTests
     {
-        private readonly IStore<DomainId> store = A.Fake<IStore<DomainId>>();
+        private readonly IPersistenceFactory<MyDomainState> persistenceFactory = A.Fake<IPersistenceFactory<MyDomainState>>();
         private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
         private readonly DomainId id = DomainId.NewGuid();
         private readonly MyDomainObject sut;
 
         public DomainObjectTests()
         {
-            sut = new MyDomainObject(store);
+            sut = new MyDomainObject(persistenceFactory);
         }
 
         [Fact]
@@ -338,9 +338,9 @@ namespace Squidex.Infrastructure.Commands
             SetupCreated(4);
             SetupDeleted();
 
-            var deleteStream = A.Fake<IPersistence>();
+            var deleteStream = A.Fake<IPersistence<MyDomainState>>();
 
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), DomainId.Combine(id, DomainId.Create("deleted")), null))
+            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), DomainId.Combine(id, DomainId.Create("deleted")), null))
                 .Returns(deleteStream);
 
             await sut.ExecuteAsync(new DeletePermanent());
@@ -376,7 +376,7 @@ namespace Squidex.Infrastructure.Commands
             AssertSnapshot(version_0, 3, 0);
             AssertSnapshot(version_1, 4, 1);
 
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
                 .MustNotHaveHappened();
         }
 
@@ -400,7 +400,7 @@ namespace Squidex.Infrastructure.Commands
             AssertSnapshot(version_0, 3, 0);
             AssertSnapshot(version_1, 4, 1);
 
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
                 .MustHaveHappened();
         }
 
@@ -428,7 +428,7 @@ namespace Squidex.Infrastructure.Commands
                     handleEvent(Envelope.Create(new ValueChanged { Value = value }));
                 });
 
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
                 .Invokes(args =>
                 {
                     handleEvent = args.GetArgument<HandleEvent>(3)!;
@@ -450,9 +450,9 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
                 .Invokes(c => @events.AddRange(c.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!));
 
-            var eventsPersistence = A.Fake<IPersistence>();
+            var eventsPersistence = A.Fake<IPersistence<MyDomainState>>();
 
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
                 .Invokes(args =>
                 {
                     handleEvent = args.GetArgument<HandleEvent>(2)!;
@@ -471,7 +471,7 @@ namespace Squidex.Infrastructure.Commands
 
         private void SetupEmpty()
         {
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
                 .Returns(persistence);
 
             A.CallTo(() => persistence.Version)

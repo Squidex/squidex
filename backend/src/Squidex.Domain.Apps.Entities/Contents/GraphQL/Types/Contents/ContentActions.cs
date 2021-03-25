@@ -6,14 +6,12 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
