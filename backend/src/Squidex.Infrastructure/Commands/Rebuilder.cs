@@ -85,7 +85,11 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task InsertManyAsync<T, TState>(IStore<TState> store, IdSource source, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
-            var worker = new ActionBlock<DomainId[]>(async ids =>
+            var parallelism = Environment.ProcessorCount * 2;
+
+            const int BatchSize = 100;
+
+            var workerBlock = new ActionBlock<DomainId[]>(async ids =>
             {
                 await using (var context = store.WithBatchContext(typeof(T)))
                 {
@@ -110,17 +114,17 @@ namespace Squidex.Infrastructure.Commands
             },
             new ExecutionDataflowBlockOptions
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
+                MaxDegreeOfParallelism = parallelism,
                 MaxMessagesPerTask = 1,
-                BoundedCapacity = Environment.ProcessorCount * 2
+                BoundedCapacity = parallelism * 2
             });
 
-            var batch = new BatchBlock<DomainId>(100, new GroupingDataflowBlockOptions
+            var batchBlock = new BatchBlock<DomainId>(BatchSize, new GroupingDataflowBlockOptions
             {
-                BoundedCapacity = 400
+                BoundedCapacity = BatchSize
             });
 
-            batch.LinkTo(worker, new DataflowLinkOptions
+            batchBlock.LinkTo(workerBlock, new DataflowLinkOptions
             {
                 PropagateCompletion = true
             });
@@ -133,13 +137,13 @@ namespace Squidex.Infrastructure.Commands
                 {
                     if (handledIds.Add(id))
                     {
-                        await batch.SendAsync(id, ct);
+                        await batchBlock.SendAsync(id, ct);
                     }
                 });
 
-                batch.Complete();
+                batchBlock.Complete();
 
-                await worker.Completion;
+                await workerBlock.Completion;
             }
         }
     }

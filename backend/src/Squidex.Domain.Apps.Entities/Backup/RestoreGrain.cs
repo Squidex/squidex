@@ -8,7 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
@@ -30,7 +32,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class RestoreGrain : GrainOfString, IRestoreGrain
     {
-        private const int BatchSize = 500;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
         private readonly ICommandBus commandBus;
@@ -319,47 +320,67 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ReadEventsAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers)
         {
-            var batch = new List<(string, Envelope<IEvent>)>(BatchSize);
+            const int BatchSize = 500;
 
-            await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async storedEvent =>
+            var handled = 0;
+
+            var writeBlock = new ActionBlock<(string? Stream, Envelope<IEvent> Event)[]>(async batch =>
             {
-                batch.Add(storedEvent);
+                var commits = batch.Where(x => x.Stream != null)
+                    .Select(x =>
+                    {
+                        var offset = runningStreamMapper.GetStreamOffset(x.Stream!);
 
-                if (batch.Count == BatchSize)
+                        return EventCommit.Create(x.Stream!, offset, x.Event, eventDataFormatter);
+                    }).ToList();
+
+                if (commits.Count > 0)
                 {
-                    await CommitBatchAsync(reader, handlers, batch);
+                    await eventStore.AppendUnsafeAsync(commits);
 
-                    batch.Clear();
+                    handled += commits.Count;
+
+                    Log($"Reading {reader.ReadEvents}/{handled} events and {reader.ReadAttachments} attachments completed.", true);
                 }
+            }, new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = 1,
+                MaxMessagesPerTask = 1,
+                BoundedCapacity = 2
             });
 
-            if (batch.Count > 0)
+            var batchBlock = new BatchBlock<(string?, Envelope<IEvent>)>(500, new GroupingDataflowBlockOptions
             {
-                await CommitBatchAsync(reader, handlers, batch);
-            }
+                BoundedCapacity = BatchSize
+            });
 
-            Log($"Reading {reader.ReadEvents} events and {reader.ReadAttachments} attachments completed.", true);
-        }
-
-        private async Task CommitBatchAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, List<(string, Envelope<IEvent>)> batch)
-        {
-            var commits = new List<EventCommit>(batch.Count);
-
-            foreach (var (stream, @event) in batch)
+            batchBlock.LinkTo(writeBlock, new DataflowLinkOptions
             {
-                var newStream = await HandleEventAsync(reader, handlers, stream, @event);
+                PropagateCompletion = true
+            });
 
-                if (newStream != null)
-                {
-                    var offset = runningStreamMapper.GetStreamOffset(newStream);
+            var processBlock = new TransformBlock<(string Stream, Envelope<IEvent> Event), (string?, Envelope<IEvent>)>(async job =>
+            {
+                var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);
 
-                    commits.Add(EventCommit.Create(newStream, offset, @event, eventDataFormatter));
-                }
-            }
+                return (newStream, job.Event);
+            }, new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = 1,
+                MaxMessagesPerTask = 1,
+                BoundedCapacity = BatchSize
+            });
 
-            await eventStore.AppendUnsafeAsync(commits);
+            processBlock.LinkTo(batchBlock, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
 
-            Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
+            await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, processBlock.SendAsync);
+
+            processBlock.Complete();
+
+            await writeBlock.Completion;
         }
 
         private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
