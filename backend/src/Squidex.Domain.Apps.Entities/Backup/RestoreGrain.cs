@@ -408,6 +408,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             var (newStream, id) = runningStreamMapper.Map(stream);
 
             @event.SetAggregateId(id);
+            @event.SetRestored();
 
             foreach (var handler in handlers)
             {

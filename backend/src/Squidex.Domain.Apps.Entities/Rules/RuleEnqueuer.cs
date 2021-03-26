@@ -66,9 +66,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public async Task On(Envelope<IEvent> @event)
         {
-            using (localCache.StartContext())
+            if (@event.Headers.Restored())
             {
-                if (@event.Payload is AppEvent appEvent)
+                return;
+            }
+
+            if (@event.Payload is AppEvent appEvent)
+            {
+                using (localCache.StartContext())
                 {
                     var rules = await GetRulesAsync(appEvent.AppId.Id);
 

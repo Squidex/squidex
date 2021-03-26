@@ -97,10 +97,35 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
 
-            var rule1 = CreateRule();
-            var rule2 = CreateRule();
+            var job1 = new RuleJob { Created = now };
+
+            SetupRules(@event, job1);
+
+            await sut.On(@event);
+
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, (Exception?)null))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_eqneue_when_event_restored()
+        {
+            var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
 
             var job1 = new RuleJob { Created = now };
+
+            SetupRules(@event, job1);
+
+            await sut.On(@event.SetRestored(true));
+
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, A<Exception?>._))
+                .MustNotHaveHappened();
+        }
+
+        private void SetupRules(Envelope<IEvent> @event, RuleJob job1)
+        {
+            var rule1 = CreateRule();
+            var rule2 = CreateRule();
 
             A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
                 .Returns(new List<IRuleEntity> { rule1, rule2 });
@@ -110,11 +135,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             A.CallTo(() => ruleService.CreateJobsAsync(rule2.RuleDef, rule2.Id, @event, true))
                 .Returns(new List<(RuleJob, Exception?)>());
-
-            await sut.On(@event);
-
-            A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, (Exception?)null))
-                .MustHaveHappened();
         }
 
         private static RuleEntity CreateRule()

@@ -55,6 +55,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Should_not_delete_assets_when_event_restored()
+        {
+            var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
+
+            await sut.On(Envelope.Create(@event).SetRestored());
+
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, A<long>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_delete_assets_for_all_versions()
         {
             var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };

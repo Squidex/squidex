@@ -88,6 +88,11 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public Task On(Envelope<IEvent> @event)
         {
+            if (@event.Headers.Restored())
+            {
+                return Task.CompletedTask;
+            }
+
             var jsonString = jsonSerializer.Serialize(@event);
             var jsonBytes = Encoding.UTF8.GetBytes(jsonString);
 

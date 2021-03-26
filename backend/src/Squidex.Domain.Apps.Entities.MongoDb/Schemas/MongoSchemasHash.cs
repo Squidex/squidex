@@ -58,6 +58,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 
             foreach (var @event in events)
             {
+                if (@event.Headers.Restored())
+                {
+                    continue;
+                }
+
                 switch (@event.Payload)
                 {
                     case SchemaEvent schemaEvent:
