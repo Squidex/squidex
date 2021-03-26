@@ -345,7 +345,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 1,
-                MaxMessagesPerTask = 1,
+                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
                 BoundedCapacity = 2
             });
 
@@ -367,7 +367,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 1,
-                MaxMessagesPerTask = 1,
+                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
                 BoundedCapacity = BatchSize
             });
 
