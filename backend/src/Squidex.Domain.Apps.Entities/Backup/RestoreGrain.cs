@@ -324,24 +324,22 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var handled = 0;
 
-            var writeBlock = new ActionBlock<(string? Stream, Envelope<IEvent> Event)[]>(async batch =>
+            var writeBlock = new ActionBlock<(string, Envelope<IEvent>)[]>(async batch =>
             {
-                var commits = batch.Where(x => x.Stream != null)
-                    .Select(x =>
-                    {
-                        var offset = runningStreamMapper.GetStreamOffset(x.Stream!);
+                var commits = new List<EventCommit>(batch.Length);
 
-                        return EventCommit.Create(x.Stream!, offset, x.Event, eventDataFormatter);
-                    }).ToList();
-
-                if (commits.Count > 0)
+                foreach (var (stream, @event) in batch)
                 {
-                    await eventStore.AppendUnsafeAsync(commits);
+                    var offset = runningStreamMapper.GetStreamOffset(stream);
 
-                    handled += commits.Count;
-
-                    Log($"Reading {reader.ReadEvents}/{handled} events and {reader.ReadAttachments} attachments completed.", true);
+                    commits.Add(EventCommit.Create(stream, offset, @event, eventDataFormatter));
                 }
+
+                await eventStore.AppendUnsafeAsync(commits);
+
+                handled += commits.Count;
+
+                Log($"Reading {reader.ReadEvents}/{handled} events and {reader.ReadAttachments} attachments completed.", true);
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 1,
@@ -349,7 +347,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 BoundedCapacity = 2
             });
 
-            var batchBlock = new BatchBlock<(string?, Envelope<IEvent>)>(500, new GroupingDataflowBlockOptions
+            var batchBlock = new BatchBlock<(string, Envelope<IEvent>)>(500, new GroupingDataflowBlockOptions
             {
                 BoundedCapacity = BatchSize
             });
@@ -359,26 +357,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 PropagateCompletion = true
             });
 
-            var processBlock = new TransformBlock<(string Stream, Envelope<IEvent> Event), (string?, Envelope<IEvent>)>(async job =>
+            await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async job =>
             {
                 var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);
 
-                return (newStream, job.Event);
-            }, new ExecutionDataflowBlockOptions
-            {
-                MaxDegreeOfParallelism = 1,
-                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
-                BoundedCapacity = BatchSize
+                if (newStream != null)
+                {
+                    await batchBlock.SendAsync((newStream, job.Event));
+                }
             });
 
-            processBlock.LinkTo(batchBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
-
-            await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, processBlock.SendAsync);
-
-            processBlock.Complete();
+            batchBlock.Complete();
 
             await writeBlock.Completion;
         }

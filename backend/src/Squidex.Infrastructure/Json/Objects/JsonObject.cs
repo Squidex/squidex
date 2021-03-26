@@ -56,6 +56,11 @@ namespace Squidex.Infrastructure.Json.Objects
             inner = new Dictionary<string, IJsonValue>();
         }
 
+        public JsonObject(int capacity)
+        {
+            inner = new Dictionary<string, IJsonValue>(capacity);
+        }
+
         public JsonObject(JsonObject obj)
         {
             inner = new Dictionary<string, IJsonValue>(obj.inner);
