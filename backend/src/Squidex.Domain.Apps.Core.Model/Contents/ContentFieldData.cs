@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -30,17 +31,31 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
+        public bool TryGetNonNull(string key, [MaybeNullWhen(false)] out IJsonValue result)
+        {
+            result = null!;
+
+            if (TryGetValue(key, out var found) && found != null && found.Type != JsonValueType.Null)
+            {
+                result = found;
+                return true;
+            }
+
+            return false;
+        }
+
         public ContentFieldData AddInvariant(object? value)
         {
-            this[InvariantPartitioning.Key] = JsonValue.Create(value);
-
-            return this;
+            return AddValue(InvariantPartitioning.Key, JsonValue.Create(value));
         }
 
         public ContentFieldData AddLocalized(string key, object? value)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            return AddValue(key, JsonValue.Create(value));
+        }
 
+        public ContentFieldData AddValue(string key, IJsonValue? value)
+        {
             this[key] = JsonValue.Create(value);
 
             return this;

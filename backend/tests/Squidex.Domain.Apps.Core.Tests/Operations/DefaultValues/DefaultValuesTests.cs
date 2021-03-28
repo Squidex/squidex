@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -37,8 +38,16 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                         new BooleanFieldProperties { DefaultValue = true });
         }
 
-        [Fact]
-        public void Should_enrich_with_default_values()
+        private static IEnumerable<object?[]> InvalidValues()
+        {
+            yield return new object?[] { null };
+            yield return new object?[] { JsonValue.Null };
+            yield return new object?[] { JsonValue.False }; // Undefined
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidValues))]
+        public void Should_enrich_with_default_values(IJsonValue? value)
         {
             var data =
                 new ContentData()
@@ -48,6 +57,11 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                     .AddField("my-number",
                         new ContentFieldData()
                             .AddInvariant(456));
+
+            if (value != JsonBoolean.False)
+            {
+                data["my-string"]!["en"] = value!;
+            }
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 

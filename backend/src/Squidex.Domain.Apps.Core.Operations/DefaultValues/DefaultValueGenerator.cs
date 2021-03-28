@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
                 return;
             }
 
-            if (!fieldData.ContainsKey(partitionKey))
+            if (!fieldData.TryGetNonNull(partitionKey, out _))
             {
                 fieldData.AddLocalized(partitionKey, defaultValue);
             }

@@ -59,21 +59,21 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static FieldConverter ResolveInvariant(LanguagesConfig languages)
         {
-            var codeForInvariant = InvariantPartitioning.Key;
+            var iv = InvariantPartitioning.Key;
 
             return (data, field) =>
             {
-                if (field.Partitioning.Equals(Partitioning.Invariant) && !data.ContainsKey(codeForInvariant))
+                if (field.Partitioning.Equals(Partitioning.Invariant) && !data.TryGetNonNull(iv, out _))
                 {
                     var result = new ContentFieldData(1);
 
-                    if (data.TryGetValue(languages.Master, out var value))
+                    if (data.TryGetNonNull(languages.Master, out var value))
                     {
-                        result[codeForInvariant] = value;
+                        result[iv] = value;
                     }
                     else if (data.Count > 0)
                     {
-                        result[codeForInvariant] = data.Values.First();
+                        result[iv] = data.Values.First();
                     }
 
                     return result;
@@ -85,13 +85,13 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static FieldConverter ResolveLanguages(LanguagesConfig languages)
         {
-            var codeForInvariant = InvariantPartitioning.Key;
+            var iv = InvariantPartitioning.Key;
 
             return (data, field) =>
             {
                 if (field.Partitioning.Equals(Partitioning.Language))
                 {
-                    if (data.TryGetValue(codeForInvariant, out var value))
+                    if (data.TryGetNonNull(iv, out var value))
                     {
                         var result = new ContentFieldData
                         {
@@ -119,11 +119,11 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     foreach (var languageCode in languages.AllKeys)
                     {
-                        if (!data.ContainsKey(languageCode))
+                        if (!data.TryGetNonNull(languageCode, out _))
                         {
                             foreach (var fallback in languages.GetPriorities(languageCode))
                             {
-                                if (data.TryGetValue(fallback, out var value))
+                                if (data.TryGetNonNull(fallback, out var value))
                                 {
                                     data[languageCode] = value;
                                     break;
