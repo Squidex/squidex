@@ -49,14 +49,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
         }
 
         [Fact]
-        public async Task Should_throw_exception_if_backup_has_no_version()
+        public async Task Should_not_throw_exception_if_backup_has_no_version()
         {
             var reader = A.Fake<IBackupReader>();
 
             A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._))
                 .Throws(new FileNotFoundException());
 
-            await Assert.ThrowsAsync<BackupRestoreException>(() => reader.CheckCompatibilityAsync());
+            await reader.CheckCompatibilityAsync();
         }
     }
 }
