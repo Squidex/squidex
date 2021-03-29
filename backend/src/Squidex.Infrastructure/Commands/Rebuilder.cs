@@ -10,9 +10,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
+
+#pragma warning disable RECS0108 // Warns about static fields in generic types
 
 namespace Squidex.Infrastructure.Commands
 {
@@ -21,31 +24,40 @@ namespace Squidex.Infrastructure.Commands
     public class Rebuilder
     {
         private readonly ILocalCache localCache;
-        private readonly IStore<DomainId> store;
         private readonly IEventStore eventStore;
         private readonly IServiceProvider serviceProvider;
 
+        private static class Factory<T, TState> where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        {
+            private static readonly ObjectFactory ObjectFactory = ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(IPersistenceFactory<TState>) });
+
+            public static T Create(IServiceProvider serviceProvider, IPersistenceFactory<TState> persistenceFactory)
+            {
+                return (T)ObjectFactory(serviceProvider, new object[] { persistenceFactory });
+            }
+        }
+
         public Rebuilder(
             ILocalCache localCache,
-            IStore<DomainId> store,
             IEventStore eventStore,
             IServiceProvider serviceProvider)
         {
             Guard.NotNull(localCache, nameof(localCache));
-            Guard.NotNull(store, nameof(store));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
             Guard.NotNull(eventStore, nameof(eventStore));
 
             this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
             this.localCache = localCache;
-            this.store = store;
         }
 
         public virtual async Task RebuildAsync<T, TState>(string filter, CancellationToken ct) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
-            await store.GetSnapshotStore<TState>().ClearAsync();
+            var store = serviceProvider.GetRequiredService<IStore<TState>>();
 
-            await InsertManyAsync<T, TState>(async target =>
+            await store.ClearSnapshotsAsync();
+
+            await InsertManyAsync<T, TState>(store, async target =>
             {
                 await eventStore.QueryAsync(async storedEvent =>
                 {
@@ -60,7 +72,9 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(source, nameof(source));
 
-            await InsertManyAsync<T, TState>(async target =>
+            var store = serviceProvider.GetRequiredService<IStore<TState>>();
+
+            await InsertManyAsync<T, TState>(store, async target =>
             {
                 foreach (var id in source)
                 {
@@ -69,26 +83,50 @@ namespace Squidex.Infrastructure.Commands
             }, ct);
         }
 
-        private async Task InsertManyAsync<T, TState>(IdSource source, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        private async Task InsertManyAsync<T, TState>(IStore<TState> store, IdSource source, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
-            var worker = new ActionBlock<DomainId>(async id =>
+            var parallelism = Environment.ProcessorCount * 2;
+
+            const int BatchSize = 100;
+
+            var workerBlock = new ActionBlock<DomainId[]>(async ids =>
             {
-                try
+                await using (var context = store.WithBatchContext(typeof(T)))
                 {
-                    var domainObject = (T)serviceProvider.GetService(typeof(T))!;
+                    await context.LoadAsync(ids);
 
-                    domainObject.Setup(id);
+                    foreach (var id in ids)
+                    {
+                        try
+                        {
+                            var domainObject = Factory<T, TState>.Create(serviceProvider, context);
 
-                    await domainObject.RebuildStateAsync();
-                }
-                catch (DomainObjectNotFoundException)
-                {
-                    return;
+                            domainObject.Setup(id);
+
+                            await domainObject.RebuildStateAsync();
+                        }
+                        catch (DomainObjectNotFoundException)
+                        {
+                            return;
+                        }
+                    }
                 }
             },
             new ExecutionDataflowBlockOptions
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount * 4
+                MaxDegreeOfParallelism = parallelism,
+                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
+                BoundedCapacity = parallelism * 2
+            });
+
+            var batchBlock = new BatchBlock<DomainId>(BatchSize, new GroupingDataflowBlockOptions
+            {
+                BoundedCapacity = BatchSize
+            });
+
+            batchBlock.LinkTo(workerBlock, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
             });
 
             var handledIds = new HashSet<DomainId>();
@@ -99,13 +137,13 @@ namespace Squidex.Infrastructure.Commands
                 {
                     if (handledIds.Add(id))
                     {
-                        await worker.SendAsync(id, ct);
+                        await batchBlock.SendAsync(id, ct);
                     }
                 });
 
-                worker.Complete();
+                batchBlock.Complete();
 
-                await worker.Completion;
+                await workerBlock.Completion;
             }
         }
     }

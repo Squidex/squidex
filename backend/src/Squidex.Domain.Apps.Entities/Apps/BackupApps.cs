@@ -135,7 +135,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task CompleteRestoreAsync(RestoreContext context)
         {
             await appsIndex.AddAsync(appReservation);
-
             await appsIndex.RebuildByContributorsAsync(context.AppId, contributors);
         }
 

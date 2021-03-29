@@ -127,9 +127,9 @@ namespace Squidex.Domain.Apps.Entities.History
             var now = clock.GetCurrentInstant();
 
             var publishedEvents = events
+                .Where(x => x.AppEvent.Headers.Restored() == false)
                 .Where(x => IsTooOld(x.AppEvent.Headers, now) == false)
-                .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null)
-                .ToList();
+                .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null);
 
             foreach (var batch in publishedEvents.Batch(50))
             {

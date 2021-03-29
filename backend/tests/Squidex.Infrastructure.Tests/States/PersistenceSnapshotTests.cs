@@ -15,20 +15,16 @@ namespace Squidex.Infrastructure.States
 {
     public class PersistenceSnapshotTests
     {
-        private readonly string key = Guid.NewGuid().ToString();
+        private readonly DomainId key = DomainId.NewGuid();
+        private readonly ISnapshotStore<int> snapshotStore = A.Fake<ISnapshotStore<int>>();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IServiceProvider services = A.Fake<IServiceProvider>();
-        private readonly ISnapshotStore<int, string> snapshotStore = A.Fake<ISnapshotStore<int, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
-        private readonly IStore<string> sut;
+        private readonly IStore<int> sut;
 
         public PersistenceSnapshotTests()
         {
-            A.CallTo(() => services.GetService(typeof(ISnapshotStore<int, string>)))
-                .Returns(snapshotStore);
-
-            sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
+            sut = new Store<int>(snapshotStore, eventStore, eventDataFormatter, streamNameResolver);
         }
 
         [Fact]
@@ -122,7 +118,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_write_snapshot_to_store_with_empty_version()
         {
-            var persistence = sut.WithSnapshots<int>(None.Type, key, null);
+            var persistence = sut.WithSnapshots(None.Type, key, null);
 
             await persistence.WriteSnapshotAsync(100);
 
@@ -165,33 +161,10 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_call_snapshot_store_on_clear()
         {
-            await sut.ClearSnapshotsAsync<string, int>();
+            await sut.ClearSnapshotsAsync();
 
             A.CallTo(() => snapshotStore.ClearAsync())
                 .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_delete_snapshot_but_not_events_when_deleted_from_store()
-        {
-            await sut.RemoveSnapshotAsync<string, int>(key);
-
-            A.CallTo(() => eventStore.DeleteStreamAsync(A<string>._))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => snapshotStore.RemoveAsync(key))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_get_snapshot()
-        {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, -1));
-
-            var result = await sut.GetSnapshotAsync<string, int>(key);
-
-            Assert.Equal(123, result);
         }
     }
 }

@@ -29,24 +29,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id)
         {
-            var stream = OpenStream(id);
+            Stream stream;
 
             if (string.Equals(url.Scheme, "file"))
             {
-                try
-                {
-                    using (var sourceStream = new FileStream(url.LocalPath, FileMode.Open, FileAccess.Read))
-                    {
-                        await sourceStream.CopyToAsync(stream);
-                    }
-                }
-                catch (IOException ex)
-                {
-                    throw new BackupRestoreException($"Cannot download the archive: {ex.Message}.", ex);
-                }
+                stream = new FileStream(url.LocalPath, FileMode.Open, FileAccess.Read);
             }
             else
             {
+                stream = OpenStream(id);
+
                 HttpResponseMessage? response = null;
                 try
                 {

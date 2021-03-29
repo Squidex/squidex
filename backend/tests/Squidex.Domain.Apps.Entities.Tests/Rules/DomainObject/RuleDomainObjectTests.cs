@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         public RuleDomainObjectTests()
         {
-            sut = new RuleDomainObject(Store, A.Dummy<ISemanticLog>(), appProvider, ruleEnqueuer);
+            sut = new RuleDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), appProvider, ruleEnqueuer);
             sut.Setup(Id);
         }
 

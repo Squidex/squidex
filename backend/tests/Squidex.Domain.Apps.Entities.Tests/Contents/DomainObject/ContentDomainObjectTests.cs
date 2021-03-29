@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
@@ -119,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     .AddSingleton<IValidatorsFactory>(new DefaultValidatorsFactory())
                     .BuildServiceProvider();
 
-            sut = new ContentDomainObject(Store, log, serviceProvider);
+            sut = new ContentDomainObject(PersistenceFactory, log, serviceProvider);
             sut.Setup(Id);
         }
 

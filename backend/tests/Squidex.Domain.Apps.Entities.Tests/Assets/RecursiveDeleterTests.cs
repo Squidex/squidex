@@ -62,6 +62,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Should_Not_invoke_delete_commands_when_event_restored()
+        {
+            var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
+
+            await sut.On(Envelope.Create(@event).SetRestored());
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_invoke_delete_commands_for_all_subfolders()
         {
             var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };

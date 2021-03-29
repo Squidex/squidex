@@ -34,6 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var current = await reader.ReadVersionAsync();
 
+            if (None.Equals(current))
+            {
+                return;
+            }
+
             if (!Expected.Equals(current))
             {
                 throw new BackupRestoreException("Backup file is not compatible with this version.");

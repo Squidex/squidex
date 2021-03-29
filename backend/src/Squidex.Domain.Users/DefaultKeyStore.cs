@@ -13,13 +13,14 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.IdentityModel.Tokens;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Users
 {
     public sealed class DefaultKeyStore : ISigningCredentialStore, IValidationKeysStore
     {
-        private readonly ISnapshotStore<State, Guid> store;
+        private readonly ISnapshotStore<State> store;
         private SigningCredentials? cachedKey;
         private SecurityKeyInfo[]? cachedKeyInfo;
 
@@ -31,8 +32,10 @@ namespace Squidex.Domain.Users
             public RSAParameters Parameters { get; set; }
         }
 
-        public DefaultKeyStore(ISnapshotStore<State, Guid> store)
+        public DefaultKeyStore(ISnapshotStore<State> store)
         {
+            Guard.NotNull(store, nameof(store));
+
             this.store = store;
         }
 
