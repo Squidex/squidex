@@ -8,7 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
@@ -19,7 +21,6 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
@@ -31,7 +32,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class RestoreGrain : GrainOfString, IRestoreGrain
     {
-        private const int BatchSize = 500;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
         private readonly ICommandBus commandBus;
@@ -42,7 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IUserResolver userResolver;
         private readonly IGrainState<BackupRestoreState> state;
-        private RestoreContext restoreContext;
+        private RestoreContext runningContext;
+        private StreamMapper runningStreamMapper;
 
         private RestoreJob CurrentJob
         {
@@ -176,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             using (Profiler.TraceMethod(handler.GetType(), nameof(IBackupHandler.RestoreAsync)))
                             {
-                                await handler.RestoreAsync(restoreContext);
+                                await handler.RestoreAsync(runningContext);
                             }
 
                             Log($"Restored {handler.Name}");
@@ -186,7 +187,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             using (Profiler.TraceMethod(handler.GetType(), nameof(IBackupHandler.CompleteRestoreAsync)))
                             {
-                                await handler.CompleteRestoreAsync(restoreContext);
+                                await handler.CompleteRestoreAsync(runningContext);
                             }
 
                             Log($"Completed {handler.Name}");
@@ -243,6 +244,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     CurrentJob.Stopped = clock.GetCurrentInstant();
 
                     await state.WriteAsync();
+
+                    runningStreamMapper = null!;
+                    runningContext = null!;
                 }
             }
         }
@@ -316,51 +320,59 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ReadEventsAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers)
         {
-            var batch = new List<(string, Envelope<IEvent>)>(BatchSize);
+            const int BatchSize = 500;
 
-            await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async storedEvent =>
+            var handled = 0;
+
+            var writeBlock = new ActionBlock<(string, Envelope<IEvent>)[]>(async batch =>
             {
-                batch.Add(storedEvent);
+                var commits = new List<EventCommit>(batch.Length);
 
-                if (batch.Count == BatchSize)
+                foreach (var (stream, @event) in batch)
                 {
-                    await CommitBatchAsync(reader, handlers, batch);
+                    var offset = runningStreamMapper.GetStreamOffset(stream);
 
-                    batch.Clear();
+                    commits.Add(EventCommit.Create(stream, offset, @event, eventDataFormatter));
+                }
+
+                await eventStore.AppendUnsafeAsync(commits);
+
+                handled += commits.Count;
+
+                Log($"Reading {reader.ReadEvents}/{handled} events and {reader.ReadAttachments} attachments completed.", true);
+            }, new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = 1,
+                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
+                BoundedCapacity = 2
+            });
+
+            var batchBlock = new BatchBlock<(string, Envelope<IEvent>)>(500, new GroupingDataflowBlockOptions
+            {
+                BoundedCapacity = BatchSize
+            });
+
+            batchBlock.LinkTo(writeBlock, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async job =>
+            {
+                var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);
+
+                if (newStream != null)
+                {
+                    await batchBlock.SendAsync((newStream, job.Event));
                 }
             });
 
-            if (batch.Count > 0)
-            {
-                await CommitBatchAsync(reader, handlers, batch);
-            }
+            batchBlock.Complete();
 
-            Log($"Reading {reader.ReadEvents} events and {reader.ReadAttachments} attachments completed.", true);
+            await writeBlock.Completion;
         }
 
-        private async Task CommitBatchAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, List<(string, Envelope<IEvent>)> batch)
-        {
-            var commits = new List<EventCommit>(batch.Count);
-
-            foreach (var (stream, @event) in batch)
-            {
-                var handled = await HandleEventAsync(reader, handlers, stream, @event);
-
-                if (handled)
-                {
-                    var streamName = restoreContext.GetStreamName(stream);
-                    var streamOffset = restoreContext.GetStreamOffset(streamName);
-
-                    commits.Add(EventCommit.Create(streamName, streamOffset, @event, eventDataFormatter));
-                }
-            }
-
-            await eventStore.AppendUnsafeAsync(commits);
-
-            Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
-        }
-
-        private async Task<bool> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
+        private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
         {
             if (@event.Payload is AppCreated appCreated)
             {
@@ -382,7 +394,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (@event.Payload is SquidexEvent squidexEvent && squidexEvent.Actor != null)
             {
-                if (restoreContext.UserMapping.TryMap(squidexEvent.Actor, out var newUser))
+                if (runningContext.UserMapping.TryMap(squidexEvent.Actor, out var newUser))
                 {
                     squidexEvent.Actor = newUser;
                 }
@@ -393,26 +405,20 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 appEvent.AppId = CurrentJob.AppId;
             }
 
-            if (@event.Headers.TryGet(CommonHeaders.AggregateId, out var value) && value is JsonString idString)
-            {
-                var id = idString.Value.Replace(
-                    restoreContext.PreviousAppId.ToString(),
-                    restoreContext.AppId.ToString());
+            var (newStream, id) = runningStreamMapper.Map(stream);
 
-                var domainId = DomainId.Create(id);
-
-                @event.SetAggregateId(domainId);
-            }
+            @event.SetAggregateId(id);
+            @event.SetRestored();
 
             foreach (var handler in handlers)
             {
-                if (!await handler.RestoreEventAsync(@event, restoreContext))
+                if (!await handler.RestoreEventAsync(@event, runningContext))
                 {
-                    return false;
+                    return null;
                 }
             }
 
-            return true;
+            return newStream;
         }
 
         private async Task CreateContextAsync(IBackupReader reader, DomainId previousAppId)
@@ -428,7 +434,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Log("Created Users");
             }
 
-            restoreContext = new RestoreContext(CurrentJob.AppId.Id, userMapping, reader, previousAppId);
+            runningContext = new RestoreContext(CurrentJob.AppId.Id, userMapping, reader, previousAppId);
+            runningStreamMapper = new StreamMapper(runningContext);
         }
 
         private void Log(string message, bool replace = false)

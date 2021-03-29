@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly SnapshotList<T> snapshots = new SnapshotList<T>();
-        private readonly IStore<DomainId> store;
+        private readonly IPersistenceFactory<T> factory;
         private readonly ISemanticLog log;
         private IPersistence<T>? persistence;
         private bool isLoaded;
@@ -45,12 +45,12 @@ namespace Squidex.Infrastructure.Commands
             set => snapshots.Capacity = value;
         }
 
-        protected DomainObject(IStore<DomainId> store, ISemanticLog log)
+        protected DomainObject(IPersistenceFactory<T> factory, ISemanticLog log)
         {
-            Guard.NotNull(store, nameof(store));
+            Guard.NotNull(factory, nameof(factory));
             Guard.NotNull(log, nameof(log));
 
-            this.store = store;
+            this.factory = factory;
 
             this.log = log;
         }
@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Commands
 
                 snapshots.Add(snapshot, snapshot.Version, false);
 
-                var allEvents = store.WithEventSourcing(GetType(), UniqueId, @event =>
+                var allEvents = factory.WithEventSourcing(GetType(), UniqueId, @event =>
                 {
                     var newVersion = snapshot.Version + 1;
 
@@ -97,7 +97,7 @@ namespace Squidex.Infrastructure.Commands
         {
             this.uniqueId = uniqueId;
 
-            persistence = store.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
+            persistence = factory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
                 new HandleSnapshot<T>(snapshot =>
                 {
                     snapshot.Version = Version + 1;
@@ -175,7 +175,7 @@ namespace Squidex.Infrastructure.Commands
                 if (events != null)
                 {
                     var deletedId = DomainId.Combine(UniqueId, DomainId.Create("deleted"));
-                    var deletedStream = store.WithEventSourcing(GetType(), deletedId, null);
+                    var deletedStream = factory.WithEventSourcing(GetType(), deletedId, null);
 
                     await deletedStream.WriteEventsAsync(events);
 

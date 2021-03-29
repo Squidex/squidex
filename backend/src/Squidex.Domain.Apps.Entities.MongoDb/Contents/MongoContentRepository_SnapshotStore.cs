@@ -19,19 +19,19 @@ using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State, DomainId>
+    public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State>
     {
-        Task ISnapshotStore<ContentDomainObject.State, DomainId>.ReadAllAsync(Func<ContentDomainObject.State, long, Task> callback, CancellationToken ct)
+        Task ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(Func<ContentDomainObject.State, long, Task> callback, CancellationToken ct)
         {
             throw new NotSupportedException();
         }
 
-        Task<(ContentDomainObject.State Value, long Version)> ISnapshotStore<ContentDomainObject.State, DomainId>.ReadAsync(DomainId key)
+        Task<(ContentDomainObject.State Value, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key)
         {
             return Task.FromResult<(ContentDomainObject.State, long Version)>((null!, EtagVersion.Empty));
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State, DomainId>.ClearAsync()
+        async Task ISnapshotStore<ContentDomainObject.State>.ClearAsync()
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State, DomainId>.RemoveAsync(DomainId key)
+        async Task ISnapshotStore<ContentDomainObject.State>.RemoveAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State, DomainId>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -64,9 +64,32 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
+        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version)> snapshots)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                var entitiesPublished = new List<MongoContentEntity>();
+                var entitiesAll = new List<MongoContentEntity>();
+
+                foreach (var (_, value, version) in snapshots)
+                {
+                    if (ShouldWritePublished(value))
+                    {
+                        entitiesPublished.Add(await CreatePublishedContentAsync(value, version));
+                    }
+
+                    entitiesAll.Add(await CreateDraftContentAsync(value, version));
+                }
+
+                await Task.WhenAll(
+                    collectionPublished.InsertManyAsync(entitiesPublished),
+                    collectionAll.InsertManyAsync(entitiesAll));
+            }
+        }
+
         private async Task UpsertOrDeletePublishedAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            if (value.Status == Status.Published && !value.IsDeleted)
+            if (ShouldWritePublished(value))
             {
                 await UpsertPublishedContentAsync(value, oldVersion, newVersion);
             }
@@ -85,48 +108,67 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            var content = await CreateContentAsync(value, value.Data, newVersion);
+            var entity = await CreateDraftContentAsync(value, newVersion);
 
-            content.ScheduledAt = value.ScheduleJob?.DueTime;
-            content.ScheduleJob = value.ScheduleJob;
-            content.NewStatus = value.NewStatus;
-
-            await collectionAll.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
+            await collectionAll.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity);
         }
 
         private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            var content = await CreateContentAsync(value, value.CurrentVersion.Data, newVersion);
+            var entity = await CreatePublishedContentAsync(value, newVersion);
 
-            content.ScheduledAt = null;
-            content.ScheduleJob = null;
-            content.NewStatus = null;
+            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity);
+        }
 
-            await collectionPublished.UpsertVersionedAsync(content.DocumentId, oldVersion, content);
+        private async Task<MongoContentEntity> CreatePublishedContentAsync(ContentDomainObject.State value, long newVersion)
+        {
+            var entity = await CreateContentAsync(value, value.CurrentVersion.Data, newVersion);
+
+            entity.ScheduledAt = null;
+            entity.ScheduleJob = null;
+            entity.NewStatus = null;
+
+            return entity;
+        }
+
+        private async Task<MongoContentEntity> CreateDraftContentAsync(ContentDomainObject.State value, long newVersion)
+        {
+            var entity = await CreateContentAsync(value, value.Data, newVersion);
+
+            entity.ScheduledAt = value.ScheduleJob?.DueTime;
+            entity.ScheduleJob = value.ScheduleJob;
+            entity.NewStatus = value.NewStatus;
+
+            return entity;
         }
 
         private async Task<MongoContentEntity> CreateContentAsync(ContentDomainObject.State value, ContentData data, long newVersion)
         {
-            var content = SimpleMapper.Map(value, new MongoContentEntity());
+            var entity = SimpleMapper.Map(value, new MongoContentEntity());
 
-            content.Data = data;
-            content.DocumentId = value.UniqueId;
-            content.IndexedAppId = value.AppId.Id;
-            content.IndexedSchemaId = value.SchemaId.Id;
-            content.Version = newVersion;
+            entity.Data = data;
+            entity.DocumentId = value.UniqueId;
+            entity.IndexedAppId = value.AppId.Id;
+            entity.IndexedSchemaId = value.SchemaId.Id;
+            entity.Version = newVersion;
 
             var schema = await appProvider.GetSchemaAsync(value.AppId.Id, value.SchemaId.Id, true);
 
             if (schema != null)
             {
-                content.ReferencedIds = content.Data.GetReferencedIds(schema.SchemaDef);
+                entity.ReferencedIds = entity.Data.GetReferencedIds(schema.SchemaDef);
             }
             else
             {
-                content.ReferencedIds = new HashSet<DomainId>();
+                entity.ReferencedIds = new HashSet<DomainId>();
             }
 
-            return content;
+            return entity;
+        }
+
+        private static bool ShouldWritePublished(ContentDomainObject.State value)
+        {
+            return value.Status == Status.Published && !value.IsDeleted;
         }
     }
 }

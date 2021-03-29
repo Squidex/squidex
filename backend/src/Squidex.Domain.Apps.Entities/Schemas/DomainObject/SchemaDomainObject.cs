@@ -25,8 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 {
     public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject.State>
     {
-        public SchemaDomainObject(IStore<DomainId> store, ISemanticLog log)
-            : base(store, log)
+        public SchemaDomainObject(IPersistenceFactory<State> persistence, ISemanticLog log)
+            : base(persistence, log)
         {
         }
 

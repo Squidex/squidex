@@ -45,6 +45,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public async Task On(Envelope<IEvent> @event)
         {
+            if (@event.Headers.Restored())
+            {
+                return;
+            }
+
             if (@event.Payload is AssetDeleted assetDeleted)
             {
                 for (var version = 0; version < @event.Headers.EventStreamNumber(); version++)

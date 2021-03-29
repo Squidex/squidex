@@ -87,6 +87,18 @@ namespace Squidex.Infrastructure.EventSourcing
             return envelope;
         }
 
+        public static bool Restored(this EnvelopeHeaders headers)
+        {
+            return headers.GetBoolean(CommonHeaders.Restored);
+        }
+
+        public static Envelope<T> SetRestored<T>(this Envelope<T> envelope, bool value = true) where T : class, IEvent
+        {
+            envelope.Headers.Add(CommonHeaders.Restored, value);
+
+            return envelope;
+        }
+
         public static long GetLong(this JsonObject obj, string key)
         {
             if (obj.TryGetValue(key, out var v))
@@ -106,12 +118,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Guid GetGuid(this JsonObject obj, string key)
         {
-            if (obj.TryGetValue(key, out var v))
+            if (obj.TryGetValue<JsonString>(key, out var v) && Guid.TryParse(v.ToString(), out var guid))
             {
-                if (v.Type == JsonValueType.String && Guid.TryParse(v.ToString(), out var guid))
-                {
-                    return guid;
-                }
+                return guid;
             }
 
             return default;
@@ -119,12 +128,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Instant GetInstant(this JsonObject obj, string key)
         {
-            if (obj.TryGetValue(key, out var v))
+            if (obj.TryGetValue<JsonString>(key, out var v) && InstantPattern.ExtendedIso.Parse(v.ToString()).TryGetValue(default, out var instant))
             {
-                if (v.Type == JsonValueType.String && InstantPattern.ExtendedIso.Parse(v.ToString()).TryGetValue(default, out var instant))
-                {
-                    return instant;
-                }
+                return instant;
             }
 
             return default;
@@ -138,6 +144,16 @@ namespace Squidex.Infrastructure.EventSourcing
             }
 
             return string.Empty;
+        }
+
+        public static bool GetBoolean(this JsonObject obj, string key)
+        {
+            if (obj.TryGetValue<JsonBoolean>(key, out var v))
+            {
+                return v.Value;
+            }
+
+            return false;
         }
     }
 }

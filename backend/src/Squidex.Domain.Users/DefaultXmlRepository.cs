@@ -16,7 +16,7 @@ namespace Squidex.Domain.Users
 {
     public sealed class DefaultXmlRepository : IXmlRepository
     {
-        private readonly ISnapshotStore<State, string> store;
+        private readonly ISnapshotStore<State> store;
 
         [CollectionName("Identity_Xml")]
         public sealed class State
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Users
             }
         }
 
-        public DefaultXmlRepository(ISnapshotStore<State, string> store)
+        public DefaultXmlRepository(ISnapshotStore<State> store)
         {
             Guard.NotNull(store, nameof(store));
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Users
         {
             var state = new State(element);
 
-            store.WriteAsync(friendlyName, state, EtagVersion.Any, 0);
+            store.WriteAsync(DomainId.Create(friendlyName), state, EtagVersion.Any, 0);
         }
     }
 }

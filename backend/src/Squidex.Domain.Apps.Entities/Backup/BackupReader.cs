@@ -99,14 +99,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             while (true)
             {
-                var eventEntry = archive.GetEntry(ArchiveHelper.GetEventPath(readEvents));
+                var entry = archive.GetEntry(ArchiveHelper.GetEventPath(readEvents));
 
-                if (eventEntry == null)
+                if (entry == null)
                 {
                     break;
                 }
 
-                using (var stream = eventEntry.Open())
+                using (var stream = entry.Open())
                 {
                     var storedEvent = serializer.Deserialize<CompatibleStoredEvent>(stream).ToStoredEvent();
 

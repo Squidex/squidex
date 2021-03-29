@@ -115,7 +115,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 if (writes.Count > 0)
                 {
-                    await Collection.BulkWriteAsync(writes, Unordered);
+                    await Collection.BulkWriteAsync(writes, BulkUnordered);
                 }
             }
         }

@@ -198,7 +198,7 @@ namespace Squidex.Infrastructure.MongoDb
                             new ExecutionDataflowBlockOptions
                             {
                                 MaxDegreeOfParallelism = 1,
-                                MaxMessagesPerTask = 1,
+                                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
                                 BoundedCapacity = Batching.BufferSize
                             });
                     try

@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     break;
                 case JsonToken.StartObject:
                     {
-                        var result = JsonValue.Object();
+                        var result = new JsonObject(1);
 
                         while (reader.Read())
                         {
@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
                 case JsonToken.StartArray:
                     {
-                        var result = JsonValue.Array();
+                        var result = new JsonArray(1);
 
                         while (reader.Read())
                         {

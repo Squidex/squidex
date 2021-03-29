@@ -6,73 +6,76 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class Store<TKey> : IStore<TKey> where TKey : notnull
+    public sealed class Store<T> : IStore<T>
     {
-        private readonly IServiceProvider services;
         private readonly IStreamNameResolver streamNameResolver;
+        private readonly ISnapshotStore<T> snapshotStore;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
 
         public Store(
+            ISnapshotStore<T> snapshotStore,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            IServiceProvider services,
             IStreamNameResolver streamNameResolver)
         {
+            Guard.NotNull(snapshotStore, nameof(snapshotStore));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(services, nameof(services));
             Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
 
+            this.snapshotStore = snapshotStore;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.services = services;
             this.streamNameResolver = streamNameResolver;
         }
 
-        public IPersistence WithEventSourcing(Type owner, TKey key, HandleEvent? applyEvent)
+        public Task ClearSnapshotsAsync()
         {
-            return CreatePersistence(owner, key, applyEvent);
+            return snapshotStore.ClearAsync();
         }
 
-        public IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot)
+        public IBatchContext<T> WithBatchContext(Type owner)
+        {
+            return new BatchContext<T>(owner,
+                snapshotStore,
+                eventStore,
+                eventDataFormatter,
+                streamNameResolver);
+        }
+
+        public IPersistence<T> WithEventSourcing(Type owner, DomainId key, HandleEvent? applyEvent)
+        {
+            return CreatePersistence(owner, key, PersistenceMode.EventSourcing, null, applyEvent);
+        }
+
+        public IPersistence<T> WithSnapshots(Type owner, DomainId key, HandleSnapshot<T>? applySnapshot)
         {
             return CreatePersistence(owner, key, PersistenceMode.Snapshots, applySnapshot, null);
         }
 
-        public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent)
+        public IPersistence<T> WithSnapshotsAndEventSourcing(Type owner, DomainId key, HandleSnapshot<T>? applySnapshot, HandleEvent? applyEvent)
         {
-            return CreatePersistence(owner, key, PersistenceMode.SnapshotsAndEventSourcing,
-                applySnapshot, applyEvent);
+            return CreatePersistence(owner, key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
         }
 
-        private IPersistence CreatePersistence(Type owner, TKey key, HandleEvent? applyEvent)
+        private IPersistence<T> CreatePersistence(Type owner, DomainId key, PersistenceMode mode, HandleSnapshot<T>? applySnapshot, HandleEvent? applyEvent)
         {
             Guard.NotNull(key, nameof(key));
 
-            var snapshotStore = GetSnapshotStore<None>();
-
-            return new Persistence<TKey>(key, owner, eventStore, eventDataFormatter,
-                snapshotStore, streamNameResolver, applyEvent);
-        }
-
-        private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, HandleSnapshot<TState>? applySnapshot, HandleEvent? applyEvent)
-        {
-            Guard.NotNull(key, nameof(key));
-
-            var snapshotStore = GetSnapshotStore<TState>();
-
-            return new Persistence<TState, TKey>(key, owner, eventStore, eventDataFormatter,
-                snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
-        }
-
-        public ISnapshotStore<TState, TKey> GetSnapshotStore<TState>()
-        {
-            return (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>))!;
+            return new Persistence<T>(key, owner,
+                snapshotStore,
+                eventStore,
+                eventDataFormatter,
+                streamNameResolver,
+                mode,
+                applySnapshot,
+                applyEvent);
         }
     }
 }

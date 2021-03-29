@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Tasks
                 var workerOption = SimpleMapper.Map(dataflowBlockOptions, new ExecutionDataflowBlockOptions());
 
                 workerOption.MaxDegreeOfParallelism = 1;
-                workerOption.MaxMessagesPerTask = 1;
+                workerOption.MaxMessagesPerTask = DataflowBlockOptions.Unbounded;
 
                 workers[i] = new ActionBlock<TInput>(action, workerOption);
             }
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Tasks
             var distributorOption = new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 1,
-                MaxMessagesPerTask = 1,
+                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
                 BoundedCapacity = 1
             };
 

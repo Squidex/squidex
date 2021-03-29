@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
         public SchemaDomainObjectTests()
         {
-            sut = new SchemaDomainObject(Store, A.Dummy<ISemanticLog>());
+            sut = new SchemaDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>());
             sut.Setup(Id);
         }
 

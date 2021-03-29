@@ -19,7 +19,6 @@ namespace Squidex.Infrastructure.Log
 {
     public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest>, IRequestLogRepository
     {
-        private static readonly InsertManyOptions Unordered = new InsertManyOptions { IsOrdered = false };
         private readonly RequestLogStoreOptions options;
 
         public MongoRequestLogRepository(IMongoDatabase database, IOptions<RequestLogStoreOptions> options)
@@ -57,9 +56,14 @@ namespace Squidex.Infrastructure.Log
         {
             Guard.NotNull(items, nameof(items));
 
-            var documents = items.Select(x => new MongoRequest { Key = x.Key, Timestamp = x.Timestamp, Properties = x.Properties });
+            var entities = items.Select(x => new MongoRequest { Key = x.Key, Timestamp = x.Timestamp, Properties = x.Properties }).ToList();
 
-            return Collection.InsertManyAsync(documents, Unordered);
+            if (entities.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            return Collection.InsertManyAsync(entities, InsertUnordered);
         }
 
         public Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default)

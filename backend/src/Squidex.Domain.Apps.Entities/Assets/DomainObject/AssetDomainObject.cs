@@ -30,11 +30,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private readonly IAssetTagService assetTags;
         private readonly IAssetQueryService assetQuery;
 
-        public AssetDomainObject(IStore<DomainId> store, ISemanticLog log,
+        public AssetDomainObject(IPersistenceFactory<AssetDomainObject.State> factory, ISemanticLog log,
             IAssetTagService assetTags,
             IAssetQueryService assetQuery,
             IContentRepository contentRepository)
-            : base(store, log)
+            : base(factory, log)
         {
             Guard.NotNull(assetTags, nameof(assetTags));
             Guard.NotNull(assetQuery, nameof(assetQuery));

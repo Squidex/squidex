@@ -6,20 +6,23 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.States
 {
-    public interface ISnapshotStore<T, in TKey>
+    public interface ISnapshotStore<T>
     {
-        Task WriteAsync(TKey key, T value, long oldVersion, long newVersion);
+        Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion);
 
-        Task<(T Value, long Version)> ReadAsync(TKey key);
+        Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> snapshots);
+
+        Task<(T Value, long Version)> ReadAsync(DomainId key);
 
         Task ClearAsync();
 
-        Task RemoveAsync(TKey key);
+        Task RemoveAsync(DomainId key);
 
         Task ReadAllAsync(Func<T, long, Task> callback, CancellationToken ct = default);
     }

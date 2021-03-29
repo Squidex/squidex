@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Tasks
             }, x => x.P, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 100,
-                MaxMessagesPerTask = 1,
+                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
                 BoundedCapacity = 100
             });
 

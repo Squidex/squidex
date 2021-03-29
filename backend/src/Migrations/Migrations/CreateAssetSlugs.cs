@@ -16,9 +16,9 @@ namespace Migrations.Migrations
 {
     public sealed class CreateAssetSlugs : IMigration
     {
-        private readonly ISnapshotStore<AssetDomainObject.State, string> stateForAssets;
+        private readonly ISnapshotStore<AssetDomainObject.State> stateForAssets;
 
-        public CreateAssetSlugs(ISnapshotStore<AssetDomainObject.State, string> stateForAssets)
+        public CreateAssetSlugs(ISnapshotStore<AssetDomainObject.State> stateForAssets)
         {
             this.stateForAssets = stateForAssets;
         }
@@ -29,7 +29,7 @@ namespace Migrations.Migrations
             {
                 state.Slug = state.FileName.ToAssetSlug();
 
-                var key = DomainId.Combine(state.AppId.Id, state.Id).ToString();
+                var key = DomainId.Combine(state.AppId.Id, state.Id);
 
                 await stateForAssets.WriteAsync(key, state, version, version);
             });
