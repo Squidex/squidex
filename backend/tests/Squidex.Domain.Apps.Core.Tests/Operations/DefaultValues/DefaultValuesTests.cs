@@ -38,16 +38,8 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                         new BooleanFieldProperties { DefaultValue = true });
         }
 
-        private static IEnumerable<object?[]> InvalidValues()
-        {
-            yield return new object?[] { null };
-            yield return new object?[] { JsonValue.Null };
-            yield return new object?[] { JsonValue.False }; // Undefined
-        }
-
-        [Theory]
-        [MemberData(nameof(InvalidValues))]
-        public void Should_enrich_with_default_values(IJsonValue? value)
+        [Fact]
+        public void Should_enrich_with_default_values()
         {
             var data =
                 new ContentData()
@@ -57,11 +49,6 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                     .AddField("my-number",
                         new ContentFieldData()
                             .AddInvariant(456));
-
-            if (value != JsonBoolean.False)
-            {
-                data["my-string"]!["en"] = value!;
-            }
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
