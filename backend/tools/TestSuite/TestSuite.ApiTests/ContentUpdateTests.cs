@@ -150,7 +150,7 @@ namespace TestSuite.ApiTests
 
 
                 // STEP 2: Get the item and ensure that the text is the same.
-                var updated = await _.Contents.GetAsync(content.Id);
+                var updated = await _.Contents.GetAsync(content.Id, QueryContext.Default.IgnoreFallback());
 
                 Assert.Null(updated.Data.Localized["en"]);
             }
