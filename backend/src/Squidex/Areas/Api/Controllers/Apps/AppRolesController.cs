@@ -123,6 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppRolesUpdate)]
         [ApiCosts(1)]
+        [UrlDecodeRouteParams]
         public async Task<IActionResult> PutRole(string app, string roleName, [FromBody] UpdateRoleDto request)
         {
             var command = request.ToCommand(roleName);
@@ -147,6 +148,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppRolesDelete)]
         [ApiCosts(1)]
+        [UrlDecodeRouteParams]
         public async Task<IActionResult> DeleteRole(string app, string roleName)
         {
             var command = new DeleteRole { Name = roleName };

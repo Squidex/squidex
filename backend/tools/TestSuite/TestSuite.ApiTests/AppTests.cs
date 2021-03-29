@@ -185,7 +185,8 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_manage_roles()
         {
-            var roleName = Guid.NewGuid().ToString();
+            // Use role name with hash to test previous bug.
+            var roleName = $"{Guid.NewGuid()}/1";
             var roleClient = Guid.NewGuid().ToString();
             var roleContributor1 = "role1@squidex.io";
             var roleContributor2 = "role2@squidex.io";
