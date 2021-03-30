@@ -26,28 +26,31 @@ namespace Squidex.Infrastructure.Orleans
         [Fact]
         public void Should_not_copy_null()
         {
-            var v = (string?)null;
-            var c = J<int>.Copy(v, null);
+            var source = (string?)null;
 
-            Assert.Null(c);
+            var clone = J<int>.Copy(source, null);
+
+            Assert.Null(clone);
         }
 
         [Fact]
         public void Should_copy_null_json()
         {
-            var v = new J<List<int>?>(null);
-            var c = (J<List<int>>)J<object>.Copy(v, null)!;
+            var source = new J<List<int>?>(null);
 
-            Assert.Null(c.Value);
+            var clone = (J<List<int>>)J<object>.Copy(source, null)!;
+
+            Assert.Null(clone.Value);
         }
 
         [Fact]
         public void Should_not_copy_immutable_values()
         {
-            var v = new List<int> { 1, 2, 3 }.AsJ();
-            var c = (J<List<int>>)J<object>.Copy(v, null)!;
+            var source = new List<int> { 1, 2, 3 }.AsJ();
 
-            Assert.Same(v.Value, c.Value);
+            var copy = (J<List<int>>)J<object>.Copy(source, null)!;
+
+            Assert.Same(source.Value, copy.Value);
         }
 
         [Fact]
