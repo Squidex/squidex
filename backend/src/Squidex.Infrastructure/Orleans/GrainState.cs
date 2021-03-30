@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.Orleans
             return persistence.ReadAsync();
         }
 
-        private void ApplyState(T value)
+        private void ApplyState(T value, long version)
         {
             Value = value;
         }

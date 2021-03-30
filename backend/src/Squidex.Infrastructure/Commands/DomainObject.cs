@@ -61,23 +61,19 @@ namespace Squidex.Infrastructure.Commands
 
             if (result == null && valid)
             {
-                var snapshot = new T
-                {
-                    Version = EtagVersion.Empty
-                };
+                var snapshotCurrent = new T();
+                var snapshotVersion = EtagVersion.Empty;
 
-                snapshots.Add(snapshot, snapshot.Version, false);
+                snapshots.Add(snapshotCurrent, snapshotVersion, false);
 
                 var allEvents = factory.WithEventSourcing(GetType(), UniqueId, @event =>
                 {
-                    var newVersion = snapshot.Version + 1;
+                    snapshotVersion++;
 
-                    if (!snapshots.Contains(newVersion))
+                    if (!snapshots.Contains(snapshotVersion))
                     {
-                        snapshot = Apply(snapshot, @event);
-                        snapshot.Version = newVersion;
-
-                        snapshots.Add(snapshot, snapshot.Version, false);
+                        snapshotCurrent = Apply(snapshotCurrent, @event);
+                        snapshots.Add(snapshotCurrent, snapshotVersion, false);
 
                         return true;
                     }
@@ -90,7 +86,7 @@ namespace Squidex.Infrastructure.Commands
                 (result, valid) = snapshots.Get(version);
             }
 
-            return result ?? new T { Version = EtagVersion.Empty };
+            return result ?? new T();
         }
 
         public virtual void Setup(DomainId uniqueId)
@@ -98,10 +94,9 @@ namespace Squidex.Infrastructure.Commands
             this.uniqueId = uniqueId;
 
             persistence = factory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
-                new HandleSnapshot<T>(snapshot =>
+                new HandleSnapshot<T>((snapshot, version) =>
                 {
-                    snapshot.Version = Version + 1;
-                    snapshots.Add(snapshot, snapshot.Version, true);
+                    snapshots.Add(snapshot, version, true);
                 }),
                 @event => ApplyEvent(@event, true));
         }
@@ -292,14 +287,11 @@ namespace Squidex.Infrastructure.Commands
 
         private bool ApplyEvent(Envelope<IEvent> @event, bool isLoading)
         {
-            var newVersion = Version + 1;
-
             var snapshotNew = Apply(Snapshot, @event);
 
             if (!ReferenceEquals(Snapshot, snapshotNew) || isLoading)
             {
-                snapshotNew.Version = newVersion;
-                snapshots.Add(snapshotNew, snapshotNew.Version, true);
+                snapshots.Add(snapshotNew, Version + 1, true);
 
                 return true;
             }
@@ -328,7 +320,7 @@ namespace Squidex.Infrastructure.Commands
         {
             await EnsureLoadedAsync(true);
 
-            if (Snapshot.Version <= EtagVersion.Empty)
+            if (Version <= EtagVersion.Empty)
             {
                 throw new DomainObjectNotFoundException(UniqueId.ToString());
             }

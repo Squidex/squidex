@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Commands
         public void Should_instantiate()
         {
             Assert.Equal(EtagVersion.Empty, sut.Version);
-            AssertSnapshot(sut.Snapshot, 0, -1);
+            AssertSnapshot(sut.Snapshot, 0);
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Commands
             Assert.Equal(CommandResult.Empty(id, 0, EtagVersion.Empty), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 4, 0);
+            AssertSnapshot(sut.Snapshot, 4);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.Commands
             Assert.Equal(CommandResult.Empty(id, 2, 1), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 4, 2);
+            AssertSnapshot(sut.Snapshot, 4);
         }
 
         [Fact]
@@ -114,7 +114,7 @@ namespace Squidex.Infrastructure.Commands
             Assert.Equal(CommandResult.Empty(id, 2, 1), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 4, 2);
+            AssertSnapshot(sut.Snapshot, 4);
         }
 
         [Fact]
@@ -150,7 +150,7 @@ namespace Squidex.Infrastructure.Commands
             Assert.Equal(CommandResult.Empty(id, 1, 0), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 8, 1);
+            AssertSnapshot(sut.Snapshot, 8);
         }
 
         [Fact]
@@ -170,7 +170,7 @@ namespace Squidex.Infrastructure.Commands
             Assert.Equal(CommandResult.Empty(id, 1, 0), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 8, 1);
+            AssertSnapshot(sut.Snapshot, 8);
         }
 
         [Fact]
@@ -196,7 +196,7 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappenedOnceExactly();
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 9, 2);
+            AssertSnapshot(sut.Snapshot, 9);
         }
 
         [Fact]
@@ -301,7 +301,7 @@ namespace Squidex.Infrastructure.Commands
             Assert.Equal(CommandResult.Empty(id, 0, 0), result);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 4, 0);
+            AssertSnapshot(sut.Snapshot, 4);
         }
 
         [Fact]
@@ -315,7 +315,7 @@ namespace Squidex.Infrastructure.Commands
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new CreateAuto()));
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 0, -1);
+            AssertSnapshot(sut.Snapshot, 0);
         }
 
         [Fact]
@@ -329,7 +329,7 @@ namespace Squidex.Infrastructure.Commands
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new UpdateAuto()));
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 4, 0);
+            AssertSnapshot(sut.Snapshot, 4);
         }
 
         [Fact]
@@ -345,7 +345,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.ExecuteAsync(new DeletePermanent());
 
-            AssertSnapshot(sut.Snapshot, 0, EtagVersion.Empty, false);
+            AssertSnapshot(sut.Snapshot, 0, false);
 
             A.CallTo(() => persistence.DeleteAsync())
                 .MustHaveHappened();
@@ -372,9 +372,9 @@ namespace Squidex.Infrastructure.Commands
             var version_1 = await sut.GetSnapshotAsync(1);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(version_Empty, 0, -1);
-            AssertSnapshot(version_0, 3, 0);
-            AssertSnapshot(version_1, 4, 1);
+            AssertSnapshot(version_Empty, 0);
+            AssertSnapshot(version_0, 3);
+            AssertSnapshot(version_1, 4);
 
             A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
                 .MustNotHaveHappened();
@@ -396,17 +396,17 @@ namespace Squidex.Infrastructure.Commands
             var version_1 = await sut.GetSnapshotAsync(1);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(version_Empty, 0, -1);
-            AssertSnapshot(version_0, 3, 0);
-            AssertSnapshot(version_1, 4, 1);
+            AssertSnapshot(version_Empty, 0);
+            AssertSnapshot(version_0, 3);
+            AssertSnapshot(version_1, 4);
 
             A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
                 .MustHaveHappened();
         }
 
-        private static void AssertSnapshot(MyDomainState state, int value, long version, bool isDeleted = false)
+        private static void AssertSnapshot(MyDomainState state, int value, bool isDeleted = false)
         {
-            Assert.Equal(new MyDomainState { Value = value, Version = version, IsDeleted = isDeleted }, state);
+            Assert.Equal(new MyDomainState { Value = value, IsDeleted = isDeleted }, state);
         }
 
         private void SetupDeleted()

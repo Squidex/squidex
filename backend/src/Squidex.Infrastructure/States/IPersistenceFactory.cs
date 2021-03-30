@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.States
 {
     public delegate bool HandleEvent(Envelope<IEvent> @event);
 
-    public delegate void HandleSnapshot<in T>(T state);
+    public delegate void HandleSnapshot<in T>(T state, long version);
 
     public interface IPersistenceFactory<T>
     {

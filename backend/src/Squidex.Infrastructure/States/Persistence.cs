@@ -109,17 +109,16 @@ namespace Squidex.Infrastructure.States
 
         private async Task ReadSnapshotAsync()
         {
-            var (state, position) = await snapshotStore.ReadAsync(ownerKey);
+            var (state, version) = await snapshotStore.ReadAsync(ownerKey);
 
-            // Treat all negative values as not-found (empty).
-            position = Math.Max(position, EtagVersion.Empty);
+            version = Math.Max(version, EtagVersion.Empty);
 
-            versionSnapshot = position;
-            versionEvents = position;
+            versionSnapshot = version;
+            versionEvents = version;
 
-            if (applyState != null && position >= 0)
+            if (applyState != null && version >= 0)
             {
-                applyState(state);
+                applyState(state, version);
             }
         }
 
@@ -138,7 +137,6 @@ namespace Squidex.Infrastructure.States
                     throw new InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
                 }
 
-                // Skip the parsing for performance reasons if we are not interested, but continue reading to get the version
                 if (!isStopped)
                 {
                     var parsedEvent = eventDataFormatter.ParseIfKnown(@event);

@@ -73,6 +73,8 @@ namespace Squidex.Domain.Apps.Entities
             clone.LastModified = timestamp;
             clone.LastModifiedBy = payload.Actor;
 
+            clone.Version++;
+
             return (clone as T)!;
         }
     }

@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return context;
         }
 
-        protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : class, IDomainState<T>, new()
+        protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : class, IDomainState<T>, IEntityWithVersion, new()
         {
             var result = await domainObject.ExecuteAsync(command);
 

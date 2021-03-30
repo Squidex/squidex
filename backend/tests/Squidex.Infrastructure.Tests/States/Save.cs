@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.States
             {
                 Value = initial;
 
-                Write = state =>
+                Write = (state, _) =>
                 {
                     Value = state;
                 };

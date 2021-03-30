@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Commands
         public void Clear()
         {
             items.Clear();
-            items.Add(new T { Version = EtagVersion.Empty });
+            items.Add(new T());
         }
 
         public (T?, bool Valid) Get(long version)
@@ -110,7 +110,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var lastIndex = items.Count - 1;
 
-            for (var i = lastIndex - capacity; i >= 0; i--)
+            for (var i = lastIndex - capacity; i > 0; i--)
             {
                 items[i] = null;
             }
