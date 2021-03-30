@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 foreach (var schema in trigger.Schemas)
                 {
-                    if (schema != null && MatchsSchema(schema, @event.SchemaId) && MatchsCondition(schema, @event))
+                    if (MatchsSchema(schema, @event.SchemaId) && MatchsCondition(schema, @event))
                     {
                         return true;
                     }
@@ -178,9 +178,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return false;
         }
 
-        private static bool MatchsSchema(ContentChangedTriggerSchemaV2 schema, NamedId<DomainId> eventId)
+        private static bool MatchsSchema(ContentChangedTriggerSchemaV2? schema, NamedId<DomainId> eventId)
         {
-            return eventId.Id == schema.SchemaId;
+            return eventId.Id == schema?.SchemaId;
         }
 
         private bool MatchsCondition(ContentChangedTriggerSchemaV2 schema, EnrichedSchemaEventBase @event)
