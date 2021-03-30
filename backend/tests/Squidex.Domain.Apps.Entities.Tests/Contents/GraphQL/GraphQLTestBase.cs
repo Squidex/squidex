@@ -100,6 +100,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new GeolocationFieldProperties())
                     .AddTags(14, "my-tags", Partitioning.Invariant,
                         new TagsFieldProperties())
+                    .AddArray(20, "my-empty-array", Partitioning.Invariant, null,
+                        new ArrayFieldProperties())
                     .AddArray(15, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number")

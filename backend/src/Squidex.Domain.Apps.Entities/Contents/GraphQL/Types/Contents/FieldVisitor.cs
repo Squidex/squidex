@@ -97,6 +97,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IArrayField field, FieldInfo args)
         {
+            if (args.Fields.Count == 0)
+            {
+                return default;
+            }
+
             var schemaFieldType =
                 new ListGraphType(
                     new NonNullGraphType(
@@ -152,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<UIFieldProperties> field, FieldInfo args)
         {
-            return (null, null, null);
+            return default;
         }
 
         private (IGraphType?, IFieldResolver?, QueryArguments?) ResolveReferences(IField<ReferencesFieldProperties> field, FieldInfo args)
@@ -165,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 if (!union.PossibleTypes.Any())
                 {
-                    return (null, null, null);
+                    return default;
                 }
 
                 contentType = union;

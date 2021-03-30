@@ -21,6 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IGraphType? Visit(IArrayField field, FieldInfo args)
         {
+            if (args.Fields.Count == 0)
+            {
+                return null;
+            }
+
             var schemaFieldType =
                 new ListGraphType(
                     new NonNullGraphType(
