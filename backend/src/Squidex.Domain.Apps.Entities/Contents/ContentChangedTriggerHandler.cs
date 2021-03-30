@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 foreach (var schema in trigger.Schemas)
                 {
-                    if (MatchsSchema(schema, @event.SchemaId) && MatchsCondition(schema, @event))
+                    if (schema != null && MatchsSchema(schema, @event.SchemaId) && MatchsCondition(schema, @event))
                     {
                         return true;
                     }
