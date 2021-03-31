@@ -45,6 +45,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return content.NewStatus ?? content.Status;
         }
 
+        public static bool IsPublished(this IContentEntity content)
+        {
+            return content.EditingStatus() == Status.Published;
+        }
+
         public static SearchScope Scope(this Context context)
         {
             return context.ShouldProvideUnpublished() || context.IsFrontendClient ? SearchScope.All : SearchScope.Published;

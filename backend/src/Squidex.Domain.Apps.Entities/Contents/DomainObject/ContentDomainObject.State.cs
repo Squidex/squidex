@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             [IgnoreDataMember]
             public Status Status
             {
-                get => CurrentVersion.Status;
+                get => CurrentVersion?.Status ?? Status.Draft;
             }
 
             public override bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)

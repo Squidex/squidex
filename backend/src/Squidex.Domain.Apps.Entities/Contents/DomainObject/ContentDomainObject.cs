@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                         operation.MustHavePermission(Permissions.AppContentsReadOwn);
 
-                        await operation.ValidateContentAndInputAsync(Snapshot.Data, false);
+                        await operation.ValidateContentAndInputAsync(Snapshot.Data, false, Snapshot.IsPublished());
 
                         return true;
                     });
@@ -226,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate)
             {
-                await operation.ValidateInputAsync(c.Data, c.OptimizeValidation);
+                await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
             }
 
             var status = await operation.GetInitialStatusAsync();
@@ -240,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate)
             {
-                await operation.ValidateContentAsync(c.Data, c.OptimizeValidation);
+                await operation.ValidateContentAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
             }
 
             Create(c, status);
@@ -293,7 +293,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate && c.Status == Status.Published && operation.SchemaDef.Properties.ValidateOnPublish)
             {
-                await operation.ValidateContentAndInputAsync(Snapshot.Data, c.OptimizeValidation);
+                await operation.ValidateContentAndInputAsync(Snapshot.Data, c.OptimizeValidation, true);
             }
 
             ChangeStatus(c);
@@ -306,7 +306,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate)
             {
-                await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation);
+                await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
             }
 
             if (!c.DoNotValidateWorkflow)
@@ -328,7 +328,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate)
             {
-                await operation.ValidateContentAsync(newData, c.OptimizeValidation);
+                await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished());
             }
 
             Update(c, newData);
@@ -341,7 +341,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate)
             {
-                await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation);
+                await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
             }
 
             if (!c.DoNotValidateWorkflow)
@@ -363,7 +363,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate)
             {
-                await operation.ValidateContentAsync(newData, c.OptimizeValidation);
+                await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished());
             }
 
             Update(c, newData);
@@ -438,7 +438,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             {
                 return StatusChange.Published;
             }
-            else if (Snapshot.EditingStatus() == Status.Published)
+            else if (Snapshot.IsPublished())
             {
                 return StatusChange.Unpublished;
             }
