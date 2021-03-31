@@ -265,7 +265,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 await operation.CheckTransitionAsync(c.Status);
             }
 
-            if (c.CheckReferrers && Snapshot.Status == Status.Published)
+            if (c.CheckReferrers && Snapshot.IsPublished())
             {
                 await operation.CheckReferrersAsync();
             }
