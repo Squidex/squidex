@@ -50,7 +50,10 @@ namespace Squidex.Infrastructure.Commands
         public void Clear()
         {
             items.Clear();
-            items.Add(new T());
+            items.Add(new T
+            {
+                Version = EtagVersion.Empty
+            });
         }
 
         public (T?, bool Valid) Get(long version)

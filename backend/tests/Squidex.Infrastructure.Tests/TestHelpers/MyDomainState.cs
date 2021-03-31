@@ -16,6 +16,8 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public bool IsDeleted { get; set; }
 
+        public long Version { get; set; }
+
         public long Value { get; set; }
 
         public MyDomainState Apply(Envelope<IEvent> @event)

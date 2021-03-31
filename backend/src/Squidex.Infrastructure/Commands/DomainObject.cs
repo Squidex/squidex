@@ -61,19 +61,23 @@ namespace Squidex.Infrastructure.Commands
 
             if (result == null && valid)
             {
-                var snapshotCurrent = new T();
-                var snapshotVersion = EtagVersion.Empty;
+                var snapshot = new T
+                {
+                    Version = EtagVersion.Empty
+                };
 
-                snapshots.Add(snapshotCurrent, snapshotVersion, false);
+                snapshots.Add(snapshot, snapshot.Version, false);
 
                 var allEvents = factory.WithEventSourcing(GetType(), UniqueId, @event =>
                 {
-                    snapshotVersion++;
+                    var newVersion = snapshot.Version + 1;
 
-                    if (!snapshots.Contains(snapshotVersion))
+                    if (!snapshots.Contains(newVersion))
                     {
-                        snapshotCurrent = Apply(snapshotCurrent, @event);
-                        snapshots.Add(snapshotCurrent, snapshotVersion, false);
+                        snapshot = Apply(snapshot, @event);
+                        snapshot.Version = newVersion;
+
+                        snapshots.Add(snapshot, newVersion, false);
 
                         return true;
                     }
@@ -86,7 +90,7 @@ namespace Squidex.Infrastructure.Commands
                 (result, valid) = snapshots.Get(version);
             }
 
-            return result ?? new T();
+            return result ?? new T { Version = EtagVersion.Empty };
         }
 
         public virtual void Setup(DomainId uniqueId)
@@ -96,6 +100,7 @@ namespace Squidex.Infrastructure.Commands
             persistence = factory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
                 new HandleSnapshot<T>((snapshot, version) =>
                 {
+                    snapshot.Version = version;
                     snapshots.Add(snapshot, version, true);
                 }),
                 @event => ApplyEvent(@event, true));
@@ -287,11 +292,14 @@ namespace Squidex.Infrastructure.Commands
 
         private bool ApplyEvent(Envelope<IEvent> @event, bool isLoading)
         {
+            var newVersion = Version + 1;
+
             var snapshotNew = Apply(Snapshot, @event);
 
             if (!ReferenceEquals(Snapshot, snapshotNew) || isLoading)
             {
-                snapshots.Add(snapshotNew, Version + 1, true);
+                snapshotNew.Version = newVersion;
+                snapshots.Add(snapshotNew, newVersion, true);
 
                 return true;
             }

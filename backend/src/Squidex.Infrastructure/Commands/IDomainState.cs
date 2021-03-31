@@ -11,6 +11,8 @@ namespace Squidex.Infrastructure.Commands
 {
     public interface IDomainState<out T>
     {
+        long Version { get; set; }
+
         T Apply(Envelope<IEvent> @event);
     }
 }
