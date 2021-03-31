@@ -7,12 +7,24 @@
 
 using System.Globalization;
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
-
 namespace Squidex.Infrastructure.Commands
 {
-    public sealed record CommandRequest(IAggregateCommand Command, string Culture, string CultureUI)
+    public sealed class CommandRequest
     {
+        public IAggregateCommand Command { get; }
+
+        public string Culture { get; }
+
+        public string CultureUI { get; }
+
+        public CommandRequest(IAggregateCommand command, string culture, string cultureUI)
+        {
+            Command = command;
+
+            Culture = culture;
+            CultureUI = cultureUI;
+        }
+
         public static CommandRequest Create(IAggregateCommand command)
         {
             return new CommandRequest(command,
