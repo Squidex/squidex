@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
+import { DialogService, ErrorDto, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService, StatusInfo } from './../services/contents.service';
@@ -342,7 +342,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     private bulkWithRetry(contents: ReadonlyArray<ContentDto>, job: Partial<BulkUpdateJobDto>, confirmTitle: string, confirmText: string, confirmKey: string): Observable<ReadonlyArray<BulkResultDto>> {
         return this.bulkMany(contents, true, job).pipe(
             switchMap(results => {
-                const failed = contents.filter(x => results.find(r => r.contentId === x.id)?.error?.statusCode === 400);
+                const failed = contents.filter(x => isReferrerError(results.find(r => r.contentId === x.id)?.error));
 
                 if (failed.length > 0) {
                     return this.dialogs.confirm(confirmTitle, confirmText, confirmKey).pipe(
@@ -393,6 +393,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public abstract get schemaName(): string;
+}
+
+function isReferrerError(error?: ErrorDto) {
+    return error?.statusCode === 400 && (!error?.details || error?.details.length === 0);
 }
 
 @Injectable()

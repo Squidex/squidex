@@ -286,7 +286,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     public deleteAsset(asset: AssetDto) {
         return this.assetsService.deleteAssetItem(this.appName, asset, true, asset.version).pipe(
             catchError((error: ErrorDto) => {
-                if (error.statusCode === 400) {
+                if (isReferrerError(error)) {
                     return this.dialogs.confirm(
                         'i18n:assets.deleteReferrerConfirmTitle',
                         'i18n:assets.deleteReferrerConfirmText',
@@ -399,6 +399,10 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     private get appName() {
         return this.appsState.appName;
     }
+}
+
+function isReferrerError(error?: ErrorDto) {
+    return error?.statusCode === 400 && (!error?.details || error?.details.length === 0);
 }
 
 function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto) {

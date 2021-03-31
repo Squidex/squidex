@@ -48,36 +48,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
-        public static async Task ValidateInputAsync(this OperationContext context, ContentData data, bool optimize)
+        public static async Task ValidateInputAsync(this OperationContext context, ContentData data, bool optimize, bool published)
         {
-            var validator = GetValidator(context, optimize);
+            var validator = GetValidator(context, optimize, published);
 
             await validator.ValidateInputAsync(data);
 
             context.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
-        public static async Task ValidateInputPartialAsync(this OperationContext context, ContentData data, bool optimize)
+        public static async Task ValidateInputPartialAsync(this OperationContext context, ContentData data, bool optimize, bool published)
         {
-            var validator = GetValidator(context, optimize);
+            var validator = GetValidator(context, optimize, published);
 
             await validator.ValidateInputPartialAsync(data);
 
             context.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
-        public static async Task ValidateContentAsync(this OperationContext context, ContentData data, bool optimize)
+        public static async Task ValidateContentAsync(this OperationContext context, ContentData data, bool optimize, bool published)
         {
-            var validator = GetValidator(context, optimize);
+            var validator = GetValidator(context, optimize, published);
 
             await validator.ValidateContentAsync(data);
 
             context.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
-        public static async Task ValidateContentAndInputAsync(this OperationContext operation, ContentData data, bool optimize)
+        public static async Task ValidateContentAndInputAsync(this OperationContext operation, ContentData data, bool optimize, bool published)
         {
-            var validator = GetValidator(operation, optimize);
+            var validator = GetValidator(operation, optimize, published);
 
             await validator.ValidateInputAsync(data);
             await validator.ValidateContentAsync(data);
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
-        private static ContentValidator GetValidator(this OperationContext context, bool optimize)
+        private static ContentValidator GetValidator(this OperationContext context, bool optimize, bool published)
         {
             var validationContext =
                 new ValidationContext(context.Resolve<IJsonSerializer>(),
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                     context.Schema.NamedId(),
                     context.SchemaDef,
                     context.ContentId)
-                .Optimized(optimize);
+                .Optimized(optimize).AsPublishing(published);
 
             var validator =
                 new ContentValidator(context.Partition(),
