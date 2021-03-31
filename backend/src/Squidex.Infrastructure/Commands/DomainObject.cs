@@ -312,6 +312,11 @@ namespace Squidex.Infrastructure.Commands
             if (persistence != null)
             {
                 await persistence.ReadAsync();
+
+                if (persistence.IsSnapshotStale)
+                {
+                    await persistence.WriteSnapshotAsync(Snapshot);
+                }
             }
         }
 

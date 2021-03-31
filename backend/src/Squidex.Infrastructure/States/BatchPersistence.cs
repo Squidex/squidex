@@ -21,6 +21,8 @@ namespace Squidex.Infrastructure.States
 
         public long Version { get; }
 
+        public bool IsSnapshotStale => false;
+
         internal BatchPersistence(DomainId ownerKey, BatchContext<T> context, long version, IReadOnlyList<Envelope<IEvent>> @events,
             HandleEvent? applyEvent)
         {

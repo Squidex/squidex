@@ -15,6 +15,8 @@ namespace Squidex.Infrastructure.States
     {
         long Version { get; }
 
+        bool IsSnapshotStale { get; }
+
         Task DeleteAsync();
 
         Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events);
