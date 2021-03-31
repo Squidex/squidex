@@ -359,13 +359,13 @@
     <value>Num days</value>
   </data>
   <data name="common.odataFailure" xml:space="preserve">
-    <value>Failed to parse query: {message}</value>
+    <value>Failed to parse query: {message}, for query: {odata}</value>
   </data>
   <data name="common.odataFilterNotValid" xml:space="preserve">
     <value>OData $filter clause not valid: {message}</value>
   </data>
   <data name="common.odataNotSupported" xml:space="preserve">
-    <value>OData operation is not supported.</value>
+    <value>OData operation is not supported for query: {odata}</value>
   </data>
   <data name="common.odataSearchNotValid" xml:space="preserve">
     <value>OData $search clause not valid: {message}</value>

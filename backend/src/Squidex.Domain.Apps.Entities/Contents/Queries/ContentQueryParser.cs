@@ -187,11 +187,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
             catch (NotSupportedException)
             {
-                throw new ValidationException(T.Get("common.odataNotSupported"));
+                throw new ValidationException(T.Get("common.odataNotSupported", new { odata }));
             }
             catch (ODataException ex)
             {
-                throw new ValidationException(T.Get("common.odataFailure", new { message = ex.Message }), ex);
+                var message = ex.Message;
+
+                throw new ValidationException(T.Get("common.odataFailure", new { odata, message }), ex);
+            }
+            catch (Exception)
+            {
+                throw new ValidationException(T.Get("common.odataNotSupported", new { odata }));
             }
         }
 

@@ -209,9 +209,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         const content = this.content;
 
         if (content) {
-            this.contentsState.deleteMany([content]);
-
-            this.back();
+            this.contentsState.deleteMany([content]).subscribe(() => {
+                this.back();
+            });
         }
     }
 
@@ -271,10 +271,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     private loadContent(data: any, isInitial: boolean) {
         this.isLoadingContent = true;
-
-        this.autoSaveService.remove(this.autoSaveKey);
-
         try {
+            this.autoSaveService.remove(this.autoSaveKey);
+            
             this.contentForm.load(data, isInitial);
             this.contentForm.setEnabled(!this.content || this.content.canUpdate);
         } finally {
