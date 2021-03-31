@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.States
 
         public bool IsSnapshotStale
         {
-            get => persistenceMode == PersistenceMode.SnapshotsAndEventSourcing && versionSnapshot < versionEvents;
+            get => persistenceMode == PersistenceMode.SnapshotsAndEventSourcing && versionSnapshot < versionEvents && versionSnapshot > EtagVersion.Empty;
         }
 
         public Persistence(DomainId ownerKey, Type ownerType,

@@ -315,7 +315,16 @@ namespace Squidex.Infrastructure.Commands
 
                 if (persistence.IsSnapshotStale)
                 {
-                    await persistence.WriteSnapshotAsync(Snapshot);
+                    try
+                    {
+                        await persistence.WriteSnapshotAsync(Snapshot);
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, w => w
+                            .WriteProperty("action", "RepairSnapshot")
+                            .WriteProperty("status", "Failed"));
+                    }
                 }
             }
         }
