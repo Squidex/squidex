@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var writer = new StreamWriter(stream, Encoding.UTF8, 4096, true);
             try
             {
-                using (var csv = new CsvWriter(writer, CsvConfiguration))
+                await using (var csv = new CsvWriter(writer, CsvConfiguration))
                 {
                     csv.WriteField(FieldTimestamp);
                     csv.WriteField(FieldRequestPath);
