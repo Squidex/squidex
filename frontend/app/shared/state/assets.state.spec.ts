@@ -342,7 +342,7 @@ describe('AssetsState', () => {
 
         it('should remove asset from snapshot when when referenced and not confirmed', () => {
             assetsService.setup(x => x.deleteAssetItem(app, asset1, false, asset1.version))
-                .returns(() => throwError(new ErrorDto(404, 'Referenced')));
+                .returns(() => throwError(new ErrorDto(404, 'Referenced', 'OBJECT_REFERENCED')));
 
             assetsService.setup(x => x.deleteAssetItem(app, asset1, true, asset1.version))
                 .returns(() => of(versioned(newVersion)));
@@ -359,7 +359,7 @@ describe('AssetsState', () => {
 
         it('should not remove asset when referenced and not confirmed', () => {
             assetsService.setup(x => x.deleteAssetItem(app, asset1, true, asset1.version))
-                .returns(() => throwError(new ErrorDto(404, 'Referenced')));
+                .returns(() => throwError(new ErrorDto(404, 'Referenced', 'OBJECT_REFERENCED')));
 
             dialogs.setup(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAnyString()))
                 .returns(() => of(false));

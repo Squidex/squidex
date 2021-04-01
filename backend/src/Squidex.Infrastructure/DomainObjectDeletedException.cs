@@ -14,8 +14,10 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainObjectDeletedException : DomainObjectException
     {
+        private const string ValidationError = "OBJECT_DELETED";
+
         public DomainObjectDeletedException(string id, Exception? inner = null)
-            : base(FormatMessage(id), id, inner)
+            : base(FormatMessage(id), id, ValidationError, inner)
         {
         }
 

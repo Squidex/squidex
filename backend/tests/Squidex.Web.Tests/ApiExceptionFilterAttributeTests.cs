@@ -104,6 +104,19 @@ namespace Squidex.Web
         }
 
         [Fact]
+        public void Should_generate_400_for_DomainException_with_error_code()
+        {
+            var context = Error(new DomainException("NotAllowed", "ERROR_CODE_XYZ"));
+
+            sut.OnException(context);
+
+            Validate(400, context.Result, context.Exception, "ERROR_CODE_XYZ");
+
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public void Should_generate_400_for_DecoderFallbackException()
         {
             var context = Error(new DecoderFallbackException("Decoder"));
@@ -123,7 +136,20 @@ namespace Squidex.Web
 
             sut.OnException(context);
 
-            Validate(409, context.Result, context.Exception);
+            Validate(409, context.Result, context.Exception, "OBJECT_CONFLICT");
+
+            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_generate_410_for_DomainObjectDeletedException()
+        {
+            var context = Error(new DomainObjectDeletedException("1"));
+
+            sut.OnException(context);
+
+            Validate(410, context.Result, context.Exception, "OBJECT_DELETED");
 
             A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
@@ -136,7 +162,7 @@ namespace Squidex.Web
 
             sut.OnException(context);
 
-            Validate(412, context.Result, context.Exception);
+            Validate(412, context.Result, context.Exception, "OBJECT_VERSION_CONFLICT");
 
             A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
@@ -149,7 +175,7 @@ namespace Squidex.Web
 
             sut.OnException(context);
 
-            Validate(403, context.Result, context.Exception);
+            Validate(403, context.Result, context.Exception, "FORBIDDEN");
 
             A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();
@@ -229,7 +255,7 @@ namespace Squidex.Web
             return actionContext;
         }
 
-        private static void Validate(int statusCode, IActionResult? actionResult, Exception? exception)
+        private static void Validate(int statusCode, IActionResult? actionResult, Exception? exception, string? errorCode = null)
         {
             var result = actionResult as ObjectResult;
 
@@ -239,6 +265,7 @@ namespace Squidex.Web
 
             Assert.Equal(statusCode, result?.StatusCode);
             Assert.Equal(statusCode, error?.StatusCode);
+            Assert.Equal(errorCode, error?.ErrorCode);
 
             if (exception != null)
             {

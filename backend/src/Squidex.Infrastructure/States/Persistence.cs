@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.States
 
         public bool IsSnapshotStale
         {
-            get => persistenceMode == PersistenceMode.SnapshotsAndEventSourcing && versionSnapshot < versionEvents && versionSnapshot > EtagVersion.Empty;
+            get => UseSnapshots && UseEventSourcing && versionSnapshot < versionEvents;
         }
 
         public Persistence(DomainId ownerKey, Type ownerType,
@@ -114,14 +114,17 @@ namespace Squidex.Infrastructure.States
 
         private async Task ReadSnapshotAsync()
         {
-            var (state, version) = await snapshotStore.ReadAsync(ownerKey);
+            var (state, valid, version) = await snapshotStore.ReadAsync(ownerKey);
 
             version = Math.Max(version, EtagVersion.Empty);
-
             versionSnapshot = version;
-            versionEvents = version;
 
-            if (applyState != null && version >= 0)
+            if (valid)
+            {
+                versionEvents = version;
+            }
+
+            if (applyState != null && version > EtagVersion.Empty && valid)
             {
                 applyState(state, version);
             }
@@ -162,7 +165,7 @@ namespace Squidex.Infrastructure.States
 
             if (oldVersion == EtagVersion.Empty && UseEventSourcing)
             {
-                oldVersion = (versionEvents - 1);
+                oldVersion = versionEvents - 1;
             }
 
             var newVersion = UseEventSourcing ? versionEvents : oldVersion + 1;

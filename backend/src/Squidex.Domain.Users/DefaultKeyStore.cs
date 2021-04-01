@@ -60,7 +60,7 @@ namespace Squidex.Domain.Users
                 return (cachedKeyInfo, cachedKey);
             }
 
-            var (state, _) = await store.ReadAsync(default);
+            var (state, _, _) = await store.ReadAsync(default);
 
             RsaSecurityKey securityKey;
 
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Users
                 }
                 catch (InconsistentStateException)
                 {
-                    (state, _) = await store.ReadAsync(default);
+                    (state, _, _) = await store.ReadAsync(default);
                 }
             }
 

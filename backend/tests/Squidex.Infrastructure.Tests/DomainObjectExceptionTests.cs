@@ -13,13 +13,22 @@ namespace Squidex.Infrastructure
     public class DomainObjectExceptionTests
     {
         [Fact]
+        public void Should_serialize_and_deserialize_DomainException()
+        {
+            var source = new DomainException("Message", "ErrorCode");
+            var result = source.SerializeAndDeserializeBinary();
+
+            Assert.Equal(result.ErrorCode, source.ErrorCode);
+            Assert.Equal(result.Message, source.Message);
+        }
+
+        [Fact]
         public void Should_serialize_and_deserialize_DomainObjectDeletedException()
         {
             var source = new DomainObjectDeletedException("123");
             var result = source.SerializeAndDeserializeBinary();
 
             Assert.Equal(result.Id, source.Id);
-
             Assert.Equal(result.Message, source.Message);
         }
 
@@ -30,7 +39,6 @@ namespace Squidex.Infrastructure
             var result = source.SerializeAndDeserializeBinary();
 
             Assert.Equal(result.Id, source.Id);
-
             Assert.Equal(result.Message, source.Message);
         }
 
@@ -43,7 +51,6 @@ namespace Squidex.Infrastructure
             Assert.Equal(result.Id, source.Id);
             Assert.Equal(result.ExpectedVersion, source.ExpectedVersion);
             Assert.Equal(result.CurrentVersion, source.CurrentVersion);
-
             Assert.Equal(result.Message, source.Message);
         }
     }

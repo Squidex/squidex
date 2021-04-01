@@ -273,7 +273,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.isLoadingContent = true;
         try {
             this.autoSaveService.remove(this.autoSaveKey);
-            
+
             this.contentForm.load(data, isInitial);
             this.contentForm.setEnabled(!this.content || this.content.canUpdate);
         } finally {

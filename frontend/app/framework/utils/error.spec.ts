@@ -20,6 +20,12 @@ describe('ErrorDto', () => {
             .returns((key: string) => key.substr(5));
     });
 
+    it('should create simple message with error code', () => {
+        const error = new ErrorDto(500, 'i18n:error.', 'ERROR_CODE_XYZ');
+
+        expect(error.errorCode).toBe('ERROR_CODE_XYZ');
+    });
+
     it('should create simple message when no details are specified.', () => {
         const error = new ErrorDto(500, 'i18n:error.');
 
@@ -37,7 +43,7 @@ describe('ErrorDto', () => {
     });
 
     it('should append dot to detail', () => {
-        const error = new ErrorDto(500, 'i18n:error.', ['i18n:detail']);
+        const error = new ErrorDto(500, 'i18n:error.', null, ['i18n:detail']);
 
         const result = error.translate(localizer.object);
 
@@ -45,7 +51,7 @@ describe('ErrorDto', () => {
     });
 
     it('should ccreate html list when detail has one item', () => {
-        const error = new ErrorDto(500, 'i18n:error.', ['i18n:detail.']);
+        const error = new ErrorDto(500, 'i18n:error.', null, ['i18n:detail.']);
 
         const result = error.translate(localizer.object);
 
@@ -53,7 +59,7 @@ describe('ErrorDto', () => {
     });
 
     it('should create html list when error has more items.', () => {
-        const error = new ErrorDto(500, 'i18n:error.', ['i18n:detail1.', 'i18n:detail2.']);
+        const error = new ErrorDto(500, 'i18n:error.', null, ['i18n:detail1.', 'i18n:detail2.']);
 
         const result = error.translate(localizer.object);
 

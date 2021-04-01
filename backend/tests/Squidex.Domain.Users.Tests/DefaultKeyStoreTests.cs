@@ -27,7 +27,7 @@ namespace Squidex.Domain.Users
         public async Task Should_generate_signing_credentials_once()
         {
             A.CallTo(() => store.ReadAsync(A<DomainId>._))
-                .Returns((null!, 0));
+                .Returns((null!, true, 0));
 
             var credentials1 = await sut.GetSigningCredentialsAsync();
             var credentials2 = await sut.GetSigningCredentialsAsync();
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Users
         public async Task Should_generate_validation_keys_once()
         {
             A.CallTo(() => store.ReadAsync(A<DomainId>._))
-                .Returns((null!, 0));
+                .Returns((null!, true, 0));
 
             var credentials1 = await sut.GetValidationKeysAsync();
             var credentials2 = await sut.GetValidationKeysAsync();

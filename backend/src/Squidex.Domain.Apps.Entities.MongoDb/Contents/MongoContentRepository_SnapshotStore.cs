@@ -23,12 +23,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         Task ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(Func<ContentDomainObject.State, long, Task> callback, CancellationToken ct)
         {
-            throw new NotSupportedException();
+            return Task.CompletedTask;
         }
 
-        Task<(ContentDomainObject.State Value, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key)
+        async Task<(ContentDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key)
         {
-            return Task.FromResult<(ContentDomainObject.State, long Version)>((null!, EtagVersion.Empty));
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                var version = await collectionAll.FindVersionAsync(key);
+
+                return (null!, false, version);
+            }
         }
 
         async Task ISnapshotStore<ContentDomainObject.State>.ClearAsync()

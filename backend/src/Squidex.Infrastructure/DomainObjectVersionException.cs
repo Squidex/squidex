@@ -14,12 +14,14 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainObjectVersionException : DomainObjectException
     {
+        private const string ValidationError = "OBJECT_VERSION_CONFLICT";
+
         public long CurrentVersion { get; }
 
         public long ExpectedVersion { get; }
 
         public DomainObjectVersionException(string id, long currentVersion, long expectedVersion, Exception? inner = null)
-            : base(FormatMessage(id, currentVersion, expectedVersion), id, inner)
+            : base(FormatMessage(id, currentVersion, expectedVersion), id, ValidationError, inner)
         {
             CurrentVersion = currentVersion;
 

@@ -396,7 +396,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 }
 
 function isReferrerError(error?: ErrorDto) {
-    return error?.statusCode === 400 && (!error?.details || error?.details.length === 0);
+    return error?.errorCode === 'OBJECT_REFERENCED';
 }
 
 @Injectable()

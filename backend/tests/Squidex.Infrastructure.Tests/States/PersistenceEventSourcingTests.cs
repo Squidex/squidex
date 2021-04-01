@@ -19,18 +19,18 @@ namespace Squidex.Infrastructure.States
     public class PersistenceEventSourcingTests
     {
         private readonly DomainId key = DomainId.NewGuid();
-        private readonly ISnapshotStore<int> snapshotStore = A.Fake<ISnapshotStore<int>>();
+        private readonly ISnapshotStore<string> snapshotStore = A.Fake<ISnapshotStore<string>>();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
-        private readonly IStore<int> sut;
+        private readonly IStore<string> sut;
 
         public PersistenceEventSourcingTests()
         {
             A.CallTo(() => streamNameResolver.GetStreamName(None.Type, A<string>._))
                 .ReturnsLazily(x => x.GetArgument<string>(1)!);
 
-            sut = new Store<int>(snapshotStore, eventStore, eventDataFormatter, streamNameResolver);
+            sut = new Store<string>(snapshotStore, eventStore, eventDataFormatter, streamNameResolver);
         }
 
         [Fact]
@@ -86,20 +86,42 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_read_status_from_snapshot()
+        public async Task Should_read_read_from_snapshot_store()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((2, 2L));
+                .Returns(("2", true, 2L));
 
             SetupEventStore(3, 2);
 
-            var persistedState = Save.Snapshot(-1);
+            var persistedState = Save.Snapshot(string.Empty);
             var persistedEvents = Save.Events();
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
             await persistence.ReadAsync();
 
+            Assert.False(persistence.IsSnapshotStale);
+
             A.CallTo(() => eventStore.QueryAsync(key.ToString(), 3))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_mark_as_stale_when_snapshot_old_than_events()
+        {
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns(("2", true, 1L));
+
+            SetupEventStore(3, 2, 2);
+
+            var persistedState = Save.Snapshot(string.Empty);
+            var persistedEvents = Save.Events();
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
+
+            await persistence.ReadAsync();
+
+            Assert.True(persistence.IsSnapshotStale);
+
+            A.CallTo(() => eventStore.QueryAsync(key.ToString(), 2))
                 .MustHaveHappened();
         }
 
@@ -107,11 +129,11 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_events_are_older_than_snapshot()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((2, 2L));
+                .Returns(("2", true, 2L));
 
             SetupEventStore(3, 0, 3);
 
-            var persistedState = Save.Snapshot(-1);
+            var persistedState = Save.Snapshot(string.Empty);
             var persistedEvents = Save.Events();
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
@@ -122,11 +144,11 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_events_have_gaps_to_snapshot()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((2, 2L));
+                .Returns(("2", true, 2L));
 
             SetupEventStore(3, 4, 3);
 
-            var persistedState = Save.Snapshot(-1);
+            var persistedState = Save.Snapshot(string.Empty);
             var persistedEvents = Save.Events();
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
@@ -159,11 +181,11 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_other_version_found_from_snapshot()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((2, 2L));
+                .Returns(("2", true, 2L));
 
             SetupEventStore(0);
 
-            var persistedState = Save.Snapshot(-1);
+            var persistedState = Save.Snapshot(string.Empty);
             var persistedEvents = Save.Events();
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
@@ -175,7 +197,7 @@ namespace Squidex.Infrastructure.States
         {
             SetupEventStore(0);
 
-            var persistedState = Save.Snapshot(-1);
+            var persistedState = Save.Snapshot(string.Empty);
             var persistedEvents = Save.Events();
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
@@ -200,7 +222,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => eventStore.AppendAsync(A<Guid>._, key.ToString(), 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<string>._, A<long>._, A<long>._))
                 .MustNotHaveHappened();
         }
 
@@ -219,25 +241,25 @@ namespace Squidex.Infrastructure.States
         public async Task Should_write_snapshot_to_store()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((2, 2L));
+                .Returns(("2", true, 2L));
 
             SetupEventStore(3);
 
-            var persistedState = Save.Snapshot(-1);
+            var persistedState = Save.Snapshot(string.Empty);
             var persistedEvents = Save.Events();
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
             await persistence.ReadAsync();
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync(4);
+            await persistence.WriteSnapshotAsync("4");
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync(5);
+            await persistence.WriteSnapshotAsync("5");
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 4, 2, 3))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 3))
                 .MustHaveHappened();
-            A.CallTo(() => snapshotStore.WriteAsync(key, 5, 3, 4))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 3, 4))
                 .MustHaveHappened();
         }
 
@@ -245,25 +267,25 @@ namespace Squidex.Infrastructure.States
         public async Task Should_write_snapshot_to_store_when_not_read_before()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((default, EtagVersion.Empty));
+                .Returns((null!, true, EtagVersion.Empty));
 
             SetupEventStore(3);
 
-            var persistedState = Save.Snapshot(-1);
+            var persistedState = Save.Snapshot(string.Empty);
             var persistedEvents = Save.Events();
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
             await persistence.ReadAsync();
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync(4);
+            await persistence.WriteSnapshotAsync("4");
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
-            await persistence.WriteSnapshotAsync(5);
+            await persistence.WriteSnapshotAsync("5");
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 4, 2, 3))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 3))
                 .MustHaveHappened();
-            A.CallTo(() => snapshotStore.WriteAsync(key, 5, 3, 4))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 3, 4))
                 .MustHaveHappened();
         }
 
@@ -271,19 +293,19 @@ namespace Squidex.Infrastructure.States
         public async Task Should_not_write_snapshot_to_store_when_not_changed()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((0, 2));
+                .Returns(("0", true, 2));
 
             SetupEventStore(3);
 
-            var persistedState = Save.Snapshot(-1);
+            var persistedState = Save.Snapshot(string.Empty);
             var persistedEvents = Save.Events();
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, persistedState.Write, persistedEvents.Write);
 
             await persistence.ReadAsync();
 
-            await persistence.WriteSnapshotAsync(4);
+            await persistence.WriteSnapshotAsync("4");
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, A<int>._, A<long>._, A<long>._))
+            A.CallTo(() => snapshotStore.WriteAsync(key, A<string>._, A<long>._, A<long>._))
                 .MustNotHaveHappened();
         }
 

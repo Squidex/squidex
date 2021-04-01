@@ -33,7 +33,7 @@ describe('ErrorValidator', () => {
     });
 
     it('should return no message when error does not match', () => {
-        validator.setError(new ErrorDto(500, 'Error', [
+        validator.setError(new ErrorDto(500, 'Error', null, [
             'nested1Property: My Error.'
         ]));
 
@@ -43,7 +43,7 @@ describe('ErrorValidator', () => {
     });
 
     it('should return matching error', () => {
-        validator.setError(new ErrorDto(500, 'Error', [
+        validator.setError(new ErrorDto(500, 'Error', null, [
             'other, nested1: My Error.'
         ]));
 
@@ -57,7 +57,7 @@ describe('ErrorValidator', () => {
     });
 
     it('should return matching error twice if value does not change', () => {
-        validator.setError(new ErrorDto(500, 'Error', [
+        validator.setError(new ErrorDto(500, 'Error', null, [
             'nested1: My Error.'
         ]));
 
@@ -78,7 +78,7 @@ describe('ErrorValidator', () => {
     });
 
     it('should not return matching error again if value has changed', () => {
-        validator.setError(new ErrorDto(500, 'Error', [
+        validator.setError(new ErrorDto(500, 'Error', null, [
             'nested1[1].nested2: My Error.'
         ]));
 
@@ -100,7 +100,7 @@ describe('ErrorValidator', () => {
     });
 
     it('should not return matching error again if value has changed to initial', () => {
-        validator.setError(new ErrorDto(500, 'Error', [
+        validator.setError(new ErrorDto(500, 'Error', null, [
             'nested1[1].nested2: My Error.'
         ]));
 
@@ -126,7 +126,7 @@ describe('ErrorValidator', () => {
     });
 
     it('should return matching errors', () => {
-        validator.setError(new ErrorDto(500, 'Error', [
+        validator.setError(new ErrorDto(500, 'Error', null, [
             'nested1: My Error1.',
             'nested1: My Error2.'
         ]));
@@ -141,7 +141,7 @@ describe('ErrorValidator', () => {
     });
 
     it('should return deeply matching error', () => {
-        validator.setError(new ErrorDto(500, 'Error', [
+        validator.setError(new ErrorDto(500, 'Error', null, [
             'nested1[1].nested2: My Error.'
         ]));
 
@@ -155,7 +155,7 @@ describe('ErrorValidator', () => {
     });
 
     it('should return partial matching error', () => {
-        validator.setError(new ErrorDto(500, 'Error', [
+        validator.setError(new ErrorDto(500, 'Error', null, [
             'nested1[1].nested2: My Error.'
         ]));
 
@@ -169,7 +169,7 @@ describe('ErrorValidator', () => {
     });
 
     it('should return partial matching index error', () => {
-        validator.setError(new ErrorDto(500, 'Error', [
+        validator.setError(new ErrorDto(500, 'Error', null, [
             'nested1[1].nested2: My Error.'
         ]));
 

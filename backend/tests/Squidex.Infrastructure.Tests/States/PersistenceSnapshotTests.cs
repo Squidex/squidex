@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_read_from_store()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((20, 10));
+                .Returns((20, true, 10));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -43,10 +43,25 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_not_read_from_store_when_not_valid()
+        {
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((20, false, 10));
+
+            var persistedState = Save.Snapshot(0);
+            var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
+
+            await persistence.ReadAsync();
+
+            Assert.Equal(10, persistence.Version);
+            Assert.Equal(0, persistedState.Value);
+        }
+
+        [Fact]
         public async Task Should_return_empty_version_when_version_negative()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((20, -10));
+                .Returns((20, true, -10));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -60,7 +75,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_set_to_empty_when_store_returns_not_found()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((20, EtagVersion.Empty));
+                .Returns((20, true, EtagVersion.Empty));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -75,7 +90,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_not_found_and_version_expected()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, EtagVersion.Empty));
+                .Returns((123, true, EtagVersion.Empty));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -87,7 +102,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_throw_exception_if_other_version_found()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, 2));
+                .Returns((123, true, 2));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -99,7 +114,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_write_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((20, 10));
+                .Returns((20, true, 10));
 
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);
@@ -130,7 +145,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_not_wrap_exception_when_writing_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((20, 10));
+                .Returns((20, true, 10));
 
             A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11))
                 .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));

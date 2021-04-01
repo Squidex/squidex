@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.States
             return $"States_{name}";
         }
 
-        public async Task<(T Value, long Version)> ReadAsync(DomainId key)
+        public async Task<(T Value, bool Valid, long Version)> ReadAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoSnapshotStore<T>>())
             {
@@ -53,10 +53,10 @@ namespace Squidex.Infrastructure.States
 
                 if (existing != null)
                 {
-                    return (existing.Doc, existing.Version);
+                    return (existing.Doc, true, existing.Version);
                 }
 
-                return (default!, EtagVersion.Empty);
+                return (default!, true, EtagVersion.Empty);
             }
         }
 

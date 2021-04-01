@@ -97,11 +97,11 @@ export function parseError(response: HttpErrorResponse, fallback: string) {
     const { error, status } = response;
 
     if (status === 412) {
-        return new ErrorDto(412, 'i18n:common.httpConflict', [], response);
+        return new ErrorDto(412, 'i18n:common.httpConflict', null, [], response);
     }
 
     if (status === 429) {
-        return new ErrorDto(429, 'i18n:common.httpLimit', [], response);
+        return new ErrorDto(429, 'i18n:common.httpLimit', null, [], response);
     }
 
     let parsed: any;
@@ -117,8 +117,8 @@ export function parseError(response: HttpErrorResponse, fallback: string) {
     }
 
     if (parsed && Types.isString(parsed.message)) {
-        return new ErrorDto(status, parsed.message, parsed.details, response);
+        return new ErrorDto(status, parsed.message, parsed.errorCode, parsed.details, response);
     }
 
-    return new ErrorDto(500, fallback, [], response);
+    return new ErrorDto(500, fallback, null, [], response);
 }

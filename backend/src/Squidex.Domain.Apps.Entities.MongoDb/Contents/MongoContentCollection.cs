@@ -168,9 +168,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public Task<MongoContentEntity> FindAsync(DomainId documentId)
+        public async Task<long> FindVersionAsync(DomainId documentId)
         {
-            return Collection.Find(x => x.DocumentId == documentId).FirstOrDefaultAsync();
+            var result = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.Version).FirstOrDefaultAsync();
+
+            return result?["vs"].AsInt64 ?? EtagVersion.Empty;
         }
 
         public Task ResetScheduledAsync(DomainId documentId)

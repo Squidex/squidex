@@ -29,6 +29,7 @@ namespace Squidex.Web
             [404] = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
             [406] = "https://tools.ietf.org/html/rfc7231#section-6.5.6",
             [409] = "https://tools.ietf.org/html/rfc7231#section-6.5.8",
+            [410] = "https://tools.ietf.org/html/rfc7231#section-6.5.9",
             [412] = "https://tools.ietf.org/html/rfc7231#section-6.5.10",
             [415] = "https://tools.ietf.org/html/rfc7231#section-6.5.13",
             [422] = "https://tools.ietf.org/html/rfc4918#section-11.2",
@@ -85,20 +86,23 @@ namespace Squidex.Web
                 case ValidationException ex:
                     return (CreateError(400, T.Get("common.httpValidationError"), ToErrors(ex.Errors).ToArray()), true);
 
-                case DomainObjectNotFoundException:
-                    return (CreateError(404), true);
+                case DomainObjectNotFoundException ex:
+                    return (CreateError(404, errorCode: ex.ErrorCode), true);
 
-                case DomainObjectVersionException:
-                    return (CreateError(412, exception.Message), true);
+                case DomainObjectVersionException ex:
+                    return (CreateError(412, exception.Message, errorCode: ex.ErrorCode), true);
 
-                case DomainObjectConflictException:
-                    return (CreateError(409, exception.Message), true);
+                case DomainObjectDeletedException ex:
+                    return (CreateError(410, exception.Message, errorCode: ex.ErrorCode), true);
 
-                case DomainForbiddenException:
-                    return (CreateError(403, exception.Message), true);
+                case DomainObjectConflictException ex:
+                    return (CreateError(409, exception.Message, errorCode: ex.ErrorCode), true);
 
-                case DomainException:
-                    return (CreateError(400, exception.Message), true);
+                case DomainForbiddenException ex:
+                    return (CreateError(403, exception.Message, errorCode: ex.ErrorCode), true);
+
+                case DomainException ex:
+                    return (CreateError(400, exception.Message, errorCode: ex.ErrorCode), true);
 
                 case SecurityException:
                     return (CreateError(403), false);
@@ -114,9 +118,9 @@ namespace Squidex.Web
             }
         }
 
-        private static ErrorDto CreateError(int status, string? message = null, string[]? details = null)
+        private static ErrorDto CreateError(int status, string? message = null, string[]? details = null, string? errorCode = null)
         {
-            var error = new ErrorDto { StatusCode = status, Message = message, Details = details };
+            var error = new ErrorDto { StatusCode = status, Message = message, Details = details, ErrorCode = errorCode };
 
             return error;
         }

@@ -39,6 +39,7 @@ export class ErrorDto {
     constructor(
         public readonly statusCode: number,
         public readonly message: string,
+        public readonly errorCode?: string | null,
         details?: ReadonlyArray<string> | ReadonlyArray<ErrorDetailsDto>,
         public readonly inner?: any
     ) {

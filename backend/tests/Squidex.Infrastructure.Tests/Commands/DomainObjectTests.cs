@@ -36,6 +36,34 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
+        public async Task Should_repair_when_stale()
+        {
+            A.CallTo(() => persistence.IsSnapshotStale)
+                .Returns(true);
+
+            SetupCreated(1);
+
+            await sut.EnsureLoadedAsync();
+
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_repair_when_not_stale()
+        {
+            A.CallTo(() => persistence.IsSnapshotStale)
+                .Returns(false);
+
+            SetupCreated(1);
+
+            await sut.EnsureLoadedAsync();
+
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_write_state_and_events_when_created()
         {
             SetupEmpty();

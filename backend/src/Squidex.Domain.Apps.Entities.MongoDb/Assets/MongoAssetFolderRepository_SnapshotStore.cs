@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderDomainObject.State>
     {
-        async Task<(AssetFolderDomainObject.State Value, long Version)> ISnapshotStore<AssetFolderDomainObject.State>.ReadAsync(DomainId key)
+        async Task<(AssetFolderDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetFolderDomainObject.State>.ReadAsync(DomainId key)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
@@ -33,10 +33,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 if (existing != null)
                 {
-                    return (Map(existing), existing.Version);
+                    return (Map(existing), true, existing.Version);
                 }
 
-                return (null!, EtagVersion.Empty);
+                return (null!, true, EtagVersion.Empty);
             }
         }
 
