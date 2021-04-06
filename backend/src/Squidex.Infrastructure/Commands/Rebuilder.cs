@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task InsertManyAsync<T, TState>(IStore<TState> store, IdSource source, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
-            var parallelism = Environment.ProcessorCount * 2;
+            var parallelism = Environment.ProcessorCount;
 
             const int BatchSize = 100;
 
@@ -116,7 +116,7 @@ namespace Squidex.Infrastructure.Commands
             {
                 MaxDegreeOfParallelism = parallelism,
                 MaxMessagesPerTask = 1,
-                BoundedCapacity = parallelism * 2
+                BoundedCapacity = parallelism
             });
 
             var batchBlock = new BatchBlock<DomainId>(BatchSize, new GroupingDataflowBlockOptions
