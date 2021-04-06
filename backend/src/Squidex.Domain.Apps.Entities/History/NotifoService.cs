@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,6 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -63,9 +63,20 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        public void OnUserUpdated(IUser user)
+        public async Task OnUserCreatedAsync(IUser user)
         {
-            UpsertUserAsync(user).Forget();
+            if (!string.IsNullOrWhiteSpace(user.Email))
+            {
+                await UpsertUserAsync(user);
+            }
+        }
+
+        public async Task OnUserUpdatedAsync(IUser user, IUser previous)
+        {
+            if (!string.Equals(user.Email, previous?.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                await UpsertUserAsync(user);
+            }
         }
 
         private async Task UpsertUserAsync(IUser user)

@@ -217,14 +217,14 @@ namespace Squidex.Domain.Users
 
             foreach (var @events in userEvents)
             {
-                @events.OnUserRegistered(resolved);
+                await @events.OnUserRegisteredAsync(resolved);
             }
 
             if (HasConsentGiven(values, null!))
             {
                 foreach (var @events in userEvents)
                 {
-                    @events.OnConsentGiven(resolved);
+                    await @events.OnConsentGivenAsync(resolved);
                 }
             }
 
@@ -281,14 +281,14 @@ namespace Squidex.Domain.Users
             {
                 foreach (var @events in userEvents)
                 {
-                    @events.OnUserUpdated(resolved);
+                    await @events.OnUserUpdatedAsync(resolved, oldUser);
                 }
 
                 if (HasConsentGiven(values, oldUser))
                 {
                     foreach (var @events in userEvents)
                     {
-                        @events.OnConsentGiven(resolved);
+                        await @events.OnConsentGivenAsync(resolved);
                     }
                 }
             }
@@ -336,7 +336,7 @@ namespace Squidex.Domain.Users
 
             foreach (var @events in userEvents)
             {
-                @events.OnUserDeleted(resolved);
+                await @events.OnUserDeletedAsync(resolved);
             }
         }
 
