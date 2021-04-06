@@ -105,7 +105,7 @@ namespace Migrations.Migrations.MongoDb
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
-                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
+                MaxMessagesPerTask = 1,
                 BoundedCapacity = SizeOfQueue
             });
 

@@ -70,9 +70,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 return job;
             }, new ExecutionDataflowBlockOptions
             {
-                BoundedCapacity = batchSize,
                 MaxDegreeOfParallelism = 1,
-                MaxMessagesPerTask = DataflowBlockOptions.Unbounded
+                MaxMessagesPerTask = 1,
+                BoundedCapacity = batchSize
             });
 
             var buffer = AsyncHelper.CreateBatchBlock<Job>(batchSize, batchDelay, new GroupingDataflowBlockOptions
@@ -105,7 +105,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             {
                 BoundedCapacity = 2,
                 MaxDegreeOfParallelism = 1,
-                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
+                MaxMessagesPerTask = 1,
                 TaskScheduler = scheduler
             });
 

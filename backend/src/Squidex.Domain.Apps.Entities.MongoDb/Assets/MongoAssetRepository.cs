@@ -60,7 +60,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         .Ascending(x => x.IsDeleted)
                         .Ascending(x => x.FileHash)
                         .Ascending(x => x.FileName)
-                        .Ascending(x => x.FileSize))
+                        .Ascending(x => x.FileSize)),
+                new CreateIndexModel<MongoAssetEntity>(
+                    Index
+                        .Ascending(x => x.Id)
+                        .Ascending(x => x.IsDeleted))
             }, ct);
         }
 

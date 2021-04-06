@@ -43,14 +43,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
 
         protected override Task SetupCollectionAsync(IMongoCollection<HistoryEvent> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateOneAsync(
+            return collection.Indexes.CreateManyAsync(new[]
+            {
                 new CreateIndexModel<HistoryEvent>(
                     Index
                         .Ascending(x => x.AppId)
                         .Ascending(x => x.Channel)
                         .Descending(x => x.Created)
                         .Descending(x => x.Version)),
-                cancellationToken: ct);
+                new CreateIndexModel<HistoryEvent>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Descending(x => x.Created)
+                        .Descending(x => x.Version)),
+            }, ct);
         }
 
         public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count)

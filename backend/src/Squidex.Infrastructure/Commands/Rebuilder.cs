@@ -115,7 +115,7 @@ namespace Squidex.Infrastructure.Commands
             new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = parallelism,
-                MaxMessagesPerTask = DataflowBlockOptions.Unbounded,
+                MaxMessagesPerTask = 1,
                 BoundedCapacity = parallelism * 2
             });
 
