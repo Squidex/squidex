@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -31,22 +32,28 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly NotifoOptions options;
         private readonly IUrlGenerator urlGenerator;
         private readonly IUserResolver userResolver;
+        private readonly ISemanticLog log;
         private readonly IClock clock;
         private readonly INotifoClient? client;
 
-        public NotifoService(IOptions<NotifoOptions> options, IUrlGenerator urlGenerator, IUserResolver userResolver, IClock clock)
+        public NotifoService(IOptions<NotifoOptions> options,
+            IUrlGenerator urlGenerator,
+            IUserResolver userResolver,
+            ISemanticLog log,
+            IClock clock)
         {
             Guard.NotNull(options, nameof(options));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
             Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(log, nameof(log));
             Guard.NotNull(clock, nameof(clock));
 
             this.options = options.Value;
 
             this.urlGenerator = urlGenerator;
             this.userResolver = userResolver;
-
             this.clock = clock;
+            this.log = log;
 
             if (options.Value.IsConfigured())
             {
@@ -65,10 +72,10 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public async Task OnUserCreatedAsync(IUser user)
         {
-            if (!string.IsNullOrWhiteSpace(user.Email))
-            {
-                await UpsertUserAsync(user);
-            }
+                if (!string.IsNullOrWhiteSpace(user.Email))
+                {
+                    await UpsertUserAsync(user);
+                }
         }
 
         public async Task OnUserUpdatedAsync(IUser user, IUser previous)
@@ -86,44 +93,55 @@ namespace Squidex.Domain.Apps.Entities.History
                 return;
             }
 
-            var settings = new Dictionary<string, NotificationSettingDto>
+            try
             {
-                [Providers.WebPush] = new NotificationSettingDto
+                var settings = new Dictionary<string, NotificationSettingDto>
                 {
-                    Send = NotificationSend.Send,
-                    DelayInSeconds = null
-                },
+                    [Providers.WebPush] = new NotificationSettingDto
+                    {
+                        Send = NotificationSend.Send,
+                        DelayInSeconds = null
+                    },
 
-                [Providers.Email] = new NotificationSettingDto
+                    [Providers.Email] = new NotificationSettingDto
+                    {
+                        Send = NotificationSend.Send,
+                        DelayInSeconds = 5 * 60
+                    }
+                };
+
+                var userRequest = new UpsertUserDto
                 {
-                    Send = NotificationSend.Send,
-                    DelayInSeconds = 5 * 60
+                    Id = user.Id,
+                    FullName = user.Claims.DisplayName(),
+                    PreferredLanguage = "en",
+                    PreferredTimezone = null,
+                    Settings = settings
+                };
+
+                if (user.Email.IsEmail())
+                {
+                    userRequest.EmailAddress = user.Email;
                 }
-            };
 
-            var userRequest = new UpsertUserDto
-            {
-                Id = user.Id,
-                FullName = user.Claims.DisplayName(),
-                PreferredLanguage = "en",
-                PreferredTimezone = null,
-                Settings = settings
-            };
+                var response = await client.Users.PostUsersAsync(options.AppId, new UpsertUsersDto
+                {
+                    Requests = new List<UpsertUserDto>
+                    {
+                        userRequest
+                    }
+                });
 
-            if (user.Email.IsEmail())
-            {
-                userRequest.EmailAddress = user.Email;
+                var apiKey = response.First().ApiKey;
+
+                await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.First().ApiKey, true);
             }
-
-            var response = await client.Users.PostUsersAsync(options.AppId, new UpsertUsersDto
+            catch (Exception ex)
             {
-                Requests = new List<UpsertUserDto>
-                {
-                    userRequest
-                }
-            });
-
-            await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.First().ApiKey, true);
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "RegisterToNotifo")
+                    .WriteProperty("status", "Failed"));
+            }
         }
 
         public async Task HandleEventsAsync(IEnumerable<(Envelope<AppEvent> AppEvent, HistoryEvent? HistoryEvent)> events)
