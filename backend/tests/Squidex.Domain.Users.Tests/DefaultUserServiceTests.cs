@@ -299,6 +299,19 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
+        public async Task Update_should_not_invoke_events_if_silent()
+        {
+            var update = new UserValues();
+
+            var identity = CreateIdentity(found: true);
+
+            await sut.UpdateAsync(identity.Id, update, true);
+
+            A.CallTo(() => userEvents.OnUserUpdated(A<IUser>.That.Matches(x => x.Identity == identity)))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Update_should_do_nothing_for_new_update()
         {
             var update = new UserValues();

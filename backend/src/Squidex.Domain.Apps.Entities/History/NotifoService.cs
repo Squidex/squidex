@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.History
                 }
             });
 
-            await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.First().ApiKey);
+            await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.First().ApiKey, true);
         }
 
         public async Task HandleEventsAsync(IEnumerable<(Envelope<AppEvent> AppEvent, HistoryEvent? HistoryEvent)> events)

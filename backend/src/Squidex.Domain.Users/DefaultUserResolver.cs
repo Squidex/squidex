@@ -56,7 +56,7 @@ namespace Squidex.Domain.Users
             }
         }
 
-        public async Task SetClaimAsync(string id, string type, string value)
+        public async Task SetClaimAsync(string id, string type, string value, bool silent)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNullOrEmpty(type, nameof(type));
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Users
                     }
                 };
 
-                await userService.UpdateAsync(id, values);
+                await userService.UpdateAsync(id, values, silent);
             }
         }
 

@@ -248,7 +248,7 @@ namespace Squidex.Domain.Users
             });
         }
 
-        public async Task<IUser> UpdateAsync(string id, UserValues values)
+        public async Task<IUser> UpdateAsync(string id, UserValues values, bool silent = false)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNull(values, nameof(values));
@@ -277,16 +277,19 @@ namespace Squidex.Domain.Users
 
             var resolved = await ResolveAsync(user);
 
-            foreach (var @events in userEvents)
-            {
-                @events.OnUserUpdated(resolved);
-            }
-
-            if (HasConsentGiven(values, oldUser))
+            if (!silent)
             {
                 foreach (var @events in userEvents)
                 {
-                    @events.OnConsentGiven(resolved);
+                    @events.OnUserUpdated(resolved);
+                }
+
+                if (HasConsentGiven(values, oldUser))
+                {
+                    foreach (var @events in userEvents)
+                    {
+                        @events.OnConsentGiven(resolved);
+                    }
                 }
             }
 

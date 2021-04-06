@@ -133,12 +133,14 @@ namespace Squidex.Infrastructure.Commands
 
             using (localCache.StartContext())
             {
-                await source(async id =>
+                await source(id =>
                 {
                     if (handledIds.Add(id))
                     {
-                        await batchBlock.SendAsync(id, ct);
+                        return batchBlock.SendAsync(id, ct);
                     }
+
+                    return Task.CompletedTask;
                 });
 
                 batchBlock.Complete();

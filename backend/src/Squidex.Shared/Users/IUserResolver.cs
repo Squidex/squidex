@@ -18,7 +18,7 @@ namespace Squidex.Shared.Users
 
         Task<IUser?> FindByIdAsync(string idOrEmail);
 
-        Task SetClaimAsync(string id, string type, string value);
+        Task SetClaimAsync(string id, string type, string value, bool silent = false);
 
         Task<List<IUser>> QueryByEmailAsync(string email);
 

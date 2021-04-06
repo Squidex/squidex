@@ -48,7 +48,7 @@ namespace Squidex.Domain.Users
 
         Task<IUser> UnlockAsync(string id);
 
-        Task<IUser> UpdateAsync(string id, UserValues values);
+        Task<IUser> UpdateAsync(string id, UserValues values, bool silent = false);
 
         Task DeleteAsync(string id);
     }

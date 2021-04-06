@@ -82,10 +82,22 @@ namespace Squidex.Domain.Users
         {
             var id = "123";
 
-            await sut.SetClaimAsync(id, "my-claim", "my-value");
+            await sut.SetClaimAsync(id, "my-claim", "my-value", false);
 
             A.CallTo(() => userService.UpdateAsync(id,
-                    A<UserValues>.That.Matches(x => x.CustomClaims!.Any(y => y.Type == "my-claim" && y.Value == "my-value"))))
+                    A<UserValues>.That.Matches(x => x.CustomClaims!.Any(y => y.Type == "my-claim" && y.Value == "my-value")), false))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_add_claim_when_not_added_yet_silently()
+        {
+            var id = "123";
+
+            await sut.SetClaimAsync(id, "my-claim", "my-value", true);
+
+            A.CallTo(() => userService.UpdateAsync(id,
+                    A<UserValues>.That.Matches(x => x.CustomClaims!.Any(y => y.Type == "my-claim" && y.Value == "my-value")), true))
                 .MustHaveHappened();
         }
 
