@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             var json = JsonConvert.SerializeObject(source, serializerSettings);
 
-            var serialized = JsonConvert.DeserializeObject<MyClass<IReadOnlyDictionary<int, int>>>(json);
+            var serialized = JsonConvert.DeserializeObject<MyClass<IReadOnlyDictionary<int, int>>>(json)!;
 
             Assert.DoesNotContain("$type", json);
             Assert.Equal(2, serialized.Values.Count);
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             var json = JsonConvert.SerializeObject(source, serializerSettings);
 
-            var serialized = JsonConvert.DeserializeObject<MyClass<IReadOnlyList<int>>>(json);
+            var serialized = JsonConvert.DeserializeObject<MyClass<IReadOnlyList<int>>>(json)!;
 
             Assert.DoesNotContain("$type", json);
             Assert.Equal(2, serialized.Values.Count);

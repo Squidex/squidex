@@ -19,17 +19,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             Description = "Unstructured Json object";
         }
 
-        public override object ParseLiteral(IValue value)
+        public override object? ParseLiteral(IValue value)
         {
             return value.Value;
         }
 
-        public override object ParseValue(object value)
+        public override object? ParseValue(object? value)
         {
             return value;
         }
 
-        public override object Serialize(object value)
+        public override object? Serialize(object? value)
         {
             return value;
         }

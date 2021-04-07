@@ -89,6 +89,7 @@
     <Rule Id="IDE0070" Action="None" />
     <Rule Id="IDE0032" Action="None" />
     <Rule Id="IDE0042" Action="None" />
+    <Rule Id="IDE0090" Action="None" />
   </Rules>
   <Rules AnalyzerId="Microsoft.AspNetCore.Mvc.Api.Analyzers" RuleNamespace="Microsoft.AspNetCore.Mvc.Api.Analyzers">
     <Rule Id="API1000" Action="Error" />

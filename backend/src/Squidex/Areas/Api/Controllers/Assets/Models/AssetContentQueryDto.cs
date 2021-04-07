@@ -58,6 +58,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public ResizeMode? Mode { get; set; }
 
         /// <summary>
+        /// Optional background color.
+        /// </summary>
+        [FromQuery(Name = "bg")]
+        public string? Background { get; set; }
+
+        /// <summary>
         /// Override the y focus point.
         /// </summary>
         [FromQuery(Name = "focusX")]

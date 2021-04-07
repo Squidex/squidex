@@ -13,17 +13,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
     public sealed class JsonGraphType : JsonNoopGraphType
     {
-        public override object Serialize(object value)
+        public override object? Serialize(object? value)
         {
             return value;
         }
 
-        public override object ParseValue(object value)
+        public override object? ParseValue(object? value)
         {
             return ParseJson(value);
         }
 
-        public static IJsonValue ParseJson(object value)
+        public static IJsonValue ParseJson(object? value)
         {
             switch (value)
             {
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             return value;
         }
 
-        public override IValue ToAST(object value)
+        public override IValue ToAST(object? value)
         {
             return new JsonValueNode(ParseJson(value));
         }
