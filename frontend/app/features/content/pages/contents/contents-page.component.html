@@ -21,6 +21,7 @@
                     (queryChange)="search($event)"
                     [query]="contentsState.query | async"
                     [queries]="queries | async"
+                    [queriesTypes]="'common.contents' | sqxTranslate"
                     [queryModel]="queryModel | async"
                     [language]="languagesState.isoMasterLanguage | async"
                     enableShortcut="true">

@@ -28,6 +28,7 @@
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize"
                             [query]="assetsState.query | async"
                             [queries]="queries"
+                            [queriesTypes]="'common.assets' | sqxTranslate"
                             (queryChange)="search($event)"
                             enableShortcut="true">
                         </sqx-search-form>

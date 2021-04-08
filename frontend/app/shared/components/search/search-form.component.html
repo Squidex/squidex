@@ -43,15 +43,51 @@
         </ng-container>
         
         <ng-container content>
-            <div class="form-horizontal">
-                <sqx-query [model]="queryModel" 
-                    [query]="query" 
-                    (queryChange)="changeQuery($event)"
-                    [language]="language">
-                </sqx-query>
-
-                <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown"></div>
+            <div class="buttons2" *ngIf="queries && queriesTypes">
+                <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
+                    <a class="save-search" (click)="queries.remove(key)">
+                        <i class="icon-star-full"></i>
+                    </a>
+                </ng-container>
+            
+                <ng-template #notBookmarked>
+                    <a class="save-search" (click)="saveQuery()">
+                        <i class="icon-star-empty"></i>
+                    </a>
+                </ng-template>
+                
+                <div class="btn-group ml-2">
+                    <button type="button" class="btn btn-sm btn-secondary btn-toggle" [class.btn-primary]="!showQueries" [disabled]="!showQueries" (click)="changeView(false)">
+                        {{ 'common.designer' | sqxTranslate }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary btn-toggle" [class.btn-primary]="showQueries" [disabled]="showQueries" (click)="changeView(true)">
+                        {{ 'common.bookmarks' | sqxTranslate }}
+                    </button>
+                </div>
             </div>
+
+            <ng-container *ngIf="!showQueries; else savedQueries">
+                <div class="form-horizontal">
+                    <sqx-query [model]="queryModel" 
+                        [query]="query" 
+                        (queryChange)="changeQuery($event)"
+                        [language]="language">
+                    </sqx-query>
+    
+                    <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown"></div>
+                </div>
+            </ng-container>
+
+            <ng-template #savedQueries>
+                <div class='mt-4' *ngIf="queries && queriesTypes">
+                    <sqx-shared-queries
+                        [types]="queriesTypes"
+                        [queryUsed]="query"
+                        [queries]="queries"
+                        (search)="changeQuery($event)">
+                    </sqx-shared-queries>
+                </div>
+            </ng-template>
         </ng-container>
         
         <ng-container footer>

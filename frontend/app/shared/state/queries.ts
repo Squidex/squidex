@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { compareStrings } from '@app/framework';
+import { compareStrings, Types } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { deserializeQuery, equalsQuery, Query } from './query';
@@ -58,19 +58,27 @@ export class Queries {
         this.uiState.set(this.getPath(key), JSON.stringify(query), user);
     }
 
-    public removeShared(saved: SavedQuery) {
-        this.uiState.removeShared(this.getPath(saved.name));
+    public removeShared(saved: SavedQuery | string) {
+        this.uiState.removeShared(this.getPath(saved));
     }
 
-    public removeUser(saved: SavedQuery) {
-        this.uiState.removeUser(this.getPath(saved.name));
+    public removeUser(saved: SavedQuery | string) {
+        this.uiState.removeUser(this.getPath(saved));
     }
 
-    public remove(saved: SavedQuery) {
-        this.uiState.remove(this.getPath(saved.name));
+    public remove(saved: SavedQuery | string) {
+        this.uiState.remove(this.getPath(saved));
     }
 
-    private getPath(key: string): string {
+    private getPath(saved: SavedQuery | string): string {
+        let key: string;
+
+        if (Types.isString(saved)) {
+            key = saved;
+        } else {
+            key = saved.name;
+        }
+
         return `${this.prefix}.queries.${key}`;
     }
 
