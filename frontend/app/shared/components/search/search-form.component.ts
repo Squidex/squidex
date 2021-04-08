@@ -39,10 +39,15 @@ export class SearchFormComponent implements OnChanges {
     public queries: Queries;
 
     @Input()
+    public queriesTypes: string;
+
+    @Input()
     public enableShortcut = false;
 
     @Input()
     public formClass = 'form-inline search-form';
+
+    public showQueries = false;
 
     public saveKey: Observable<string | undefined>;
     public saveQueryDialog = new DialogModel();
@@ -113,6 +118,10 @@ export class SearchFormComponent implements OnChanges {
         this.query = query;
 
         this.updateSaveKey();
+    }
+
+    public changeView(value: boolean) {
+        this.showQueries = value;
     }
 
     private updateSaveKey() {

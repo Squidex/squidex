@@ -15,7 +15,11 @@
 }
 
 .buttons {
-    @include absolute(8px, 8px, auto, auto);
+    @include absolute(8px, 8px);
+}
+
+.buttons2 {
+    @include absolute(.75rem, 1.75rem);
 }
 
 .save-search {
