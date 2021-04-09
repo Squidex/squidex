@@ -27,6 +27,18 @@ function measureAndNotifyParent() {
     }, 50);
 }
 
+function isNumber(value) {
+    return typeof value === 'number';
+}
+
+function isString(value) {
+    return typeof value === 'string';
+}
+
+function isFunction(value) {
+    return typeof value === 'function';
+}
+
 function SquidexPlugin() {
     var initHandler;
     var initCalled = false;
@@ -87,8 +99,14 @@ function SquidexPlugin() {
 
         /**
          * Register an function that is called when the sidebar is initialized.
+         *
+         * @param {Function} callback: The callback to invoke.
          */
         onInit: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
             initHandler = callback;
 
             raiseInit();
@@ -96,10 +114,14 @@ function SquidexPlugin() {
 
         /**
          * Register an function that is called whenever the value of the content has changed.
-         * 
-         * The callback has one argument with the value of the content (any).
+         *
+         * @param {Function} callback: The callback to invoke. Argument 1: Content value (any).
          */
         onContentChanged: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
             contentHandler = callback;
 
             raiseContentChanged();
@@ -128,12 +150,14 @@ function SquidexFormField() {
     var disabled = false;
     var fullscreen = false;
     var fullscreenHandler = false;
+    var movedHandler;
     var valueHandler;
     var value;
     var languageHandler;
     var language;
     var formValueHandler;
     var formValue;
+    var index;
     var currentConfirm;
     var currentPickAssets;
     var context;
@@ -142,6 +166,12 @@ function SquidexFormField() {
     function raiseDisabled() {
         if (disabledHandler) {
             disabledHandler(disabled);
+        }
+    }
+
+    function raiseFullscreen() {
+        if (fullscreenHandler) {
+            fullscreenHandler(fullscreen);
         }
     }
 
@@ -158,14 +188,14 @@ function SquidexFormField() {
     }
 
     function raiseLanguageChanged() {
-        if (languageHandler && language) {
+        if (languageHandler && isString(language)) {
             languageHandler(language);
         }
     }
 
-    function raiseFullscreen() {
-        if (fullscreenHandler) {
-            fullscreenHandler(fullscreen);
+    function raisedMoved() {
+        if (movedHandler && isNumber(index)) {
+            movedHandler(index);
         }
     }
 
@@ -181,10 +211,28 @@ function SquidexFormField() {
             var type = event.data.type;
 
             if (type === 'disabled') {
-                if (disabled !== event.data.isDisabled) {
-                    disabled = event.data.isDisabled;
+                var newDisabled = event.data.isDisabled;
+
+                if (disabled !== newDisabled) {
+                    disabled = newDisabled;
 
                     raiseDisabled();
+                }
+            } else if (type === 'moved') {
+                var newIndex = event.data.index;
+
+                if (index !== newIndex) {
+                    index = newIndex;
+
+                    raisedMoved();
+                }
+            } else if (type === 'languageChanged') {
+                var newLanguage = event.data.language;
+
+                if (language !== newLanguage) {
+                    language = newLanguage;
+
+                    raiseLanguageChanged();
                 }
             } else if (type === 'valueChanged') {
                 value = event.data.value;
@@ -198,10 +246,6 @@ function SquidexFormField() {
                 fullscreen = event.data.fullscreen;
 
                 raiseFullscreen();
-            } else if (type === 'languageChanged') {
-                language = event.data.language;
-
-                raiseLanguageChanged();
             } else if (type === 'init') {
                 context = event.data.context;
 
@@ -257,6 +301,13 @@ function SquidexFormField() {
          */
         getLanguage: function () {
             return language;
+        },
+
+        /**
+         * Get the current index when the field is an array item. 
+         */
+        getIndex: function () {
+            return index;
         },
 
         /**
@@ -345,7 +396,7 @@ function SquidexFormField() {
          * @param {function} callback The callback to invoke when the dialog is completed or closed.
          */
         confirm: function (title, text, callback) {
-            if (!callback || typeof callback !== 'function') {
+            if (!isFunction(callback)) {
                 return;
             }
 
@@ -367,7 +418,7 @@ function SquidexFormField() {
          * @param {function} callback The callback to invoke when the dialog is completed or closed.
          */
         pickAssets: function (callback) {
-            if (!callback || typeof callback !== 'function') {
+            if (!isFunction(callback)) {
                 return;
             }
 
@@ -385,8 +436,29 @@ function SquidexFormField() {
 
         /**
          * Register an function that is called when the field is initialized.
+         * 
+         * @param {Function} callback: The callback to invoke.
          */
         onInit: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
+            initHandler = callback;
+
+            raiseInit();
+        },
+
+        /**
+         * Register an function that is called when the field is moved.
+         *
+         * @param {Function} callback: The callback to invoke. Argument 1: New position (number).
+         */
+        onInit: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
             initHandler = callback;
 
             raiseInit();
@@ -394,10 +466,14 @@ function SquidexFormField() {
 
         /**
          * Register an function that is called whenever the field is disabled or enabled.
-         * 
-         * The callback has one argument with disabled state (disabled = true, enabled = false).
+         *
+         * @param {Function} callback: The callback to invoke. Argument 1: New disabled state (boolean, disabled = true, enabled = false).
          */
         onDisabled: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
             disabledHandler = callback;
 
             raiseDisabled();
@@ -405,10 +481,14 @@ function SquidexFormField() {
 
         /**
          * Register an function that is called whenever the field language is changed.
-         * 
-         * The callback has one argument with the language of the field (string).
+         *
+         * @param {Function} callback: The callback to invoke. Argument 1: Language code (string).
          */
         onLanguageChanged: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
             languageHandler = callback;
 
             raiseLanguageChanged();
@@ -416,10 +496,14 @@ function SquidexFormField() {
 
         /**
          * Register an function that is called whenever the value of the field has changed.
-         * 
-         * The callback has one argument with the value of the field (any).
+         *
+         * @param {Function} callback: The callback to invoke. Argument 1: Field value (any).
          */
         onValueChanged: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
             valueHandler = callback;
 
             raiseValueChanged();
@@ -427,10 +511,14 @@ function SquidexFormField() {
 
         /**
          * Register an function that is called whenever the value of the content has changed.
-         * 
-         * The callback has one argument with the value of the content (any).
+         *
+         * @param {Function} callback: The callback to invoke. Argument 1: Content value (any).
          */
         onFormValueChanged: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
             formValueHandler = callback;
 
             raiseFormValueChanged();
@@ -438,10 +526,14 @@ function SquidexFormField() {
 
         /**
          * Register an function that is called whenever the fullscreen mode has changed.
-         * 
-         * The callback has one argument with fullscreen state (fullscreen on = true, fullscreen off = false).
+         *
+         * @param {Function} callback: The callback to invoke. Argument 1: Fullscreen state (boolean, fullscreen on = true, fullscreen off = false).
          */
         onFullscreen: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
             fullscreenHandler = callback;
 
             raiseFullscreen();
