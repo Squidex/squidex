@@ -33,7 +33,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.3" />
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.4" />
     <PackageReference Include="GraphQL.DataLoader" Version="4.2.0" />
     <PackageReference Include="GraphQL.Server.Core" Version="5.0.1" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.NewtonsoftJson" Version="5.0.1" />
@@ -51,12 +51,12 @@
     <PackageReference Include="Microsoft.Orleans.Core" Version="3.4.2" />
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.4.2" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.4.2" />
-    <PackageReference Include="MongoDB.Driver" Version="2.12.1" />
-    <PackageReference Include="Namotion.Reflection" Version="1.0.18" />
+    <PackageReference Include="MongoDB.Driver" Version="2.12.2" />
+    <PackageReference Include="Namotion.Reflection" Version="1.0.19" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NJsonSchema" Version="10.4.0" />
+    <PackageReference Include="NJsonSchema" Version="10.4.1" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.10.8" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.10.9" />
     <PackageReference Include="OpenCover" Version="4.7.922" PrivateAssets="all" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="3.3.0" />
     <PackageReference Include="OrleansDashboard" Version="3.1.0" />
