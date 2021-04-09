@@ -18,7 +18,6 @@ export * from './angular/forms/editors/code-editor.component';
 export * from './angular/forms/editors/color-picker.component';
 export * from './angular/forms/editors/date-time-editor.component';
 export * from './angular/forms/editors/dropdown.component';
-export * from './angular/forms/editors/iframe-editor.component';
 export * from './angular/forms/editors/localized-input.component';
 export * from './angular/forms/editors/stars.component';
 export * from './angular/forms/editors/tag-editor.component';

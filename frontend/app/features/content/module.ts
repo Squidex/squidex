@@ -12,6 +12,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule, UnsetContentGuard } from '@app/shared';
 import { ArrayEditorComponent, ArrayItemComponent, ArraySectionComponent, AssetsEditorComponent, CommentsPageComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentListCellDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthPipe, ContentPageComponent, ContentReferencesComponent, ContentsColumnsPipe, ContentSectionComponent, ContentSelectorComponent, ContentSelectorItemComponent, ContentsFiltersPageComponent, ContentsPageComponent, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
 import { ContentExtensionComponent } from './shared/content-extension.component';
+import { IFrameEditorComponent } from './shared/forms/iframe-editor.component';
 
 const routes: Routes = [
     {
@@ -114,6 +115,7 @@ const routes: Routes = [
         DueTimeSelectorComponent,
         FieldEditorComponent,
         FieldLanguagesComponent,
+        IFrameEditorComponent,
         PreviewButtonComponent,
         ReferenceItemComponent,
         ReferencesEditorComponent,

@@ -8,7 +8,8 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Router } from '@angular/router';
-import { StatefulControlComponent, Types } from '@app/framework/internal';
+import { DialogModel, DialogService, StatefulControlComponent, Types } from '@app/framework/internal';
+import { AssetDto } from '@app/shared';
 
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true
@@ -31,6 +32,7 @@ interface State {
 export class IFrameEditorComponent extends StatefulControlComponent<State, any> implements OnChanges, OnDestroy, AfterViewInit {
     private value: any;
     private isInitialized = false;
+    private assetsCorrelationId: any;
 
     @ViewChild('iframe', { static: false })
     public iframe: ElementRef<HTMLIFrameElement>;
@@ -53,9 +55,12 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     @Input()
     public url: string;
 
+    public assetsDialog = new DialogModel();
+
     public fullscreen: boolean;
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly dialogs: DialogService,
         private readonly renderer: Renderer2,
         private readonly router: Router
     ) {
@@ -129,11 +134,48 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
                         }
                     } else if (type === 'touched') {
                         this.callTouched();
+                    } else if (type === 'notifyInfo') {
+                        const { text } = event.data;
+
+                        if (Types.isString(text)) {
+                            this.dialogs.notifyInfo(text);
+                        }
+                    } else if (type === 'notifyError') {
+                        const { text } = event.data;
+
+                        if (Types.isString(text)) {
+                            this.dialogs.notifyError(text);
+                        }
+                    } else if (type === 'confirm') {
+                        const { text, title, correlationId } = event.data;
+
+                        if (Types.isString(text) && Types.isString(title) && correlationId) {
+                            this.dialogs.confirm(title, text).subscribe(result => {
+                                this.sendMessage('confirmResult', { correlationId, result });
+                            });
+                        }
+                    } else if (type === 'pickAssets') {
+                        const { correlationId } = event.data;
+
+                        if (correlationId) {
+                            this.assetsCorrelationId = correlationId;
+                            this.assetsDialog.show();
+                        }
                     }
 
                     this.detectChanges();
                 }
             }));
+    }
+
+    public pickAssets(assets: ReadonlyArray<AssetDto>) {
+        if (this.assetsCorrelationId) {
+            this.sendMessage('pickAssetsResult', { correlationId: this.assetsCorrelationId, result: assets });
+
+            this.assetsCorrelationId = null;
+        }
+
+        this.assetsDialog.hide();
     }
 
     public writeValue(obj: any) {

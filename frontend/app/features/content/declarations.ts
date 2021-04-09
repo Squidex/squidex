@@ -27,6 +27,7 @@ export * from './shared/forms/array-item.component';
 export * from './shared/forms/array-section.component';
 export * from './shared/forms/assets-editor.component';
 export * from './shared/forms/field-editor.component';
+export * from './shared/forms/iframe-editor.component';
 export * from './shared/forms/stock-photo-editor.component';
 export * from './shared/list/content-list-cell.directive';
 export * from './shared/list/content-list-field.component';

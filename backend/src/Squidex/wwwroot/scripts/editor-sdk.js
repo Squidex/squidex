@@ -76,7 +76,7 @@ function SquidexPlugin() {
             return context;
         },
 
-        /*
+        /**
          * Notifies the parent to navigate to the path.
          */
         navigate: function (url) {
@@ -134,6 +134,8 @@ function SquidexFormField() {
     var language;
     var formValueHandler;
     var formValue;
+    var currentConfirm;
+    var currentPickAssets;
     var context;
     var timer;
 
@@ -199,11 +201,27 @@ function SquidexFormField() {
             } else if (type === 'languageChanged') {
                 language = event.data.language;
 
-                raiseLanguageChanged();                 
+                raiseLanguageChanged();
             } else if (type === 'init') {
                 context = event.data.context;
 
                 raiseInit();
+            } else if (type === 'confirmResult') {
+                var correlationId = event.data.correlationId;
+
+                if (currentConfirm && currentConfirm.correlationId === correlationId) {
+                    if (typeof currentConfirm.callback === 'function') {
+                        currentConfirm.callback(event.data.result);
+                    }
+                }
+            } else if (type === 'pickAssetsResult') {
+                var correlationId = event.data.correlationId;
+
+                if (currentPickAssets && currentPickAssets.correlationId === correlationId) {
+                    if (typeof currentPickAssets.callback === 'function') {
+                        currentPickAssets.callback(event.data.result);
+                    }
+                }
             }
         }
     }
@@ -234,21 +252,21 @@ function SquidexFormField() {
             return formValue;
         },
 
-        /*
+        /**
          * Get the current field language.
          */
         getLanguage: function () {
             return language;
         },
 
-        /*
+        /**
          * Get the disabled state.
          */
         isDisabled: function () {
             return disabled;
         },
 
-        /*
+        /**
          * Get the fullscreen state.
          */
         isFullscreen: function () {
@@ -264,10 +282,10 @@ function SquidexFormField() {
             }
         },
 
-        /*
+        /**
          * Notifies the parent to navigate to the path.
          *
-         * @params url: string: The url to navigate to.
+         * @param {string} url: The url to navigate to.
          */
         navigate: function (url) {
             if (window.parent) {
@@ -275,10 +293,8 @@ function SquidexFormField() {
             }
         },
 
-        /*
+        /**
          * Notifies the parent to go to fullscreen mode.
-         *
-         * @params mode: boolean: The fullscreen mode.
          */
         toggleFullscreen: function () {
             if (window.parent) {
@@ -289,13 +305,81 @@ function SquidexFormField() {
         /**
          * Notifies the control container that the value has been changed.
          *
-         * @params newValue: any: The new field value.
+         * @param {any} newValue: The new field value.
          */
         valueChanged: function (newValue) {
             value = newValue;
 
             if (window.parent) {
                 window.parent.postMessage({ type: 'valueChanged', value: newValue }, '*');
+            }
+        },
+
+        /**
+         * Shows an info alert.
+         * 
+         * @param {string} text: The info text.
+         */
+        notifyInfo: function (text) {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'notifyInfo', text: text }, '*');
+            }
+        },
+
+        /**
+         * Shows an error alert.
+         * 
+         * @param {string} text: error info text.
+         */
+        notifyError: function (text) {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'notifyError', text: text }, '*');
+            }
+        },
+
+        /**
+         * Shows an confirm dialog.
+         * 
+         * @param {string} title The title of the dialog.
+         * @param {string} text The text of the dialog.
+         * @param {function} callback The callback to invoke when the dialog is completed or closed.
+         */
+        confirm: function (title, text, callback) {
+            if (!callback || typeof callback !== 'function') {
+                return;
+            }
+
+            var correlationId = new Date().getTime().toString();
+
+            currentConfirm = {
+                correlationId: correlationId,
+                callback: callback
+            };
+
+            if (window.parent) {
+                window.parent.postMessage({ type: 'confirm', title: title, text: text, correlationId: correlationId }, '*');
+            }
+        },
+
+        /**
+         * Shows the dialog to pick assets.
+         * 
+         * @param {function} callback The callback to invoke when the dialog is completed or closed.
+         */
+        pickAssets: function (callback) {
+            if (!callback || typeof callback !== 'function') {
+                return;
+            }
+
+            var correlationId = new Date().getTime().toString();
+
+            currentPickAssets = {
+                correlationId: correlationId,
+                callback: callback
+            };
+
+            if (window.parent) {
+                window.parent.postMessage({ type: 'pickAssets', correlationId: correlationId }, '*');
             }
         },
 

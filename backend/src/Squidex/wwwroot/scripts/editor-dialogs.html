@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+</head>
+
+<body>
+    <button id="alert">
+        ALERT
+    </button>
+
+    <button id="info">
+        INFO
+    </button>
+
+    <button id="confirm">
+        CONFIRM
+    </button>
+
+    <button id="pickAssets">
+        PICK ASSETS
+    </button>
+
+    <script>
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        //
+        // Furthermore it sends the current size to the parent.
+        var field = new SquidexFormField();
+
+        document.getElementById('alert').addEventListener('click', function () {
+            field.notifyError('ERROR Text');
+        });
+
+        document.getElementById('info').addEventListener('click', function () {
+            field.notifyInfo('INFO Text');
+        });
+
+        document.getElementById('confirm').addEventListener('click', function () {
+            field.confirm('CONFIRM Title', 'CONFIRM Text', function (confirmed) {
+                console.log('CONFIRMED: ' + confirmed);
+            });
+        });
+
+        document.getElementById('pickAssets').addEventListener('click', function () {
+            field.pickAssets(function (assets) {
+                console.log('ASSETS: ' + JSON.stringify(assets, undefined, 2));
+            });
+        });
+    </script>
+</body>
+
+</html>
