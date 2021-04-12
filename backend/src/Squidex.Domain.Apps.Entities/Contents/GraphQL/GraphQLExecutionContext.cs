@@ -16,6 +16,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Log;
+using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
@@ -24,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
         private static readonly List<IEnrichedContentEntity> EmptyContents = new List<IEnrichedContentEntity>();
         private readonly IDataLoaderContextAccessor dataLoaders;
+        private readonly IUserResolver userResolver;
 
         public IUrlGenerator UrlGenerator { get; }
 
@@ -35,10 +37,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public GraphQLExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery,
             Context context,
-            IDataLoaderContextAccessor dataLoaders, ICommandBus commandBus, IUrlGenerator urlGenerator, ISemanticLog log)
+            IDataLoaderContextAccessor dataLoaders,
+            ICommandBus commandBus, IUrlGenerator urlGenerator, IUserResolver userResolver,
+            ISemanticLog log)
             : base(assetQuery, contentQuery)
         {
             this.dataLoaders = dataLoaders;
+            this.userResolver = userResolver;
 
             CommandBus = commandBus;
 
@@ -49,6 +54,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 .WithoutContentEnrichment());
 
             Log = log;
+        }
+
+        public async Task<IUser> FindUserAsync(RefToken refToken)
+        {
+            if (refToken.IsClient)
+            {
+                return new ClientUser(refToken);
+            }
+            else
+            {
+                var dataLoader = GetUserLoader();
+
+                return await dataLoader.LoadAsync(refToken.Identifier).GetResultAsync();
+            }
         }
 
         public async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id)
@@ -112,6 +131,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     var result = await GetReferencedContentsAsync(new List<DomainId>(batch));
 
                     return result.ToDictionary(x => x.Id);
+                });
+        }
+
+        private IDataLoader<string, IUser> GetUserLoader()
+        {
+            return dataLoaders.Context.GetOrAddBatchLoader<string, IUser>(nameof(GetUserLoader),
+                async batch =>
+                {
+                    var result = await userResolver.QueryManyAsync(batch.ToArray());
+
+                    return result;
                 });
         }
 

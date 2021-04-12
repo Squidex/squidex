@@ -27,8 +27,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             AddField(ContentFields.Version);
             AddField(ContentFields.Created);
             AddField(ContentFields.CreatedBy);
+            AddField(ContentFields.CreatedByUser);
             AddField(ContentFields.LastModified);
             AddField(ContentFields.LastModifiedBy);
+            AddField(ContentFields.LastModifiedByUser);
             AddField(ContentFields.Status);
             AddField(ContentFields.StatusColor);
 

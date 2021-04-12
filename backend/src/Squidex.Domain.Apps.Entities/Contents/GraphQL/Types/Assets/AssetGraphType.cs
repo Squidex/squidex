@@ -56,6 +56,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 
             AddField(new FieldType
             {
+                Name = "createdByUser",
+                ResolvedType = UserGraphType.NonNull,
+                Resolver = EntityResolvers.CreatedByUser,
+                Description = "The full info of the user that has created the asset."
+            });
+
+            AddField(new FieldType
+            {
                 Name = "lastModified",
                 ResolvedType = AllTypes.NonNullDateTime,
                 Resolver = EntityResolvers.LastModified,
@@ -68,6 +76,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = EntityResolvers.LastModifiedBy,
                 Description = "The user that has updated the asset last."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "lastModifiedByUser",
+                ResolvedType = UserGraphType.NonNull,
+                Resolver = EntityResolvers.LastModifiedByUser,
+                Description = "The full info of the user that has created the asset."
             });
 
             AddField(new FieldType
