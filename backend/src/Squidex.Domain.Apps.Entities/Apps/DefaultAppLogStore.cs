@@ -46,6 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public Task LogAsync(DomainId appId, RequestLog request)
         {
+            if (!requestLogStore.IsEnabled)
+            {
+                return Task.CompletedTask;
+            }
+
             var storedRequest = new Request
             {
                 Key = appId.ToString(),

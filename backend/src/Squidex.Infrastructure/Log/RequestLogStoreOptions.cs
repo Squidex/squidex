@@ -9,6 +9,12 @@ namespace Squidex.Infrastructure.Log
 {
     public sealed class RequestLogStoreOptions
     {
+        public bool StoreEnabled { get; set; }
+
         public int StoreRetentionInDays { get; set; } = 90;
+
+        public int BatchSize { get; set; } = 1000;
+
+        public int WriteIntervall { get; set; } = 1000;
     }
 }

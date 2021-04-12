@@ -28,9 +28,24 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
+        public async Task Should_not_forward_request_if_disabled()
+        {
+            A.CallTo(() => requestLogStore.IsEnabled)
+                .Returns(false);
+
+            await sut.LogAsync(DomainId.NewGuid(), default);
+
+            A.CallTo(() => requestLogStore.LogAsync(A<Request>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_forward_request_log_to_store()
         {
             Request? recordedRequest = null;
+
+            A.CallTo(() => requestLogStore.IsEnabled)
+                .Returns(true);
 
             A.CallTo(() => requestLogStore.LogAsync(A<Request>._))
                 .Invokes((Request request) => recordedRequest = request);

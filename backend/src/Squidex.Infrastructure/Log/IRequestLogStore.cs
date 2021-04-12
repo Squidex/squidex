@@ -13,6 +13,8 @@ namespace Squidex.Infrastructure.Log
 {
     public interface IRequestLogStore
     {
+        bool IsEnabled { get; }
+
         Task LogAsync(Request request);
 
         Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default);

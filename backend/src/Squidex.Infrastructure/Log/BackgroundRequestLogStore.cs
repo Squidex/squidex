@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Timers;
 using Squidex.Log;
 
@@ -17,23 +18,30 @@ namespace Squidex.Infrastructure.Log
 {
     public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLogStore
     {
-        private const int Intervall = 10 * 1000;
-        private const int BatchSize = 1000;
         private readonly IRequestLogRepository logRepository;
         private readonly ISemanticLog log;
         private readonly CompletionTimer timer;
+        private readonly RequestLogStoreOptions options;
         private ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
 
-        public BackgroundRequestLogStore(IRequestLogRepository logRepository, ISemanticLog log)
+        public bool IsEnabled
         {
+            get => options.StoreEnabled;
+        }
+
+        public BackgroundRequestLogStore(IOptions<RequestLogStoreOptions> options,
+            IRequestLogRepository logRepository, ISemanticLog log)
+        {
+            Guard.NotNull(options, nameof(options));
             Guard.NotNull(logRepository, nameof(logRepository));
             Guard.NotNull(log, nameof(log));
 
-            this.logRepository = logRepository;
+            this.options = options.Value;
 
+            this.logRepository = logRepository;
             this.log = log;
 
-            timer = new CompletionTimer(Intervall, ct => TrackAsync(), Intervall);
+            timer = new CompletionTimer(options.Value.WriteIntervall, ct => TrackAsync(), options.Value.WriteIntervall);
         }
 
         protected override void DisposeObject(bool disposing)
@@ -53,17 +61,24 @@ namespace Squidex.Infrastructure.Log
 
         private async Task TrackAsync()
         {
+            if (!IsEnabled)
+            {
+                return;
+            }
+
             try
             {
+                var batchSize = options.BatchSize;
+
                 var localJobs = Interlocked.Exchange(ref jobs, new ConcurrentQueue<Request>());
 
                 if (!localJobs.IsEmpty)
                 {
-                    var pages = (int)Math.Ceiling((double)localJobs.Count / BatchSize);
+                    var pages = (int)Math.Ceiling((double)localJobs.Count / batchSize);
 
                     for (var i = 0; i < pages; i++)
                     {
-                        await logRepository.InsertManyAsync(localJobs.Skip(i * BatchSize).Take(BatchSize));
+                        await logRepository.InsertManyAsync(localJobs.Skip(i * batchSize).Take(batchSize));
                     }
                 }
             }
