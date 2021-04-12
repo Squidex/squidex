@@ -6,15 +6,30 @@
 
     <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
     <script src="editor-sdk.js"></script>
+
+    <style>
+        #textarea {
+            box-sizing: border-box;
+            min-width: 100%;
+            min-height: 200px;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body>
-    <button id="button">New Value</button>
+    <div>
+        <button id="button">Generate New Value</button>
+    </div>
+
+    <textarea id="textarea"></textarea>
 
     <script>
         var numberGenerator = 1;
 
         var button = document.getElementById('button');
+
+        var textarea = document.getElementById('textarea');
 
         // When the field is instantiated it notifies the UI that it has been loaded.
         // 
@@ -22,7 +37,50 @@
         var field = new SquidexFormField();
 
         function logState(message) {
-            console.log(`${message}.\n\Language: ${field.getLanguage()}\n\nValue\n<${JSON.stringify(field.getValue(), 2)}>\n\nForm Value\n<${JSON.stringify(field.getFormValue())}>\n\nDisabled: ${field.isDisabled()}`);
+            var text = '';
+
+            function append(value) {
+                text += value;
+            }
+
+            function appendLine(value) {
+                if (value !== undefined) {
+                    append(value);
+                }
+
+                text += '\n';
+            }
+
+            appendLine(message);
+            appendLine();
+
+            append('Language: ');
+            appendLine(field.getLanguage());
+            appendLine();
+
+            append('Disabled: ');
+            appendLine(field.isDisabled());
+            appendLine();
+
+            append('FullScreen: ');
+            appendLine(field.isFullscreen());
+            appendLine();
+
+            append('Index: ');
+            appendLine(field.getIndex());
+            appendLine();
+
+            appendLine('Value');
+            appendLine(`<${JSON.stringify(field.getValue(), 2)}>`);
+            appendLine();
+
+            appendLine('Form Value');
+            appendLine(`<${JSON.stringify(field.getFormValue(), 2)}>`);
+            appendLine();
+
+            console.log(text);
+
+            textarea.value = text;
         }
 
         logState('Setup');
@@ -48,6 +106,10 @@
         field.onFormValueChanged(function () {
             logState('Form value changed');
         });
+
+        field.onMoved(function (index) {
+            logState('Form value moved');
+        })
 
         field.onLanguageChanged(function () {
             logState('Field language changed');

@@ -50,6 +50,9 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     public formValue: any;
 
     @Input()
+    public formIndex?: number | null;
+
+    @Input()
     public language: string;
 
     @Input()
@@ -86,6 +89,10 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
             if (changes['language']) {
                 this.sendLanguage();
             }
+
+            if (changes['formIndex']) {
+                this.sendMoved();
+            }
         }
     }
 
@@ -109,6 +116,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
                         this.sendFormValue();
                         this.sendLanguage();
                         this.sendDisabled();
+                        this.sendMoved();
                         this.sendValue();
                     } else if (type === 'resize') {
                         const { height } = event.data;
@@ -219,6 +227,12 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     private sendLanguage() {
         if (this.language) {
             this.sendMessage('languageChanged', { language: this.language });
+        }
+    }
+
+    private sendMoved() {
+        if (Types.isNumber(this.formIndex)) {
+            this.sendMessage('moved', { index: this.formIndex });
         }
     }
 
