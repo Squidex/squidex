@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Hosting;
 using Squidex.Infrastructure.Caching;
+using Squidex.Properties;
 using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
@@ -96,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .RequirePermission(Permissions.AppContentsReadOwn)
                 .Operation("Query")
                 .OperationSummary("Query schema contents items.")
-                .Describe(Properties.Resources.OpenApiSchemaQuery)
+                .Describe(Resources.OpenApiSchemaQuery)
                 .HasQueryOptions(true)
                 .Responds(200, "Content items retrieved.", builder.ContentsSchema)
                 .Responds(400, "Query not valid.");
@@ -130,7 +131,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .OperationSummary("Create a schema content item.")
                 .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
                 .HasQuery("id", JsonObjectType.String, "The optional custom content id.")
-                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
+                .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
                 .Responds(201, "Content item created", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
 
@@ -140,7 +141,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .OperationSummary("Upsert a schema content item.")
                 .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
                 .HasId()
-                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
+                .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
                 .Responds(200, "Content item created or updated.", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
 
@@ -149,7 +150,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .Operation("Update")
                 .OperationSummary("Update a schema content item.")
                 .HasId()
-                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
+                .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
                 .Responds(200, "Content item updated.", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
 
@@ -158,26 +159,18 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .Operation("Patch")
                 .OperationSummary("Patch a schema content item.")
                 .HasId()
-                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
+                .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
                 .Responds(200, "Content item updated.", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
 
             builder.AddOperation(OpenApiOperationMethod.Put, "/{id}/status")
-                .RequirePermission(Permissions.AppContentsUpdateOwn)
-                .Operation("Patch")
-                .OperationSummary("Patch a schema content item.")
-                .HasId()
-                .HasBody("data", builder.DataSchema, Properties.Resources.OpenApiSchemaBody)
-                .Responds(200, "Content item updated.", builder.ContentSchema)
-                .Responds(400, "Content data not valid.");
-
-            builder.AddOperation(OpenApiOperationMethod.Delete, "/{id}")
                 .RequirePermission(Permissions.AppContentsChangeStatusOwn)
                 .Operation("Change")
                 .OperationSummary("Change the status of a schema content item.")
                 .HasId()
                 .HasBody("request", builder.Parent.ChangeStatusSchema, "The request to change content status.")
-                .Responds(200, "Content status updated.", builder.ContentSchema);
+                .Responds(200, "Content status updated.", builder.ContentSchema)
+                .Responds(400, "Content status not valid.");
 
             builder.AddOperation(OpenApiOperationMethod.Delete, "/{id}")
                 .RequirePermission(Permissions.AppContentsDeleteOwn)
@@ -214,7 +207,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 {
                     Title = $"Squidex Content API for '{appName}' App",
                     Description =
-                        Properties.Resources.OpenApiContentDescription
+                        Resources.OpenApiContentDescription
                             .Replace("[REDOC_LINK_NORMAL]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs"))
                             .Replace("[REDOC_LINK_SIMPLE]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs/flat"))
                 },
