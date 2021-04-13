@@ -1,7 +1,7 @@
 #
 # Stage 1, Build Backend
 #
-FROM mcr.microsoft.com/dotnet/sdk:5.0.102-ca-patch-buster-slim as backend
+FROM mcr.microsoft.com/dotnet/sdk:5.0 as backend
 
 ARG SQUIDEX__VERSION=4.0.0
 
