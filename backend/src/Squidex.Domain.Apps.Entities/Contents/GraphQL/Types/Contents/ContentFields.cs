@@ -46,6 +46,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Description = "The user that has created the content."
         };
 
+        public static readonly FieldType CreatedByUser = new FieldType
+        {
+            Name = "createdByUser",
+            ResolvedType = UserGraphType.NonNull,
+            Resolver = EntityResolvers.CreatedByUser,
+            Description = "The full info of the user that has created the content."
+        };
+
         public static readonly FieldType LastModified = new FieldType
         {
             Name = "lastModified",
@@ -60,6 +68,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             ResolvedType = AllTypes.NonNullString,
             Resolver = EntityResolvers.LastModifiedBy,
             Description = "The user that has updated the content last."
+        };
+
+        public static readonly FieldType LastModifiedByUser = new FieldType
+        {
+            Name = "lastModifiedByUser",
+            ResolvedType = UserGraphType.NonNull,
+            Resolver = EntityResolvers.LastModifiedByUser,
+            Description = "The full info of the user that has updated the content last."
         };
 
         public static readonly FieldType Status = new FieldType

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -26,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
     {
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
-        private readonly IUser user = A.Fake<IUser>();
+        private readonly IUser user;
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly string contributorId = DomainId.NewGuid().ToString();
         private readonly string clientId = "client";
@@ -48,8 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         public AppDomainObjectTests()
         {
-            A.CallTo(() => user.Id)
-                .Returns(contributorId);
+            user = UserMocks.User(contributorId);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId))
                 .Returns(user);

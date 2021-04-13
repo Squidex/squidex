@@ -8,6 +8,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Shared.Users;
@@ -157,10 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         {
             if (email != null)
             {
-                var user = A.Fake<IUser>();
-
-                A.CallTo(() => user.Email)
-                    .Returns(email);
+                var user = UserMocks.User(id, email);
 
                 A.CallTo(() => userResolver.FindByIdOrEmailAsync(id))
                     .Returns(user);

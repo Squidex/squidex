@@ -49,7 +49,7 @@ namespace Squidex.Shared.Users
             claims = new List<Claim>
             {
                 new Claim(OpenIdClaims.ClientId, token.Identifier),
-                new Claim(SquidexClaimTypes.DisplayName, token.ToString())
+                new Claim(SquidexClaimTypes.DisplayName, token.Identifier)
             };
         }
     }

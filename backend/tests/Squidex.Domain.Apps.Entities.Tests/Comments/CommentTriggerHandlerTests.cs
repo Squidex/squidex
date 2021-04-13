@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Domain.Apps.Events.Contents;
@@ -52,8 +53,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_create_enriched_events()
         {
-            var user1 = CreateUser("1");
-            var user2 = CreateUser("2");
+            var user1 = UserMocks.User("1");
+            var user2 = UserMocks.User("2");
 
             var users = new List<IUser> { user1, user2 };
             var userIds = users.Select(x => x.Id).ToArray();
@@ -79,8 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_not_create_enriched_events_when_users_cannot_be_resolved()
         {
-            var user1 = CreateUser("1");
-            var user2 = CreateUser("2");
+            var user1 = UserMocks.User("1");
+            var user2 = UserMocks.User("2");
 
             var users = new List<IUser> { user1, user2 };
             var userIds = users.Select(x => x.Id).ToArray();
@@ -213,9 +214,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public void Should_trigger_check_when_email_is_correct()
         {
-            TestForRealCondition("event.mentionedUser.email == 'sebastian@squidex.io'", (handler, trigger) =>
+            TestForRealCondition("event.mentionedUser.email == '1@email.com'", (handler, trigger) =>
             {
-                var user = CreateUser("1");
+                var user = UserMocks.User("1", "1@email.com");
 
                 var result = handler.Trigger(new EnrichedCommentEvent { MentionedUser = user }, trigger);
 
@@ -228,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         {
             TestForRealCondition("event.mentionedUser.email == 'other@squidex.io'", (handler, trigger) =>
             {
-                var user = CreateUser("1");
+                var user = UserMocks.User("1");
 
                 var result = handler.Trigger(new EnrichedCommentEvent { MentionedUser = user }, trigger);
 
@@ -260,16 +261,6 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
                 Assert.False(result);
             });
-        }
-
-        private static IUser CreateUser(string id, string email = "sebastian@squidex.io")
-        {
-            var user = A.Fake<IUser>();
-
-            A.CallTo(() => user.Id).Returns(id);
-            A.CallTo(() => user.Email).Returns(email);
-
-            return user;
         }
 
         private void TestForRealCondition(string condition, Action<IRuleTriggerHandler, CommentTrigger> action)
