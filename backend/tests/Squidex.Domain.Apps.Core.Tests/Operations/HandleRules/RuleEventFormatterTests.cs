@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
     public class RuleEventFormatterTests
     {
-        private readonly IUser user = A.Fake<IUser>();
+        private readonly IUser user = UserMocks.User("user123", "me@email.com", "me");
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
@@ -67,15 +67,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             A.CallTo(() => urlGenerator.AssetContent(appId, assetId.ToString()))
                 .Returns("asset-content-url");
-
-            A.CallTo(() => user.Id)
-                .Returns("user123");
-
-            A.CallTo(() => user.Email)
-                .Returns("me@email.com");
-
-            A.CallTo(() => user.Claims)
-                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
 
             var formatters = new IRuleEventFormatter[]
             {

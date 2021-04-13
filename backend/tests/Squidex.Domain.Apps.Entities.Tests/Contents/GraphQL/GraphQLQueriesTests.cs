@@ -229,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             created = content.Created,
                             createdBy = "subject:user1",
                             lastModified = content.LastModified,
-                            lastModifiedBy = "subject:user2",
+                            lastModifiedBy = "client:client1",
                             status = "DRAFT",
                             statusColor = "red",
                             url = $"contents/my-schema/{content.Id}",

@@ -23,9 +23,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 {
     public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
-        private readonly IUser user1 = A.Fake<IUser>();
-        private readonly IUser user2 = A.Fake<IUser>();
-        private readonly IUser user3 = A.Fake<IUser>();
+        private readonly IUser user1 = UserMocks.User("1");
+        private readonly IUser user2 = UserMocks.User("2");
+        private readonly IUser user3 = UserMocks.User("3");
         private readonly IUserResolver users = A.Fake<IUserResolver>();
         private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
         private readonly AppContributors contributors_0 = AppContributors.Empty;

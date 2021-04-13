@@ -20,8 +20,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             version
             created
             createdBy
+            createdByUser {
+              id,
+              email,
+              displayName
+            }
             lastModified
             lastModifiedBy
+            lastModifiedByUser {
+              id,
+              email,
+              displayName
+            }
             status
             statusColor
             url
@@ -148,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Created = now,
                 CreatedBy = RefToken.User("user1"),
                 LastModified = now,
-                LastModifiedBy = RefToken.User("user2"),
+                LastModifiedBy = RefToken.Client("client1"),
                 Data = data,
                 SchemaId = schemaId,
                 Status = Status.Draft,
@@ -192,9 +202,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 id = content.Id,
                 version = 1,
                 created = content.Created,
-                createdBy = "subject:user1",
+                createdBy = content.CreatedBy.ToString(),
+                createdByUser = new
+                {
+                    id = content.CreatedBy.Identifier,
+                    email = $"{content.CreatedBy.Identifier}@email.com",
+                    displayName = $"name_{content.CreatedBy.Identifier}"
+                },
                 lastModified = content.LastModified,
-                lastModifiedBy = "subject:user2",
+                lastModifiedBy = content.LastModifiedBy.ToString(),
+                lastModifiedByUser = new
+                {
+                    id = content.LastModifiedBy.Identifier,
+                    email = $"{content.LastModifiedBy}",
+                    displayName = content.LastModifiedBy.Identifier
+                },
                 status = "DRAFT",
                 statusColor = "red",
                 url = $"contents/my-schema/{content.Id}",

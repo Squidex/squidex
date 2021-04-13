@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -23,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
     {
         private readonly INotificationSender notificatíonSender = A.Fake<INotificationSender>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly IUser assigner = A.Fake<IUser>();
-        private readonly IUser assignee = A.Fake<IUser>();
+        private readonly IUser assigner = UserMocks.User("1");
+        private readonly IUser assignee = UserMocks.User("2");
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly string assignerId = DomainId.NewGuid().ToString();
         private readonly string assigneeId = DomainId.NewGuid().ToString();

@@ -106,7 +106,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             if (resources.CanCreateContent(Name))
             {
                 AddPostLink("contents/create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));
-
                 AddPostLink("contents/create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
             }
 
@@ -130,10 +129,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 AddPutLink("fields/order", resources.Url<SchemaFieldsController>(x => nameof(x.PutSchemaFieldOrdering), values));
 
                 AddPutLink("update", resources.Url<SchemasController>(x => nameof(x.PutSchema), values));
+                AddPutLink("update/category", resources.Url<SchemasController>(x => nameof(x.PutCategory), values));
+                AddPutLink("update/rules", resources.Url<SchemasController>(x => nameof(x.PutRules), values));
                 AddPutLink("update/sync", resources.Url<SchemasController>(x => nameof(x.PutSchemaSync), values));
                 AddPutLink("update/urls", resources.Url<SchemasController>(x => nameof(x.PutPreviewUrls), values));
-                AddPutLink("update/rules", resources.Url<SchemasController>(x => nameof(x.PutRules), values));
-                AddPutLink("update/category", resources.Url<SchemasController>(x => nameof(x.PutCategory), values));
             }
 
             if (resources.CanUpdateSchemaScripts(Name))

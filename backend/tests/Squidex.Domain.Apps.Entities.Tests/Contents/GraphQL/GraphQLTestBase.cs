@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using GraphQL;
@@ -32,6 +33,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
 using Squidex.Log;
 using Squidex.Shared;
+using Squidex.Shared.Users;
 using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
@@ -46,6 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
+        protected readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         protected readonly ISchemaEntity schema;
         protected readonly ISchemaEntity schemaRef1;
         protected readonly ISchemaEntity schemaRef2;
@@ -62,6 +65,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public GraphQLTestBase()
         {
             app = Mocks.App(appId, Language.DE, Language.GermanGermany);
+
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
+                .ReturnsLazily(x =>
+                {
+                    var ids = x.GetArgument<string[]>(0)!;
+
+                    var users = ids.Select(id => UserMocks.User(id, $"{id}@email.com", $"name_{id}"));
+
+                    return Task.FromResult(users.ToDictionary(x => x.Id));
+                });
 
             var schemaDef =
                 new Schema(schemaId.Name)
@@ -201,6 +214,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddSingleton(contentQuery)
                     .AddSingleton(dataLoaderContext)
                     .AddSingleton(dataLoaderListener)
+                    .AddSingleton(userResolver)
                     .AddSingleton<InstantGraphType>()
                     .AddSingleton<JsonGraphType>()
                     .AddSingleton<JsonNoopGraphType>()

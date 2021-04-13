@@ -8,6 +8,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -138,10 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         private void SetupUser(string id, string email)
         {
-            var user = A.Fake<IUser>();
-
-            A.CallTo(() => user.Id).Returns(id);
-            A.CallTo(() => user.Email).Returns(email);
+            var user = UserMocks.User(id, email);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(email))
                 .Returns(user);
