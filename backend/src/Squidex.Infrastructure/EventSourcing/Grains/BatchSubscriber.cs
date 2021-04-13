@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 1,
-                MaxMessagesPerTask = 1,
+                MaxMessagesPerTask = 10,
                 BoundedCapacity = batchSize
             });
 

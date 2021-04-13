@@ -319,7 +319,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ReadEventsAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers)
         {
-            const int BatchSize = 500;
+            const int BatchSize = 100;
 
             var handled = 0;
 
@@ -346,7 +346,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 BoundedCapacity = 2
             });
 
-            var batchBlock = new BatchBlock<(string, Envelope<IEvent>)>(500, new GroupingDataflowBlockOptions
+            var batchBlock = new BatchBlock<(string, Envelope<IEvent>)>(BatchSize, new GroupingDataflowBlockOptions
             {
                 BoundedCapacity = BatchSize
             });
