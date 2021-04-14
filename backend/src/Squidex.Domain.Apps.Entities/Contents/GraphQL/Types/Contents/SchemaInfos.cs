@@ -151,7 +151,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             "Asset",
             "AssetResultDto",
             "EntitySavedResultDto",
-            "JsonScalar"
+            "JsonScalar",
+            "JsonPrimitive",
+            "User"
         };
         private readonly Dictionary<string, int> takenNames = new Dictionary<string, int>();
 
