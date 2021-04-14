@@ -11,7 +11,7 @@ using Lazy;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
-using P = Squidex.Shared.Permissions;
+using Squidex.Shared;
 
 namespace Squidex.Web
 {
@@ -20,155 +20,148 @@ namespace Squidex.Web
         private readonly Dictionary<(string, string), bool> schemaPermissions = new Dictionary<(string, string), bool>();
 
         // Contents
-        public bool CanReadContent(string schema) => IsAllowedForSchema(P.AppContentsReadOwn, schema);
+        public bool CanReadContent(string schema) => IsAllowedForSchema(Permissions.AppContentsReadOwn, schema);
 
-        public bool CanCreateContent(string schema) => IsAllowedForSchema(P.AppContentsCreate, schema);
+        public bool CanCreateContent(string schema) => IsAllowedForSchema(Permissions.AppContentsCreate, schema);
 
-        public bool CanCreateContentVersion(string schema) => IsAllowedForSchema(P.AppContentsVersionCreateOwn, schema);
+        public bool CanCreateContentVersion(string schema) => IsAllowedForSchema(Permissions.AppContentsVersionCreateOwn, schema);
 
-        public bool CanDeleteContent(string schema) => IsAllowedForSchema(P.AppContentsDeleteOwn, schema);
+        public bool CanDeleteContent(string schema) => IsAllowedForSchema(Permissions.AppContentsDeleteOwn, schema);
 
-        public bool CanDeleteContentVersion(string schema) => IsAllowedForSchema(P.AppContentsVersionDeleteOwn, schema);
+        public bool CanDeleteContentVersion(string schema) => IsAllowedForSchema(Permissions.AppContentsVersionDeleteOwn, schema);
 
-        public bool CanUpdateContent(string schema) => IsAllowedForSchema(P.AppContentsUpdateOwn, schema);
+        public bool CanUpdateContent(string schema) => IsAllowedForSchema(Permissions.AppContentsUpdateOwn, schema);
 
         // Schemas
-        public bool CanUpdateSchema(string schema) => IsAllowedForSchema(P.AppSchemasDelete, schema);
+        public bool CanUpdateSchema(string schema) => IsAllowedForSchema(Permissions.AppSchemasDelete, schema);
 
-        public bool CanUpdateSchemaScripts(string schema) => IsAllowedForSchema(P.AppSchemasScripts, schema);
+        public bool CanUpdateSchemaScripts(string schema) => IsAllowedForSchema(Permissions.AppSchemasScripts, schema);
 
-        public bool CanPublishSchema(string schema) => IsAllowedForSchema(P.AppSchemasPublish, schema);
+        public bool CanPublishSchema(string schema) => IsAllowedForSchema(Permissions.AppSchemasPublish, schema);
 
-        public bool CanDeleteSchema(string schema) => IsAllowedForSchema(P.AppSchemasDelete, schema);
+        public bool CanDeleteSchema(string schema) => IsAllowedForSchema(Permissions.AppSchemasDelete, schema);
 
         [Lazy]
-        public bool CanCreateSchema => IsAllowed(P.AppSchemasCreate);
+        public bool CanCreateSchema => IsAllowed(Permissions.AppSchemasCreate);
+
+        [Lazy]
+        public bool CanUpdateSettings => IsAllowed(Permissions.AppUpdateSettings);
 
         // Contributors
         [Lazy]
-        public bool CanAssignContributor => IsAllowed(P.AppContributorsAssign);
+        public bool CanAssignContributor => IsAllowed(Permissions.AppContributorsAssign);
 
         [Lazy]
-        public bool CanRevokeContributor => IsAllowed(P.AppContributorsRevoke);
+        public bool CanRevokeContributor => IsAllowed(Permissions.AppContributorsRevoke);
 
         // Workflows
         [Lazy]
-        public bool CanCreateWorkflow => IsAllowed(P.AppWorkflowsCreate);
+        public bool CanCreateWorkflow => IsAllowed(Permissions.AppWorkflowsCreate);
 
         [Lazy]
-        public bool CanUpdateWorkflow => IsAllowed(P.AppWorkflowsUpdate);
+        public bool CanUpdateWorkflow => IsAllowed(Permissions.AppWorkflowsUpdate);
 
         [Lazy]
-        public bool CanDeleteWorkflow => IsAllowed(P.AppWorkflowsDelete);
+        public bool CanDeleteWorkflow => IsAllowed(Permissions.AppWorkflowsDelete);
 
         // Roles
         [Lazy]
-        public bool CanCreateRole => IsAllowed(P.AppRolesCreate);
+        public bool CanCreateRole => IsAllowed(Permissions.AppRolesCreate);
 
         [Lazy]
-        public bool CanUpdateRole => IsAllowed(P.AppRolesUpdate);
+        public bool CanUpdateRole => IsAllowed(Permissions.AppRolesUpdate);
 
         [Lazy]
-        public bool CanDeleteRole => IsAllowed(P.AppRolesDelete);
+        public bool CanDeleteRole => IsAllowed(Permissions.AppRolesDelete);
 
         // Languages
         [Lazy]
-        public bool CanCreateLanguage => IsAllowed(P.AppLanguagesCreate);
+        public bool CanCreateLanguage => IsAllowed(Permissions.AppLanguagesCreate);
 
         [Lazy]
-        public bool CanUpdateLanguage => IsAllowed(P.AppLanguagesUpdate);
+        public bool CanUpdateLanguage => IsAllowed(Permissions.AppLanguagesUpdate);
 
         [Lazy]
-        public bool CanDeleteLanguage => IsAllowed(P.AppLanguagesDelete);
-
-        // Patterns
-        [Lazy]
-        public bool CanCreatePattern => IsAllowed(P.AppClientsCreate);
-
-        [Lazy]
-        public bool CanUpdatePattern => IsAllowed(P.AppPatternsUpdate);
-
-        [Lazy]
-        public bool CanDeletePattern => IsAllowed(P.AppPatternsDelete);
+        public bool CanDeleteLanguage => IsAllowed(Permissions.AppLanguagesDelete);
 
         // Clients
         [Lazy]
-        public bool CanCreateClient => IsAllowed(P.AppClientsCreate);
+        public bool CanCreateClient => IsAllowed(Permissions.AppClientsCreate);
 
         [Lazy]
-        public bool CanUpdateClient => IsAllowed(P.AppClientsUpdate);
+        public bool CanUpdateClient => IsAllowed(Permissions.AppClientsUpdate);
 
         [Lazy]
-        public bool CanDeleteClient => IsAllowed(P.AppClientsDelete);
+        public bool CanDeleteClient => IsAllowed(Permissions.AppClientsDelete);
 
         // Rules
         [Lazy]
-        public bool CanDisableRule => IsAllowed(P.AppRulesDisable);
+        public bool CanDisableRule => IsAllowed(Permissions.AppRulesDisable);
 
         [Lazy]
-        public bool CanCreateRule => IsAllowed(P.AppRulesCreate);
+        public bool CanCreateRule => IsAllowed(Permissions.AppRulesCreate);
 
         [Lazy]
-        public bool CanUpdateRule => IsAllowed(P.AppRulesUpdate);
+        public bool CanUpdateRule => IsAllowed(Permissions.AppRulesUpdate);
 
         [Lazy]
-        public bool CanDeleteRule => IsAllowed(P.AppRulesDelete);
+        public bool CanDeleteRule => IsAllowed(Permissions.AppRulesDelete);
 
         [Lazy]
-        public bool CanReadRuleEvents => IsAllowed(P.AppRulesEvents);
+        public bool CanReadRuleEvents => IsAllowed(Permissions.AppRulesEvents);
 
         // Users
         [Lazy]
-        public bool CanReadUsers => IsAllowed(P.AdminUsersRead);
+        public bool CanReadUsers => IsAllowed(Permissions.AdminUsersRead);
 
         [Lazy]
-        public bool CanCreateUser => IsAllowed(P.AdminUsersCreate);
+        public bool CanCreateUser => IsAllowed(Permissions.AdminUsersCreate);
 
         [Lazy]
-        public bool CanLockUser => IsAllowed(P.AdminUsersLock);
+        public bool CanLockUser => IsAllowed(Permissions.AdminUsersLock);
 
         [Lazy]
-        public bool CanUnlockUser => IsAllowed(P.AdminUsersUnlock);
+        public bool CanUnlockUser => IsAllowed(Permissions.AdminUsersUnlock);
 
         [Lazy]
-        public bool CanUpdateUser => IsAllowed(P.AdminUsersUpdate);
+        public bool CanUpdateUser => IsAllowed(Permissions.AdminUsersUpdate);
 
         // Assets
         [Lazy]
-        public bool CanUploadAsset => IsAllowed(P.AppAssetsUpload);
+        public bool CanUploadAsset => IsAllowed(Permissions.AppAssetsUpload);
 
         [Lazy]
-        public bool CanCreateAsset => IsAllowed(P.AppAssetsCreate);
+        public bool CanCreateAsset => IsAllowed(Permissions.AppAssetsCreate);
 
         [Lazy]
-        public bool CanDeleteAsset => IsAllowed(P.AppAssetsDelete);
+        public bool CanDeleteAsset => IsAllowed(Permissions.AppAssetsDelete);
 
         [Lazy]
-        public bool CanUpdateAsset => IsAllowed(P.AppAssetsUpdate);
+        public bool CanUpdateAsset => IsAllowed(Permissions.AppAssetsUpdate);
 
         [Lazy]
-        public bool CanReadAssets => IsAllowed(P.AppAssetsRead);
+        public bool CanReadAssets => IsAllowed(Permissions.AppAssetsRead);
 
         // Events
         [Lazy]
-        public bool CanReadEvents => IsAllowed(P.AdminEventsRead);
+        public bool CanReadEvents => IsAllowed(Permissions.AdminEventsRead);
 
         [Lazy]
-        public bool CanManageEvents => IsAllowed(P.AdminEventsManage);
+        public bool CanManageEvents => IsAllowed(Permissions.AdminEventsManage);
 
         // Orleans
         [Lazy]
-        public bool CanReadOrleans => IsAllowed(P.AdminOrleans);
+        public bool CanReadOrleans => IsAllowed(Permissions.AdminOrleans);
 
         // Backups
         [Lazy]
-        public bool CanRestoreBackup => IsAllowed(P.AdminEventsRead);
+        public bool CanRestoreBackup => IsAllowed(Permissions.AdminEventsRead);
 
         [Lazy]
-        public bool CanCreateBackup => IsAllowed(P.AppBackupsCreate);
+        public bool CanCreateBackup => IsAllowed(Permissions.AppBackupsCreate);
 
         [Lazy]
-        public bool CanDeleteBackup => IsAllowed(P.AppBackupsDelete);
+        public bool CanDeleteBackup => IsAllowed(Permissions.AppBackupsDelete);
 
         [Lazy]
         public string? App => GetAppName();
@@ -228,7 +221,7 @@ namespace Squidex.Web
                 }
             }
 
-            var permission = P.ForApp(id, app, schema);
+            var permission = Permissions.ForApp(id, app, schema);
 
             return Context.UserPermissions.Allows(permission) || additional?.Allows(permission) == true;
         }

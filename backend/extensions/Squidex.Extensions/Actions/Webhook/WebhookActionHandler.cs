@@ -105,6 +105,12 @@ namespace Squidex.Extensions.Actions.Webhook
                     case WebhookMethod.GET:
                         method = HttpMethod.Get;
                         break;
+                    case WebhookMethod.DELETE:
+                        method = HttpMethod.Delete;
+                        break;
+                    case WebhookMethod.PATCH:
+                        method = HttpMethod.Patch;
+                        break;
                 }
 
                 var request = new HttpRequestMessage(method, job.RequestUrl);

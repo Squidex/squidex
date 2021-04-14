@@ -8,13 +8,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
-using Squidex.Infrastructure;
 
 namespace Squidex.Config.Domain
 {
@@ -47,21 +45,10 @@ namespace Squidex.Config.Domain
             {
                 var uiOptions = c.GetRequiredService<IOptions<MyUIOptions>>().Value;
 
-                var result = new InitialPatterns();
-
-                if (uiOptions.RegexSuggestions != null)
+                return new InitialSettings
                 {
-                    foreach (var (key, value) in uiOptions.RegexSuggestions)
-                    {
-                        if (!string.IsNullOrWhiteSpace(key) &&
-                            !string.IsNullOrWhiteSpace(value))
-                        {
-                            result[DomainId.NewGuid()] = new AppPattern(key, value);
-                        }
-                    }
-                }
-
-                return result;
+                    Settings = uiOptions.AppSettings
+                };
             });
         }
     }

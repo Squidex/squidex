@@ -64,12 +64,12 @@
         <ng-template #notEditing>
             <form [formGroup]="editForm.form" class="edit-form" (ngSubmit)="save()">
                 <sqx-field-form 
-                    [patterns]="patternsState.patterns | async" 
                     [languages]="languagesState.isoLanguages | async"
                     [field]="field"
                     [fieldForm]="editForm.form"
                     [isEditable]="true" 
-                    [isLocalizable]="isLocalizable">
+                    [isLocalizable]="isLocalizable"
+                    [settings]="settings">
                 </sqx-field-form>
             </form>
         </ng-template>

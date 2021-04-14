@@ -7,7 +7,7 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnInit } from '@angular/core';
-import { DialogModel, FieldDto, fieldTypes, LanguagesState, PatternsState, SchemaDetailsDto, SchemasState, sorted } from '@app/shared';
+import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, SchemaDetailsDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-fields',
@@ -25,16 +25,14 @@ export class SchemaFieldsComponent implements OnInit {
     public trackByFieldFn: (_index: number, field: FieldDto) => any;
 
     constructor(
+        public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
-        public readonly languageState: LanguagesState,
-        public readonly patternsState: PatternsState
+        public readonly languageState: LanguagesState
     ) {
         this.trackByFieldFn = this.trackByField.bind(this);
     }
 
     public ngOnInit() {
-        this.patternsState.load();
-
         this.languageState.load();
     }
 

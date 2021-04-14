@@ -32,6 +32,10 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
     public dropdown = new ModalModel();
     public dropdownNew = new ModalModel();
 
+    public get disableScheduler() {
+        return this.appsState.snapshot.selectedSettings?.hideScheduler;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly contentPage: ContentPageComponent,

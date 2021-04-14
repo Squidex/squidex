@@ -83,7 +83,7 @@ describe('AppsState', () => {
             .returns(() => of(newApp));
 
         appsState.select(app1.name).subscribe();
-        appsState.reloadSelected();
+        appsState.reloadApps();
 
         expect(appsState.snapshot.selectedApp).toEqual(newApp);
     });

@@ -37,10 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly string planIdFree = "free";
         private readonly AppDomainObject sut;
         private readonly DomainId workflowId = DomainId.NewGuid();
-        private readonly DomainId patternId1 = DomainId.NewGuid();
-        private readonly DomainId patternId2 = DomainId.NewGuid();
-        private readonly DomainId patternId3 = DomainId.NewGuid();
-        private readonly InitialPatterns initialPatterns;
+        private readonly InitialSettings initialSettings;
 
         protected override DomainId Id
         {
@@ -63,13 +60,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             A.CallTo(() => appPlansProvider.GetPlan(planIdPaid))
                 .Returns(new ConfigAppLimitsPlan { Id = planIdPaid, MaxContributors = 30 });
 
-            initialPatterns = new InitialPatterns
+            initialSettings = new InitialSettings
             {
-                { patternId1, new AppPattern("Number", "[0-9]") },
-                { patternId2, new AppPattern("Numbers", "[0-9]*") }
+                Settings = AppSettings.Empty
             };
 
-            sut = new AppDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), initialPatterns, appPlansProvider, appPlansBillingManager, userResolver);
+            sut = new AppDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), initialSettings, appPlansProvider, appPlansBillingManager, userResolver);
             sut.Setup(Id);
         }
 
@@ -97,8 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
                     CreateEvent(new AppContributorAssigned { ContributorId = Actor.Identifier, Role = Role.Owner }),
-                    CreateEvent(new AppPatternAdded { PatternId = patternId1, Name = "Number", Pattern = "[0-9]" }),
-                    CreateEvent(new AppPatternAdded { PatternId = patternId2, Name = "Numbers", Pattern = "[0-9]*" })
+                    CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings })
                 );
         }
 
@@ -116,8 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }, true),
-                    CreateEvent(new AppPatternAdded { PatternId = patternId1, Name = "Number", Pattern = "[0-9]" }, true),
-                    CreateEvent(new AppPatternAdded { PatternId = patternId2, Name = "Numbers", Pattern = "[0-9]*" }, true)
+                    CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings })
                 );
         }
 
@@ -602,63 +596,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         }
 
         [Fact]
-        public async Task AddPattern_should_create_events_and_add_pattern()
-        {
-            var command = new AddPattern { PatternId = patternId3, Name = "Any", Pattern = ".*", Message = "Msg" };
-
-            await ExecuteCreateAsync();
-
-            var result = await PublishAsync(command);
-
-            result.ShouldBeEquivalent(sut.Snapshot);
-
-            Assert.Equal(initialPatterns.Count + 1, sut.Snapshot.Patterns.Count);
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateEvent(new AppPatternAdded { PatternId = patternId3, Name = "Any", Pattern = ".*", Message = "Msg" })
-                );
-        }
-
-        [Fact]
-        public async Task DeletePattern_should_create_events_and_update_pattern()
-        {
-            var command = new DeletePattern { PatternId = patternId3 };
-
-            await ExecuteCreateAsync();
-            await ExecuteAddPatternAsync();
-
-            var result = await PublishAsync(command);
-
-            result.ShouldBeEquivalent(sut.Snapshot);
-
-            Assert.Equal(initialPatterns.Count, sut.Snapshot.Patterns.Count);
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateEvent(new AppPatternDeleted { PatternId = patternId3 })
-                );
-        }
-
-        [Fact]
-        public async Task UpdatePattern_should_create_events_and_remove_pattern()
-        {
-            var command = new UpdatePattern { PatternId = patternId3, Name = "Any", Pattern = ".*", Message = "Msg" };
-
-            await ExecuteCreateAsync();
-            await ExecuteAddPatternAsync();
-
-            var result = await PublishIdempotentAsync(command);
-
-            result.ShouldBeEquivalent(sut.Snapshot);
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateEvent(new AppPatternUpdated { PatternId = patternId3, Name = "Any", Pattern = ".*", Message = "Msg" })
-                );
-        }
-
-        [Fact]
         public async Task ArchiveApp_should_create_events_and_update_archived_flag()
         {
             var command = new ArchiveApp();
@@ -688,11 +625,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private Task ExecuteUploadImage()
         {
             return PublishAsync(new UploadAppImage { File = new NoopAssetFile() });
-        }
-
-        private Task ExecuteAddPatternAsync()
-        {
-            return PublishAsync(new AddPattern { PatternId = patternId3, Name = "Name", Pattern = ".*" });
         }
 
         private Task ExecuteAssignContributorAsync()

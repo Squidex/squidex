@@ -8,8 +8,8 @@
 import { Injectable } from '@angular/core';
 import { DialogService, shareSubscribed, State, Types } from '@app/framework';
 import { Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-import { AppDto, AppsService, CreateAppDto, UpdateAppDto } from './../services/apps.service';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { AppDto, AppSettingsDto, AppsService, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
 
 interface Snapshot {
     // All apps, loaded once.
@@ -17,6 +17,9 @@ interface Snapshot {
 
     // The selected app.
     selectedApp: AppDto | null;
+
+    // The selected app settings.
+    selectedSettings: AppSettingsDto | null;
 }
 
 @Injectable()
@@ -26,6 +29,9 @@ export class AppsState extends State<Snapshot> {
 
     public selectedApp =
         this.project(s => s.selectedApp);
+
+    public selectedSettings =
+        this.project(s => s.selectedSettings);
 
     public get appName() {
         return this.snapshot.selectedApp?.name || '';
@@ -39,19 +45,30 @@ export class AppsState extends State<Snapshot> {
         private readonly appsService: AppsService,
         private readonly dialogs: DialogService
     ) {
-        super({ apps: [], selectedApp: null }, 'Apps');
+        super({
+            apps: [],
+            selectedApp: null,
+            selectedSettings: null}, 'Apps');
     }
 
-    public reloadSelected() {
+    public reloadApps() {
         return this.loadApp(this.appName).pipe(
             shareSubscribed(this.dialogs));
     }
 
     public select(name: string | null): Observable<AppDto | null> {
         return this.loadApp(name, true).pipe(
-            tap(selectedApp => {
-                this.next({ selectedApp }, 'Selected');
-            }));
+            switchMap(selectedApp => {
+                if (selectedApp) {
+                    return this.appsService.getSettings(selectedApp.name).pipe(map(selectedSettings => ({ selectedApp, selectedSettings })));
+                } else {
+                    return of({ selectedApp, selectedSettings: null });
+                }
+            }),
+            tap(changes => {
+                this.next(changes, 'Selected');
+            }),
+            map(changes => changes.selectedApp));
     }
 
     public loadApp(name: string | null, cached = false) {
@@ -82,6 +99,18 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public loadSettings(isReload = false): Observable<any> {
+        return this.appsService.getSettings(this.snapshot.selectedApp!.name).pipe(
+            tap(settings => {
+                if (isReload) {
+                    this.dialogs.notifyInfo('i18n:appSettings.reloaded');
+                }
+
+                this.replaceAppSettings(settings);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public create(request: CreateAppDto): Observable<AppDto> {
         return this.appsService.postApp(request).pipe(
             tap(created => {
@@ -98,6 +127,14 @@ export class AppsState extends State<Snapshot> {
         return this.appsService.putApp(app, request, app.version).pipe(
             tap(updated => {
                 this.replaceApp(updated, app);
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
+    }
+
+    public updateSettings(settings: AppSettingsDto, request: UpdateAppSettingsDto): Observable<AppSettingsDto> {
+        return this.appsService.putSettings(settings, request, settings.version).pipe(
+            tap(updated => {
+                this.replaceAppSettings(updated);
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -134,6 +171,10 @@ export class AppsState extends State<Snapshot> {
                 this.removeApp(app);
             }),
             shareSubscribed(this.dialogs));
+    }
+
+    private replaceAppSettings(selectedSettings: AppSettingsDto) {
+        this.next({ selectedSettings }, 'UpdatedSettings');
     }
 
     private removeApp(app: AppDto) {

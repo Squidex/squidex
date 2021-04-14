@@ -8,7 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { createProperties, DialogModel, EditFieldForm, fadeAnimation, LanguageDto, ModalModel, NestedFieldDto, PatternDto, RootFieldDto, SchemaDetailsDto, SchemasState, sorted } from '@app/shared';
+import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, fadeAnimation, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
     selector: 'sqx-field',
@@ -32,7 +32,7 @@ export class FieldComponent implements OnChanges {
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public patterns: ReadonlyArray<PatternDto>;
+    public settings: AppSettingsDto;
 
     public get isLocalizable() {
         return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];

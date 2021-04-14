@@ -55,6 +55,8 @@ namespace Squidex.Extensions.Actions.Webhook
     {
         POST,
         PUT,
-        GET
+        GET,
+        DELETE,
+        PATCH
     }
 }

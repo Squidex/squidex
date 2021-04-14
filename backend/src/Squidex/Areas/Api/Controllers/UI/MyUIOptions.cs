@@ -6,12 +6,13 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Areas.Api.Controllers.UI
 {
     public sealed class MyUIOptions
     {
-        public Dictionary<string, string> RegexSuggestions { get; set; }
+        public AppSettings AppSettings { get; set; }
 
         public Dictionary<string, string> More { get; set; } = new Dictionary<string, string>();
 

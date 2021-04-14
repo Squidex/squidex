@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
-import { DialogModel, UIOptions } from '@app/shared';
+import { Component, Input } from '@angular/core';
+import { DialogModel } from '@app/shared';
 import { Observable, of, Subject } from 'rxjs';
 
 const OPTION_IMMEDIATELY = 'Immediately';
@@ -17,17 +17,15 @@ const OPTION_IMMEDIATELY = 'Immediately';
     templateUrl: './due-time-selector.component.html'
 })
 export class DueTimeSelectorComponent {
-    private readonly disabled: boolean;
     private dueTimeResult: Subject<string | null>;
+
+    @Input()
+    public disabled = false;
 
     public dueTimeDialog = new DialogModel();
     public dueTime: string | null = '';
     public dueTimeAction: string | null = '';
     public dueTimeMode = OPTION_IMMEDIATELY;
-
-    constructor(uiOptions: UIOptions) {
-        this.disabled = uiOptions.get('disableScheduledChanges') === true;
-    }
 
     public selectDueTime(action: string): Observable<string | null> {
         if (this.disabled) {

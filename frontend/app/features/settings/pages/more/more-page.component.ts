@@ -49,7 +49,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
                     this.updateForm.setEnabled(this.isEditable);
                 }));
 
-        this.appsState.reloadSelected();
+        this.appsState.reloadApps();
     }
 
     public save() {

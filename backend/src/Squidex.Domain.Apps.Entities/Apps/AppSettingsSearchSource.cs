@@ -63,9 +63,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Search("Languages", Permissions.AppLanguagesRead,
                 urlGenerator.LanguagesUI, SearchResultType.Setting);
 
-            Search("Patterns", Permissions.AppPatternsRead,
-                urlGenerator.PatternsUI, SearchResultType.Setting);
-
             Search("Roles", Permissions.AppRolesRead,
                 urlGenerator.RolesUI, SearchResultType.Setting);
 

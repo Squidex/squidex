@@ -45,6 +45,10 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
+    public get disableScheduler() {
+        return this.appsState.snapshot.selectedSettings?.hideScheduler;
+    }
+
     public queryModel =
         combineLatest([
             this.schemasState.selectedSchema.pipe(defined()),

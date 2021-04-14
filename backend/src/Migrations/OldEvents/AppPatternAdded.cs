@@ -5,11 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Migrations.OldEvents
 {
-    public sealed class AddPattern : AppUpdateCommand
+    [EventType(nameof(AppPatternAdded))]
+    [Obsolete("New Event introduced")]
+    public sealed class AppPatternAdded : AppEvent
     {
         public DomainId PatternId { get; set; }
 
@@ -18,10 +23,5 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
         public string Pattern { get; set; }
 
         public string? Message { get; set; }
-
-        public AddPattern()
-        {
-            PatternId = DomainId.NewGuid();
-        }
     }
 }

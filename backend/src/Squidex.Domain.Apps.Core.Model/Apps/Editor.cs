@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -9,8 +9,7 @@
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed record AppPattern(string Name, string Pattern)
+    public sealed record Editor(string Name, string Url)
     {
-        public string? Message { get; init; }
     }
 }

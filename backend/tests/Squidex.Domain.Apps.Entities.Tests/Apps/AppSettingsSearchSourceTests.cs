@@ -95,23 +95,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_return_patterns_result_if_matching_and_permission_given()
-        {
-            var permission = Permissions.ForApp(Permissions.AppPatternsRead, appId.Name);
-
-            var ctx = ContextWithPermission(permission.Id);
-
-            A.CallTo(() => urlGenerator.PatternsUI(appId))
-                .Returns("patterns-url");
-
-            var result = await sut.SearchAsync("patterns", ctx);
-
-            result.Should().BeEquivalentTo(
-                new SearchResults()
-                    .Add("Patterns", SearchResultType.Setting, "patterns-url"));
-        }
-
-        [Fact]
         public async Task Should_not_return_patterns_result_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();

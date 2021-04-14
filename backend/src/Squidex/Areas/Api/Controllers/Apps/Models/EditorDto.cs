@@ -1,37 +1,26 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class PatternDto
+    public sealed class EditorDto
     {
         /// <summary>
-        /// Unique id of the pattern.
-        /// </summary>
-        public DomainId Id { get; set; }
-
-        /// <summary>
-        /// The name of the suggestion.
+        /// The name of the editor.
         /// </summary>
         [LocalizedRequired]
         public string Name { get; set; }
 
         /// <summary>
-        /// The regex pattern.
+        /// The url to the editor.
         /// </summary>
         [LocalizedRequired]
-        public string Regex { get; set; }
-
-        /// <summary>
-        /// The regex message.
-        /// </summary>
-        public string? Message { get; set; }
+        public string Url { get; set; }
     }
 }

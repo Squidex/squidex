@@ -7,7 +7,7 @@
 
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AddFieldForm, createProperties, EditFieldForm, FieldDto, fieldTypes, LanguagesState, PatternsState, RootFieldDto, SchemaDetailsDto, SchemasState, Types } from '@app/shared';
+import { AddFieldForm, AppSettingsDto, createProperties, EditFieldForm, FieldDto, fieldTypes, LanguagesState, RootFieldDto, SchemaDetailsDto, SchemasState, Types } from '@app/shared';
 
 const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
 
@@ -22,6 +22,9 @@ export class FieldWizardComponent implements OnInit {
 
     @Input()
     public schema: SchemaDetailsDto;
+
+    @Input()
+    public settings: AppSettingsDto;
 
     @Input()
     public parent: RootFieldDto;
@@ -44,9 +47,9 @@ export class FieldWizardComponent implements OnInit {
     constructor(
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
-        public readonly languagesState: LanguagesState,
-        public readonly patternsState: PatternsState
-    ) {}
+        public readonly languagesState: LanguagesState
+    ) {
+    }
 
     public ngOnInit() {
         if (this.parent) {

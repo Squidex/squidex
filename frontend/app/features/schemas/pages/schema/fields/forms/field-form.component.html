@@ -37,10 +37,11 @@
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
     <sqx-field-form-validation 
-        [patterns]="patterns" [languages]="languages"
+        [languages]="languages"
         [fieldForm]="fieldForm"
         [field]="field"
-        [isLocalizable]="isLocalizable">
+        [isLocalizable]="isLocalizable"
+        [settings]="settings" >
     </sqx-field-form-validation>
 </div>
 

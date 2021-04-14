@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Events.Apps
     {
         public string PlanId { get; set; }
 
-        public AppPlan ToAppPlan()
+        public AppPlan ToPlan()
         {
             return new AppPlan(Actor, PlanId);
         }
