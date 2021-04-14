@@ -46,61 +46,69 @@ namespace Migrations.Migrations.MongoDb
 
             var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
             {
-                var writes = new List<WriteModel<BsonDocument>>();
-
-                foreach (var document in batch)
+                try
                 {
-                    var eventStream = document["EventStream"].AsString;
+                    var writes = new List<WriteModel<BsonDocument>>();
 
-                    if (TryGetAppId(document, out var appId))
+                    foreach (var document in batch)
                     {
-                        if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
+                        var eventStream = document["EventStream"].AsString;
+
+                        if (TryGetAppId(document, out var appId))
                         {
-                            var indexOfType = eventStream.IndexOf('-');
-                            var indexOfId = indexOfType + 1;
-
-                            var indexOfOldId = eventStream.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
-
-                            if (indexOfOldId > 0)
+                            if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
                             {
-                                indexOfId = indexOfOldId + 2;
+                                var indexOfType = eventStream.IndexOf('-');
+                                var indexOfId = indexOfType + 1;
+
+                                var indexOfOldId = eventStream.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
+
+                                if (indexOfOldId > 0)
+                                {
+                                    indexOfId = indexOfOldId + 2;
+                                }
+
+                                var domainType = eventStream.Substring(0, indexOfType);
+                                var domainId = eventStream[indexOfId..];
+
+                                var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();
+                                var newStreamName = $"{domainType}-{newDomainId}";
+
+                                document["EventStream"] = newStreamName;
+
+                                foreach (var @event in document["Events"].AsBsonArray)
+                                {
+                                    var metadata = @event["Metadata"].AsBsonDocument;
+
+                                    metadata["AggregateId"] = newDomainId;
+                                }
                             }
-
-                            var domainType = eventStream.Substring(0, indexOfType);
-                            var domainId = eventStream[indexOfId..];
-
-                            var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();
-                            var newStreamName = $"{domainType}-{newDomainId}";
-
-                            document["EventStream"] = newStreamName;
 
                             foreach (var @event in document["Events"].AsBsonArray)
                             {
                                 var metadata = @event["Metadata"].AsBsonDocument;
 
-                                metadata["AggregateId"] = newDomainId;
+                                metadata.Remove("AppId");
                             }
                         }
 
-                        foreach (var @event in document["Events"].AsBsonArray)
-                        {
-                            var metadata = @event["Metadata"].AsBsonDocument;
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].AsString);
 
-                            metadata.Remove("AppId");
-                        }
+                        writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                        {
+                            IsUpsert = true
+                        });
                     }
 
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].AsString);
-
-                    writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                    if (writes.Count > 0)
                     {
-                        IsUpsert = true
-                    });
+                        await collectionNew.BulkWriteAsync(writes, writeOptions);
+                    }
                 }
-
-                if (writes.Count > 0)
+                catch (OperationCanceledException ex)
                 {
-                    await collectionNew.BulkWriteAsync(writes, writeOptions);
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
                 }
             }, new ExecutionDataflowBlockOptions
             {

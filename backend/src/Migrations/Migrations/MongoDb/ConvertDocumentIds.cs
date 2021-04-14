@@ -102,39 +102,47 @@ namespace Migrations.Migrations.MongoDb
 
             var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
             {
-                var writes = new List<WriteModel<BsonDocument>>();
-
-                foreach (var document in batch)
+                try
                 {
-                    var appId = document["_ai"].AsString;
+                    var writes = new List<WriteModel<BsonDocument>>();
 
-                    var documentIdOld = document["_id"].AsString;
-
-                    if (documentIdOld.Contains("--", StringComparison.OrdinalIgnoreCase))
+                    foreach (var document in batch)
                     {
-                        var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
+                        var appId = document["_ai"].AsString;
 
-                        documentIdOld = documentIdOld[(index + 2)..];
+                        var documentIdOld = document["_id"].AsString;
+
+                        if (documentIdOld.Contains("--", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
+
+                            documentIdOld = documentIdOld[(index + 2)..];
+                        }
+
+                        var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();
+
+                        document["id"] = documentIdOld;
+                        document["_id"] = documentIdNew;
+
+                        extraAction?.Invoke(document);
+
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", documentIdNew);
+
+                        writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                        {
+                            IsUpsert = true
+                        });
                     }
 
-                    var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();
-
-                    document["id"] = documentIdOld;
-                    document["_id"] = documentIdNew;
-
-                    extraAction?.Invoke(document);
-
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", documentIdNew);
-
-                    writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                    if (writes.Count > 0)
                     {
-                        IsUpsert = true
-                    });
+                        await collectionNew.BulkWriteAsync(writes, writeOptions);
+                    }
                 }
-
-                if (writes.Count > 0)
+                catch (OperationCanceledException ex)
                 {
-                    await collectionNew.BulkWriteAsync(writes, writeOptions);
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
                 }
             }, new ExecutionDataflowBlockOptions
             {

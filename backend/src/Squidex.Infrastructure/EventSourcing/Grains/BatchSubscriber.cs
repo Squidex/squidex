@@ -50,24 +50,32 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             var parse = new TransformBlock<Job, Job>(job =>
             {
-                if (job.StoredEvent != null)
+                try
                 {
-                    job.ShouldHandle = eventConsumer.Handles(job.StoredEvent);
-                }
+                    if (job.StoredEvent != null)
+                    {
+                        job.ShouldHandle = eventConsumer.Handles(job.StoredEvent);
+                    }
 
-                if (job.ShouldHandle)
+                    if (job.ShouldHandle)
+                    {
+                        try
+                        {
+                            job.Event = eventDataFormatter.ParseIfKnown(job.StoredEvent!);
+                        }
+                        catch (Exception ex)
+                        {
+                            job.Exception = ex;
+                        }
+                    }
+
+                    return job;
+                }
+                catch (OperationCanceledException ex)
                 {
-                    try
-                    {
-                        job.Event = eventDataFormatter.ParseIfKnown(job.StoredEvent!);
-                    }
-                    catch (Exception ex)
-                    {
-                        job.Exception = ex;
-                    }
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
                 }
-
-                return job;
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 1,
@@ -82,23 +90,31 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             var handle = new ActionBlock<IList<Job>>(async jobs =>
             {
-                var sender = eventSubscription?.Sender;
-
-                foreach (var jobsBySender in jobs.GroupBy(x => x.Sender))
+                try
                 {
-                    if (sender != null && ReferenceEquals(jobsBySender.Key, sender))
-                    {
-                        var exception = jobs.FirstOrDefault(x => x.Exception != null)?.Exception;
+                    var sender = eventSubscription?.Sender;
 
-                        if (exception != null)
+                    foreach (var jobsBySender in jobs.GroupBy(x => x.Sender))
+                    {
+                        if (sender != null && ReferenceEquals(jobsBySender.Key, sender))
                         {
-                            await grain.OnErrorAsync(sender, exception);
-                        }
-                        else
-                        {
-                            await grain.OnEventsAsync(sender, GetEvents(jobsBySender), GetPosition(jobsBySender));
+                            var exception = jobs.FirstOrDefault(x => x.Exception != null)?.Exception;
+
+                            if (exception != null)
+                            {
+                                await grain.OnErrorAsync(sender, exception);
+                            }
+                            else
+                            {
+                                await grain.OnEventsAsync(sender, GetEvents(jobsBySender), GetPosition(jobsBySender));
+                            }
                         }
                     }
+                }
+                catch (OperationCanceledException ex)
+                {
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
                 }
             },
             new ExecutionDataflowBlockOptions

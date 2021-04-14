@@ -44,7 +44,18 @@ namespace Squidex.Infrastructure.Tasks
                 workerOption.MaxDegreeOfParallelism = 1;
                 workerOption.MaxMessagesPerTask = 1;
 
-                workers[i] = new ActionBlock<TInput>(action, workerOption);
+                workers[i] = new ActionBlock<TInput>(async input =>
+                {
+                    try
+                    {
+                        await action(input);
+                    }
+                    catch (OperationCanceledException ex)
+                    {
+                        // Dataflow swallows operation cancelled exception.
+                        throw new AggregateException(ex);
+                    }
+                }, workerOption);
             }
 
             var distributorOption = new ExecutionDataflowBlockOptions
@@ -54,12 +65,20 @@ namespace Squidex.Infrastructure.Tasks
                 BoundedCapacity = 1
             };
 
-            distributor = new ActionBlock<TInput>(x =>
+            distributor = new ActionBlock<TInput>(async input =>
             {
-                var partition = Math.Abs(partitioner(x)) % workers.Length;
+                try
+                {
+                    var partition = Math.Abs(partitioner(input)) % workers.Length;
 
-                return workers[partition].SendAsync(x);
-            }, distributorOption);
+                    await workers[partition].SendAsync(input);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
+                }
+        }, distributorOption);
 
             distributor.Completion.ContinueWith(x =>
             {

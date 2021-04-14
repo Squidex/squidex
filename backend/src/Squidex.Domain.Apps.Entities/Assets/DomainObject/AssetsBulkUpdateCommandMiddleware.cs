@@ -59,14 +59,30 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                     var createCommandsBlock = new TransformBlock<BulkTask, BulkTaskCommand?>(task =>
                     {
-                        return CreateCommand(task);
+                        try
+                        {
+                            return CreateCommand(task);
+                        }
+                        catch (OperationCanceledException ex)
+                        {
+                            // Dataflow swallows operation cancelled exception.
+                            throw new AggregateException(ex);
+                        }
                     }, executionOptions);
 
                     var executeCommandBlock = new ActionBlock<BulkTaskCommand?>(async command =>
                     {
-                        if (command != null)
+                        try
                         {
-                            await ExecuteCommandAsync(command);
+                            if (command != null)
+                            {
+                                await ExecuteCommandAsync(command);
+                            }
+                        }
+                        catch (OperationCanceledException ex)
+                        {
+                            // Dataflow swallows operation cancelled exception.
+                            throw new AggregateException(ex);
                         }
                     }, executionOptions);
 
@@ -115,23 +131,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private static async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
         {
             var (task, id, command) = bulkCommand;
-
-            Exception? exception = null;
             try
             {
                 await task.Bus.PublishAsync(command);
+
+                task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex));
             }
             catch (Exception ex)
             {
-                exception = ex;
+                task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
             }
-
-            task.Results.Add(new BulkUpdateResultItem
-            {
-                Id = id,
-                JobIndex = task.JobIndex,
-                Exception = exception
-            });
         }
 
         private BulkTaskCommand? CreateCommand(BulkTask task)
@@ -148,13 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
             catch (Exception ex)
             {
-                task.Results.Add(new BulkUpdateResultItem
-                {
-                    Id = id,
-                    JobIndex = task.JobIndex,
-                    Exception = ex
-                });
-
+                task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
                 return null;
             }
         }

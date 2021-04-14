@@ -325,20 +325,28 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var writeBlock = new ActionBlock<(string, Envelope<IEvent>)[]>(async batch =>
             {
-                var commits = new List<EventCommit>(batch.Length);
-
-                foreach (var (stream, @event) in batch)
+                try
                 {
-                    var offset = runningStreamMapper.GetStreamOffset(stream);
+                    var commits = new List<EventCommit>(batch.Length);
 
-                    commits.Add(EventCommit.Create(stream, offset, @event, eventDataFormatter));
+                    foreach (var (stream, @event) in batch)
+                    {
+                        var offset = runningStreamMapper.GetStreamOffset(stream);
+
+                        commits.Add(EventCommit.Create(stream, offset, @event, eventDataFormatter));
+                    }
+
+                    await eventStore.AppendUnsafeAsync(commits);
+
+                    handled += commits.Count;
+
+                    Log($"Reading {reader.ReadEvents}/{handled} events and {reader.ReadAttachments} attachments completed.", true);
                 }
-
-                await eventStore.AppendUnsafeAsync(commits);
-
-                handled += commits.Count;
-
-                Log($"Reading {reader.ReadEvents}/{handled} events and {reader.ReadAttachments} attachments completed.", true);
+                catch (OperationCanceledException ex)
+                {
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
+                }
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 1,

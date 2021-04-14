@@ -91,25 +91,33 @@ namespace Squidex.Infrastructure.Commands
 
             var workerBlock = new ActionBlock<DomainId[]>(async ids =>
             {
-                await using (var context = store.WithBatchContext(typeof(T)))
+                try
                 {
-                    await context.LoadAsync(ids);
-
-                    foreach (var id in ids)
+                    await using (var context = store.WithBatchContext(typeof(T)))
                     {
-                        try
-                        {
-                            var domainObject = Factory<T, TState>.Create(serviceProvider, context);
+                        await context.LoadAsync(ids);
 
-                            domainObject.Setup(id);
-
-                            await domainObject.RebuildStateAsync();
-                        }
-                        catch (DomainObjectNotFoundException)
+                        foreach (var id in ids)
                         {
-                            return;
+                            try
+                            {
+                                var domainObject = Factory<T, TState>.Create(serviceProvider, context);
+
+                                domainObject.Setup(id);
+
+                                await domainObject.RebuildStateAsync();
+                            }
+                            catch (DomainObjectNotFoundException)
+                            {
+                                return;
+                            }
                         }
                     }
+                }
+                catch (OperationCanceledException ex)
+                {
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
                 }
             },
             new ExecutionDataflowBlockOptions
