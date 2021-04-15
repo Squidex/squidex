@@ -17,16 +17,16 @@ import { take } from 'rxjs/operators';
 })
 export class ConfirmClickDirective {
     @Input()
-    public confirmTitle: string;
+    public confirmTitle: string | undefined | null;
 
     @Input()
-    public confirmText: string;
+    public confirmText: string | undefined | null;
 
     @Input()
     public confirmRememberKey: string;
 
     @Input()
-    public confirmRequired = true;
+    public confirmRequired?: boolean | null = true;
 
     @Output()
     public beforeClick = new EventEmitter();

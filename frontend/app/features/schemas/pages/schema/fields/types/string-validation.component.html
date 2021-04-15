@@ -41,7 +41,7 @@
         
                         <div *ngFor="let pattern of settings.patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
                             <div class="truncate">{{pattern.name}}</div>
-                            <div class="truncate text-muted">{{pattern.pattern}}</div>
+                            <div class="truncate text-muted">{{pattern.regex}}</div>
                         </div>
                     </div>
                 </ng-container>

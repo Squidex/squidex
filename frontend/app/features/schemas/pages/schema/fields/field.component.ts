@@ -43,7 +43,7 @@ export class FieldComponent implements OnChanges {
     public trackByFieldFn: (_index: number, field: NestedFieldDto) => any;
 
     public isEditing = false;
-    public isEditable = false;
+    public isEditable?: boolean | null;
 
     public editForm = new EditFieldForm(this.formBuilder);
 

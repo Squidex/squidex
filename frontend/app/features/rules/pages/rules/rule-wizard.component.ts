@@ -32,7 +32,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     public schemas: ReadonlyArray<SchemaDto>;
 
     @Input()
-    public rule: RuleDto;
+    public rule?: RuleDto | null;
 
     @Input()
     public mode = MODE_WIZARD;
@@ -55,7 +55,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
         return this.ruleTriggers[this.trigger.triggerType];
     }
 
-    public isEditable: boolean;
+    public isEditable = false;
 
     public step = 1;
 
@@ -70,11 +70,11 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
         if (this.mode === MODE_EDIT_ACTION) {
             this.step = 4;
 
-            this.action = this.rule.action;
+            this.action = this.rule?.action;
         } else if (this.mode === MODE_EDIT_TRIGGER) {
             this.step = 2;
 
-            this.trigger = this.rule.trigger;
+            this.trigger = this.rule?.trigger;
         }
     }
 
@@ -152,7 +152,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     }
 
     private updateTrigger() {
-        if (!this.isEditable) {
+        if (!this.isEditable || !this.rule) {
             return;
         }
 
@@ -167,7 +167,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     }
 
     private updateAction() {
-        if (!this.isEditable) {
+        if (!this.isEditable || !this.rule) {
             return;
         }
 

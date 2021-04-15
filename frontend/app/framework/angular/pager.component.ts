@@ -21,17 +21,17 @@ export class PagerComponent implements OnChanges {
     public pagingChange = new EventEmitter<{ page: number, pageSize: number }>();
 
     @Input()
-    public paging: PagingInfo;
+    public paging: PagingInfo | undefined | null;
 
     @Input()
-    public autoHide = false;
+    public autoHide?: boolean | null;
 
     public totalPages = 0;
 
     public itemFirst = 0;
     public itemLast = 0;
 
-    public canGoPrev = false;
+    public canGoPrev?: boolean | null;
     public canGoNext = false;
 
     public translationInfo: any;
@@ -39,6 +39,10 @@ export class PagerComponent implements OnChanges {
     public pageSizes = PAGE_SIZES;
 
     public ngOnChanges() {
+        if (!this.paging) {
+            return;
+        }
+
         const { page, pageSize, count, total } = this.paging;
 
         const totalPages = Math.ceil(total / pageSize);
@@ -64,12 +68,20 @@ export class PagerComponent implements OnChanges {
     }
 
     public goPrev() {
+        if (!this.paging) {
+            return;
+        }
+
         const { page, pageSize } = this.paging;
 
         this.pagingChange.emit({ page: page - 1, pageSize });
     }
 
     public goNext() {
+        if (!this.paging) {
+            return;
+        }
+
         const { page, pageSize } = this.paging;
 
         this.pagingChange.emit({ page: page + 1, pageSize });

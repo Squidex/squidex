@@ -16,7 +16,7 @@ export class FocusOnInitDirective implements AfterViewInit {
     public select: boolean;
 
     @Input('sqxFocusOnInit')
-    public enabled = true;
+    public enabled?: string | boolean | null = true;
 
     constructor(
         private readonly element: ElementRef<HTMLElement>
@@ -24,7 +24,7 @@ export class FocusOnInitDirective implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        if (this.enabled === false) {
+        if (!this.enabled) {
             return;
         }
 

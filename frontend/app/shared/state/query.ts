@@ -162,7 +162,7 @@ export class QuerySynchronizer implements RouteSynchronizer {
     }
 }
 
-export function sanitize(query?: Query) {
+export function sanitize(query?: Query | null) {
     if (!query) {
         return DEFAULT_QUERY;
     }
@@ -178,15 +178,15 @@ export function sanitize(query?: Query) {
     return query;
 }
 
-export function equalsQuery(lhs?: Query, rhs?: Query) {
+export function equalsQuery(lhs?: Query | null, rhs?: Query | null) {
     return Types.equals(sanitize(lhs), sanitize(rhs));
 }
 
-export function serializeQuery(query?: Query) {
+export function serializeQuery(query?: Query | null) {
     return JSON.stringify(sanitize(query));
 }
 
-export function encodeQuery(query?: Query) {
+export function encodeQuery(query?: Query | null) {
     return encodeURIComponent(serializeQuery(query));
 }
 
@@ -208,7 +208,7 @@ export function deserializeQuery(raw?: string): Query | undefined {
     return query;
 }
 
-export function hasFilter(query?: Query) {
+export function hasFilter(query?: Query | null) {
     return !!query && !Types.isEmpty(query.filter);
 }
 

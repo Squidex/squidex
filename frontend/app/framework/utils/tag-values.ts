@@ -117,8 +117,7 @@ export class StringConverter implements TagConverter {
     }
 }
 
-export function getTagValues(values: ReadonlyArray<string | TagValue>) {
-
+export function getTagValues(values: ReadonlyArray<string | TagValue> | undefined | null) {
     if (!Types.isArray(values)) {
         return [];
     }

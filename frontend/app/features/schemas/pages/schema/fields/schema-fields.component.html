@@ -14,7 +14,7 @@
             [cdkDropListData]="schema.fields"
             (cdkDropListDropped)="sortFields($event)">
             <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn" class="table-drag" cdkDrag cdkDragLockAxis="y">
-                <sqx-field [field]="field" [schema]="schema" [settings]="settings" [languages]="languages">
+                <sqx-field [field]="$any(field)" [schema]="schema" [settings]="settings" [languages]="languages">
                     <i cdkDragHandle class="icon-drag2 drag-handle"></i>
                 </sqx-field>
             </div>

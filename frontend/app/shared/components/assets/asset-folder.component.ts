@@ -22,21 +22,25 @@ export class AssetFolderComponent {
     public navigate = new EventEmitter<AssetPathItem>();
 
     @Output()
-    public delete = new EventEmitter<AssetPathItem>();
+    public delete = new EventEmitter<AssetFolderDto>();
 
     @Input()
-    public assetFolder: AssetFolderDto | AssetPathItem;
+    public assetPathItem: AssetPathItem;
 
     public dropdown = new ModalModel();
 
     public editDialog = new DialogModel();
 
+    public get assetFolder(): AssetFolderDto {
+        return this.assetPathItem as any;
+    }
+
     public get canUpdate() {
-        return Types.is(this.assetFolder, AssetFolderDto) && this.assetFolder.canUpdate;
+        return Types.is(this.assetPathItem, AssetFolderDto) && this.assetPathItem.canUpdate;
     }
 
     public get canDelete() {
-        return Types.is(this.assetFolder, AssetFolderDto) && this.assetFolder.canDelete;
+        return Types.is(this.assetPathItem, AssetFolderDto) && this.assetPathItem.canDelete;
     }
 
     public preventSelection(mouseEvent: MouseEvent) {
@@ -50,6 +54,6 @@ export class AssetFolderComponent {
     }
 
     public emitNavigate() {
-        this.navigate.emit(this.assetFolder);
+        this.navigate.emit(this.assetPathItem);
     }
 }

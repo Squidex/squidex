@@ -40,28 +40,28 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
     public minWidth?: string;
 
     @Input()
-    public isBlank = false;
+    public isBlank?: boolean | null;
 
     @Input()
-    public isFullSize = false;
+    public isFullSize?: boolean | null;
 
     @Input()
-    public isLazyLoaded = true;
+    public isLazyLoaded?: boolean | null = true;
 
     @Input()
-    public scrollX = false;
+    public scrollX?: boolean | null;
 
     @Input()
-    public showScrollbar = false;
+    public showScrollbar?: boolean | null;
 
     @Input()
-    public showSecondHeader = false;
+    public showSecondHeader?: boolean | null;
 
     @Input()
-    public showSidebar = false;
+    public showSidebar?: boolean | null;
 
     @Input()
-    public showClose = true;
+    public showClose?: boolean | null = true;
 
     @Input()
     public contentClass = '';
@@ -70,10 +70,10 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
     public sidebarClass = '';
 
     @Input()
-    public grid = false;
+    public grid?: boolean | null;
 
     @Input()
-    public noPadding = false;
+    public noPadding?: boolean | null;
 
     @ViewChild('panel', { static: false })
     public panel: ElementRef<HTMLElement>;

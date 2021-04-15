@@ -28,7 +28,7 @@ export class ReferencesValidationComponent implements OnInit {
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public isLocalizable: boolean;
+    public isLocalizable?: boolean | null;
 
     constructor(
         public readonly schemasSource: SchemaTagSource

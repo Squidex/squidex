@@ -46,7 +46,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public languages: ReadonlyArray<AppLanguageDto>;
 
     public get disableScheduler() {
-        return this.appsState.snapshot.selectedSettings?.hideScheduler;
+        return this.appsState.snapshot.selectedSettings?.hideScheduler === true;
     }
 
     public queryModel =

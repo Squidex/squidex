@@ -48,19 +48,19 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     public mode: 'DateTime' | 'Date';
 
     @Input()
-    public enforceTime: boolean;
+    public enforceTime?: boolean | null;
 
     @Input()
-    public hideClear: boolean;
+    public hideClear?: boolean | null;
 
     @Input()
-    public hideDateButtons: boolean;
+    public hideDateButtons?: boolean | null;
 
     @Input()
-    public hideDateTimeModeButton: boolean;
+    public hideDateTimeModeButton?: boolean | null;
 
     @Input()
-    public isCompact: boolean;
+    public isCompact?: boolean | null;
 
     @ViewChild('dateInput', { static: false })
     public dateInput: ElementRef<HTMLInputElement>;

@@ -41,8 +41,16 @@ export class EditAppSettingsForm extends Form<FormGroup, UpdateAppSettingsDto, A
         return this.form.controls['patterns']! as FormArray;
     }
 
+    public get patternsControls(): ReadonlyArray<FormGroup> {
+        return this.patterns.controls as any;
+    }
+
     public get editors(): FormArray {
         return this.form.controls['editors']! as FormArray;
+    }
+
+    public get editorsControls(): ReadonlyArray<FormGroup> {
+        return this.editors.controls as any;
     }
 
     constructor(

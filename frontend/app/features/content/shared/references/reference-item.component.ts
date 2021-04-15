@@ -24,19 +24,19 @@ export class ReferenceItemComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public canRemove = true;
+    public canRemove?: boolean | null = true;
 
     @Input()
-    public isCompact = false;
+    public isCompact?: boolean | null;
 
     @Input()
-    public isDisabled = false;
+    public isDisabled?: boolean | null;
 
     @Input()
     public validations: { [id: string]: boolean };
 
     @Input()
-    public validityVisible: boolean;
+    public validityVisible?: boolean | null;
 
     @Input()
     public columns = 0;

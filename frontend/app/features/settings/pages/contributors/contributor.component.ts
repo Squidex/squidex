@@ -21,7 +21,7 @@ export class ContributorComponent {
     public roles: ReadonlyArray<RoleDto>;
 
     @Input()
-    public search: string;
+    public search?: string | RegExp | null;
 
     @Input('sqxContributor')
     public contributor: ContributorDto;

@@ -22,13 +22,13 @@ import { take } from 'rxjs/operators';
 })
 export class DashboardConfigComponent implements OnChanges {
     @Input()
-    public app: AppDto[];
+    public app: AppDto;
 
     @Input()
     public config: GridsterItem[];
 
     @Input()
-    public needsAttention = false;
+    public needsAttention?: boolean | null;
 
     @Output()
     public configChange = new EventEmitter<GridsterItem[]>();

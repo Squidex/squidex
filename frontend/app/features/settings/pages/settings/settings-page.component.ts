@@ -15,7 +15,7 @@ import { AppSettingsDto, AppsState, EditAppSettingsForm, ResourceOwner } from '@
     templateUrl: './settings-page.component.html'
 })
 export class SettingsPageComponent extends ResourceOwner implements OnInit {
-    public isEditable: boolean;
+    public isEditable = false;
 
     public editForm = new EditAppSettingsForm(this.formBuilder);
     public editingSettings: AppSettingsDto;

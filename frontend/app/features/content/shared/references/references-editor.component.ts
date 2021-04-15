@@ -45,7 +45,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public formContext: any;
 
     @Input()
-    public allowDuplicates = true;
+    public allowDuplicates?: boolean | null = true;
 
     public contentCreatorDialog = new DialogModel();
     public contentSelectorDialog = new DialogModel();

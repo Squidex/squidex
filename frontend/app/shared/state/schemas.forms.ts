@@ -73,6 +73,10 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
 }
 
 export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<FieldRule>, SchemaDetailsDto> {
+    public get rulesControls(): ReadonlyArray<FormGroup> {
+        return this.form.controls as any;
+    }
+
     constructor(
         private readonly formBuilder: FormBuilder
     ) {
@@ -122,6 +126,10 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
 type ConfigurePreviewUrlsFormType = { [name: string]: string };
 
 export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUrlsFormType, SchemaDetailsDto> {
+    public get previewControls(): ReadonlyArray<FormGroup> {
+        return this.form.controls as any;
+    }
+
     constructor(
         private readonly formBuilder: FormBuilder
     ) {

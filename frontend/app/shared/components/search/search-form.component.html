@@ -25,14 +25,14 @@
                 <i class="icon-filter-filled"></i>
             </a>
     
-            <sqx-onboarding-tooltip helpId="contentArchive" [for]="expand" position="bottom-right" after="60000">
+            <sqx-onboarding-tooltip helpId="contentArchive" [for]="expand" position="bottom-right" [after]="60000">
                 {{ 'search.advancedTour' | sqxTranslate }}
             </sqx-onboarding-tooltip>
         </ng-container>
     </div>
 </form>
 
-<sqx-onboarding-tooltip helpId="contentFind" [for]="inputFind" position="bottom-right" after="120000">
+<sqx-onboarding-tooltip helpId="contentFind" [for]="inputFind" position="bottom-right" [after]="120000">
     {{ 'search.fullTextTour' | sqxTranslate }}
 </sqx-onboarding-tooltip>
 
@@ -67,7 +67,7 @@
             </div>
 
             <ng-container *ngIf="!showQueries; else savedQueries">
-                <div class="form-horizontal">
+                <div class="form-horizontal" *ngIf="queryModel">
                     <sqx-query [model]="queryModel" 
                         [query]="query" 
                         (queryChange)="changeQuery($event)"

@@ -27,7 +27,7 @@ export class LanguageComponent implements OnChanges {
 
     public otherLanguage: LanguageDto;
 
-    public isEditing = false;
+    public isEditing?: boolean | null;
     public isEditable = false;
 
     public editForm = new EditLanguageForm(this.formBuilder);
@@ -78,7 +78,7 @@ export class LanguageComponent implements OnChanges {
         }
     }
 
-    public removeFallbackLanguage(language: AppLanguageDto) {
+    public removeFallbackLanguage(language: LanguageDto) {
         this.fallbackLanguages = this.fallbackLanguages.removed(language);
         this.fallbackLanguagesNew = [...this.fallbackLanguagesNew, language].sortedByString(x => x.iso2Code);
 

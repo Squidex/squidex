@@ -22,7 +22,7 @@ export class ShortcutComponent extends StatefulComponent implements OnDestroy, O
     public keys: string;
 
     @Input()
-    public disabled: boolean;
+    public disabled?: boolean | null;
 
     constructor(
         changeDetector: ChangeDetectorRef,

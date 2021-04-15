@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="form-group">
-                    <sqx-control-errors for="name" submitOnly="true"></sqx-control-errors>
+                    <sqx-control-errors for="name"></sqx-control-errors>
 
                     <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput placeholder="{{ 'schemas.field.namePlaceholder' | sqxTranslate }}" sqxFocusOnInit>
                 </div>
@@ -64,7 +64,7 @@
         <ng-template #notEditing>
             <form [formGroup]="editForm.form" class="edit-form" (ngSubmit)="save()">
                 <sqx-field-form 
-                    [languages]="languagesState.isoLanguages | async"
+                    [languages]="(languagesState.isoLanguages | async)!"
                     [field]="field"
                     [fieldForm]="editForm.form"
                     [isEditable]="true" 

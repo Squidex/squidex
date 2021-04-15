@@ -38,7 +38,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public editor: ElementRef;
 
     @Input()
-    public noBorder = false;
+    public noBorder?: boolean | null;
 
     @Input()
     public mode = 'ace/mode/javascript';
@@ -53,7 +53,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public height = 0;
 
     @Input()
-    public set completion(value: ReadonlyArray<{ name: string, description: string }> | undefined) {
+    public set completion(value: ReadonlyArray<{ name: string, description: string }> | undefined | null) {
         if (value) {
             this.completions = value.map(({ name, description }) => ({ value: name, name, meta: 'context', description }));
         } else {

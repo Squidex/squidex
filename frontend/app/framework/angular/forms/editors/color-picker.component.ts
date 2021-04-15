@@ -16,7 +16,7 @@ export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
 
 interface State {
     // The current value.
-    value?: string;
+    value: string;
 
     // The foreground color.
     foreground: string;
@@ -48,7 +48,7 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
     public modal = new ModalModel();
 
     constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, { foreground: 'black' });
+        super(changeDetector, { foreground: 'black', value: 'black' });
 
         this.modal.isOpenChanges.subscribe(open => {
             if (open) {

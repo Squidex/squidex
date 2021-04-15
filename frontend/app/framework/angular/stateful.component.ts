@@ -114,7 +114,7 @@ export abstract class StatefulControlComponent<T extends object, TValue> extends
         this.fnTouched();
     }
 
-    public callChange(value: TValue | null | undefined) {
+    public callChange(value: TValue | undefined | null) {
         this.fnChanged(value);
     }
 

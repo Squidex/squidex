@@ -54,7 +54,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     public formIndex?: number | null;
 
     @Input()
-    public language: string;
+    public language?: string | null;
 
     @Input()
     public url: string;

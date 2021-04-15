@@ -28,7 +28,7 @@ export class AssetsValidationComponent implements OnInit {
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public isLocalizable: boolean;
+    public isLocalizable?: boolean | null;
 
     public ngOnInit() {
         this.fieldForm.setControl('minItems',

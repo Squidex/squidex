@@ -22,7 +22,7 @@ export class SchemaEditFormComponent implements OnChanges {
 
     public fieldForm = new EditSchemaForm(this.formBuilder);
 
-    public isEditable = false;
+    public  isEditable ?: boolean | null;
 
     constructor(
         private readonly formBuilder: FormBuilder,

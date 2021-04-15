@@ -4,7 +4,7 @@
         [class.custom-control-inline]="snapshot.isSingleLine">
         <input class="custom-control-input" type="checkbox" id="{{controlId}}_{{value}}"
             (blur)="callTouched()"
-            (change)="check($event.target.checked, value)" 
+            (change)="check($event!.target!.checked!, value)" 
             [checked]="isChecked(value)"
             [disabled]="snapshot.isDisabled">
     

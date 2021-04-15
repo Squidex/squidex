@@ -22,10 +22,10 @@ export class ContentExtensionComponent extends ResourceOwner implements AfterVie
     private isInitialized = false;
 
     @Input()
-    public url: string;
+    public url?: string | null;
 
     @Input()
-    public content: ContentDto;
+    public content?: ContentDto | null;
 
     @Input()
     public contentSchema: SchemaDto;

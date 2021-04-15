@@ -15,5 +15,5 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 })
 export class LogoComponent {
     @Input()
-    public isLoading = false;
+    public isLoading?: boolean | null;
 }

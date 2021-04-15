@@ -35,26 +35,26 @@ export class ListViewComponent extends StatefulComponent<State> implements After
     public contentElement: ElementRef<ParentNode>;
 
     @Input() @HostBinding('class.overflow')
-    public overflow = false;
+    public overflow?: boolean | null;
 
     @Input()
-    public syncedHeader = false;
+    public syncedHeader?: boolean | null;
 
     @Input()
-    public table = false;
+    public table?: boolean | null;
 
     @Input()
-    public isLoaded = true;
+    public isLoaded: boolean | undefined | null = true;
 
     @Input()
-    public set isLoading(value: boolean) {
+    public set isLoading(value: boolean | undefined | null) {
         clearTimeout(this.timer);
 
         if (value) {
             this.next({ isLoading: value });
         } else {
             this.timer = setTimeout(() => {
-                this.next({ isLoading: value });
+                this.next({ isLoading: !!value });
             }, 250);
         }
     }

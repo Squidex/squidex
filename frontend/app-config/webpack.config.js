@@ -440,7 +440,10 @@ module.exports = function (env) {
             }, {
                 loader: 'postcss-loader'
             }, {
-                loader: 'sass-loader?sourceMap'
+                loader: 'sass-loader',
+                options: {
+                    sourceMap: true
+                }
             }],
             /*
              * Do not include component styles.

@@ -24,7 +24,7 @@
                     <sqx-array-editor
                         [canUnset]="canUnset"
                         [form]="form"
-                        [formModel]="formModel"
+                        [formModel]="$any(formModel)"
                         [formContext]="formContext"
                         [language]="language"
                         [languages]="languages">
@@ -47,13 +47,13 @@
                     </ng-container>
                 </ng-container>
                 <ng-container *ngSwitchCase="'DateTime'">
-                    <sqx-date-time-editor [formControl]="editorControl" [mode]="field.rawProperties.editor" enforceTime="true"></sqx-date-time-editor>
+                    <sqx-date-time-editor [formControl]="editorControl" [mode]="field.rawProperties.editor" [enforceTime]="true"></sqx-date-time-editor>
                 </ng-container>
 				<ng-container *ngSwitchCase="'Geolocation'">
 					<sqx-geolocation-editor [formControl]="editorControl"></sqx-geolocation-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Json'">
-					<sqx-code-editor [formControl]="editorControl" valueMode="Json" height="350"></sqx-code-editor>
+					<sqx-code-editor [formControl]="editorControl" valueMode="Json" [height]="350"></sqx-code-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Number'">
 					<ng-container [ngSwitch]="field.rawProperties.editor">
@@ -129,7 +129,7 @@
 							<sqx-rich-editor [formControl]="editorControl" #editor [folderId]="field.rawProperties.folderId"></sqx-rich-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Html'">
-							<sqx-code-editor [formControl]="editorControl" #editor mode="ace/mode/html" height="350"  ></sqx-code-editor>
+							<sqx-code-editor [formControl]="editorControl" #editor mode="ace/mode/html" [height]="350"  ></sqx-code-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Markdown'">
 							<sqx-markdown-editor [formControl]="editorControl" #editor [folderId]="field.rawProperties.folderId"></sqx-markdown-editor>
@@ -188,7 +188,7 @@
         </button>
     </div>
 
-    <sqx-form-hint *ngIf="field.properties.hints?.length > 0">
+    <sqx-form-hint *ngIf="field.properties.hints && field.properties.hints.length > 0">
         <span [innerHTML]="field.properties.hints | sqxMarkdownInline"></span>
     </sqx-form-hint>
 </div>

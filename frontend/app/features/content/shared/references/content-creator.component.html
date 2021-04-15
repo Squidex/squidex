@@ -15,7 +15,7 @@
         <div class="row no-gutters">
             <div class="col-auto">          
                 <div *ngIf="schema && languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
+                    <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language!" [languages]="languages"></sqx-language-selector>
                 </div>
             </div>
 
@@ -28,7 +28,7 @@
                     {{ 'contents.referencesCreatePublish' | sqxTranslate }}
                 </button>
 
-                <sqx-form-error bubble="true" closeable="true" [error]="contentForm?.error | async"></sqx-form-error>
+                <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm?.error | async"></sqx-form-error>
             </div>
         </div>
     </ng-container>

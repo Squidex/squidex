@@ -25,7 +25,7 @@ export class QueryComponent {
     public model: QueryModel;
 
     @Input()
-    public set query(query: Query) {
+    public set query(query: Query | undefined | null) {
         if (!query) {
             query = {};
         }

@@ -30,7 +30,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public allowDuplicates: boolean;
+    public allowDuplicates?: boolean | null;
 
     @Input()
     public alreadySelected: ReadonlyArray<ContentDto>;

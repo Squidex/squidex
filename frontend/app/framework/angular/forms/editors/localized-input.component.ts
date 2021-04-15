@@ -42,7 +42,7 @@ export class LocalizedInputComponent extends StatefulControlComponent<State, { [
     public languages: ReadonlyArray<Language>;
 
     @Input()
-    public type: 'text' | 'boolean' | 'datetime' | 'date' | 'tags' = 'text';
+    public type: 'text' | 'boolean' | 'datetime' | 'date' | 'tags' | 'number' = 'text';
 
     @Input()
     public name: string;

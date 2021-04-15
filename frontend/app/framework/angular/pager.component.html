@@ -1,5 +1,5 @@
 <div class="clearfix" *ngIf="!autoHide || canGoPrev || canGoNext">
-    <div class="float-right pagination">
+    <div class="float-right pagination" *ngIf="paging">
         <select class="custom-select custom-select-sm" [ngModel]="paging.pageSize" (ngModelChange)="setPageSize($event)">
             <option *ngFor="let pageSize of pageSizes" [ngValue]="pageSize">{{pageSize}}</option>
         </select>

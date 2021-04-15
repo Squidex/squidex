@@ -42,7 +42,7 @@ interface Snapshot extends ListState<Query> {
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
-    public selectedContent: Observable<ContentDto | null | undefined> =
+    public selectedContent: Observable<ContentDto | undefined | null> =
         this.project(x => x.selectedContent, Types.equals);
 
     public contents =

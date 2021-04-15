@@ -35,7 +35,7 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public isLocalizable: boolean;
+    public isLocalizable?: boolean | null;
 
     public contentTypes = STRING_CONTENT_TYPES;
 

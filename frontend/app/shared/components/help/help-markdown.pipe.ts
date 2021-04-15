@@ -23,7 +23,7 @@ renderer.link = (href, _, text) => {
     pure: true
 })
 export class HelpMarkdownPipe implements PipeTransform {
-    public transform(text: string | null | undefined): string {
+    public transform(text: string | undefined | null): string {
         if (text) {
             return marked(text, { renderer });
         } else {

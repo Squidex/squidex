@@ -22,7 +22,7 @@
 
         <input class="form-control" [formControl]="stockPhotoSearch" placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}">
 
-        <sqx-list-view [isLoading]="snapshot.isLoading" table="true">
+        <sqx-list-view [isLoading]="snapshot.isLoading" [table]="true">
             <div content>
                 <div class="photos">
                     <ng-container *ngIf="stockPhotos | async; let photos">

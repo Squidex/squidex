@@ -29,7 +29,7 @@ export class DateTimeValidationComponent implements OnInit {
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public isLocalizable: boolean;
+    public isLocalizable?: boolean | null;
 
     public showDefaultValues: Observable<boolean>;
     public showDefaultValue: Observable<boolean>;

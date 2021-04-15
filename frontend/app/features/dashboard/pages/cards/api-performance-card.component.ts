@@ -27,7 +27,7 @@ export class ApiPerformanceCardComponent implements OnChanges {
     public usage: CallsUsageDto;
 
     @Input()
-    public isStacked = false;
+    public isStacked?: boolean | null;
 
     @Output()
     public isStackedChange = new EventEmitter<boolean>();

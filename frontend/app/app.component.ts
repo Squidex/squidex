@@ -13,5 +13,5 @@ import { Component } from '@angular/core';
     templateUrl: './app.component.html'
 })
 export class AppComponent {
-    public isLoaded = false;
+    public isLoaded?: boolean | null;
 }

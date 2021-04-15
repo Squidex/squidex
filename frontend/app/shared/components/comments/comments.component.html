@@ -15,7 +15,7 @@
     <div class="comments-footer">                
         <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
             <input class="form-control" name="text" formControlName="text" placeholder="{{ 'comments.create' | sqxTranslate }}"
-                [mention]="users"
+                [mention]="$any(users)"
                 [mentionConfig]="mentionConfig"
                 autocomplete="off"
                 autocorrect="off"

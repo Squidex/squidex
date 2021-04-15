@@ -20,7 +20,7 @@ export class DueTimeSelectorComponent {
     private dueTimeResult: Subject<string | null>;
 
     @Input()
-    public disabled = false;
+    public disabled?: boolean | null;
 
     public dueTimeDialog = new DialogModel();
     public dueTime: string | null = '';

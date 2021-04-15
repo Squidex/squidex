@@ -43,7 +43,7 @@ export class ContentComponent implements OnChanges {
     public listFields: ReadonlyArray<TableField>;
 
     @Input()
-    public cloneable: boolean;
+    public cloneable?: boolean | null;
 
     @Input()
     public link: any = null;
@@ -55,7 +55,7 @@ export class ContentComponent implements OnChanges {
     public fields: QueryList<ContentListFieldComponent>;
 
     public patchForm: PatchContentForm;
-    public patchAllowed = false;
+    public patchAllowed?: boolean | null;
 
     public dropdown = new ModalModel();
 

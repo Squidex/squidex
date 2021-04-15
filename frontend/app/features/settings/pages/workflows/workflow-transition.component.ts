@@ -29,7 +29,7 @@ export class WorkflowTransitionComponent {
     public roles: ReadonlyArray<string>;
 
     @Input()
-    public disabled: boolean;
+    public disabled?: boolean | null;
 
     public changeExpression(expression: string) {
         this.update.emit({ expression });

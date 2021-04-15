@@ -19,7 +19,7 @@ export class SavedQueriesComponent {
     public search = new EventEmitter<Query>();
 
     @Input()
-    public queryUsed: Query;
+    public queryUsed: Query | undefined | null;
 
     @Input()
     public queries: Queries;

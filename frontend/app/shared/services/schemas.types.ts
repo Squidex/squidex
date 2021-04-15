@@ -129,7 +129,7 @@ export interface FieldPropertiesVisitor<T> {
     visitUI(properties: UIFieldPropertiesDto): T;
 }
 
-type DefaultValue<T> = { [key: string]: T | null | undefined };
+type DefaultValue<T> = { [key: string]: T | undefined | null };
 
 export abstract class FieldPropertiesDto {
     public abstract fieldType: FieldType;

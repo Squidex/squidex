@@ -42,16 +42,16 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     public formModel: FieldArrayItemForm;
 
     @Input()
-    public canUnset: boolean;
+    public canUnset?: boolean | null;
 
     @Input()
-    public isFirst = false;
+    public isFirst?: boolean | null;
 
     @Input()
-    public isLast = false;
+    public isLast?: boolean | null;
 
     @Input()
-    public isDisabled = false;
+    public isDisabled?: boolean | null;
 
     @Input()
     public index: number;

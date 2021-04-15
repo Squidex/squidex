@@ -1,6 +1,6 @@
 <sqx-title message="i18n:assets.listPageTitle"></sqx-title>
 
-<sqx-panel desiredWidth="*" minWidth="50rem" showSidebar="true" grid="true" closeQueryParamsHandling="none">
+<sqx-panel desiredWidth="*" minWidth="50rem" [showSidebar]="true" [grid]="true" closeQueryParamsHandling="">
     <ng-container title>
         {{ 'common.assets' | sqxTranslate }}
     </ng-container>
@@ -17,7 +17,7 @@
             <div class="col pl-1" style="width: 300px">
                 <div class="row no-gutters search">
                     <div class="col-6">
-                        <sqx-tag-editor class="tags" singleLine="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
+                        <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
                             [suggestions]="assetsState.tagsNames | async"
                             [ngModel]="assetsState.selectedTagNames | async"
                             (ngModelChange)="selectTags($event)"
@@ -30,7 +30,7 @@
                             [queries]="queries"
                             [queriesTypes]="'common.assets' | sqxTranslate"
                             (queryChange)="search($event)"
-                            enableShortcut="true">
+                            [enableShortcut]="true">
                         </sqx-search-form>
                     </div>
                 </div>

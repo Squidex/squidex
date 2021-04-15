@@ -10,7 +10,7 @@
         </div>
         <div class="col-auto color pr-2">
             <sqx-color-picker mode="Circle"
-                [disabled]="disabled"
+                [disabled]="$any(disabled)"
                 [ngModelOptions]="onBlur" 
                 [ngModel]="step.color" 
                 (ngModelChange)="changeColor($event)" >
@@ -63,7 +63,7 @@
             <div class="col col-step">
                 <div class="custom-control custom-checkbox float-right">
                     <input class="custom-control-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}"
-                        [disabled]="disabled" 
+                        [disabled]="!!disabled" 
                         [ngModel]="step.noUpdate" 
                         (ngModelChange)="changeNoUpdate($event)">
 
@@ -78,7 +78,7 @@
                 </div>
                 <div class="col col-step-expression">
                     <input class="form-control" [class.dashed]="!step.noUpdateExpression" spellcheck="false" 
-                        [disabled]="disabled" 
+                        [disabled]="!!disabled" 
                         [ngModelOptions]="onBlur" 
                         [ngModel]="step.noUpdateExpression" 
                         (ngModelChange)="changeNoUpdateExpression($event)" 
@@ -89,7 +89,7 @@
                 </div>
                 <div class="col col-roles">
                     <sqx-tag-editor [allowDuplicates]="false" [dashed]="true" 
-                        [disabled]="disabled" 
+                        [disabled]="!!disabled" 
                         [ngModelOptions]="onBlur" 
                         [ngModel]="step.noUpdateRoles"
                         (ngModelChange)="changeNoUpdateRoles($event)"

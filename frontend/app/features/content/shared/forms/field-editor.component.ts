@@ -36,7 +36,7 @@ export class FieldEditorComponent implements OnChanges {
     public index: number;
 
     @Input()
-    public canUnset: boolean;
+    public canUnset?: boolean | null;
 
     @Input()
     public displaySuffix: string;

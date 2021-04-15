@@ -20,13 +20,13 @@ export class ContentFieldComponent implements OnChanges {
     public languageChange = new EventEmitter<AppLanguageDto>();
 
     @Input()
-    public isCompact = false;
+    public isCompact?: boolean | null;
 
     @Input()
     public form: EditContentForm;
 
     @Input()
-    public formCompare?: EditContentForm;
+    public formCompare?: EditContentForm | null;
 
     @Input()
     public formContext: any;

@@ -1,4 +1,4 @@
-<sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false">
+<sqx-panel desiredWidth="20rem" [isBlank]="true" [isLazyLoaded]="false">
     <ng-container title>
         {{ 'common.workflow' | sqxTranslate }}
     </ng-container>
@@ -32,8 +32,8 @@
                 <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdownNew.toggle()" [class.active]="dropdownNew.isOpenChanges | async" #buttonOptions>
                     <sqx-content-status
                         layout="multiline"
-                        [status]="content.newStatus"
-                        [statusColor]="content.newStatusColor"
+                        [status]="content.newStatus!"
+                        [statusColor]="content.newStatusColor!"
                         [scheduled]="content.scheduleJob">
                     </sqx-content-status>
                 </button>
@@ -75,7 +75,7 @@
 
             <div *ngIf="!content.newStatus; else newStatusOld">
                 <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
-                    <sqx-content-status small="true"
+                    <sqx-content-status [small]="true"
                         layout="multiline"
                         [status]="content.status"
                         [statusColor]="content.statusColor"
@@ -89,7 +89,7 @@
                             <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
                                 {{ 'common.statusChangeTo' | sqxTranslate }} 
                                 
-                                <sqx-content-status small="true"
+                                <sqx-content-status [small]="true"
                                     layout="text"
                                     [status]="info.status"
                                     [statusColor]="info.color">
@@ -117,13 +117,13 @@
                 </button>
             </ng-template>
 
-            <sqx-form-hint marginTop="1">
+            <sqx-form-hint [marginTop="1"]>
                 {{ 'contents.lastUpdatedLabel' | sqxTranslate }}: {{content.lastModified | sqxFromNow}}
             </sqx-form-hint>
         </div>
 
         <div class="section">
-            <h3 class="bordered">{{ 'common.history' | sqxTranslate }}</h3>
+            <h3 class="bordered">{{ 'common.history2' | sqxTranslate }}</h3>
     
             <sqx-content-event *ngFor="let event of contentEvents | async; trackBy: trackByEvent"
                 [content]="content"

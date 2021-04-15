@@ -21,7 +21,7 @@ export class CustomViewEditorComponent implements OnChanges {
     public fieldNamesChange = new EventEmitter<ReadonlyArray<string>>();
 
     @Input()
-    public fieldNames: ReadonlyArray<string>;
+    public fieldNames: string[];
 
     @Input()
     public allFields: ReadonlyArray<string>;
@@ -32,7 +32,7 @@ export class CustomViewEditorComponent implements OnChanges {
         this.fieldsNotAdded = this.allFields.filter(n => this.fieldNames.indexOf(n) < 0);
     }
 
-    public drop(event: CdkDragDrop<string[]>) {
+    public drop(event: CdkDragDrop<string[], any>) {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
 
         this.updateFieldNames(event.container.data);

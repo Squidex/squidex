@@ -43,7 +43,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     private value: any;
 
     @Input()
-    public items: ReadonlyArray<any> = [];
+    public items: ReadonlyArray<any> | undefined | null = [];
 
     @Input()
     public searchProperty = 'name';
@@ -52,10 +52,10 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     public valueProperty?: string;
 
     @Input()
-    public canSearch = true;
+    public canSearch?: boolean | null = true;
 
     @Input()
-    public separated = false;
+    public separated?: boolean | null;
 
     @ContentChildren(TemplateRef)
     public templates: QueryList<any>;
@@ -226,7 +226,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     private getSelectedIndex(value: any) {
-        if (!value) {
+        if (!value || !this.items) {
             return -1;
         }
 

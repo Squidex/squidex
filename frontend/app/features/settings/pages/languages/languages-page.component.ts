@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { AppLanguageDto, LanguagesState } from '@app/shared';
+import { LanguagesState, SnapshotLanguage } from '@app/shared';
 
 @Component({
     selector: 'sqx-languages-page',
@@ -27,7 +27,7 @@ export class LanguagesPageComponent implements OnInit {
         this.languagesState.load(true);
     }
 
-    public trackByLanguage(_index: number, language: { language: AppLanguageDto }) {
+    public trackByLanguage(_index: number, language: SnapshotLanguage) {
         return language.language.iso2Code;
     }
 }

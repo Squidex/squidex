@@ -5,10 +5,10 @@
                 <span class="workflow-name">{{workflow.displayName}}</span>
             </div>
             <div class="col col-tags">
-                <sqx-tag-editor [converter]="schemasSource.converter | async" [ngModel]="workflow.schemaIds" 
-                    styleBlank="true" 
-                    singleLine="true" 
-                    readonly="true">
+                <sqx-tag-editor [converter]="(schemasSource.converter | async)!" [ngModel]="workflow.schemaIds" 
+                    [styleBlank]="true" 
+                    [singleLine]="true" 
+                    [readonly]="true">
                 </sqx-tag-editor>
             </div>
             <div class="col-options">
@@ -78,7 +78,7 @@
                     <label class="col-form-label" for="{{workflow.id}}_schemas">{{ 'common.schemas' | sqxTranslate }}</label>
             
                     <div class="col">
-                        <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" [converter]="schemasSource.converter | async" 
+                        <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" [converter]="(schemasSource.converter | async)!" 
                             [ngModel]="workflow.schemaIds" 
                             (ngModelChange)="changeSchemaIds($event)" 
                             [suggestions]="(schemasSource.converter | async)?.suggestions">

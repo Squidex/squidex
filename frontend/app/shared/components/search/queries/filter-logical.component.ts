@@ -32,16 +32,16 @@ export class FilterLogicalComponent {
     public level = 0;
 
     @Input()
-    public isRoot = false;
+    public isRoot?: boolean | null;
 
     @Input()
     public model: QueryModel;
 
     @Input()
-    public set filter(filter: FilterLogical) {
-        this.filterValue = filter;
+    public set filter(filter: FilterLogical | undefined | null) {
+        this.filterValue = filter || {};
 
-        this.updateFilters(filter);
+        this.updateFilters(this.filterValue);
     }
 
     public get filter() {
@@ -49,11 +49,11 @@ export class FilterLogicalComponent {
     }
 
     public get isAnd() {
-        return !!this.filter.and;
+        return !!this.filterValue.and;
     }
 
     public get isOr() {
-        return !!this.filter.or;
+        return !!this.filterValue.or;
     }
 
     public get nestedLevel() {

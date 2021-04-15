@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.languages"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" showSidebar="true" grid="true">
+<sqx-panel desiredWidth="50rem" [showSidebar]="true" [grid]="true">
     <ng-container title>
         {{ 'common.languages' | sqxTranslate }}
     </ng-container>
@@ -23,7 +23,8 @@
                         [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew">
                     </sqx-language>
         
-                    <sqx-language-add-form *ngIf="languagesState.canCreate | async" [newLanguages]="languagesState.newLanguages | async">
+                    <sqx-language-add-form *ngIf="languagesState.canCreate | async" 
+                        [newLanguages]="(languagesState.newLanguages | async)!">
                     </sqx-language-add-form>
                 </ng-container>
             </div>

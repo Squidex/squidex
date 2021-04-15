@@ -1,6 +1,6 @@
 <sqx-title [message]="schema.displayName"></sqx-title>
 
-<sqx-panel desiredWidth="*" minWidth="50rem" showSidebar="true" grid="true" closeQueryParamsHandling="none">
+<sqx-panel desiredWidth="*" minWidth="50rem" [showSidebar]="true" [grid]="true" closeQueryParamsHandling="">
     <ng-container title>
         {{ 'common.contents' | sqxTranslate }}
     </ng-container>
@@ -23,8 +23,8 @@
                     [queries]="queries | async"
                     [queriesTypes]="'common.contents' | sqxTranslate"
                     [queryModel]="queryModel | async"
-                    [language]="languagesState.isoMasterLanguage | async"
-                    enableShortcut="true">
+                    [language]="(languagesState.isoMasterLanguage | async)!"
+                    [enableShortcut]="true">
                 </sqx-search-form>
             </div>
             <div class="col-auto pl-1" *ngIf="languages.length > 1">
@@ -42,7 +42,7 @@
 
     <ng-container content>
         <ng-container *ngIf="tableView.listFields | async; let listFields">    
-            <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
+            <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [table]="true">
                 <ng-container topHeader>
                     <div class="selection" *ngIf="selectionCount > 0">
                         {{ 'contents.selectionCount' | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
@@ -72,7 +72,7 @@
                             <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" @fade position="bottom-right">
                                 <sqx-custom-view-editor [allFields]="tableView.allFields" 
                                     (fieldNamesChange)="tableView.updateFields($event)"
-                                    [fieldNames]="tableView.listFieldNames | async">
+                                    [fieldNames]="$any(tableView.listFieldNames | async)">
                                 </sqx-custom-view-editor>
                             </div>
                         </ng-container>
@@ -99,7 +99,7 @@
                                     <sqx-content-list-header
                                         [field]="field"
                                         (queryChange)="search($event)"
-                                        [query]="contentsState.query | async"
+                                        [query]="(contentsState.query | async)!"
                                         [language]="language">
                                     </sqx-content-list-header>
                                 </th>

@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, LanguageDto, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator',
@@ -24,7 +24,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     public schemaIds: ReadonlyArray<string>;
 
     @Input()
-    public language: LanguageDto;
+    public language: AppLanguageDto;
 
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;

@@ -1,4 +1,4 @@
-<sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false">
+<sqx-panel desiredWidth="20rem" [isBlank]="true" [isLazyLoaded]="false">
     <ng-container title>
         {{ 'common.sidebar' | sqxTranslate }}
     </ng-container>
@@ -7,7 +7,7 @@
         <sqx-content-extension
             [url]="url | async"
             [content]="contentsState.selectedContent | async"
-            [contentSchema]="schemasState.selectedSchema | async">
+            [contentSchema]="(schemasState.selectedSchema | async)!">
         </sqx-content-extension>
     </ng-container>
 </sqx-panel>

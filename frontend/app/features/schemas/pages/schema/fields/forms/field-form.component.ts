@@ -16,10 +16,10 @@ import { AppSettingsDto, FieldDto, LanguageDto } from '@app/shared';
 })
 export class FieldFormComponent implements AfterViewInit {
     @Input()
-    public showButtons: boolean;
+    public showButtons?: boolean | null;
 
     @Input()
-    public isEditable: boolean;
+    public isEditable?: boolean | null;
 
     @Input()
     public fieldForm: FormGroup;
@@ -34,7 +34,7 @@ export class FieldFormComponent implements AfterViewInit {
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public isLocalizable: boolean;
+    public isLocalizable?: boolean | null;
 
     @Output()
     public cancel = new EventEmitter();

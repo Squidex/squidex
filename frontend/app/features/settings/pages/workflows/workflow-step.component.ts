@@ -47,7 +47,7 @@ export class WorkflowStepComponent implements OnChanges {
     public roles: ReadonlyArray<string>;
 
     @Input()
-    public disabled: boolean;
+    public disabled?: boolean | null;
 
     public openSteps: ReadonlyArray<WorkflowStep>;
     public openStep: WorkflowStep;
@@ -87,7 +87,7 @@ export class WorkflowStepComponent implements OnChanges {
         this.update.emit({ noUpdateRoles });
     }
 
-    public trackByTransition(_index: number, transition: WorkflowTransition) {
+    public trackByTransition(_index: number, transition: WorkflowTransitionView) {
         return transition.to;
     }
 }

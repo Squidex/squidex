@@ -21,19 +21,19 @@ interface State {
 })
 export class CommentComponent extends StatefulComponent<State> implements OnChanges {
     @Input()
-    public canFollow = false;
+    public canFollow?: boolean | null;
 
     @Input()
-    public canDelete = false;
+    public canDelete?: boolean | null;
 
     @Input()
-    public canEdit = false;
+    public canEdit?: boolean | null;
 
     @Input()
     public commentsState: CommentsState;
 
     @Input()
-    public confirmDelete = true;
+    public confirmDelete?: boolean | null = true;
 
     @Input()
     public comment: CommentDto;

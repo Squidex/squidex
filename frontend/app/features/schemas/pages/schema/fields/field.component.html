@@ -94,7 +94,7 @@
 
     <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
-            <sqx-field-form showButtons="true" (cancel)="toggleEditing()"
+            <sqx-field-form [showButtons]="true" (cancel)="toggleEditing()"
                 [languages]="languages"
                 [fieldForm]="editForm.form"
                 [field]="field"
@@ -118,7 +118,7 @@
 
                     <span class="nested-field-line-h"></span>
     
-                    <sqx-field [field]="nested" [schema]="schema" [parent]="field" [settings]="settings" [languages]="languages">
+                    <sqx-field [field]="nested" [schema]="schema" [parent]="$any(field)" [settings]="settings" [languages]="languages">
                         <i cdkDragHandle class="icon-drag2 drag-handle"></i>
                     </sqx-field>
                 </div>
@@ -134,7 +134,7 @@
                 
             <ng-container *sqxModal="addFieldDialog">
                 <sqx-field-wizard 
-                    [parent]="field"
+                    [parent]="$any(field)"
                     [schema]="schema"
                     [settings]="settings"
                     (complete)="addFieldDialog.hide()">

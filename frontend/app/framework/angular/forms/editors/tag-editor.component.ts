@@ -62,28 +62,28 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public converter = StringConverter.INSTANCE;
 
     @Input()
-    public undefinedWhenEmpty = true;
+    public undefinedWhenEmpty?: boolean | null = true;
 
     @Input()
-    public acceptEnter = false;
+    public acceptEnter?: boolean | null;
 
     @Input()
-    public allowDuplicates = true;
+    public allowDuplicates?: boolean | null = true;
 
     @Input()
-    public dashed = false;
+    public dashed?: boolean | null;
 
     @Input()
-    public separated = false;
+    public separated?: boolean | null;
 
     @Input()
-    public singleLine = false;
+    public singleLine?: boolean | null;
 
     @Input()
-    public readonly = false;
+    public readonly?: boolean | null;
 
     @Input()
-    public styleBlank = false;
+    public styleBlank?: boolean | null;
 
     @Input()
     public placeholder = 'i18n:common.tagAdd';
@@ -92,13 +92,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public inputName = 'tag-editor';
 
     @Input()
-    public set suggestions(value: ReadonlyArray<string | TagValue>) {
+    public set suggestions(value: ReadonlyArray<string | TagValue> | undefined | null) {
         this.suggestionsSorted = getTagValues(value);
     }
 
     @Input()
-    public set disabled(value: boolean) {
-        this.setDisabledState(value);
+    public set disabled(value: boolean | undefined | null) {
+        this.setDisabledState(value === true);
     }
 
     public suggestionsSorted: ReadonlyArray<TagValue> = [];

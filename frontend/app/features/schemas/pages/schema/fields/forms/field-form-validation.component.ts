@@ -28,5 +28,5 @@ export class FieldFormValidationComponent {
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public isLocalizable: boolean;
+    public isLocalizable?: boolean | null;
 }

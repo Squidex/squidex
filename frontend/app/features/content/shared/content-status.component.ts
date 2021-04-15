@@ -22,16 +22,16 @@ export class ContentStatusComponent {
     public statusColor: string;
 
     @Input()
-    public scheduled?: ScheduleDto;
+    public scheduled?: ScheduleDto | null;
 
     @Input()
     public layout: 'icon' | 'text' | 'multiline' = 'icon';
 
     @Input()
-    public truncate = false;
+    public truncate?: boolean | null;
 
     @Input()
-    public small = false;
+    public small?: boolean | null;
 
     public get isMultiline() {
         return this.layout === 'multiline';

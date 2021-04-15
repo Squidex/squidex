@@ -30,7 +30,9 @@
     "angularCompilerOptions": {
         "disableTypeScriptVersionCheck": true,
         "fullTemplateTypeCheck": true,
+        "strictDomEventTypes": false,
         "strictInjectionParameters": true,
-        "strictTemplate": true
+        "strictInputTypes": true,
+        "strictTemplates": true
     }
 }

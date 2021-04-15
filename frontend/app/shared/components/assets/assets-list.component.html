@@ -14,7 +14,7 @@
     <div class="file-drop-info">{{ 'assets.uploadHint' | sqxTranslate }}</div>
 </div>
 
-<sqx-list-view [isLoading]="(assetsState.isLoading | async) && indicateLoading" overflow="true">
+<sqx-list-view [isLoading]="(assetsState.isLoading | async) && indicateLoading" [overflow]="true">
     <ng-container topHeader>
         <div cdkDropListGroup>
             <div class="folders" *ngIf="assetsState.pathAvailable | async">
@@ -29,12 +29,12 @@
                         (cdkDropListDropped)="move($event)">
                         <div class="folder-container-over"></div>
             
-                        <sqx-asset-folder [assetFolder]="parent"
+                        <sqx-asset-folder [assetPathItem]="parent"
                             (navigate)="assetsState.navigate($event.id)">
                         </sqx-asset-folder>
                     </div>
                     
-                    <div class="folder-container" *ngFor="let assetFolder of assetsState.folders | async; trackBy: trackByAssetItem"
+                    <div class="folder-container" *ngFor="let assetFolder of assetsState.folders | async; trackBy: trackByAssetFolder"
                         cdkDropList 
                         cdkDropListSortingDisabled
                         [cdkDropListEnterPredicate]="canEnter"
@@ -42,7 +42,7 @@
                         (cdkDropListDropped)="move($event)">
                         <div class="folder-container-over"></div>
         
-                        <sqx-asset-folder [assetFolder]="assetFolder"
+                        <sqx-asset-folder [assetPathItem]="assetFolder"
                             cdkDrag
                             [cdkDragData]="assetFolder"
                             [cdkDragDisabled]="isDisabled || !assetFolder.canMove"
@@ -68,7 +68,7 @@
                         (load)="add(file, $event)">
                     </sqx-asset>
         
-                    <sqx-asset *ngFor="let asset of assets; trackBy: trackByAssetItem"
+                    <sqx-asset *ngFor="let asset of assets; trackBy: trackByAsset"
                         cdkDrag
                         [cdkDragData]="asset"
                         [cdkDragDisabled]="isDisabled || !asset.canMove"
