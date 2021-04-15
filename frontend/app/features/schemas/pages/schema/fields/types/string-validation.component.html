@@ -46,10 +46,11 @@
                     </div>
                 </ng-container>
             </ng-container>
+
+            <sqx-form-hint>
+                {{patternName}}
+            </sqx-form-hint>
         </div>
-        <small class="col-3" style="align-self: center">
-            {{patternName}}
-        </small>
     </div>
 
     <div class="form-group row" *ngIf="showPatternMessage | async">

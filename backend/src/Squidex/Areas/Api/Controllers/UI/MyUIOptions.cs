@@ -12,7 +12,7 @@ namespace Squidex.Areas.Api.Controllers.UI
 {
     public sealed class MyUIOptions
     {
-        public AppSettings AppSettings { get; set; }
+        public Dictionary<string, string> RegexSuggestions { get; set; }
 
         public Dictionary<string, string> More { get; set; } = new Dictionary<string, string>();
 

@@ -68,6 +68,8 @@ namespace Squidex.Areas.Api.Controllers.News.Service
                 }
             }
 
+            result.Features ??= new List<FeatureDto>();
+
             return result;
         }
     }
