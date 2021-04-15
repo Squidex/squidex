@@ -120,7 +120,7 @@ module.exports = function (env) {
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[hash].[ext]',
+                    loader: 'file-loader?name=[name].[fullhash].[ext]',
                     options: {
                         outputPath: 'assets',
                         /*
@@ -132,7 +132,7 @@ module.exports = function (env) {
             }, {
                 test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[hash].[ext]',
+                    loader: 'file-loader?name=[name].[fullhash].[ext]',
                     options: {
                         outputPath: 'assets'
                     }
@@ -283,7 +283,7 @@ module.exports = function (env) {
                  *
                  * See: https://webpack.js.org/configuration/output/#output-chunkfilename
                  */
-                chunkFilename: '[id].[hash].chunk.js'
+                chunkFilename: '[id].[fullhash].chunk.js'
             };
         } else {
             config.output = {
@@ -440,7 +440,10 @@ module.exports = function (env) {
             }, {
                 loader: 'postcss-loader'
             }, {
-                loader: 'sass-loader?sourceMap'
+                loader: 'sass-loader',
+                options: {
+                    sourceMap: true,
+                }
             }],
             /*
              * Do not include component styles.

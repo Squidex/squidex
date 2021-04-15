@@ -8,7 +8,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiUrlConfig, ResourceOwner, Types } from '@app/framework/internal';
-import { AppsState, AuthService, ContentDto, SchemaDto } from '@app/shared';
+import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-extension',
@@ -18,6 +18,7 @@ import { AppsState, AuthService, ContentDto, SchemaDto } from '@app/shared';
 })
 export class ContentExtensionComponent extends ResourceOwner implements AfterViewInit, OnChanges {
     private readonly context: any;
+    private computedUrl: string;
     private isInitialized = false;
 
     @Input()
@@ -32,7 +33,8 @@ export class ContentExtensionComponent extends ResourceOwner implements AfterVie
     @ViewChild('iframe', { static: false })
     public iframe: ElementRef<HTMLIFrameElement>;
 
-    constructor(apiUrl: ApiUrlConfig, authService: AuthService, appsState: AppsState,
+    constructor(apiUrl: ApiUrlConfig, authService: AuthService,
+        private readonly appsState: AppsState,
         private readonly renderer: Renderer2,
         private readonly router: Router
     ) {
@@ -47,8 +49,10 @@ export class ContentExtensionComponent extends ResourceOwner implements AfterVie
     }
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['url'] && this.iframe?.nativeElement) {
-            this.iframe.nativeElement.src = this.url || '';
+        if (changes['url']) {
+            this.computedUrl = computeEditorUrl(this.url, this.appsState.snapshot.selectedSettings);
+
+            this.setupUrl();
         }
 
         if (changes['contentSchema']) {
@@ -61,8 +65,14 @@ export class ContentExtensionComponent extends ResourceOwner implements AfterVie
         }
     }
 
+    private setupUrl() {
+        if (this.iframe?.nativeElement) {
+            this.iframe.nativeElement.src = this.computedUrl;
+        }
+    }
+
     public ngAfterViewInit() {
-        this.iframe.nativeElement.src = this.url || '';
+        this.setupUrl();
 
         this.own(
             this.renderer.listen('window', 'message', (event: MessageEvent) => {

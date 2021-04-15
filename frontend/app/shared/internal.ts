@@ -70,4 +70,5 @@ export * from './state/ui-languages';
 export * from './state/ui.state';
 export * from './state/workflows.forms';
 export * from './state/workflows.state';
+export * from './utils/editor-utils';
 export * from './utils/messages';
