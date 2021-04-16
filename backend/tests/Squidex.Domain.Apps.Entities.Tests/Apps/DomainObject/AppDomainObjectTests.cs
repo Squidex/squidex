@@ -60,9 +60,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             A.CallTo(() => appPlansProvider.GetPlan(planIdPaid))
                 .Returns(new ConfigAppLimitsPlan { Id = planIdPaid, MaxContributors = 30 });
 
+            // Create a non-empty setting, otherwise the event is not raised as it does not change the domain object.
             initialSettings = new InitialSettings
             {
-                Settings = AppSettings.Empty
+                Settings = new AppSettings
+                {
+                    HideScheduler = true
+                }
             };
 
             sut = new AppDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), initialSettings, appPlansProvider, appPlansBillingManager, userResolver);
@@ -110,8 +114,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppCreated { Name = AppName }, true),
-                    CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings })
+                    CreateEvent(new AppCreated { Name = AppName }, true), // Must be with client actor.
+                    CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings }, true)
                 );
         }
 
@@ -131,7 +135,31 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppUpdated { Label = "my-label", Description = "my-description" })
+                    CreateEvent(new AppUpdated { Label = command.Label, Description = command.Description })
+                );
+        }
+
+        [Fact]
+        public async Task UpdateSettings_should_create_event_and_update_settings()
+        {
+            var settings = new AppSettings
+            {
+                HideDateTimeQuickButtons = true
+            };
+
+            var command = new UpdateAppSettings { Settings = settings };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishIdempotentAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(settings, sut.Snapshot.Settings);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppSettingsUpdated { Settings = settings })
                 );
         }
 

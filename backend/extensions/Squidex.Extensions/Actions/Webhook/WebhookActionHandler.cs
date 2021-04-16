@@ -79,12 +79,12 @@ namespace Squidex.Extensions.Actions.Webhook
 
                 if (indexEqual > 0 && indexEqual < line.Length - 1)
                 {
-                    var key = line.Substring(0, indexEqual);
-                    var val = line[(indexEqual + 1)..];
+                    var headerKey = line.Substring(0, indexEqual);
+                    var headerValue = line[(indexEqual + 1)..];
 
-                    val = await FormatAsync(val, @event);
+                    headerValue = await FormatAsync(headerValue, @event);
 
-                    headersDictionary[key] = val;
+                    headersDictionary[headerKey] = headerValue;
                 }
             }
 

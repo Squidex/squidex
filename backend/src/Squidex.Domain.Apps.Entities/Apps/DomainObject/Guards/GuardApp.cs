@@ -58,15 +58,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
             Validate.It(e =>
             {
+                var prefix = nameof(command.Settings);
+
                 var settings = command.Settings;
 
                 if (settings == null)
                 {
-                    e(Not.Defined(nameof(settings)), nameof(settings));
+                    e(Not.Defined(nameof(settings)), prefix);
                     return;
                 }
 
-                var patternsPrefix = $"{nameof(settings)}.{nameof(settings.Patterns)}";
+                var patternsPrefix = $"{prefix}.{nameof(settings.Patterns)}";
 
                 if (settings.Patterns == null)
                 {
@@ -90,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     });
                 }
 
-                var editorsPrefix = $"{nameof(settings)}.{nameof(settings.Editors)}";
+                var editorsPrefix = $"{prefix}.{nameof(settings.Editors)}";
 
                 if (settings.Editors == null)
                 {
@@ -100,16 +102,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                 {
                     settings.Editors.Foreach((editor, index) =>
                     {
-                        var patternPrefix = $"{patternsPrefix}[{index}]";
+                        var editorPrefix = $"{editorsPrefix}[{index}]";
 
                         if (string.IsNullOrWhiteSpace(editor.Name))
                         {
-                            e(Not.Defined(nameof(editor.Name)), $"{patternPrefix}.{nameof(editor.Name)}");
+                            e(Not.Defined(nameof(editor.Name)), $"{editorPrefix}.{nameof(editor.Name)}");
                         }
 
                         if (string.IsNullOrWhiteSpace(editor.Url))
                         {
-                            e(Not.Defined(nameof(editor.Url)), $"{patternPrefix}.{nameof(editor.Url)}");
+                            e(Not.Defined(nameof(editor.Url)), $"{editorPrefix}.{nameof(editor.Url)}");
                         }
                     });
                 }

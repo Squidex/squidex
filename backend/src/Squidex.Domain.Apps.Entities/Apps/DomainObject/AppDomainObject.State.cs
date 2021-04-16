@@ -109,6 +109,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                     case AppWorkflowUpdated e:
                         return UpdateWorkflows(e, (e, w) => w.Update(e.WorkflowId, e.Workflow));
 
+                    case AppWorkflowDeleted e:
+                        return UpdateWorkflows(e, (e, w) => w.Remove(e.WorkflowId));
+
                     case AppRoleAdded e:
                         return UpdateRoles(e, (e, r) => r.Add(e.Name));
 
