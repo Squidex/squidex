@@ -221,13 +221,15 @@ describe('UsersService', () => {
         req.flush({});
     }));
 
-    function userResponse(id: number) {
+    function userResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
         return {
             id: `${id}`,
-            email: `user${id}@domain.com`,
-            displayName: `user${id}`,
+            email: `user${key}@domain.com`,
+            displayName: `user${key}`,
             permissions: [
-                `Permission${id}`
+                `Permission${key}`
             ],
             isLocked: true,
             _links: {
@@ -244,12 +246,14 @@ export function createUser(id: number, suffix = '') {
         update: { method: 'PUT', href: `/users/${id}` }
     };
 
+    const key = `${id}${suffix}`;
+
     return new UserDto(links,
         `${id}`,
-        `user${id}${suffix}@domain.com`,
-        `user${id}${suffix}`,
+        `user${key}@domain.com`,
+        `user${key}`,
         [
-            `Permission${id}${suffix}`
+            `Permission${key}`
         ],
         true);
 }

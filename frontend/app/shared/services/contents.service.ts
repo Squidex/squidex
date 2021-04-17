@@ -25,8 +25,6 @@ export class ScheduleDto {
     }
 }
 
-export type StatusInfo = { status: string; color: string; };
-
 export class ContentsDto extends ResultSet<ContentDto> {
     constructor(
         public readonly statuses: ReadonlyArray<StatusInfo>,
@@ -45,11 +43,6 @@ export class ContentsDto extends ResultSet<ContentDto> {
         return hasAnyLink(this._links, 'create/publish');
     }
 }
-
-export type ContentReferencesValue = { [partition: string]: string } | string;
-export type ContentReferences = { [fieldName: string ]: ContentFieldData<ContentReferencesValue> };
-export type ContentFieldData<T = any> = { [partition: string]: T };
-export type ContentData = { [fieldName: string ]: ContentFieldData };
 
 export class ContentDto {
     public readonly _links: ResourceLinks;
@@ -93,7 +86,7 @@ export class ContentDto {
         const updates: StatusInfo[] = [];
 
         for (const link in links) {
-            if (link.startsWith('status/')) {
+            if (links.hasOwnProperty(link) && link.startsWith('status/')) {
                 const status = link.substr(7);
 
                 updates.push({ status, color: links[link].metadata! });
@@ -112,28 +105,31 @@ export class BulkResultDto {
     }
 }
 
-export interface BulkUpdateDto {
-    readonly jobs: ReadonlyArray<BulkUpdateJobDto>;
-    readonly doNotScript?: boolean;
-    readonly checkReferrers?: boolean;
-}
+export type BulkUpdateType = 'Upsert' | 'ChangeStatus' | 'Delete' | 'Validate';
 
-export interface BulkUpdateJobDto {
-    readonly id: string;
-    readonly type: 'Upsert' | 'ChangeStatus' | 'Delete' | 'Validate';
-    readonly status?: string;
-    readonly schema?: string;
-    readonly dueTime?: string | null;
-    readonly expectedVersion?: number;
-}
+export type StatusInfo =
+    Readonly<{ status: string; color: string; }>;
 
-export interface ContentQueryDto {
-    readonly ids?: ReadonlyArray<string>;
-    readonly maxLength?: number;
-    readonly query?: Query;
-    readonly skip?: number;
-    readonly take?: number;
-}
+export type ContentReferencesValue =
+    Readonly<{ [partition: string]: string }> | string;
+
+export type ContentReferences =
+    Readonly<{ [fieldName: string ]: ContentFieldData<ContentReferencesValue> }>;
+
+export type ContentFieldData<T = any> =
+    Readonly<{ [partition: string]: T }>;
+
+export type ContentData =
+    Readonly<{ [fieldName: string ]: ContentFieldData }>;
+
+export type BulkUpdateDto =
+    Readonly<{ jobs: readonly BulkUpdateJobDto[], doNotScript?: boolean, checkReferrers?: boolean }>;
+
+export type BulkUpdateJobDto =
+    Readonly<{ id: string; type: BulkUpdateType; status?: string; schema?: string; dueTime?: string | null; expectedVersion?: number }>;
+
+export type ContentQueryDto =
+    Readonly<{ ids?: ReadonlyArray<string>; maxLength?: number; query?: Query; skip?: number; take?: number; }>;
 
 @Injectable()
 export class ContentsService {

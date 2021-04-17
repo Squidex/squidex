@@ -7,12 +7,12 @@
 
 export module StringHelper {
     export function firstNonEmpty(...values: ReadonlyArray<(string | undefined | null)>) {
-        for (let value of values) {
+        for (const value of values) {
             if (value) {
-                value = value.trim();
+                const trimmed = value.trim();
 
-                if (value.length > 0) {
-                    return value;
+                if (trimmed.length > 0) {
+                    return trimmed;
                 }
             }
         }

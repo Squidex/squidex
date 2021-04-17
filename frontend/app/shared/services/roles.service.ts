@@ -11,13 +11,6 @@ import { AnalyticsService, ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretify
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-export type RolesDto = Versioned<RolesPayload>;
-export type RolesPayload = {
-    readonly items: ReadonlyArray<RoleDto>;
-
-    readonly canCreate: boolean;
-} & Resource;
-
 export class RoleDto {
     public readonly _links: ResourceLinks;
 
@@ -40,14 +33,19 @@ export class RoleDto {
     }
 }
 
-export interface CreateRoleDto {
-    readonly name: string;
-}
+type Permissions = readonly string[];
 
-export interface UpdateRoleDto {
-    readonly permissions: ReadonlyArray<string>;
-    readonly properties: {};
-}
+export type RolesDto =
+    Versioned<RolesPayload>;
+
+export type RolesPayload =
+    Readonly<{ items: readonly RoleDto[]; canCreate: boolean; } & Resource>;
+
+export type CreateRoleDto =
+    Readonly<{ name: string; }>;
+
+export type UpdateRoleDto =
+    Readonly<{ permissions: Permissions; properties: {}; }>;
 
 @Injectable()
 export class RolesService {

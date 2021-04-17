@@ -97,7 +97,7 @@ export class PlansState extends State<Snapshot> {
                 }
 
                 const planId = overridePlanId || payload.currentPlanId;
-                const plans = payload.plans.map(x => this.createPlan(x, planId));
+                const plans = payload.plans.map(x => createPlan(x, planId));
 
                 this.next({
                     hasPortal: payload.hasPortal,
@@ -121,21 +121,13 @@ export class PlansState extends State<Snapshot> {
                     this.window.location.href = payload.redirectUri;
                 } else {
                     this.next(s => {
-                        const plans = s.plans.map(x => this.createPlan(x.plan, planId));
+                        const plans = s.plans.map(x => createPlan(x.plan, planId));
 
                         return { ...s, plans, isOwner: true, version };
                     }, 'Change');
                 }
             }),
             shareSubscribed(this.dialogs));
-    }
-
-    private createPlan(plan: PlanDto, id: string) {
-        return {
-            plan,
-            isSelected: plan.id === id,
-            isYearlySelected: plan.yearlyId === id
-        };
     }
 
     private get appName() {
@@ -149,4 +141,12 @@ export class PlansState extends State<Snapshot> {
     private get version() {
         return this.snapshot.version;
     }
+}
+
+function createPlan(plan: PlanDto, id: string) {
+    return {
+        plan,
+        isSelected: plan.id === id,
+        isYearlySelected: plan.yearlyId === id
+    };
 }

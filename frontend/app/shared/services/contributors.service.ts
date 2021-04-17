@@ -11,15 +11,6 @@ import { AnalyticsService, ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretify
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-export type ContributorsDto = Versioned<ContributorsPayload>;
-export type ContributorsPayload = {
-    readonly items: ReadonlyArray<ContributorDto>;
-
-    readonly maxContributors: number;
-
-    readonly canCreate: boolean;
-} & Resource;
-
 export class ContributorDto {
     public readonly _links: ResourceLinks;
 
@@ -44,11 +35,14 @@ export class ContributorDto {
     }
 }
 
-export interface AssignContributorDto {
-    readonly contributorId: string;
-    readonly role: string;
-    readonly invite?: boolean;
-}
+export type ContributorsDto =
+    Versioned<ContributorsPayload>;
+
+export type ContributorsPayload =
+    Readonly<{ items: ReadonlyArray<ContributorDto>; maxContributors: number; canCreate: boolean; } & Resource>;
+
+export type AssignContributorDto =
+    Readonly<{ contributorId: string; role: string; invite?: boolean; }>;
 
 @Injectable()
 export class ContributorsService {

@@ -25,7 +25,7 @@
         <sqx-list-view [isLoading]="snapshot.isLoading" [table]="true">
             <div content>
                 <div class="photos">
-                    <ng-container *ngIf="stockPhotos | async; let photos">
+                    <ng-container *ngIf="stockPhotos | async; let photos; trackBy: trackByPhoto">
                         <div *ngFor="let photo of photos" class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
                             <img [src]="photo.thumbUrl">
 

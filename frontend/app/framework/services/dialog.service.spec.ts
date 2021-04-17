@@ -6,7 +6,7 @@
  */
 
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogRequest, DialogService, DialogServiceFactory, Notification, Tooltip } from './dialog.service';
+import { DialogRequest, DialogService, Notification, Tooltip } from './dialog.service';
 import { LocalStoreService } from './local-store.service';
 
 describe('DialogService', () => {
@@ -14,12 +14,6 @@ describe('DialogService', () => {
 
     beforeEach(() => {
         localStore = Mock.ofType<LocalStoreService>();
-    });
-
-    it('should instantiate from factory', () => {
-        const dialogService = DialogServiceFactory(localStore.object);
-
-        expect(dialogService).toBeDefined();
     });
 
     it('should instantiate', () => {
@@ -55,10 +49,13 @@ describe('DialogService', () => {
                 dialog.complete(confirmed);
             });
 
-            dialogService.confirm('MyTitle', 'MyText').subscribe(result => {
-                isNext = result;
-            }, undefined, () => {
-                isCompleted = true;
+            dialogService.confirm('MyTitle', 'MyText').subscribe({
+                next: result => {
+                    isNext = result;
+                },
+                complete: () => {
+                    isCompleted = true;
+                }
             });
 
             expect(isCompleted).toBeTruthy();

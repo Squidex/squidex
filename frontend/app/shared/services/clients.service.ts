@@ -11,13 +11,6 @@ import { AnalyticsService, ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretify
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-export type ClientsDto = Versioned<ClientsPayload>;
-export type ClientsPayload = {
-    readonly items: ReadonlyArray<ClientDto>;
-
-    readonly canCreate: boolean;
-} & Resource;
-
 export class ClientDto {
     public readonly _links: ResourceLinks;
 
@@ -49,17 +42,17 @@ export class AccessTokenDto {
     }
 }
 
-export interface CreateClientDto {
-    readonly id: string;
-}
+export type ClientsDto =
+    Versioned<ClientsPayload>;
 
-export interface UpdateClientDto {
-    readonly name?: string;
-    readonly role?: string;
-    readonly apiCallsLimit?: number;
-    readonly apiTrafficLimit?: number;
-    readonly allowAnonymous?: boolean;
-}
+export type ClientsPayload =
+    Readonly<{ items: readonly ClientDto[], canCreate: boolean } & Resource>;
+
+export type CreateClientDto =
+    Readonly<{ id: string }>;
+
+export type UpdateClientDto =
+    Readonly<{ name?: string; role?: string; allowAnonymous?: boolean; apiCallsLimit?: number; }>;
 
 @Injectable()
 export class ClientsService {

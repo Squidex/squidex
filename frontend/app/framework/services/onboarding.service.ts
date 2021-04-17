@@ -9,10 +9,6 @@ import { Injectable } from '@angular/core';
 import { UIOptions } from './../configurations';
 import { LocalStoreService } from './local-store.service';
 
-export const OnboardingServiceFactory = (uiOptions: UIOptions, localStore: LocalStoreService) => {
-    return new OnboardingService(uiOptions, localStore);
-};
-
 @Injectable()
 export class OnboardingService {
     private readonly disabled: boolean;

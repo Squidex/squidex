@@ -12,8 +12,6 @@ import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { fadeAnimation, getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
-export const CONVERSION_FAILED = {};
-
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true
 };

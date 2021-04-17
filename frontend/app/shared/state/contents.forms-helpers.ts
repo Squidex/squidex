@@ -126,7 +126,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         return this.disabled$;
     }
 
-    constructor(
+    protected constructor(
         public readonly field: T,
         public readonly form: TForm,
         public readonly isOptional: boolean,

@@ -396,16 +396,18 @@ describe('RulesService', () => {
     }));
 
     function ruleEventResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
         return {
             id: `id${id}`,
             created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
-            eventName: `event${id}${suffix}`,
+            eventName: `event-name${key}`,
             nextAttempt: `${id % 1000 + 2000}-11-11T10:10`,
-            jobResult: `Failed${id}${suffix}`,
-            lastDump: `dump${id}${suffix}`,
+            jobResult: `Failed${key}`,
+            lastDump: `event-dump${key}`,
             numCalls: id,
-            description: `url${id}${suffix}`,
-            result: `Failed${id}${suffix}`,
+            description: `event-url${key}`,
+            result: `Failed${key}`,
             _links: {
                 update: { method: 'PUT', href: `/rules/events/${id}` }
             }
@@ -413,13 +415,15 @@ describe('RulesService', () => {
     }
 
     function ruleResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
         return {
             id: `id${id}`,
             created: `${id % 1000 + 2000}-12-12T10:10`,
             createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10`,
             lastModifiedBy: `modifier${id}`,
-            name: `Name${id}${suffix}`,
+            name: `rule-name${key}`,
             numSucceeded: id * 3,
             numFailed: id * 4,
             lastExecuted: `${id % 1000 + 2000}-10-10T10:10:00Z`,
@@ -427,12 +431,12 @@ describe('RulesService', () => {
             trigger: {
                 param1: 1,
                 param2: 2,
-                triggerType: `ContentChanged${id}${suffix}`
+                triggerType: `rule-trigger${key}`
             },
             action: {
                 param3: 3,
                 param4: 4,
-                actionType: `Webhook${id}${suffix}`
+                actionType: `rule-action${key}`
             },
             version: id,
             _links: {
@@ -447,14 +451,16 @@ export function createRuleEvent(id: number, suffix = '') {
         update: { method: 'PUT', href: `/rules/events/${id}` }
     };
 
+    const key = `${id}${suffix}`;
+
     return new RuleEventDto(links, `id${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`),
-        `event${id}${suffix}`,
-        `url${id}${suffix}`,
-        `dump${id}${suffix}`,
-        `Failed${id}${suffix}`,
-        `Failed${id}${suffix}`,
+        `event-name${key}`,
+        `event-url${key}`,
+        `event-dump${key}`,
+        `Failed${key}`,
+        `Failed${key}`,
         id);
 }
 
@@ -463,25 +469,27 @@ export function createRule(id: number, suffix = '') {
         update: { method: 'PUT', href: `/rules/${id}` }
     };
 
+    const key = `${id}${suffix}`;
+
     return new RuleDto(links,
         `id${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
-        new Version(`${id}${suffix}`),
+        new Version(key),
         id % 2 === 0,
         {
             param1: 1,
             param2: 2,
-            triggerType: `ContentChanged${id}${suffix}`
+            triggerType: `rule-trigger${key}`
         },
-        `ContentChanged${id}${suffix}`,
+        `rule-trigger${key}`,
         {
             param3: 3,
             param4: 4,
-            actionType: `Webhook${id}${suffix}`
+            actionType: `rule-action${key}`
         },
-        `Webhook${id}${suffix}`,
-        `Name${id}${suffix}`,
+        `rule-action${key}`,
+        `rule-name${key}`,
         id * 3,
         id * 4,
         DateTime.parseISO(`${id % 1000 + 2000}-10-10T10:10:00Z`));

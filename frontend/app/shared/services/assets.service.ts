@@ -7,13 +7,14 @@
 
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ResultSet, StringHelper, Types, Version, Versioned } from '@app/framework';
+import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ResultSet, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
 import { encodeQuery, Query } from './../state/query';
 import { AuthService } from './auth.service';
 
 const SVG_PREVIEW_LIMIT = 10 * 1024;
+
 const MIME_TIFF = 'image/tiff';
 const MIME_SVG = 'image/svg+xml';
 
@@ -34,6 +35,14 @@ export class AssetDto {
     public readonly canUpload: boolean;
     public readonly canMove: boolean;
 
+    public get isDuplicate() {
+        return this._meta && this._meta['isDuplicate'] === 'true';
+    }
+
+    public get contentUrl() {
+        return getLinkUrl(this, 'content');
+    }
+
     public get fileNameWithoutExtension() {
         const index = this.fileName.lastIndexOf('.');
 
@@ -42,14 +51,6 @@ export class AssetDto {
         } else {
             return this.fileName;
         }
-    }
-
-    public get isDuplicate() {
-        return this._meta && this._meta['isDuplicate'] === 'true';
-    }
-
-    public get contentUrl() {
-        return this._links['content'].href;
     }
 
     constructor(links: ResourceLinks, meta: Metadata,
@@ -73,7 +74,9 @@ export class AssetDto {
         public readonly tags: ReadonlyArray<string>,
         public readonly version: Version
     ) {
-        this.canPreview = (this.type === 'Image' && this.mimeType !== MIME_TIFF) || (this.mimeType === MIME_SVG && this.fileSize < SVG_PREVIEW_LIMIT);
+        this.canPreview =
+            (this.mimeType !== MIME_TIFF && this.type === 'Image') ||
+            (this.mimeType === MIME_SVG && this.fileSize < SVG_PREVIEW_LIMIT);
 
         this._links = links;
 
@@ -130,35 +133,24 @@ export class AssetFolderDto {
     }
 }
 
-export interface AnnotateAssetDto {
-    readonly fileName?: string;
-    readonly isProtected?: boolean;
-    readonly slug?: string;
-    readonly tags?: ReadonlyArray<string>;
-    readonly metadata?: { [key: string]: any };
-}
+type Tags = readonly string[];
 
-export interface CreateAssetFolderDto extends MoveAssetItemDto {
-    readonly folderName: string;
-}
+type AssetMetadata = { [key: string]: any };
 
-export interface RenameAssetFolderDto {
-    readonly folderName: string;
-}
+export type AnnotateAssetDto =
+    Readonly<{ fileName?: string; isProtected?: boolean; slug?: string; tags?: Tags; metadata?: AssetMetadata }>;
 
-export interface MoveAssetItemDto {
-    readonly parentId?: string;
-}
+export type CreateAssetFolderDto =
+    Readonly<{ folderName: string } & MoveAssetItemDto>;
 
-export interface AssetQueryDto {
-    readonly ids?: ReadonlyArray<string>;
-    readonly maxLength?: number;
-    readonly parentId?: string;
-    readonly query?: Query;
-    readonly skip?: number;
-    readonly tags?: ReadonlyArray<string>;
-    readonly take?: number;
-}
+export type RenameAssetFolderDto =
+    Readonly<{ folderName: string }>;
+
+export type MoveAssetItemDto =
+    Readonly<{ parentId?: string }>;
+
+export type AssetQueryDto =
+    Readonly<{ ids?: Tags; maxLength?: number; parentId?: string; query?: Query; skip?: number; tags?: Tags; take?: number; }>;
 
 @Injectable()
 export class AssetsService {
@@ -178,7 +170,7 @@ export class AssetsService {
     public getAssets(appName: string, q?: AssetQueryDto): Observable<AssetsDto> {
         const { ids, maxLength, parentId, query, skip, tags, take } = q || {};
 
-        let fullQuery = '';
+        let fullQuery: string;
 
         let queryObj: Query | undefined = undefined;
 

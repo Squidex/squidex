@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { LocalizerService, LocalizerServiceFactory } from './localizer.service';
+import { LocalizerService } from './localizer.service';
 
 describe('LocalizerService', () => {
     const translations = {
@@ -15,12 +15,6 @@ describe('LocalizerService', () => {
         withMultiple: 'Text1: {text1}, Text2: {Text2}.',
         withVar: 'Var: {var}.'
     };
-
-    it('should instantiate from factory', () => {
-        const titleService = LocalizerServiceFactory(translations);
-
-        expect(titleService).toBeDefined();
-    });
 
     it('should instantiate', () => {
         const titleService = new LocalizerService(translations);

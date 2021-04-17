@@ -397,7 +397,9 @@ describe('ContentsService', () => {
         ]);
     }));
 
-    function contentResponse(id: number) {
+    function contentResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
         return {
             id: `id${id}`,
             status: `Status${id}`,
@@ -419,7 +421,7 @@ describe('ContentsService', () => {
             schemaDisplayName: 'MySchema',
             referenceData: {},
             referenceFields: [],
-            version: `${id}`,
+            version: key,
             _links: {
                 update: { method: 'PUT', href: `/contents/id${id}` }
             }
@@ -432,11 +434,13 @@ export function createContent(id: number, suffix = '') {
         update:  { method: 'PUT', href: `/contents/id${id}` }
     };
 
+    const key = `${id}${suffix}`;
+
     return new ContentDto(links,
         `id${id}`,
-        `Status${id}${suffix}`,
+        `Status${key}`,
         'black',
-        `NewStatus${id}${suffix}`,
+        `NewStatus${key}`,
         'black',
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
@@ -446,5 +450,5 @@ export function createContent(id: number, suffix = '') {
         'MySchema',
         {},
         [],
-        new Version(`${id}${suffix}`));
+        new Version(key));
 }

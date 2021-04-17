@@ -59,11 +59,8 @@ export class AppsState extends State<Snapshot> {
     public select(name: string | null): Observable<AppDto | null> {
         return this.loadApp(name, true).pipe(
             switchMap(selectedApp => {
-                if (selectedApp) {
-                    return this.appsService.getSettings(selectedApp.name).pipe(map(selectedSettings => ({ selectedApp, selectedSettings })));
-                } else {
-                    return of({ selectedApp, selectedSettings: null });
-                }
+                return this.loadSettingsCore(selectedApp).pipe(
+                    map(selectedSettings => ({ selectedApp, selectedSettings })));
             }),
             tap(changes => {
                 this.next(changes, 'Selected');
@@ -100,7 +97,7 @@ export class AppsState extends State<Snapshot> {
     }
 
     public loadSettings(isReload = false): Observable<any> {
-        return this.appsService.getSettings(this.snapshot.selectedApp!.name).pipe(
+        return this.loadSettingsCore(this.snapshot.selectedApp).pipe(
             tap(settings => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:appSettings.reloaded');
@@ -173,7 +170,15 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    private replaceAppSettings(selectedSettings: AppSettingsDto) {
+    private loadSettingsCore(app?: AppDto | null): Observable<null | AppSettingsDto> {
+        if (!app) {
+            return of(null);
+        } else {
+            return this.appsService.getSettings(app.name);
+        }
+    }
+
+    private replaceAppSettings(selectedSettings?: AppSettingsDto | null) {
         this.next({ selectedSettings }, 'UpdatedSettings');
     }
 

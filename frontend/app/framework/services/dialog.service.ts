@@ -11,10 +11,6 @@ import { ErrorDto } from './../utils/error';
 import { Types } from './../utils/types';
 import { LocalStoreService } from './local-store.service';
 
-export const DialogServiceFactory = (localStore: LocalStoreService) => {
-    return new DialogService(localStore);
-};
-
 export class DialogRequest {
     private readonly resultStream$ = new ReplaySubject<boolean>();
 

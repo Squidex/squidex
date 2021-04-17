@@ -57,7 +57,7 @@
                     <h5>{{ 'common.files' | sqxTranslate }}</h5>
                 </ng-container>
                 
-                <div class="row no-gutters" [class.unrow]="isListView" *ngIf="assetsState.tagsNames | async; let tags" (paste)="addFiles($event)"
+                <div class="row no-gutters" [class.unrow]="isListView" *ngIf="assetsState.tagsNames | async; let tags"
                     cdkDropList
                     cdkDropListSortingDisabled>
                     <sqx-asset *ngFor="let file of snapshot.newFiles" 

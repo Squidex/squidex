@@ -5,15 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { LocalStoreService, LocalStoreServiceFactory } from './local-store.service';
+import { LocalStoreService } from './local-store.service';
 
 describe('LocalStore', () => {
-    it('should instantiate from factory', () => {
-        const localStoreService = LocalStoreServiceFactory();
-
-        expect(localStoreService).toBeDefined();
-    });
-
     it('should instantiate', () => {
         const localStoreService = new LocalStoreService();
 
@@ -61,10 +55,10 @@ describe('LocalStore', () => {
         const localStoreService = new LocalStoreService();
 
         localStoreService.configureStore({
-            setItem: (k: string, v: string) => {
+            setItem: () => {
                 throw 'Not supported';
             },
-            getItem: (k: string) => {
+            getItem: () => {
                 throw 'Not supported';
             }
         });

@@ -43,7 +43,7 @@ export class IntConverter implements TagConverter {
 
         const parsed = parseInt(input, 10);
 
-        if (parsed) {
+        if (Types.isNumber(parsed)) {
             return new TagValue(parsed, input, parsed);
         }
 
@@ -73,7 +73,7 @@ export class FloatConverter implements TagConverter {
 
         const parsed = parseFloat(input);
 
-        if (parsed) {
+        if (Types.isNumber(parsed)) {
             return new TagValue(parsed, input, parsed);
         }
 
@@ -121,6 +121,7 @@ export function getTagValues(values: ReadonlyArray<string | TagValue> | undefine
     if (!Types.isArray(values)) {
         return [];
     }
+
     const result: TagValue[] = [];
 
     for (const value of values) {

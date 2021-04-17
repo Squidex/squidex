@@ -32,9 +32,7 @@ export class AppDto {
     public readonly canUploadAssets: boolean;
     public readonly image: string;
 
-    public get displayName() {
-        return StringHelper.firstNonEmpty(this.label, this.name);
-    }
+    public readonly displayName: string;
 
     constructor(links: ResourceLinks,
         public readonly id: string,
@@ -71,6 +69,8 @@ export class AppDto {
         this.canUploadAssets = hasAnyLink(links, 'assets/create');
 
         this.image = getLinkUrl(links, 'image');
+
+        this.displayName = StringHelper.firstNonEmpty(this.label, this.name);
     }
 }
 
@@ -91,32 +91,37 @@ export class AppSettingsDto {
     }
 }
 
-export interface PatternDto {
-    readonly name: string;
-    readonly regex: string;
-    readonly message: string;
+export class PatternDto {
+    constructor(
+        public readonly name: string,
+        public readonly regex: string,
+        public readonly message?: string
+    ) {
+    }
 }
 
-export interface EditorDto {
-    readonly name: string;
-    readonly url: string;
+export class EditorDto {
+    constructor(
+        public readonly name: string,
+        public readonly url: string
+    ) {
+    }
 }
 
-export interface UpdateAppSettingsDto {
-    readonly patterns: ReadonlyArray<PatternDto>;
-    readonly editors: ReadonlyArray<EditorDto>;
-    readonly hideScheduler: boolean;
-}
+export type UpdatePatternDto =
+    Readonly<{ name: string, regex: string, message?: string }>;
 
-export interface CreateAppDto {
-    readonly name: string;
-    readonly template?: string;
-}
+export type UpdateEditorDto =
+    Readonly<{ name: string, regex: string, message?: string }>;
 
-export interface UpdateAppDto {
-    readonly label?: string;
-    readonly description?: string;
-}
+export type UpdateAppSettingsDto =
+    Readonly<{ patterns: readonly UpdatePatternDto[], editors: readonly UpdateEditorDto[], hideScheduler?: boolean }>;
+
+export type CreateAppDto =
+    Readonly<{ name: string; template?: string; }>;
+
+export type UpdateAppDto =
+    Readonly<{ label?: string, description?: string }>;
 
 @Injectable()
 export class AppsService {
@@ -301,7 +306,11 @@ function parseApp(response: any) {
 function parseAppSettings(response: any) {
     return new AppSettingsDto(response._links,
         response.hideScheduler,
-        response.patterns,
-        response.editors,
+        response.patterns.map((x: any) => {
+            return new PatternDto(x.name, x.regex, x.message);
+        }),
+        response.editors.map((x: any) => {
+            return new EditorDto(x.name, x.url);
+        }),
         new Version(response.version.toString()));
 }

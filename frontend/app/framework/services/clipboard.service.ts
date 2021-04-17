@@ -8,10 +8,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-export const ClipboardServiceFactory = () => {
-    return new ClipboardService();
-};
-
 @Injectable()
 export class ClipboardService {
     private readonly text$ = new BehaviorSubject<string>('');

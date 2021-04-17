@@ -57,7 +57,7 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
     private readonly subscriptions = new ResourceOwner();
     private readonly subscription: Subscription;
 
-    constructor(
+    protected constructor(
         private readonly changeDetector: ChangeDetectorRef,
         state: T
     ) {
@@ -95,10 +95,10 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
 type Disabled = { isDisabled: boolean };
 
 export abstract class StatefulControlComponent<T extends object, TValue> extends StatefulComponent<Disabled & T> implements ControlValueAccessor {
-    private fnChanged = (v: any) => { /* NOOP */ };
+    private fnChanged = (_: any) => { /* NOOP */ };
     private fnTouched = () => { /* NOOP */ };
 
-    constructor(changeDetector: ChangeDetectorRef, state: T) {
+    protected constructor(changeDetector: ChangeDetectorRef, state: T) {
         super(changeDetector, { ...state, isDisabled: false });
     }
 

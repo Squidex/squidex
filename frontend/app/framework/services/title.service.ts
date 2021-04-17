@@ -19,10 +19,6 @@ export class TitlesConfig {
     }
 }
 
-export const TitleServiceFactory = (titles: TitlesConfig, localizer: LocalizerService) => {
-    return new TitleService(titles, localizer);
-};
-
 @Injectable()
 export class TitleService {
     private readonly stack: any[] = [];

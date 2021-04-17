@@ -8,6 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { AnalyticsService, ApiUrlConfig, AppDto, AppsService, DateTime, ErrorDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { AppSettingsDto, EditorDto, PatternDto } from './apps.service';
 
 describe('AppsService', () => {
     const version = new Version('1');
@@ -68,6 +69,50 @@ describe('AppsService', () => {
         req.flush(appResponse(12));
 
         expect(app!).toEqual(createApp(12));
+    }));
+
+    it('should make get request to get app settings',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+
+        let app: AppSettingsDto;
+
+        appsService.getSettings('my-app').subscribe(result => {
+            app = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/settings');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush(appSettingsResponse(12));
+
+        expect(app!).toEqual(createAppSettings(12));
+    }));
+
+    it('should make put request to update app settings',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: '/api/apps/my-app/settings' }
+            }
+        };
+
+        let app: AppSettingsDto;
+
+        appsService.putSettings(resource, {} as any, version).subscribe(result => {
+            app = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/settings');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(appSettingsResponse(12));
+
+        expect(app!).toEqual(createAppSettings(12));
     }));
 
     it('should make post request to create app',
@@ -234,11 +279,13 @@ describe('AppsService', () => {
     }));
 
     function appResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
         return {
             id: `id${id}`,
-            name: `my-name${id}${suffix}`,
-            label: `my-label${id}${suffix}`,
-            description: `my-description${id}${suffix}`,
+            name: `app-name${key}`,
+            label: `app-label${key}`,
+            description: `app-description${key}`,
             permissions: ['Owner'],
             created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
@@ -247,9 +294,31 @@ describe('AppsService', () => {
             planName: 'Free',
             planUpgrade: 'Basic',
             roleProperties: createProperties(id),
-            version: id,
+            version: key,
             _links: {
-                schemas: { method: 'GET', href: '/schemas' }
+                update: { method: 'PUT', href: `apps/${id}` }
+            }
+        };
+    }
+
+    function appSettingsResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
+        return {
+            hideScheduler: false,
+            patterns: [1, 2, 3].map(i => {
+                const name = `pattern${i}${key}`;
+
+                return { name, regex: `${name}_regex`, message: `${name}_message` };
+            }),
+            editors: [1, 2, 3].map(i => {
+                const name = `editor${i}${key}`;
+
+                return { name, url: `${name}_url` };
+            }),
+            version: key,
+            _links: {
+                update: { method: 'PUT', href: `apps/${id}/settings` }
             }
         };
     }
@@ -257,14 +326,16 @@ describe('AppsService', () => {
 
 export function createApp(id: number, suffix = '') {
     const links: ResourceLinks = {
-        schemas: { method: 'GET', href: '/schemas' }
+        update: { method: 'PUT', href: `apps/${id}` }
     };
+
+    const key = `${id}${suffix}`;
 
     return new AppDto(links,
         `id${id}`,
-        `my-name${id}${suffix}`,
-        `my-label${id}${suffix}`,
-        `my-description${id}${suffix}`,
+        `app-name${key}`,
+        `app-label${key}`,
+        `app-description${key}`,
         ['Owner'],
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`),
@@ -272,7 +343,29 @@ export function createApp(id: number, suffix = '') {
         id % 2 === 0,
         'Free', 'Basic',
         createProperties(id),
-        new Version(`${id}${suffix}`));
+        new Version(key));
+}
+
+export function createAppSettings(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `apps/${id}/settings` }
+    };
+
+    const key = `${id}${suffix}`;
+
+    return new AppSettingsDto(links,
+        false,
+        [1, 2, 3].map(i => {
+            const name = `pattern${i}${key}`;
+
+            return new PatternDto(name, `${name}_regex`, `${name}_message`);
+        }),
+        [1, 2, 3].map(i => {
+            const name = `editor${i}${key}`;
+
+            return new EditorDto(name, `${name}_url`);
+        }),
+        new Version(key));
 }
 
 function createProperties(id: number) {

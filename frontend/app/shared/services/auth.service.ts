@@ -8,8 +8,8 @@
 import { Injectable } from '@angular/core';
 import { ApiUrlConfig, Types } from '@app/framework';
 import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client';
-import { Observable, Observer, of, ReplaySubject, throwError, TimeoutError } from 'rxjs';
-import { concat, delay, mergeMap, retryWhen, take, timeout } from 'rxjs/operators';
+import { concat, Observable, Observer, of, ReplaySubject, throwError, TimeoutError } from 'rxjs';
+import { delay, mergeMap, retryWhen, take, timeout } from 'rxjs/operators';
 
 export class Profile {
     public get id(): string {
@@ -112,7 +112,7 @@ export class AuthService {
     }
 
     public logoutRedirectComplete(): Observable<any> {
-        return Observable.create((observer: Observer<any>) => {
+        return new Observable((observer: Observer<any>) => {
             this.userManager.signoutRedirectCallback()
                 .then(x => {
                     observer.next(x);
@@ -125,10 +125,10 @@ export class AuthService {
     }
 
     public loginPopup(): Observable<Profile> {
-        return Observable.create((observer: Observer<Profile>) => {
+        return new Observable<Profile>(observer => {
             this.userManager.signinPopup()
                 .then(x => {
-                    observer.next(this.createProfile(x));
+                    observer.next(AuthService.createProfile(x));
                     observer.complete();
                 }, err => {
                     observer.error(err);
@@ -138,10 +138,10 @@ export class AuthService {
     }
 
     public loginRedirectComplete(): Observable<Profile> {
-        return Observable.create((observer: Observer<Profile>) => {
+        return new Observable<Profile>(observer => {
             this.userManager.signinRedirectCallback()
                 .then(x => {
-                    observer.next(this.createProfile(x));
+                    observer.next(AuthService.createProfile(x));
                     observer.complete();
                 }, err => {
                     observer.error(err);
@@ -151,11 +151,11 @@ export class AuthService {
     }
 
     public loginSilent(): Observable<Profile> {
-        const observable: Observable<Profile> =
-            Observable.create((observer: Observer<Profile | null>) => {
+        const observable =
+            new Observable<Profile>(observer => {
                 this.userManager.signinSilent()
                     .then(x => {
-                        observer.next(this.createProfile(x));
+                        observer.next(AuthService.createProfile(x));
                         observer.complete();
                     }, err => {
                         observer.error(err);
@@ -165,27 +165,32 @@ export class AuthService {
 
         return observable.pipe(
             timeout(2000),
-            retryWhen(errors => errors.pipe(
-                mergeMap(e => Types.is(e, TimeoutError) ? of(e) : throwError(e)),
-                delay(500),
-                take(5),
-                concat(throwError(new Error('Retry limit exceeded.'))))));
+            retryWhen(errors =>
+                concat(
+                    errors.pipe(
+                        mergeMap(e => Types.is(e, TimeoutError) ? of(e) : throwError(e)),
+                        delay(500),
+                        take(5)),
+                    throwError(new Error('Retry limit exceeded.'))
+                )
+            )
+        );
     }
 
-    private createProfile(user: User): Profile {
+    private static createProfile(user: User): Profile {
         return new Profile(user);
     }
 
     private checkState(promise: Promise<User | null>) {
         promise.then(user => {
             if (user) {
-                this.user$.next(this.createProfile(user));
+                this.user$.next(AuthService.createProfile(user));
             } else {
                 this.user$.next(null);
             }
 
             return true;
-        }, error => {
+        }, _ => {
             this.user$.next(null);
 
             return false;

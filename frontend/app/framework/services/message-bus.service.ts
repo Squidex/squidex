@@ -17,10 +17,6 @@ interface Message {
     data: any;
 }
 
-export const MessageBusFactory = () => {
-    return new MessageBus();
-};
-
 @Injectable()
 export class MessageBus {
     private message$ = new Subject<Message>();

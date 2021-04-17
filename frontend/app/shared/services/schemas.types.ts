@@ -260,10 +260,6 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 
 export type GeolocationFieldEditor = 'Map';
 
-export const GEOLOCATION_FIELD_EDITORS: ReadonlyArray<GeolocationFieldEditor> = [
-    'Map'
-];
-
 export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Geolocation';
 

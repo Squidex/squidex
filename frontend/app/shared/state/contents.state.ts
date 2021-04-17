@@ -86,7 +86,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.appsState.appId;
     }
 
-    constructor(name: string,
+    protected constructor(name: string,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService

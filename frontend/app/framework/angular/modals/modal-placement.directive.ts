@@ -90,8 +90,8 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
 
         const targetRect = this.targetElement.getBoundingClientRect();
 
-        let y = 0;
-        let x = 0;
+        let y: number;
+        let x: number;
 
         if (this.position === 'full') {
             x = -this.offset + targetRect.left;

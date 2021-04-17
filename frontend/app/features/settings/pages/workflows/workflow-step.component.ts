@@ -55,7 +55,7 @@ export class WorkflowStepComponent implements OnChanges {
     public transitions: ReadonlyArray<WorkflowTransitionView>;
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['workflow'] || changes['step'] || false) {
+        if (changes['workflow'] || changes['step']) {
             this.openSteps = this.workflow.getOpenSteps(this.step);
             this.openStep = this.openSteps[0];
 

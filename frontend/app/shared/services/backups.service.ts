@@ -58,10 +58,8 @@ export class RestoreDto {
     }
 }
 
-export interface StartRestoreDto {
-    readonly url: string;
-    readonly newAppName?: string;
-}
+export type StartRestoreDto =
+    Readonly<{ url: string, newAppName?: string }>;
 
 @Injectable()
 export class BackupsService {

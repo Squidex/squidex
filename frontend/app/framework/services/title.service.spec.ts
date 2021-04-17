@@ -7,7 +7,7 @@
 
 import { IMock, It, Mock } from 'typemoq';
 import { LocalizerService } from './localizer.service';
-import { TitlesConfig, TitleService, TitleServiceFactory } from './title.service';
+import { TitlesConfig, TitleService } from './title.service';
 
 describe('TitleService', () => {
     let localizer: IMock<LocalizerService>;
@@ -19,12 +19,6 @@ describe('TitleService', () => {
 
         localizer.setup(x => x.getOrKey(It.isAnyString()))
             .returns((key: string) => key.substr(5));
-    });
-
-    it('should instantiate from factory', () => {
-        const titleService = TitleServiceFactory(new TitlesConfig(), localizer.object);
-
-        expect(titleService).toBeDefined();
     });
 
     it('should instantiate', () => {
