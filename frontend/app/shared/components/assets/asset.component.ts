@@ -51,22 +51,22 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public folderId?: string;
 
     @Input()
-    public removeMode = false;
+    public removeMode?: boolean | null;
 
     @Input()
-    public isDisabled = false;
+    public isDisabled?: boolean | null;
 
     @Input()
-    public isSelected = false;
+    public isSelected?: boolean | null;
 
     @Input()
-    public isCompact: boolean;
+    public isCompact: boolean | undefined | null;
 
     @Input()
-    public isSelectable = false;
+    public isSelectable?: boolean | null;
 
     @Input() @HostBinding('class.isListView')
-    public isListView = false;
+    public isListView?: boolean | null;
 
     @Input()
     public allTags: ReadonlyArray<string>;
@@ -105,7 +105,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         }
     }
 
-    public updateFile(files: FileList) {
+    public updateFile(files: ReadonlyArray<File>) {
         if (files.length === 1 && this.asset.canUpload) {
             this.dialogs.confirm('i18n:assets.replaceConfirmTitle', 'i18n:assets.replaceConfirmText')
                 .subscribe(confirmed => {

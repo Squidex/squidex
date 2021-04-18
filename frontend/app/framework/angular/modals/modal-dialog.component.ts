@@ -22,22 +22,22 @@ export class ModalDialogComponent implements AfterViewInit {
     public close = new EventEmitter();
 
     @Input()
-    public showClose = true;
+    public showClose?: boolean | null = true;
 
     @Input()
-    public showHeader = true;
+    public showHeader?: boolean | null = true;
 
     @Input()
-    public showFooter = true;
+    public showFooter?: boolean | null = true;
 
     @Input()
     public size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
 
     @Input()
-    public flexBody = false;
+    public flexBody?: boolean | null;
 
     @Input()
-    public fullHeight = false;
+    public fullHeight?: boolean | null;
 
     @ViewChild('tabsElement', { static: false })
     public tabsElement: ElementRef<ParentNode>;

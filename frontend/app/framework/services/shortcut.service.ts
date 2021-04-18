@@ -8,10 +8,6 @@
 import { Injectable } from '@angular/core';
 import * as Mousetrap from 'mousetrap';
 
-export const ShortcutServiceFactory = () => {
-    return new ShortcutService();
-};
-
 @Injectable()
 export class ShortcutService {
     public on(keys: string, callback: (e: KeyboardEvent, combo: string) => void) {

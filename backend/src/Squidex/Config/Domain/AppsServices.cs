@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI;
@@ -14,7 +15,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Config.Domain
 {
@@ -47,7 +48,7 @@ namespace Squidex.Config.Domain
             {
                 var uiOptions = c.GetRequiredService<IOptions<MyUIOptions>>().Value;
 
-                var result = new InitialPatterns();
+                var patterns = new List<Pattern>();
 
                 if (uiOptions.RegexSuggestions != null)
                 {
@@ -56,12 +57,18 @@ namespace Squidex.Config.Domain
                         if (!string.IsNullOrWhiteSpace(key) &&
                             !string.IsNullOrWhiteSpace(value))
                         {
-                            result[DomainId.NewGuid()] = new AppPattern(key, value);
+                            patterns.Add(new Pattern(key, value));
                         }
                     }
                 }
 
-                return result;
+                return new InitialSettings
+                {
+                    Settings = new AppSettings
+                    {
+                        Patterns = patterns.ToReadOnlyCollection()
+                    }
+                };
             });
         }
     }

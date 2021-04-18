@@ -35,7 +35,7 @@
     
     
     <ng-container *sqxModal="expertDialog">
-        <sqx-modal-dialog (close)="expertDialog.hide()" fullHeight="true" size="lg">
+        <sqx-modal-dialog (close)="expertDialog.hide()" [fullHeight]="true" size="lg">
             <ng-container title>
                 {{ 'dashboard.editConfig' | sqxTranslate }}
             </ng-container>

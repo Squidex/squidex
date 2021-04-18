@@ -13,15 +13,6 @@ import { AnalyticsService, ApiUrlConfig, compareStrings, hasAnyLink, HTTP, mapVe
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-export type WorkflowsDto = Versioned<WorkflowsPayload>;
-export type WorkflowsPayload = {
-    readonly items: WorkflowDto[];
-
-    readonly errors: string[];
-
-    readonly canCreate: boolean;
-} & Resource;
-
 export class WorkflowDto extends Model<WorkflowDto> {
     public readonly _links: ResourceLinks;
 
@@ -196,17 +187,29 @@ export class WorkflowDto extends Model<WorkflowDto> {
     }
 }
 
-export type WorkflowStepValues = { color?: string; isLocked?: boolean; noUpdate?: boolean; noUpdateExpression?: string; noUpdateRoles?: ReadonlyArray<string> };
-export type WorkflowStep = { name: string } & WorkflowStepValues;
+export type WorkflowStepValues =
+    Readonly<{ color?: string; isLocked?: boolean; noUpdate?: boolean; noUpdateExpression?: string; noUpdateRoles?: ReadonlyArray<string> }>;
 
-export type WorkflowTransitionValues = { expression?: string; roles?: string[]; };
-export type WorkflowTransition = { from: string; to: string } & WorkflowTransitionValues;
+export type WorkflowStep =
+    Readonly<{ name: string } & WorkflowStepValues>;
 
-export type WorkflowTransitionView = { step: WorkflowStep } & WorkflowTransition;
+export type WorkflowTransitionValues =
+    Readonly<{ expression?: string; roles?: string[]; }>;
 
-export interface CreateWorkflowDto {
-    readonly name: string;
-}
+export type WorkflowTransition =
+    Readonly<{ from: string; to: string } & WorkflowTransitionValues>;
+
+export type WorkflowTransitionView =
+    Readonly<{ step: WorkflowStep } & WorkflowTransition>;
+
+export type WorkflowsDto =
+    Versioned<WorkflowsPayload>;
+
+export type WorkflowsPayload =
+    Readonly<{ items: WorkflowDto[]; errors: string[]; canCreate: boolean; } & Resource>;
+
+export type CreateWorkflowDto =
+    Readonly<{ name: string }>;
 
 @Injectable()
 export class WorkflowsService {

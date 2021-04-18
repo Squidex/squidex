@@ -43,7 +43,7 @@ export class TableFields {
             });
     }
 
-    public updateFields(fieldNames: string[], save = true) {
+    public updateFields(fieldNames: ReadonlyArray<string>, save = true) {
         fieldNames = fieldNames.filter(x => this.allFields.indexOf(x) >= 0);
 
         if (fieldNames.length === 0) {

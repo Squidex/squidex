@@ -29,7 +29,7 @@ export class ArrayEditorComponent implements OnChanges {
     public formModel: FieldArrayForm;
 
     @Input()
-    public canUnset: boolean;
+    public canUnset?: boolean | null;
 
     @Input()
     public language: AppLanguageDto;

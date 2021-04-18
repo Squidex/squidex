@@ -14,14 +14,6 @@ import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
-export type SchemasDto = {
-    readonly items: ReadonlyArray<SchemaDto>;
-
-    readonly canCreate: boolean;
-} & Resource;
-
-type FieldNames = ReadonlyArray<string>;
-
 export const MetaFields = {
     id: 'meta.id',
     created: 'meta.created',
@@ -94,19 +86,6 @@ export class SchemaDto {
     }
 }
 
-export type TableField = RootFieldDto | string;
-
-export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
-export type FieldRule = { field: string, action: FieldRuleAction, condition: string };
-
-export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
-    'Disable',
-    'Hide',
-    'Require'
-];
-
-export type SchemaCompletions = ReadonlyArray<{ name: string, description: string }>;
-
 export class SchemaDetailsDto extends SchemaDto {
     public readonly contentFields: ReadonlyArray<RootFieldDto>;
 
@@ -123,8 +102,8 @@ export class SchemaDetailsDto extends SchemaDto {
         lastModifiedBy: string,
         version: Version,
         public readonly fields: ReadonlyArray<RootFieldDto> = [],
-        public readonly fieldsInLists: FieldNames = [],
-        public readonly fieldsInReferences: FieldNames = [],
+        public readonly fieldsInLists: Tags = [],
+        public readonly fieldsInReferences: Tags = [],
         public readonly fieldRules: ReadonlyArray<FieldRule> = [],
         public readonly scripts = {},
         public readonly previewUrls = {}
@@ -334,48 +313,43 @@ export class SchemaPropertiesDto {
     }
 }
 
-export interface AddFieldDto {
-    readonly name: string;
-    readonly partitioning?: string;
-    readonly properties: FieldPropertiesDto;
-}
+export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
+    'Disable',
+    'Hide',
+    'Require'
+];
 
-export interface UpdateUIFields {
-    readonly fieldsInLists?: FieldNames;
-    readonly fieldsInReferences?: FieldNames;
-}
+type Tags = readonly string[];
 
-export interface CreateSchemaDto {
-    readonly name: string;
-    readonly fields?: ReadonlyArray<RootFieldDto>;
-    readonly category?: string;
-    readonly isSingleton?: boolean;
-    readonly isPublished?: boolean;
-    readonly properties?: SchemaPropertiesDto;
-}
+export type TableField = RootFieldDto | string;
 
-export interface UpdateSchemaCategoryDto {
-    readonly name?: string;
-}
+export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
+export type FieldRule = { field: string, action: FieldRuleAction, condition: string };
+export type SchemaCompletions = ReadonlyArray<{ name: string, description: string }>;
 
-export interface UpdateFieldDto {
-    readonly properties: FieldPropertiesDto;
-}
+export type SchemasDto =
+    Readonly<{ items: readonly SchemaDto[]; canCreate: boolean } & Resource>;
 
-export interface SynchronizeSchemaDto {
-    readonly noFieldDeletiong?: boolean;
-    readonly noFieldRecreation?: boolean;
-}
+export type AddFieldDto =
+    Readonly<{ name: string;  partitioning?: string; properties: FieldPropertiesDto }>;
 
-export interface UpdateSchemaDto {
-    readonly label?: string;
-    readonly hints?: string;
-    readonly contentsSidebarUrl?: string;
-    readonly contentSidebarUrl?: string;
-    readonly contentEditorUrl?: string;
-    readonly validateOnPublish?: boolean;
-    readonly tags?: ReadonlyArray<string>;
-}
+export type UpdateUIFields =
+    Readonly<{ fieldsInLists?: Tags; fieldsInReferences?: Tags; }>;
+
+export type CreateSchemaDto =
+    Readonly<{ name: string; fields?: ReadonlyArray<RootFieldDto>; category?: string; isSingleton?: boolean; isPublished?: boolean; properties?: SchemaPropertiesDto; }>;
+
+export type UpdateSchemaCategoryDto =
+    Readonly<{ name?: string; }>;
+
+export type UpdateFieldDto =
+    Readonly<{ properties: FieldPropertiesDto; }>;
+
+export type SynchronizeSchemaDto =
+    Readonly<{ noFieldDeletiong?: boolean; noFieldRecreation?: boolean; }>;
+
+export type UpdateSchemaDto =
+    Readonly<{ label?: string; hints?: string; contentsSidebarUrl?: string; contentSidebarUrl?: string; contentEditorUrl?: string; validateOnPublish?: boolean; tags?: Tags; }>;
 
 @Injectable()
 export class SchemasService {

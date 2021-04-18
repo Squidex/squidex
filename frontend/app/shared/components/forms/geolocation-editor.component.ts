@@ -173,11 +173,11 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     private ngAfterViewInitOSM() {
         this.searchBoxInput.nativeElement.remove();
 
-        this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.css');
-        this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css');
-
-        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js')
-            .then(() => {
+        Promise.all([
+            this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.css'),
+            this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css'),
+            this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js')
+        ]).then(() => {
                 this.map = L.map(this.editor.nativeElement).fitWorld();
 
                 L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png',

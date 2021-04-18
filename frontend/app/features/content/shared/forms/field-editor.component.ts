@@ -6,7 +6,7 @@
  */
 
 import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormControl } from '@angular/forms';
+import { AbstractControl, FormControl } from '@angular/forms';
 import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, MathHelper, RootFieldDto, Types } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -36,7 +36,7 @@ export class FieldEditorComponent implements OnChanges {
     public index: number;
 
     @Input()
-    public canUnset: boolean;
+    public canUnset?: boolean | null;
 
     @Input()
     public displaySuffix: string;
@@ -48,10 +48,6 @@ export class FieldEditorComponent implements OnChanges {
 
     public get field() {
         return this.formModel.field;
-    }
-
-    public get arrayControl() {
-        return this.formModel.form as FormArray;
     }
 
     public get editorControl() {

@@ -35,7 +35,7 @@ export class ArraySectionComponent {
     public index: number;
 
     @Input()
-    public canUnset: boolean;
+    public canUnset?: boolean | null;
 
     @ViewChildren(FieldEditorComponent)
     public editors: QueryList<FieldEditorComponent>;

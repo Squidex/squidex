@@ -5,18 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { MessageBus, MessageBusFactory } from './message-bus.service';
+import { MessageBus } from './message-bus.service';
 
 class Event1 {}
 class Event2 {}
 
 describe('MessageBus', () => {
-    it('should instantiate from factory', () => {
-        const messageBus = MessageBusFactory();
-
-        expect(messageBus).toBeDefined();
-    });
-
     it('should instantiate', () => {
         const messageBus = new MessageBus();
 

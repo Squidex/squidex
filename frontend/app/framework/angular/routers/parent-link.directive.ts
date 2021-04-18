@@ -16,7 +16,7 @@ export class ParentLinkDirective extends ResourceOwner implements OnInit {
     private url: string;
 
     @Input()
-    public isLazyLoaded = false;
+    public isLazyLoaded?: boolean | null;
 
     @Input()
     public queryParamsHandling: QueryParamsHandling;

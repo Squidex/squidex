@@ -5,21 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class InitialPatterns : Dictionary<DomainId, AppPattern>
+    public sealed class InitialSettings
     {
-        public InitialPatterns()
-        {
-        }
-
-        public InitialPatterns(Dictionary<DomainId, AppPattern> patterns)
-            : base(patterns)
-        {
-        }
+        public AppSettings Settings { get; set; }
     }
 }

@@ -52,6 +52,72 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             Guard.NotNull(command, nameof(command));
         }
 
+        public static void CanUpdateSettings(UpdateAppSettings command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            Validate.It(e =>
+            {
+                var prefix = nameof(command.Settings);
+
+                var settings = command.Settings;
+
+                if (settings == null)
+                {
+                    e(Not.Defined(nameof(settings)), prefix);
+                    return;
+                }
+
+                var patternsPrefix = $"{prefix}.{nameof(settings.Patterns)}";
+
+                if (settings.Patterns == null)
+                {
+                    e(Not.Defined(nameof(settings.Patterns)), patternsPrefix);
+                }
+                else
+                {
+                    settings.Patterns.Foreach((pattern, index) =>
+                    {
+                        var patternPrefix = $"{patternsPrefix}[{index}]";
+
+                        if (string.IsNullOrWhiteSpace(pattern.Name))
+                        {
+                            e(Not.Defined(nameof(pattern.Name)), $"{patternPrefix}.{nameof(pattern.Name)}");
+                        }
+
+                        if (string.IsNullOrWhiteSpace(pattern.Regex))
+                        {
+                            e(Not.Defined(nameof(pattern.Regex)), $"{patternPrefix}.{nameof(pattern.Regex)}");
+                        }
+                    });
+                }
+
+                var editorsPrefix = $"{prefix}.{nameof(settings.Editors)}";
+
+                if (settings.Editors == null)
+                {
+                    e(Not.Defined(nameof(settings.Editors)), editorsPrefix);
+                }
+                else
+                {
+                    settings.Editors.Foreach((editor, index) =>
+                    {
+                        var editorPrefix = $"{editorsPrefix}[{index}]";
+
+                        if (string.IsNullOrWhiteSpace(editor.Name))
+                        {
+                            e(Not.Defined(nameof(editor.Name)), $"{editorPrefix}.{nameof(editor.Name)}");
+                        }
+
+                        if (string.IsNullOrWhiteSpace(editor.Url))
+                        {
+                            e(Not.Defined(nameof(editor.Url)), $"{editorPrefix}.{nameof(editor.Url)}");
+                        }
+                    });
+                }
+            });
+        }
+
         public static void CanChangePlan(ChangePlan command, IAppEntity app, IAppPlansProvider appPlans)
         {
             Guard.NotNull(command, nameof(command));

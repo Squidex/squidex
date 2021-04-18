@@ -456,28 +456,33 @@ describe('AssetsService', () => {
     function assetResponse(id: number, suffix = '', parentId?: string) {
         parentId = parentId || MathHelper.EMPTY_GUID;
 
+        const key = `${id}${suffix}`;
+
         return {
             id: `id${id}`,
             created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
             createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
             lastModifiedBy: `modifier${id}`,
-            fileName: `My Name${id}${suffix}.png`,
-            fileHash: `My Hash${id}${suffix}`,
+            fileName: `My Name${key}.png`,
+            fileHash: `My Hash${key}`,
             fileType: 'png',
             fileSize: id * 2,
             fileVersion: id * 4,
             isProtected: true,
             parentId,
             mimeType: 'image/png',
-            type: `my-type${id}${suffix}`,
-            metadataText: `my-metadata${id}${suffix}`,
+            type: `my-type${key}`,
+            metadataText: `my-metadata${key}`,
             metadata: {
                 pixelWidth: id * 3,
                 pixelHeight: id * 5
             },
-            slug: `my-name${id}${suffix}.png`,
-            tags: ['tag1', 'tag2'],
+            slug: `my-name${key}.png`,
+            tags: [
+                'tag1',
+                'tag2'
+            ],
             version: id,
             _links: {
                 update: { method: 'PUT', href: `/assets/${id}` }
@@ -491,9 +496,11 @@ describe('AssetsService', () => {
     function assetFolderResponse(id: number, suffix = '', parentId?: string) {
         parentId = parentId || MathHelper.EMPTY_GUID;
 
+        const key = `${id}${suffix}`;
+
         return {
             id: `id${id}`,
-            folderName: `My Folder${id}${suffix}`,
+            folderName: `My Folder${key}`,
             parentId,
             version: id,
             _links: {
@@ -509,6 +516,8 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         update: { method: 'PUT', href: `/assets/${id}` }
     };
 
+    const key = `${id}${suffix}`;
+
     const meta = {
         isDuplicate: 'true'
     };
@@ -519,31 +528,36 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         `id${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
-        `My Name${id}${suffix}.png`,
-        `My Hash${id}${suffix}`,
+        `My Name${key}.png`,
+        `My Hash${key}`,
         'png',
         id * 2,
         id * 4,
         true,
         parentId,
         'image/png',
-        `my-type${id}${suffix}`,
-        `my-metadata${id}${suffix}`,
+        `my-type${key}`,
+        `my-metadata${key}`,
         {
             pixelWidth: id * 3,
             pixelHeight: id * 5
         },
-        `my-name${id}${suffix}.png`,
-        tags || ['tag1', 'tag2'],
-        new Version(`${id}${suffix}`));
+        `my-name${key}.png`,
+        tags || [
+            'tag1',
+            'tag2'
+        ],
+        new Version(key));
 }
 
 export function createAssetFolder(id: number, suffix = '', parentId?: string) {
     parentId = parentId || MathHelper.EMPTY_GUID;
 
+    const key = `${id}${suffix}`;
+
     const links: ResourceLinks = {
         update: { method: 'PUT', href: `/assets/folders/${id}` }
     };
 
-    return new AssetFolderDto(links, `id${id}`, `My Folder${id}${suffix}`, parentId, new Version(`${id}`));
+    return new AssetFolderDto(links, `id${id}`, `My Folder${key}`, parentId, new Version(`${id}`));
 }

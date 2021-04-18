@@ -12,10 +12,6 @@ export interface ResizeListener {
     onResize(rect: DOMRect, element: Element): void;
 }
 
-export const ResizeServiceFactory = () => {
-    return new ResizeService();
-};
-
 @Injectable()
 export class ResizeService implements OnDestroy {
     private readonly listeners = new WeakMap<Element, ResizeListener>();

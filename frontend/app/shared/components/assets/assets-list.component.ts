@@ -28,19 +28,19 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public assetsState: AssetsState;
 
     @Input()
-    public isDisabled = false;
+    public isDisabled?: boolean | null;
 
     @Input()
-    public isListView = false;
+    public isListView?: boolean | null;
 
     @Input()
-    public indicateLoading = false;
+    public indicateLoading?: boolean | null;
 
     @Input()
     public selectedIds: object;
 
     @Input()
-    public showPager = true;
+    public showPager?: boolean | null = true;
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
@@ -110,7 +110,11 @@ export class AssetsListComponent extends StatefulComponent<State> {
         return drag.data.id !== drop.data;
     }
 
-    public trackByAssetItem(_index: number, asset: AssetDto | AssetFolderDto) {
+    public trackByAssetFolder(_index: number, asset: AssetFolderDto) {
+        return asset.id;
+    }
+
+    public trackByAsset(_index: number, asset: AssetDto) {
         return asset.id;
     }
 }

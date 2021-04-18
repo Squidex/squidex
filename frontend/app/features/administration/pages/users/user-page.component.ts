@@ -17,7 +17,7 @@ import { ResourceOwner } from '@app/shared';
     templateUrl: './user-page.component.html'
 })
 export class UserPageComponent extends ResourceOwner implements OnInit {
-    public isEditable = true;
+    public isEditable = false;
 
     public user?: UserDto | null;
     public userForm = new UserForm(this.formBuilder);

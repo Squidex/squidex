@@ -19,7 +19,7 @@ export class FieldLanguagesComponent {
     public showAllControlsChange = new EventEmitter<boolean>();
 
     @Input()
-    public showAllControls: boolean;
+    public showAllControls?: boolean | null;
 
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();

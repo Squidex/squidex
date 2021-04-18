@@ -188,7 +188,7 @@ describe('AssetsState', () => {
         });
 
         it('should not add asset to snapshot when parent id is not the same', () => {
-            const newAsset = createAsset(5, ['new'], 'new', 'other-parent');
+            const newAsset = createAsset(5, ['new'], '_new', 'other-parent');
 
             assetsState.addAsset(newAsset);
 

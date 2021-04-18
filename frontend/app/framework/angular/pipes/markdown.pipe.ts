@@ -31,7 +31,7 @@ inlinerRenderer.link = renderer.link;
     pure: true
 })
 export class MarkdownPipe implements PipeTransform {
-    public transform(text: string | null | undefined): string {
+    public transform(text: string | undefined | null): string {
         if (text) {
             return marked(text, { renderer });
         } else {
@@ -45,7 +45,7 @@ export class MarkdownPipe implements PipeTransform {
     pure: true
 })
 export class MarkdownInlinePipe implements PipeTransform {
-    public transform(text: string | null | undefined): string {
+    public transform(text: string | undefined | null): string {
         if (text) {
             return marked(text, { renderer: inlinerRenderer });
         } else {

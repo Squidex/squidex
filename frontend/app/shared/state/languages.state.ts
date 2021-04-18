@@ -13,7 +13,7 @@ import { AppLanguageDto, AppLanguagesPayload, AppLanguagesService, UpdateAppLang
 import { LanguageDto, LanguagesService } from './../services/languages.service';
 import { AppsState } from './apps.state';
 
-interface SnapshotLanguage {
+export interface SnapshotLanguage {
     // The language.
     language: AppLanguageDto;
 

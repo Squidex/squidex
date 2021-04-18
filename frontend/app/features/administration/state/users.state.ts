@@ -166,7 +166,7 @@ export class UsersState extends State<Snapshot> {
 
     public delete(user: UserDto) {
         return this.usersService.deleteUser(user).pipe(
-            tap(updated => {
+            tap(() => {
                 this.next(s => {
                     const users = s.users.filter(x => x.id !== user.id);
 

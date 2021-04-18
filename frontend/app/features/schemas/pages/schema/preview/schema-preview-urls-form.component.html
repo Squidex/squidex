@@ -1,4 +1,4 @@
-<form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
+<form (ngSubmit)="saveSchema()">
     <div class="card mb-2">
         <div class="card-header">{{ 'schemas.previewUrls.title' | sqxTranslate }}</div>
 
@@ -8,11 +8,11 @@
             </sqx-form-alert>
 
             <div class="content">
-                <div class="mt-4" *ngIf="!isEditable && editForm.form.controls.length === 0">
+                <div class="mt-4" *ngIf="!isEditable && editForm.previewControls.length === 0">
                     {{ 'schemas.previewUrls.empty' | sqxTranslate }}
                 </div>
 
-                <div class="form-group row no-gutters" *ngFor="let form of editForm.form.controls; let i = index" [formGroup]="form">
+                <div class="form-group row no-gutters" *ngFor="let form of editForm.previewControls; let i = index" [formGroup]="form">
                     <div class="col col-name pr-1">
                         <sqx-control-errors for="name"></sqx-control-errors>
 
@@ -54,7 +54,7 @@
             </div>
         </div>
         <div class="card-footer" *ngIf="isEditable">
-            <button type="submit" class="float-right btn btn-primary" [class.invisible]="!isEditable">
+            <button type="submit" class="float-right btn btn-primary">
                 {{ 'common.save' | sqxTranslate }}
             </button>
         </div>

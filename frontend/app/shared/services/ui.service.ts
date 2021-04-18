@@ -11,9 +11,8 @@ import { ApiUrlConfig } from '@app/framework';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-export interface UISettingsDto {
-    readonly canCreateApps: boolean;
-}
+export type UISettingsDto =
+    Readonly<{ canCreateApps: boolean }>;
 
 @Injectable()
 export class UIService {

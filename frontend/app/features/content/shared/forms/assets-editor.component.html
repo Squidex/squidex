@@ -1,8 +1,8 @@
-<div class="assets-container" (sqxDropFile)="addFiles($event)" (sqxDropDisabled)="snapshot.isDisabled" tabindex="1000">
+<div class="assets-container" (sqxDropFile)="addFiles($event)" [sqxDropDisabled]="snapshot.isDisabled" tabindex="1000">
     <div class="header list">
         <div class="row no-gutters">
             <div class="col" [class.disabled]="snapshot.isDisabled">
-                <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxDropFile)="addFiles($event)" (sqxDropDisabled)="snapshot.isDisabled">
+                <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxDropFile)="addFiles($event)" [sqxDropDisabled]="snapshot.isDisabled">
                     {{ 'contents.assetsUpload' | sqxTranslate }}
                 </div>
             </div>

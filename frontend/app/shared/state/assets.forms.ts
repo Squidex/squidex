@@ -14,6 +14,9 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
     public get metadata() {
         return this.form.get('metadata')! as FormArray;
     }
+    public get metadataControls(): ReadonlyArray<FormGroup> {
+        return this.metadata.controls as any;
+    }
 
     constructor(
         private readonly formBuilder: FormBuilder

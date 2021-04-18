@@ -64,7 +64,7 @@ $list-height: 2.25rem;
     }
 
     &-footer {
-        max-height: auto;
+        max-height: none;
         min-height: $asset-footer;
         padding: 1rem;
         padding-top: .5rem;

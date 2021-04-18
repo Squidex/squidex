@@ -41,19 +41,13 @@ export class UserDto {
     }
 }
 
-export interface CreateUserDto {
-    readonly email: string;
-    readonly displayName: string;
-    readonly permissions: ReadonlyArray<string>;
-    readonly password: string;
-}
+type Permissions = readonly string[];
 
-export interface UpdateUserDto {
-    readonly email: string;
-    readonly displayName: string;
-    readonly permissions: ReadonlyArray<string>;
-    readonly password?: string;
-}
+export type CreateUserDto =
+    Readonly<{ email: string, displayName: string, permissions: Permissions, password: string }>;
+
+export type UpdateUserDto =
+    Partial<CreateUserDto>;
 
 @Injectable()
 export class UsersService {

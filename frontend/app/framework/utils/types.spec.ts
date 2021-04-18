@@ -183,7 +183,7 @@ describe('Types', () => {
         expect(Types.equals(undefined, '', false)).toBeFalsy();
     });
 
-    FalsyValues.forEach(x => {
+    FalsyValues.map(x => {
         it(`should compare empty string with {x}`, () => {
             expect(Types.equals('', x, true)).toBeFalsy();
             expect(Types.equals('', x, false)).toBeFalsy();

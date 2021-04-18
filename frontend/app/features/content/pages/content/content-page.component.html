@@ -1,7 +1,7 @@
 <sqx-title [message]="schema.displayName"></sqx-title>
 
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-    <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="!!content" grid="true" (close)="back()">
+    <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="!!content" [grid]="true" (close)="back()">
         <ng-container title>
             <a class="btn btn-text" (click)="back()" *ngIf="!schema.isSingleton">
                 <i class="icon-angle-left"></i>
@@ -102,7 +102,7 @@
                 <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-template>
 
-            <sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async"></sqx-form-error>
+            <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm.error | async"></sqx-form-error>
         </ng-container>
 
         <ng-container content>
@@ -164,7 +164,7 @@
                     <i class="icon-plugin"></i>
                 </a>
 
-                <sqx-onboarding-tooltip helpId="history" [for]="linkHistory" position="left-top" after="120000">
+                <sqx-onboarding-tooltip helpId="history" [for]="linkHistory" position="left-top" [after]="120000">
                     {{ 'common.sidebarTour' | sqxTranslate }}
                 </sqx-onboarding-tooltip>
             </div>

@@ -10,7 +10,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HelpComponent, HistoryComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { BackupComponent, BackupsPageComponent, ClientAddFormComponent, ClientComponent, ClientConnectFormComponent, ClientsPageComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, ImportContributorsDialogComponent, LanguageAddFormComponent, LanguageComponent, LanguagesPageComponent, MorePageComponent, PatternComponent, PatternsPageComponent, PlanComponent, PlansPageComponent, RoleAddFormComponent, RoleComponent, RolesPageComponent, SettingsAreaComponent, WorkflowAddFormComponent, WorkflowComponent, WorkflowsPageComponent, WorkflowStepComponent, WorkflowTransitionComponent } from './declarations';
+import { BackupComponent, BackupsPageComponent, ClientAddFormComponent, ClientComponent, ClientConnectFormComponent, ClientsPageComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, ImportContributorsDialogComponent, LanguageAddFormComponent, LanguageComponent, LanguagesPageComponent, MorePageComponent, PlanComponent, PlansPageComponent, RoleAddFormComponent, RoleComponent, RolesPageComponent, SettingsAreaComponent, WorkflowAddFormComponent, WorkflowComponent, WorkflowsPageComponent, WorkflowStepComponent, WorkflowTransitionComponent } from './declarations';
+import { SettingsPageComponent } from './pages/settings/settings-page.component';
 import { WorkflowDiagramComponent } from './pages/workflows/workflow-diagram.component';
 
 const routes: Routes = [
@@ -96,24 +97,8 @@ const routes: Routes = [
                 ]
             },
             {
-                path: 'patterns',
-                component: PatternsPageComponent,
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.patterns'
-                        }
-                    },
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/patterns'
-                        }
-                    }
-                ]
+                path: 'settings',
+                component: SettingsPageComponent
             },
             {
                 path: 'plans',
@@ -186,13 +171,12 @@ const routes: Routes = [
         LanguageComponent,
         LanguagesPageComponent,
         MorePageComponent,
-        PatternComponent,
-        PatternsPageComponent,
         PlanComponent,
         PlansPageComponent,
         RoleAddFormComponent,
         RoleComponent,
         RolesPageComponent,
+        SettingsPageComponent,
         SettingsAreaComponent,
         WorkflowAddFormComponent,
         WorkflowComponent,

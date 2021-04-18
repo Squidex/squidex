@@ -11,13 +11,6 @@ import { AnalyticsService, ApiUrlConfig, HTTP, mapVersioned, pretifyError, Versi
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-export type PlansDto = Versioned<{
-    readonly currentPlanId: string,
-    readonly planOwner: string,
-    readonly hasPortal: boolean,
-    readonly plans: ReadonlyArray<PlanDto>
-}>;
-
 export class PlanDto {
     constructor(
         public readonly id: string,
@@ -35,13 +28,14 @@ export class PlanDto {
     }
 }
 
-export interface PlanChangedDto {
-    readonly redirectUri?: string;
-}
+export type PlansDto =
+    Versioned<Readonly<{ currentPlanId: string; planOwner: string; hasPortal: boolean; plans: ReadonlyArray<PlanDto>; }>>;
 
-export interface ChangePlanDto {
-    readonly planId: string;
-}
+export type PlanChangedDto =
+    Readonly<{ redirectUri?: string }>;
+
+export type ChangePlanDto =
+    Readonly<{ planId: string }>;
 
 @Injectable()
 export class PlansService {

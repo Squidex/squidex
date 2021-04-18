@@ -104,7 +104,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     public canCreateFolders =
         this.project(x => x.canCreateFolders === true);
 
-    constructor(name: string,
+    protected constructor(name: string,
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
         private readonly dialogs: DialogService

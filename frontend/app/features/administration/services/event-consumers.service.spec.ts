@@ -130,14 +130,16 @@ describe('EventConsumersService', () => {
         expect(eventConsumer!).toEqual(createEventConsumer(12));
     }));
 
-    function eventConsumerResponse(id: number) {
+    function eventConsumerResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
         return {
             name: `event-consumer${id}`,
-            position: `position${id}`,
+            position: `position${key}`,
             count: id,
             isStopped: true,
             isResetting: true,
-            error: `failure${id}`,
+            error: `failure${key}`,
             _links: {
                 reset: { method: 'PUT', href: `/event-consumers/${id}/reset` }
             }
@@ -150,11 +152,13 @@ export function createEventConsumer(id: number, suffix = '') {
         reset: { method: 'PUT', href: `/event-consumers/${id}/reset` }
     };
 
+    const key = `${id}${suffix}`;
+
     return new EventConsumerDto(links,
         `event-consumer${id}`,
         id,
         true,
         true,
-        `failure${id}${suffix}`,
-        `position${id}${suffix}`);
+        `failure${key}`,
+        `position${key}`);
 }

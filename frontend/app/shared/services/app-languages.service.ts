@@ -11,13 +11,6 @@ import { AnalyticsService, ApiUrlConfig, hasAnyLink, HTTP, mapVersioned, pretify
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-export type AppLanguagesDto = Versioned<AppLanguagesPayload>;
-export type AppLanguagesPayload = {
-    readonly items: ReadonlyArray<AppLanguageDto>;
-
-    readonly canCreate: boolean;
-} & Resource;
-
 export class AppLanguageDto {
     public readonly _links: ResourceLinks;
 
@@ -39,15 +32,17 @@ export class AppLanguageDto {
     }
 }
 
-export interface AddAppLanguageDto {
-    readonly language: string;
-}
+export type AppLanguagesDto =
+    Versioned<AppLanguagesPayload>;
 
-export interface UpdateAppLanguageDto {
-    readonly isMaster?: boolean;
-    readonly isOptional?: boolean;
-    readonly fallback?: ReadonlyArray<string>;
-}
+export type AppLanguagesPayload =
+    Readonly<{ items: readonly AppLanguageDto[], canCreate: boolean } & Resource>;
+
+export type AddAppLanguageDto =
+    Readonly<{ language: string }>;
+
+export type UpdateAppLanguageDto =
+    Readonly<{ isMaster?: boolean, isOptional?: boolean, falback?: readonly string[] }>;
 
 @Injectable()
 export class AppLanguagesService {

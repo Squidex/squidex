@@ -8,23 +8,23 @@
 import { DateTime } from './date-time';
 import { Types } from './types';
 
-const regex = /\${[^}]+}/g;
+const regex = /\$?{([^}]+)}/g;
 
 export function interpolate(pattern: string, value?: any, shortcut?: string, fallback = 'undefined'): string {
-    const result = pattern.replace(regex, (match: string) => {
+    const result = pattern.replace(regex, (_: string, path: string) => {
         let replaced = value;
 
-        const path = match.substr(2, match.length - 3).split('.');
+        for (const segment of path.split('.')) {
+            const trimmed = segment.trim();
 
-        for (const segment of path) {
             if (!replaced) {
                 return false;
             }
 
             if (Types.isArray(replaced)) {
-                replaced = replaced[Number.parseInt(segment, 10)];
+                replaced = replaced[Number.parseInt(trimmed, 10)];
             } else {
-                replaced = replaced[segment];
+                replaced = replaced[trimmed];
             }
         }
 

@@ -22,8 +22,8 @@ export class RuleElementComponent {
     public element: RuleElementDto;
 
     @Input()
-    public isSmall = true;
+    public isSmall?: boolean | null = true;
 
     @Input()
-    public disabled = false;
+    public disabled?: boolean | null;
 }

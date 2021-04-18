@@ -1,6 +1,6 @@
 <sqx-title message="i18n:rules.listPageTitle"></sqx-title>
 
-<sqx-panel desiredWidth="54rem" showSidebar="true" grid="true">
+<sqx-panel desiredWidth="54rem" [showSidebar]="true" [grid]="true">
     <ng-container title>
         {{ 'common.rules' | sqxTranslate }}
     </ng-container>
@@ -56,10 +56,10 @@
                     </table>
         
                     <ng-container *sqxModal="addRuleDialog">
-                        <sqx-rule-wizard [schemas]="schemasState.schemas | async"
+                        <sqx-rule-wizard [schemas]="(schemasState.schemas | async)!"
                             [rule]="wizardRule"
                             [ruleActions]="ruleActions"
-                            [ruleTriggers]="ruleTriggers"
+                            [ruleTriggers]="$any(ruleTriggers)"
                             [mode]="wizardMode"
                             (complete)="addRuleDialog.hide()">
                         </sqx-rule-wizard>
@@ -79,7 +79,7 @@
                 <i class="icon-help2"></i>
             </a>
 
-            <sqx-onboarding-tooltip helpId="help" [for]="helpLink" position="left-top" after="180000">
+            <sqx-onboarding-tooltip helpId="help" [for]="helpLink" position="left-top" [after]="180000">
                 <span [innerHTML]="'common.helpTour' | sqxTranslate | sqxMarkdownInline"></span>
             </sqx-onboarding-tooltip>
         </div>

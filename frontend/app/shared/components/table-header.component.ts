@@ -31,7 +31,7 @@ export class TableHeaderComponent implements OnChanges {
     public language: LanguageDto;
 
     @Input()
-    public sortable = false;
+    public sortable?: boolean | null;
 
     public order: SortMode | null;
 

@@ -28,7 +28,7 @@ export class NumberValidationComponent implements OnInit {
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public isLocalizable: boolean;
+    public isLocalizable?: boolean | null;
 
     public showUnique: boolean;
 

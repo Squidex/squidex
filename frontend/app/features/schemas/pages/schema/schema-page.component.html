@@ -1,6 +1,6 @@
 <sqx-title [message]="schemasState.schemaName"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" showSidebar="true" noPadding="true" *ngIf="schemaTab | async; let tab">
+<sqx-panel desiredWidth="50rem" [showSidebar]="true" [noPadding]="true" *ngIf="schemaTab | async; let tab">
     <ng-container header>
         <ul class="nav nav-tabs2">
             <li class="nav-item">
@@ -69,11 +69,11 @@
             </div>
         </ng-container>
 
-        <sqx-onboarding-tooltip helpId="history" [for]="buttonOptions" position="bottom-right" after="60000">
+        <sqx-onboarding-tooltip helpId="history" [for]="buttonOptions" position="bottom-right" [after]="60000">
             {{ 'schemas.contextMenuTour' | sqxTranslate }}
         </sqx-onboarding-tooltip>
 
-        <sqx-onboarding-tooltip helpId="history" [for]="buttonPublish" position="bottom-right" after="240000">
+        <sqx-onboarding-tooltip helpId="history" [for]="buttonPublish" position="bottom-right" [after]="240000">
             {{ 'schemas.publishedTour' | sqxTranslate }}
         </sqx-onboarding-tooltip>
     </ng-container>

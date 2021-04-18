@@ -7,10 +7,6 @@
 
 import { Injectable } from '@angular/core';
 
-export const TempServiceFactory = () => {
-   return new TempService();
-};
-
 @Injectable()
 export class TempService {
    private value: any = null;

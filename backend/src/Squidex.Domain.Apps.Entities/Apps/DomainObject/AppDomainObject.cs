@@ -26,13 +26,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
     public sealed partial class AppDomainObject : DomainObject<AppDomainObject.State>
     {
-        private readonly InitialPatterns initialPatterns;
+        private readonly InitialSettings initialSettings;
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
         public AppDomainObject(IPersistenceFactory<State> persistence, ISemanticLog log,
-            InitialPatterns initialPatterns,
+            InitialSettings initialPatterns,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             this.userResolver = userResolver;
             this.appPlansProvider = appPlansProvider;
             this.appPlansBillingManager = appPlansBillingManager;
-            this.initialPatterns = initialPatterns;
+            this.initialSettings = initialPatterns;
         }
 
         protected override bool IsDeleted()
@@ -84,6 +84,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         GuardApp.CanUpdate(c);
 
                         Update(c);
+
+                        return Snapshot;
+                    });
+
+                case UpdateAppSettings updateSettings:
+                    return UpdateReturn(updateSettings, c =>
+                    {
+                        GuardApp.CanUpdateSettings(c);
+
+                        UpdateSettings(c);
 
                         return Snapshot;
                     });
@@ -248,36 +258,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         return Snapshot;
                     });
 
-                case AddPattern addPattern:
-                    return UpdateReturn(addPattern, c =>
-                    {
-                        GuardAppPatterns.CanAdd(c, Snapshot);
-
-                        AddPattern(c);
-
-                        return Snapshot;
-                    });
-
-                case DeletePattern deletePattern:
-                    return UpdateReturn(deletePattern, c =>
-                    {
-                        GuardAppPatterns.CanDelete(c, Snapshot);
-
-                        DeletePattern(c);
-
-                        return Snapshot;
-                    });
-
-                case UpdatePattern updatePattern:
-                    return UpdateReturn(updatePattern, c =>
-                    {
-                        GuardAppPatterns.CanUpdate(c, Snapshot);
-
-                        UpdatePattern(c);
-
-                        return Snapshot;
-                    });
-
                 case ChangePlan changePlan:
                     return UpdateReturnAsync(changePlan, async c =>
                     {
@@ -339,10 +319,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 events.Add(CreateInitialOwner(command.Actor));
             }
 
-            foreach (var (key, value) in initialPatterns)
-            {
-                events.Add(CreateInitialPattern(key, value));
-            }
+            events.Add(CreateInitialSettings());
 
             foreach (var @event in events)
             {
@@ -367,6 +344,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private void Update(UpdateApp command)
         {
             Raise(command, new AppUpdated());
+        }
+
+        private void UpdateSettings(UpdateAppSettings command)
+        {
+            Raise(command, new AppSettingsUpdated());
         }
 
         private void UpdateClient(UpdateClient command)
@@ -434,21 +416,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             Raise(command, new AppLanguageRemoved());
         }
 
-        private void AddPattern(AddPattern command)
-        {
-            Raise(command, new AppPatternAdded());
-        }
-
-        private void DeletePattern(DeletePattern command)
-        {
-            Raise(command, new AppPatternDeleted());
-        }
-
-        private void UpdatePattern(UpdatePattern command)
-        {
-            Raise(command, new AppPatternUpdated());
-        }
-
         private void AddRole(AddRole command)
         {
             Raise(command, new AppRoleAdded());
@@ -493,15 +460,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
         }
 
-        private static AppPatternAdded CreateInitialPattern(DomainId id, AppPattern pattern)
+        private AppSettingsUpdated CreateInitialSettings()
         {
-            return new AppPatternAdded
-            {
-                Name = pattern.Name,
-                PatternId = id,
-                Pattern = pattern.Pattern,
-                Message = pattern.Message
-            };
+            return new AppSettingsUpdated { Settings = initialSettings.Settings };
         }
     }
 }

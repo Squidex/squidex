@@ -122,7 +122,7 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
         this.enable();
     }
 
-    private updateSubmitState(errorOrMessage: string | ErrorDto | null | undefined, submitting: boolean, replaceDetails = true) {
+    private updateSubmitState(errorOrMessage: string | ErrorDto | undefined | null, submitting: boolean, replaceDetails = true) {
         const error = getError(errorOrMessage);
 
         this.state.next(s => ({

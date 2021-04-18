@@ -7,16 +7,10 @@
 
 import { Event, NavigationError, NavigationStart } from '@angular/router';
 import { Subject } from 'rxjs';
-import { LoadingService, LoadingServiceFactory } from './loading.service';
+import { LoadingService } from './loading.service';
 
 describe('LoadingService', () => {
     const events = new Subject<Event>();
-
-    it('should instantiate from factory', () => {
-        const loadingService = LoadingServiceFactory(<any>{ events });
-
-        expect(loadingService).toBeDefined();
-    });
 
     it('should instantiate', () => {
         const loadingService = new LoadingService(<any>{ events });

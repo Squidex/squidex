@@ -34,4 +34,4 @@ export function versioned<T = any>(version: Version, payload: T = undefined!): V
     return { version, payload };
 }
 
-export type Versioned<T> = { readonly version: Version, readonly payload: T };
+export type Versioned<T> = Readonly<{ version: Version, payload: T }>;

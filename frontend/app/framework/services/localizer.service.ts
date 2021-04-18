@@ -8,10 +8,6 @@
 import { Injectable } from '@angular/core';
 import { compareStrings } from '../utils/array-helper';
 
-export const LocalizerServiceFactory = (translations: Object) => {
-    return new LocalizerService(translations);
-};
-
 @Injectable()
 export class LocalizerService {
     private shouldLog = false;

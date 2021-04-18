@@ -28,10 +28,10 @@ export class ContentListFieldComponent extends StatefulComponent<State> implemen
     public content: ContentDto;
 
     @Input()
-    public patchAllowed: boolean;
+    public patchAllowed?: boolean | null;
 
     @Input()
-    public patchForm: FormGroup;
+    public patchForm?: FormGroup | null;
 
     @Input()
     public language: LanguageDto;

@@ -601,24 +601,28 @@ describe('SchemasService', () => {
     }));
 
     function schemaPropertiesResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
         return {
-            label: `label${id}${suffix}`,
-            contentsSidebarUrl: `url/to/contents/${id}${suffix}`,
-            contentSidebarUrl: `url/to/content/${id}${suffix}`,
-            contentEditorUrl: `url/to/editor/${id}${suffix}`,
+            label: `label${key}`,
+            contentsSidebarUrl: `url/to/contents/${key}`,
+            contentSidebarUrl: `url/to/content/${key}`,
+            contentEditorUrl: `url/to/editor/${key}`,
             tags: [
-                `tags${id}${suffix}`
+                `tags${key}`
             ],
             validateOnPublish: id % 2 === 1,
-            hints: `hints${id}${suffix}`
+            hints: `hints${key}`
         };
     }
 
     function schemaResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
         return {
-            id: `schema-id${id}${suffix}`,
-            name: `schema-name${id}${suffix}`,
-            category: `category${id}${suffix}`,
+            id: `id${id}`,
+            name: `schema-name${key}`,
+            category: `schema-category${key}`,
             isSingleton: id % 2 === 0,
             isPublished: id % 3 === 0,
             created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
@@ -626,7 +630,7 @@ describe('SchemasService', () => {
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
             lastModifiedBy: `modifier${id}`,
             properties: schemaPropertiesResponse(id, suffix),
-            version: `${id}`,
+            version: key,
             _links: {
                 update: { method: 'PUT', href: `/schemas/${id}` }
             }
@@ -634,17 +638,19 @@ describe('SchemasService', () => {
     }
 
     function schemaDetailsResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
         return {
-            id: `schema-id${id}`,
-            name: `schema-name${id}${suffix}`,
-            category: `category${id}${suffix}`,
+            id: `id${id}`,
+            name: `schema-name${key}`,
+            category: `schema-category${key}`,
             isSingleton: id % 2 === 0,
             isPublished: id % 3 === 0,
             created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
             createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
             lastModifiedBy: `modifier${id}`,
-            version: `${id}`,
+            version: key,
             properties: schemaPropertiesResponse(id, suffix),
             previewUrls: {
                 Default: 'url'
@@ -816,15 +822,17 @@ describe('SchemasService', () => {
 });
 
 function createSchemaProperties(id: number, suffix = '') {
+    const key = `${id}${suffix}`;
+
     return new SchemaPropertiesDto(
-        `label${id}${suffix}`,
-        `hints${id}${suffix}`,
-        `url/to/contents/${id}${suffix}`,
-        `url/to/content/${id}${suffix}`,
-        `url/to/editor/${id}${suffix}`,
+        `label${key}`,
+        `hints${key}`,
+        `url/to/contents/${key}`,
+        `url/to/content/${key}`,
+        `url/to/editor/${key}`,
         id % 2 === 1,
         [
-            `tags${id}${suffix}`
+            `tags${key}`
         ]
     );
 }
@@ -834,16 +842,18 @@ export function createSchema(id: number, suffix = '') {
         update: { method: 'PUT', href: `/schemas/${id}` }
     };
 
+    const key = `${id}${suffix}`;
+
     return new SchemaDto(links,
-        `schema-id${id}`,
-        `schema-name${id}${suffix}`,
-        `category${id}${suffix}`,
+        `id${id}`,
+        `schema-name${key}`,
+        `schema-category${key}`,
         createSchemaProperties(id, suffix),
         id % 2 === 0,
         id % 3 === 0,
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
-        new Version(`${id}${suffix}`));
+        new Version(key));
 }
 
 export function createSchemaDetails(id: number, suffix = '') {
@@ -851,16 +861,18 @@ export function createSchemaDetails(id: number, suffix = '') {
         update: { method: 'PUT', href: `/schemas/${id}` }
     };
 
+    const key = `${id}${suffix}`;
+
     return new SchemaDetailsDto(links,
-        `schema-id${id}`,
-        `schema-name${id}${suffix}`,
-        `category${id}${suffix}`,
+        `id${id}`,
+        `schema-name${key}`,
+        `schema-category${key}`,
         createSchemaProperties(id, suffix),
         id % 2 === 0,
         id % 3 === 0,
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
-        new Version(`${id}${suffix}`),
+        new Version(key),
         [
             new RootFieldDto({}, 11, 'field11', createProperties('Array'), 'language', true, true, true, [
                 new NestedFieldDto({}, 101, 'field101', createProperties('String'), 11, true, true, true),

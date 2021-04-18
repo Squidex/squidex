@@ -7,6 +7,7 @@
 
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { AppLanguageDto } from './../services/app-languages.service';
 import { FieldDto, FieldRule, RootFieldDto } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
@@ -20,6 +21,10 @@ export abstract class Hidden {
 
     public get hiddenChanges(): Observable<boolean> {
         return this.hidden$;
+    }
+
+    public get visibleChanges(): Observable<boolean> {
+        return this.hidden$.pipe(map(x => !x));
     }
 
     protected setHidden(hidden: boolean) {
@@ -121,7 +126,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         return this.disabled$;
     }
 
-    constructor(
+    protected constructor(
         public readonly field: T,
         public readonly form: TForm,
         public readonly isOptional: boolean,

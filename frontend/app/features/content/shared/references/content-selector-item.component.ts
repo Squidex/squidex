@@ -21,10 +21,10 @@ export class ContentSelectorItemComponent {
     public selectedChange = new EventEmitter<boolean>();
 
     @Input()
-    public selected = false;
+    public selected?: boolean | null;
 
     @Input()
-    public selectable = true;
+    public selectable?: boolean | null = true;
 
     @Input()
     public language: LanguageDto;

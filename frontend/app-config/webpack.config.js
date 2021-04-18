@@ -6,7 +6,7 @@ function root() {
     var newArgs = Array.prototype.slice.call(arguments, 0);
 
     return path.join.apply(path, [appRoot].concat(newArgs));
-};
+}
 
 const plugins = {
     // https://github.com/webpack-contrib/mini-css-extract-plugin
@@ -440,7 +440,10 @@ module.exports = function (env) {
             }, {
                 loader: 'postcss-loader'
             }, {
-                loader: 'sass-loader?sourceMap'
+                loader: 'sass-loader',
+                options: {
+                    sourceMap: true
+                }
             }],
             /*
              * Do not include component styles.

@@ -14,10 +14,6 @@ import { UIOptions } from './../configurations';
 import { Types } from './../utils/types';
 import { ResourceLoaderService } from './resource-loader.service';
 
-export const AnalyticsServiceFactory = (uiOptions: UIOptions, router: Router, resourceLoader: ResourceLoaderService) => {
-    return new AnalyticsService(uiOptions, router, resourceLoader);
-};
-
 @Injectable()
 export class AnalyticsService {
     private readonly gtag: any;

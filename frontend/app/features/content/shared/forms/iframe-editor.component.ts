@@ -8,8 +8,8 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DialogModel, DialogService, StatefulControlComponent, Types } from '@app/framework/internal';
-import { AssetDto } from '@app/shared';
+import { DialogModel, DialogService, StatefulControlComponent, Types } from '@app/framework';
+import { AppsState, AssetDto, computeEditorUrl } from '@app/shared';
 
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true
@@ -32,6 +32,7 @@ interface State {
 export class IFrameEditorComponent extends StatefulControlComponent<State, any> implements OnChanges, OnDestroy, AfterViewInit {
     private value: any;
     private isInitialized = false;
+    private computedUrl: string;
     private assetsCorrelationId: any;
 
     @ViewChild('iframe', { static: false })
@@ -53,7 +54,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     public formIndex?: number | null;
 
     @Input()
-    public language: string;
+    public language?: string | null;
 
     @Input()
     public url: string;
@@ -63,6 +64,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     public fullscreen: boolean;
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
         private readonly renderer: Renderer2,
         private readonly router: Router
@@ -77,11 +79,13 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (this.iframe) {
-            if (changes['url']) {
-                this.setupUrl();
-            }
+        if (changes['url']) {
+            this.computedUrl = computeEditorUrl(this.url, this.appsState.snapshot.selectedSettings);
 
+            this.setupUrl();
+        }
+
+        if (this.iframe?.nativeElement) {
             if (changes['formValue']) {
                 this.sendFormValue();
             }
@@ -97,7 +101,9 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     private setupUrl() {
-        this.iframe.nativeElement.src = this.url;
+        if (this.iframe?.nativeElement) {
+            this.iframe.nativeElement.src = this.computedUrl;
+        }
     }
 
     public ngAfterViewInit() {
@@ -251,7 +257,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     private sendMessage(type: string, payload: any) {
-        if (!this.iframe) {
+        if (!this.iframe?.nativeElement) {
             return;
         }
 

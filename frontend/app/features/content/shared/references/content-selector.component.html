@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" fullHeight="true" grid="true" flexBody="true">
+<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [flexBody]="true">
     <ng-container title>
         <div class="row">
             <div class="col-selector">
@@ -36,7 +36,7 @@
 
     <ng-container content>
         <ng-container *ngIf="schema">
-            <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
+            <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [table]="true">
                 <ng-container syncedHeader>
                     <table class="table table-items table-fixed" [style.minWidth]="schema.defaultReferenceFields | sqxContentListWidth" #header>
                         <thead>
@@ -52,7 +52,7 @@
                                 <th *ngFor="let field of schema.defaultReferenceFields" [sqxContentListCell]="field">
                                     <sqx-content-list-header
                                         [field]="field"
-                                        [query]="contentsState.query | async"
+                                        [query]="(contentsState.query | async)!"
                                         (queryChange)="search($event)"
                                         [language]="language">
                                     </sqx-content-list-header>

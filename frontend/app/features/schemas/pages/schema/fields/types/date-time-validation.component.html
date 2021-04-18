@@ -3,7 +3,7 @@
         <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.dateTime.rangeMin' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="minValue"></sqx-date-time-editor>
+            <sqx-date-time-editor [enforceTime]="true" mode="DateTime" formControlName="minValue"></sqx-date-time-editor>
         </div>
     </div>
 
@@ -11,7 +11,7 @@
         <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.dateTime.rangeMax' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="maxValue"></sqx-date-time-editor>
+            <sqx-date-time-editor [enforceTime]="true" mode="DateTime" formControlName="maxValue"></sqx-date-time-editor>
         </div>
     </div>
 
@@ -31,7 +31,7 @@
             <label class="col-3 col-form-label">{{ 'schemas.field.defaultValue' | sqxTranslate }}</label>
 
             <div class="col-9">
-                <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="defaultValue"></sqx-date-time-editor>
+                <sqx-date-time-editor [enforceTime]="true" mode="DateTime" formControlName="defaultValue"></sqx-date-time-editor>
             </div>
         </div>
 

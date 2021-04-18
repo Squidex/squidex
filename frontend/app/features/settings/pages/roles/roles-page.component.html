@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.roles"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" showSidebar="true" grid="true">
+<sqx-panel desiredWidth="50rem" [showSidebar]="true" [grid]="true">
     <ng-container title>
         {{ 'common.roles' | sqxTranslate }}
     </ng-container>
@@ -18,7 +18,7 @@
             <div content>
                 <ng-container *ngIf="(rolesState.isLoaded | async) && (rolesState.roles | async); let roles">
                     <sqx-role *ngFor="let role of roles; trackBy: trackByRole" [role]="role"
-                        [schemas]="schemasState.schemas | async" [allPermissions]="allPermissions">
+                        [schemas]="(schemasState.schemas | async)!" [allPermissions]="allPermissions">
                     </sqx-role>
         
                     <sqx-role-add-form *ngIf="rolesState.canCreate | async"></sqx-role-add-form>

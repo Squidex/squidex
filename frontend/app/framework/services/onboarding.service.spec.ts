@@ -6,7 +6,7 @@
  */
 
 import { UIOptions } from './../configurations';
-import { OnboardingService, OnboardingServiceFactory } from './onboarding.service';
+import { OnboardingService } from './onboarding.service';
 
 class LocalStoreMock {
     private store = {};
@@ -25,12 +25,6 @@ describe('OnboardingService', () => {
 
     beforeEach(() => {
         localStore = new LocalStoreMock();
-    });
-
-    it('should instantiate from factory', () => {
-        const onboardingService = OnboardingServiceFactory(new UIOptions({}), <any>localStore);
-
-        expect(onboardingService).toBeDefined();
     });
 
     it('should instantiate', () => {

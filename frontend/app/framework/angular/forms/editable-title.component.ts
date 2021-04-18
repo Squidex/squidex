@@ -19,7 +19,7 @@ export class EditableTitleComponent {
     public nameChange = new EventEmitter<string>();
 
     @Input()
-    public disabled = false;
+    public disabled?: boolean | null;
 
     @Input()
     public fallback: string;

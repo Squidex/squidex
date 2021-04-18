@@ -32,9 +32,7 @@ export class AppDto {
     public readonly canUploadAssets: boolean;
     public readonly image: string;
 
-    public get displayName() {
-        return StringHelper.firstNonEmpty(this.label, this.name);
-    }
+    public readonly displayName: string;
 
     constructor(links: ResourceLinks,
         public readonly id: string,
@@ -71,18 +69,59 @@ export class AppDto {
         this.canUploadAssets = hasAnyLink(links, 'assets/create');
 
         this.image = getLinkUrl(links, 'image');
+
+        this.displayName = StringHelper.firstNonEmpty(this.label, this.name);
     }
 }
 
-export interface CreateAppDto {
-    readonly name: string;
-    readonly template?: string;
+export class AppSettingsDto {
+    public readonly _links: ResourceLinks;
+
+    public readonly canUpdate: boolean;
+
+    constructor(links: ResourceLinks,
+        public readonly hideScheduler: boolean,
+        public readonly patterns: ReadonlyArray<PatternDto>,
+        public readonly editors: ReadonlyArray<EditorDto>,
+        public readonly version: Version
+    ) {
+        this._links = links;
+
+        this.canUpdate = hasAnyLink(links, 'update');
+    }
 }
 
-export interface UpdateAppDto {
-    readonly label?: string;
-    readonly description?: string;
+export class PatternDto {
+    constructor(
+        public readonly name: string,
+        public readonly regex: string,
+        public readonly message?: string
+    ) {
+    }
 }
+
+export class EditorDto {
+    constructor(
+        public readonly name: string,
+        public readonly url: string
+    ) {
+    }
+}
+
+export type UpdatePatternDto =
+    Readonly<{ name: string, regex: string, message?: string }>;
+
+export type UpdateEditorDto =
+    Readonly<{ name: string, regex: string, message?: string }>;
+
+export type UpdateAppSettingsDto =
+    Readonly<{ patterns: readonly UpdatePatternDto[], editors: readonly UpdateEditorDto[], hideScheduler?: boolean }>;
+
+export type CreateAppDto =
+    Readonly<{ name: string; template?: string; }>;
+
+export type UpdateAppDto =
+    Readonly<{ label?: string, description?: string }>;
 
 @Injectable()
 export class AppsService {
@@ -143,6 +182,33 @@ export class AppsService {
                 this.analytics.trackEvent('App', 'Updated');
             }),
             pretifyError('i18n:apps.updateFailed'));
+    }
+
+    public getSettings(name: string): Observable<AppSettingsDto> {
+        const url = this.apiUrl.buildUrl(`/api/apps/${name}/settings`);
+
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                const appSettings = parseAppSettings(body);
+
+                return appSettings;
+            }),
+            pretifyError('i18n:appSettings.loadFailed'));
+    }
+
+    public putSettings(resource: Resource, dto: UpdateAppSettingsDto, version: Version): Observable<AppSettingsDto> {
+        const link = resource._links['update'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ payload }) => {
+                return parseAppSettings(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('App', 'Updated');
+            }),
+            pretifyError('i18n:appSettings.updateFailed'));
     }
 
     public postAppImage(resource: Resource, file: File, version: Version): Observable<number | AppDto> {
@@ -234,5 +300,17 @@ function parseApp(response: any) {
         response.planName,
         response.planUpgrade,
         response.roleProperties,
+        new Version(response.version.toString()));
+}
+
+function parseAppSettings(response: any) {
+    return new AppSettingsDto(response._links,
+        response.hideScheduler,
+        response.patterns.map((x: any) => {
+            return new PatternDto(x.name, x.regex, x.message);
+        }),
+        response.editors.map((x: any) => {
+            return new EditorDto(x.name, x.url);
+        }),
         new Version(response.version.toString()));
 }

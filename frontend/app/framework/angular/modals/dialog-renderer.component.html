@@ -1,7 +1,7 @@
 <ng-content></ng-content>
 
 <ng-container *sqxModal="dialogView">
-    <sqx-modal-dialog showClose="false" (close)="cancel()" *ngIf="snapshot.dialogRequest; let request">
+    <sqx-modal-dialog [showClose]="false" (close)="cancel()" *ngIf="snapshot.dialogRequest; let request">
         <ng-container title>
             {{request.title | sqxTranslate}}
         </ng-container>

@@ -33,7 +33,7 @@ export class SchemaCategoryComponent implements OnChanges {
     public schemasFilter: string;
 
     @Input()
-    public forContent: boolean;
+    public forContent?: boolean | null;
 
     public filteredSchemas: SchemasList;
 

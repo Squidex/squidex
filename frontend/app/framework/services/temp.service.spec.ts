@@ -5,15 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { TempService, TempServiceFactory } from './temp.service';
+import { TempService } from './temp.service';
 
 describe('TempService', () => {
-    it('should instantiate from factory', () => {
-        const tempService = TempServiceFactory();
-
-        expect(tempService).toBeDefined();
-    });
-
     it('should instantiate', () => {
         const tempService = new TempService();
 

@@ -1,4 +1,4 @@
-<sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false">
+<sqx-panel desiredWidth="20rem" [isBlank]="true" [isLazyLoaded]="false">
     <ng-container title>
         {{ 'common.filters' | sqxTranslate }}
     </ng-container>
@@ -7,8 +7,8 @@
         <h3>{{ 'common.tags' | sqxTranslate }}</h3>
 
         <sqx-asset-tags (reset)="resetTags()"
-            [tags]="assetsState.tags | async"
-            [tagsSelected]="assetsState.tagsSelected | async"
+            [tags]="(assetsState.tags | async)!"
+            [tagsSelected]="(assetsState.tagsSelected | async)!"
             (toggle)="toggleTag($event)">
         </sqx-asset-tags>
 

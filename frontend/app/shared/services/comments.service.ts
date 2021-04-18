@@ -34,10 +34,8 @@ export class CommentDto extends Model<CommentDto> {
     }
 }
 
-export interface UpsertCommentDto {
-    readonly text: string;
-    readonly url?: string;
-}
+export type UpsertCommentDto =
+    Readonly<{ text: string, url?: string }>;
 
 @Injectable()
 export class CommentsService {

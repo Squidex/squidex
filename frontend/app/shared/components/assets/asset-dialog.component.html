@@ -1,5 +1,5 @@
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
-    <sqx-modal-dialog (close)="emitComplete()" size="xl" fullHeight="true" [title]="false" [showFooter]="false">
+    <sqx-modal-dialog (close)="emitComplete()" size="xl" [fullHeight]="true" [showFooter]="false">
         <ng-container plainTitle>
             <ul class="nav nav-tabs2">
                 <li class="nav-item">
@@ -68,7 +68,7 @@
                             <label for="id">{{ 'common.folder' | sqxTranslate }}</label>
 
                             <div class="path">
-                                <sqx-asset-path [path]="path | async" all="true" (navigate)="navigate($event.id)"></sqx-asset-path>
+                                <sqx-asset-path [path]="path | async" [all]="true" (navigate)="navigate($event.id)"></sqx-asset-path>
                             </div>
                         </div>
 
@@ -133,17 +133,17 @@
                         <div class="form-group">
                             <label>{{ 'assets.metadata' | sqxTranslate }}</label>
             
-                            <div class="form-group row no-gutters" *ngFor="let form of annotateForm.metadata.controls; let i = index">
+                            <div class="form-group row no-gutters" *ngFor="let form of annotateForm.metadataControls; let i = index" [formGroup]="form">
                                 <div class="col col-name pr-1">
-                                    <sqx-control-errors [for]="form.get('name')" fieldName="Name"></sqx-control-errors>
+                                    <sqx-control-errors for="name" fieldName="Name"></sqx-control-errors>
                 
-                                    <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="{{ 'common.name' | sqxTranslate }}" spellcheck="false">
+                                    <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="{{ 'common.name' | sqxTranslate }}" spellcheck="false">
                                 </div>
                 
                                 <div class="col pr-1">
-                                    <sqx-control-errors [for]="form.get('value')" fieldName="Value"></sqx-control-errors>
+                                    <sqx-control-errors for="value" fieldName="Value"></sqx-control-errors>
                 
-                                    <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('value')" placeholder="{{ 'common.value' | sqxTranslate }}">
+                                    <input type="text" class="form-control" maxlength="1000" formControlName="value" placeholder="{{ 'common.value' | sqxTranslate }}">
                                 </div>
             
                                 <div class="col-auto col-options">

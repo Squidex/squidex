@@ -1,6 +1,6 @@
 <sqx-title message="i18n:users.listPageTitle"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" grid="true" closeQueryParamsHandling="none">
+<sqx-panel desiredWidth="50rem" [grid]="true" closeQueryParamsHandling="">
     <ng-container title>
         {{ 'users.listTitle' | sqxTranslate }}
     </ng-container>
@@ -27,7 +27,7 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-list-view [isLoading]="usersState.isLoading | async" table="true">
+        <sqx-list-view [isLoading]="usersState.isLoading | async" [table]="true">
             <ng-container header>
                 <table class="table table-items table-fixed" #header>
                     <thead>

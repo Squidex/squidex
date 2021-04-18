@@ -57,7 +57,7 @@ export function getControlPath(control: AbstractControl | undefined | null, apiC
                 name = key;
             }
         }
-    } else if (control.parent instanceof FormArray) {
+    } else if (control.parent) {
         for (let i = 0; i < control.parent.controls.length; i++) {
             if (control.parent.controls[i] === control) {
                 if (apiCompatible) {

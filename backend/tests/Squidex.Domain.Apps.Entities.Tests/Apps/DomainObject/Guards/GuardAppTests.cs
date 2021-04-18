@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Xunit;
@@ -125,6 +126,126 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             var plan = new AppPlan(command.Actor, "premium");
 
             GuardApp.CanChangePlan(command, App(plan), appPlans);
+        }
+
+        [Fact]
+        public void CanUpdateSettings_should_throw_exception_if_settings_is_null()
+        {
+            var command = new UpdateAppSettings();
+
+            ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
+                new ValidationError("Settings is required.", "Settings"));
+        }
+
+        [Fact]
+        public void CanUpdateSettings_should_throw_exception_if_patterns_is_null()
+        {
+            var command = new UpdateAppSettings
+            {
+                Settings = new AppSettings
+                {
+                    Patterns = null!
+                }
+            };
+
+            ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
+                new ValidationError("Patterns is required.", "Settings.Patterns"));
+        }
+
+        [Fact]
+        public void CanUpdateSettings_should_throw_exception_if_patterns_has_null_name()
+        {
+            var command = new UpdateAppSettings
+            {
+                Settings = new AppSettings
+                {
+                    Patterns = ReadOnlyCollection.Create(
+                        new Pattern(null!, "[a-z]"))
+                }
+            };
+
+            ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
+                new ValidationError("Name is required.", "Settings.Patterns[0].Name"));
+        }
+
+        [Fact]
+        public void CanUpdateSettings_should_throw_exception_if_patterns_has_null_regex()
+        {
+            var command = new UpdateAppSettings
+            {
+                Settings = new AppSettings
+                {
+                    Patterns = ReadOnlyCollection.Create(
+                        new Pattern("name", null!))
+                }
+            };
+
+            ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
+                new ValidationError("Regex is required.", "Settings.Patterns[0].Regex"));
+        }
+
+        [Fact]
+        public void CanUpdateSettings_should_throw_exception_if_editors_is_null()
+        {
+            var command = new UpdateAppSettings
+            {
+                Settings = new AppSettings
+                {
+                    Editors = null!
+                }
+            };
+
+            ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
+                new ValidationError("Editors is required.", "Settings.Editors"));
+        }
+
+        [Fact]
+        public void CanUpdateSettings_should_throw_exception_if_editors_has_null_name()
+        {
+            var command = new UpdateAppSettings
+            {
+                Settings = new AppSettings
+                {
+                    Editors = ReadOnlyCollection.Create(
+                        new Editor(null!, "[a-z]"))
+                }
+            };
+
+            ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
+                new ValidationError("Name is required.", "Settings.Editors[0].Name"));
+        }
+
+        [Fact]
+        public void CanUpdateSettings_should_throw_exception_if_patterns_has_null_url()
+        {
+            var command = new UpdateAppSettings
+            {
+                Settings = new AppSettings
+                {
+                    Editors = ReadOnlyCollection.Create(
+                        new Editor("name", null!))
+                }
+            };
+
+            ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
+                new ValidationError("Url is required.", "Settings.Editors[0].Url"));
+        }
+
+        [Fact]
+        public void CanUpdateSettings_should_not_throw_exception_if_setting_is_valid()
+        {
+            var command = new UpdateAppSettings
+            {
+                Settings = new AppSettings
+                {
+                    Patterns = ReadOnlyCollection.Create(
+                        new Pattern("name", "[a-z]")),
+                    Editors = ReadOnlyCollection.Create(
+                        new Editor("name", "url/to/editor"))
+                }
+            };
+
+            GuardApp.CanUpdateSettings(command);
         }
 
         private static IAppEntity App(AppPlan? plan)

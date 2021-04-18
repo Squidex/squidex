@@ -8,10 +8,6 @@
 import { Injectable } from '@angular/core';
 import { Types } from './../utils/types';
 
-export const LocalStoreServiceFactory = () => {
-    return new LocalStoreService();
-};
-
 @Injectable()
 export class LocalStoreService {
     private readonly fallback: { [key: string]: string } = {};

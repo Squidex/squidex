@@ -18,11 +18,11 @@ export class FormAlertComponent {
     public class: string;
 
     @Input()
-    public marginTop = 2;
+    public marginTop: number | string | undefined | null = 2;
 
     @Input()
-    public marginBottom = 4;
+    public marginBottom: number | string | undefined | null = 4;
 
     @Input()
-    public light = false;
+    public light?: boolean | null;
 }

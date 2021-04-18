@@ -23,6 +23,6 @@ export class OnboardingDialogComponent {
     public close = new EventEmitter();
 
     public next() {
-        this.step = this.step + 1;
+        this.step += 1;
     }
 }

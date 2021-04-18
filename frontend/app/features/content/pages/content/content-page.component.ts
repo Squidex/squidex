@@ -282,6 +282,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 }
 
-function isOtherContent(lhs: ContentDto | null | undefined, rhs: ContentDto | null | undefined) {
+function isOtherContent(lhs: ContentDto | undefined | null, rhs: ContentDto | undefined | null) {
     return !lhs || !rhs || lhs.id !== rhs.id;
 }

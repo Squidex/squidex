@@ -139,12 +139,6 @@
   <data name="apps.notImage" xml:space="preserve">
     <value>Bestand is geen afbeelding</value>
   </data>
-  <data name="apps.patterns.nameAlreadyExists" xml:space="preserve">
-    <value>Er bestaat al een patroon met dezelfde naam.</value>
-  </data>
-  <data name="apps.patterns.patternAlreadyExists" xml:space="preserve">
-    <value>Dit patroon bestaat al maar met een andere naam.</value>
-  </data>
   <data name="apps.plans.notFound" xml:space="preserve">
     <value>Een plan met deze id bestaat niet.</value>
   </data>
@@ -721,15 +715,6 @@
   <data name="history.apps.languagedUpdated" xml:space="preserve">
     <value>bijgewerkte taal {[Language]}</value>
   </data>
-  <data name="history.apps.patternAdded" xml:space="preserve">
-    <value>toegevoegd patroon {[Name]}</value>
-  </data>
-  <data name="history.apps.patternDeleted" xml:space="preserve">
-    <value>verwijderd patroon {[PatternId]}</value>
-  </data>
-  <data name="history.apps.patternUpdated" xml:space="preserve">
-    <value>bijgewerkt patroon {[Name]}</value>
-  </data>
   <data name="history.apps.planChanged" xml:space="preserve">
     <value>plan gewijzigd in {[Plan]}</value>
   </data>
@@ -744,6 +729,9 @@
   </data>
   <data name="history.apps.roleUpdated" xml:space="preserve">
     <value>bijgewerkte rol {[Name]}</value>
+  </data>
+  <data name="history.apps.settingsUpdated" xml:space="preserve">
+    <value>updated UI settings</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
     <value>item vervangen.</value>

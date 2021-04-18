@@ -18,8 +18,8 @@ export class FormHintComponent {
     public class: string;
 
     @Input()
-    public marginTop = 0;
+    public marginTop: number | string = 0;
 
     @Input()
-    public marginBottom = 0;
+    public marginBottom: number | string = 0;
 }

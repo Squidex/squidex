@@ -107,7 +107,7 @@ describe('AuthInterceptor', () => {
 
     const AUTH_ERRORS = [403];
 
-    AUTH_ERRORS.forEach(statusCode => {
+    AUTH_ERRORS.map(statusCode => {
         it(`should redirect for ${statusCode} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 
@@ -127,7 +127,7 @@ describe('AuthInterceptor', () => {
 
     const SERVER_ERRORS = [500, 404, 405];
 
-    SERVER_ERRORS.forEach(statusCode => {
+    SERVER_ERRORS.map(statusCode => {
         it(`should not logout for ${statusCode} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
 

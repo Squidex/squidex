@@ -50,7 +50,6 @@ namespace Squidex.Domain.Apps.Core.Apps
                     new PermissionSet(
                         WithoutPrefix(Permissions.AppAssets),
                         WithoutPrefix(Permissions.AppContents),
-                        WithoutPrefix(Permissions.AppPatterns),
                         WithoutPrefix(Permissions.AppRolesRead),
                         WithoutPrefix(Permissions.AppRules),
                         WithoutPrefix(Permissions.AppSchemas),

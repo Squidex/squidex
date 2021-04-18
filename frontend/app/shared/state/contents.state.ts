@@ -42,7 +42,7 @@ interface Snapshot extends ListState<Query> {
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
-    public selectedContent: Observable<ContentDto | null | undefined> =
+    public selectedContent: Observable<ContentDto | undefined | null> =
         this.project(x => x.selectedContent, Types.equals);
 
     public contents =
@@ -86,7 +86,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.appsState.appId;
     }
 
-    constructor(name: string,
+    protected constructor(name: string,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService

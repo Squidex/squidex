@@ -69,7 +69,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public icon: string;
 
     @Input()
-    public autoFocus = false;
+    public autoFocus?: boolean | null;
 
     @Input()
     public debounceTime = 300;

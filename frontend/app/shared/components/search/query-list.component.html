@@ -1,4 +1,4 @@
-<ng-container *ngIf="queries?.length > 0; else noQuery">
+<ng-container *ngIf="queries && queries.length > 0; else noQuery">
     <a class="sidebar-item" *ngFor="let saved of queries; trackBy: trackByQuery" (click)="search.emit(saved.query)"
         [class.active]="isSelectedQuery(saved)">
 

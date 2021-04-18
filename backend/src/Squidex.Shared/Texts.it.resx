@@ -139,12 +139,6 @@
   <data name="apps.notImage" xml:space="preserve">
     <value>Il file non è una immagine</value>
   </data>
-  <data name="apps.patterns.nameAlreadyExists" xml:space="preserve">
-    <value>Esiste già un pattern con lo stesso nome.</value>
-  </data>
-  <data name="apps.patterns.patternAlreadyExists" xml:space="preserve">
-    <value>Questo pattern esiste già con un altro nome.</value>
-  </data>
   <data name="apps.plans.notFound" xml:space="preserve">
     <value>Non esiste un piano con questo id.</value>
   </data>
@@ -721,15 +715,6 @@
   <data name="history.apps.languagedUpdated" xml:space="preserve">
     <value>aggiornata la lingua {[Language]}</value>
   </data>
-  <data name="history.apps.patternAdded" xml:space="preserve">
-    <value>ha aggiunto pattern {[Name]}</value>
-  </data>
-  <data name="history.apps.patternDeleted" xml:space="preserve">
-    <value>ha eliminato pattern {[PatternId]}</value>
-  </data>
-  <data name="history.apps.patternUpdated" xml:space="preserve">
-    <value>ha modificato pattern {[Name]}</value>
-  </data>
   <data name="history.apps.planChanged" xml:space="preserve">
     <value>ha cambiato il piano in {[Plan]}</value>
   </data>
@@ -744,6 +729,9 @@
   </data>
   <data name="history.apps.roleUpdated" xml:space="preserve">
     <value>ha aggiornato il ruolo {[Name]}</value>
+  </data>
+  <data name="history.apps.settingsUpdated" xml:space="preserve">
+    <value>updated UI settings</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
     <value>ha sostituito la risorsa.</value>

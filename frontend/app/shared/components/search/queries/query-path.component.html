@@ -1,7 +1,7 @@
 <sqx-dropdown [items]="model.fields | sqxKeys" 
     [ngModel]="path"
     (ngModelChange)="pathChange.emit($event)" 
-    [canSearch]="false" separated="true">
+    [canSearch]="false" [separated]="true">
     <ng-template let-field="$implicit">
         <div class="row">
             <div class="col-auto">

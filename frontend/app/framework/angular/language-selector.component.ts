@@ -21,7 +21,7 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
 })
 export class LanguageSelectorComponent implements OnChanges, OnInit {
     @Output()
-    public selectedLanguageChange = new EventEmitter<Language>();
+    public selectedLanguageChange = new EventEmitter<any>();
 
     @Input()
     public selectedLanguage: Language;

@@ -17,7 +17,7 @@ describe('UndefinableFormArray', () => {
         value: ['1']
     }];
 
-    tests.forEach(x => {
+    tests.map(x => {
         it(`should set value as ${x.name}`, () => {
             const control =
                 new UndefinableFormArray([
@@ -30,7 +30,7 @@ describe('UndefinableFormArray', () => {
         });
     });
 
-    tests.forEach(x => {
+    tests.map(x => {
         it(`should patch value as ${x.name}`, () => {
             const control =
                 new UndefinableFormArray([
@@ -43,7 +43,7 @@ describe('UndefinableFormArray', () => {
         });
     });
 
-    tests.forEach(x => {
+    tests.map(x => {
         it(`should reset value as ${x.name}`, () => {
             const control =
                 new UndefinableFormArray([

@@ -68,17 +68,17 @@ export class UIState extends State<Snapshot> {
         this.project(x => x.canRestore === true || x.canReadUsers === true || x.canReadEvents === true || x.canUseOrleans);
 
     public get<T>(path: string, defaultValue: T) {
-        return this.settings.pipe(map(x => this.getValue(x, path, defaultValue)),
+        return this.settings.pipe(map(x => getValue(x, path, defaultValue)),
             distinctUntilChanged());
     }
 
     public getShared<T>(path: string, defaultValue: T) {
-        return this.settingsShared.pipe(map(x => this.getValue(x, path, defaultValue)),
+        return this.settingsShared.pipe(map(x => getValue(x, path, defaultValue)),
             distinctUntilChanged());
     }
 
     public getUser<T>(path: string, defaultValue: T) {
-        return this.settingsUser.pipe(map(x => this.getValue(x, path, defaultValue)),
+        return this.settingsUser.pipe(map(x => getValue(x, path, defaultValue)),
             distinctUntilChanged());
     }
 
@@ -207,29 +207,29 @@ export class UIState extends State<Snapshot> {
         return false;
     }
 
-    private getValue<T>(setting: object & UISettingsDto, path: string, defaultValue: T) {
-        const segments = path.split('.');
-
-        let current = setting;
-
-        for (const segment of segments) {
-            const temp = current[segment];
-
-            if (temp) {
-                current[segment] = temp;
-            } else {
-                return defaultValue;
-            }
-
-            current = temp;
-        }
-
-        return <T><any>current;
-    }
-
     private get appName() {
         return this.appsState.appName;
     }
+}
+
+function getValue<T>(setting: object & UISettingsDto, path: string, defaultValue: T) {
+    const segments = path.split('.');
+
+    let current = setting;
+
+    for (const segment of segments) {
+        const temp = current[segment];
+
+        if (temp) {
+            current[segment] = temp;
+        } else {
+            return defaultValue;
+        }
+
+        current = temp;
+    }
+
+    return <T><any>current;
 }
 
 function getContainer(settings: object, path: string) {

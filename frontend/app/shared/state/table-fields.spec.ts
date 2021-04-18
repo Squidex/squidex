@@ -33,7 +33,7 @@ describe('TableFields', () => {
         { case: 'invalid', fields: ['invalid'] }
     ];
 
-    INVALID_CONFIGS.forEach(test => {
+    INVALID_CONFIGS.map(test => {
         it(`should provide default fields if config is ${test.case}`, () => {
             let fields: ReadonlyArray<TableField>;
             let fieldNames: ReadonlyArray<string>;
@@ -62,7 +62,7 @@ describe('TableFields', () => {
         });
     });
 
-    INVALID_CONFIGS.forEach(test => {
+    INVALID_CONFIGS.map(test => {
         it(`should remove ui state if config is ${test.case}`, () => {
             uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
                 .returns(() => of([]));

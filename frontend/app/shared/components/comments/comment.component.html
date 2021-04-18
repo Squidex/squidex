@@ -41,7 +41,11 @@
     <ng-template #editing>
         <div class="col">
             <form (ngSubmit)="update()">
-                <textarea class="form-control mb-1" name="{{comment.id}}" sqxFocusOnInit [(ngModel)]="editingText" [mention]="mentionUsers" [mentionConfig]="mentionConfig" (keydown)="updateWhenEnter($event)"></textarea>
+                <textarea class="form-control mb-1" name="{{comment.id}}" sqxFocusOnInit [(ngModel)]="editingText" 
+                    [mention]="$any(mentionUsers)"
+                    [mentionConfig]="mentionConfig"
+                    (keydown)="updateWhenEnter($event)">
+                </textarea>
     
                 <div>
                     <button type="button" class="btn btn-sm btn-text-secondary2 mr-1" (click)="cancelEdit()">

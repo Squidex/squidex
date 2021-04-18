@@ -2,7 +2,7 @@
     <div class="header" *ngIf="formSection.separator; let separator">
         <h3>{{separator!.displayName}}</h3>
 
-        <sqx-form-hint *ngIf="separator!.properties.hints?.length > 0">
+        <sqx-form-hint *ngIf="separator.properties.hints && separator.properties.hints.length > 0">
             {{separator!.properties.hints}}
         </sqx-form-hint>
     </div>

@@ -15,7 +15,7 @@ import { Types } from '@app/framework/internal';
     pure: false
 })
 export class HighlightPipe implements PipeTransform {
-    public transform(text: string, highlight: string | RegExp | undefined): string {
+    public transform(text: string, highlight: string | RegExp | undefined | null): string {
         if (!highlight) {
             return text;
         }

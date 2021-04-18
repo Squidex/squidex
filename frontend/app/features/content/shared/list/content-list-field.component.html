@@ -24,7 +24,7 @@
         <ng-container *ngIf="content.newStatus; else singleStatus">
             <div class="row no-gutters status-grid">
                 <div class="col">
-                    <sqx-content-status truncate="true"
+                    <sqx-content-status [truncate]="true"
                         layout="text"
                         [status]="content.status"
                         [statusColor]="content.statusColor">
@@ -34,10 +34,10 @@
                     <i class="icon-caret-right"></i>
                 </div>
                 <div class="col">
-                    <sqx-content-status truncate="true" 
+                    <sqx-content-status [truncate]="true" 
                         layout="text"
                         [status]="content.newStatus"
-                        [statusColor]="content.newStatusColor"
+                        [statusColor]="content.newStatusColor!"
                         [scheduled]="content.scheduleJob">
                     </sqx-content-status>
                 </div>
@@ -45,7 +45,7 @@
         </ng-container>
 
         <ng-template #singleStatus>
-            <sqx-content-status truncate="true" 
+            <sqx-content-status [truncate]="true" 
                 layout="text"
                 [status]="content.status"
                 [statusColor]="content.statusColor"
@@ -57,8 +57,8 @@
         <span class="truncate" *ngIf="content.scheduleJob">
             <sqx-content-status
                 layout="text"
-                [status]="content.scheduleJob?.status"
-                [statusColor]="content.scheduleJob?.color">
+                [status]="content.scheduleJob.status"
+                [statusColor]="content.scheduleJob.color">
             </sqx-content-status>
         
             {{ 'contents.scheduledAtLabel' | sqxTranslate }}&nbsp;{{content.scheduleJob?.dueTime | sqxShortDate}}
@@ -76,7 +76,7 @@
     
                 <sqx-content-status
                     [status]="content.newStatus"
-                    [statusColor]="content.newStatusColor"
+                    [statusColor]="content.newStatusColor!"
                     [scheduled]="content.scheduleJob">
                 </sqx-content-status>
             </span>
@@ -94,8 +94,8 @@
         <small class="truncate">{{content.version.value}}</small>
     </ng-container>
     <ng-container *ngSwitchDefault>
-        <ng-container *ngIf="isInlineEditable && patchAllowed; else displayTemplate">
-            <sqx-content-value-editor [form]="patchForm" [field]="field"></sqx-content-value-editor>
+        <ng-container *ngIf="isInlineEditable && patchAllowed && patchForm; else displayTemplate">
+            <sqx-content-value-editor [form]="patchForm" [field]="$any(field)"></sqx-content-value-editor>
         </ng-container>
 
         <ng-template #displayTemplate>

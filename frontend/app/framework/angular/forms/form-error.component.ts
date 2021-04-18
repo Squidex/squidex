@@ -19,10 +19,10 @@ export class FormErrorComponent implements OnChanges {
     public error?: ErrorDto | null;
 
     @Input()
-    public bubble = false;
+    public bubble?: boolean | null;
 
     @Input()
-    public closeable = false;
+    public closeable?: boolean | null;
 
     public show: boolean;
 

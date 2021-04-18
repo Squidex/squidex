@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { fadeAnimation, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
+import { AppSettingsDto, fadeAnimation, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -29,13 +29,13 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     public properties: StringFieldPropertiesDto;
 
     @Input()
-    public patterns: ReadonlyArray<PatternDto>;
+    public settings: AppSettingsDto;
 
     @Input()
     public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public isLocalizable: boolean;
+    public isLocalizable?: boolean | null;
 
     public contentTypes = STRING_CONTENT_TYPES;
 
@@ -115,7 +115,7 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     }
 
     public setPattern(pattern: PatternDto) {
-        this.fieldForm.controls['pattern'].setValue(pattern.pattern);
+        this.fieldForm.controls['pattern'].setValue(pattern.regex);
         this.fieldForm.controls['patternMessage'].setValue(pattern.message);
     }
 
@@ -125,7 +125,7 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
         if (!value) {
             this.patternName = '';
         } else {
-            const matchingPattern = this.patterns.find(x => x.pattern === this.fieldForm.controls['pattern'].value);
+            const matchingPattern = this.settings.patterns.find(x => x.regex === this.fieldForm.controls['pattern'].value);
 
             if (matchingPattern) {
                 this.patternName = matchingPattern.name;

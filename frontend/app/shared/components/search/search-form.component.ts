@@ -18,7 +18,7 @@ import { Observable } from 'rxjs';
 })
 export class SearchFormComponent implements OnChanges {
     public readonly standalone = { standalone: true };
-    private previousQuery?: Query;
+    private previousQuery?: Query | null;
 
     @Output()
     public queryChange = new EventEmitter<Query>();
@@ -30,19 +30,19 @@ export class SearchFormComponent implements OnChanges {
     public language: LanguageDto;
 
     @Input()
-    public queryModel: QueryModel;
+    public queryModel?: QueryModel | null;
 
     @Input()
-    public query?: Query;
+    public query?: Query | null;
 
     @Input()
-    public queries: Queries;
+    public queries?: Queries | null;
 
     @Input()
     public queriesTypes: string;
 
     @Input()
-    public enableShortcut = false;
+    public enableShortcut?: boolean | null;
 
     @Input()
     public formClass = 'form-inline search-form';
@@ -77,7 +77,7 @@ export class SearchFormComponent implements OnChanges {
     public search(close = false) {
         this.hasFilter = hasFilter(this.query);
 
-        if (!equalsQuery(this.query, this.previousQuery)) {
+        if (this.query && !equalsQuery(this.query, this.previousQuery)) {
             const clone = Types.clone(this.query);
 
             this.queryChange.emit(clone);

@@ -31,7 +31,7 @@
                 <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
                     {{ 'common.statusChangeTo' | sqxTranslate }} 
 
-                    <sqx-content-status small="true"
+                    <sqx-content-status [small]="true"
                         layout="text"
                         [status]="info.status"
                         [statusColor]="info.color">

@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" fullHeight="true">
+<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true">
     <ng-container title>
         {{ 'assets.selectMany' | sqxTranslate }}
     </ng-container>
@@ -13,11 +13,15 @@
             <div class="col pl-1">
                 <div class="row no-gutters search">
                     <div class="col-6">
-                        <sqx-tag-editor class="tags" singleLine="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}" [suggestions]="assetsState.tagsNames | async" [ngModel]="assetsState.selectedTagNames | async" (ngModelChange)="selectTags($event)" [undefinedWhenEmpty]="false">
+                        <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}" 
+                            [suggestions]="assetsState.tagsNames | async"
+                            [ngModel]="assetsState.selectedTagNames | async"
+                            (ngModelChange)="selectTags($event)" [undefinedWhenEmpty]="false">
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">
-                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" [query]="assetsState.query | async" (queryChange)="search($event)" enableShortcut="true">
+                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" 
+                            [query]="assetsState.query | async" (queryChange)="search($event)" [enableShortcut]="true">
                         </sqx-search-form>
                     </div>
                 </div>

@@ -30,7 +30,7 @@
             confirmRememberKey="changePlan"
             confirmTitle="i18n:plans.changeConfirmTitle"
             [confirmText]="planInfo.plan.confirmText"
-            [confirmRequired]="planInfo.plan.confirmText">
+            [confirmRequired]="!!planInfo.plan.confirmText">
             {{ 'plans.change' | sqxTranslate }}
         </button>
     </div>
@@ -48,8 +48,8 @@
         <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async"
             (sqxConfirmClick)="changeYearly()"
             confirmTitle="i18n:plans.changeConfirmTitle"
-            [confirmText]="planInfo.plan.yearlyConfirmText"
-            [confirmRequired]="planInfo.plan.yearlyConfirmText">
+            [confirmText]="planInfo.plan.yearlyConfirmText!"
+            [confirmRequired]="!!planInfo.plan.yearlyConfirmText">
             {{ 'plans.change' | sqxTranslate }}
         </button>
     </div>

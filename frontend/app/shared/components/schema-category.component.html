@@ -13,7 +13,7 @@
             </div>
             <div class="col">
                 <h3 class="truncate">
-                    <ng-container *ngIf="schemaCategory.name?.length > 0; else noName">
+                    <ng-container *ngIf="schemaCategory && schemaCategory.name.length > 0; else noName">
                         {{schemaCategory.name}}
                     </ng-container>
                     <ng-template #noName>

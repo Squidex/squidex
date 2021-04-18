@@ -28,7 +28,7 @@ interface State {
 })
 export class ToggleComponent extends StatefulControlComponent<State, boolean | null> {
     @Input()
-    public threeStates = false;
+    public threeStates?: boolean | null;
 
     public set disabled(value: boolean) {
         this.setDisabledState(value);
@@ -58,10 +58,8 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
         if (this.threeStates) {
             if (isChecked) {
                 isChecked = null;
-            } else if (isChecked === null) {
-                isChecked = false;
             } else {
-                isChecked = true;
+                isChecked = isChecked !== null;
             }
         } else {
             isChecked = !(isChecked === true);

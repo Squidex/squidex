@@ -1,24 +1,18 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [EventType(nameof(AppPatternAdded))]
-    public sealed class AppPatternAdded : AppEvent
+    [EventType(nameof(AppSettingsUpdated))]
+    public sealed class AppSettingsUpdated : AppEvent
     {
-        public DomainId PatternId { get; set; }
-
-        public string Name { get; set; }
-
-        public string Pattern { get; set; }
-
-        public string? Message { get; set; }
+        public AppSettings Settings { get; set; }
     }
 }

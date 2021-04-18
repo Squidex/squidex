@@ -37,10 +37,10 @@ export class ProgressBarComponent implements OnChanges, OnInit {
     public strokeWidth = 4;
 
     @Input()
-    public showText = true;
+    public showText?: boolean | null = true;
 
     @Input()
-    public animated = true;
+    public animated?: boolean | null = true;
 
     @Input()
     public value = 0;

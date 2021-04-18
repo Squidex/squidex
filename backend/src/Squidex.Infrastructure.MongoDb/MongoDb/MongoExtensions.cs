@@ -190,17 +190,9 @@ namespace Squidex.Infrastructure.MongoDb
                     var actionBlock =
                         new ActionBlock<T>(async x =>
                             {
-                                try
+                                if (!combined.IsCancellationRequested)
                                 {
-                                    if (!combined.IsCancellationRequested)
-                                    {
-                                        await processor(x);
-                                    }
-                                }
-                                catch (OperationCanceledException ex)
-                                {
-                                    // Dataflow swallows operation cancelled exception.
-                                    throw new AggregateException(ex);
+                                    await processor(x);
                                 }
                             },
                             new ExecutionDataflowBlockOptions

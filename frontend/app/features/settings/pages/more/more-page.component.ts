@@ -18,7 +18,7 @@ import { AppDto, AppsState, defined, ResourceOwner, Types, UpdateAppForm } from 
 export class MorePageComponent extends ResourceOwner implements OnInit {
     public app: AppDto;
 
-    public isEditable: boolean;
+    public isEditable = false;
     public isImageEditable: boolean;
     public isDeletable: boolean;
 
@@ -49,7 +49,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
                     this.updateForm.setEnabled(this.isEditable);
                 }));
 
-        this.appsState.reloadSelected();
+        this.appsState.reloadApps();
     }
 
     public save() {

@@ -27,7 +27,7 @@ export class ContentEditorComponent {
     public contentVersion: Version | null;
 
     @Input()
-    public contentFormCompare?: EditContentForm;
+    public contentFormCompare?: EditContentForm | null;
 
     @Input()
     public schema: SchemaDetailsDto;

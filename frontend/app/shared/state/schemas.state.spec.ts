@@ -64,8 +64,8 @@ describe('SchemasState', () => {
 
             expect(categories!).toEqual([
                 { name: '', upper: '', schemas: [] },
-                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
-                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] }
+                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
+                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] }
             ]);
 
             schemasService.verifyAll();
@@ -75,7 +75,7 @@ describe('SchemasState', () => {
             schemasService.setup(x => x.getSchemas(app))
                 .returns(() => of(oldSchemas)).verifiable();
 
-            schemasState.addCategory('category3');
+            schemasState.addCategory('schema-category3');
             schemasState.load(true).subscribe();
 
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
@@ -86,9 +86,9 @@ describe('SchemasState', () => {
 
             expect(categories!).toEqual([
                 { name: '', upper: '', schemas: [] },
-                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
-                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] },
-                { name: 'category3', upper: 'CATEGORY3', schemas: [] }
+                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
+                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] },
+                { name: 'schema-category3', upper: 'SCHEMA-CATEGORY3', schemas: [] }
             ]);
 
             schemasService.verifyAll();
@@ -148,40 +148,40 @@ describe('SchemasState', () => {
         });
 
         it('should add category', () => {
-            schemasState.addCategory('category3');
+            schemasState.addCategory('schema-category3');
 
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
                 { name: '', upper: '', schemas: [] },
-                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
-                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] },
-                { name: 'category3', upper: 'CATEGORY3', schemas: [] }
+                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
+                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] },
+                { name: 'schema-category3', upper: 'SCHEMA-CATEGORY3', schemas: [] }
             ]);
         });
 
         it('should not remove category with schemas', () => {
-            schemasState.addCategory('category1');
+            schemasState.addCategory('schema-category1');
 
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
                 { name: '', upper: '', schemas: [] },
-                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
-                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] }
+                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
+                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] }
             ]);
         });
 
         it('should remove category', () => {
-            schemasState.addCategory('category3');
-            schemasState.removeCategory('category3');
+            schemasState.addCategory('schema-category3');
+            schemasState.removeCategory('schema-category3');
 
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
                 { name: '', upper: '', schemas: [] },
-                { name: 'category1', upper: 'CATEGORY1', schemas: [schema1] },
-                { name: 'category2', upper: 'CATEGORY2', schemas: [schema2] }
+                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
+                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] }
             ]);
         });
 

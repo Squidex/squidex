@@ -11,10 +11,6 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Types } from './../utils/types';
 
-export const LoadingServiceFactory = (router: Router) => {
-    return new LoadingService(router);
-};
-
 @Injectable()
 export class LoadingService implements OnDestroy {
     private readonly routerSubscription: Subscription;

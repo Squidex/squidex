@@ -11,13 +11,13 @@ import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, Model, pret
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-export type RuleElementMetadataDto = {
+export type RuleElementMetadataDto = Readonly<{
     description: string;
     display: string;
     iconColor: string;
     iconCode: string;
     title?: string;
-};
+}>;
 
 export type TriggerType =
     'AssetChanged' |
@@ -73,8 +73,6 @@ export const ALL_TRIGGERS: TriggersDto = {
         title: 'Usage'
     }
 };
-
-export type ActionsDto = { [name: string]: RuleElementDto };
 
 export class RuleElementDto {
     constructor(
@@ -194,14 +192,17 @@ export class RuleEventDto extends Model<RuleEventDto> {
     }
 }
 
-export interface UpsertRuleDto {
-    readonly trigger?: RuleTrigger;
-    readonly action?: RuleAction;
-    readonly name?: string;
-}
+export type ActionsDto =
+    Readonly<{ [name: string]: RuleElementDto }>;
 
-export type RuleAction = { actionType: string } & any;
-export type RuleTrigger = { triggerType: string } & any;
+export type UpsertRuleDto =
+    Readonly<{ trigger?: RuleTrigger; action?: RuleAction; name?: string; }>;
+
+export type RuleAction =
+    Readonly<{ actionType: string } & any>;
+
+export type RuleTrigger =
+    Readonly<{ triggerType: string } & any>;
 
 @Injectable()
 export class RulesService {

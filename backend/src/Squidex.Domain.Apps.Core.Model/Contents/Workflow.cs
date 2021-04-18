@@ -6,8 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 #pragma warning disable IDE0051 // Remove unused private members
 
@@ -19,20 +21,20 @@ namespace Squidex.Domain.Apps.Core.Contents
         private const string DefaultName = "Unnamed";
 
         public static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
-        public static readonly IReadOnlyList<DomainId> EmptySchemaIds = new List<DomainId>();
+
         public static readonly Workflow Default = CreateDefault();
-        public static readonly Workflow Empty = new Workflow(default, EmptySteps);
+        public static readonly Workflow Empty = new Workflow(default, null);
 
         [IgnoreDuringEquals]
         public IReadOnlyDictionary<Status, WorkflowStep> Steps { get; } = EmptySteps;
 
-        public IReadOnlyList<DomainId> SchemaIds { get; } = EmptySchemaIds;
+        public ReadOnlyCollection<DomainId> SchemaIds { get; } = ReadOnlyCollection.Empty<DomainId>();
 
         public Status Initial { get; }
 
         public Workflow(
             Status initial,
-            IReadOnlyDictionary<Status, WorkflowStep>? steps,
+            IReadOnlyDictionary<Status, WorkflowStep>? steps = null,
             IReadOnlyList<DomainId>? schemaIds = null,
             string? name = null)
             : base(name.Or(DefaultName))
@@ -46,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             if (schemaIds != null)
             {
-                SchemaIds = schemaIds;
+                SchemaIds = schemaIds.ToReadOnlyCollection();
             }
         }
 

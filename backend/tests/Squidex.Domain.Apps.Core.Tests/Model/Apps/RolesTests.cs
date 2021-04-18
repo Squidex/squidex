@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             Assert.False(Roles.IsDefault(firstRole));
         }
 
-        [InlineData("Developer", 7)]
+        [InlineData("Developer", 6)]
         [InlineData("Editor", 4)]
         [InlineData("Reader", 2)]
         [InlineData("Owner", 1)]
@@ -173,9 +173,9 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             Assert.Equal(permissionCount, result!.Permissions.Count);
         }
 
-        [InlineData("Developer", 17)]
-        [InlineData("Editor", 14)]
-        [InlineData("Reader", 13)]
+        [InlineData("Developer", 15)]
+        [InlineData("Editor", 13)]
+        [InlineData("Reader", 12)]
         [InlineData("Owner", 1)]
         [Theory]
         public void Should_add_extra_permissions_for_frontend_client(string name, int permissionCount)

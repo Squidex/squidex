@@ -16,7 +16,7 @@ export class CachingInterceptor implements HttpInterceptor {
     private readonly cache: { [url: string]: HttpResponse<any> } = {};
 
     public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        if (req.method === 'GET' && req.reportProgress === false) {
+        if (req.method === 'GET' && !req.reportProgress) {
             const cacheEntry = this.cache[req.url];
 
             if (cacheEntry) {

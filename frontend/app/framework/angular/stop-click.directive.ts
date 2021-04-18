@@ -12,7 +12,7 @@ import { Directive, HostListener, Input } from '@angular/core';
 })
 export class StopClickDirective {
     @Input('sqxStopClick')
-    public shouldStop = true;
+    public shouldStop: any = true;
 
     @HostListener('click', ['$event'])
     public onClick(event: Event) {

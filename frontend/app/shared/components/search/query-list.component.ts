@@ -22,13 +22,13 @@ export class QueryListComponent {
     public remove = new EventEmitter<SavedQuery>();
 
     @Input()
-    public queryUsed?: Query;
+    public queryUsed?: Query | null;
 
     @Input()
-    public queries: ReadonlyArray<SavedQuery>;
+    public queries?: ReadonlyArray<SavedQuery> | null;
 
     @Input()
-    public canRemove: boolean;
+    public canRemove?: boolean | null;
 
     @Input()
     public types: string;

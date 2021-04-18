@@ -19,8 +19,8 @@ export class AssetPathComponent {
     public navigate = new EventEmitter<AssetPathItem>();
 
     @Input()
-    public path?: ReadonlyArray<AssetPathItem>;
+    public path?: ReadonlyArray<AssetPathItem> | null;
 
     @Input()
-    public all = false;
+    public all?: boolean | null;
 }

@@ -44,7 +44,12 @@
                     <label class="col-3 col-form-label fallback-label">{{ 'common.fallback' | sqxTranslate }}</label>
 
                     <div class="col-9">
-                        <div class="fallback-languages" cdkDropList [cdkDropListData]="fallbackLanguages" [cdkDropListDisabled]="!isEditable" (cdkDropListDropped)="sort($event)" *ngIf="fallbackLanguages.length > 0">
+                        <div class="fallback-languages"
+                            cdkDropList
+                            [cdkDropListData]="$any(fallbackLanguages)"
+                            [cdkDropListDisabled]="!isEditable"
+                            (cdkDropListDropped)="sort($event)"
+                            *ngIf="fallbackLanguages.length > 0">
                             <div class="fallback-language table-drag" *ngFor="let language of fallbackLanguages" cdkDrag cdkDragLockAxis="y">
                                 <div class="row no-gutters">
                                     <div class="col-auto" *ngIf="isEditable">

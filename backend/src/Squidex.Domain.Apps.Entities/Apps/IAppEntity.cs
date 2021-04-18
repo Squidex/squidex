@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         AppClients Clients { get; }
 
-        AppPatterns Patterns { get; }
+        AppSettings Settings { get; }
 
         AppContributors Contributors { get; }
 
