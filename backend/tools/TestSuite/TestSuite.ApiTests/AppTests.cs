@@ -40,16 +40,16 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_manage_app_properties()
         {
-            var appLabel = Guid.NewGuid().ToString();
-            var appDescription = Guid.NewGuid().ToString();
+            var newLabel = Guid.NewGuid().ToString();
+            var newDescription = Guid.NewGuid().ToString();
 
             // STEP 1: Update app
-            var updateRequest = new UpdateAppDto { Label = appLabel, Description = appDescription };
+            var updateRequest = new UpdateAppDto { Label = newLabel, Description = newDescription };
 
-            var app_1 = await _.Apps.UpdateAppAsync(_.AppName, updateRequest);
+            var app_1 = await _.Apps.PutAppAsync(_.AppName, updateRequest);
 
-            Assert.Equal(appLabel, app_1.Label);
-            Assert.Equal(appDescription, app_1.Description);
+            Assert.Equal(newLabel, app_1.Label);
+            Assert.Equal(newDescription, app_1.Description);
         }
 
         [Fact]
@@ -330,6 +330,32 @@ namespace TestSuite.ApiTests
 
             Assert.Equal(new string[] { "it" }, languageDE_5.Fallback.ToArray());
             Assert.Equal(new string[] { "it", "de", "en" }, languages_5.Items.Select(x => x.Iso2Code).ToArray());
+        }
+
+        [Fact]
+        public async Task Should_manage_settings()
+        {
+            // STEP 1: Get initial settings.
+            var settings_0 = await _.Apps.GetAppSettingsAsync(_.AppName);
+
+            Assert.NotEmpty(settings_0.Patterns);
+            Assert.Empty(settings_0.Editors);
+
+
+            // STEP 2: Update settings with new state.
+            var updateRequest = new UpdateAppSettingsDto
+            {
+                Patterns = settings_0.Patterns,
+                Editors = new List<EditorDto>
+                {
+                    new EditorDto { Name = "editor", Url = "http://squidex.io/path/to/editor" }
+                }
+            };
+
+            var settings_1 = await _.Apps.PutAppSettingsAsync(_.AppName, updateRequest);
+
+            Assert.NotEmpty(settings_1.Patterns);
+            Assert.NotEmpty(settings_1.Editors);
         }
     }
 }
