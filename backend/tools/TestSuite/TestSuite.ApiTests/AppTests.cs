@@ -253,40 +253,6 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_manage_patterns()
-        {
-            var patternName = Guid.NewGuid().ToString();
-            var patternRegex1 = Guid.NewGuid().ToString();
-            var patternRegex2 = Guid.NewGuid().ToString();
-
-            // STEP 1: Add pattern.
-            var createRequest = new UpdatePatternDto { Name = patternName, Pattern = patternRegex1 };
-
-            var patterns_1 = await _.Apps.PostPatternAsync(_.AppName, createRequest);
-            var pattern_1 = patterns_1.Items.Single(x => x.Name == patternName);
-
-            // Should return pattern with correct regex.
-            Assert.Equal(patternRegex1, pattern_1.Pattern);
-
-
-            // STEP 2: Update pattern.
-            var updateRequest = new UpdatePatternDto { Name = patternName, Pattern = patternRegex2 };
-
-            var patterns_2 = await _.Apps.PutPatternAsync(_.AppName, pattern_1.Id, updateRequest);
-            var pattern_2 = patterns_2.Items.Single(x => x.Name == patternName);
-
-            // Should return pattern with correct regex.
-            Assert.Equal(patternRegex2, pattern_2.Pattern);
-
-
-            // STEP 3: Remove pattern.
-            var patterns_3 = await _.Apps.DeletePatternAsync(_.AppName, pattern_2.Id);
-
-            // Should not return deleted pattern.
-            Assert.DoesNotContain(patterns_3.Items, x => x.Id == pattern_2.Id);
-        }
-
-        [Fact]
         public async Task Should_manage_languages()
         {
             var appName = Guid.NewGuid().ToString();
