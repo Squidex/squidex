@@ -20,20 +20,20 @@ describe('TitleComponent', () => {
     });
 
     it('should set title in service', () => {
-        titleComponent.message = 'new title';
+        titleComponent.message = 'title1';
 
-        titleService.verify(x => x.push('new-title', undefined), Times.once());
+        titleService.verify(x => x.push('title1', undefined), Times.once());
     });
 
     it('should replace title in title service', () => {
-        titleComponent.message = 'old title';
-        titleComponent.message = 'new title';
+        titleComponent.message = 'title1';
+        titleComponent.message = 'title2';
 
-        titleService.verify(x => x.push('new-title', 'old title'), Times.once());
+        titleService.verify(x => x.push('title2', 'title1'), Times.once());
     });
 
     it('should remove title on destroy if set before', () => {
-        titleComponent.message = 'title';
+        titleComponent.message = 'title1';
         titleComponent.ngOnDestroy();
 
         titleService.verify(x => x.pop(), Times.once());
@@ -43,6 +43,6 @@ describe('TitleComponent', () => {
         titleComponent.message = undefined!;
         titleComponent.ngOnDestroy();
 
-        titleService.verify(x => x.pop(), Times.once());
+        titleService.verify(x => x.pop(), Times.never());
     });
 });
