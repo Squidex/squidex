@@ -31,7 +31,12 @@ namespace Squidex.Extensions.Actions.Fastly
 
         protected override (string Description, FastlyJob Data) CreateJob(EnrichedEvent @event, FastlyAction action)
         {
-            var id = @event is IEnrichedEntityEvent entityEvent ? entityEvent.Id.ToString() : string.Empty;
+            var id = string.Empty;
+
+            if (@event is IEnrichedEntityEvent entityEvent)
+            {
+                id = DomainId.Combine(@event.AppId.Id, entityEvent.Id).ToString();
+            }
 
             var ruleJob = new FastlyJob
             {
