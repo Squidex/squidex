@@ -114,6 +114,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             vars.ContentId = context.ContentId;
             vars.AppId = context.App.Id;
             vars.AppName = context.App.Name;
+            vars.SchemaId = context.Schema.Id;
+            vars.SchemaName = context.Schema.SchemaDef.Name;
             vars.User = context.User;
 
             return vars;

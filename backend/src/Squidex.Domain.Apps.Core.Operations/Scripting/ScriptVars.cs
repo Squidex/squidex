@@ -29,6 +29,12 @@ namespace Squidex.Domain.Apps.Core.Scripting
             set => SetValue(value);
         }
 
+        public DomainId SchemaId
+        {
+            get => GetValue<DomainId>();
+            set => SetValue(value);
+        }
+
         public DomainId ContentId
         {
             get => GetValue<DomainId>();
@@ -42,6 +48,12 @@ namespace Squidex.Domain.Apps.Core.Scripting
         }
 
         public string? AppName
+        {
+            get => GetValue<string?>();
+            set => SetValue(value);
+        }
+
+        public string? SchemaName
         {
             get => GetValue<string?>();
             set => SetValue(value);
