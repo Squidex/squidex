@@ -80,13 +80,13 @@ export class LanguageComponent implements OnChanges {
 
     public removeFallbackLanguage(language: LanguageDto) {
         this.fallbackLanguages = this.fallbackLanguages.removed(language);
-        this.fallbackLanguagesNew = [...this.fallbackLanguagesNew, language].sortedByString(x => x.iso2Code);
+        this.fallbackLanguagesNew = [...this.fallbackLanguagesNew, language].sortByString(x => x.iso2Code);
 
         this.otherLanguage = this.fallbackLanguagesNew[0];
     }
 
     public addFallbackLanguage() {
-        this.fallbackLanguages = [...this.fallbackLanguages, this.otherLanguage].sortedByString(x => x.iso2Code);
+        this.fallbackLanguages = [...this.fallbackLanguages, this.otherLanguage].sortByString(x => x.iso2Code);
         this.fallbackLanguagesNew = this.fallbackLanguagesNew.removed(this.otherLanguage);
 
         this.otherLanguage = this.fallbackLanguagesNew[0];

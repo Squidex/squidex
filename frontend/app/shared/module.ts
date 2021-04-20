@@ -17,6 +17,8 @@ import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { AssetFolderDropdownComponent } from './components/assets/asset-folder-dropdown.component';
 import { PreviewableType } from './components/assets/pipes';
 import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetsListComponent, AssetsSelectorComponent, AssetsService, AssetsState, AssetTextEditorComponent, AssetUploaderComponent, AssetUploaderState, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, ClientsService, ClientsState, CommentComponent, CommentsComponent, CommentsService, ContentMustExistGuard, ContentsService, ContentsState, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, GeolocationEditorComponent, GraphQlService, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, ImageCropperComponent, ImageFocusPointComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PlansService, PlansState, QueryComponent, QueryListComponent, QueryPathComponent, ReferencesCheckboxesComponent, ReferencesDropdownComponent, ReferencesTagsComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, SearchFormComponent, SortingComponent, StockPhotoService, TableHeaderComponent, TranslationsService, UIService, UIState, UnsetAppGuard, UnsetContentGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WorkflowsService, WorkflowsState } from './declarations';
+import { RuleMustExistGuard } from './guards/rule-must-exist.guard';
+import { UnsetRuleGuard } from './guards/unset-rule.guard';
 import { SearchService } from './services/search.service';
 
 @NgModule({
@@ -161,6 +163,7 @@ export class SqxSharedModule {
                 RolesService,
                 RolesState,
                 RuleEventsState,
+                RuleMustExistGuard,
                 RulesService,
                 RulesState,
                 SchemaMustExistGuard,
@@ -176,6 +179,7 @@ export class SqxSharedModule {
                 UIState,
                 UnsetAppGuard,
                 UnsetContentGuard,
+                UnsetRuleGuard,
                 UsagesService,
                 UsersProviderService,
                 UsersService,

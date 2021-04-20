@@ -201,7 +201,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                 }
 
                 this.next(s => {
-                    const folders = [...s.folders, folder].sortedByString(x => x.folderName);
+                    const folders = [...s.folders, folder].sortByString(x => x.folderName);
 
                     return { ...s, folders };
                 }, 'Folder Created');
@@ -215,7 +215,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                 this.next(s => {
                     const tags = updateTags(s, updated);
 
-                    const assets = s.assets.replaceBy('id', updated);
+                    const assets = s.assets.replacedBy('id', updated);
 
                     return { ...s, assets, ...tags };
                 }, 'Asset Updated');
@@ -227,7 +227,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         return this.assetsService.putAssetFolder(this.appName, folder, request, folder.version).pipe(
             tap(updated => {
                 this.next(s => {
-                    const folders = s.folders.replaceBy('id', updated);
+                    const folders = s.folders.replacedBy('id', updated);
 
                     return { ...s, folders };
                 }, 'Folder Updated');
@@ -273,7 +273,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         return this.assetsService.putAssetItemParent(this.appName, folder, { parentId }, folder.version).pipe(
             catchError(error => {
                 this.next(s => {
-                    const folders = [...s.folders, folder].sortedByString(x => x.folderName);
+                    const folders = [...s.folders, folder].sortByString(x => x.folderName);
 
                     return { ...s, folders };
                 }, 'Folder Moving Done');

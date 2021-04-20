@@ -60,7 +60,7 @@ export class CommentsState extends State<Snapshot> {
                     }
 
                     for (const updated of payload.updatedComments) {
-                        comments = comments.replaceBy('id', updated);
+                        comments = comments.replacedBy('id', updated);
                     }
 
                     for (const deleted of payload.deletedComments) {
@@ -89,7 +89,7 @@ export class CommentsState extends State<Snapshot> {
         return this.commentsService.deleteComment(this.commentsUrl, comment.id).pipe(
             tap(() => {
                 this.next(s => {
-                    const comments = s.comments.removeBy('id', comment);
+                    const comments = s.comments.removedBy('id', comment);
 
                     return { ...s, comments };
                 }, 'Deleted');
@@ -102,7 +102,7 @@ export class CommentsState extends State<Snapshot> {
             map(() => update(comment, text, now || DateTime.now())),
             tap(updated => {
                 this.next(s => {
-                    const comments = s.comments.replaceBy('id', updated);
+                    const comments = s.comments.replacedBy('id', updated);
 
                     return { ...s, comments };
                 }, 'Updated');

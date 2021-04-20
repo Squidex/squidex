@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
@@ -13,15 +13,19 @@ import { FormControl, FormGroup } from '@angular/forms';
     styleUrls: ['./schema-changed-trigger.component.scss'],
     templateUrl: './schema-changed-trigger.component.html'
 })
-export class SchemaChangedTriggerComponent implements OnInit {
+export class SchemaChangedTriggerComponent implements OnChanges {
     @Input()
     public trigger: any;
 
     @Input()
     public triggerForm: FormGroup;
 
-    public ngOnInit() {
-        this.triggerForm.setControl('condition',
-            new FormControl(this.trigger.condition || ''));
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['triggerForm']) {
+            this.triggerForm.setControl('condition',
+                new FormControl());
+        }
+
+        this.triggerForm.patchValue(this.trigger);
     }
 }

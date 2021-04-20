@@ -57,7 +57,7 @@ export class AssetUploaderState extends State<Snapshot> {
         upload.cancel.error(new UploadCanceled());
 
         this.next(s => {
-            const uploads = s.uploads.removeBy('id', upload);
+            const uploads = s.uploads.removedBy('id', upload);
 
             return { ...s, uploads };
         }, 'Stopped');
@@ -120,7 +120,7 @@ export class AssetUploaderState extends State<Snapshot> {
 
         setTimeout(() => {
             this.next(s => {
-                const uploads = s.uploads.removeBy('id', upload);
+                const uploads = s.uploads.removedBy('id', upload);
 
                 return { ...s, uploads };
             }, 'Upload Done');
@@ -134,7 +134,7 @@ export class AssetUploaderState extends State<Snapshot> {
         upload = { ...upload, ...update };
 
         this.next(s => {
-            const uploads = s.uploads.replaceBy('id', upload);
+            const uploads = s.uploads.replacedBy('id', upload);
 
             return { ...s, uploads };
         }, 'Updated');

@@ -99,7 +99,7 @@ export class EventConsumersState extends State<Snapshot> {
 
     private replaceEventConsumer(eventConsumer: EventConsumerDto) {
         this.next(s => {
-            const eventConsumers = s.eventConsumers.replaceBy('name', eventConsumer);
+            const eventConsumers = s.eventConsumers.replacedBy('name', eventConsumer);
 
             return { ...s, eventConsumers };
         }, 'Updated');

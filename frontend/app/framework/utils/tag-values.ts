@@ -132,5 +132,5 @@ export function getTagValues(values: ReadonlyArray<string | TagValue> | undefine
         }
     }
 
-    return result.sortedByString(x => x.lowerCaseName);
+    return result.sortByString(x => x.lowerCaseName);
 }

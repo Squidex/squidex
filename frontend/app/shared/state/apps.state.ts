@@ -112,7 +112,7 @@ export class AppsState extends State<Snapshot> {
         return this.appsService.postApp(request).pipe(
             tap(created => {
                 this.next(s => {
-                    const apps = [...s.apps, created].sortedByString(x => x.displayName);
+                    const apps = [...s.apps, created].sortByString(x => x.displayName);
 
                     return { ...s, apps };
                 }, 'Created');
@@ -198,7 +198,7 @@ export class AppsState extends State<Snapshot> {
 
     private replaceApp(updated: AppDto, app: AppDto) {
         this.next(s => {
-            const apps = s.apps.replaceBy('id', updated);
+            const apps = s.apps.replacedBy('id', updated);
 
             const selectedApp =
                 s.selectedApp &&

@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ALL_TRIGGERS, DialogModel, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState } from '@app/shared';
+import { ALL_TRIGGERS, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-rules-page',
@@ -14,13 +14,8 @@ import { ALL_TRIGGERS, DialogModel, RuleDto, RuleElementDto, RulesService, Rules
     templateUrl: './rules-page.component.html'
 })
 export class RulesPageComponent implements OnInit {
-    public addRuleDialog = new DialogModel();
-
-    public wizardMode = 'Wizard';
-    public wizardRule: RuleDto | null;
-
-    public ruleActions: { [name: string]: RuleElementDto };
-    public ruleTriggers = ALL_TRIGGERS;
+    public supportedActions: { [name: string]: RuleElementDto };
+    public supportedTriggers = ALL_TRIGGERS;
 
     constructor(
         public readonly rulesState: RulesState,
@@ -34,7 +29,7 @@ export class RulesPageComponent implements OnInit {
 
         this.rulesService.getActions()
             .subscribe(actions => {
-                this.ruleActions = actions;
+                this.supportedActions = actions;
             });
 
         this.schemasState.loadIfNotLoaded();
@@ -58,27 +53,6 @@ export class RulesPageComponent implements OnInit {
         } else {
             this.rulesState.enable(rule);
         }
-    }
-
-    public createNew() {
-        this.wizardMode = 'Wizard';
-        this.wizardRule = null;
-
-        this.addRuleDialog.show();
-    }
-
-    public editTrigger(rule: RuleDto) {
-        this.wizardMode = 'EditTrigger';
-        this.wizardRule = rule;
-
-        this.addRuleDialog.show();
-    }
-
-    public editAction(rule: RuleDto) {
-        this.wizardMode = 'EditAction';
-        this.wizardRule = rule;
-
-        this.addRuleDialog.show();
     }
 
     public trackByRule(_index: number, rule: RuleDto) {

@@ -50,14 +50,14 @@ describe('ArrayExtensions', () => {
 
     it('should sort by value', () => {
         const array_0 = [3, 1, 2];
-        const array_1 = array_0.sorted();
+        const array_1 = array_0.sort();
 
         expect(array_1).toEqual([1, 2, 3]);
     });
 
     it('should sort by property', () => {
         const array_0 = [{ id: 'C' }, { id: 'b' }, { id: 'A' }];
-        const array_1 = array_0.sortedByString(x => x.id);
+        const array_1 = array_0.sortByString(x => x.id);
 
         expect(array_1).toEqual([{ id: 'A' }, { id: 'b' }, { id: 'C' }]);
     });

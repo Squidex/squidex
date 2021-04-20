@@ -46,7 +46,7 @@ export class SchemaFieldRulesFormComponent implements OnChanges {
             }
         }
 
-        this.fieldNames = fieldNames.sorted();
+        this.fieldNames = fieldNames.sort();
 
         this.isEditable = this.schema.canUpdateUrls;
 

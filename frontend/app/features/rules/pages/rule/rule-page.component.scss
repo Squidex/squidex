@@ -1,0 +1,16 @@
+.summary-row {
+    @include force-height(4rem);
+    margin-bottom: 1rem;
+
+    h3 {
+        margin: 0;
+    }
+
+    .col-syntax {
+        width: 4rem;
+    }
+}
+
+.main-separator {
+    margin: 2rem 0;
+}

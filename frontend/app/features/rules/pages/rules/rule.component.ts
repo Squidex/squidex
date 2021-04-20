@@ -7,7 +7,7 @@
 
 // tslint:disable: component-selector
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionsDto, fadeAnimation, ModalModel, RuleDto, RulesState, TriggersDto } from '@app/shared';
 
 @Component({
@@ -20,12 +20,6 @@ import { ActionsDto, fadeAnimation, ModalModel, RuleDto, RulesState, TriggersDto
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RuleComponent {
-    @Output()
-    public editTrigger = new EventEmitter();
-
-    @Output()
-    public editAction = new EventEmitter();
-
     @Input()
     public ruleTriggers: TriggersDto;
 
@@ -64,16 +58,6 @@ export class RuleComponent {
 
     public trigger() {
         this.rulesState.trigger(this.rule);
-    }
-
-    public emitEditAction() {
-        this.editAction.emit();
-    }
-
-    public emitEditTrigger() {
-        if (!this.isManual) {
-            this.editTrigger.emit();
-        }
     }
 
     public toggle() {

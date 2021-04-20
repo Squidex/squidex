@@ -7,14 +7,17 @@
 
 import { Injectable } from '@angular/core';
 import { DialogService, shareSubscribed, State } from '@app/framework';
-import { Observable } from 'rxjs';
-import { finalize, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { finalize, map, tap } from 'rxjs/operators';
 import { RuleDto, RulesService, UpsertRuleDto } from './../services/rules.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot {
     // The current rules.
     rules: RulesList;
+
+    // The selected rule.
+    selectedRule?: RuleDto | null;
 
     // Indicates if the rules are loaded.
     isLoaded?: boolean;
@@ -39,6 +42,9 @@ type RulesList = ReadonlyArray<RuleDto>;
 
 @Injectable()
 export class RulesState extends State<Snapshot> {
+    public selectedRule =
+        this.project(x => x.selectedRule);
+
     public rules =
         this.project(x => x.rules);
 
@@ -71,12 +77,28 @@ export class RulesState extends State<Snapshot> {
         super({ rules: [] }, 'Rules');
     }
 
+    public select(id: string | null): Observable<RuleDto | null> {
+        return this.loadIfNotLoaded().pipe(
+            map(() => this.snapshot.rules.find(x => x.id === id) || null),
+            tap(selectedRule => {
+                this.next({ selectedRule });
+            }));
+    }
+
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState('Loading Initial');
+            this.resetState({ selectedRule: this.snapshot.selectedRule }, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);
+    }
+
+    public loadIfNotLoaded(): Observable<any> {
+        if (this.snapshot.isLoaded) {
+            return of({});
+        }
+
+        return this.loadInternal(false);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
@@ -120,7 +142,7 @@ export class RulesState extends State<Snapshot> {
         return this.rulesService.deleteRule(this.appName, rule, rule.version).pipe(
             tap(() => {
                 this.next(s => {
-                    const rules = s.rules.removeBy('id', rule);
+                    const rules = s.rules.removedBy('id', rule);
 
                     return { ...s, rules };
                 }, 'Deleted');
@@ -128,16 +150,8 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public updateAction(rule: RuleDto, action: any): Observable<RuleDto> {
-        return this.rulesService.putRule(this.appName, rule, { action }, rule.version).pipe(
-            tap(updated => {
-                this.replaceRule(updated);
-            }),
-            shareSubscribed(this.dialogs));
-    }
-
-    public updateTrigger(rule: RuleDto, trigger: any): Observable<RuleDto> {
-        return this.rulesService.putRule(this.appName, rule, { trigger }, rule.version).pipe(
+    public update(rule: RuleDto, dto: Partial<UpsertRuleDto>): Observable<RuleDto> {
+        return this.rulesService.putRule(this.appName, rule, dto, rule.version).pipe(
             tap(updated => {
                 this.replaceRule(updated);
             }),
@@ -202,7 +216,7 @@ export class RulesState extends State<Snapshot> {
 
     private replaceRule(rule: RuleDto) {
         this.next(s => {
-            const rules = s.rules.replaceBy('id', rule);
+            const rules = s.rules.replacedBy('id', rule);
 
             return { ...s, rules };
         }, 'Updated');
