@@ -139,24 +139,28 @@ describe('AppsState', () => {
     });
 
     it('should update app in snapshot if updated', () => {
+        const request = {};
+
         const updated = createApp(2, '_new');
 
-        appsService.setup(x => x.putApp(app2, {}, app2.version))
+        appsService.setup(x => x.putApp(app2, request, app2.version))
             .returns(() => of(updated)).verifiable();
 
-        appsState.update(app2, {}).subscribe();
+        appsState.update(app2, request).subscribe();
 
         expect(appsState.snapshot.apps).toEqual([app1, updated]);
     });
 
     it('should update selected app in snapshot if updated', () => {
+        const request = {};
+
         const updated = createApp(1, '_new');
 
-        appsService.setup(x => x.putApp(app1, {}, app1.version))
+        appsService.setup(x => x.putApp(app1, request, app1.version))
             .returns(() => of(updated)).verifiable();
 
         appsState.select(app1.name).subscribe();
-        appsState.update(app1, {}).subscribe();
+        appsState.update(app1, request).subscribe();
 
         expect(appsState.snapshot.apps).toEqual([updated, app2]);
         expect(appsState.snapshot.selectedApp).toEqual(updated);

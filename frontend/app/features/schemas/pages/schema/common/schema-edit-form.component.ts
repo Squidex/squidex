@@ -15,14 +15,12 @@ import { EditSchemaForm, SchemaDetailsDto, SchemasState } from '@app/shared';
     templateUrl: './schema-edit-form.component.html'
 })
 export class SchemaEditFormComponent implements OnChanges {
-    public readonly standalone = { standalone: true };
-
     @Input()
     public schema: SchemaDetailsDto;
 
     public fieldForm = new EditSchemaForm(this.formBuilder);
 
-    public  isEditable ?: boolean | null;
+    public isEditable?: boolean | null;
 
     constructor(
         private readonly formBuilder: FormBuilder,

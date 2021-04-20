@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ALL_TRIGGERS, DialogModel, Form, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerType } from '@app/shared';
+import { ALL_TRIGGERS, Form, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerType } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-page',
@@ -16,8 +16,6 @@ import { ALL_TRIGGERS, DialogModel, Form, ResourceOwner, RuleDto, RuleElementDto
     templateUrl: './rule-page.component.html'
 })
 export class RulePageComponent extends ResourceOwner implements OnInit {
-    public addRuleDialog = new DialogModel();
-
     public supportedActions: { [name: string]: RuleElementDto };
     public supportedTriggers = ALL_TRIGGERS;
 
@@ -32,7 +30,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
     public triggerProperties?: any;
     public triggerType: string;
 
-    public name: string;
+    public isEnabled = false;
 
     public get actionElement() {
         return this.supportedActions[this.actionType];
@@ -69,15 +67,13 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
 
                     if (rule) {
                         this.isEditable = rule.canUpdate;
-
-                        this.name = rule.name;
+                        this.isEnabled = rule.isEnabled;
 
                         this.selectAction(rule.action);
                         this.selectTrigger(rule.trigger);
                     } else {
                         this.isEditable = true;
-
-                        this.name = '';
+                        this.isEnabled = false;
 
                         this.resetAction();
                         this.resetTrigger();
@@ -152,7 +148,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
                 actionType: this.actionType,
                 ...ruleAction
             },
-            name: this.name
+            isEnabled: this.isEnabled
         };
 
         if (this.rule) {

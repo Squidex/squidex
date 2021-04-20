@@ -199,7 +199,7 @@ export class UsersState extends State<Snapshot> {
             const selectedUser =
                 s.selectedUser?.id !== user.id ?
                 s.selectedUser :
-                users.find(x => x.id === user.id);
+                user;
 
             return { ...s, users, selectedUser };
         }, 'Updated');

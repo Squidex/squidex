@@ -156,9 +156,22 @@ describe('RulesState', () => {
 
             rulesState.update(rule1, request).subscribe();
 
-            const newRule1 = rulesState.snapshot.rules[0];
+            expect(rulesState.snapshot.rules).toEqual([updated, rule2]);
+        });
 
-            expect(newRule1).toEqual(updated);
+        it('should update selected rule in snapshot if updated', () => {
+            const request = {};
+
+            const updated = createRule(1, '_new');
+
+            rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
+                .returns(() => of(updated)).verifiable();
+
+            rulesState.select(rule1.name).subscribe();
+            rulesState.update(rule1, request).subscribe();
+
+            expect(rulesState.snapshot.rules).toEqual([updated, rule2]);
+            expect(rulesState.snapshot.selectedRule).toEqual(updated);
         });
 
         it('should update rule if renamed', () => {
@@ -171,9 +184,7 @@ describe('RulesState', () => {
 
             rulesState.rename(rule1, newName).subscribe();
 
-            const rule1New = rulesState.snapshot.rules[0];
-
-            expect(rule1New).toEqual(updated);
+            expect(rulesState.snapshot.rules).toEqual([updated, rule2]);
         });
 
         it('should update rule if enabled', () => {
@@ -184,9 +195,7 @@ describe('RulesState', () => {
 
             rulesState.enable(rule1).subscribe();
 
-            const rule1New = rulesState.snapshot.rules[0];
-
-            expect(rule1New).toEqual(updated);
+            expect(rulesState.snapshot.rules).toEqual([updated, rule2]);
         });
 
         it('should not update rule if triggered', () => {
@@ -195,9 +204,7 @@ describe('RulesState', () => {
 
             rulesState.trigger(rule1).subscribe();
 
-            const rule1New = rulesState.snapshot.rules[0];
-
-            expect(rule1New).toEqual(rule1);
+            expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
         });
 
         it('should not update rule if running', () => {
@@ -206,9 +213,7 @@ describe('RulesState', () => {
 
             rulesState.run(rule1).subscribe();
 
-            const rule1New = rulesState.snapshot.rules[0];
-
-            expect(rule1New).toEqual(rule1);
+            expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
         });
 
         it('should not update rule if running from snapshots', () => {
@@ -217,9 +222,7 @@ describe('RulesState', () => {
 
             rulesState.runFromSnapshots(rule1).subscribe();
 
-            const rule1New = rulesState.snapshot.rules[0];
-
-            expect(rule1New).toEqual(rule1);
+            expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
         });
 
         it('should update rule if disabled', () => {
@@ -230,9 +233,7 @@ describe('RulesState', () => {
 
             rulesState.disable(rule1).subscribe();
 
-            const rule1New = rulesState.snapshot.rules[0];
-
-            expect(rule1New).toEqual(updated);
+            expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
         });
 
         it('should remove rule from snapshot if deleted', () => {
@@ -242,6 +243,16 @@ describe('RulesState', () => {
             rulesState.delete(rule1).subscribe();
 
             expect(rulesState.snapshot.rules).toEqual([rule2]);
+        });
+
+        it('should remove selected rule from snapshot if deleted', () => {
+            rulesService.setup(x => x.deleteRule(app, rule1, version))
+                .returns(() => of(versioned(newVersion))).verifiable();
+
+            rulesState.select(rule1.name).subscribe();
+            rulesState.delete(rule1).subscribe();
+
+            expect(rulesState.snapshot.selectedRule).toBeNull();
         });
 
         it('should invoke rule service if run is cancelled', () => {

@@ -50,6 +50,8 @@ export class ContentChangedTriggerComponent implements OnChanges {
                 new FormControl());
         }
 
+        this.triggerForm.patchValue(this.trigger);
+
         const schemas: TriggerSchemaForm[] = [];
 
         if (this.trigger.schemas && this.schemas) {

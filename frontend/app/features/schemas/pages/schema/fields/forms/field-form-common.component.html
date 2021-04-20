@@ -3,7 +3,7 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldName">{{ 'common.name' | sqxTranslate }}</label>
 
         <div class="col-9">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldName" readonly [ngModel]="field.name" [ngModelOptions]="standalone">
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldName" readonly [ngModel]="field.name" [ngModelOptions]="{ standalone: true }">
 
             <sqx-form-hint>
                 {{ 'schemas.field.nameHint' | sqxTranslate }}

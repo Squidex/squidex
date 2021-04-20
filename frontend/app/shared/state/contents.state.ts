@@ -329,10 +329,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 const contents = s.contents.replacedBy('id', content);
 
                 const selectedContent =
-                    s.selectedContent &&
-                        s.selectedContent.id === content.id ?
-                        content :
-                        s.selectedContent;
+                    s.selectedContent?.id !== content.id ?
+                    s.selectedContent :
+                    content;
 
                 return { ...s, contents, selectedContent };
             }, 'Updated');

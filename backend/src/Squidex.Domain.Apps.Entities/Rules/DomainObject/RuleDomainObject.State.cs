@@ -64,6 +64,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                                 RuleDef = RuleDef.Rename(e.Name);
                             }
 
+                            if (e.IsEnabled == true)
+                            {
+                                RuleDef = RuleDef.Enable();
+                            }
+                            else
+                            {
+                                RuleDef = RuleDef.Disable();
+                            }
+
                             break;
                         }
 

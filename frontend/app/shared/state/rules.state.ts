@@ -153,7 +153,12 @@ export class RulesState extends State<Snapshot> {
                 this.next(s => {
                     const rules = s.rules.removedBy('id', rule);
 
-                    return { ...s, rules };
+                    const selectedRule =
+                        s.selectedRule?.id !== rule.id ?
+                        s.selectedRule :
+                        null;
+
+                    return { ...s, rules, selectedRule };
                 }, 'Deleted');
             }),
             shareSubscribed(this.dialogs));
@@ -227,7 +232,12 @@ export class RulesState extends State<Snapshot> {
         this.next(s => {
             const rules = s.rules.replacedBy('id', rule);
 
-            return { ...s, rules };
+            const selectedRule =
+                s.selectedRule?.id !== rule.id ?
+                s.selectedRule :
+                rule;
+
+            return { ...s, rules, selectedRule };
         }, 'Updated');
     }
 

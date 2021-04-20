@@ -1,6 +1,5 @@
 .summary-row {
     @include force-height(4rem);
-    margin-bottom: 1rem;
 
     h3 {
         margin: 0;
@@ -9,8 +8,18 @@
     .col-syntax {
         width: 4rem;
     }
+
+    .col-icon {
+        max-width: 15rem;
+    }
 }
 
-.main-separator {
-    margin: 2rem 0;
+.card-body {
+    &:empty {
+        display: none;
+    }
+}
+
+.btn-enabled {
+    border-color: $color-border;
 }

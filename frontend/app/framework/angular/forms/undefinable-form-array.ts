@@ -42,7 +42,7 @@ export class UndefinableFormArray extends FormArray {
         super.push(control);
     }
 
-    public  insert(index: number, control: AbstractControl) {
+    public insert(index: number, control: AbstractControl) {
         this.isUndefined = false;
 
         super.insert(index, control);

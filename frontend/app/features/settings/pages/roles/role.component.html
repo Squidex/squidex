@@ -104,7 +104,7 @@
                                 [disabled]="!isEditable"
                                 [ngModel]="getProperty(property.key)"
                                 (ngModelChange)="setProperty(property.key, $event)"
-                                [ngModelOptions]="standalone">
+                                [ngModelOptions]="{ standalone: true }">
                             <label class="custom-control-label" for="{{role.name}}_{{property.key}}">
                                 {{ property.name | sqxTranslate }}
                             </label>
@@ -121,7 +121,7 @@
                                         [disabled]="!isEditable"
                                         [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
                                         (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
-                                        [ngModelOptions]="standalone">
+                                        [ngModelOptions]="{ standalone: true }">
                                     <label class="custom-control-label" for="{{role.name}}_schema_{{schema.name}}">
                                         <span class="truncate">
                                             {{ 'roles.properties.hideContents' | sqxTranslate: { schema: schema.displayName } }}
@@ -136,7 +136,7 @@
                                         [disabled]="!isEditable"
                                         [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
                                         (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
-                                        [ngModelOptions]="standalone">
+                                        [ngModelOptions]="{ standalone: true }">
                                     <label class="custom-control-label" for="{{role.name}}_schema_{{schema.name}}">
                                         <span class="truncate">
                                             {{ 'roles.properties.hideContents' | sqxTranslate: { schema: schema.displayName } }}
