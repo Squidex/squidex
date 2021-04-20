@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         }
 
         [Fact]
-        public async Task Should_not_send_invitation_email_when_no_consent_given()
+        public async Task Should_not_send_invitation_email_if_no_consent_given()
         {
             var withoutConsent = UserMocks.User("2", "2@email.com", "user", false);
 
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         }
 
         [Fact]
-        public async Task Should_send_invitation_email_when_consent_given()
+        public async Task Should_send_invitation_email_if_consent_given()
         {
             var withConsent = UserMocks.User("2", "2@email.com", "user", true);
 

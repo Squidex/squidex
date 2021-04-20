@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_return_field_data_when_excluding_changed_types_and_all_values_are_valid()
+        public void Should_return_field_data_if_excluding_changed_types_and_all_values_are_valid()
         {
             var field = Fields.Number(1, "number", Partitioning.Invariant);
 
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_return_null_when_excluding_changed_types_and_one_value_is_invalid()
+        public void Should_return_null_if_excluding_changed_types_and_one_value_is_invalid()
         {
             var field = Fields.Number(1, "number", Partitioning.Invariant);
 

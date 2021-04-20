@@ -32,19 +32,19 @@ describe('DateTime', () => {
         expect(actual.raw).not.toBeNull();
     });
 
-    it('should throw when date string to parse is null', () => {
+    it('should throw if date string to parse is null', () => {
         expect(() => DateTime.parseISO(null!)).toThrow();
     });
 
-    it('should throw when date string to parse is invalid', () => {
+    it('should throw if date string to parse is invalid', () => {
         expect(() => DateTime.parseISO('#')).toThrow();
     });
 
-    it('should return null when date string to try parse is null', () => {
+    it('should return null if date string to try parse is null', () => {
         expect(DateTime.tryParseISO(null!)).toBeNull();
     });
 
-    it('should return null when date string to try parse is invalid', () => {
+    it('should return null if date string to try parse is invalid', () => {
         expect(DateTime.tryParseISO(null!)).toBeNull();
     });
 

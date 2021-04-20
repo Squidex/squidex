@@ -218,7 +218,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_add_app_to_indexes_when_creating()
+        public async Task Should_add_app_to_indexes_if_creating()
         {
             var token = RandomHash.Simple();
 
@@ -273,7 +273,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_clear_reservation_when_app_creation_failed()
+        public async Task Should_clear_reservation_if_app_creation_failed()
         {
             var token = RandomHash.Simple();
 
@@ -298,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_not_add_to_indexes_when_name_is_taken()
+        public async Task Should_not_add_to_indexes_if_name_is_taken()
         {
             A.CallTo(() => indexByName.ReserveAsync(appId.Id, appId.Name))
                 .Returns(Task.FromResult<string?>(null));
@@ -322,7 +322,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_not_add_to_indexes_when_name_is_invalid()
+        public async Task Should_not_add_to_indexes_if_name_is_invalid()
         {
             var command = Create("INVALID");
 
@@ -343,7 +343,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_add_app_to_index_when_contributor_assigned()
+        public async Task Should_add_app_to_index_if_contributor_assigned()
         {
             CreateApp();
 
@@ -360,7 +360,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_update_index_when_app_is_updated()
+        public async Task Should_update_index_if_app_is_updated()
         {
             var (_, appGrain) = CreateApp();
 
@@ -377,7 +377,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_update_index_with_result_when_app_is_updated()
+        public async Task Should_update_index_with_result_if_app_is_updated()
         {
             var (app, appGrain) = CreateApp();
 
@@ -394,7 +394,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_remove_from_user_index_when_contributor_removed()
+        public async Task Should_remove_from_user_index_if_contributor_removed()
         {
             CreateApp();
 
@@ -411,7 +411,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_remove_app_from_indexes_when_app_gets_archived()
+        public async Task Should_remove_app_from_indexes_if_app_gets_archived()
         {
             CreateApp(isArchived: true);
 
@@ -431,7 +431,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_also_remove_app_from_client_index_when_created_by_client()
+        public async Task Should_also_remove_app_from_client_index_if_created_by_client()
         {
             CreateApp(fromClient: true);
 
@@ -454,7 +454,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_forward_call_when_rebuilding_for_contributors1()
+        public async Task Should_forward_call_if_rebuilding_for_contributors1()
         {
             var apps = new HashSet<DomainId>();
 
@@ -465,7 +465,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_forward_call_when_rebuilding_for_contributors2()
+        public async Task Should_forward_call_if_rebuilding_for_contributors2()
         {
             var users = new HashSet<string> { userId };
 
@@ -476,7 +476,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_forward_call_when_rebuilding()
+        public async Task Should_forward_call_if_rebuilding()
         {
             var apps = new Dictionary<string, DomainId>();
 

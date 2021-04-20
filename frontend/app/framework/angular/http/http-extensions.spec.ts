@@ -9,7 +9,7 @@ import { ErrorDto } from './../../utils/error';
 import { parseError } from './http-extensions';
 
 describe('ErrorParsing', () => {
-    it('should return default when error is javascript exception', () => {
+    it('should return default if error is javascript exception', () => {
         const response: any = new Error();
         const result = parseError(response, 'Fallback');
 
@@ -55,7 +55,7 @@ describe('ErrorParsing', () => {
         expect(result).toEqual(new ErrorDto(400, 'My-Message', undefined, ['My-Detail'], response));
     });
 
-    it('should return default when object is invalid', () => {
+    it('should return default if object is invalid', () => {
         const error = { text: 'invalid' };
 
         const response: any = { status: 400, error };
@@ -64,7 +64,7 @@ describe('ErrorParsing', () => {
         expect(result).toEqual(new ErrorDto(500, 'Fallback', null, [], response));
     });
 
-    it('should return default when json is invalid', () => {
+    it('should return default if json is invalid', () => {
         const error = '{{';
 
         const response: any = { status: 400, error };

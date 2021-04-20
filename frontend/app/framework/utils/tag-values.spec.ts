@@ -19,7 +19,7 @@ describe('TagValue', () => {
         expect(value.toString()).toEqual('Tag-Name');
     });
 
-    it('should get sorted tags when input is array of string', () => {
+    it('should get sorted tags if input is array of string', () => {
         const input = [
             '2',
             '1',
@@ -35,7 +35,7 @@ describe('TagValue', () => {
         ]);
     });
 
-    it('should get sorted tags when input is array of tags', () => {
+    it('should get sorted tags if input is array of tags', () => {
         const input = [
             new TagValue(2, '2', 2),
             new TagValue(1, '1', 1),
@@ -52,7 +52,7 @@ describe('TagValue', () => {
     });
 
     [null, undefined, []].map(input => {
-        it(`should get tags as empty array when input is <${input}>`, () => {
+        it(`should get tags as empty array if input is <${input}>`, () => {
             const result = getTagValues(input);
 
             expect(result).toEqual([]);
@@ -66,7 +66,7 @@ describe('TagValue', () => {
             { input: '7',   result: new TagValue(7, '7', 7) },
             { input: '0',   result: new TagValue(0, '0', 0) }
         ].map(x => {
-            it(`should return tag value when input is <${x.input}>`, () => {
+            it(`should return tag value if input is <${x.input}>`, () => {
                 const result = IntConverter.INSTANCE.convertInput(x.input);
 
                 expect(result).toEqual(x.result);
@@ -79,7 +79,7 @@ describe('TagValue', () => {
             { input: 'text' },
             { input: '' }
         ].map(x => {
-            it(`should not return tag value when input is <${x.input}>`, () => {
+            it(`should not return tag value if input is <${x.input}>`, () => {
                 const result = IntConverter.INSTANCE.convertInput(x.input!);
 
                 expect(result).toBeNull();
@@ -90,7 +90,7 @@ describe('TagValue', () => {
             { input: 7, result: new TagValue(7, '7', 7) },
             { input: 0, result: new TagValue(0, '0', 0) }
         ].map(x => {
-            it(`should return tag value when value is <${x.input}>`, () => {
+            it(`should return tag value if value is <${x.input}>`, () => {
                 const result = IntConverter.INSTANCE.convertValue(x.input);
 
                 expect(result).toEqual(x.result);
@@ -103,7 +103,7 @@ describe('TagValue', () => {
             { input: 'text' },
             { input: '' }
         ].map(x => {
-            it(`should not return tag value when value is <${x.input}>`, () => {
+            it(`should not return tag value if value is <${x.input}>`, () => {
                 const result = IntConverter.INSTANCE.convertValue(x.input!);
 
                 expect(result).toBeNull();
@@ -117,7 +117,7 @@ describe('TagValue', () => {
             { input: '0.0', result: new TagValue(0, '0.0', 0) },
             { input: '0',   result: new TagValue(0, '0', 0) }
         ].map(x => {
-            it(`should return tag value when input is <${x.input}>`, () => {
+            it(`should return tag value if input is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertInput(x.input);
 
                 expect(result).toEqual(x.result);
@@ -130,7 +130,7 @@ describe('TagValue', () => {
             { input: 'text' },
             { input: '' }
         ].map(x => {
-            it(`should not return tag value when input is <${x.input}>`, () => {
+            it(`should not return tag value if input is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertInput(x.input!);
 
                 expect(result).toBeNull();
@@ -142,7 +142,7 @@ describe('TagValue', () => {
             { input: 7,   result: new TagValue(7, '7', 7) },
             { input: 0,   result: new TagValue(0, '0', 0) }
         ].map(x => {
-            it(`should return tag value when value is <${x.input}>`, () => {
+            it(`should return tag value if value is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertValue(x.input);
 
                 expect(result).toEqual(x.result);
@@ -155,7 +155,7 @@ describe('TagValue', () => {
             { input: 'text' },
             { input: '' }
         ].map(x => {
-            it(`should not return tag value when value is <${x.input}>`, () => {
+            it(`should not return tag value if value is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertValue(x.input!);
 
                 expect(result).toBeNull();
@@ -168,7 +168,7 @@ describe('TagValue', () => {
             { input: 'text',  result: new TagValue('text', 'text', 'text') },
             { input: 'text ', result: new TagValue('text', 'text', 'text') }
         ].map(x => {
-            it(`should return tag value when input is <${x.input}>`, () => {
+            it(`should return tag value if input is <${x.input}>`, () => {
                 const result = StringConverter.INSTANCE.convertInput(x.input);
 
                 expect(result).toEqual(x.result);
@@ -180,7 +180,7 @@ describe('TagValue', () => {
             { input: null },
             { input: ''}
         ].map(x => {
-            it(`should not return tag value when input is <${x.input}>`, () => {
+            it(`should not return tag value if input is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertInput(x.input!);
 
                 expect(result).toBeNull();
@@ -191,7 +191,7 @@ describe('TagValue', () => {
             { input: 'text',  result: new TagValue('text', 'text', 'text') },
             { input: 'text ', result: new TagValue('text', 'text', 'text') }
         ].map(x => {
-            it(`should return tag value when value is <${x.input}>`, () => {
+            it(`should return tag value if value is <${x.input}>`, () => {
                 const result = StringConverter.INSTANCE.convertValue(x.input);
 
                 expect(result).toEqual(x.result);
@@ -203,7 +203,7 @@ describe('TagValue', () => {
             { input: null },
             { input: ''}
         ].map(x => {
-            it(`should not return tag value when value is <${x.input}>`, () => {
+            it(`should not return tag value if value is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertValue(x.input!);
 
                 expect(result).toBeNull();

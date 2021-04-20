@@ -52,7 +52,7 @@ describe('ClientsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading when loading failed', () => {
+        it('should reset loading if loading failed', () => {
             clientsService.setup(x => x.getClients(app))
                 .returns(() => throwError('error'));
 
@@ -61,7 +61,7 @@ describe('ClientsState', () => {
             expect(clientsState.snapshot.isLoading).toBeFalsy();
         });
 
-        it('should show notification on load when reload is true', () => {
+        it('should show notification on load if reload is true', () => {
             clientsService.setup(x => x.getClients(app))
                 .returns(() => of(versioned(version, oldClients))).verifiable();
 
@@ -81,7 +81,7 @@ describe('ClientsState', () => {
             clientsState.load().subscribe();
         });
 
-        it('should update clients when client added', () => {
+        it('should update clients if client added', () => {
             const updated = createClients(1, 2, 3);
 
             const request = { id: 'id3' };
@@ -94,7 +94,7 @@ describe('ClientsState', () => {
             expectNewClients(updated);
         });
 
-        it('should update clients when role updated', () => {
+        it('should update clients if role updated', () => {
             const updated = createClients(1, 2, 3);
 
             const request = { role: 'Owner' };
@@ -107,7 +107,7 @@ describe('ClientsState', () => {
             expectNewClients(updated);
         });
 
-        it('should update clients when name updated', () => {
+        it('should update clients if name updated', () => {
             const updated = createClients(1, 2, 3);
 
             const request = { name: 'NewName' };
@@ -120,7 +120,7 @@ describe('ClientsState', () => {
             expectNewClients(updated);
         });
 
-        it('should update clients when client revoked', () => {
+        it('should update clients if client revoked', () => {
             const updated = createClients(1, 2, 3);
 
             clientsService.setup(x => x.deleteClient(app, oldClients.items[0], version))

@@ -159,7 +159,7 @@ describe('AssetsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should make post request to get assets by name when request limit reached',
+    it('should make post request to get assets by name if request limit reached',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
         const query = { fullText: 'my-query' };
@@ -192,7 +192,7 @@ describe('AssetsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should make get request to get assets by tag when request limit reached',
+    it('should make get request to get assets by tag if request limit reached',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
         assetsService.getAssets('my-app', { take: 17, skip: 13, tags: ['tag1'], maxLength: 5 }).subscribe();
@@ -261,7 +261,7 @@ describe('AssetsService', () => {
         expect(asset!).toEqual(createAsset(12));
     }));
 
-    it('should return proper error when upload failed with 413',
+    it('should return proper error if upload failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
         let asset: AssetDto;
@@ -309,7 +309,7 @@ describe('AssetsService', () => {
         expect(asset!).toEqual(createAsset(123));
     }));
 
-    it('should return proper error when replacing asset content failed with 413',
+    it('should return proper error if replacing asset content failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
         const resource: Resource = {

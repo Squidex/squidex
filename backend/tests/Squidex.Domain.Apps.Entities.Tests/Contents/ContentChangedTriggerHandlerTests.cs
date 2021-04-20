@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_return_true_when_asking_for_snapshot_support()
+        public void Should_return_true_if_asking_for_snapshot_support()
         {
             Assert.True(sut.CanCreateSnapshotEvents);
         }
@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_enrich_with_old_data_when_updated()
+        public async Task Should_enrich_with_old_data_if_updated()
         {
             var @event = new ContentUpdated { AppId = appId, ContentId = DomainId.NewGuid(), SchemaId = schemaMatch };
 
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_event_type_not_correct()
+        public void Should_not_trigger_precheck_if_event_type_not_correct()
         {
             TestForTrigger(handleAll: true, schemaId: null, condition: null, action: trigger =>
             {
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_trigger_contains_no_schemas()
+        public void Should_not_trigger_precheck_if_trigger_contains_no_schemas()
         {
             TestForTrigger(handleAll: false, schemaId: null, condition: null, action: trigger =>
             {
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_trigger_precheck_when_handling_all_events()
+        public void Should_trigger_precheck_if_handling_all_events()
         {
             TestForTrigger(handleAll: true, schemaId: schemaMatch, condition: null, action: trigger =>
             {
@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_trigger_precheck_when_condition_is_empty()
+        public void Should_trigger_precheck_if_condition_is_empty()
         {
             TestForTrigger(handleAll: false, schemaId: schemaMatch, condition: string.Empty, action: trigger =>
             {
@@ -202,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_schema_id_does_not_match()
+        public void Should_not_trigger_precheck_if_schema_id_does_not_match()
         {
             TestForTrigger(handleAll: false, schemaId: schemaNonMatch, condition: null, action: trigger =>
             {
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_event_type_not_correct()
+        public void Should_not_trigger_check_if_event_type_not_correct()
         {
             TestForTrigger(handleAll: true, schemaId: null, condition: null, action: trigger =>
             {
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_trigger_contains_no_schemas()
+        public void Should_not_trigger_check_if_trigger_contains_no_schemas()
         {
             TestForTrigger(handleAll: false, schemaId: null, condition: null, action: trigger =>
             {
@@ -235,7 +235,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_trigger_check_when_handling_all_events()
+        public void Should_trigger_check_if_handling_all_events()
         {
             TestForTrigger(handleAll: true, schemaId: schemaMatch, condition: null, action: trigger =>
             {
@@ -246,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_is_empty()
+        public void Should_trigger_check_if_condition_is_empty()
         {
             TestForTrigger(handleAll: false, schemaId: schemaMatch, condition: string.Empty, action: trigger =>
             {
@@ -257,7 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_matchs()
+        public void Should_trigger_check_if_condition_matchs()
         {
             TestForTrigger(handleAll: false, schemaId: schemaMatch, condition: "true", action: trigger =>
             {
@@ -268,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_schema_id_does_not_match()
+        public void Should_not_trigger_check_if_schema_id_does_not_match()
         {
             TestForTrigger(handleAll: false, schemaId: schemaNonMatch, condition: null, action: trigger =>
             {
@@ -279,7 +279,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_condition_does_not_matchs()
+        public void Should_not_trigger_check_if_condition_does_not_matchs()
         {
             TestForTrigger(handleAll: false, schemaId: schemaMatch, condition: "false", action: trigger =>
             {

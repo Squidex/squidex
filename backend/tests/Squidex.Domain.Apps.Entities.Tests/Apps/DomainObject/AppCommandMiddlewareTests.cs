@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_file_to_upload_is_not_an_image()
+        public async Task Should_throw_exception_if_file_to_upload_is_not_an_image()
         {
             var file = new NoopAssetFile();
 

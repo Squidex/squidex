@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_add_schema_to_index_when_creating()
+        public async Task Should_add_schema_to_index_if_creating()
         {
             var token = RandomHash.Simple();
 
@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_clear_reservation_when_schema_creation_failed()
+        public async Task Should_clear_reservation_if_schema_creation_failed()
         {
             var token = RandomHash.Simple();
 
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_not_add_to_indexes_when_name_is_taken()
+        public async Task Should_not_add_to_indexes_if_name_is_taken()
         {
             A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
                 .Returns(Task.FromResult<string?>(null));
@@ -233,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_not_add_to_indexes_when_name_is_invalid()
+        public async Task Should_not_add_to_indexes_if_name_is_invalid()
         {
             var command = Create("INVALID");
 
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_update_index_when_schema_is_updated()
+        public async Task Should_update_index_if_schema_is_updated()
         {
             var (_, schemaGrain) = SetupSchema();
 
@@ -268,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_update_index_with_result_when_schema_is_updated()
+        public async Task Should_update_index_with_result_if_schema_is_updated()
         {
             var (schema, schemaGrain) = SetupSchema();
 
@@ -285,7 +285,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_remove_schema_from_index_when_deleted_and_exists()
+        public async Task Should_remove_schema_from_index_if_deleted_and_exists()
         {
             var (schema, _) = SetupSchema(isDeleted: true);
 
@@ -302,7 +302,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_forward_call_when_rebuilding()
+        public async Task Should_forward_call_if_rebuilding()
         {
             var schemas = new Dictionary<string, DomainId>();
 

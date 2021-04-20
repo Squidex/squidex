@@ -491,7 +491,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public async Task Should_return_succeeded_job_with_full_dump_when_handler_returns_no_exception()
+        public async Task Should_return_succeeded_job_with_full_dump_if_handler_returns_no_exception()
         {
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Returns(Result.Success(actionDump));
@@ -505,7 +505,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public async Task Should_return_failed_job_with_full_dump_when_handler_returns_exception()
+        public async Task Should_return_failed_job_with_full_dump_if_handler_returns_exception()
         {
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Returns(Result.Failed(new InvalidOperationException(), actionDump));
@@ -519,7 +519,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public async Task Should_return_timedout_job_with_full_dump_when_exception_from_handler_indicates_timeout()
+        public async Task Should_return_timedout_job_with_full_dump_if_exception_from_handler_indicates_timeout()
         {
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
                 .Returns(Result.Failed(new TimeoutException(), actionDump));
@@ -535,7 +535,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public async Task Should_create_exception_details_when_job_to_execute_failed()
+        public async Task Should_create_exception_details_if_job_to_execute_failed()
         {
             var ex = new InvalidOperationException();
 

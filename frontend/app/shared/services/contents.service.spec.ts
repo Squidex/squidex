@@ -81,7 +81,7 @@ describe('ContentsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should make post request to get contents with json query when request limit reached',
+    it('should make post request to get contents with json query if request limit reached',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
         const query = { fullText: 'my-query' };
@@ -114,7 +114,7 @@ describe('ContentsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should make post request to get contents with ids when request limit reached',
+    it('should make post request to get contents with ids if request limit reached',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
         const ids = ['1', '2'];
@@ -145,7 +145,7 @@ describe('ContentsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should make post request to get contents with odata filter when request limit reached',
+    it('should make post request to get contents with odata filter if request limit reached',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
         const query = { fullText: '$filter=my-filter' };
@@ -176,7 +176,7 @@ describe('ContentsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should make post request to get contents by ids when request limit reached',
+    it('should make post request to get contents by ids if request limit reached',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
         const ids = ['1', '2', '3'];

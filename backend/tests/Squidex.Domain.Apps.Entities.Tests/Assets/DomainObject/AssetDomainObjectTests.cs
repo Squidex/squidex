@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_create_events_and_set_intitial_state_when_not_found()
+        public async Task Upsert_should_create_events_and_set_intitial_state_if_not_found()
         {
             var command = new UpsertAsset { File = file, FileHash = "NewHash" };
 
@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_create_events_and_update_file_state_when_found()
+        public async Task Upsert_should_create_events_and_update_file_state_if_found()
         {
             var command = new UpsertAsset { File = file, FileHash = "NewHash" };
 

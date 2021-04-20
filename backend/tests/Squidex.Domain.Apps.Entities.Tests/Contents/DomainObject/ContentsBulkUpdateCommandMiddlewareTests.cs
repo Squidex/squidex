@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_content_cannot_be_resolved()
+        public async Task Should_throw_exception_if_content_cannot_be_resolved()
         {
             SetupContext(Permissions.AppContentsUpdateOwn);
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_query_resolves_multiple_contents()
+        public async Task Should_throw_exception_if_query_resolves_multiple_contents()
         {
             var requestContext = SetupContext(Permissions.AppContentsUpdateOwn);
 
@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_upsert_content_when_id_defined()
+        public async Task Should_upsert_content_if_id_defined()
         {
             SetupContext(Permissions.AppContentsUpsert);
 
@@ -264,7 +264,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_creating()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_creating()
         {
             SetupContext(Permissions.AppContentsReadOwn);
 
@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_updating()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_updating()
         {
             SetupContext(Permissions.AppContentsReadOwn);
 
@@ -338,7 +338,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_patching()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_patching()
         {
             SetupContext(Permissions.AppContentsReadOwn);
 
@@ -392,7 +392,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_changing_status()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_changing_status()
         {
             SetupContext(Permissions.AppContentsReadOwn);
 
@@ -429,7 +429,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_validation()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_validation()
         {
             SetupContext(Permissions.AppContentsDeleteOwn);
 
@@ -466,7 +466,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_deletion()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_deletion()
         {
             SetupContext(Permissions.AppContentsReadOwn);
 

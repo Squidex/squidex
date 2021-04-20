@@ -473,13 +473,13 @@ describe('StringField', () => {
         expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', true)).toEqual(new HtmlValue('<img src="https://images.unsplash.com/123?x&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=50&fit=max" />'));
     });
 
-    it('should not format to preview image when html not allowed', () => {
+    it('should not format to preview image if html not allowed', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
         expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', false)).toBe('https://images.unsplash.com/123?x');
     });
 
-    it('should not format to preview image when not unsplash image', () => {
+    it('should not format to preview image if not unsplash image', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
         expect(FieldFormatter.format(field2, 'https://images.com/123?x', true)).toBe('https://images.com/123?x');

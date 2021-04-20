@@ -23,7 +23,7 @@ describe('Router2State', () => {
             expect(query).toEqual({ key: 'my-string' });
         });
 
-        it('should parse from state as undefined when not a string', () => {
+        it('should parse from state as undefined if not a string', () => {
             const value = 123;
 
             const query = synchronizer.parseFromState({ key: value });
@@ -67,7 +67,7 @@ describe('Router2State', () => {
             expect(query).toEqual({ key: 'flag1,flag2' });
         });
 
-        it('should parse from state as undefined when empty', () => {
+        it('should parse from state as undefined if empty', () => {
             const value = 123;
 
             const query = synchronizer.parseFromState({ key: value });
@@ -75,7 +75,7 @@ describe('Router2State', () => {
             expect(query).toBeUndefined();
         });
 
-        it('should parse from state as undefined when not an object', () => {
+        it('should parse from state as undefined if not an object', () => {
             const value = 123;
 
             const query = synchronizer.parseFromState({ key: value });
@@ -120,7 +120,7 @@ describe('Router2State', () => {
             localStore.verify(x => x.setInt('contents.pageSize', 20), Times.once());
         });
 
-        it('should parse from state without page when zero', () => {
+        it('should parse from state without page if zero', () => {
             const state = { page: 0, pageSize: 20 };
 
             const query = synchronizer.parseFromState(state);
@@ -243,7 +243,7 @@ describe('Router2State', () => {
             router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.exactly(2));
         });
 
-        it('Should not sync from state again when nothing has changed', () => {
+        it('Should not sync from state again if nothing has changed', () => {
             let routeExtras: NavigationExtras;
 
             router.setup(x => x.navigate([], It.isAny()))

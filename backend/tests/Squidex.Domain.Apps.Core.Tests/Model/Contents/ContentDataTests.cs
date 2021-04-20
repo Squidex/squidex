@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         }
 
         [Fact]
-        public void Should_be_equal_when_data_have_same_structure()
+        public void Should_be_equal_if_data_have_same_structure()
         {
             var lhs =
                 new ContentData()
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         }
 
         [Fact]
-        public void Should_not_be_equal_when_data_have_not_same_structure()
+        public void Should_not_be_equal_if_data_have_not_same_structure()
         {
             var lhs =
                 new ContentData()
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         }
 
         [Fact]
-        public void Should_be_equal_fields_when_they_have_same_value()
+        public void Should_be_equal_fields_if_they_have_same_value()
         {
             var lhs =
                 new ContentFieldData()

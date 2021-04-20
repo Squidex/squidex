@@ -84,7 +84,7 @@ describe('PlansState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading when loading failed', () => {
+        it('should reset loading if loading failed', () => {
             plansService.setup(x => x.getPlans(app))
                 .returns(() => throwError('error'));
 
@@ -93,7 +93,7 @@ describe('PlansState', () => {
             expect(plansState.snapshot.isLoading).toBeFalsy();
         });
 
-        it('should show notification on load when reload is true', () => {
+        it('should show notification on load if reload is true', () => {
             plansService.setup(x => x.getPlans(app))
                 .returns(() => of(versioned(version, oldPlans))).verifiable();
 
@@ -115,7 +115,7 @@ describe('PlansState', () => {
             plansState.load().subscribe();
         });
 
-        it('should redirect when returning url', () => {
+        it('should redirect if returning url', () => {
             plansState.window = <any>{ location: {} };
 
             const result = { redirectUri: 'http://url' };
@@ -133,7 +133,7 @@ describe('PlansState', () => {
             expect(plansState.snapshot.version).toEqual(version);
         });
 
-        it('should update plans when no returning url', () => {
+        it('should update plans if no returning url', () => {
             plansService.setup(x => x.putPlan(app, It.isAny(), version))
                 .returns(() => of(versioned(newVersion, { redirectUri: '' })));
 

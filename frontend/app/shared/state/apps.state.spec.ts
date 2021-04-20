@@ -56,20 +56,20 @@ describe('AppsState', () => {
         appsService.verify(x => x.getSettings(app1.name), Times.once());
     });
 
-    it('should reload settings when app selected', () => {
+    it('should reload settings if app selected', () => {
         appsState.select(app1.name).subscribe();
         appsState.loadSettings();
 
         appsService.verify(x => x.getSettings(app1.name), Times.exactly(2));
     });
 
-    it('should not load settings when no app selected', () => {
+    it('should not load settings if no app selected', () => {
         appsState.loadSettings();
 
         appsService.verify(x => x.getSettings(app1.name), Times.never());
     });
 
-    it('should return null on select when unselecting app', () => {
+    it('should return null on select if unselecting app', () => {
         let selectedApp: AppDto;
 
         appsState.select(null).subscribe(x => {
@@ -83,7 +83,7 @@ describe('AppsState', () => {
         appsService.verify(x => x.getSettings(It.isAnyString()), Times.never());
     });
 
-    it('should return new app when loaded', () => {
+    it('should return new app if loaded', () => {
         const newApp = createApp(1, '_new');
 
         appsService.setup(x => x.getApp(app1.name))
@@ -99,7 +99,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.selectedApp).toBeNull();
     });
 
-    it('should return new app when reloaded', () => {
+    it('should return new app if reloaded', () => {
         const newApp = createApp(1, '_new');
 
         appsService.setup(x => x.getApp(app1.name))
@@ -111,7 +111,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.selectedApp).toEqual(newApp);
     });
 
-    it('should return null on select when app is not found', () => {
+    it('should return null on select if app is not found', () => {
         let selectedApp: AppDto;
 
         appsService.setup(x => x.getApp('unknown'))
@@ -125,7 +125,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.selectedApp).toBeNull();
     });
 
-    it('should add app to snapshot when created', () => {
+    it('should add app to snapshot if created', () => {
         const updated = createApp(3, '_new');
 
         const request = { ...updated };
@@ -138,7 +138,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.apps).toEqual([app1, app2, updated]);
     });
 
-    it('should update app in snapshot when updated', () => {
+    it('should update app in snapshot if updated', () => {
         const updated = createApp(2, '_new');
 
         appsService.setup(x => x.putApp(app2, {}, app2.version))
@@ -149,7 +149,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.apps).toEqual([app1, updated]);
     });
 
-    it('should update selected app in snapshot when updated', () => {
+    it('should update selected app in snapshot if updated', () => {
         const updated = createApp(1, '_new');
 
         appsService.setup(x => x.putApp(app1, {}, app1.version))
@@ -162,7 +162,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.selectedApp).toEqual(updated);
     });
 
-    it('should update selected app settings in snapshot when updated', () => {
+    it('should update selected app settings in snapshot if updated', () => {
         const updated = createAppSettings(1, '_new');
 
         appsService.setup(x => x.putSettings(app1Settings, {} as any, app1Settings.version))
@@ -174,7 +174,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.selectedSettings).toBe(updated);
     });
 
-    it('should update app in snapshot when image uploaded', () => {
+    it('should update app in snapshot if image uploaded', () => {
         const updated = createApp(2, '_new');
 
         const file = <File>{};
@@ -187,7 +187,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.apps).toEqual([app1, updated]);
     });
 
-    it('should update app in snapshot when image removed', () => {
+    it('should update app in snapshot if image removed', () => {
         const updated = createApp(2, '_new');
 
         appsService.setup(x => x.deleteAppImage(app2, app2.version))
@@ -198,7 +198,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.apps).toEqual([app1, updated]);
     });
 
-    it('should remove app from snapshot when left', () => {
+    it('should remove app from snapshot if left', () => {
         appsService.setup(x => x.leaveApp(app2))
             .returns(() => of({})).verifiable();
 
@@ -207,7 +207,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.apps).toEqual([app1]);
     });
 
-    it('should remove app from snapshot when archived', () => {
+    it('should remove app from snapshot if archived', () => {
         appsService.setup(x => x.deleteApp(app2))
             .returns(() => of({})).verifiable();
 
@@ -216,7 +216,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.apps).toEqual([app1]);
     });
 
-    it('should remove selected app from snapshot when archived', () => {
+    it('should remove selected app from snapshot if archived', () => {
         appsService.setup(x => x.deleteApp(app1))
             .returns(() => of({})).verifiable();
 

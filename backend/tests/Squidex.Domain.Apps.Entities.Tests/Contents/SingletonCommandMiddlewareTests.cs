@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly SingletonCommandMiddleware sut = new SingletonCommandMiddleware();
 
         [Fact]
-        public async Task Should_create_content_when_singleton_schema_is_created()
+        public async Task Should_create_content_if_singleton_schema_is_created()
         {
             var command = new CreateSchema { IsSingleton = true, Name = "my-schema" };
 
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_not_create_content_when_non_singleton_schema_is_created()
+        public async Task Should_not_create_content_if_non_singleton_schema_is_created()
         {
             var command = new CreateSchema { IsSingleton = false };
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_not_create_content_when_singleton_schema_not_created()
+        public async Task Should_not_create_content_if_singleton_schema_not_created()
         {
             var command = new CreateSchema { IsSingleton = true };
 

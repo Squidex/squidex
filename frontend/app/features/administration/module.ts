@@ -10,7 +10,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AdministrationAreaComponent, ClusterPageComponent, EventConsumerComponent, EventConsumersPageComponent, EventConsumersService, EventConsumersState, RestorePageComponent, UnsetUserGuard, UserComponent, UserMustExistGuard, UserPageComponent, UsersPageComponent, UsersService, UsersState } from './declarations';
+import { AdministrationAreaComponent, ClusterPageComponent, EventConsumerComponent, EventConsumersPageComponent, EventConsumersService, EventConsumersState, RestorePageComponent, UserComponent, UserMustExistGuard, UserPageComponent, UsersPageComponent, UsersService, UsersState } from './declarations';
 
 const routes: Routes = [
     {
@@ -36,11 +36,6 @@ const routes: Routes = [
                         path: 'users',
                         component: UsersPageComponent,
                         children: [
-                            {
-                                path: 'new',
-                                component: UserPageComponent,
-                                canActivate: [UnsetUserGuard]
-                            },
                             {
                                 path: ':userId',
                                 component: UserPageComponent,
@@ -73,7 +68,6 @@ const routes: Routes = [
     providers: [
         EventConsumersService,
         EventConsumersState,
-        UnsetUserGuard,
         UserMustExistGuard,
         UsersService,
         UsersState

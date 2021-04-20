@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_Not_invoke_delete_commands_when_event_restored()
+        public async Task Should_Not_invoke_delete_commands_if_event_restored()
         {
             var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
 

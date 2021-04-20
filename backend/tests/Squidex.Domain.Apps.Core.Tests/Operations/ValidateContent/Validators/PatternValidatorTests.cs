@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
-        public async Task Should_add_timeout_error_when_regex_is_too_slow()
+        public async Task Should_add_timeout_error_if_regex_is_too_slow()
         {
             var sut = new PatternValidator(@"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$");
 

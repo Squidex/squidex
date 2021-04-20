@@ -75,7 +75,7 @@ describe('LanguagesState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading when loading failed', () => {
+        it('should reset loading if loading failed', () => {
             languagesService.setup(x => x.getLanguages(app))
                 .returns(() => throwError('error'));
 
@@ -84,7 +84,7 @@ describe('LanguagesState', () => {
             expect(languagesState.snapshot.isLoading).toBeFalsy();
         });
 
-        it('should show notification on load when reload is true', () => {
+        it('should show notification on load if reload is true', () => {
             languagesState.load(true).subscribe();
 
             expect().nothing();
@@ -98,7 +98,7 @@ describe('LanguagesState', () => {
             languagesState.load().subscribe();
         });
 
-        it('should update languages when language added', () => {
+        it('should update languages if language added', () => {
             const updated = createLanguages('de');
 
             languagesService.setup(x => x.postLanguage(app, It.isAny(), version))
@@ -109,7 +109,7 @@ describe('LanguagesState', () => {
             expectNewLanguages(updated);
         });
 
-        it('should update languages when language updated', () => {
+        it('should update languages if language updated', () => {
             const updated = createLanguages('de');
 
             const request = { isMaster: true, isOptional: false, fallback: [] };
@@ -122,7 +122,7 @@ describe('LanguagesState', () => {
             expectNewLanguages(updated);
         });
 
-        it('should update languages when language deleted', () => {
+        it('should update languages if language deleted', () => {
             const updated = createLanguages('de');
 
             languagesService.setup(x => x.deleteLanguage(app, oldLanguages.items[1], version))

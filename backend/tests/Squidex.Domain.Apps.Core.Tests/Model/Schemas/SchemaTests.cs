@@ -366,7 +366,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
-        public void Should_also_set_list_fields_when_reordered()
+        public void Should_also_set_list_fields_if_reordered()
         {
             var schema_1 = schema_0.SetFieldsInLists("2", "1");
             var schema_2 = schema_1.SetFieldsInLists("1", "2");
@@ -388,7 +388,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
-        public void Should_also_set_reference_fields_when_reordered()
+        public void Should_also_set_reference_fields_if_reordered()
         {
             var schema_1 = schema_0.SetFieldsInReferences("2", "1");
             var schema_2 = schema_1.SetFieldsInReferences("1", "2");

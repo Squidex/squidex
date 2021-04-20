@@ -40,7 +40,7 @@ describe('State', () => {
         expect(updated).toBeTruthy();
     });
 
-    it('should not update state when nothing changed', () => {
+    it('should not update state if nothing changed', () => {
         let updateCount = 0;
 
         state.changes.subscribe(() => {
@@ -55,7 +55,7 @@ describe('State', () => {
         expect(updated).toBeFalsy();
     });
 
-    it('should not reset state when nothing changed', () => {
+    it('should not reset state if nothing changed', () => {
         let updateCount = 0;
 
         state.changes.subscribe(() => {

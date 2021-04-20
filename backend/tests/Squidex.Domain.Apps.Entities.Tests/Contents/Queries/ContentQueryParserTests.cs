@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_skip_total_when_set_in_context()
+        public async Task Should_skip_total_if_set_in_context()
         {
             var q = await sut.ParseAsync(requestContext.Clone(b => b.WithoutTotal()), Q.Empty);
 
@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_convert_full_text_query_to_filter_when_single_id_found()
+        public async Task Should_convert_full_text_query_to_filter_if_single_id_found()
         {
             A.CallTo(() => textIndex.SearchAsync(requestContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), requestContext.Scope()))
                 .Returns(new List<DomainId> { DomainId.Create("1") });
@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_convert_full_text_query_to_filter_when_index_returns_null()
+        public async Task Should_convert_full_text_query_to_filter_if_index_returns_null()
         {
             A.CallTo(() => textIndex.SearchAsync(requestContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), requestContext.Scope()))
                 .Returns(Task.FromResult<List<DomainId>?>(null));
@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_convert_full_text_query_to_filter_when_index_returns_empty()
+        public async Task Should_convert_full_text_query_to_filter_if_index_returns_empty()
         {
             A.CallTo(() => textIndex.SearchAsync(requestContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), requestContext.Scope()))
                 .Returns(new List<DomainId>());
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_convert_geo_query_to_filter_when_single_id_found()
+        public async Task Should_convert_geo_query_to_filter_if_single_id_found()
         {
             A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope()))
                 .Returns(new List<DomainId> { DomainId.Create("1") });
@@ -217,7 +217,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_convert_geo_query_to_filter_when_index_returns_null()
+        public async Task Should_convert_geo_query_to_filter_if_index_returns_null()
         {
             A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope()))
                 .Returns(Task.FromResult<List<DomainId>?>(null));
@@ -230,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_convert_geo_query_to_filter_when_index_returns_empty()
+        public async Task Should_convert_geo_query_to_filter_if_index_returns_empty()
         {
             A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope()))
                 .Returns(new List<DomainId>());

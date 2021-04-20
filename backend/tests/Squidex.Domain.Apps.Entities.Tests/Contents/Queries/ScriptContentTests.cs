@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_not_call_script_engine_when_no_script_configured()
+        public async Task Should_not_call_script_engine_if_no_script_configured()
         {
             var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
 

@@ -45,7 +45,7 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
-        public async Task Should_create_user_and_return_true_when_created()
+        public async Task Should_create_user_and_return_true_if_created()
         {
             var email = "123@email.com";
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
-        public async Task Should_create_user_and_return_false_when_exception_thrown()
+        public async Task Should_create_user_and_return_false_if_exception_thrown()
         {
             var email = "123@email.com";
 
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
-        public async Task Should_add_claim_when_not_added_yet()
+        public async Task Should_add_claim_if_not_added_yet()
         {
             var id = "123";
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
-        public async Task Should_add_claim_when_not_added_yet_silently()
+        public async Task Should_add_claim_if_not_added_yet_silently()
         {
             var id = "123";
 

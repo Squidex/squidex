@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Should_update_repository_when_enqueing()
+        public async Task Should_update_repository_if_enqueing()
         {
             var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
 
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Should_not_eqneue_when_event_restored()
+        public async Task Should_not_eqneue_if_event_restored()
         {
             var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
 

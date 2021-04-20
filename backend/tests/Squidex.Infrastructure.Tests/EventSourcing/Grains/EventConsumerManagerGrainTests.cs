@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_activate_matching_grains_when_stream_name_defined()
+        public async Task Should_activate_matching_grains_if_stream_name_defined()
         {
             await sut.ActivateAsync("a-123");
 

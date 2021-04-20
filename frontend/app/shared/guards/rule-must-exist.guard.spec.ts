@@ -12,12 +12,6 @@ import { IMock, It, Mock, Times } from 'typemoq';
 import { RuleMustExistGuard } from './rule-must-exist.guard';
 
 describe('RuleMustExistGuard', () => {
-    const route: any = {
-        params: {
-            ruleId: '123'
-        }
-    };
-
     let router: IMock<Router>;
     let rulesState: IMock<RulesState>;
     let ruleGuard: RuleMustExistGuard;
@@ -28,11 +22,17 @@ describe('RuleMustExistGuard', () => {
         ruleGuard = new RuleMustExistGuard(rulesState.object, router.object);
     });
 
-    it('should load rule and return true when found', () => {
+    it('should load rule and return true if found', () => {
         rulesState.setup(x => x.select('123'))
             .returns(() => of(<RuleDto>{}));
 
         let result: boolean;
+
+        const route: any = {
+            params: {
+                ruleId: '123'
+            }
+        };
 
         ruleGuard.canActivate(route).subscribe(x => {
             result = x;
@@ -43,11 +43,17 @@ describe('RuleMustExistGuard', () => {
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
-    it('should load rule and return false when not found', () => {
+    it('should load rule and return false if not found', () => {
         rulesState.setup(x => x.select('123'))
             .returns(() => of(null));
 
         let result: boolean;
+
+        const route: any = {
+            params: {
+                ruleId: '123'
+            }
+        };
 
         ruleGuard.canActivate(route).subscribe(x => {
             result = x;
@@ -56,5 +62,47 @@ describe('RuleMustExistGuard', () => {
         expect(result!).toBeFalsy();
 
         router.verify(x => x.navigate(['/404']), Times.once());
+    });
+
+    it('should unset rule if rule id is undefined', () => {
+        rulesState.setup(x => x.select(null))
+            .returns(() => of(null));
+
+        let result: boolean;
+
+        const route: any = {
+            params: {
+                ruleId: undefined
+            }
+        };
+
+        ruleGuard.canActivate(route).subscribe(x => {
+            result = x;
+        }).unsubscribe();
+
+        expect(result!).toBeTruthy();
+
+        rulesState.verify(x => x.select(null), Times.once());
+    });
+
+    it('should unset rule if rule id is <new>', () => {
+        rulesState.setup(x => x.select(null))
+            .returns(() => of(null));
+
+        let result: boolean;
+
+        const route: any = {
+            params: {
+                ruleId: 'new'
+            }
+        };
+
+        ruleGuard.canActivate(route).subscribe(x => {
+            result = x;
+        }).unsubscribe();
+
+        expect(result!).toBeTruthy();
+
+        rulesState.verify(x => x.select(null), Times.once());
     });
 });

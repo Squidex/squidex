@@ -93,7 +93,7 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
             const keys = Object.keys(this.schema.previewUrls);
 
             state.previewNameSelected = selectedName;
-            state.previewNamesMore = keys.removed(selectedName).sort();
+            state.previewNamesMore = keys.removed(selectedName).sorted();
 
             this.localStore.set(this.configKey(), selectedName);
 

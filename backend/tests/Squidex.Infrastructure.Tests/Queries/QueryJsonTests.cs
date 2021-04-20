@@ -166,7 +166,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_not_throw_exception_when_filter_has_unknown_property()
+        public void Should_not_throw_exception_if_filter_has_unknown_property()
         {
             var json = new
             {

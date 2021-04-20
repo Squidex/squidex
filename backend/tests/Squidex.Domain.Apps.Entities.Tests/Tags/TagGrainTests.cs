@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_delete_and_reset_state_when_cleaning()
+        public async Task Should_delete_and_reset_state_if_cleaning()
         {
             await sut.NormalizeTagsAsync(HashSet.Of("name1", "name2"), null);
             await sut.NormalizeTagsAsync(HashSet.Of("name2", "name3"), null);

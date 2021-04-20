@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
-        public async Task Should_sum_up_when_getting_monthly_calls()
+        public async Task Should_sum_up_if_getting_monthly_calls()
         {
             var dateFrom = new DateTime(date.Year, date.Month, 1);
             var dateTo = dateFrom.AddMonths(1).AddDays(-1);
@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
-        public async Task Should_sum_up_when_getting_last_calls_calls()
+        public async Task Should_sum_up_if_getting_last_calls_calls()
         {
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(10);

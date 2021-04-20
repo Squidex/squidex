@@ -47,7 +47,7 @@ describe('RuleEventsState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
-    it('should reset loading when loading failed', () => {
+    it('should reset loading if loading failed', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, undefined))
             .returns(() => throwError('error'));
 
@@ -56,7 +56,7 @@ describe('RuleEventsState', () => {
         expect(ruleEventsState.snapshot.isLoading).toBeFalsy();
     });
 
-    it('should show notification on load when reload is true', () => {
+    it('should show notification on load if reload is true', () => {
         ruleEventsState.load(true).subscribe();
 
         expect().nothing();
@@ -64,7 +64,7 @@ describe('RuleEventsState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
-    it('should load with new pagination when paging', () => {
+    it('should load with new pagination if paging', () => {
         rulesService.setup(x => x.getEvents(app, 30, 30, undefined))
             .returns(() => of(new RuleEventsDto(200, [])));
 
@@ -76,7 +76,7 @@ describe('RuleEventsState', () => {
         rulesService.verify(x => x.getEvents(app, 30, 0, undefined), Times.once());
     });
 
-    it('should load with rule id when filtered', () => {
+    it('should load with rule id if filtered', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, '12'))
             .returns(() => of(new RuleEventsDto(200, [])));
 
@@ -87,7 +87,7 @@ describe('RuleEventsState', () => {
         rulesService.verify(x => x.getEvents(app, 30, 0, '12'), Times.once());
     });
 
-    it('should not load again when rule id has not changed', () => {
+    it('should not load again if rule id has not changed', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, '12'))
             .returns(() => of(new RuleEventsDto(200, [])));
 
@@ -99,7 +99,7 @@ describe('RuleEventsState', () => {
         rulesService.verify(x => x.getEvents(app, 30, 0, '12'), Times.once());
     });
 
-    it('should call service when enqueuing event', () => {
+    it('should call service if enqueuing event', () => {
         rulesService.setup(x => x.enqueueEvent(app, oldRuleEvents[0]))
             .returns(() => of({}));
 
@@ -110,7 +110,7 @@ describe('RuleEventsState', () => {
         rulesService.verify(x => x.enqueueEvent(app, oldRuleEvents[0]), Times.once());
     });
 
-    it('should call service when cancelling event', () => {
+    it('should call service if cancelling event', () => {
         rulesService.setup(x => x.cancelEvent(app, oldRuleEvents[0]))
             .returns(() => of({}));
 

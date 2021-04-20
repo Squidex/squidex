@@ -159,7 +159,7 @@ namespace Squidex.Infrastructure.Migrations
         }
 
         [Fact]
-        public async Task Should_unlock_when_migration_failed()
+        public async Task Should_unlock_if_migration_failed()
         {
             var migrator_0_1 = BuildMigration(0, 1);
             var migrator_1_2 = BuildMigration(1, 2);
@@ -194,7 +194,7 @@ namespace Squidex.Infrastructure.Migrations
         }
 
         [Fact]
-        public async Task Should_log_exception_when_migration_failed()
+        public async Task Should_log_exception_if_migration_failed()
         {
             var migrator_0_1 = BuildMigration(0, 1);
             var migrator_1_2 = BuildMigration(1, 2);

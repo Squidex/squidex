@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
-        public void Should_return_empty_list_from_field_when_value_item_is_invalid(IField field)
+        public void Should_return_empty_list_from_field_if_value_item_is_invalid(IField field)
         {
             var result = field.GetReferencedIds(JsonValue.Array(1)).ToArray();
 
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
-        public void Should_return_empty_list_from_field_when_value_is_empty(IField field)
+        public void Should_return_empty_list_from_field_if_value_is_empty(IField field)
         {
             var result = field.GetReferencedIds(JsonValue.Array()).ToArray();
 
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
-        public void Should_return_empty_list_from_field_when_value_is_json_null(IField field)
+        public void Should_return_empty_list_from_field_if_value_is_json_null(IField field)
         {
             var result = field.GetReferencedIds(null).ToArray();
 
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
-        public void Should_return_empty_list_from_field_when_value_is_null(IField field)
+        public void Should_return_empty_list_from_field_if_value_is_null(IField field)
         {
             var result = field.GetReferencedIds(null).ToArray();
 
@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
         [Theory]
         [MemberData(nameof(ReferencingFields))]
-        public void Should_return_same_value_from_field_when_value_is_json_null(IField field)
+        public void Should_return_same_value_from_field_if_value_is_json_null(IField field)
         {
             var result = ValueReferencesConverter.CleanReferences(RandomIds())(JsonValue.Null, field, null);
 

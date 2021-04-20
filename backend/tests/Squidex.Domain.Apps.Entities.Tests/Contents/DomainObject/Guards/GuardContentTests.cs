@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public void Should_throw_exception_when_draft_already_created()
+        public void Should_throw_exception_if_draft_already_created()
         {
             var context = CreateContext(CreateDraftContent(Status.Draft), normalSchema);
 
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public void Should_throw_exception_when_draft_cannot_be_created()
+        public void Should_throw_exception_if_draft_cannot_be_created()
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public void Should_not_throw_exception_when_draft_can_be_created()
+        public void Should_not_throw_exception_if_draft_can_be_created()
         {
             var context = CreateContext(CreateContent(Status.Published), normalSchema);
 
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public void Should_throw_exception_when_draft_cannot_be_deleted()
+        public void Should_throw_exception_if_draft_cannot_be_deleted()
         {
             var context = CreateContext(CreateContent(Status.Published), normalSchema);
 
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public void Should_not_throw_exception_when_draft_can_be_deleted()
+        public void Should_not_throw_exception_if_draft_can_be_deleted()
         {
             var context = CreateContext(CreateDraftContent(Status.Draft), normalSchema);
 
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_workflow_permits_update()
+        public async Task Should_throw_exception_if_workflow_permits_update()
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
@@ -185,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task Should_not_throw_exception_when_workflow_allows_update()
+        public async Task Should_not_throw_exception_if_workflow_allows_update()
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_workflow_status_not_valid()
+        public async Task Should_throw_exception_if_workflow_status_not_valid()
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task Should_not_throw_exception_when_workflow_status_is_valid()
+        public async Task Should_not_throw_exception_if_workflow_status_is_valid()
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
@@ -218,7 +218,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task Should_not_throw_exception_when_workflow_status_is_checked_for_singleton()
+        public async Task Should_not_throw_exception_if_workflow_status_is_checked_for_singleton()
         {
             var context = CreateContext(CreateContent(Status.Draft), singletonSchema);
 
@@ -229,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_workflow_transition_not_valid()
+        public async Task Should_throw_exception_if_workflow_transition_not_valid()
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
@@ -240,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task Should_not_throw_exception_when_workflow_transition_is_valid()
+        public async Task Should_not_throw_exception_if_workflow_transition_is_valid()
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         }
 
         [Fact]
-        public async Task Should_not_throw_exception_when_workflow_transition_is_checked_for_singleton()
+        public async Task Should_not_throw_exception_if_workflow_transition_is_checked_for_singleton()
         {
             var context = CreateContext(CreateContent(Status.Draft), singletonSchema);
 

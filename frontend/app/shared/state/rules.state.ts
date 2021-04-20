@@ -110,14 +110,23 @@ export class RulesState extends State<Snapshot> {
                     this.dialogs.notifyInfo('i18n:rules.reloaded');
                 }
 
-                this.next({
-                    canCancelRun,
-                    canCreate,
-                    canReadEvents,
-                    isLoaded: true,
-                    isLoading: false,
-                    runningRuleId,
-                    rules
+                this.next(s => {
+                    let selectedRule = s.selectedRule;
+
+                    if (selectedRule) {
+                        selectedRule = rules.find(x => x.id === selectedRule!.id);
+                    }
+
+                    return {
+                        canCancelRun,
+                        canCreate,
+                        canReadEvents,
+                        isLoaded: true,
+                        isLoading: false,
+                        runningRuleId,
+                        rules,
+                        selectedRule
+                    };
                 }, 'Loading Success');
             }),
             finalize(() => {

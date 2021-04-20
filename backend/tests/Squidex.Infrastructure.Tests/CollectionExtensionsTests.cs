@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure
         private readonly Dictionary<int, List<int>> listDictionary = new Dictionary<int, List<int>>();
 
         [Fact]
-        public void SetEquals_should_return_false_when_subset()
+        public void SetEquals_should_return_false_if_subset()
         {
             var set1 = new[] { 1, 2 };
             var set2 = new[] { 1, 2, 3 };
@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void IndexOf_should_return_index_when_found()
+        public void IndexOf_should_return_index_if_found()
         {
             var source = new List<(int Value, int Other)>
             {
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void IndexOf_should_return_negative_value_when_not_found()
+        public void IndexOf_should_return_negative_value_if_not_found()
         {
             var source = new List<(int Value, int Other)>
             {

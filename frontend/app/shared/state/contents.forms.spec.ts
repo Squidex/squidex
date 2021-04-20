@@ -595,17 +595,17 @@ describe('ContentForm', () => {
             ]);
         });
 
-        it('should not be an unsaved change when nothing has changed', () => {
+        it('should not be an unsaved change if nothing has changed', () => {
             expect(simpleForm.hasChanged()).toBeFalsy();
         });
 
-        it('should be an unsaved change when value has changed but not saved', () => {
+        it('should be an unsaved change if value has changed but not saved', () => {
             simpleForm.form.setValue({ field1: { iv: 'Change' }});
 
             expect(simpleForm.hasChanged()).toBeTruthy();
         });
 
-        it('should not be an unsaved change when value has changed and saved', () => {
+        it('should not be an unsaved change if value has changed and saved', () => {
             simpleForm.form.setValue({ field1: { iv: 'Change' }});
             simpleForm.submit();
             simpleForm.submitCompleted();
@@ -636,25 +636,25 @@ describe('ContentForm', () => {
             simpleForm.load({ field1: { iv: 'Initial' } }, true);
         });
 
-        it('should not be an unsaved change when nothing has changed', () => {
+        it('should not be an unsaved change if nothing has changed', () => {
             simpleForm.load({ field1: { iv: 'Initial' } }, true);
 
             expect(simpleForm.hasChanged()).toBeFalsy();
         });
 
-        it('should be an unsaved change when value has changed but not saved', () => {
+        it('should be an unsaved change if value has changed but not saved', () => {
             simpleForm.form.setValue({ field1: { iv: 'Change' }});
 
             expect(simpleForm.hasChanged()).toBeTruthy();
         });
 
-        it('should be an unsaved change when value has been loaded but not saved', () => {
+        it('should be an unsaved change if value has been loaded but not saved', () => {
             simpleForm.load({ field1: { iv: 'Prev' } });
 
             expect(simpleForm.hasChanged()).toBeTruthy();
         });
 
-        it('should not be an unsaved change when value has changed and saved', () => {
+        it('should not be an unsaved change if value has changed and saved', () => {
             simpleForm.form.setValue({ field1: { iv: 'Change' }});
             simpleForm.submit();
             simpleForm.submitCompleted();
@@ -662,7 +662,7 @@ describe('ContentForm', () => {
             expect(simpleForm.hasChanged()).toBeFalsy();
         });
 
-        it('should not be an unsaved change when value has been loaded but not saved', () => {
+        it('should not be an unsaved change if value has been loaded but not saved', () => {
             simpleForm.load({ field1: { iv: 'Prev' } });
             simpleForm.submit();
             simpleForm.submitCompleted();

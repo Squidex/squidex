@@ -353,7 +353,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_create_null_when_adding_null_to_array()
+        public void Should_create_null_if_adding_null_to_array()
         {
             var array = JsonValue.Array();
 
@@ -363,7 +363,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_create_null_when_replacing_to_null_in_array()
+        public void Should_create_null_if_replacing_to_null_in_array()
         {
             var array = JsonValue.Array(1);
 
@@ -373,7 +373,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_create_null_when_adding_null_to_object()
+        public void Should_create_null_if_adding_null_to_object()
         {
             var obj = JsonValue.Object();
 
@@ -383,7 +383,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_create_null_when_replacing_to_null_object()
+        public void Should_create_null_if_replacing_to_null_object()
         {
             var obj = JsonValue.Object();
 
@@ -435,13 +435,13 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_throw_exception_when_creation_value_from_invalid_type()
+        public void Should_throw_exception_if_creation_value_from_invalid_type()
         {
             Assert.Throws<ArgumentException>(() => JsonValue.Create(default(TimeSpan)));
         }
 
         [Fact]
-        public void Should_return_null_when_getting_value_by_path_segment_from_null()
+        public void Should_return_null_if_getting_value_by_path_segment_from_null()
         {
             var json = JsonValue.Null;
 
@@ -452,7 +452,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_getting_value_by_path_segment_from_string()
+        public void Should_return_null_if_getting_value_by_path_segment_from_string()
         {
             var json = JsonValue.Create("string");
 
@@ -463,7 +463,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_getting_value_by_path_segment_from_boolean()
+        public void Should_return_null_if_getting_value_by_path_segment_from_boolean()
         {
             var json = JsonValue.True;
 
@@ -474,7 +474,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_getting_value_by_path_segment_from_number()
+        public void Should_return_null_if_getting_value_by_path_segment_from_number()
         {
             var json = JsonValue.Create(12);
 
@@ -485,7 +485,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_same_object_when_path_is_null()
+        public void Should_return_same_object_if_path_is_null()
         {
             var json = JsonValue.Object().Add("property", 12);
 
@@ -496,7 +496,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_same_object_when_path_is_empty()
+        public void Should_return_same_object_if_path_is_empty()
         {
             var json = JsonValue.Object().Add("property", 12);
 
@@ -524,7 +524,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_property_not_found()
+        public void Should_return_null_if_property_not_found()
         {
             var json =
                 JsonValue.Object()
@@ -537,7 +537,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_out_of_index1()
+        public void Should_return_null_if_out_of_index1()
         {
             var json = JsonValue.Array(12, 14);
 
@@ -548,7 +548,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_out_of_index2()
+        public void Should_return_null_if_out_of_index2()
         {
             var json = JsonValue.Array(12, 14);
 

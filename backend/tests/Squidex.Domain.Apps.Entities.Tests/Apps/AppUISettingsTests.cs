@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_call_grain_when_retrieving_settings()
+        public async Task Should_call_grain_if_retrieving_settings()
         {
             var settings = JsonValue.Object();
 
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_call_grain_when_setting_value()
+        public async Task Should_call_grain_if_setting_value()
         {
             var value = JsonValue.Object();
 
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_call_grain_when_replacing_settings()
+        public async Task Should_call_grain_if_replacing_settings()
         {
             var value = JsonValue.Object();
 
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_call_grain_when_removing_value()
+        public async Task Should_call_grain_if_removing_value()
         {
             await sut.RemoveAsync(DomainId.NewGuid(), "user", "the.path");
 

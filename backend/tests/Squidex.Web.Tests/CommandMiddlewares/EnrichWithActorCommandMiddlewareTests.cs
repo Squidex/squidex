@@ -33,13 +33,13 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_no_subject_or_client_is_found()
+        public async Task Should_throw_security_exception_if_no_subject_or_client_is_found()
         {
             await Assert.ThrowsAsync<DomainForbiddenException>(() => HandleAsync(new CreateContent()));
         }
 
         [Fact]
-        public async Task Should_do_nothing_when_context_is_null()
+        public async Task Should_do_nothing_if_context_is_null()
         {
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(null!);

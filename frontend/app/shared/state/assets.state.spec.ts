@@ -66,7 +66,7 @@ describe('AssetsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should show notification on load when reload is true', () => {
+        it('should show notification on load if reload is true', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
                 .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable();
 
@@ -77,7 +77,7 @@ describe('AssetsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
-        it('should load without tags when tag untoggled', () => {
+        it('should load without tags if tag untoggled', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1'] }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
@@ -90,7 +90,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.tagsSelected).toEqual({});
         });
 
-        it('should load without tags when tags reset', () => {
+        it('should load without tags if tags reset', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
@@ -99,7 +99,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.tagsSelected).toEqual({});
         });
 
-        it('should load with new pagination when paging', () => {
+        it('should load with new pagination if paging', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID }))
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 
@@ -124,7 +124,7 @@ describe('AssetsState', () => {
     });
 
     describe('Searching', () => {
-        it('should load with tags when tag toggled', () => {
+        it('should load with tags if tag toggled', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1'] }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
@@ -133,7 +133,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.tagsSelected).toEqual({ tag1: true });
         });
 
-        it('should load with tags when tags selected', () => {
+        it('should load with tags if tags selected', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1', 'tag2'] }))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
@@ -142,7 +142,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.tagsSelected).toEqual({ tag1: true, tag2: true });
         });
 
-        it('should load with query when searching', () => {
+        it('should load with query if searching', () => {
             const query = { fullText: 'my-query' };
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, query }))
@@ -168,7 +168,7 @@ describe('AssetsState', () => {
             assetsState.load(true).subscribe();
         });
 
-        it('should add asset to snapshot when created', () => {
+        it('should add asset to snapshot if created', () => {
             const newAsset = createAsset(5, ['new']);
 
             assetsState.addAsset(newAsset);
@@ -177,7 +177,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.total).toBe(201);
         });
 
-        it('should truncate assets when page size reached', () => {
+        it('should truncate assets if page size reached', () => {
             const newAsset = createAsset(5, ['new']);
 
             assetsState.page({ page: 0, pageSize: 2 }).subscribe();
@@ -187,7 +187,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.total).toBe(201);
         });
 
-        it('should not add asset to snapshot when parent id is not the same', () => {
+        it('should not add asset to snapshot if parent id is not the same', () => {
             const newAsset = createAsset(5, ['new'], '_new', 'other-parent');
 
             assetsState.addAsset(newAsset);
@@ -196,14 +196,14 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.total).toBe(200);
         });
 
-        it('should increment tags when asset added', () => {
+        it('should increment tags if asset added', () => {
             assetsState.addAsset(createAsset(5, ['new']));
             assetsState.addAsset(createAsset(6, ['new']));
 
             expect(assetsState.snapshot.tagsAvailable).toEqual({ tag1: 1, tag2: 1, shared: 2, new: 2 });
         });
 
-        it('should add asset folder when created', () => {
+        it('should add asset folder if created', () => {
             const request = { folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID };
 
             assetsService.setup(x => x.postAssetFolder(app, It.isValue(request)))
@@ -214,7 +214,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.folders).toEqual([newAssetFolder, assetFolder1, assetFolder2]);
         });
 
-        it('should add asset folder when path has changed', () => {
+        it('should add asset folder if path has changed', () => {
             const otherPath = createAssetFolder(3, '_new', 'otherParent');
 
             const request = { folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID };
@@ -227,7 +227,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.folders).toEqual([assetFolder1, assetFolder2]);
         });
 
-        it('should update asset when updated', () => {
+        it('should update asset if updated', () => {
             const updated = createAsset(1, ['new'], '_new');
 
             const request = { fileName: 'New Name' };
@@ -243,7 +243,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.tagsAvailable).toEqual({ tag2: 1, shared: 1, new: 1 });
         });
 
-        it('should update asset folder when updated', () => {
+        it('should update asset folder if updated', () => {
             const updated = createAssetFolder(1, '_new');
 
             const request = { folderName: 'New Name' };
@@ -258,7 +258,7 @@ describe('AssetsState', () => {
             expect(assetFolder1New).toEqual(updated);
         });
 
-        it('should remove asset from snapshot when moved to other folder', () => {
+        it('should remove asset from snapshot if moved to other folder', () => {
             const request = { parentId: 'newParent' };
 
             assetsService.setup(x => x.putAssetItemParent(app, asset1, It.isValue(request), asset1.version))
@@ -270,7 +270,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.total).toBe(200);
         });
 
-        it('should not do anything when moving asset to current parent', () => {
+        it('should not do anything if moving asset to current parent', () => {
             const request = { parentId: MathHelper.EMPTY_GUID };
 
             assetsState.moveAsset(asset1, request.parentId).pipe(onErrorResumeNext()).subscribe();
@@ -279,7 +279,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.total).toBe(200);
         });
 
-        it('should move asset back to snapshot when moving via api failed', () => {
+        it('should move asset back to snapshot if moving via api failed', () => {
             const request = { parentId: 'newParent' };
 
             assetsService.setup(x => x.putAssetItemParent(app, asset1, It.isValue(request), asset1.version))
@@ -291,7 +291,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.total).toBe(200);
         });
 
-        it('should remove asset folder from snapshot when moved to other folder', () => {
+        it('should remove asset folder from snapshot if moved to other folder', () => {
             const request = { parentId: 'newParent' };
 
             assetsService.setup(x => x.putAssetItemParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
@@ -302,7 +302,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.folders.length).toBe(1);
         });
 
-        it('should not do anything when moving asset folder to itself', () => {
+        it('should not do anything if moving asset folder to itself', () => {
             const request = { parentId: assetFolder1.id };
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNext()).subscribe();
@@ -310,7 +310,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.assets.length).toBe(2);
         });
 
-        it('should not do anything when moving asset folder to current parent', () => {
+        it('should not do anything if moving asset folder to current parent', () => {
             const request = { parentId: MathHelper.EMPTY_GUID };
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNext()).subscribe();
@@ -318,7 +318,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.assets.length).toBe(2);
         });
 
-        it('should move asset folder back to snapshot when moving via api failed', () => {
+        it('should move asset folder back to snapshot if moving via api failed', () => {
             const request = { parentId: 'newParent' };
 
             assetsService.setup(x => x.putAssetItemParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
@@ -329,7 +329,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.assets.length).toBe(2);
         });
 
-        it('should remove asset from snapshot when deleted', () => {
+        it('should remove asset from snapshot if deleted', () => {
             assetsService.setup(x => x.deleteAssetItem(app, asset1, true, asset1.version))
                 .returns(() => of(versioned(newVersion)));
 
@@ -340,7 +340,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.tagsAvailable).toEqual({ shared: 1, tag2: 1 });
         });
 
-        it('should remove asset from snapshot when when referenced and not confirmed', () => {
+        it('should remove asset from snapshot if when referenced and not confirmed', () => {
             assetsService.setup(x => x.deleteAssetItem(app, asset1, false, asset1.version))
                 .returns(() => throwError(new ErrorDto(404, 'Referenced', 'OBJECT_REFERENCED')));
 
@@ -357,7 +357,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.tagsAvailable).toEqual({ shared: 1, tag2: 1 });
         });
 
-        it('should not remove asset when referenced and not confirmed', () => {
+        it('should not remove asset if referenced and not confirmed', () => {
             assetsService.setup(x => x.deleteAssetItem(app, asset1, true, asset1.version))
                 .returns(() => throwError(new ErrorDto(404, 'Referenced', 'OBJECT_REFERENCED')));
 
@@ -369,7 +369,7 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.assets.length).toBe(2);
         });
 
-        it('should remove asset folder from snapshot when deleted', () => {
+        it('should remove asset folder from snapshot if deleted', () => {
             assetsService.setup(x => x.deleteAssetItem(app, assetFolder1, false, assetFolder1.version))
                 .returns(() => of(versioned(newVersion)));
 

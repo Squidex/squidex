@@ -27,7 +27,7 @@ describe('TitleService', () => {
         expect(titleService).toBeDefined();
     });
 
-    it('should use single part when title element is pushed', () => {
+    it('should use single part if title element is pushed', () => {
         const titleService = new TitleService(new TitlesConfig(), localizer.object);
 
         titleService.push('i18n:my-title');
@@ -35,7 +35,7 @@ describe('TitleService', () => {
         expect(document.title).toBe('my-title');
     });
 
-    it('should concatenate multiple parts when title elements are pushed', () => {
+    it('should concatenate multiple parts if title elements are pushed', () => {
         const titleService = new TitleService(new TitlesConfig(), localizer.object);
 
         titleService.push('i18n:my-title1');
@@ -44,7 +44,7 @@ describe('TitleService', () => {
         expect(document.title).toBe('my-title1 | my-title2');
     });
 
-    it('should replace previous element when found', () => {
+    it('should replace previous element if found', () => {
         const titleService = new TitleService(new TitlesConfig(), localizer.object);
 
         titleService.push('i18n:my-title1');
@@ -54,7 +54,7 @@ describe('TitleService', () => {
         expect(document.title).toBe('my-title1 | my-title3');
     });
 
-    it('should concatenate remainging parts when title elements are popped', () => {
+    it('should concatenate remainging parts if title elements are popped', () => {
         const titleService = new TitleService(new TitlesConfig(), localizer.object);
 
         titleService.push('i18n:my-title1');
@@ -79,7 +79,7 @@ describe('TitleService', () => {
         expect(document.title).toBe('my-title - suffix');
     });
 
-    it('should use suffix when stack is empty', () => {
+    it('should use suffix if stack is empty', () => {
         const titleService = new TitleService(new TitlesConfig('i18n:prefix', 'i18n:suffix'), localizer.object);
 
         titleService.pop();
@@ -87,7 +87,7 @@ describe('TitleService', () => {
         expect(document.title).toBe('suffix');
     });
 
-    it('should use suffix when stack is empty and no suffix is set', () => {
+    it('should use suffix if stack is empty and no suffix is set', () => {
         const titleService = new TitleService(new TitlesConfig('i18n:prefix'), localizer.object);
 
         titleService.pop();

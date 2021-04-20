@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         }
 
         [Fact]
-        public async Task Should_call_grain_when_restoring_backup()
+        public async Task Should_call_grain_if_restoring_backup()
         {
             var grain = A.Fake<IRestoreGrain>();
 

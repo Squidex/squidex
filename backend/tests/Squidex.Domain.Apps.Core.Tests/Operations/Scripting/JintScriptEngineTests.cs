@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task TransformAsync_should_return_original_content_when_script_failed()
+        public async Task TransformAsync_should_return_original_content_if_script_failed()
         {
             var content = new ContentData();
             var context = new ScriptVars { Data = content };
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task TransformAsync_should_throw_exception_when_script_failed()
+        public async Task TransformAsync_should_throw_exception_if_script_failed()
         {
             var content = new ContentData();
             var context = new ScriptVars { Data = content };
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task TransformAsync_should_return_original_content_when_not_replaced()
+        public async Task TransformAsync_should_return_original_content_if_not_replaced()
         {
             var content = new ContentData();
             var context = new ScriptVars { Data = content };
@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task TransformAsync_should_return_original_content_when_not_replaced_async()
+        public async Task TransformAsync_should_return_original_content_if_not_replaced_async()
         {
             var content = new ContentData();
             var context = new ScriptVars { Data = content };
@@ -254,7 +254,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task TransformAsync_should_not_ignore_transformation_when_async_not_set()
+        public async Task TransformAsync_should_not_ignore_transformation_if_async_not_set()
         {
             var content = new ContentData();
             var context = new ScriptVars { Data = content, Operation = "MyOperation" };
@@ -276,7 +276,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task TransformAsync_should_timeout_when_replace_never_called()
+        public async Task TransformAsync_should_timeout_if_replace_never_called()
         {
             var content = new ContentData();
             var context = new ScriptVars { Data = content, Operation = "MyOperation" };
@@ -372,7 +372,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Evaluate_should_return_true_when_expression_match()
+        public void Evaluate_should_return_true_if_expression_match()
         {
             const string script = @"
                 value.i == 2
@@ -389,7 +389,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Evaluate_should_return_true_when_status_match()
+        public void Evaluate_should_return_true_if_status_match()
         {
             const string script = @"
                 value.status == 'Published'
@@ -406,7 +406,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Evaluate_should_return_false_when_expression_match()
+        public void Evaluate_should_return_false_if_expression_match()
         {
             const string script = @"
                 value.i == 3
@@ -423,7 +423,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Evaluate_should_return_false_when_script_is_invalid()
+        public void Evaluate_should_return_false_if_script_is_invalid()
         {
             const string script = @"
                 function();

@@ -46,7 +46,7 @@ describe('ShortcutComponent', () => {
         expect().nothing();
     });
 
-    it('should raise event when triggered', () => {
+    it('should raise event if triggered', () => {
         const shortcutComponent = new ShortcutComponent(changeDetector, shortcutService, new NgZone({}));
 
         let isTriggered = false;
@@ -60,7 +60,7 @@ describe('ShortcutComponent', () => {
         expect(isTriggered).toBeTruthy();
     });
 
-    it('should not raise event when triggered but disabled', () => {
+    it('should not raise event if triggered but disabled', () => {
         const shortcutComponent = new ShortcutComponent(changeDetector, shortcutService, new NgZone({}));
 
         let isTriggered = false;
@@ -75,7 +75,7 @@ describe('ShortcutComponent', () => {
         expect(isTriggered).toBeFalsy();
     });
 
-    it('should not raise event when triggered but destroyed', () => {
+    it('should not raise event if triggered but destroyed', () => {
         const shortcutComponent = new ShortcutComponent(changeDetector, shortcutService, new NgZone({}));
 
         let isTriggered = false;

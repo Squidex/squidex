@@ -107,7 +107,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_not_subscribe_to_event_store_when_stopped_in_db()
+        public async Task Should_not_subscribe_to_event_store_if_stopped_in_db()
         {
             grainState.Value = grainState.Value.Stopped();
 
@@ -123,7 +123,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_subscribe_to_event_store_when_not_found_in_db()
+        public async Task Should_subscribe_to_event_store_if_not_found_in_db()
         {
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -137,7 +137,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_subscribe_to_event_store_when_failed()
+        public async Task Should_subscribe_to_event_store_if_failed()
         {
             grainState.Value = grainState.Value.Stopped(new InvalidOperationException());
 
@@ -153,7 +153,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_subscribe_to_event_store_when_not_stopped_in_db()
+        public async Task Should_subscribe_to_event_store_if_not_stopped_in_db()
         {
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_stop_subscription_when_stopped()
+        public async Task Should_stop_subscription_if_stopped()
         {
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -186,7 +186,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_reset_consumer_when_resetting()
+        public async Task Should_reset_consumer_if_resetting()
         {
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -214,7 +214,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_invoke_and_update_position_when_event_received()
+        public async Task Should_invoke_and_update_position_if_event_received()
         {
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
@@ -235,7 +235,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_invoke_and_update_position_when_event_received_one_by_one()
+        public async Task Should_invoke_and_update_position_if_event_received_one_by_one()
         {
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
@@ -263,7 +263,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_invoke_and_update_position_when_event_received_batched()
+        public async Task Should_invoke_and_update_position_if_event_received_batched()
         {
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
@@ -291,7 +291,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_not_invoke_but_update_position_when_consumer_does_not_want_to_handle()
+        public async Task Should_not_invoke_but_update_position_if_consumer_does_not_want_to_handle()
         {
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
@@ -339,7 +339,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_not_invoke_and_update_position_when_event_is_from_another_subscription()
+        public async Task Should_not_invoke_and_update_position_if_event_is_from_another_subscription()
         {
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
@@ -378,7 +378,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_not_make_error_handling_when_exception_is_from_another_subscription()
+        public async Task Should_not_make_error_handling_if_exception_is_from_another_subscription()
         {
             var ex = new InvalidOperationException();
 
@@ -396,7 +396,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_wakeup_when_already_subscribed()
+        public async Task Should_wakeup_if_already_subscribed()
         {
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -490,7 +490,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_start_after_stop_when_handling_failed()
+        public async Task Should_start_after_stop_if_handling_failed()
         {
             var exception = new InvalidOperationException();
 

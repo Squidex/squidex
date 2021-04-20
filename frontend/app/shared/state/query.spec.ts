@@ -9,7 +9,7 @@ import { Query, QueryParams } from '@app/shared/internal';
 import { equalsQuery, QueryFullTextSynchronizer, QuerySynchronizer } from './query';
 
 describe('equalsQuery', () => {
-    it('should return true when comparing with empty query', () => {
+    it('should return true if comparing with empty query', () => {
         const lhs: Query = {};
 
         const rhs: Query = {
@@ -22,7 +22,7 @@ describe('equalsQuery', () => {
         expect(equalsQuery(lhs, rhs)).toBeTruthy();
     });
 
-    it('should return true when comparing without sort', () => {
+    it('should return true if comparing without sort', () => {
         const lhs: Query = {
             filter: {
                 and: []
@@ -39,7 +39,7 @@ describe('equalsQuery', () => {
         expect(equalsQuery(lhs, rhs)).toBeTruthy();
     });
 
-    it('should return true when comparing without filter', () => {
+    it('should return true if comparing without filter', () => {
         const lhs: Query = {
             sort: []
         };
@@ -66,7 +66,7 @@ describe('QueryFullTextSynchronizer', () => {
         expect(query).toEqual({ query: 'my-query' });
     });
 
-    it('should parse from state as undefined when not a query', () => {
+    it('should parse from state as undefined if not a query', () => {
         const value = 123;
 
         const query = synchronizer.parseFromState({ query: value });
@@ -74,7 +74,7 @@ describe('QueryFullTextSynchronizer', () => {
         expect(query).toBeUndefined();
     });
 
-    it('should parse from state as undefined when no full text', () => {
+    it('should parse from state as undefined if no full text', () => {
         const value = { fullText: undefined };
 
         const query = synchronizer.parseFromState({ query: value });
@@ -82,7 +82,7 @@ describe('QueryFullTextSynchronizer', () => {
         expect(query).toBeUndefined();
     });
 
-    it('should parse from state as undefined when empty full text', () => {
+    it('should parse from state as undefined if empty full text', () => {
         const value = { fullText: '' };
 
         const query = synchronizer.parseFromState({ query: value });
@@ -117,7 +117,7 @@ describe('QuerySynchronizer', () => {
 
         expect(query).toEqual({ query: '{"filter":"my-filter","sort":[]}' });
     });
-    it('should parse from state as undefined when not a query', () => {
+    it('should parse from state as undefined if not a query', () => {
         const value = 123;
 
         const query = synchronizer.parseFromState({ query: value });

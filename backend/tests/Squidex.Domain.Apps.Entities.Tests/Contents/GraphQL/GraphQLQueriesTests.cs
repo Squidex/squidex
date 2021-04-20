@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_multiple_assets_when_querying_assets()
+        public async Task Should_return_multiple_assets_if_querying_assets()
         {
             var query = CreateQuery(@"
                 query {
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_multiple_assets_with_total_when_querying_assets_with_total()
+        public async Task Should_return_multiple_assets_with_total_if_querying_assets_with_total()
         {
             var query = CreateQuery(@"
                 query {
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_null_single_asset_when_not_found()
+        public async Task Should_return_null_single_asset_if_not_found()
         {
             var assetId = DomainId.NewGuid();
 
@@ -147,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_asset_when_finding_asset()
+        public async Task Should_return_single_asset_if_finding_asset()
         {
             var assetId = DomainId.NewGuid();
             var asset = TestAsset.Create(appId, assetId);
@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_multiple_flat_contents_when_querying_contents()
+        public async Task Should_return_multiple_flat_contents_if_querying_contents()
         {
             var query = CreateQuery(@"
                 query {
@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_multiple_contents_when_querying_contents()
+        public async Task Should_return_multiple_contents_if_querying_contents()
         {
             var query = CreateQuery(@"
                 query {
@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_multiple_contents_with_total_when_querying_contents_with_total()
+        public async Task Should_return_multiple_contents_with_total_if_querying_contents_with_total()
         {
             var query = CreateQuery(@"
                 query {
@@ -349,7 +349,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_null_single_content_when_not_found()
+        public async Task Should_return_null_single_content_if_not_found()
         {
             var contentId = DomainId.NewGuid();
 
@@ -377,7 +377,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_finding_content()
+        public async Task Should_return_single_content_if_finding_content()
         {
             var contentId = DomainId.NewGuid();
             var content = TestContent.Create(appId, schemaId, contentId, DomainId.Empty, DomainId.Empty);
@@ -406,7 +406,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_finding_content_with_version()
+        public async Task Should_return_single_content_if_finding_content_with_version()
         {
             var contentId = DomainId.NewGuid();
             var content = TestContent.Create(appId, schemaId, contentId, DomainId.Empty, DomainId.Empty);
@@ -435,7 +435,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_also_fetch_referenced_contents_when_field_is_included_in_query()
+        public async Task Should_also_fetch_referenced_contents_if_field_is_included_in_query()
         {
             var contentRefId = DomainId.NewGuid();
             var contentRef = TestContent.CreateRef(schemaRefId1, contentRefId, "ref1-field", "ref1");
@@ -505,7 +505,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_also_fetch_referencing_contents_when_field_is_included_in_query()
+        public async Task Should_also_fetch_referencing_contents_if_field_is_included_in_query()
         {
             var contentRefId = DomainId.NewGuid();
             var contentRef = TestContent.CreateRef(schemaRefId1, contentRefId, "ref1-field", "ref1");
@@ -566,7 +566,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_also_fetch_referencing_contents_with_total_when_field_is_included_in_query()
+        public async Task Should_also_fetch_referencing_contents_with_total_if_field_is_included_in_query()
         {
             var contentRefId = DomainId.NewGuid();
             var contentRef = TestContent.CreateRef(schemaRefId1, contentRefId, "ref1-field", "ref1");
@@ -634,7 +634,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_also_fetch_union_contents_when_field_is_included_in_query()
+        public async Task Should_also_fetch_union_contents_if_field_is_included_in_query()
         {
             var contentRefId = DomainId.NewGuid();
             var contentRef = TestContent.CreateRef(schemaRefId1, contentRefId, "ref1-field", "ref1");
@@ -710,7 +710,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_also_fetch_referenced_assets_when_field_is_included_in_query()
+        public async Task Should_also_fetch_referenced_assets_if_field_is_included_in_query()
         {
             var assetRefId = DomainId.NewGuid();
             var assetRef = TestAsset.Create(appId, assetRefId);
@@ -768,7 +768,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_not_return_data_when_field_not_part_of_content()
+        public async Task Should_not_return_data_if_field_not_part_of_content()
         {
             var contentId = DomainId.NewGuid();
             var content = TestContent.Create(appId, schemaId, contentId, DomainId.Empty, DomainId.Empty, new ContentData());

@@ -186,7 +186,7 @@ describe('AppsService', () => {
         expect(app!).toEqual(createApp(12));
     }));
 
-    it('should return proper error when uploading app image failed with 413',
+    it('should return proper error if uploading app image failed with 413',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
 
         const resource: Resource = {

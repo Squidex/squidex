@@ -28,7 +28,7 @@ describe('ShortcutService', () => {
         expect(clipboardService.selectText()).toBe('MyContent');
     });
 
-    it('should raise subject when setting text', () => {
+    it('should raise subject if setting text', () => {
         const clipboardService = new ClipboardService();
 
         let text = '';

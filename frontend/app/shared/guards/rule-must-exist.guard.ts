@@ -23,7 +23,7 @@ export class RuleMustExistGuard implements CanActivate {
     public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
         const ruleId = allParams(route)['ruleId'];
 
-        if (ruleId === 'new') {
+        if (!ruleId || ruleId === 'new') {
             return this.rulesState.select(null).pipe(map(u => u === null));
         }
 

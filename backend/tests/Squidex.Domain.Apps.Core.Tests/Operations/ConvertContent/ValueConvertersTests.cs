@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Theory]
         [InlineData("other")]
         [InlineData("**")]
-        public void Should_not_convert_asset_ids_when_field_name_does_not_match(string path)
+        public void Should_not_convert_asset_ids_if_field_name_does_not_match(string path)
         {
             var field = Fields.Assets(1, "assets", Partitioning.Invariant);
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [InlineData("parent")]
         [InlineData("parent.other")]
         [InlineData("other.assets")]
-        public void Should_not_convert_nested_asset_ids_when_field_name_does_not_match(string path)
+        public void Should_not_convert_nested_asset_ids_if_field_name_does_not_match(string path)
         {
             var field = Fields.Array(1, "parent", Partitioning.Invariant, Fields.Assets(11, "assets"));
 

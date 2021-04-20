@@ -28,7 +28,7 @@ describe('FocusOnInitDirective', () => {
         isSelectCalled = false;
     });
 
-    it('should call focus on element when init', (cb) => {
+    it('should call focus on element if init', (cb) => {
         const directive = new FocusOnInitDirective(element);
         directive.select = false;
         directive.ngAfterViewInit();
@@ -41,7 +41,7 @@ describe('FocusOnInitDirective', () => {
         }, 200);
     });
 
-    it('should call select on element when init', (cb) => {
+    it('should call select on element if init', (cb) => {
         const directive = new FocusOnInitDirective(element);
         directive.select = true;
         directive.ngAfterViewInit();

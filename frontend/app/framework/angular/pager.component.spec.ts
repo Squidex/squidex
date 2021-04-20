@@ -85,7 +85,7 @@ describe('Pager', () => {
         expect(pager.itemLast).toEqual(99);
     });
 
-    it('should emit when changing size', () => {
+    it('should emit if changing size', () => {
         const pager = new PagerComponent();
 
         pager.paging = { page: 4, pageSize: 10, count: 10, total: 100 };
@@ -102,7 +102,7 @@ describe('Pager', () => {
         expect(emitted).toEqual({ page: 0, pageSize: 20 });
     });
 
-    it('should emit when going next', () => {
+    it('should emit if going next', () => {
         const pager = new PagerComponent();
 
         pager.paging = { page: 4, pageSize: 10, count: 10, total: 100 };
@@ -119,7 +119,7 @@ describe('Pager', () => {
         expect(emitted).toEqual({ page: 5, pageSize: 10 });
     });
 
-    it('should emit when going prev', () => {
+    it('should emit if going prev', () => {
         const pager = new PagerComponent();
 
         pager.paging = { page: 4, pageSize: 10, count: 10, total: 100 };

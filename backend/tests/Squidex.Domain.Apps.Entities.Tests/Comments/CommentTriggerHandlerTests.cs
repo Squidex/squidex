@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_return_false_when_asking_for_snapshot_support()
+        public void Should_return_false_if_asking_for_snapshot_support()
         {
             Assert.False(sut.CanCreateSnapshotEvents);
         }
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public async Task Should_not_create_enriched_events_when_users_cannot_be_resolved()
+        public async Task Should_not_create_enriched_events_if_users_cannot_be_resolved()
         {
             var user1 = UserMocks.User("1");
             var user2 = UserMocks.User("2");
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public async Task Should_not_create_enriched_events_when_mentions_is_null()
+        public async Task Should_not_create_enriched_events_if_mentions_is_null()
         {
             var envelope = Envelope.Create<AppEvent>(new CommentCreated { Mentions = null });
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public async Task Should_not_create_enriched_events_when_mentions_is_empty()
+        public async Task Should_not_create_enriched_events_if_mentions_is_empty()
         {
             var envelope = Envelope.Create<AppEvent>(new CommentCreated { Mentions = Array.Empty<string>() });
 
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_event_type_not_correct()
+        public void Should_not_trigger_precheck_if_event_type_not_correct()
         {
             TestForCondition(string.Empty, trigger =>
             {
@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_trigger_precheck_when_event_type_correct()
+        public void Should_trigger_precheck_if_event_type_correct()
         {
             TestForCondition(string.Empty, trigger =>
             {
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_event_type_not_correct()
+        public void Should_not_trigger_check_if_event_type_not_correct()
         {
             TestForCondition(string.Empty, trigger =>
             {
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_is_empty()
+        public void Should_trigger_check_if_condition_is_empty()
         {
             TestForCondition(string.Empty, trigger =>
             {
@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_matchs()
+        public void Should_trigger_check_if_condition_matchs()
         {
             TestForCondition("true", trigger =>
             {
@@ -201,7 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_condition_does_not_matchs()
+        public void Should_not_trigger_check_if_condition_does_not_matchs()
         {
             TestForCondition("false", trigger =>
             {
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_trigger_check_when_email_is_correct()
+        public void Should_trigger_check_if_email_is_correct()
         {
             TestForRealCondition("event.mentionedUser.email == '1@email.com'", (handler, trigger) =>
             {
@@ -225,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_email_is_correct()
+        public void Should_not_trigger_check_if_email_is_correct()
         {
             TestForRealCondition("event.mentionedUser.email == 'other@squidex.io'", (handler, trigger) =>
             {
@@ -238,7 +238,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_trigger_check_when_text_is_urgent()
+        public void Should_trigger_check_if_text_is_urgent()
         {
             TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, trigger) =>
             {
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_text_is_not_urgent()
+        public void Should_not_trigger_check_if_text_is_not_urgent()
         {
             TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, trigger) =>
             {

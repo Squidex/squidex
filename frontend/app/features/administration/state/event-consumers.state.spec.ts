@@ -46,7 +46,7 @@ describe('EventConsumersState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading when loading failed', () => {
+        it('should reset loading if loading failed', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
                 .returns(() => throwError('error'));
 
@@ -55,7 +55,7 @@ describe('EventConsumersState', () => {
             expect(eventConsumersState.snapshot.isLoading).toBeFalsy();
         });
 
-        it('should show notification on load when reload is true', () => {
+        it('should show notification on load if reload is true', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
                 .returns(() => of(new EventConsumersDto([eventConsumer1, eventConsumer2]))).verifiable();
 
@@ -66,7 +66,7 @@ describe('EventConsumersState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
-        it('should show notification on load error when silent is false', () => {
+        it('should show notification on load error if silent is false', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
                 .returns(() => throwError({})).verifiable();
 
@@ -86,7 +86,7 @@ describe('EventConsumersState', () => {
             eventConsumersState.load().subscribe();
         });
 
-        it('should update event consumer when started', () => {
+        it('should update event consumer if started', () => {
             const updated = createEventConsumer(2, '_new');
 
             eventConsumersService.setup(x => x.putStart(eventConsumer2))
@@ -99,7 +99,7 @@ describe('EventConsumersState', () => {
             expect(newConsumer2).toEqual(updated);
         });
 
-        it('should update event consumer when stopped', () => {
+        it('should update event consumer if stopped', () => {
             const updated = createEventConsumer(2, '_new');
 
             eventConsumersService.setup(x => x.putStop(eventConsumer2))
@@ -112,7 +112,7 @@ describe('EventConsumersState', () => {
             expect(newConsumer2).toEqual(updated);
         });
 
-        it('should update event consumer when reset', () => {
+        it('should update event consumer if reset', () => {
             const updated = createEventConsumer(2, '_new');
 
             eventConsumersService.setup(x => x.putReset(eventConsumer2))

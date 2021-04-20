@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_be_equal_fields_when_they_have_same_value()
+        public void Should_be_equal_fields_if_they_have_same_value()
         {
             var lhs =
                 new ContentFieldData()

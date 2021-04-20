@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("createdNullable")]
         [InlineData("properties/datetime")]
         [InlineData("properties/nested/datetime")]
-        public void Should_parse_filter_when_type_is_datetime(string field)
+        public void Should_parse_filter_if_type_is_datetime(string field)
         {
             var i = _Q($"$filter={field} eq 1988-01-19T12:00:00Z");
             var o = _C($"Filter: {field} == 1988-01-19T12:00:00Z");
@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("createdNullable")]
         [InlineData("properties/datetime")]
         [InlineData("properties/nested/datetime")]
-        public void Should_parse_filter_when_type_is_datetime_and_value_is_null(string field)
+        public void Should_parse_filter_if_type_is_datetime_and_value_is_null(string field)
         {
             var i = _Q($"$filter={field} eq null");
             var o = _C($"Filter: {field} == null");
@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_datetime_list()
+        public void Should_parse_filter_if_type_is_datetime_list()
         {
             var i = _Q("$filter=created in ('1988-01-19T12:00:00Z')");
             var o = _C("Filter: created in [1988-01-19T12:00:00Z]");
@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_datetime_and_and_value_is_date()
+        public void Should_parse_filter_if_type_is_datetime_and_and_value_is_date()
         {
             var i = _Q("$filter=created eq 1988-01-19");
             var o = _C("Filter: created == 1988-01-19T00:00:00Z");
@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("birthdayNullable")]
         [InlineData("properties/date")]
         [InlineData("properties/nested/date")]
-        public void Should_parse_filter_when_type_is_date(string field)
+        public void Should_parse_filter_if_type_is_date(string field)
         {
             var i = _Q($"$filter={field} eq 1988-01-19");
             var o = _C($"Filter: {field} == 1988-01-19T00:00:00Z");
@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_date_list()
+        public void Should_parse_filter_if_type_is_date_list()
         {
             var i = _Q("$filter=birthday in ('1988-01-19')");
             var o = _C("Filter: birthday in [1988-01-19T00:00:00Z]");
@@ -134,7 +134,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("idNullable")]
         [InlineData("properties/uid")]
         [InlineData("properties/nested/guid")]
-        public void Should_parse_filter_when_type_is_guid(string field)
+        public void Should_parse_filter_if_type_is_guid(string field)
         {
             var i = _Q($"$filter={field} eq B5FE25E3-B262-4B17-91EF-B3772A6B62BB");
             var o = _C($"Filter: {field} == b5fe25e3-b262-4b17-91ef-b3772a6b62bb");
@@ -147,7 +147,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("idNullable")]
         [InlineData("properties/uid")]
         [InlineData("properties/nested/guid")]
-        public void Should_parse_filter_when_type_is_guid_and_value_is_null(string field)
+        public void Should_parse_filter_if_type_is_guid_and_value_is_null(string field)
         {
             var i = _Q($"$filter={field} eq null");
             var o = _C($"Filter: {field} == null");
@@ -156,7 +156,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_guid_list()
+        public void Should_parse_filter_if_type_is_guid_list()
         {
             var i = _Q("$filter=id in ('B5FE25E3-B262-4B17-91EF-B3772A6B62BB')");
             var o = _C("Filter: id in [b5fe25e3-b262-4b17-91ef-b3772a6b62bb]");
@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_null()
+        public void Should_parse_filter_if_type_is_null()
         {
             var i = _Q("$filter=firstName eq null");
             var o = _C("Filter: firstName == null");
@@ -178,7 +178,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("firstNameNullable")]
         [InlineData("properties/string")]
         [InlineData("properties/nested/string")]
-        public void Should_parse_filter_when_type_is_string(string field)
+        public void Should_parse_filter_if_type_is_string(string field)
         {
             var i = _Q($"$filter={field} eq 'Dagobert'");
             var o = _C($"Filter: {field} == 'Dagobert'");
@@ -187,7 +187,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_string_list()
+        public void Should_parse_filter_if_type_is_string_list()
         {
             var i = _Q("$filter=firstName in ('Dagobert')");
             var o = _C("Filter: firstName in ['Dagobert']");
@@ -200,7 +200,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("isComicFigureNullable")]
         [InlineData("properties/boolean")]
         [InlineData("properties/nested/boolean")]
-        public void Should_parse_filter_when_type_is_boolean(string field)
+        public void Should_parse_filter_if_type_is_boolean(string field)
         {
             var i = _Q($"$filter={field} eq true");
             var o = _C($"Filter: {field} == True");
@@ -213,7 +213,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("isComicFigureNullable")]
         [InlineData("properties/boolean")]
         [InlineData("properties/nested/boolean")]
-        public void Should_parse_filter_when_type_is_boolean_and_value_is_null(string field)
+        public void Should_parse_filter_if_type_is_boolean_and_value_is_null(string field)
         {
             var i = _Q($"$filter={field} eq null");
             var o = _C($"Filter: {field} == null");
@@ -222,7 +222,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_boolean_list()
+        public void Should_parse_filter_if_type_is_boolean_list()
         {
             var i = _Q("$filter=isComicFigure in (true)");
             var o = _C("Filter: isComicFigure in [True]");
@@ -235,7 +235,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("ageNullable")]
         [InlineData("properties/int")]
         [InlineData("properties/nested/int")]
-        public void Should_parse_filter_when_type_is_int32(string field)
+        public void Should_parse_filter_if_type_is_int32(string field)
         {
             var i = _Q($"$filter={field} eq 60");
             var o = _C($"Filter: {field} == 60");
@@ -244,7 +244,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_int32_list()
+        public void Should_parse_filter_if_type_is_int32_list()
         {
             var i = _Q("$filter=age in (60)");
             var o = _C("Filter: age in [60]");
@@ -257,7 +257,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("incomeCentsNullable")]
         [InlineData("properties/long")]
         [InlineData("properties/nested/long")]
-        public void Should_parse_filter_when_type_is_int64(string field)
+        public void Should_parse_filter_if_type_is_int64(string field)
         {
             var i = _Q($"$filter={field} eq 31543143513456789");
             var o = _C($"Filter: {field} == 31543143513456789");
@@ -266,7 +266,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_int64_list()
+        public void Should_parse_filter_if_type_is_int64_list()
         {
             var i = _Q("$filter=incomeCents in (31543143513456789)");
             var o = _C("Filter: incomeCents in [31543143513456789]");
@@ -279,7 +279,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("incomeMioNullable")]
         [InlineData("properties/double")]
         [InlineData("properties/nested/double")]
-        public void Should_parse_filter_when_type_is_double(string field)
+        public void Should_parse_filter_if_type_is_double(string field)
         {
             var i = _Q($"$filter={field} eq 5634474356.1233");
             var o = _C($"Filter: {field} == 5634474356.1233");
@@ -292,7 +292,7 @@ namespace Squidex.Infrastructure.Queries
         [InlineData("geoNullable")]
         [InlineData("properties/geo")]
         [InlineData("properties/nested/geo")]
-        public void Should_parse_filter_when_type_is_geograph(string field)
+        public void Should_parse_filter_if_type_is_geograph(string field)
         {
             var i = _Q($"$filter=geo.distance({field}, geography'POINT(10 20)') lt 30.0");
             var o = _C($"Filter: {field} < Radius(10, 20, 30)");
@@ -301,7 +301,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_parse_filter_when_type_is_double_list()
+        public void Should_parse_filter_if_type_is_double_list()
         {
             var i = _Q("$filter=incomeMio in (5634474356.1233)");
             var o = _C("Filter: incomeMio in [5634474356.1233]");

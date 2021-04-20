@@ -102,7 +102,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_append_authorization_as_header_when_user_has_subject()
+        public async Task Should_append_authorization_as_header_if_user_has_subject()
         {
             var identity = (ClaimsIdentity)httpContext.User.Identity!;
 
@@ -114,7 +114,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_append_client_id_as_header_when_user_has_client_but_no_subject()
+        public async Task Should_append_client_id_as_header_if_user_has_client_but_no_subject()
         {
             var identity = (ClaimsIdentity)httpContext.User.Identity!;
 
@@ -299,7 +299,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_not_generate_etag_when_already_added()
+        public async Task Should_not_generate_etag_if_already_added()
         {
             var id1 = DomainId.NewGuid();
             var id2 = DomainId.NewGuid();

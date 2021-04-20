@@ -91,7 +91,7 @@ describe('BackupsService', () => {
                 ]));
     }));
 
-    it('should return null when get restore return 404',
+    it('should return null if get restore return 404',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
 
         let restore: RestoreDto | null;
@@ -110,7 +110,7 @@ describe('BackupsService', () => {
         expect(restore!).toBeNull();
     }));
 
-    it('should throw error when get restore return non 404',
+    it('should throw error if get restore return non 404',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
 
         let restore: RestoreDto | null;

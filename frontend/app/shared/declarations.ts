@@ -58,6 +58,4 @@ export * from './guards/schema-must-exist-published.guard';
 export * from './guards/schema-must-exist.guard';
 export * from './guards/schema-must-not-be-singleton.guard';
 export * from './guards/unset-app.guard';
-export * from './guards/unset-content.guard';
-export * from './guards/unset-rule.guard';
 export * from './internal';

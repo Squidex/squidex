@@ -14,7 +14,7 @@ describe('ShortcutService', () => {
         expect(shortcutService).toBeDefined();
     });
 
-    it('should raise event when triggered', () => {
+    it('should raise event if triggered', () => {
         const shortcutService = new ShortcutService();
 
         let isTriggered = false;
@@ -25,7 +25,7 @@ describe('ShortcutService', () => {
         expect(isTriggered).toBeTruthy();
     });
 
-    it('should not raise event when triggered but unsubscribed', () => {
+    it('should not raise event if triggered but unsubscribed', () => {
         const shortcutService = new ShortcutService();
 
         let isTriggered = false;

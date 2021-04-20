@@ -46,10 +46,13 @@ Array.prototype.replaceBy = function<T>(field: keyof T, value: T) {
         return self;
     }
 
-    const index = self.findIndex(v => v[field] === value[field]);
+    for (let i = 0; i < self.length; i++) {
+        const item = self[i];
 
-    if (index >= 0) {
-        self[index] = value;
+        if (value[field] === item[field]) {
+            self[i] = value;
+            break;
+        }
     }
 
     return self;
@@ -62,7 +65,18 @@ Array.prototype.replacedBy = function<T>(field: keyof T, value: T) {
         return self;
     }
 
-    return self.map((v: T) => v[field] === value[field] ? value : v);
+    const copy = [...self];
+
+    for (let i = 0; i < self.length; i++) {
+        const item = self[i];
+
+        if (value[field] === item[field]) {
+            copy[i] = value;
+            break;
+        }
+    }
+
+    return copy;
 };
 
 Array.prototype.removeBy = function<T>(field: keyof T, value: T) {
@@ -72,11 +86,13 @@ Array.prototype.removeBy = function<T>(field: keyof T, value: T) {
         return self;
     }
 
-    return self.splice(self.findIndex(x => x[field] === value[field]), 1);
+    self.splice(self.findIndex(x => x[field] === value[field]), 1);
+
+    return self;
 };
 
 Array.prototype.removed = function<T>(value?: T) {
-    const self: ReadonlyArray<T> = [];
+    const self: ReadonlyArray<T> = this;
 
     if (!value) {
         return this;
@@ -86,13 +102,17 @@ Array.prototype.removed = function<T>(value?: T) {
 };
 
 Array.prototype.remove = function<T>(value?: T) {
-    const self: T[] = [];
+    const self: T[] = this;
 
     if (!value) {
         return this;
     }
 
-    return self.splice(this.indexOf(value), 1);
+    const index = self.indexOf(value);
+
+    self.splice(index, 1);
+
+    return self;
 };
 
 Array.prototype.removedBy = function<T>(field: keyof T, value: T) {
@@ -116,15 +136,17 @@ Array.prototype.sorted = function() {
 };
 
 Array.prototype.sortedByString = function<T>(selector: (value: T) => string) {
-    let self: ReadonlyArray<any> = this;
+    const self: ReadonlyArray<any> = this;
 
     if (!selector) {
         return self;
     }
 
-    self = [...self].sort((a, b) => selector(a).localeCompare(selector(b), undefined, { sensitivity: 'base' }));
+    const copy = [...self];
 
-    return self;
+    copy.sort((a, b) => selector(a).localeCompare(selector(b), undefined, { sensitivity: 'base' }));
+
+    return copy;
 };
 
 Array.prototype.sortByString = function<T>(selector: (value: T) => string) {

@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
-        public async Task Should_retrieve_from_inner_when_not_cached()
+        public async Task Should_retrieve_from_inner_if_not_cached()
         {
             var contentIds = HashSet.Of(contentId);
 
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
-        public async Task Should_retrieve_from_inner_when_not_cached_and_not_found()
+        public async Task Should_retrieve_from_inner_if_not_cached_and_not_found()
         {
             var contentIds = HashSet.Of(contentId);
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
-        public async Task Should_not_retrieve_from_inner_when_cached()
+        public async Task Should_not_retrieve_from_inner_if_cached()
         {
             var contentIds = HashSet.Of(contentId);
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
-        public async Task Should_not_retrieve_from_inner_when_removed()
+        public async Task Should_not_retrieve_from_inner_if_removed()
         {
             var contentIds = HashSet.Of(contentId);
 

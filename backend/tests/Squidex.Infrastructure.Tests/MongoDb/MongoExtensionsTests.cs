@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
-        public async Task Should_break_when_cursor_failed()
+        public async Task Should_break_if_cursor_failed()
         {
             var ex = new InvalidOperationException();
 
@@ -110,7 +110,7 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
-        public async Task Should_break_when_handler_failed()
+        public async Task Should_break_if_handler_failed()
         {
             var ex = new InvalidOperationException();
 
@@ -137,7 +137,7 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
-        public async Task Should_stop_when_cancelled1()
+        public async Task Should_stop_if_cancelled1()
         {
             using (var cts = new CancellationTokenSource())
             {
