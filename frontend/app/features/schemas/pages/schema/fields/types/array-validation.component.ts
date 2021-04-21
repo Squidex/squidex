@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ArrayFieldPropertiesDto, FieldDto, SchemaTagSource } from '@app/shared';
 
@@ -14,7 +14,7 @@ import { ArrayFieldPropertiesDto, FieldDto, SchemaTagSource } from '@app/shared'
     styleUrls: ['array-validation.component.scss'],
     templateUrl: 'array-validation.component.html'
 })
-export class ArrayValidationComponent implements OnChanges {
+export class ArrayValidationComponent implements OnInit {
     @Input()
     public fieldForm: FormGroup;
 
@@ -29,14 +29,12 @@ export class ArrayValidationComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldForm']) {
-            this.fieldForm.setControl('maxItems',
-                new FormControl());
+    public ngOnInit() {
+        this.fieldForm.setControl('maxItems',
+            new FormControl());
 
-            this.fieldForm.setControl('minItems',
-                new FormControl());
-        }
+        this.fieldForm.setControl('minItems',
+            new FormControl());
 
         this.fieldForm.patchValue(this.properties);
     }

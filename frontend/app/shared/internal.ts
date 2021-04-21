@@ -60,6 +60,7 @@ export * from './state/query';
 export * from './state/roles.forms';
 export * from './state/roles.state';
 export * from './state/rule-events.state';
+export * from './state/rules.forms';
 export * from './state/rules.state';
 export * from './state/schema-tag-source';
 export * from './state/schemas.forms';

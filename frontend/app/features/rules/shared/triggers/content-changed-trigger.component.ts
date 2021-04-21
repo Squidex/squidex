@@ -7,9 +7,8 @@
 
 // tslint:disable: readonly-array
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { SchemaDto } from '@app/shared';
+import { Component, Input, OnChanges } from '@angular/core';
+import { SchemaDto, TriggerForm } from '@app/shared';
 
 export interface TriggerSchemaForm {
     schema: SchemaDto;
@@ -30,7 +29,7 @@ export class ContentChangedTriggerComponent implements OnChanges {
     public trigger: any;
 
     @Input()
-    public triggerForm: FormGroup;
+    public triggerForm: TriggerForm;
 
     public triggerSchemas: TriggerSchemaForm[] = [];
 
@@ -41,17 +40,7 @@ export class ContentChangedTriggerComponent implements OnChanges {
         return !!this.schemaToAdd;
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['triggerForm']) {
-            this.triggerForm.setControl('schemas',
-                new FormControl([]));
-
-            this.triggerForm.setControl('handleAll',
-                new FormControl());
-        }
-
-        this.triggerForm.patchValue(this.trigger);
-
+    public ngOnChanges() {
         const schemas: TriggerSchemaForm[] = [];
 
         if (this.trigger.schemas && this.schemas) {
@@ -96,7 +85,7 @@ export class ContentChangedTriggerComponent implements OnChanges {
     public updateValue() {
         const schemas = this.triggerSchemas.map(s => ({ schemaId: s.schema.id, condition: s.condition }));
 
-        this.triggerForm.controls['schemas'].setValue(schemas);
+        this.triggerForm.form.patchValue({ schemas });
     }
 
     private updateSchemaToAdd() {

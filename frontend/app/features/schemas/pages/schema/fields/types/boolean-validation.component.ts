@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { BooleanFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@app/shared';
 import { Observable } from 'rxjs';
@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
     styleUrls: ['boolean-validation.component.scss'],
     templateUrl: 'boolean-validation.component.html'
 })
-export class BooleanValidationComponent implements OnChanges {
+export class BooleanValidationComponent implements OnInit {
     @Input()
     public fieldForm: FormGroup;
 
@@ -33,20 +33,18 @@ export class BooleanValidationComponent implements OnChanges {
 
     public showDefaultValue: Observable<boolean>;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldForm']) {
-            this.fieldForm.setControl('defaultValue',
-                new FormControl());
+    public ngOnInit() {
+        this.fieldForm.setControl('defaultValue',
+            new FormControl());
 
-            this.fieldForm.setControl('defaultValues',
-                new FormControl());
+        this.fieldForm.setControl('defaultValues',
+            new FormControl());
 
-            this.fieldForm.setControl('inlineEditable',
-                new FormControl());
+        this.fieldForm.setControl('inlineEditable',
+            new FormControl());
 
-            this.showDefaultValue =
-                hasNoValue$(this.fieldForm.controls['isRequired']);
-        }
+        this.showDefaultValue =
+            hasNoValue$(this.fieldForm.controls['isRequired']);
 
         this.fieldForm.patchValue(this.properties);
     }

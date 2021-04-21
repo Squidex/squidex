@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldDto, TagsFieldPropertiesDto, TAGS_FIELD_EDITORS } from '@app/shared';
 
@@ -14,7 +14,7 @@ import { FieldDto, TagsFieldPropertiesDto, TAGS_FIELD_EDITORS } from '@app/share
     styleUrls: ['tags-ui.component.scss'],
     templateUrl: 'tags-ui.component.html'
 })
-export class TagsUIComponent implements OnChanges {
+export class TagsUIComponent implements OnInit {
     @Input()
     public fieldForm: FormGroup;
 
@@ -26,14 +26,12 @@ export class TagsUIComponent implements OnChanges {
 
     public editors = TAGS_FIELD_EDITORS;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldForm']) {
-            this.fieldForm.setControl('editor',
-                new FormControl(undefined, Validators.required));
+    public ngOnInit() {
+        this.fieldForm.setControl('editor',
+            new FormControl(undefined, Validators.required));
 
-            this.fieldForm.setControl('allowedValues',
-                new FormControl());
-        }
+        this.fieldForm.setControl('allowedValues',
+            new FormControl());
 
         this.fieldForm.patchValue(this.field.properties);
     }

@@ -10,6 +10,7 @@ export * from './pages/events/rule-events-page.component';
 export * from './pages/rule/rule-page.component';
 export * from './pages/rules/rule.component';
 export * from './pages/rules/rules-page.component';
+export * from './shared/actions/formattable-input.component';
 export * from './shared/actions/generic-action.component';
 export * from './shared/rule-element.component';
 export * from './shared/rule-icon.component';

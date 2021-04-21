@@ -49,42 +49,30 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <ng-container *ngIf="triggerType && formTrigger; else selectTrigger">
+                        <ng-container *ngIf="triggerType && formForTrigger; else selectTrigger">
                             <sqx-form-alert marginTop="0" *ngIf="!rule">
                                 {{ 'rules.wizard.triggerHint' | sqxTranslate }}
                             </sqx-form-alert>
         
                             <ng-container [ngSwitch]="triggerType">
                                 <ng-container *ngSwitchCase="'AssetChanged'">
-                                    <sqx-asset-changed-trigger
-                                        [trigger]="triggerProperties"
-                                        [triggerForm]="formTrigger.form">
-                                    </sqx-asset-changed-trigger>
+                                    <sqx-asset-changed-trigger [triggerForm]="formForTrigger"></sqx-asset-changed-trigger>
                                 </ng-container>
                                 <ng-container *ngSwitchCase="'Comment'">
-                                    <sqx-comment-trigger
-                                        [trigger]="triggerProperties"
-                                        [triggerForm]="formTrigger.form">
-                                    </sqx-comment-trigger>
+                                    <sqx-comment-trigger [triggerForm]="formForTrigger"></sqx-comment-trigger>
                                 </ng-container>
                                 <ng-container *ngSwitchCase="'ContentChanged'">
                                     <sqx-content-changed-trigger 
                                         [schemas]="schemasState.schemas | async" 
                                         [trigger]="triggerProperties" 
-                                        [triggerForm]="formTrigger.form">
+                                        [triggerForm]="formForTrigger">
                                     </sqx-content-changed-trigger>
                                 </ng-container>
                                 <ng-container *ngSwitchCase="'SchemaChanged'">
-                                    <sqx-schema-changed-trigger 
-                                        [trigger]="triggerProperties" 
-                                        [triggerForm]="formTrigger.form">
-                                    </sqx-schema-changed-trigger>
+                                    <sqx-schema-changed-trigger [triggerForm]="formForTrigger"></sqx-schema-changed-trigger>
                                 </ng-container>
                                 <ng-container *ngSwitchCase="'Usage'">
-                                    <sqx-usage-trigger
-                                        [trigger]="triggerProperties"
-                                        [triggerForm]="formTrigger.form">
-                                    </sqx-usage-trigger>
+                                    <sqx-usage-trigger [triggerForm]="formForTrigger"></sqx-usage-trigger>
                                 </ng-container>
                             </ng-container>
                         </ng-container>
@@ -125,16 +113,12 @@
                     </div>
 
                     <div class="card-body">
-                        <ng-container *ngIf="actionType && formAction; else selectAction">
+                        <ng-container *ngIf="actionType && formForAction; else selectAction">
                             <sqx-form-alert marginTop="0" *ngIf="!rule">
                                 {{ 'rules.wizard.actionHint' | sqxTranslate }}
                             </sqx-form-alert>
         
-                            <sqx-generic-action 
-                                [definition]="actionElement"
-                                [action]="actionProperties"
-                                [actionForm]="formAction.form">
-                            </sqx-generic-action>
+                            <sqx-generic-action [actionForm]="formForAction"></sqx-generic-action>
                         </ng-container>
                 
                         <ng-template #selectAction>        
