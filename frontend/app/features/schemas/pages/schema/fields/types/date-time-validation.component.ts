@@ -5,17 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto, ValidatorsEx } from '@app/shared';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@app/shared';
 import { Observable } from 'rxjs';
+
+const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
 @Component({
     selector: 'sqx-date-time-validation',
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html'
 })
-export class DateTimeValidationComponent implements OnInit {
+export class DateTimeValidationComponent implements OnChanges {
     @Input()
     public fieldForm: FormGroup;
 
@@ -34,30 +36,15 @@ export class DateTimeValidationComponent implements OnInit {
     public showDefaultValues: Observable<boolean>;
     public showDefaultValue: Observable<boolean>;
 
-    public calculatedDefaultValues: ReadonlyArray<string> = ['Now', 'Today'];
+    public calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 
-    public ngOnInit() {
-        this.fieldForm.setControl('calculatedDefaultValue',
-            new FormControl());
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['fieldForm']) {
+            this.showDefaultValues =
+                hasNoValue$(this.fieldForm.controls['isRequired']);
 
-        this.fieldForm.setControl('maxValue',
-            new FormControl(undefined, ValidatorsEx.validDateTime()));
-
-        this.fieldForm.setControl('minValue',
-            new FormControl(undefined, ValidatorsEx.validDateTime()));
-
-        this.fieldForm.setControl('defaultValue',
-            new FormControl());
-
-        this.fieldForm.setControl('defaultValues',
-            new FormControl());
-
-        this.showDefaultValues =
-            hasNoValue$(this.fieldForm.controls['isRequired']);
-
-        this.showDefaultValue =
-            hasNoValue$(this.fieldForm.controls['calculatedDefaultValue']);
-
-        this.fieldForm.patchValue(this.properties);
+            this.showDefaultValue =
+                hasNoValue$(this.fieldForm.controls['calculatedDefaultValue']);
+        }
     }
 }

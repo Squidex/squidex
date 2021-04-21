@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
 
 @Component({
@@ -14,7 +14,7 @@ import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html'
 })
-export class AssetsValidationComponent implements OnInit {
+export class AssetsValidationComponent {
     @Input()
     public fieldForm: FormGroup;
 
@@ -29,53 +29,4 @@ export class AssetsValidationComponent implements OnInit {
 
     @Input()
     public isLocalizable?: boolean | null;
-
-    public ngOnInit() {
-        this.fieldForm.setControl('minItems',
-            new FormControl());
-
-        this.fieldForm.setControl('maxItems',
-            new FormControl());
-
-        this.fieldForm.setControl('minSize',
-            new FormControl());
-
-        this.fieldForm.setControl('maxSize',
-            new FormControl());
-
-        this.fieldForm.setControl('allowedExtensions',
-            new FormControl());
-
-        this.fieldForm.setControl('mustBeImage',
-            new FormControl());
-
-        this.fieldForm.setControl('minWidth',
-            new FormControl());
-
-        this.fieldForm.setControl('maxWidth',
-            new FormControl());
-
-        this.fieldForm.setControl('minHeight',
-            new FormControl());
-
-        this.fieldForm.setControl('maxHeight',
-            new FormControl());
-
-        this.fieldForm.setControl('aspectWidth',
-            new FormControl());
-
-        this.fieldForm.setControl('aspectHeight',
-            new FormControl());
-
-        this.fieldForm.setControl('allowDuplicates',
-            new FormControl());
-
-        this.fieldForm.setControl('defaultValue',
-            new FormControl());
-
-        this.fieldForm.setControl('defaultValues',
-            new FormControl());
-
-        this.fieldForm.patchValue(this.properties);
-    }
 }

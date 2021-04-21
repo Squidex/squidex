@@ -41,8 +41,7 @@ export class FieldWizardComponent implements OnInit {
 
     public addFieldForm = new AddFieldForm(this.formBuilder);
 
-    public editing = false;
-    public editForm = new EditFieldForm(this.formBuilder);
+    public editForm?: EditFieldForm;
 
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -76,7 +75,8 @@ export class FieldWizardComponent implements OnInit {
                             this.nameInput.nativeElement.focus();
                         }
                     } else if (edit) {
-                        this.editing = true;
+                        this.editForm = new EditFieldForm(this.formBuilder, this.field.properties);
+                        this.editForm.load(this.field.properties);
                     } else {
                         this.emitComplete();
                     }
@@ -87,6 +87,10 @@ export class FieldWizardComponent implements OnInit {
     }
 
     public save(addNew = false) {
+        if (!this.editForm) {
+            return;
+        }
+
         const value = this.editForm.submit();
 
         if (value) {
@@ -94,15 +98,15 @@ export class FieldWizardComponent implements OnInit {
 
             this.schemasState.updateField(this.schema, this.field as RootFieldDto, { properties })
                 .subscribe(() => {
-                    this.editForm.submitCompleted();
+                    this.editForm!.submitCompleted();
 
                     if (addNew) {
-                        this.editing = false;
+                        this.editForm = undefined;
                     } else {
                         this.emitComplete();
                     }
                 }, error => {
-                    this.editForm.submitFailed(error);
+                    this.editForm!.submitFailed(error);
                 });
         }
     }

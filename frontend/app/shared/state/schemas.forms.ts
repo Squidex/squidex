@@ -9,7 +9,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Form, ValidatorsEx, value$ } from '@app/framework';
 import { map } from 'rxjs/operators';
 import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDetailsDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
-import { createProperties, FieldPropertiesDto } from './../services/schemas.types';
+import { createProperties, FieldPropertiesDto, FieldPropertiesVisitor } from './../services/schemas.types';
 
 type CreateCategoryFormType = { name: string };
 
@@ -204,8 +204,12 @@ export class EditScriptsForm extends Form<FormGroup, {}, SchemaDetailsDto> {
 }
 
 export class EditFieldForm extends Form<FormGroup, {}, FieldPropertiesDto> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
+    constructor(formBuilder: FormBuilder, properties: FieldPropertiesDto) {
+        super(EditFieldForm.buildForm(formBuilder, properties));
+    }
+
+    private static buildForm(formBuilder: FormBuilder, properties: FieldPropertiesDto) {
+        const config = {
             label: ['',
                 [
                     Validators.maxLength(100)
@@ -221,12 +225,128 @@ export class EditFieldForm extends Form<FormGroup, {}, FieldPropertiesDto> {
                     Validators.maxLength(1000)
                 ]
             ],
-            editorUrl: null,
+            editor: undefined,
+            editorUrl: undefined,
             isRequired: false,
             isRequiredOnPublish: false,
             isHalfWidth: false,
             tags: []
-        }));
+        };
+
+        const visitor = new EditFieldFormVisitor(config);
+
+        properties.accept(visitor);
+
+        return formBuilder.group(config);
+    }
+}
+
+export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
+    constructor(
+        private readonly config:  { [key: string]: any; }
+    ) {
+    }
+
+    public visitArray() {
+        this.config['maxItems'] = undefined;
+        this.config['minItems'] = undefined;
+    }
+
+    public visitAssets() {
+        this.config['allowDuplicates'] = undefined;
+        this.config['allowedExtensions'] = undefined;
+        this.config['aspectHeight'] = undefined;
+        this.config['aspectHeight'] = undefined;
+        this.config['aspectWidth'] = undefined;
+        this.config['defaultValue'] = undefined;
+        this.config['defaultValues'] = undefined;
+        this.config['folderId'] = undefined;
+        this.config['maxHeight'] = undefined;
+        this.config['maxItems'] = undefined;
+        this.config['maxSize'] = undefined;
+        this.config['maxWidth'] = undefined;
+        this.config['minHeight'] = undefined;
+        this.config['minItems'] = undefined;
+        this.config['minSize'] = undefined;
+        this.config['minWidth'] = undefined;
+        this.config['mustBeImage'] = undefined;
+        this.config['previewMode'] = undefined;
+        this.config['resolveFirst'] = undefined;
+    }
+
+    public visitBoolean() {
+        this.config['inlineEditable'] = undefined;
+        this.config['defaultValues'] = undefined;
+        this.config['defaultValue'] = undefined;
+    }
+
+    public visitDateTime() {
+        this.config['calculatedDefaultValue'] = undefined;
+        this.config['defaultValue'] = undefined;
+        this.config['defaultValues'] = undefined;
+        this.config['maxValue'] = [undefined, ValidatorsEx.validDateTime()];
+        this.config['minValue'] = [undefined, ValidatorsEx.validDateTime()];
+    }
+
+    public visitNumber() {
+        this.config['allowedValues'] = undefined;
+        this.config['defaultValue'] = undefined;
+        this.config['defaultValues'] = undefined;
+        this.config['inlineEditable'] = undefined;
+        this.config['isUnique'] = undefined;
+        this.config['maxValue'] = undefined;
+        this.config['minValue'] = undefined;
+    }
+
+    public visitReferences() {
+        this.config['allowDuplicates'] = undefined;
+        this.config['maxItems'] = undefined;
+        this.config['minItems'] = undefined;
+        this.config['schemaIds'] = undefined;
+        this.config['defaultValue'] = undefined;
+        this.config['defaultValues'] = undefined;
+        this.config['mustBePublished'] = undefined;
+        this.config['defaultValues'] = undefined;
+        this.config['defaultValues'] = undefined;
+        this.config['defaultValues'] = undefined;
+    }
+
+    public visitString() {
+        this.config['allowedValues'] = undefined;
+        this.config['contentType'] = undefined;
+        this.config['defaultValue'] = undefined;
+        this.config['defaultValues'] = undefined;
+        this.config['folderId'] = undefined;
+        this.config['inlineEditable'] = undefined;
+        this.config['isUnique'] = undefined;
+        this.config['maxCharacters'] = undefined;
+        this.config['maxLength'] = undefined;
+        this.config['maxWords'] = undefined;
+        this.config['minCharacters'] = undefined;
+        this.config['minLength'] = undefined;
+        this.config['minWords'] = undefined;
+        this.config['pattern'] = undefined;
+        this.config['patternMessage'] = undefined;
+    }
+
+    public visitTags() {
+        this.config['allowedValues'] = undefined;
+        this.config['defaultValue'] = undefined;
+        this.config['defaultValues'] = undefined;
+        this.config['maxItems'] = undefined;
+        this.config['minItems'] = undefined;
+    }
+
+    public visitGeolocation() {
+        return;
+    }
+
+    public visitJson() {
+        return;
+    }
+
+    public visitUI() {
+        return;
     }
 }
 

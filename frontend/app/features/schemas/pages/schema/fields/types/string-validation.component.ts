@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { AppSettingsDto, fadeAnimation, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 
@@ -18,7 +18,7 @@ import { Observable } from 'rxjs';
         fadeAnimation
     ]
 })
-export class StringValidationComponent extends ResourceOwner implements OnInit {
+export class StringValidationComponent extends ResourceOwner implements OnChanges {
     @Input()
     public fieldForm: FormGroup;
 
@@ -45,71 +45,37 @@ export class StringValidationComponent extends ResourceOwner implements OnInit {
     public patternName: string;
     public patternsModal = new ModalModel();
 
-    public showUnique: boolean;
+    public get showUnique() {
+        return Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
+    }
 
-    public ngOnInit() {
-        this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
-
-        if (this.showUnique) {
-            this.fieldForm.setControl('isUnique',
-                new FormControl());
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['settings']) {
+            this.setPatternName();
         }
 
-        this.fieldForm.setControl('maxLength',
-            new FormControl());
+        if (changes['fieldForm']) {
+            this.unsubscribeAll();
 
-        this.fieldForm.setControl('minLength',
-            new FormControl());
+            this.showPatternSuggestions =
+                hasNoValue$(this.fieldForm.controls['pattern']);
 
-        this.fieldForm.setControl('maxWords',
-            new FormControl());
+            this.showPatternSuggestions =
+                hasNoValue$(this.fieldForm.controls['pattern']);
 
-        this.fieldForm.setControl('minWords',
-            new FormControl());
+            this.showPatternMessage =
+                hasValue$(this.fieldForm.controls['pattern']);
 
-        this.fieldForm.setControl('maxCharacters',
-            new FormControl());
+            this.own(
+                value$(this.fieldForm.controls['pattern'])
+                    .subscribe((value: string) => {
+                        if (!value) {
+                            this.fieldForm.controls['patternMessage'].setValue(undefined);
+                        }
 
-        this.fieldForm.setControl('minCharacters',
-            new FormControl());
-
-        this.fieldForm.setControl('contentType',
-            new FormControl());
-
-        this.fieldForm.setControl('pattern',
-            new FormControl());
-
-        this.fieldForm.setControl('patternMessage',
-            new FormControl());
-
-        this.fieldForm.setControl('defaultValue',
-            new FormControl());
-
-        this.fieldForm.setControl('defaultValues',
-            new FormControl());
-
-        this.showPatternSuggestions =
-            hasNoValue$(this.fieldForm.controls['pattern']);
-
-        this.showPatternSuggestions =
-            hasNoValue$(this.fieldForm.controls['pattern']);
-
-        this.showPatternMessage =
-            hasValue$(this.fieldForm.controls['pattern']);
-
-        this.own(
-            value$(this.fieldForm.controls['pattern'])
-                .subscribe((value: string) => {
-                    if (!value) {
-                        this.fieldForm.controls['patternMessage'].setValue(undefined);
-                    }
-
-                    this.setPatternName();
-                }));
-
-        this.setPatternName();
-
-        this.fieldForm.patchValue(this.field.properties);
+                        this.setPatternName();
+                    }));
+        }
     }
 
     public setPattern(pattern: PatternDto) {

@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
@@ -14,7 +14,7 @@ import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
     styleUrls: ['assets-ui.component.scss'],
     templateUrl: 'assets-ui.component.html'
 })
-export class AssetsUIComponent implements OnInit {
+export class AssetsUIComponent {
     @Input()
     public fieldForm: FormGroup;
 
@@ -23,17 +23,4 @@ export class AssetsUIComponent implements OnInit {
 
     @Input()
     public properties: AssetsFieldPropertiesDto;
-
-    public ngOnInit() {
-        this.fieldForm.setControl('previewMode',
-            new FormControl());
-
-        this.fieldForm.setControl('resolveFirst',
-            new FormControl());
-
-        this.fieldForm.setControl('folderId',
-            new FormControl());
-
-        this.fieldForm.patchValue(this.properties);
-    }
 }

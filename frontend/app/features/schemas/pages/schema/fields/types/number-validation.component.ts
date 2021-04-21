@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, Types } from '@app/shared';
 
 @Component({
@@ -14,7 +14,7 @@ import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, Types } 
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html'
 })
-export class NumberValidationComponent implements OnInit {
+export class NumberValidationComponent {
     @Input()
     public fieldForm: FormGroup;
 
@@ -30,28 +30,7 @@ export class NumberValidationComponent implements OnInit {
     @Input()
     public isLocalizable?: boolean | null;
 
-    public showUnique: boolean;
-
-    public ngOnInit() {
-        this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
-
-        if (this.showUnique) {
-            this.fieldForm.setControl('isUnique',
-                new FormControl());
-        }
-
-        this.fieldForm.setControl('maxValue',
-            new FormControl());
-
-        this.fieldForm.setControl('minValue',
-            new FormControl());
-
-        this.fieldForm.setControl('defaultValue',
-            new FormControl());
-
-        this.fieldForm.setControl('defaultValues',
-            new FormControl());
-
-        this.fieldForm.patchValue(this.field.properties);
+    public get showUnique() {
+        return Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
     }
 }
