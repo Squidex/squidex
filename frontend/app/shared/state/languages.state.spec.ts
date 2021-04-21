@@ -75,7 +75,7 @@ describe('LanguagesState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading if loading failed', () => {
+        it('should reset loading state if loading failed', () => {
             languagesService.setup(x => x.getLanguages(app))
                 .returns(() => throwError('error'));
 

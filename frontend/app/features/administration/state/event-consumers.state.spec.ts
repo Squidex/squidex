@@ -46,7 +46,7 @@ describe('EventConsumersState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading if loading failed', () => {
+        it('should reset loading state if loading failed', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
                 .returns(() => throwError('error'));
 
@@ -94,9 +94,7 @@ describe('EventConsumersState', () => {
 
             eventConsumersState.start(eventConsumer2).subscribe();
 
-            const newConsumer2 = eventConsumersState.snapshot.eventConsumers[1];
-
-            expect(newConsumer2).toEqual(updated);
+            expect(eventConsumersState.snapshot.eventConsumers).toEqual([eventConsumer1, updated]);
         });
 
         it('should update event consumer if stopped', () => {
@@ -107,9 +105,7 @@ describe('EventConsumersState', () => {
 
             eventConsumersState.stop(eventConsumer2).subscribe();
 
-            const newConsumer2 = eventConsumersState.snapshot.eventConsumers[1];
-
-            expect(newConsumer2).toEqual(updated);
+            expect(eventConsumersState.snapshot.eventConsumers).toEqual([eventConsumer1, updated]);
         });
 
         it('should update event consumer if reset', () => {
@@ -120,9 +116,7 @@ describe('EventConsumersState', () => {
 
             eventConsumersState.reset(eventConsumer2).subscribe();
 
-            const newConsumer2 = eventConsumersState.snapshot.eventConsumers[1];
-
-            expect(newConsumer2).toEqual(updated);
+            expect(eventConsumersState.snapshot.eventConsumers).toEqual([eventConsumer1, updated]);
         });
     });
 });

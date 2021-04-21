@@ -91,7 +91,15 @@ export class AppsState extends State<Snapshot> {
     public load(): Observable<any> {
         return this.appsService.getApps().pipe(
             tap(apps => {
-                this.next({ apps }, 'Loaded');
+                this.next(s => {
+                    let selectedApp = s.selectedApp;
+
+                    if (selectedApp) {
+                        selectedApp = apps.find(x => x.id === selectedApp!.id) || selectedApp;
+                    }
+
+                    return { ...s, apps, selectedApp };
+                }, 'Loading Success');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -202,7 +210,7 @@ export class AppsState extends State<Snapshot> {
             const selectedApp =
                 s.selectedApp?.id !== app.id ?
                 s.selectedApp :
-                null;
+                app;
 
             return { ...s, apps, selectedApp };
         }, 'Updated');

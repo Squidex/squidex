@@ -18,8 +18,7 @@ describe('RulesState', () => {
     const {
         app,
         appsState,
-        newVersion,
-        version
+        newVersion
     } = TestValues;
 
     const rule1 = createRule(1);
@@ -65,7 +64,7 @@ describe('RulesState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading if loading failed', () => {
+        it('should reset loading state if loading failed', () => {
             rulesService.setup(x => x.getRules(app))
                 .returns(() => throwError('error'));
 
@@ -84,25 +83,6 @@ describe('RulesState', () => {
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
-
-        it('should replace selected rule if reloading', () => {
-            const newRules = [
-                createRule(1, '_new'),
-                createRule(2, '_new')
-            ];
-
-            rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto([rule1, rule2]))).verifiable(Times.exactly(2));
-
-            rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(newRules)));
-
-            rulesState.load().subscribe();
-            rulesState.select(rule1.id).subscribe();
-            rulesState.load().subscribe();
-
-            expect(rulesState.snapshot.selectedRule).toEqual(newRules[0]);
-        });
     });
 
     describe('Updates', () => {
@@ -114,24 +94,24 @@ describe('RulesState', () => {
         });
 
         it('should return rule on select and not load if already loaded', () => {
-            let selectedRule: RuleDto;
+            let ruleSelected: RuleDto;
 
             rulesState.select(rule1.id).subscribe(x => {
-                selectedRule = x!;
+                ruleSelected = x!;
             });
 
-            expect(selectedRule!).toEqual(rule1);
+            expect(ruleSelected!).toEqual(rule1);
             expect(rulesState.snapshot.selectedRule).toEqual(rule1);
         });
 
         it('should return null on select if unselecting rule', () => {
-            let selectedRule: RuleDto;
+            let ruleSelected: RuleDto;
 
             rulesState.select(null).subscribe(x => {
-                selectedRule = x!;
+                ruleSelected = x!;
             });
 
-            expect(selectedRule!).toBeNull();
+            expect(ruleSelected!).toBeNull();
             expect(rulesState.snapshot.selectedRule).toBeNull();
         });
 
@@ -151,7 +131,7 @@ describe('RulesState', () => {
 
             const updated = createRule(1, '_new');
 
-            rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
+            rulesService.setup(x => x.putRule(app, rule1, request, rule1.version))
                 .returns(() => of(updated)).verifiable();
 
             rulesState.update(rule1, request).subscribe();
@@ -159,85 +139,35 @@ describe('RulesState', () => {
             expect(rulesState.snapshot.rules).toEqual([updated, rule2]);
         });
 
-        it('should update selected rule in snapshot if updated', () => {
-            const request = {};
-
-            const updated = createRule(1, '_new');
-
-            rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
-                .returns(() => of(updated)).verifiable();
-
-            rulesState.select(rule1.name).subscribe();
-            rulesState.update(rule1, request).subscribe();
-
-            expect(rulesState.snapshot.rules).toEqual([updated, rule2]);
-            expect(rulesState.snapshot.selectedRule).toEqual(updated);
-        });
-
-        it('should update rule if renamed', () => {
-            const newName = 'NewName';
-
-            const updated = createRule(1, '_new');
-
-            rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
-                .returns(() => of(updated)).verifiable();
-
-            rulesState.rename(rule1, newName).subscribe();
-
-            expect(rulesState.snapshot.rules).toEqual([updated, rule2]);
-        });
-
-        it('should update rule if enabled', () => {
-            const updated = createRule(1, '_new');
-
-            rulesService.setup(x => x.enableRule(app, rule1, version))
-                .returns(() => of(updated)).verifiable();
-
-            rulesState.enable(rule1).subscribe();
-
-            expect(rulesState.snapshot.rules).toEqual([updated, rule2]);
-        });
-
-        it('should not update rule if triggered', () => {
+        it('should not update rule in snapshot if triggered', () => {
             rulesService.setup(x => x.triggerRule(app, rule1))
-                .returns(of).verifiable();
+                .returns(() => of(true)).verifiable();
 
             rulesState.trigger(rule1).subscribe();
 
             expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
         });
 
-        it('should not update rule if running', () => {
+        it('should not update rule in snapshot if running', () => {
             rulesService.setup(x => x.runRule(app, rule1))
-                .returns(of).verifiable();
+                .returns(() => of(true)).verifiable();
 
             rulesState.run(rule1).subscribe();
 
             expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
         });
 
-        it('should not update rule if running from snapshots', () => {
+        it('should not update rule in snapshot if running from snapshots', () => {
             rulesService.setup(x => x.runRuleFromSnapshots(app, rule1))
-                .returns(of).verifiable();
+                .returns(() => of(true)).verifiable();
 
             rulesState.runFromSnapshots(rule1).subscribe();
 
             expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
         });
 
-        it('should update rule if disabled', () => {
-            const updated = createRule(1, '_new');
-
-            rulesService.setup(x => x.disableRule(app, rule1, version))
-                .returns(() => of(updated)).verifiable();
-
-            rulesState.disable(rule1).subscribe();
-
-            expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
-        });
-
         it('should remove rule from snapshot if deleted', () => {
-            rulesService.setup(x => x.deleteRule(app, rule1, version))
+            rulesService.setup(x => x.deleteRule(app, rule1, rule1.version))
                 .returns(() => of(versioned(newVersion))).verifiable();
 
             rulesState.delete(rule1).subscribe();
@@ -245,23 +175,59 @@ describe('RulesState', () => {
             expect(rulesState.snapshot.rules).toEqual([rule2]);
         });
 
-        it('should remove selected rule from snapshot if deleted', () => {
-            rulesService.setup(x => x.deleteRule(app, rule1, version))
-                .returns(() => of(versioned(newVersion))).verifiable();
-
-            rulesState.select(rule1.name).subscribe();
-            rulesState.delete(rule1).subscribe();
-
-            expect(rulesState.snapshot.selectedRule).toBeNull();
-        });
-
         it('should invoke rule service if run is cancelled', () => {
             rulesService.setup(x => x.runCancel(app))
-                .returns(of).verifiable();
+                .returns(() => of(true)).verifiable();
 
             rulesState.runCancel().subscribe();
 
             expect().nothing();
+        });
+    });
+
+    describe('Selection', () => {
+        beforeEach(() => {
+            rulesService.setup(x => x.getRules(app))
+                .returns(() => of(new RulesDto([rule1, rule2]))).verifiable(Times.atLeastOnce());
+
+            rulesState.load().subscribe();
+            rulesState.select(rule2.id).subscribe();
+        });
+
+        it('should update selected rule if reloaded', () => {
+            const newRules = [
+                createRule(1, '_new'),
+                createRule(2, '_new')
+            ];
+
+            rulesService.setup(x => x.getRules(app))
+                .returns(() => of(new RulesDto(newRules)));
+
+            rulesState.load().subscribe();
+
+            expect(rulesState.snapshot.selectedRule).toEqual(newRules[1]);
+        });
+
+        it('should update selected rule if updated', () => {
+            const request = {};
+
+            const updated = createRule(2, '_new');
+
+            rulesService.setup(x => x.putRule(app, rule2, request, rule2.version))
+                .returns(() => of(updated)).verifiable();
+
+            rulesState.update(rule2, request).subscribe();
+
+            expect(rulesState.snapshot.selectedRule).toEqual(updated);
+        });
+
+        it('should remove selected rule from snapshot if deleted', () => {
+            rulesService.setup(x => x.deleteRule(app, rule2, rule2.version))
+                .returns(() => of(versioned(newVersion))).verifiable();
+
+            rulesState.delete(rule2).subscribe();
+
+            expect(rulesState.snapshot.selectedRule).toBeNull();
         });
     });
 });

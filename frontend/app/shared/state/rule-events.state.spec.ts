@@ -47,7 +47,7 @@ describe('RuleEventsState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
-    it('should reset loading if loading failed', () => {
+    it('should reset loading state if loading failed', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, undefined))
             .returns(() => throwError('error'));
 

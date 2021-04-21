@@ -172,30 +172,6 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public rename(rule: RuleDto, name: string): Observable<RuleDto> {
-        return this.rulesService.putRule(this.appName, rule, { name }, rule.version).pipe(
-            tap(updated => {
-                this.replaceRule(updated);
-            }),
-            shareSubscribed(this.dialogs));
-    }
-
-    public enable(rule: RuleDto): Observable<any> {
-        return this.rulesService.enableRule(this.appName, rule, rule.version).pipe(
-            tap(updated => {
-                this.replaceRule(updated);
-            }),
-            shareSubscribed(this.dialogs));
-    }
-
-    public disable(rule: RuleDto): Observable<any> {
-        return this.rulesService.disableRule(this.appName, rule, rule.version).pipe(
-            tap(updated => {
-                this.replaceRule(updated);
-            }),
-            shareSubscribed(this.dialogs));
-    }
-
     public run(rule: RuleDto): Observable<any> {
         return this.rulesService.runRule(this.appName, rule).pipe(
             tap(() => {

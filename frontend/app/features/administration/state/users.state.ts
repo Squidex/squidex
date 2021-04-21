@@ -170,7 +170,12 @@ export class UsersState extends State<Snapshot> {
                 this.next(s => {
                     const users = s.users.filter(x => x.id !== user.id);
 
-                    return { ...s, users, total: s.total - 1 };
+                    const selectedUser =
+                        s.selectedUser?.id !== user.id ?
+                        s.selectedUser :
+                        null;
+
+                    return { ...s, users, total: s.total - 1, selectedUser };
                 }, 'Delete');
             }),
             shareSubscribed(this.dialogs));

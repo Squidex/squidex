@@ -52,7 +52,7 @@ describe('ClientsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading if loading failed', () => {
+        it('should reset loading state if loading failed', () => {
             clientsService.setup(x => x.getClients(app))
                 .returns(() => throwError('error'));
 

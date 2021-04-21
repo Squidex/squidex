@@ -237,9 +237,7 @@ describe('AssetsState', () => {
 
             assetsState.updateAsset(asset1, request);
 
-            const asset1New = assetsState.snapshot.assets[0];
-
-            expect(asset1New).toEqual(updated);
+            expect(assetsState.snapshot.assets).toEqual([updated, asset2]);
             expect(assetsState.snapshot.tagsAvailable).toEqual({ tag2: 1, shared: 1, new: 1 });
         });
 
@@ -253,9 +251,7 @@ describe('AssetsState', () => {
 
             assetsState.updateAssetFolder(assetFolder1, request);
 
-            const assetFolder1New = assetsState.snapshot.folders[0];
-
-            expect(assetFolder1New).toEqual(updated);
+            expect(assetsState.snapshot.folders).toEqual([updated, assetFolder2]);
         });
 
         it('should remove asset from snapshot if moved to other folder', () => {
@@ -299,7 +295,7 @@ describe('AssetsState', () => {
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).subscribe();
 
-            expect(assetsState.snapshot.folders.length).toBe(1);
+            expect(assetsState.snapshot.folders).toEqual([assetFolder2]);
         });
 
         it('should not do anything if moving asset folder to itself', () => {
@@ -335,7 +331,7 @@ describe('AssetsState', () => {
 
             assetsState.deleteAsset(asset1).subscribe();
 
-            expect(assetsState.snapshot.assets.length).toBe(1);
+            expect(assetsState.snapshot.assets).toEqual([asset2]);
             expect(assetsState.snapshot.total).toBe(199);
             expect(assetsState.snapshot.tagsAvailable).toEqual({ shared: 1, tag2: 1 });
         });
@@ -352,7 +348,7 @@ describe('AssetsState', () => {
 
             assetsState.deleteAsset(asset1).subscribe();
 
-            expect(assetsState.snapshot.assets.length).toBe(1);
+            expect(assetsState.snapshot.assets).toEqual([asset2]);
             expect(assetsState.snapshot.total).toBe(199);
             expect(assetsState.snapshot.tagsAvailable).toEqual({ shared: 1, tag2: 1 });
         });

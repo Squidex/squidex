@@ -52,7 +52,7 @@ describe('WorkflowsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading if loading failed', () => {
+        it('should reset loading state if loading failed', () => {
             workflowsService.setup(x => x.getWorkflows(app))
                 .returns(() => throwError('error'));
 

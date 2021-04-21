@@ -53,18 +53,14 @@ export class RuleComponent {
     }
 
     public rename(name: string) {
-        this.rulesState.rename(this.rule, name);
+        this.rulesState.update(this.rule, { name });
+    }
+
+    public toggle() {
+        this.rulesState.update(this.rule, { isEnabled: !this.rule.isEnabled });
     }
 
     public trigger() {
         this.rulesState.trigger(this.rule);
-    }
-
-    public toggle() {
-        if (this.rule.isEnabled) {
-            this.rulesState.disable(this.rule);
-        } else {
-            this.rulesState.enable(this.rule);
-        }
     }
 }

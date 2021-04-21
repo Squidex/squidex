@@ -51,7 +51,7 @@ describe('UsersState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading if loading failed', () => {
+        it('should reset loading state if loading failed', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
                 .returns(() => throwError('error'));
 
@@ -69,25 +69,6 @@ describe('UsersState', () => {
             expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
-        });
-
-        it('should replace selected user if reloading', () => {
-            const newUsers = [
-                createUser(1, '_new'),
-                createUser(2, '_new')
-            ];
-
-            usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(oldUsers)).verifiable(Times.exactly(2));
-
-            usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(new UsersDto(200, newUsers)));
-
-            usersState.load().subscribe();
-            usersState.select(user1.id).subscribe();
-            usersState.load().subscribe();
-
-            expect(usersState.snapshot.selectedUser).toEqual(newUsers[0]);
         });
 
         it('should load with new pagination if paging', () => {
@@ -132,24 +113,24 @@ describe('UsersState', () => {
             usersService.setup(x => x.getUser('id3'))
                 .returns(() => of(newUser));
 
-            let selectedUser: UserDto;
+            let userSelected: UserDto;
 
             usersState.select('id3').subscribe(x => {
-                selectedUser = x!;
+                userSelected = x!;
             });
 
-            expect(selectedUser!).toEqual(newUser);
+            expect(userSelected!).toEqual(newUser);
             expect(usersState.snapshot.selectedUser).toEqual(newUser);
         });
 
         it('should return null on select if unselecting user', () => {
-            let selectedUser: UserDto;
+            let userSelected: UserDto;
 
             usersState.select(null).subscribe(x => {
-                selectedUser = x!;
+                userSelected = x!;
             });
 
-            expect(selectedUser!).toBeNull();
+            expect(userSelected!).toBeNull();
             expect(usersState.snapshot.selectedUser).toBeNull();
         });
 
@@ -157,60 +138,14 @@ describe('UsersState', () => {
             usersService.setup(x => x.getUser('unknown'))
                 .returns(() => throwError({})).verifiable();
 
-            let selectedUser: UserDto;
+            let userSelected: UserDto;
 
             usersState.select('unknown').subscribe(x => {
-                selectedUser = x!;
+                userSelected = x!;
             }).unsubscribe();
 
-            expect(selectedUser!).toBeNull();
+            expect(userSelected!).toBeNull();
             expect(usersState.snapshot.selectedUser).toBeNull();
-        });
-
-        it('should update user and selected user if locked', () => {
-            const updated = createUser(2, '_new');
-
-            usersService.setup(x => x.lockUser(user2))
-                .returns(() => of(updated)).verifiable();
-
-            usersState.select(user2.id).subscribe();
-            usersState.lock(user2).subscribe();
-
-            const user2New = usersState.snapshot.users[1];
-
-            expect(user2New).toBe(usersState.snapshot.selectedUser!);
-        });
-
-        it('should update user and selected user if unlocked', () => {
-            const updated = createUser(2, '_new');
-
-            usersService.setup(x => x.unlockUser(user2))
-                .returns(() => of(updated)).verifiable();
-
-            usersState.select(user2.id).subscribe();
-            usersState.unlock(user2).subscribe();
-
-            const user2New = usersState.snapshot.users[1];
-
-            expect(user2New).toEqual(updated);
-            expect(user2New).toBe(usersState.snapshot.selectedUser!);
-        });
-
-        it('should update user and selected user if updated', () => {
-            const request = { email: 'new@mail.com', displayName: 'New', permissions: ['Permission1'] };
-
-            const updated = createUser(2, '_new');
-
-            usersService.setup(x => x.putUser(user2, request))
-                .returns(() => of(updated)).verifiable();
-
-            usersState.select(user2.id).subscribe();
-            usersState.update(user2, request).subscribe();
-
-            const user2New = usersState.snapshot.users[1];
-
-            expect(user2New).toEqual(updated);
-            expect(user2New).toBe(usersState.snapshot.selectedUser!);
         });
 
         it('should add user to snapshot if created', () => {
@@ -223,6 +158,41 @@ describe('UsersState', () => {
 
             expect(usersState.snapshot.users).toEqual([newUser, user1, user2]);
             expect(usersState.snapshot.total).toBe(201);
+        });
+
+        it('should update user if updated', () => {
+            const request = {};
+
+            const updated = createUser(2, '_new');
+
+            usersService.setup(x => x.putUser(user2, request))
+                .returns(() => of(updated)).verifiable();
+
+            usersState.update(user2, request).subscribe();
+
+            expect(usersState.snapshot.users).toEqual([user1, updated]);
+        });
+
+        it('should update user if locked', () => {
+            const updated = createUser(2, '_new');
+
+            usersService.setup(x => x.lockUser(user2))
+                .returns(() => of(updated)).verifiable();
+
+            usersState.lock(user2).subscribe();
+
+            expect(usersState.snapshot.users).toEqual([user1, updated]);
+        });
+
+        it('should update user if locked', () => {
+            const updated = createUser(2, '_new');
+
+            usersService.setup(x => x.unlockUser(user2))
+                .returns(() => of(updated)).verifiable();
+
+            usersState.unlock(user2).subscribe();
+
+            expect(usersState.snapshot.users).toEqual([user1, updated]);
         });
 
         it('should remove user from snapshot if delete', () => {
@@ -249,6 +219,52 @@ describe('UsersState', () => {
 
             expect(usersState.snapshot.users).toEqual([newUser, user1]);
             expect(usersState.snapshot.total).toBe(201);
+        });
+    });
+
+    describe('Selection', () => {
+        beforeEach(() => {
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(oldUsers)).verifiable(Times.atLeastOnce());
+
+            usersState.load().subscribe();
+            usersState.select(user2.id).subscribe();
+        });
+
+        it('should update selected user if reloaded', () => {
+            const newUsers = [
+                createUser(1, '_new'),
+                createUser(2, '_new')
+            ];
+
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(new UsersDto(2, newUsers)));
+
+            usersState.load().subscribe();
+
+            expect(usersState.snapshot.selectedUser).toEqual(newUsers[1]);
+        });
+
+        it('should update selected user if updated', () => {
+            const request = {};
+
+            const updated = createUser(2, '_new');
+
+            usersService.setup(x => x.putUser(user2, request))
+                .returns(() => of(updated)).verifiable();
+
+            usersState.update(user2, request).subscribe();
+
+            expect(usersState.snapshot.selectedUser).toEqual(updated);
+        });
+
+        it('should remove selected user from snapshot if deleted', () => {
+            usersService.setup(x => x.deleteUser(user2))
+                .returns(() => of(true)).verifiable();
+
+            usersState.delete(user2).subscribe();
+
+            expect(usersState.snapshot.selectedUser).toBeNull();
         });
     });
 });
