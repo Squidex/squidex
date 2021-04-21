@@ -33,7 +33,7 @@ export class TableFields {
         private readonly uiState: UIState,
         private readonly schema: SchemaDetailsDto
     ) {
-        this.allFields = [...this.schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sorted();
+        this.allFields = [...this.schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sort();
 
         this.settingsKey = `schemas.${this.schema.name}.view`;
 

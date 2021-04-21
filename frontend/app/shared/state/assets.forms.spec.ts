@@ -31,7 +31,7 @@ describe('AnnotateAssetForm', () => {
         form = new AnnotateAssetForm(new FormBuilder());
     });
 
-    it('shoulde remove extension when loading asset file name', () => {
+    it('shoulde remove extension if loading asset file name', () => {
         form.load(asset);
 
         const slug = form.form.get('fileName')!.value;
@@ -59,7 +59,7 @@ describe('AnnotateAssetForm', () => {
         expect(slug).toBe('my-new-file.png');
     });
 
-    it('should convert metadata when loading', () => {
+    it('should convert metadata if loading', () => {
         form.load(asset);
 
         const metadata = form.metadata.value;
@@ -72,7 +72,7 @@ describe('AnnotateAssetForm', () => {
         ]);
     });
 
-    it('should convert values when submitting', () => {
+    it('should convert values if submitting', () => {
         form.load(asset);
 
         const request = form.submit({ fileName: 'Old File.png' } as any)!;
@@ -81,7 +81,7 @@ describe('AnnotateAssetForm', () => {
         expect(form.form.enabled).toBeFalsy();
     });
 
-    it('should return null when nothing changed before submit', () => {
+    it('should return null if nothing changed before submit', () => {
         form.load(asset);
 
         const result = form.submit(asset);
@@ -90,7 +90,7 @@ describe('AnnotateAssetForm', () => {
         expect(form.form.enabled).toBeTruthy();
     });
 
-    it('should remove previous metadata when loaded', () => {
+    it('should remove previous metadata if loaded', () => {
         const newAsset: any = {
             metadata: {
                 key1: 'Value'

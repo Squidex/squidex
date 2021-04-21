@@ -51,7 +51,7 @@ describe('LocalStore', () => {
         expect(returnedVal).toBe('myval');
     });
 
-    it('should set and get from fallback value when local store failed', () => {
+    it('should set and get from fallback value if local store failed', () => {
         const localStoreService = new LocalStoreService();
 
         localStoreService.configureStore({

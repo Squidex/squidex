@@ -100,7 +100,7 @@ describe('TableFields', () => {
         ]);
     });
 
-    it('should update config when fields are saved', () => {
+    it('should update config if fields are saved', () => {
         uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
             .returns(() => of([]));
 

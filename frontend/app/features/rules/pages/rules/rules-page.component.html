@@ -15,9 +15,9 @@
         <ng-container *ngIf="rulesState.canCreate | async">
             <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
     
-            <button type="button" class="btn btn-success" #buttonNew (click)="createNew()" title="i18n:rules.createTooltip">
+            <a type="button" class="btn btn-success" #buttonNew routerLink="new" title="i18n:rules.createTooltip">
                 <i class="icon-plus"></i> {{ 'rules.create' | sqxTranslate }}
-            </button>
+            </a>
         </ng-container>
     </ng-container>
 
@@ -34,11 +34,11 @@
             </ng-container>
 
             <div content>
-                <ng-container *ngIf="ruleActions && ruleTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">
+                <ng-container *ngIf="supportedActions && supportedTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">
                     <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
                         {{ 'rules.empty' | sqxTranslate }}
         
-                        <button type="button" class="btn btn-success btn-sm ml-2" (click)="createNew()" *ngIf="rulesState.canCreate | async">
+                        <button type="button" class="btn btn-success btn-sm ml-2" routerLink="new" *ngIf="rulesState.canCreate | async">
                             <i class="icon icon-plus"></i> {{ 'rules.emptyAddRule' | sqxTranslate }}
                         </button>
                     </div>
@@ -46,24 +46,12 @@
                     <table class="table table-items table-fixed">
                         <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule"
                             [rule]="rule"
-                            [ruleActions]="ruleActions"
-                            [ruleTriggers]="ruleTriggers"
+                            [ruleActions]="supportedActions"
+                            [ruleTriggers]="supportedTriggers"
                             (delete)="delete(rule)"
-                            (editAction)="editAction(rule)"
-                            (editTrigger)="editTrigger(rule)"
                             (toggle)="toggle(rule)">
                         </sqx-rule>
                     </table>
-        
-                    <ng-container *sqxModal="addRuleDialog">
-                        <sqx-rule-wizard [schemas]="(schemasState.schemas | async)!"
-                            [rule]="wizardRule"
-                            [ruleActions]="ruleActions"
-                            [ruleTriggers]="$any(ruleTriggers)"
-                            [mode]="wizardMode"
-                            (complete)="addRuleDialog.hide()">
-                        </sqx-rule-wizard>
-                    </ng-container>
                 </ng-container>
             </div>
         </sqx-list-view>

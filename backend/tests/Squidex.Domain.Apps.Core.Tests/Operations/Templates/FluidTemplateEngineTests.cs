@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_template_invalid()
+        public async Task Should_throw_exception_if_template_invalid()
         {
             var template = "{% for x of event %}";
 

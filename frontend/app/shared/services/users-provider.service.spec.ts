@@ -20,7 +20,7 @@ describe('UsersProviderService', () => {
         usersProviderService = new UsersProviderService(usersService.object, authService.object);
     });
 
-    it('should return users service when user not cached', () => {
+    it('should return users service if user not cached', () => {
         const user = new UserDto('123', 'User1');
 
         usersService.setup(x => x.getUser('123'))
@@ -56,7 +56,7 @@ describe('UsersProviderService', () => {
         usersService.verifyAll();
     });
 
-    it('should return me when user is current user', () => {
+    it('should return me if user is current user', () => {
         const user = new UserDto('123', 'User1');
 
         authService.setup(x => x.user)
@@ -76,7 +76,7 @@ describe('UsersProviderService', () => {
         usersService.verifyAll();
     });
 
-    it('should return invalid user when not found', () => {
+    it('should return invalid user if not found', () => {
         authService.setup(x => x.user)
             .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
 

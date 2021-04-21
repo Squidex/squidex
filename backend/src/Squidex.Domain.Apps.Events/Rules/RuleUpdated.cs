@@ -14,11 +14,13 @@ namespace Squidex.Domain.Apps.Events.Rules
     [EventType(nameof(RuleUpdated))]
     public sealed class RuleUpdated : RuleEvent, IMigrated<IEvent>
     {
-        public RuleTrigger Trigger { get; set; }
+        public string? Name { get; set; }
 
-        public RuleAction Action { get; set; }
+        public RuleTrigger? Trigger { get; set; }
 
-        public string Name { get; set; }
+        public RuleAction? Action { get; set; }
+
+        public bool? IsEnabled { get; set; }
 
         public IEvent Migrate()
         {

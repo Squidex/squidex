@@ -5,10 +5,6 @@
         transition: background-color .4s ease;
     }
 
-    &.editable {
-        cursor: pointer;
-    }
-
     &-text {
         @include absolute(0, 0, 0, 3rem);
         @include truncate;

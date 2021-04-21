@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AppSettingsDto, fadeAnimation, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
@@ -18,7 +18,7 @@ import { Observable } from 'rxjs';
         fadeAnimation
     ]
 })
-export class StringValidationComponent extends ResourceOwner implements OnChanges, OnInit {
+export class StringValidationComponent extends ResourceOwner implements OnChanges {
     @Input()
     public fieldForm: FormGroup;
 
@@ -47,71 +47,73 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
 
     public showUnique: boolean;
 
-    public ngOnInit() {
-        this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
-
-        if (this.showUnique) {
-            this.fieldForm.setControl('isUnique',
-                new FormControl(this.properties.isUnique));
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['field']) {
+            this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
         }
 
-        this.fieldForm.setControl('maxLength',
-            new FormControl(this.properties.maxLength));
+        if (changes['fieldForm']) {
+            if (this.showUnique) {
+                this.fieldForm.setControl('isUnique',
+                    new FormControl());
+            }
 
-        this.fieldForm.setControl('minLength',
-            new FormControl(this.properties.minLength));
+            this.fieldForm.setControl('maxLength',
+                new FormControl());
 
-        this.fieldForm.setControl('maxWords',
-            new FormControl(this.properties.maxWords));
+            this.fieldForm.setControl('minLength',
+                new FormControl());
 
-        this.fieldForm.setControl('minWords',
-            new FormControl(this.properties.minWords));
+            this.fieldForm.setControl('maxWords',
+                new FormControl());
 
-        this.fieldForm.setControl('maxCharacters',
-            new FormControl(this.properties.maxCharacters));
+            this.fieldForm.setControl('minWords',
+                new FormControl());
 
-        this.fieldForm.setControl('minCharacters',
-            new FormControl(this.properties.minCharacters));
+            this.fieldForm.setControl('maxCharacters',
+                new FormControl());
 
-        this.fieldForm.setControl('contentType',
-            new FormControl(this.properties.contentType));
+            this.fieldForm.setControl('minCharacters',
+                new FormControl());
 
-        this.fieldForm.setControl('pattern',
-            new FormControl(this.properties.pattern));
+            this.fieldForm.setControl('contentType',
+                new FormControl());
 
-        this.fieldForm.setControl('patternMessage',
-            new FormControl(this.properties.patternMessage));
+            this.fieldForm.setControl('pattern',
+                new FormControl());
 
-        this.fieldForm.setControl('defaultValue',
-            new FormControl(this.properties.defaultValue));
+            this.fieldForm.setControl('patternMessage',
+                new FormControl());
 
-        this.fieldForm.setControl('defaultValues',
-            new FormControl(this.properties.defaultValues));
+            this.fieldForm.setControl('defaultValue',
+                new FormControl());
 
-        this.showPatternSuggestions =
-            hasNoValue$(this.fieldForm.controls['pattern']);
+            this.fieldForm.setControl('defaultValues',
+                new FormControl());
 
-        this.showPatternSuggestions =
-            hasNoValue$(this.fieldForm.controls['pattern']);
+            this.showPatternSuggestions =
+                hasNoValue$(this.fieldForm.controls['pattern']);
 
-        this.showPatternMessage =
-            hasValue$(this.fieldForm.controls['pattern']);
+            this.showPatternSuggestions =
+                hasNoValue$(this.fieldForm.controls['pattern']);
 
-        this.own(
-            value$(this.fieldForm.controls['pattern'])
-                .subscribe((value: string) => {
-                    if (!value) {
-                        this.fieldForm.controls['patternMessage'].setValue(undefined);
-                    }
+            this.showPatternMessage =
+                hasValue$(this.fieldForm.controls['pattern']);
 
-                    this.setPatternName();
-                }));
+            this.own(
+                value$(this.fieldForm.controls['pattern'])
+                    .subscribe((value: string) => {
+                        if (!value) {
+                            this.fieldForm.controls['patternMessage'].setValue(undefined);
+                        }
+
+                        this.setPatternName();
+                    }));
+        }
 
         this.setPatternName();
-    }
 
-    public ngOnChanges() {
-        this.setPatternName();
+        this.fieldForm.patchValue(this.field.properties);
     }
 
     public setPattern(pattern: PatternDto) {
@@ -120,12 +122,12 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     }
 
     private setPatternName() {
-        const value = this.fieldForm.controls['pattern']?.value;
+        const regex = this.fieldForm.controls['pattern']?.value;
 
-        if (!value) {
+        if (!regex) {
             this.patternName = '';
         } else {
-            const matchingPattern = this.settings.patterns.find(x => x.regex === this.fieldForm.controls['pattern'].value);
+            const matchingPattern = this.settings.patterns.find(x => x.regex === regex);
 
             if (matchingPattern) {
                 this.patternName = matchingPattern.name;

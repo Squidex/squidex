@@ -24,8 +24,6 @@ type ImportStatus = {
     templateUrl: './import-contributors-dialog.component.html'
 })
 export class ImportContributorsDialogComponent {
-    public readonly standalone = { standalone: true };
-
     @Output()
     public close = new EventEmitter();
 

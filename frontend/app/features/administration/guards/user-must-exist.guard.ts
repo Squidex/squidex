@@ -23,6 +23,10 @@ export class UserMustExistGuard implements CanActivate {
     public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
         const userId = allParams(route)['userId'];
 
+        if (!userId || userId === 'new') {
+            return this.usersState.select(null).pipe(map(u => u === null));
+        }
+
         const result =
             this.usersState.select(userId).pipe(
                 tap(dto => {

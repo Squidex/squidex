@@ -61,7 +61,7 @@ describe('ContributorsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading when loading failed', () => {
+        it('should reset loading state if loading failed', () => {
             contributorsService.setup(x => x.getContributors(app))
                 .returns(() => throwError('error'));
 
@@ -91,7 +91,7 @@ describe('ContributorsState', () => {
             expect(contributorsState.snapshot.pageSize).toEqual(10);
         });
 
-        it('should show with new pagination when paging', () => {
+        it('should show with new pagination if paging', () => {
             contributorsState.load().subscribe();
             contributorsState.page({ page: 1, pageSize: 10 });
 
@@ -106,7 +106,7 @@ describe('ContributorsState', () => {
             expect(contributorsState.snapshot.pageSize).toEqual(10);
         });
 
-        it('should show filtered contributors when searching', () => {
+        it('should show filtered contributors if searching', () => {
             contributorsState.load().subscribe();
             contributorsState.search('4');
 
@@ -121,7 +121,7 @@ describe('ContributorsState', () => {
             expect(contributorsState.snapshot.pageSize).toEqual(10);
         });
 
-        it('should show notification on load when reload is true', () => {
+        it('should show notification on load if reload is true', () => {
             contributorsState.load(true).subscribe();
 
             expect().nothing();
@@ -135,7 +135,7 @@ describe('ContributorsState', () => {
             contributorsState.load().subscribe();
         });
 
-        it('should update contributors when user assigned', () => {
+        it('should update contributors if user assigned', () => {
             const updated = createContributors(5, 6);
 
             const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
@@ -148,7 +148,7 @@ describe('ContributorsState', () => {
             expectNewContributors(updated);
         });
 
-        it('should return proper error when user to add does not exist', () => {
+        it('should return proper error if user to add does not exist', () => {
             const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
 
             contributorsService.setup(x => x.postContributor(app, request, version))
@@ -167,7 +167,7 @@ describe('ContributorsState', () => {
             expect(error!.message).toBe('i18n:contributors.userNotFound');
         });
 
-        it('should return original error when not a 404', () => {
+        it('should return original error if not a 404', () => {
             const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
 
             contributorsService.setup(x => x.postContributor(app, request, version))
@@ -186,7 +186,7 @@ describe('ContributorsState', () => {
             expect(error!.message).toBe('500');
         });
 
-        it('should update contributors when contribution revoked', () => {
+        it('should update contributors if contribution revoked', () => {
             const updated = createContributors(5, 6);
 
             contributorsService.setup(x => x.deleteContributor(app, oldContributors.items[0], version))

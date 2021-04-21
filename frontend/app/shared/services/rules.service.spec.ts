@@ -190,56 +190,6 @@ describe('RulesService', () => {
         expect(rule!).toEqual(createRule(123));
     }));
 
-    it('should make put request to enable rule',
-        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-
-        const resource: Resource = {
-            _links: {
-                enable: { method: 'PUT', href: '/api/apps/my-app/rules/123/enable' }
-            }
-        };
-
-        let rule: RuleDto;
-
-        rulesService.enableRule('my-app', resource, version).subscribe(result => {
-            rule = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123/enable');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
-
-        req.flush(ruleResponse(123));
-
-        expect(rule!).toEqual(createRule(123));
-    }));
-
-    it('should make put request to disable rule',
-        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-
-        const resource: Resource = {
-            _links: {
-                disable: { method: 'PUT', href: '/api/apps/my-app/rules/123/disable' }
-            }
-        };
-
-        let rule: RuleDto;
-
-        rulesService.disableRule('my-app', resource, version).subscribe(result => {
-            rule = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123/disable');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
-
-        req.flush(ruleResponse(123));
-
-        expect(rule!).toEqual(createRule(123));
-    }));
-
     it('should make delete request to delete rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 

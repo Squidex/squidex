@@ -381,7 +381,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_return_all_statuses_for_default_workflow_when_no_workflow_configured()
+        public async Task Should_return_all_statuses_for_default_workflow_if_no_workflow_configured()
         {
             A.CallTo(() => app.Workflows).Returns(Workflows.Empty);
 

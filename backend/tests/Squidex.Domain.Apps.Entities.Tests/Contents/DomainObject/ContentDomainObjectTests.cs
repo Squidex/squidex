@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Create_should_not_change_status_when_set_to_initial()
+        public async Task Create_should_not_change_status_if_set_to_initial()
         {
             var command = new CreateContent { Data = data, Status = Status.Draft };
 
@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Create_should_change_status_when_set()
+        public async Task Create_should_change_status_if_set()
         {
             var command = new CreateContent { Data = data, Status = Status.Archived };
 
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Create_should_throw_exception_when_invalid_data_is_passed()
+        public async Task Create_should_throw_exception_if_invalid_data_is_passed()
         {
             var command = new CreateContent { Data = invalidData };
 
@@ -232,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_create_content_when_not_found()
+        public async Task Upsert_should_create_content_if_not_found()
         {
             var command = new UpsertContent { Data = data };
 
@@ -255,7 +255,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_not_change_status_on_create_when_status_set_to_initial()
+        public async Task Upsert_should_not_change_status_on_create_if_status_set_to_initial()
         {
             var command = new UpsertContent { Data = data };
 
@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_change_status_on_create_when_status_set()
+        public async Task Upsert_should_change_status_on_create_if_status_set()
         {
             var command = new UpsertContent { Data = data, Status = Status.Archived };
 
@@ -302,7 +302,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_update_content_when_found()
+        public async Task Upsert_should_update_content_if_found()
         {
             var command = new UpsertContent { Data = otherData };
 
@@ -324,7 +324,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_not_change_status_on_update_when_status_set_to_initial()
+        public async Task Upsert_should_not_change_status_on_update_if_status_set_to_initial()
         {
             var command = new UpsertContent { Data = otherData, Status = Status.Draft };
 
@@ -346,7 +346,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_change_status_on_update_when_status_set()
+        public async Task Upsert_should_change_status_on_update_if_status_set()
         {
             var command = new UpsertContent { Data = otherData, Status = Status.Archived };
 
@@ -426,7 +426,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Update_should_create_events_and_update_new_version_when_draft_available()
+        public async Task Update_should_create_events_and_update_new_version_if_draft_available()
         {
             var command = new UpdateContent { Data = otherData };
 
@@ -467,7 +467,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Update_should_throw_exception_when_invalid_data_is_passed()
+        public async Task Update_should_throw_exception_if_invalid_data_is_passed()
         {
             var command = new UpdateContent { Data = invalidData };
 
@@ -499,7 +499,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Patch_should_create_events_and_update_new_version_when_draft_available()
+        public async Task Patch_should_create_events_and_update_new_version_if_draft_available()
         {
             var command = new PatchContent { Data = patch };
 
@@ -540,7 +540,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task ChangeStatus_should_create_events_and_update_status_when_published()
+        public async Task ChangeStatus_should_create_events_and_update_status_if_published()
         {
             var command = new ChangeContentStatus { Status = Status.Archived };
 
@@ -562,7 +562,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task ChangeStatus_should_create_events_and_update_status_when_changed()
+        public async Task ChangeStatus_should_create_events_and_update_status_if_changed()
         {
             var command = new ChangeContentStatus { Status = Status.Archived };
 
@@ -584,7 +584,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task ChangeStatus_should_create_events_and_update_status_when_unpublished()
+        public async Task ChangeStatus_should_create_events_and_update_status_if_unpublished()
         {
             var command = new ChangeContentStatus { Status = Status.Draft };
 
@@ -607,7 +607,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task ChangeStatus_should_also_update_when_script_changes_data()
+        public async Task ChangeStatus_should_also_update_if_script_changes_data()
         {
             var command = new ChangeContentStatus { Status = Status.Draft };
 
@@ -635,7 +635,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task ChangeStatus_should_create_events_and_update_new_version_when_draft_available()
+        public async Task ChangeStatus_should_create_events_and_update_new_version_if_draft_available()
         {
             var command = new ChangeContentStatus { Status = Status.Archived };
 
@@ -659,7 +659,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task ChangeStatus_should_create_events_and_delete_new_version_when_available()
+        public async Task ChangeStatus_should_create_events_and_delete_new_version_if_available()
         {
             var command = new ChangeContentStatus { Status = Status.Published };
 
@@ -683,7 +683,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task ChangeStatus_create_events_and_set_schedule_when_duetime_set()
+        public async Task ChangeStatus_create_events_and_set_schedule_if_duetime_set()
         {
             var dueTime = Instant.MaxValue;
 
@@ -710,7 +710,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task ChangeStatus_should_refresh_properties_and_unset_schedule_when_completed()
+        public async Task ChangeStatus_should_refresh_properties_and_unset_schedule_if_completed()
         {
             var dueTime = Instant.MaxValue;
 
@@ -738,7 +738,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task ChangeStatus_should_create_events_and_unset_schedule_when_failed()
+        public async Task ChangeStatus_should_create_events_and_unset_schedule_if_failed()
         {
             var dueTime = Instant.MaxValue;
 

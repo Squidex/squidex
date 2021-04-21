@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_not_enrich_with_reference_fields_when_not_frontend()
+        public async Task Should_not_enrich_with_reference_fields_if_not_frontend()
         {
             var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
 

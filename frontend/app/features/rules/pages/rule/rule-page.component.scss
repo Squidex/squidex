@@ -1,0 +1,25 @@
+.summary-row {
+    @include force-height(4rem);
+
+    h3 {
+        margin: 0;
+    }
+
+    .col-syntax {
+        width: 4rem;
+    }
+
+    .col-icon {
+        max-width: 15rem;
+    }
+}
+
+.card-body {
+    &:empty {
+        display: none;
+    }
+}
+
+.btn-enabled {
+    border-color: $color-border;
+}

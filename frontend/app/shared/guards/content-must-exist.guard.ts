@@ -23,6 +23,10 @@ export class ContentMustExistGuard implements CanActivate {
     public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
         const contentId = allParams(route)['contentId'];
 
+        if (!contentId || contentId === 'new') {
+            return this.contentsState.select(null).pipe(map(u => u === null));
+        }
+
         const result =
             this.contentsState.select(contentId).pipe(
                 tap(content => {

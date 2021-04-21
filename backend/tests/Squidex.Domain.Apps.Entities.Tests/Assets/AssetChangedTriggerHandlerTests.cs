@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_event_type_not_correct()
+        public void Should_not_trigger_precheck_if_event_type_not_correct()
         {
             TestForCondition(string.Empty, trigger =>
             {
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public void Should_trigger_precheck_when_event_type_correct()
+        public void Should_trigger_precheck_if_event_type_correct()
         {
             TestForCondition(string.Empty, trigger =>
             {
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_event_type_not_correct()
+        public void Should_not_trigger_check_if_event_type_not_correct()
         {
             TestForCondition(string.Empty, trigger =>
             {
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_is_empty()
+        public void Should_trigger_check_if_condition_is_empty()
         {
             TestForCondition(string.Empty, trigger =>
             {
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_matchs()
+        public void Should_trigger_check_if_condition_matchs()
         {
             TestForCondition("true", trigger =>
             {
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_condition_does_not_matchs()
+        public void Should_not_trigger_check_if_condition_does_not_matchs()
         {
             TestForCondition("false", trigger =>
             {

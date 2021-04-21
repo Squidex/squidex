@@ -21,7 +21,7 @@ namespace Squidex.Web.Pipeline
         [Theory]
         [InlineData("administrator")]
         [InlineData("ADMINISTRATOR")]
-        public async Task Should_add_admin_permission_when_user_is_in_role(string role)
+        public async Task Should_add_admin_permission_if_user_is_in_role(string role)
         {
             var userIdentity = new ClaimsIdentity();
             var userPrinicpal = new ClaimsPrincipal(userIdentity);
@@ -35,7 +35,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_not_add_admin_persmission_when_user_has_other_role()
+        public async Task Should_not_add_admin_persmission_if_user_has_other_role()
         {
             var userIdentity = new ClaimsIdentity();
             var userPrinicpal = new ClaimsPrincipal(userIdentity);
@@ -48,7 +48,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_not_add_admin_persmission_when_user_has_no_role()
+        public async Task Should_not_add_admin_persmission_if_user_has_no_role()
         {
             var userIdentity = new ClaimsIdentity();
             var userPrinicpal = new ClaimsPrincipal(userIdentity);

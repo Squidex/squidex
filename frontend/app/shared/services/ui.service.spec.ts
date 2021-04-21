@@ -47,7 +47,7 @@ describe('UIService', () => {
         expect(settings!).toEqual(response);
     }));
 
-    it('should return default common settings when error occurs',
+    it('should return default common settings if error occurs',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
         let settings: object;
@@ -87,7 +87,7 @@ describe('UIService', () => {
         expect(settings!).toEqual(response);
     }));
 
-    it('should return default shared settings when error occurs',
+    it('should return default shared settings if error occurs',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
         let settings: object;
@@ -127,7 +127,7 @@ describe('UIService', () => {
         expect(settings!).toEqual(response);
     }));
 
-    it('should return default user settings when error occurs',
+    it('should return default user settings if error occurs',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
         let settings: object;

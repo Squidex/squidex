@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_no_reservation_token_returned()
+        public async Task Should_throw_exception_if_no_reservation_token_returned()
         {
             const string appName = "my-app";
 
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_not_cleanup_reservation_when_no_reservation_token_hold()
+        public async Task Should_not_cleanup_reservation_if_no_reservation_token_hold()
         {
             await sut.CleanupRestoreErrorAsync(appId);
 
@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_map_contributor_id_when_assigned()
+        public async Task Should_map_contributor_id_if_assigned()
         {
             var context = CreateRestoreContext();
 
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_ignore_contributor_event_when_assigned_user_not_mapped()
+        public async Task Should_ignore_contributor_event_if_assigned_user_not_mapped()
         {
             var context = CreateRestoreContext();
 
@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_map_contributor_id_when_revoked()
+        public async Task Should_map_contributor_id_if_revoked()
         {
             var context = CreateRestoreContext();
 
@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_ignore_contributor_event_when_removed_user_not_mapped()
+        public async Task Should_ignore_contributor_event_if_removed_user_not_mapped()
         {
             var context = CreateRestoreContext();
 
@@ -227,7 +227,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_ignore_exception_when_app_image_to_backup_does_not_exist()
+        public async Task Should_ignore_exception_if_app_image_to_backup_does_not_exist()
         {
             var imageStream = new MemoryStream();
 
@@ -275,7 +275,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_ignore_exception_when_app_image_cannot_be_overriden()
+        public async Task Should_ignore_exception_if_app_image_cannot_be_overriden()
         {
             var imageStream = new MemoryStream();
 

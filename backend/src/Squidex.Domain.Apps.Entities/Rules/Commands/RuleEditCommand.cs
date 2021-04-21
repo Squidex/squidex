@@ -11,10 +11,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Commands
 {
     public abstract class RuleEditCommand : RuleCommand
     {
+        public string? Name { get; set; }
+
         public RuleTrigger Trigger { get; set; }
 
         public RuleAction Action { get; set; }
 
-        public string? Name { get; set; }
+        public bool? IsEnabled { get; set; }
     }
 }

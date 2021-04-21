@@ -33,7 +33,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         schemaGuard = new SchemaMustNotBeSingletonGuard(schemasState.object, router.object);
     });
 
-    it('should subscribe to schema and return true when not singleton', () => {
+    it('should subscribe to schema and return true if not singleton', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
@@ -50,7 +50,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
-    it('should redirect to content when singleton', () => {
+    it('should redirect to content if singleton', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
@@ -67,7 +67,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         router.verify(x => x.navigate([state.url, '123']), Times.once());
     });
 
-    it('should redirect to content when singleton on new page', () => {
+    it('should redirect to content if singleton on new page', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/new/' };
 
         schemasState.setup(x => x.selectedSchema)

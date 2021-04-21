@@ -48,7 +48,7 @@ describe('RolesState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should reset loading when loading failed', () => {
+        it('should reset loading state if loading failed', () => {
             rolesService.setup(x => x.getRoles(app))
                 .returns(() => throwError('error'));
 
@@ -57,7 +57,7 @@ describe('RolesState', () => {
             expect(rolesState.snapshot.isLoading).toBeFalsy();
         });
 
-        it('should show notification on load when reload is true', () => {
+        it('should show notification on load if reload is true', () => {
             rolesService.setup(x => x.getRoles(app))
                 .returns(() => of(versioned(version, oldRoles))).verifiable();
 
@@ -77,7 +77,7 @@ describe('RolesState', () => {
             rolesState.load().subscribe();
         });
 
-        it('should update roles when role added', () => {
+        it('should update roles if role added', () => {
             const updated = createRoles(4, 5);
 
             const request = { name: 'newRole' };
@@ -90,7 +90,7 @@ describe('RolesState', () => {
             expectNewRoles(updated);
         });
 
-        it('should update roles when role updated', () => {
+        it('should update roles if role updated', () => {
             const updated = createRoles(4, 5);
 
             const request = { permissions: ['P4', 'P5'], properties: {} };
@@ -103,7 +103,7 @@ describe('RolesState', () => {
             expectNewRoles(updated);
         });
 
-        it('should update roles when role deleted', () => {
+        it('should update roles if role deleted', () => {
             const updated = createRoles(4, 5);
 
             rolesService.setup(x => x.deleteRole(app, oldRoles.items[1], version))

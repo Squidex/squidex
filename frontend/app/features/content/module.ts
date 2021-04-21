@@ -9,7 +9,7 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule, UnsetContentGuard } from '@app/shared';
+import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 import { ArrayEditorComponent, ArrayItemComponent, ArraySectionComponent, AssetsEditorComponent, CommentsPageComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentListCellDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthPipe, ContentPageComponent, ContentReferencesComponent, ContentsColumnsPipe, ContentSectionComponent, ContentSelectorComponent, ContentSelectorItemComponent, ContentsFiltersPageComponent, ContentsPageComponent, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
 import { ContentExtensionComponent } from './shared/content-extension.component';
 import { IFrameEditorComponent } from './shared/forms/iframe-editor.component';
@@ -30,7 +30,7 @@ const routes: Routes = [
                     {
                         path: '',
                         component: ContentsPageComponent,
-                        canActivate: [SchemaMustNotBeSingletonGuard, UnsetContentGuard],
+                        canActivate: [SchemaMustNotBeSingletonGuard, ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard],
                         children: [
                             {
@@ -46,7 +46,7 @@ const routes: Routes = [
                     {
                         path: 'new',
                         component: ContentPageComponent,
-                        canActivate: [SchemaMustNotBeSingletonGuard, UnsetContentGuard],
+                        canActivate: [SchemaMustNotBeSingletonGuard, ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard]
                     },
                     {

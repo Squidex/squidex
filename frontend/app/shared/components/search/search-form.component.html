@@ -3,7 +3,7 @@
 </ng-container>
 
 <form [class]="formClass" (ngSubmit)="search()">
-    <input class="form-control form-control-expandable" #inputFind [ngModel]="query?.fullText" (ngModelChange)="changeQueryFullText($event)" [ngModelOptions]="standalone" [placeholder]="placeholder">
+    <input class="form-control form-control-expandable" #inputFind [ngModel]="query?.fullText" (ngModelChange)="changeQueryFullText($event)" [ngModelOptions]="{ standalone: true }" [placeholder]="placeholder">
 
     <div class="buttons">
         <ng-container *ngIf="queries">

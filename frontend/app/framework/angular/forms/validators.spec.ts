@@ -16,7 +16,7 @@ describe('ValidatorsEx.between', () => {
         expect(validator).toBe(Validators.nullValidator);
     });
 
-    it('should return null when value is equal to min and max', () => {
+    it('should return null if value is equal to min and max', () => {
         const input = new FormControl(3);
 
         const error = <any>ValidatorsEx.between(3, 3)(input);
@@ -24,7 +24,7 @@ describe('ValidatorsEx.between', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when value is valid', () => {
+    it('should return null if value is valid', () => {
         const input = new FormControl(4);
 
         const error = <any>ValidatorsEx.between(1, 5)(input);
@@ -32,7 +32,7 @@ describe('ValidatorsEx.between', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when value is null', () => {
+    it('should return null if value is null', () => {
         const input = new FormControl(null);
 
         const error = <any>ValidatorsEx.between(1, 5)(input);
@@ -40,7 +40,7 @@ describe('ValidatorsEx.between', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when value is undefined', () => {
+    it('should return null if value is undefined', () => {
         const input = new FormControl(undefined);
 
         const error = <any>ValidatorsEx.between(1, 5)(input);
@@ -88,7 +88,7 @@ describe('ValidatorsEx.betweenLength', () => {
         expect(validator).toBe(Validators.nullValidator);
     });
 
-    it('should return null when value is equal to min and max', () => {
+    it('should return null if value is equal to min and max', () => {
         const input = new FormControl('xxx');
 
         const error = <any>ValidatorsEx.betweenLength(3, 3)(input);
@@ -96,7 +96,7 @@ describe('ValidatorsEx.betweenLength', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when value is valid', () => {
+    it('should return null if value is valid', () => {
         const input = new FormControl('xxxx');
 
         const error = <any>ValidatorsEx.betweenLength(1, 5)(input);
@@ -104,7 +104,7 @@ describe('ValidatorsEx.betweenLength', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when value is null', () => {
+    it('should return null if value is null', () => {
         const input = new FormControl(null);
 
         const error = <any>ValidatorsEx.betweenLength(1, 5)(input);
@@ -112,7 +112,7 @@ describe('ValidatorsEx.betweenLength', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when value is undefined', () => {
+    it('should return null if value is undefined', () => {
         const input = new FormControl(undefined);
 
         const error = <any>ValidatorsEx.betweenLength(1, 5)(input);
@@ -294,7 +294,7 @@ describe('ValidatorsEx.pattern', () => {
         expect(validator).toBe(Validators.nullValidator);
     });
 
-    it('should return null when value is valid pattern', () => {
+    it('should return null if value is valid pattern', () => {
         const input = new FormControl('1234');
 
         const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
@@ -302,7 +302,7 @@ describe('ValidatorsEx.pattern', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when value is null string', () => {
+    it('should return null if value is null string', () => {
         const input = new FormControl(null);
 
         const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
@@ -310,7 +310,7 @@ describe('ValidatorsEx.pattern', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when value is empty string', () => {
+    it('should return null if value is empty string', () => {
         const input = new FormControl('');
 
         const error = ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
@@ -372,7 +372,7 @@ describe('ValidatorsEx.pattern', () => {
 });
 
 describe('ValidatorsEx.uniqueStrings', () => {
-    it('should return null when value is null', () => {
+    it('should return null if value is null', () => {
         const input = new FormControl(null);
 
         const error = ValidatorsEx.uniqueStrings()(input);
@@ -380,7 +380,7 @@ describe('ValidatorsEx.uniqueStrings', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when value is not a string array', () => {
+    it('should return null if value is not a string array', () => {
         const input = new FormControl([1, 2, 3]);
 
         const error = ValidatorsEx.uniqueStrings()(input);
@@ -388,7 +388,7 @@ describe('ValidatorsEx.uniqueStrings', () => {
         expect(error).toBeNull();
     });
 
-    it('should return null when values are unique', () => {
+    it('should return null if values are unique', () => {
         const input = new FormControl(['1', '2', '3']);
 
         const error = ValidatorsEx.uniqueStrings()(input);
@@ -396,7 +396,7 @@ describe('ValidatorsEx.uniqueStrings', () => {
         expect(error).toBeNull();
     });
 
-    it('should return error when values are not unique', () => {
+    it('should return error if values are not unique', () => {
         const input = new FormControl(['1', '2', '2', '3']);
 
         const error = ValidatorsEx.uniqueStrings()(input);

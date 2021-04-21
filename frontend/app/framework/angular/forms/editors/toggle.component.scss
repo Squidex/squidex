@@ -2,6 +2,10 @@ $toggle-width: 2.2rem;
 $toggle-height: 1.25rem;
 $toggle-button-size: $toggle-height - .25rem;
 
+:host {
+    display: inline-block;
+}
+
 .toggle {
     &-button {
         @include circle($toggle-button-size);
@@ -20,8 +24,9 @@ $toggle-button-size: $toggle-height - .25rem;
             @include box-shadow-outer;
             background: lighten($color-border, 6%);
             border: 0;
-            display: inline-block;
             height: $toggle-height;
+            margin: 0;
+            margin-bottom: -3px;
             position: relative;
             transition: background-color .3s ease;
             width: $toggle-width;

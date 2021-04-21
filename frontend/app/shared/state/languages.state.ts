@@ -199,7 +199,7 @@ export class LanguagesState extends State<Snapshot> {
                     .filter(l =>
                         language.iso2Code !== l.iso2Code &&
                         language.fallback.indexOf(l.iso2Code) < 0)
-                    .sortedByString(x => x.englishName)
+                    .sortByString(x => x.englishName)
         };
     }
 }

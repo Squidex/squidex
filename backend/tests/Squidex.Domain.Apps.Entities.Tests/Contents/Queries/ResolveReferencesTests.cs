@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_not_enrich_when_content_has_more_items()
+        public async Task Should_not_enrich_if_content_has_more_items()
         {
             var ref1_1 = CreateRefContent(DomainId.NewGuid(), 1, "ref1_1", 13, refSchemaId1);
             var ref1_2 = CreateRefContent(DomainId.NewGuid(), 2, "ref1_2", 17, refSchemaId1);

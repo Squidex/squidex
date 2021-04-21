@@ -185,7 +185,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task Should_throw_validation_exception_when_calling_reject()
+        public async Task Should_throw_validation_exception_if_calling_reject()
         {
             const string script = @"
                 reject()
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task Should_throw_validation_exception_when_calling_reject_with_message()
+        public async Task Should_throw_validation_exception_if_calling_reject_with_message()
         {
             const string script = @"
                 reject('Not valid')
@@ -223,7 +223,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_calling_reject()
+        public async Task Should_throw_security_exception_if_calling_reject()
         {
             const string script = @"
                 disallow()
@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_calling_reject_with_message()
+        public async Task Should_throw_security_exception_if_calling_reject_with_message()
         {
             const string script = @"
                 disallow('Operation not allowed')
@@ -261,7 +261,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_getJson_url_is_null()
+        public async Task Should_throw_exception_if_getJson_url_is_null()
         {
             const string script = @"
                 getJSON(null, function(result) {
@@ -275,7 +275,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_getJson_callback_is_null()
+        public async Task Should_throw_exception_if_getJson_callback_is_null()
         {
             const string script = @"
                 var url = 'http://squidex.io';

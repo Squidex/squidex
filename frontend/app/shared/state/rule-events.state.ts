@@ -97,7 +97,7 @@ export class RuleEventsState extends State<Snapshot> {
         return this.rulesService.cancelEvent(this.appsState.appName, event).pipe(
             tap(() => {
                 return this.next(s => {
-                    const ruleEvents = s.ruleEvents.replaceBy('id', setCancelled(event));
+                    const ruleEvents = s.ruleEvents.replacedBy('id', setCancelled(event));
 
                     return { ...s, ruleEvents, isLoaded: true };
                 }, 'Cancel');

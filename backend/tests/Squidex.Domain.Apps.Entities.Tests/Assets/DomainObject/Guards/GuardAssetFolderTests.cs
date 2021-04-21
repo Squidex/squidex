@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_when_folder_name_not_defined()
+        public async Task CanCreate_should_throw_exception_if_folder_name_not_defined()
         {
             var command = new CreateAssetFolder { AppId = appId };
 
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_when_folder_not_found()
+        public async Task CanCreate_should_throw_exception_if_folder_not_found()
         {
             var command = new CreateAssetFolder { AppId = appId, FolderName = "My Folder", ParentId = DomainId.NewGuid() };
 
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanCreate_should_not_throw_exception_when_folder_found()
+        public async Task CanCreate_should_not_throw_exception_if_folder_found()
         {
             var command = new CreateAssetFolder { AppId = appId, FolderName = "My Folder", ParentId = DomainId.NewGuid() };
 
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanCreate_should_not_throw_exception_when_added_to_root()
+        public async Task CanCreate_should_not_throw_exception_if_added_to_root()
         {
             var command = new CreateAssetFolder { AppId = appId, FolderName = "My Folder" };
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanMove_should_throw_exception_when_adding_to_its_own_child()
+        public async Task CanMove_should_throw_exception_if_adding_to_its_own_child()
         {
             var id = DomainId.NewGuid();
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanMove_should_throw_exception_when_folder_not_found()
+        public async Task CanMove_should_throw_exception_if_folder_not_found()
         {
             var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
 
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanMove_should_not_throw_exception_when_folder_found()
+        public async Task CanMove_should_not_throw_exception_if_folder_found()
         {
             var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanMove_should_not_throw_exception_when_folder_has_not_changed()
+        public async Task CanMove_should_not_throw_exception_if_folder_has_not_changed()
         {
             var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
 
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         }
 
         [Fact]
-        public async Task CanMove_should_not_throw_exception_when_added_to_root()
+        public async Task CanMove_should_not_throw_exception_if_added_to_root()
         {
             var command = new MoveAssetFolder { AppId = appId };
 

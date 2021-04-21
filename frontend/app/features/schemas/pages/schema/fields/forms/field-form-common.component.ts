@@ -15,8 +15,6 @@ import { FieldDto } from '@app/shared';
     templateUrl: './field-form-common.component.html'
 })
 export class FieldFormCommonComponent {
-    public readonly standalone = { standalone: true };
-
     @Input()
     public fieldForm: FormGroup;
 

@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_repair_when_stale()
+        public async Task Should_repair_if_stale()
         {
             A.CallTo(() => persistence.IsSnapshotStale)
                 .Returns(true);
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_not_repair_when_not_stale()
+        public async Task Should_not_repair_if_not_stale()
         {
             A.CallTo(() => persistence.IsSnapshotStale)
                 .Returns(false);
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_write_state_and_events_when_created()
+        public async Task Should_write_state_and_events_if_created()
         {
             SetupEmpty();
 
@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_recreate_with_create_command_when_deleted_before()
+        public async Task Should_recreate_with_create_command_if_deleted_before()
         {
             sut.Recreate = true;
 
@@ -110,7 +110,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_recreation_with_create_command_not_allowed()
+        public async Task Should_throw_exception_if_recreation_with_create_command_not_allowed()
         {
             sut.Recreate = false;
 
@@ -124,7 +124,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_recreate_with_upsert_command_when_deleted_before()
+        public async Task Should_recreate_with_upsert_command_if_deleted_before()
         {
             sut.Recreate = true;
 
@@ -149,7 +149,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_recreation_with_upsert_command_not_allowed()
+        public async Task Should_throw_exception_if_recreation_with_upsert_command_not_allowed()
         {
             sut.Recreate = false;
 
@@ -163,7 +163,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_write_state_and_events_when_updated_after_creation()
+        public async Task Should_write_state_and_events_if_updated_after_creation()
         {
             SetupEmpty();
 
@@ -186,7 +186,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_write_state_and_events_when_updated()
+        public async Task Should_write_state_and_events_if_updated()
         {
             SetupCreated(4);
 
@@ -246,7 +246,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_on_rebuild_when_no_event_found()
+        public async Task Should_throw_on_rebuild_if_no_event_found()
         {
             SetupEmpty();
 
@@ -265,7 +265,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_create_command_is_invoked_for_loaded_and_created_object()
+        public async Task Should_throw_exception_if_create_command_is_invoked_for_loaded_and_created_object()
         {
             await sut.ExecuteAsync(new CreateAuto());
 
@@ -273,7 +273,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_create_command_not_accepted()
+        public async Task Should_throw_exception_if_create_command_not_accepted()
         {
             SetupEmpty();
 
@@ -291,7 +291,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_update_command_invoked_for_empty_object()
+        public async Task Should_throw_exception_if_update_command_invoked_for_empty_object()
         {
             SetupEmpty();
 
@@ -299,7 +299,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_update_command_not_accepted()
+        public async Task Should_throw_exception_if_update_command_not_accepted()
         {
             SetupCreated(4);
 
@@ -317,7 +317,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_other_verison_expected()
+        public async Task Should_throw_exception_if_other_verison_expected()
         {
             SetupCreated(4);
 
@@ -325,7 +325,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_not_update_when_snapshot_is_not_changed()
+        public async Task Should_not_update_if_snapshot_is_not_changed()
         {
             SetupCreated(4);
 
@@ -339,7 +339,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_reset_state_when_writing_snapshot_for_create_failed()
+        public async Task Should_reset_state_if_writing_snapshot_for_create_failed()
         {
             SetupEmpty();
 
@@ -353,7 +353,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_reset_state_when_writing_snapshot_for_update_failed()
+        public async Task Should_reset_state_if_writing_snapshot_for_update_failed()
         {
             SetupCreated(4);
 
@@ -392,7 +392,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_get_old_versions_when_cached()
+        public async Task Should_get_old_versions_if_cached()
         {
             sut.VersionsToKeep = int.MaxValue;
 
@@ -415,7 +415,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_get_old_versions_from_query_when_not_cached()
+        public async Task Should_get_old_versions_from_query_if_not_cached()
         {
             sut.VersionsToKeep = 1;
 

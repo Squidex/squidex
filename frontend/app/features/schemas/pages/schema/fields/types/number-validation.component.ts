@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, Types } from '@app/shared';
 
@@ -14,7 +14,7 @@ import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, Types } 
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html'
 })
-export class NumberValidationComponent implements OnInit {
+export class NumberValidationComponent implements OnChanges {
     @Input()
     public fieldForm: FormGroup;
 
@@ -32,24 +32,30 @@ export class NumberValidationComponent implements OnInit {
 
     public showUnique: boolean;
 
-    public ngOnInit() {
-        this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
-
-        if (this.showUnique) {
-            this.fieldForm.setControl('isUnique',
-                new FormControl(this.properties.isUnique));
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['field']) {
+            this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
         }
 
-        this.fieldForm.setControl('maxValue',
-            new FormControl(this.properties.maxValue));
+        if (changes['fieldForm']) {
+            if (this.showUnique) {
+                this.fieldForm.setControl('isUnique',
+                    new FormControl());
+            }
 
-        this.fieldForm.setControl('minValue',
-            new FormControl(this.properties.minValue));
+            this.fieldForm.setControl('maxValue',
+                new FormControl());
 
-        this.fieldForm.setControl('defaultValue',
-            new FormControl(this.properties.defaultValue));
+            this.fieldForm.setControl('minValue',
+                new FormControl());
 
-        this.fieldForm.setControl('defaultValues',
-            new FormControl(this.properties.defaultValues));
+            this.fieldForm.setControl('defaultValue',
+                new FormControl());
+
+            this.fieldForm.setControl('defaultValues',
+                new FormControl());
+        }
+
+        this.fieldForm.patchValue(this.field.properties);
     }
 }

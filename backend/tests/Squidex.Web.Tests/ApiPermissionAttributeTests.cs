@@ -95,7 +95,7 @@ namespace Squidex.Web
         }
 
         [Fact]
-        public async Task Should_return_forbidden_when_user_has_wrong_permission()
+        public async Task Should_return_forbidden_if_user_has_wrong_permission()
         {
             actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(NamedId.Of(DomainId.NewGuid(), "my-app")));
 
@@ -112,7 +112,7 @@ namespace Squidex.Web
         }
 
         [Fact]
-        public async Task Should_return_forbidden_when_route_data_has_no_value()
+        public async Task Should_return_forbidden_if_route_data_has_no_value()
         {
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
@@ -127,7 +127,7 @@ namespace Squidex.Web
         }
 
         [Fact]
-        public async Task Should_return_forbidden_when_user_has_no_permission()
+        public async Task Should_return_forbidden_if_user_has_no_permission()
         {
             SetContext();
 

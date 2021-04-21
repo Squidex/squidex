@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, TagsFieldPropertiesDto } from '@app/shared';
 
@@ -14,7 +14,7 @@ import { FieldDto, LanguageDto, TagsFieldPropertiesDto } from '@app/shared';
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html'
 })
-export class TagsValidationComponent implements OnInit {
+export class TagsValidationComponent implements OnChanges {
     @Input()
     public fieldForm: FormGroup;
 
@@ -30,17 +30,21 @@ export class TagsValidationComponent implements OnInit {
     @Input()
     public isLocalizable?: boolean | null;
 
-    public ngOnInit() {
-        this.fieldForm.setControl('maxItems',
-            new FormControl(this.properties.maxItems));
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['fieldForm']) {
+            this.fieldForm.setControl('maxItems',
+                new FormControl());
 
-        this.fieldForm.setControl('minItems',
-            new FormControl(this.properties.minItems));
+            this.fieldForm.setControl('minItems',
+                new FormControl());
 
-        this.fieldForm.setControl('defaultValue',
-            new FormControl(this.properties.defaultValue));
+            this.fieldForm.setControl('defaultValue',
+                new FormControl());
 
-        this.fieldForm.setControl('defaultValues',
-            new FormControl(this.properties.defaultValues));
+            this.fieldForm.setControl('defaultValues',
+                new FormControl());
+        }
+
+        this.fieldForm.patchValue(this.field.properties);
     }
 }

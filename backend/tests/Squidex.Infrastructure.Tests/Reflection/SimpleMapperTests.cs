@@ -115,7 +115,7 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         [Fact]
-        public void Should_map_when_convertible_is_null()
+        public void Should_map_if_convertible_is_null()
         {
             var obj1 = new Class1<int?, int?>
             {

@@ -102,7 +102,7 @@ export class SchemasState extends State<Snapshot> {
         return this.schemasService.getSchema(this.appName, idOrName).pipe(
             tap(schema => {
                 this.next(s => {
-                    const schemas = s.schemas.replaceBy('id', schema);
+                    const schemas = s.schemas.replacedBy('id', schema);
 
                     return { ...s, schemas };
                 }, 'Loading Schema Done');
@@ -150,7 +150,7 @@ export class SchemasState extends State<Snapshot> {
         return this.schemasService.postSchema(this.appName, request).pipe(
             tap(created => {
                 this.next(s => {
-                    const schemas = [...s.schemas, created].sortedByString(x => x.displayName);
+                    const schemas = [...s.schemas, created].sortByString(x => x.displayName);
 
                     return { ...s, schemas };
                 }, 'Created');
@@ -342,7 +342,7 @@ export class SchemasState extends State<Snapshot> {
             }
 
             this.next(s => {
-                const schemas = s.schemas.replaceBy('id', schema).sortedByString(x => x.displayName);
+                const schemas = s.schemas.replacedBy('id', schema).sortedByString(x => x.displayName);
 
                 const selectedSchema =
                     Types.is(schema, SchemaDetailsDto) &&

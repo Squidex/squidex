@@ -39,8 +39,6 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RoleComponent implements OnChanges {
-    public readonly standalone = { standalone: true };
-
     @Input()
     public role: RoleDto;
 

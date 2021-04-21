@@ -83,7 +83,7 @@ export class AppsState extends State<Snapshot> {
 
         return this.appsService.getApp(name).pipe(
             tap(app => {
-                this.replaceApp(app, app);
+                this.replaceApp(app);
             }),
             catchError(() => of(null)));
     }
@@ -91,7 +91,15 @@ export class AppsState extends State<Snapshot> {
     public load(): Observable<any> {
         return this.appsService.getApps().pipe(
             tap(apps => {
-                this.next({ apps }, 'Loaded');
+                this.next(s => {
+                    let selectedApp = s.selectedApp;
+
+                    if (selectedApp) {
+                        selectedApp = apps.find(x => x.id === selectedApp!.id) || selectedApp;
+                    }
+
+                    return { ...s, apps, selectedApp };
+                }, 'Loading Success');
             }),
             shareSubscribed(this.dialogs));
     }
@@ -112,7 +120,7 @@ export class AppsState extends State<Snapshot> {
         return this.appsService.postApp(request).pipe(
             tap(created => {
                 this.next(s => {
-                    const apps = [...s.apps, created].sortedByString(x => x.displayName);
+                    const apps = [...s.apps, created].sortByString(x => x.displayName);
 
                     return { ...s, apps };
                 }, 'Created');
@@ -123,7 +131,7 @@ export class AppsState extends State<Snapshot> {
     public update(app: AppDto, request: UpdateAppDto): Observable<AppDto> {
         return this.appsService.putApp(app, request, app.version).pipe(
             tap(updated => {
-                this.replaceApp(updated, app);
+                this.replaceApp(updated);
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -139,7 +147,7 @@ export class AppsState extends State<Snapshot> {
     public removeImage(app: AppDto): Observable<AppDto> {
         return this.appsService.deleteAppImage(app, app.version).pipe(
             tap(updated => {
-                this.replaceApp(updated, app);
+                this.replaceApp(updated);
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
@@ -148,7 +156,7 @@ export class AppsState extends State<Snapshot> {
         return this.appsService.postAppImage(app, file, app.version).pipe(
             tap(updated => {
                 if (Types.is(updated, AppDto)) {
-                    this.replaceApp(updated, app);
+                    this.replaceApp(updated);
                 }
             }),
             shareSubscribed(this.dialogs));
@@ -187,24 +195,22 @@ export class AppsState extends State<Snapshot> {
             const apps = s.apps.filter(x => x.name !== app.name);
 
             const selectedApp =
-                s.selectedApp &&
-                s.selectedApp.id === app.id ?
-                null :
-                s.selectedApp;
+                s.selectedApp?.id !== app.id ?
+                s.selectedApp :
+                null;
 
             return { ...s, apps, selectedApp };
         }, 'Deleted');
     }
 
-    private replaceApp(updated: AppDto, app: AppDto) {
+    private replaceApp(app: AppDto) {
         this.next(s => {
-            const apps = s.apps.replaceBy('id', updated);
+            const apps = s.apps.replacedBy('id', app);
 
             const selectedApp =
-                s.selectedApp &&
-                s.selectedApp.id === app.id ?
-                updated :
-                s.selectedApp;
+                s.selectedApp?.id !== app.id ?
+                s.selectedApp :
+                app;
 
             return { ...s, apps, selectedApp };
         }, 'Updated');

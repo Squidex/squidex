@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         }
 
         [Fact]
-        public async Task Should_do_nothing_when_changing_plan()
+        public async Task Should_do_nothing_if_changing_plan()
         {
             await sut.ChangePlanAsync(null!, null!, null, null);
         }

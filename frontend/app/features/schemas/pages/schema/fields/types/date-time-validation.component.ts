@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto, ValidatorsEx } from '@app/shared';
 import { Observable } from 'rxjs';
@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html'
 })
-export class DateTimeValidationComponent implements OnInit {
+export class DateTimeValidationComponent implements OnChanges {
     @Input()
     public fieldForm: FormGroup;
 
@@ -36,30 +36,30 @@ export class DateTimeValidationComponent implements OnInit {
 
     public calculatedDefaultValues: ReadonlyArray<string> = ['Now', 'Today'];
 
-    public ngOnInit() {
-        this.fieldForm.setControl('calculatedDefaultValue',
-            new FormControl(this.properties.calculatedDefaultValue));
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['fieldForm']) {
+            this.fieldForm.setControl('calculatedDefaultValue',
+                new FormControl());
 
-        this.fieldForm.setControl('maxValue',
-            new FormControl(this.properties.maxValue, [
-                ValidatorsEx.validDateTime()
-            ]));
+            this.fieldForm.setControl('maxValue',
+                new FormControl(undefined, ValidatorsEx.validDateTime()));
 
-        this.fieldForm.setControl('minValue',
-            new FormControl(this.properties.minValue, [
-                ValidatorsEx.validDateTime()
-            ]));
+            this.fieldForm.setControl('minValue',
+                new FormControl(undefined, ValidatorsEx.validDateTime()));
 
-        this.fieldForm.setControl('defaultValue',
-            new FormControl(this.properties.defaultValue));
+            this.fieldForm.setControl('defaultValue',
+                new FormControl());
 
-        this.fieldForm.setControl('defaultValues',
-            new FormControl(this.properties.defaultValues));
+            this.fieldForm.setControl('defaultValues',
+                new FormControl());
 
-        this.showDefaultValues =
-            hasNoValue$(this.fieldForm.controls['isRequired']);
+            this.showDefaultValues =
+                hasNoValue$(this.fieldForm.controls['isRequired']);
 
-        this.showDefaultValue =
-            hasNoValue$(this.fieldForm.controls['calculatedDefaultValue']);
+            this.showDefaultValue =
+                hasNoValue$(this.fieldForm.controls['calculatedDefaultValue']);
+        }
+
+        this.fieldForm.patchValue(this.properties);
     }
 }

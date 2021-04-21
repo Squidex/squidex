@@ -17,7 +17,6 @@ import { Observable } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchFormComponent implements OnChanges {
-    public readonly standalone = { standalone: true };
     private previousQuery?: Query | null;
 
     @Output()

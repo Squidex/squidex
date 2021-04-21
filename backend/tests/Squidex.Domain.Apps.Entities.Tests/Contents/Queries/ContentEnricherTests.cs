@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_clone_data_when_requested()
+        public async Task Should_clone_data_if_requested()
         {
             var source = CreateContent(new ContentData());
 
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_not_clone_data_when_not_requested()
+        public async Task Should_not_clone_data_if_not_requested()
         {
             var source = CreateContent(new ContentData());
 

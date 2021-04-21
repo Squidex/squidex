@@ -6,7 +6,6 @@
  */
 
 export * from './administration-area.component';
-export * from './guards/unset-user.guard';
 export * from './guards/user-must-exist.guard';
 export * from './internal';
 export * from './pages/cluster/cluster-page.component';

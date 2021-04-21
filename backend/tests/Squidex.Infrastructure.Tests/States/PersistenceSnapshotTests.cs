@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_not_read_from_store_when_not_valid()
+        public async Task Should_not_read_from_store_if_not_valid()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((20, false, 10));
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_return_empty_version_when_version_negative()
+        public async Task Should_return_empty_version_if_version_negative()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((20, true, -10));
@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_set_to_empty_when_store_returns_not_found()
+        public async Task Should_set_to_empty_if_store_returns_not_found()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((20, true, EtagVersion.Empty));
@@ -142,7 +142,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_not_wrap_exception_when_writing_to_store_with_previous_version()
+        public async Task Should_not_wrap_exception_if_writing_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((20, true, 10));
@@ -159,7 +159,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_delete_snapshot_but_not_events_when_deleted()
+        public async Task Should_delete_snapshot_but_not_events_if_deleted()
         {
             var persistedState = Save.Snapshot(0);
             var persistence = sut.WithSnapshots(None.Type, key, persistedState.Write);

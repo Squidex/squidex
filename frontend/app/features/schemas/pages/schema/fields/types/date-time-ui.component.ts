@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DateTimeFieldPropertiesDto, DATETIME_FIELD_EDITORS, FieldDto, FloatConverter } from '@app/shared';
 import { Observable } from 'rxjs';
@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
     styleUrls: ['date-time-ui.component.scss'],
     templateUrl: 'date-time-ui.component.html'
 })
-export class DateTimeUIComponent implements OnInit {
+export class DateTimeUIComponent implements OnChanges {
     public readonly converter = FloatConverter.INSTANCE;
 
     @Input()
@@ -31,10 +31,12 @@ export class DateTimeUIComponent implements OnInit {
 
     public hideAllowedValues: Observable<boolean>;
 
-    public ngOnInit() {
-        this.fieldForm.setControl('editor',
-            new FormControl(this.properties.editor, [
-                Validators.required
-            ]));
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['fieldForm']) {
+            this.fieldForm.setControl('editor',
+                new FormControl(undefined, Validators.required));
+        }
+
+        this.fieldForm.patchValue(this.properties);
     }
 }

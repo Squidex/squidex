@@ -187,7 +187,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
-        public void Should_remove_fallbacks_when_removing_language()
+        public void Should_remove_fallbacks_if_removing_language()
         {
             var config_1 = config_0.Set(Language.DE);
             var config_2 = config_1.Set(Language.IT, true, Language.UK);

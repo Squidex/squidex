@@ -271,7 +271,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public async Task Should_return_json_string_when_array()
+        public async Task Should_return_json_string_if_array()
         {
             var @event = new EnrichedContentEvent
             {

@@ -33,7 +33,7 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_do_nothing_when_context_is_null()
+        public async Task Should_do_nothing_if_context_is_null()
         {
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(null!);

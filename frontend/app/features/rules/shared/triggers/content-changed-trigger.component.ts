@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+// tslint:disable: readonly-array
+
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { SchemaDto, Types } from '@app/shared';
+import { SchemaDto } from '@app/shared';
 
 export interface TriggerSchemaForm {
     schema: SchemaDto;
@@ -20,9 +22,9 @@ export interface TriggerSchemaForm {
     styleUrls: ['./content-changed-trigger.component.scss'],
     templateUrl: './content-changed-trigger.component.html'
 })
-export class ContentChangedTriggerComponent implements OnInit {
+export class ContentChangedTriggerComponent implements OnChanges {
     @Input()
-    public schemas: ReadonlyArray<SchemaDto>;
+    public schemas?: ReadonlyArray<SchemaDto> | null;
 
     @Input()
     public trigger: any;
@@ -30,7 +32,7 @@ export class ContentChangedTriggerComponent implements OnInit {
     @Input()
     public triggerForm: FormGroup;
 
-    public triggerSchemas: ReadonlyArray<TriggerSchemaForm>;
+    public triggerSchemas: TriggerSchemaForm[] = [];
 
     public schemaToAdd: SchemaDto;
     public schemasToAdd: ReadonlyArray<SchemaDto>;
@@ -39,16 +41,20 @@ export class ContentChangedTriggerComponent implements OnInit {
         return !!this.schemaToAdd;
     }
 
-    public ngOnInit() {
-        this.triggerForm.setControl('schemas',
-            new FormControl(this.trigger.schemas || []));
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['triggerForm']) {
+            this.triggerForm.setControl('schemas',
+                new FormControl([]));
 
-        this.triggerForm.setControl('handleAll',
-            new FormControl(Types.isBoolean(this.trigger.handleAll) ? this.trigger.handleAll : false));
+            this.triggerForm.setControl('handleAll',
+                new FormControl());
+        }
+
+        this.triggerForm.patchValue(this.trigger);
 
         const schemas: TriggerSchemaForm[] = [];
 
-        if (this.trigger.schemas) {
+        if (this.trigger.schemas && this.schemas) {
             for (const triggerSchema of this.trigger.schemas) {
                 const schema = this.schemas.find(s => s.id === triggerSchema.schemaId);
 
@@ -60,20 +66,22 @@ export class ContentChangedTriggerComponent implements OnInit {
             }
         }
 
-        this.triggerSchemas = schemas.sortedByString(s => s.schema.name);
+        this.triggerSchemas = schemas;
+        this.triggerSchemas.sortByString(x => x.schema.name);
 
         this.updateSchemaToAdd();
     }
 
     public removeSchema(schemaForm: TriggerSchemaForm) {
-        this.triggerSchemas = this.triggerSchemas.removed(schemaForm);
+        this.triggerSchemas.remove(schemaForm);
 
         this.updateValue();
         this.updateSchemaToAdd();
     }
 
     public addSchema() {
-        this.triggerSchemas = [{ schema: this.schemaToAdd }, ...this.triggerSchemas].sortedByString(x => x.schema.name);
+        this.triggerSchemas.push({ schema: this.schemaToAdd });
+        this.triggerSchemas.sortByString(x => x.schema.name);
 
         this.updateValue();
         this.updateSchemaToAdd();
@@ -92,7 +100,7 @@ export class ContentChangedTriggerComponent implements OnInit {
     }
 
     private updateSchemaToAdd() {
-        this.schemasToAdd = this.schemas.filter(schema => !this.triggerSchemas.find(s => s.schema.id === schema.id)).sortedByString(x => x.name);
+        this.schemasToAdd = this.schemas?.filter(schema => !this.triggerSchemas.find(s => s.schema.id === schema.id)).sortByString(x => x.name) || [];
         this.schemaToAdd = this.schemasToAdd[0];
     }
 

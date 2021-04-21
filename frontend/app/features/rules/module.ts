@@ -9,13 +9,31 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HelpComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AssetChangedTriggerComponent, CommentTriggerComponent, ContentChangedTriggerComponent, GenericActionComponent, RuleComponent, RuleElementComponent, RuleEventBadgeClassPipe, RuleEventsPageComponent, RuleIconComponent, RulesPageComponent, RuleWizardComponent, SchemaChangedTriggerComponent, UsageTriggerComponent } from './declarations';
+import { HelpComponent, RuleMustExistGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
+import { AssetChangedTriggerComponent, CommentTriggerComponent, ContentChangedTriggerComponent, GenericActionComponent, RuleComponent, RuleElementComponent, RuleEventBadgeClassPipe, RuleEventsPageComponent, RuleIconComponent, RulesPageComponent, SchemaChangedTriggerComponent, UsageTriggerComponent } from './declarations';
+import { RulePageComponent } from './pages/rule/rule-page.component';
 
 const routes: Routes = [
     {
         path: '',
         component: RulesPageComponent,
+        children: [
+            {
+                path: 'events',
+                component: RuleEventsPageComponent
+            },
+            {
+                path: 'help',
+                component: HelpComponent,
+                data: {
+                    helpPage: '05-integrated/rules'
+                }
+            }
+        ]
+    }, {
+        path: ':ruleId',
+        component: RulePageComponent,
+        canActivate: [RuleMustExistGuard],
         children: [
             {
                 path: 'events',
@@ -48,8 +66,8 @@ const routes: Routes = [
         RuleEventBadgeClassPipe,
         RuleEventsPageComponent,
         RuleIconComponent,
+        RulePageComponent,
         RulesPageComponent,
-        RuleWizardComponent,
         SchemaChangedTriggerComponent,
         UsageTriggerComponent
     ]

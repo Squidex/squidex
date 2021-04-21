@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         [Theory]
         [MemberData(nameof(EventData))]
-        public async Task Should_increase_usage_when_asset_created(AssetEvent @event, long sizeDiff, long countDiff)
+        public async Task Should_increase_usage_if_asset_created(AssetEvent @event, long sizeDiff, long countDiff)
         {
             var date = DateTime.UtcNow.Date.AddDays(13);
 

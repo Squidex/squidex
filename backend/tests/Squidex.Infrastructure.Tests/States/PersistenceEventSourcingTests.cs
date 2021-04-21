@@ -106,7 +106,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_mark_as_stale_when_snapshot_old_than_events()
+        public async Task Should_mark_as_stale_if_snapshot_old_than_events()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns(("2", true, 1L));
@@ -264,7 +264,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_write_snapshot_to_store_when_not_read_before()
+        public async Task Should_write_snapshot_to_store_if_not_read_before()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((null!, true, EtagVersion.Empty));
@@ -290,7 +290,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_not_write_snapshot_to_store_when_not_changed()
+        public async Task Should_not_write_snapshot_to_store_if_not_changed()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns(("0", true, 2));
@@ -310,7 +310,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_wrap_exception_when_writing_to_store_with_previous_version()
+        public async Task Should_wrap_exception_if_writing_to_store_with_previous_version()
         {
             SetupEventStore(3);
 
@@ -326,7 +326,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_delete_events_but_not_snapshot_when_deleted_snapshot_only()
+        public async Task Should_delete_events_but_not_snapshot_if_deleted_snapshot_only()
         {
             var persistence = sut.WithEventSourcing(None.Type, key, null);
 
@@ -340,7 +340,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_delete_events_and_snapshot_when_deleted()
+        public async Task Should_delete_events_and_snapshot_if_deleted()
         {
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, null, null);
 

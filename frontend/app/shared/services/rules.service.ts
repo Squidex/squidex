@@ -196,7 +196,7 @@ export type ActionsDto =
     Readonly<{ [name: string]: RuleElementDto }>;
 
 export type UpsertRuleDto =
-    Readonly<{ trigger?: RuleTrigger; action?: RuleAction; name?: string; }>;
+    Readonly<{ trigger?: RuleTrigger; action?: RuleAction; name?: string; isEnabled?: boolean; }>;
 
 export type RuleAction =
     Readonly<{ actionType: string } & any>;
@@ -289,36 +289,6 @@ export class RulesService {
                 this.analytics.trackEvent('Rule', 'Updated', appName);
             }),
             pretifyError('i18n:rules.updateFailed'));
-    }
-
-    public enableRule(appName: string, resource: Resource, version: Version): Observable<RuleDto> {
-        const link = resource._links['enable'];
-
-        const url = this.apiUrl.buildUrl(link.href);
-
-        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ payload }) => {
-                return parseRule(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'Enabled', appName);
-            }),
-            pretifyError('i18n:rules.enableFailed'));
-    }
-
-    public disableRule(appName: string, resource: Resource, version: Version): Observable<RuleDto> {
-        const link = resource._links['disable'];
-
-        const url = this.apiUrl.buildUrl(link.href);
-
-        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ payload }) => {
-                return parseRule(payload.body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Rule', 'Disabled', appName);
-            }),
-            pretifyError('i18n:rules.disableFailed'));
     }
 
     public deleteRule(appName: string, resource: Resource, version: Version): Observable<any> {

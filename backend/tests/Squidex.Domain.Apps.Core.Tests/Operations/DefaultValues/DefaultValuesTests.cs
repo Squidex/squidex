@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_not_enrich_with_default_values_when_string_is_empty()
+        public void Should_not_enrich_with_default_values_if_string_is_empty()
         {
             var data =
                 new ContentData()
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_assets_field_when_set()
+        public void Should_get_default_value_from_assets_field_if_set()
         {
             var field =
                 Fields.Assets(1, "1", Partitioning.Invariant,
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_assets_field_when_localized()
+        public void Should_get_default_value_from_assets_field_if_localized()
         {
             var field =
                 Fields.Assets(1, "1", Partitioning.Invariant,
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_boolean_field_when_localized()
+        public void Should_get_default_value_from_boolean_field_if_localized()
         {
             var field =
                 Fields.Boolean(1, "1", Partitioning.Invariant,
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_datetime_field_when_set_to_today()
+        public void Should_get_default_value_from_datetime_field_if_set_to_today()
         {
             var field =
                 Fields.DateTime(1, "1", Partitioning.Invariant,
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_datetime_field_when_set_to_now()
+        public void Should_get_default_value_from_datetime_field_if_set_to_now()
         {
             var field =
                 Fields.DateTime(1, "1", Partitioning.Invariant,
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_datetime_field_when_localized()
+        public void Should_get_default_value_from_datetime_field_if_localized()
         {
             var field =
                 Fields.DateTime(1, "1", Partitioning.Invariant,
@@ -221,7 +221,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_number_field_when_localized()
+        public void Should_get_default_value_from_number_field_if_localized()
         {
             var field =
                 Fields.Number(1, "1", Partitioning.Invariant,
@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_references_field_when_set()
+        public void Should_get_default_value_from_references_field_if_set()
         {
             var field =
                 Fields.References(1, "1", Partitioning.Invariant,
@@ -258,7 +258,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_references_field_when_localized()
+        public void Should_get_default_value_from_references_field_if_localized()
         {
             var field =
                 Fields.References(1, "1", Partitioning.Invariant,
@@ -285,7 +285,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_string_field_when_localized()
+        public void Should_get_default_value_from_string_field_if_localized()
         {
             var field =
                 Fields.String(1, "1", Partitioning.Invariant,
@@ -312,7 +312,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_tags_field_when_localized()
+        public void Should_get_default_value_from_tags_field_if_localized()
         {
             var field =
                 Fields.Tags(1, "1", Partitioning.Invariant,

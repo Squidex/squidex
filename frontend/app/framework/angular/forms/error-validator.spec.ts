@@ -24,7 +24,7 @@ describe('ErrorValidator', () => {
         control.reset([]);
     });
 
-    it('should return no message when error is null', () => {
+    it('should return no message if error is null', () => {
         validator.setError(null);
 
         const error = validator.validator(control);
@@ -32,7 +32,7 @@ describe('ErrorValidator', () => {
         expect(error).toBeNull();
     });
 
-    it('should return no message when error does not match', () => {
+    it('should return no message if error does not match', () => {
         validator.setError(new ErrorDto(500, 'Error', null, [
             'nested1Property: My Error.'
         ]));

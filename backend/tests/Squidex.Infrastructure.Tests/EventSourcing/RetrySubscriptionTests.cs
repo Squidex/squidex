@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
-        public async Task Should_reopen_subscription_once_when_exception_is_retrieved()
+        public async Task Should_reopen_subscription_once_if_exception_is_retrieved()
         {
             await OnErrorAsync(eventSubscription, new InvalidOperationException());
 
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
-        public async Task Should_forward_error_from_inner_subscription_when_failed_often()
+        public async Task Should_forward_error_from_inner_subscription_if_failed_often()
         {
             var ex = new InvalidOperationException();
 
@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
-        public async Task Should_not_forward_error_when_exception_is_raised_after_unsubscribe()
+        public async Task Should_not_forward_error_if_exception_is_raised_after_unsubscribe()
         {
             var ex = new InvalidOperationException();
 
@@ -134,7 +134,7 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
-        public async Task Should_forward_event_when_message_is_from_another_subscription()
+        public async Task Should_forward_event_if_message_is_from_another_subscription()
         {
             var ev = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 

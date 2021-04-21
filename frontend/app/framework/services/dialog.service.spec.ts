@@ -96,7 +96,7 @@ describe('DialogService', () => {
         { confirmed: true,  saved: 1 },
         { confirmed: false, saved: 0 }
     ].map(({ confirmed, saved }) => {
-        it(`should confirm dialog with '${confirmed}' and remember when remembered and confirmed`, () => {
+        it(`should confirm dialog with '${confirmed}' and remember if remembered and confirmed`, () => {
             const dialogService = new DialogService(localStore.object);
 
             let isCompleted = false;
@@ -127,7 +127,7 @@ describe('DialogService', () => {
         { confirmed: true,  saved: true,  render: 0 },
         { confirmed: false, saved: false, render: 1 }
     ].map(({ confirmed, saved, render }) => {
-        it(`should confirm dialog with '${confirmed}' from local store when saved`, () => {
+        it(`should confirm dialog with '${confirmed}' from local store if saved`, () => {
             const dialogService = new DialogService(localStore.object);
 
             localStore.setup(x => x.getBoolean(`dialogs.confirm.MyKey`))

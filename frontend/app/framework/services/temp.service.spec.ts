@@ -14,7 +14,7 @@ describe('TempService', () => {
         expect(tempService).toBeDefined();
     });
 
-    it('should return null when nothing is stored', () => {
+    it('should return null if nothing is stored', () => {
         const tempService = new TempService();
 
         const temp = tempService.fetch();
@@ -22,7 +22,7 @@ describe('TempService', () => {
         expect(temp).toBeNull();
     });
 
-    it('should return value once when something is stored', () => {
+    it('should return value once if something is stored', () => {
         const tempService = new TempService();
 
         tempService.put('Hello');

@@ -71,7 +71,7 @@ describe('CommentsState', () => {
             commentsState.load().subscribe();
         });
 
-        it('should add comment to snapshot when created', () => {
+        it('should add comment to snapshot if created', () => {
             const newComment = new CommentDto('3', modified, 'text3', undefined, creator);
 
             const request = { text: 'text3', url: 'url3' };
@@ -88,7 +88,7 @@ describe('CommentsState', () => {
             ]);
         });
 
-        it('should update properties when updated', () => {
+        it('should update properties if updated', () => {
             const request = { text: 'text2_2' };
 
             commentsService.setup(x => x.putComment(commentsUrl, '2', request))
@@ -102,7 +102,7 @@ describe('CommentsState', () => {
             ]);
         });
 
-        it('should remove comment from snapshot when deleted', () => {
+        it('should remove comment from snapshot if deleted', () => {
             commentsService.setup(x => x.deleteComment(commentsUrl, '2'))
                 .returns(() => of({})).verifiable();
 

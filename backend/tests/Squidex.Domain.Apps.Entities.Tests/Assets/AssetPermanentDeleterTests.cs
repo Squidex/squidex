@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_not_delete_assets_when_event_restored()
+        public async Task Should_not_delete_assets_if_event_restored()
         {
             var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
 

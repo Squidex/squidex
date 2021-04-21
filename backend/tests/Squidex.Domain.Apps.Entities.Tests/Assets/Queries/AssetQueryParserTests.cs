@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_skip_total_when_set_in_context()
+        public async Task Should_skip_total_if_set_in_context()
         {
             var q = await sut.ParseAsync(requestContext.Clone(b => b.WithoutTotal()), Q.Empty);
 
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_not_fail_when_tags_not_found()
+        public async Task Should_not_fail_if_tags_not_found()
         {
             A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
                 .Returns(new Dictionary<string, string>());

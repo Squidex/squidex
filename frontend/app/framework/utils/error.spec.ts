@@ -26,7 +26,7 @@ describe('ErrorDto', () => {
         expect(error.errorCode).toBe('ERROR_CODE_XYZ');
     });
 
-    it('should create simple message when no details are specified.', () => {
+    it('should create simple message if no details are specified.', () => {
         const error = new ErrorDto(500, 'i18n:error.');
 
         const result = error.translate(localizer.object);
@@ -50,7 +50,7 @@ describe('ErrorDto', () => {
         expect(result).toBe('error.\n\n * detail.\n');
     });
 
-    it('should ccreate html list when detail has one item', () => {
+    it('should ccreate html list if detail has one item', () => {
         const error = new ErrorDto(500, 'i18n:error.', null, ['i18n:detail.']);
 
         const result = error.translate(localizer.object);
@@ -58,7 +58,7 @@ describe('ErrorDto', () => {
         expect(result).toBe('error.\n\n * detail.\n');
     });
 
-    it('should create html list when error has more items.', () => {
+    it('should create html list if error has more items.', () => {
         const error = new ErrorDto(500, 'i18n:error.', null, ['i18n:detail1.', 'i18n:detail2.']);
 
         const result = error.translate(localizer.object);

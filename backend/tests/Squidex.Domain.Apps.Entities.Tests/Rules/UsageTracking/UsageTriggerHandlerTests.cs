@@ -24,13 +24,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         private readonly IRuleTriggerHandler sut = new UsageTriggerHandler();
 
         [Fact]
-        public void Should_return_false_when_asking_for_snapshot_support()
+        public void Should_return_false_if_asking_for_snapshot_support()
         {
             Assert.False(sut.CanCreateSnapshotEvents);
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_event_type_not_correct()
+        public void Should_not_trigger_precheck_if_event_type_not_correct()
         {
             var result = sut.Trigger(new ContentCreated(), new UsageTrigger(), ruleId);
 
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_rule_id_not_matchs()
+        public void Should_not_trigger_precheck_if_rule_id_not_matchs()
         {
             var result = sut.Trigger(new AppUsageExceeded { RuleId = DomainId.NewGuid() }, new UsageTrigger(), ruleId);
 
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         }
 
         [Fact]
-        public void Should_trigger_precheck_when_event_type_correct_and_rule_id_matchs()
+        public void Should_trigger_precheck_if_event_type_correct_and_rule_id_matchs()
         {
             var result = sut.Trigger(new AppUsageExceeded { RuleId = ruleId }, new UsageTrigger(), ruleId);
 
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_event_type_not_correct()
+        public void Should_not_trigger_check_if_event_type_not_correct()
         {
             var result = sut.Trigger(new EnrichedContentEvent(), new UsageTrigger());
 

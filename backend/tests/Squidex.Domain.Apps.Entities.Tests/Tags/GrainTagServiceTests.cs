@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_call_grain_when_clearing()
+        public async Task Should_call_grain_if_clearing()
         {
             await sut.ClearAsync(appId, TagGroups.Assets);
 
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_call_grain_when_rebuilding()
+        public async Task Should_call_grain_if_rebuilding()
         {
             var tags = new TagsExport();
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_call_grain_when_retrieving_raw_tags()
+        public async Task Should_call_grain_if_retrieving_raw_tags()
         {
             await sut.GetExportableTagsAsync(appId, TagGroups.Assets);
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_call_grain_when_retrieving_tags()
+        public async Task Should_call_grain_if_retrieving_tags()
         {
             await sut.GetTagsAsync(appId, TagGroups.Assets);
 
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_call_grain_when_resolving_tag_ids()
+        public async Task Should_call_grain_if_resolving_tag_ids()
         {
             var tagNames = new HashSet<string>();
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_call_grain_when_denormalizing_tags()
+        public async Task Should_call_grain_if_denormalizing_tags()
         {
             var tagIds = new HashSet<string>();
 
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_call_grain_when_normalizing_tags()
+        public async Task Should_call_grain_if_normalizing_tags()
         {
             var tagIds = new HashSet<string>();
             var tagNames = new HashSet<string>();

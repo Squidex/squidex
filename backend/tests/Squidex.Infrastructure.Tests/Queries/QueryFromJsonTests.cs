@@ -480,7 +480,7 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Fact]
-            public void Should_add_error_when_using_array_value_for_non_allowed_operator()
+            public void Should_add_error_if_using_array_value_for_non_allowed_operator()
             {
                 var json = new { path = "string", op = "eq", value = new[] { "Hello" } };
 
@@ -545,7 +545,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_throw_exception_when_parsing_invalid_json()
+        public void Should_throw_exception_if_parsing_invalid_json()
         {
             var json = "invalid";
 

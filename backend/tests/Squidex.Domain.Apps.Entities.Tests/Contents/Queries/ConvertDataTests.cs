@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_convert_data_and_data_draft_when_frontend_user()
+        public async Task Should_convert_data_and_data_draft_if_frontend_user()
         {
             var content = CreateContent(new ContentData());
 
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_cleanup_references_when_everything_deleted()
+        public async Task Should_cleanup_references_if_everything_deleted()
         {
             var id1 = DomainId.NewGuid();
             var id2 = DomainId.NewGuid();

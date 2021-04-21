@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_not_throw_exception_when_not_disposed()
+        public void Should_not_throw_exception_if_not_disposed()
         {
             var sut = new MyDisposableObject();
 
@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_throw_exception_when_disposed()
+        public void Should_throw_exception_if_disposed()
         {
             var sut = new MyDisposableObject();
 

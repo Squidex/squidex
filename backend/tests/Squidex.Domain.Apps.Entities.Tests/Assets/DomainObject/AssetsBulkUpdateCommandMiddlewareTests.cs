@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_annotating()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_annotating()
         {
             SetupContext(Permissions.AppAssetsRead);
 
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_moving()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_moving()
         {
             SetupContext(Permissions.AppAssetsRead);
 
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_deletion()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_deletion()
         {
             SetupContext(Permissions.AppAssetsRead);
 

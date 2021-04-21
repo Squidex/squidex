@@ -28,7 +28,7 @@ describe('SchemaMustExistGuard', () => {
         schemaGuard = new SchemaMustExistGuard(schemasState.object, router.object);
     });
 
-    it('should load schema and return true when found', () => {
+    it('should load schema and return true if found', () => {
         schemasState.setup(x => x.select('123'))
             .returns(() => of(<SchemaDetailsDto>{}));
 
@@ -41,7 +41,7 @@ describe('SchemaMustExistGuard', () => {
         expect(result!).toBeTruthy();
     });
 
-    it('should load schema and return false when not found', () => {
+    it('should load schema and return false if not found', () => {
         schemasState.setup(x => x.select('123'))
             .returns(() => of(null));
 

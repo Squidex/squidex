@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_error_when_user_has_no_permission_to_create()
+        public async Task Should_return_error_if_user_has_no_permission_to_create()
         {
             var query = @"
                 mutation {
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_creating_content()
+        public async Task Should_return_single_content_if_creating_content()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_creating_content_with_custom_id()
+        public async Task Should_return_single_content_if_creating_content_with_custom_id()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_creating_content_with_variable()
+        public async Task Should_return_single_content_if_creating_content_with_variable()
         {
             var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_error_when_user_has_no_permission_to_update()
+        public async Task Should_return_error_if_user_has_no_permission_to_update()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -221,7 +221,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_updating_content()
+        public async Task Should_return_single_content_if_updating_content()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -254,7 +254,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_updating_content_with_variable()
+        public async Task Should_return_single_content_if_updating_content_with_variable()
         {
             var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
@@ -287,7 +287,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_error_when_user_has_no_permission_to_upsert()
+        public async Task Should_return_error_if_user_has_no_permission_to_upsert()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -329,7 +329,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_upserting_content()
+        public async Task Should_return_single_content_if_upserting_content()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -363,7 +363,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_upserting_content_with_variable()
+        public async Task Should_return_single_content_if_upserting_content_with_variable()
         {
             var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
@@ -397,7 +397,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_error_when_user_has_no_permission_to_patch()
+        public async Task Should_return_error_if_user_has_no_permission_to_patch()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -439,7 +439,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_patching_content()
+        public async Task Should_return_single_content_if_patching_content()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -472,7 +472,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_patching_content_with_variable()
+        public async Task Should_return_single_content_if_patching_content_with_variable()
         {
             var query = CreateQuery(@"
                 mutation OP($data: MySchemaDataInputDto!) {
@@ -505,7 +505,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_error_when_user_has_no_permission_to_change_status()
+        public async Task Should_return_error_if_user_has_no_permission_to_change_status()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -547,7 +547,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_changing_status()
+        public async Task Should_return_single_content_if_changing_status()
         {
             var dueTime = InstantPattern.General.Parse("2021-12-12T11:10:09Z").Value;
 
@@ -583,7 +583,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_changing_status_without_due_time()
+        public async Task Should_return_single_content_if_changing_status_without_due_time()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -617,7 +617,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_single_content_when_changing_status_with_null_due_time()
+        public async Task Should_return_single_content_if_changing_status_with_null_due_time()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -651,7 +651,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_error_when_user_has_no_permission_to_delete()
+        public async Task Should_return_error_if_user_has_no_permission_to_delete()
         {
             var query = CreateQuery(@"
                 mutation {
@@ -693,7 +693,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_new_version_when_deleting_content()
+        public async Task Should_return_new_version_if_deleting_content()
         {
             var query = CreateQuery(@"
                 mutation {

@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateRuleEvent(new RuleUpdated { Trigger = command.Trigger, Action = command.Action, Name = "NewName" })
+                    CreateRuleEvent(new RuleUpdated { Trigger = command.Trigger, Action = command.Action, Name = command.Name })
                 );
         }
 
@@ -114,6 +114,29 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         }
 
         [Fact]
+        public async Task Enable_via_update_should_create_events_and_update_enabled_flag()
+        {
+            var command = new UpdateRule
+            {
+                IsEnabled = true
+            };
+
+            await ExecuteCreateAsync();
+            await ExecuteDisableAsync();
+
+            var result = await PublishIdempotentAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.True(sut.Snapshot.RuleDef.IsEnabled);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateRuleEvent(new RuleUpdated { IsEnabled = true })
+                );
+        }
+
+        [Fact]
         public async Task Disable_should_create_events_and_update_enabled_flag()
         {
             var command = new DisableRule();
@@ -129,6 +152,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateRuleEvent(new RuleDisabled())
+                );
+        }
+
+        [Fact]
+        public async Task Disable_via_update_should_create_events_and_update_enabled_flag()
+        {
+            var command = new UpdateRule
+            {
+                IsEnabled = false
+            };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishIdempotentAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.False(sut.Snapshot.RuleDef.IsEnabled);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateRuleEvent(new RuleUpdated { IsEnabled = false })
                 );
         }
 
@@ -198,26 +243,33 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         private static CreateRule MakeCreateCommand()
         {
-            var newTrigger = new ContentChangedTriggerV2();
-
-            var newAction = new TestAction
+            return new CreateRule
             {
-                Value = 123
+                Trigger = new ContentChangedTriggerV2
+                {
+                    HandleAll = false
+                },
+                Action = new TestAction
+                {
+                    Value = 123
+                }
             };
-
-            return new CreateRule { Trigger = newTrigger, Action = newAction };
         }
 
         private static UpdateRule MakeUpdateCommand()
         {
-            var newTrigger = new ContentChangedTriggerV2 { HandleAll = true };
-
-            var newAction = new TestAction
+            return new UpdateRule
             {
-                Value = 456
+                Name = "NewName",
+                Trigger = new ContentChangedTriggerV2
+                {
+                    HandleAll = true
+                },
+                Action = new TestAction
+                {
+                    Value = 456
+                }
             };
-
-            return new UpdateRule { Trigger = newTrigger, Action = newAction, Name = "NewName" };
         }
 
         private Task<object> PublishIdempotentAsync(RuleCommand command)

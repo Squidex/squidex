@@ -88,7 +88,7 @@ describe('UIState', () => {
         expect(uiState.snapshot.canRestore).toBeTruthy();
     });
 
-    it('should add value to snapshot when set as shared', () => {
+    it('should add value to snapshot if set as shared', () => {
         uiService.setup(x => x.putSharedSetting(app, 'root.nested', 123))
             .returns(() => of({})).verifiable();
 
@@ -124,7 +124,7 @@ describe('UIState', () => {
         uiService.verifyAll();
     });
 
-    it('should add value to snapshot when set as user', () => {
+    it('should add value to snapshot if set as user', () => {
         uiService.setup(x => x.putUserSetting(app, 'root.nested', 123))
             .returns(() => of({})).verifiable();
 
@@ -160,7 +160,7 @@ describe('UIState', () => {
         uiService.verifyAll();
     });
 
-    it('should remove value from snapshot and shared settings when removed', () => {
+    it('should remove value from snapshot and shared settings if removed', () => {
         uiService.setup(x => x.deleteSharedSetting(app, 'map.key'))
             .returns(() => of({})).verifiable();
 
@@ -180,7 +180,7 @@ describe('UIState', () => {
         uiService.verifyAll();
     });
 
-    it('should remove value from snapshot and user settings when removed', () => {
+    it('should remove value from snapshot and user settings if removed', () => {
         uiService.setup(x => x.deleteUserSetting(app, 'map.sizeX'))
             .returns(() => of({})).verifiable();
 

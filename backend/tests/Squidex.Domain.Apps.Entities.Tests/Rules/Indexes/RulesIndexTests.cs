@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         }
 
         [Fact]
-        public async Task Should_forward_call_when_rebuilding()
+        public async Task Should_forward_call_if_rebuilding()
         {
             var rules = new HashSet<DomainId>();
 

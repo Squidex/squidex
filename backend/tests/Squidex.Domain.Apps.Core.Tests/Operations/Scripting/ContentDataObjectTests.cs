@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
     public class ContentDataObjectTests
     {
         [Fact]
-        public void Should_update_data_when_setting_field()
+        public void Should_update_data_if_setting_field()
         {
             var original = new ContentData();
 
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_update_data_when_setting_lazy_field()
+        public void Should_update_data_if_setting_lazy_field()
         {
             var original = new ContentData();
 
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_throw_exception_when_assigning_non_object_as_field()
+        public void Should_throw_exception_if_assigning_non_object_as_field()
         {
             var original = new ContentData();
 
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_update_data_when_deleting_field()
+        public void Should_update_data_if_deleting_field()
         {
             var original =
                 new ContentData()
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_update_data_when_setting_field_value_with_string()
+        public void Should_update_data_if_setting_field_value_with_string()
         {
             var original =
                 new ContentData()
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_update_data_when_setting_field_value_with_number()
+        public void Should_update_data_if_setting_field_value_with_number()
         {
             var original =
                 new ContentData()
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_update_data_when_setting_field_value_with_boolean()
+        public void Should_update_data_if_setting_field_value_with_boolean()
         {
             var original =
                 new ContentData()
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_update_data_when_setting_field_value_with_array()
+        public void Should_update_data_if_setting_field_value_with_array()
         {
             var original =
                 new ContentData()
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_update_data_when_setting_field_value_with_object()
+        public void Should_update_data_if_setting_field_value_with_object()
         {
             var original =
                 new ContentData()
@@ -189,7 +189,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_throw_when_defining_property_for_field()
+        public void Should_throw_if_defining_property_for_field()
         {
             var original =
                 new ContentData()
@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_update_data_when_deleting_field_value()
+        public void Should_update_data_if_deleting_field_value()
         {
             var original =
                 new ContentData()
@@ -259,7 +259,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_throw_exceptions_when_changing_objects()
+        public void Should_throw_exceptions_if_changing_objects()
         {
             var original =
                 new ContentData()
@@ -272,7 +272,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public void Should_not_throw_exceptions_when_changing_arrays()
+        public void Should_not_throw_exceptions_if_changing_arrays()
         {
             var original =
                 new ContentData()

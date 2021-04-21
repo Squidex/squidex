@@ -104,7 +104,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadContent(id).pipe(
             tap(content => {
                 this.next(s => {
-                    const contents = content ? s.contents.replaceBy('id', content) : s.contents;
+                    const contents = content ? s.contents.replacedBy('id', content) : s.contents;
 
                     return { ...s, selectedContent: content, contents };
                 }, 'Selected');
@@ -326,13 +326,12 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             }
 
             return this.next(s => {
-                const contents = s.contents.replaceBy('id', content);
+                const contents = s.contents.replacedBy('id', content);
 
                 const selectedContent =
-                    s.selectedContent &&
-                        s.selectedContent.id === content.id ?
-                        content :
-                        s.selectedContent;
+                    s.selectedContent?.id !== content.id ?
+                    s.selectedContent :
+                    content;
 
                 return { ...s, contents, selectedContent };
             }, 'Updated');
