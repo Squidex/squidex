@@ -48,11 +48,7 @@ export class RulesPageComponent implements OnInit {
     }
 
     public toggle(rule: RuleDto) {
-        if (rule.isEnabled) {
-            this.rulesState.disable(rule);
-        } else {
-            this.rulesState.enable(rule);
-        }
+        this.rulesState.update(rule, { isEnabled: !rule.isEnabled });
     }
 
     public trackByRule(_index: number, rule: RuleDto) {
