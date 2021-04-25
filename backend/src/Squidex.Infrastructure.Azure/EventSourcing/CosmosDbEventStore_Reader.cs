@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Hosting;
@@ -47,34 +48,20 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 var result = new List<StoredEvent>();
 
-                await documentClient.QueryAsync(collectionUri, query, commit =>
+                await foreach (var commit in documentClient.QueryAsync(collectionUri, query, default))
                 {
-                    var eventStreamOffset = (int)commit.EventStreamOffset;
-
-                    var commitTimestamp = commit.Timestamp;
-                    var commitOffset = 0;
-
-                    foreach (var @event in commit.Events)
+                    foreach (var storedEvent in commit.Filtered().Reverse())
                     {
-                        eventStreamOffset++;
+                        result.Add(storedEvent);
 
-                        var eventData = @event.ToEventData();
-                        var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
-
-                        result.Add(new StoredEvent(streamName, eventToken, eventStreamOffset, eventData));
+                        if (result.Count == count)
+                        {
+                            break;
+                        }
                     }
-
-                    return Task.CompletedTask;
-                });
-
-                IEnumerable<StoredEvent> ordered = result.OrderBy(x => x.EventStreamNumber);
-
-                if (result.Count > count)
-                {
-                    ordered = ordered.Skip(result.Count - count);
                 }
 
-                return ordered.ToList();
+                return result;
             }
         }
 
@@ -90,72 +77,89 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 var result = new List<StoredEvent>();
 
-                await documentClient.QueryAsync(collectionUri, query, commit =>
+                await foreach (var commit in documentClient.QueryAsync(collectionUri, query, default))
                 {
-                    var eventStreamOffset = (int)commit.EventStreamOffset;
-
-                    var commitTimestamp = commit.Timestamp;
-                    var commitOffset = 0;
-
-                    foreach (var @event in commit.Events)
+                    foreach (var storedEvent in commit.Filtered().Reverse())
                     {
-                        eventStreamOffset++;
-
-                        if (eventStreamOffset >= streamPosition)
-                        {
-                            var eventData = @event.ToEventData();
-                            var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
-
-                            result.Add(new StoredEvent(streamName, eventToken, eventStreamOffset, eventData));
-                        }
+                        result.Add(storedEvent);
                     }
-
-                    return Task.CompletedTask;
-                });
+                }
 
                 return result;
             }
         }
 
-        public async Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
+        public async IAsyncEnumerable<StoredEvent> QueryAllAsync( string? streamFilter = null, string? position = null, long take = long.MaxValue,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
-            Guard.NotNull(callback, nameof(callback));
-
             ThrowIfDisposed();
+
+            if (take <= 0)
+            {
+                yield break;
+            }
 
             StreamPosition lastPosition = position;
 
-            var filterDefinition = FilterBuilder.CreateByFilter(streamFilter, lastPosition);
-            var filterExpression = FilterBuilder.CreateExpression(null, null);
+            var filterDefinition = FilterBuilder.CreateByFilter(streamFilter, lastPosition, "ASC", take);
 
-            using (Profiler.TraceMethod<CosmosDbEventStore>())
+            var taken = int.MaxValue;
+
+            await foreach (var commit in documentClient.QueryAsync(collectionUri, filterDefinition, ct: ct))
             {
-                await documentClient.QueryAsync(collectionUri, filterDefinition, async commit =>
+                if (taken == take)
                 {
-                    var eventStreamOffset = (int)commit.EventStreamOffset;
+                    yield break;
+                }
 
-                    var commitTimestamp = commit.Timestamp;
-                    var commitOffset = 0;
-
-                    foreach (var @event in commit.Events)
+                foreach (var storedEvent in commit.Filtered(lastPosition))
+                {
+                    if (taken == take)
                     {
-                        eventStreamOffset++;
-
-                        if (commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp)
-                        {
-                            var eventData = @event.ToEventData();
-
-                            if (filterExpression(eventData))
-                            {
-                                var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
-
-                                await callback(new StoredEvent(commit.EventStream, eventToken, eventStreamOffset, eventData));
-                            }
-                        }
-
-                        commitOffset++;
+                        yield break;
                     }
-                }, ct);
+
+                    yield return storedEvent;
+
+                    taken++;
+                }
+            }
+        }
+
+        public async IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, string? position = null, long take = long.MaxValue,
+            [EnumeratorCancellation] CancellationToken ct = default)
+        {
+            ThrowIfDisposed();
+
+            if (take <= 0)
+            {
+                yield break;
+            }
+
+            StreamPosition lastPosition = position;
+
+            var filterDefinition = FilterBuilder.CreateByFilter(streamFilter, lastPosition, "DESC", take);
+
+            var taken = long.MaxValue;
+
+            await foreach (var commit in documentClient.QueryAsync(collectionUri, filterDefinition, ct: ct))
+            {
+                if (taken == take)
+                {
+                    yield break;
+                }
+
+                foreach (var storedEvent in commit.Filtered(lastPosition))
+                {
+                    if (taken == take)
+                    {
+                        yield break;
+                    }
+
+                    yield return storedEvent;
+
+                    taken++;
+                }
             }
         }
     }

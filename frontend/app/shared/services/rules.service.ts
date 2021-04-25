@@ -163,7 +163,6 @@ export class RuleDto {
 }
 
 export class RuleEventsDto extends ResultSet<RuleEventDto> {
-    public readonly _links: ResourceLinks;
 }
 
 export class RuleEventDto extends Model<RuleEventDto> {
@@ -192,6 +191,23 @@ export class RuleEventDto extends Model<RuleEventDto> {
     }
 }
 
+export class SimulatedRuleEventsDto extends ResultSet<SimulatedRuleEventDto> {
+}
+
+export class SimulatedRuleEventDto {
+    public readonly _links: ResourceLinks;
+
+    constructor(links: ResourceLinks,
+        public readonly eventName: string,
+        public readonly actionName: string | undefined,
+        public readonly actionData: string | undefined,
+        public readonly error: string | undefined,
+        public readonly skipReason: string
+    ) {
+        this._links = links;
+    }
+}
+
 export type ActionsDto =
     Readonly<{ [name: string]: RuleElementDto }>;
 
@@ -199,10 +215,10 @@ export type UpsertRuleDto =
     Readonly<{ trigger?: RuleTrigger; action?: RuleAction; name?: string; isEnabled?: boolean; }>;
 
 export type RuleAction =
-    Readonly<{ actionType: string } & any>;
+    Readonly<{ actionType: string; [key: string]: any; }>;
 
 export type RuleTrigger =
-    Readonly<{ triggerType: string } & any>;
+    Readonly<{ triggerType: string; [key: string]: any; }>;
 
 @Injectable()
 export class RulesService {
@@ -216,35 +232,9 @@ export class RulesService {
     public getActions(): Observable<{ [name: string]: RuleElementDto }> {
         const url = this.apiUrl.buildUrl('api/rules/actions');
 
-        return HTTP.getVersioned(this.http, url).pipe(
-            map(({ payload }) => {
-                const items: { [name: string]: any } = payload.body;
-
-                const actions: { [name: string]: RuleElementDto } = {};
-
-                for (const key of Object.keys(items).sort()) {
-                    const value = items[key];
-
-                    const properties = value.properties.map((property: any) =>
-                        new RuleElementPropertyDto(
-                            property.name,
-                            property.editor,
-                            property.display,
-                            property.description,
-                            property.isFormattable,
-                            property.isRequired,
-                            property.options
-                        ));
-
-                    actions[key] = new RuleElementDto(
-                        value.title,
-                        value.display,
-                        value.description,
-                        value.iconColor,
-                        value.iconImage, null,
-                        value.readMore,
-                        properties);
-                }
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                const actions = parseActions(body);
 
                 return actions;
             }),
@@ -352,25 +342,23 @@ export class RulesService {
     public getEvents(appName: string, take: number, skip: number, ruleId?: string): Observable<RuleEventsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}&ruleId=${ruleId || ''}`);
 
-        return HTTP.getVersioned(this.http, url).pipe(
-            map(({ payload }) => {
-                const body = payload.body;
+        return this.http.get<{ items: any[], total: number } & Resource>(url).pipe(
+            map(({ items, total, _links }) => {
+                const ruleEvents = items.map(parseRuleEvent);
 
-                const items: any[] = body.items;
+                return new RuleEventsDto(total, ruleEvents, _links);
+            }),
+            pretifyError('i18n:rules.ruleEvents.loadFailed'));
+    }
 
-                const ruleEvents = new RuleEventsDto(body.total, items.map(item =>
-                    new RuleEventDto(item._links,
-                        item.id,
-                        DateTime.parseISO(item.created),
-                        item.nextAttempt ? DateTime.parseISO(item.nextAttempt) : null,
-                        item.eventName,
-                        item.description,
-                        item.lastDump,
-                        item.result,
-                        item.jobResult,
-                        item.numCalls)));
+    public getSimulatedEvents(appName: string, ruleId: string): Observable<SimulatedRuleEventsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${ruleId}/simulate`);
 
-                return ruleEvents;
+        return this.http.get<{ items: any[], total: number } & Resource>(url).pipe(
+            map(({ items, total, _links }) => {
+                const simulatedRuleEvents = items.map(parseSimulatedRuleEvent);
+
+                return new SimulatedRuleEventsDto(total, simulatedRuleEvents, _links);
             }),
             pretifyError('i18n:rules.ruleEvents.loadFailed'));
     }
@@ -400,6 +388,36 @@ export class RulesService {
     }
 }
 
+function parseActions(response: any) {
+    const actions: { [name: string]: RuleElementDto } = {};
+
+    for (const key of Object.keys(response).sort()) {
+        const value = response[key];
+
+        const properties = value.properties.map((property: any) =>
+            new RuleElementPropertyDto(
+                property.name,
+                property.editor,
+                property.display,
+                property.description,
+                property.isFormattable,
+                property.isRequired,
+                property.options
+            ));
+
+        actions[key] = new RuleElementDto(
+            value.title,
+            value.display,
+            value.description,
+            value.iconColor,
+            value.iconImage, null,
+            value.readMore,
+            properties);
+    }
+
+    return actions;
+}
+
 function parseRule(response: any) {
     return new RuleDto(response._links,
         response.id,
@@ -415,4 +433,26 @@ function parseRule(response: any) {
         response.numSucceeded,
         response.numFailed,
         response.lastExecuted ? DateTime.parseISO(response.lastExecuted) : undefined);
+}
+
+function parseRuleEvent(response: any) {
+    return new RuleEventDto(response._links,
+        response.id,
+        DateTime.parseISO(response.created),
+        response.nextAttempt ? DateTime.parseISO(response.nextAttempt) : null,
+        response.eventName,
+        response.description,
+        response.lastDump,
+        response.result,
+        response.jobResult,
+        response.numCalls);
+}
+
+function parseSimulatedRuleEvent(response: any) {
+    return new SimulatedRuleEventDto(response._links,
+        response.eventName,
+        response.actionName,
+        response.actionData,
+        response.error,
+        response.skipReason);
 }

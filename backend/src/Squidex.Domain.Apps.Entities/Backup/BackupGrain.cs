@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         var context = new BackupContext(appId, userMapping, writer);
 
-                        await eventStore.QueryAsync(async storedEvent =>
+                        await foreach (var storedEvent in eventStore.QueryAllAsync(GetFilter(), ct: ct))
                         {
                             var @event = eventDataFormatter.Parse(storedEvent);
 
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             job.HandledAssets = writer.WrittenAttachments;
 
                             lastTimestamp = await WritePeriodically(lastTimestamp);
-                        }, GetFilter(), null, ct);
+                        }
 
                         foreach (var handler in handlers)
                         {

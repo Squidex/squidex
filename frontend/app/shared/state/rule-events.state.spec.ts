@@ -38,7 +38,7 @@ describe('RuleEventsState', () => {
         ruleEventsState.load().subscribe();
     });
 
-    it('should load ruleEvents', () => {
+    it('should load rule events', () => {
         expect(ruleEventsState.snapshot.ruleEvents).toEqual(oldRuleEvents);
         expect(ruleEventsState.snapshot.isLoaded).toBeTruthy();
         expect(ruleEventsState.snapshot.isLoading).toBeFalsy();

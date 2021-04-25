@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             public string? Position { get; set; }
 
-            public bool FromSnapshots { get; set; }
+            public bool RunFromSnapshots { get; set; }
         }
 
         public RuleRunnerGrain(
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             state.Value = new State
             {
                 RuleId = ruleId,
-                FromSnapshots = fromSnapshots
+                RunFromSnapshots = fromSnapshots
             };
 
             await EnsureIsRunningAsync(false);
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             if (job.RuleId != null && currentJobToken == null)
             {
-                if (state.Value.FromSnapshots && continues)
+                if (state.Value.RunFromSnapshots && continues)
                 {
                     state.Value = new State();
 
@@ -162,24 +162,30 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 currentReminder = await RegisterOrUpdateReminder("KeepAlive", TimeSpan.Zero, TimeSpan.FromMinutes(2));
 
-                var rules = await appProvider.GetRulesAsync(DomainId.Create(Key));
-
-                var rule = rules.Find(x => x.Id == currentState.RuleId);
+                var rule = await appProvider.GetRuleAsync(DomainId.Create(Key), currentState.RuleId!.Value);
 
                 if (rule == null)
                 {
-                    throw new InvalidOperationException("Cannot find rule.");
+                    throw new DomainObjectNotFoundException(currentState.RuleId.ToString()!);
                 }
 
                 using (localCache.StartContext())
                 {
-                    if (currentState.FromSnapshots && ruleService.CanCreateSnapshotEvents(rule.RuleDef))
+                    var context = new RuleContext
                     {
-                        await EnqueueFromSnapshotsAsync(rule);
+                        AppId = rule.AppId,
+                        Rule = rule.RuleDef,
+                        RuleId = rule.Id,
+                        IgnoreStale = true
+                    };
+
+                    if (currentState.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(context))
+                    {
+                        await EnqueueFromSnapshotsAsync(context, ct);
                     }
                     else
                     {
-                        await EnqueueFromEventsAsync(currentState, rule, ct);
+                        await EnqueueFromEventsAsync(currentState, context, ct);
                     }
                 }
             }
@@ -216,11 +222,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
         }
 
-        private async Task EnqueueFromSnapshotsAsync(IRuleEntity rule)
+        private async Task EnqueueFromSnapshotsAsync(RuleContext context, CancellationToken ct)
         {
             var errors = 0;
 
-            await foreach (var (job, ex) in ruleService.CreateSnapshotJobsAsync(rule.RuleDef, rule.Id, rule.AppId.Id))
+            await foreach (var (job, ex, _) in ruleService.CreateSnapshotJobsAsync(context, ct))
             {
                 if (job != null)
                 {
@@ -242,11 +248,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
         }
 
-        private async Task EnqueueFromEventsAsync(State currentState, IRuleEntity rule, CancellationToken ct)
+        private async Task EnqueueFromEventsAsync(State currentState, RuleContext context, CancellationToken ct)
         {
             var errors = 0;
 
-            await eventStore.QueryAsync(async storedEvent =>
+            var filter = $"^([a-z]+)\\-{Key}";
+
+            await foreach (var storedEvent in eventStore.QueryAllAsync(filter, currentState.Position, ct: ct))
             {
                 try
                 {
@@ -254,11 +262,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                     if (@event != null)
                     {
-                        var jobs = await ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event, false);
+                        var jobs = ruleService.CreateJobsAsync(@event, context, ct);
 
-                        foreach (var (job, ex) in jobs)
+                        await foreach (var (job, ex, _) in jobs)
                         {
-                            await ruleEventRepository.EnqueueAsync(job, ex);
+                            if (job != null)
+                            {
+                                await ruleEventRepository.EnqueueAsync(job, ex);
+                            }
                         }
                     }
                 }
@@ -281,7 +292,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                 }
 
                 await state.WriteAsync();
-            }, $"^([a-z]+)\\-{Key}", currentState.Position, ct);
+            }
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)

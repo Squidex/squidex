@@ -5,6 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -18,9 +22,11 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public sealed class SchemaChangedTriggerHandler : RuleTriggerHandler<SchemaChangedTrigger, SchemaEvent, EnrichedSchemaEvent>
+    public sealed class SchemaChangedTriggerHandler : IRuleTriggerHandler
     {
         private readonly IScriptEngine scriptEngine;
+
+        public Type TriggerType => typeof(SchemaChangedTrigger);
 
         public SchemaChangedTriggerHandler(IScriptEngine scriptEngine)
         {
@@ -29,9 +35,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.scriptEngine = scriptEngine;
         }
 
-        protected override Task<EnrichedSchemaEvent?> CreateEnrichedEventAsync(Envelope<SchemaEvent> @event)
+        public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+            [EnumeratorCancellation] CancellationToken ct)
         {
-            EnrichedSchemaEvent? result = new EnrichedSchemaEvent();
+            var result = new EnrichedSchemaEvent();
 
             SimpleMapper.Map(@event.Payload, result);
 
@@ -57,20 +64,31 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     result.Type = EnrichedSchemaEventType.Deleted;
                     break;
                 default:
-                    result = null;
-                    break;
+                    yield break;
             }
 
-            if (result != null)
-            {
-                result.Name = $"Schema{result.Type}";
-            }
+            await Task.Yield();
 
-            return Task.FromResult(result);
+            yield return result;
         }
 
-        protected override bool Trigger(EnrichedSchemaEvent @event, SchemaChangedTrigger trigger)
+        public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
         {
+            return @event.Payload is SchemaEvent;
+        }
+
+        public bool Trigger(EnrichedEvent @event, RuleContext context)
+        {
+            if (context.Rule.Trigger is not SchemaChangedTrigger trigger)
+            {
+                return false;
+            }
+
+            if (@event is not EnrichedSchemaEvent)
+            {
+                return false;
+            }
+
             if (string.IsNullOrWhiteSpace(trigger.Condition))
             {
                 return true;

@@ -346,7 +346,7 @@ export type UpdateFieldDto =
     Readonly<{ properties: FieldPropertiesDto; }>;
 
 export type SynchronizeSchemaDto =
-    Readonly<{ noFieldDeletiong?: boolean; noFieldRecreation?: boolean; }>;
+    Readonly<{ noFieldDeletiong?: boolean; noFieldRecreation?: boolean; [key: string]: any; }>;
 
 export type UpdateSchemaDto =
     Readonly<{ label?: string; hints?: string; contentsSidebarUrl?: string; contentSidebarUrl?: string; contentEditorUrl?: string; validateOnPublish?: boolean; tags?: Tags; }>;
@@ -423,7 +423,7 @@ export class SchemasService {
             pretifyError('i18n:schemas.updateRulesFailed'));
     }
 
-    public putSchemaSync(appName: string, resource: Resource, dto: SynchronizeSchemaDto & any, version: Version): Observable<SchemaDetailsDto> {
+    public putSchemaSync(appName: string, resource: Resource, dto: SynchronizeSchemaDto, version: Version): Observable<SchemaDetailsDto> {
         const link = resource._links['update/sync'];
 
         const url = this.apiUrl.buildUrl(link.href);

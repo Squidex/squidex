@@ -75,7 +75,7 @@ namespace Migrations.Migrations
                 }
             }
 
-            await eventStore.QueryAsync(storedEvent =>
+            await foreach (var storedEvent in eventStore.QueryAllAsync("^app\\-"))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
@@ -109,9 +109,7 @@ namespace Migrations.Migrations
                             break;
                     }
                 }
-
-                return Task.CompletedTask;
-            }, "^app\\-");
+            }
 
             await indexApps.RebuildAsync(appsByName);
 
@@ -130,7 +128,7 @@ namespace Migrations.Migrations
                 return rulesByApp!.GetOrAddNew(@event.AppId.Id);
             }
 
-            await eventStore.QueryAsync(storedEvent =>
+            await foreach (var storedEvent in eventStore.QueryAllAsync("^rule\\-"))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
@@ -146,9 +144,7 @@ namespace Migrations.Migrations
                             break;
                     }
                 }
-
-                return Task.CompletedTask;
-            }, "^rule\\-");
+            }
 
             foreach (var (appId, rules) in rulesByApp)
             {
@@ -165,7 +161,7 @@ namespace Migrations.Migrations
                 return schemasByApp!.GetOrAddNew(@event.AppId.Id);
             }
 
-            await eventStore.QueryAsync(storedEvent =>
+            await foreach (var storedEvent in eventStore.QueryAllAsync("^schema\\-"))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
@@ -181,9 +177,7 @@ namespace Migrations.Migrations
                             break;
                     }
                 }
-
-                return Task.CompletedTask;
-            }, "^schema\\-");
+            }
 
             foreach (var (appId, schemas) in schemasByApp)
             {

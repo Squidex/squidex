@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -22,17 +23,6 @@ namespace Squidex.Infrastructure.EventSourcing
     public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
         private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
-
-        public Task CreateIndexAsync(string property)
-        {
-            Guard.NotNullOrEmpty(property, nameof(property));
-
-            return Collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoEventCommit>(
-                    Index
-                        .Ascending(CreateIndexPath(property))
-                        .Ascending(TimestampField)));
-        }
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
@@ -64,21 +54,9 @@ namespace Squidex.Infrastructure.EventSourcing
                             Filter.Eq(EventStreamField, streamName))
                         .Sort(Sort.Descending(TimestampField)).Limit(count).ToListAsync();
 
-                var result = new List<StoredEvent>();
+                var result = commits.Select(x => x.Filtered()).Reverse().SelectMany(x => x).TakeLast(count).ToList();
 
-                foreach (var commit in commits)
-                {
-                    result.AddRange(commit.Filtered(long.MinValue));
-                }
-
-                IEnumerable<StoredEvent> ordered = result.OrderBy(x => x.EventStreamNumber);
-
-                if (result.Count > count)
-                {
-                    ordered = ordered.Skip(result.Count - count);
-                }
-
-                return ordered.ToList();
+                return result;
             }
         }
 
@@ -125,35 +103,95 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default)
+        public async IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, string? position = null, long take = long.MaxValue,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
-            Guard.NotNull(callback, nameof(callback));
+            if (take <= 0)
+            {
+                yield break;
+            }
 
             StreamPosition lastPosition = position;
 
             var filterDefinition = CreateFilter(streamFilter, lastPosition);
 
-            return QueryAsync(callback, lastPosition, filterDefinition, ct);
+            var find =
+                Collection.Find(filterDefinition, options: Batching.Options)
+                    .Limit((int)take).Sort(Sort.Descending(TimestampField));
+
+            var taken = 0;
+
+            using (var cursor = await find.ToCursorAsync(ct))
+            {
+                while (taken < take && await cursor.MoveNextAsync(ct))
+                {
+                    foreach (var current in cursor.Current)
+                    {
+                        foreach (var @event in current.Filtered(position).Reverse())
+                        {
+                            yield return @event;
+
+                            taken++;
+
+                            if (taken == take)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (taken == take)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
-        private async Task QueryAsync(Func<StoredEvent, Task> callback, StreamPosition position, EventFilter filter, CancellationToken ct = default)
+        public async IAsyncEnumerable<StoredEvent> QueryAllAsync(string? streamFilter = null, string? position = null, long take = long.MaxValue,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
-            using (Profiler.TraceMethod<MongoEventStore>())
+            StreamPosition lastPosition = position;
+
+            var filterDefinition = CreateFilter(streamFilter, lastPosition);
+
+            var find =
+                Collection.Find(filterDefinition)
+                    .Limit((int)take).Sort(Sort.Ascending(TimestampField));
+
+            var taken = 0;
+
+            using (var cursor = await find.ToCursorAsync(ct))
             {
-                await Collection.Find(filter, options: Batching.Options).Sort(Sort.Ascending(TimestampField)).ForEachPipedAsync(async commit =>
+                while (taken < take && await cursor.MoveNextAsync(ct))
                 {
-                    foreach (var @event in commit.Filtered(position))
+                    foreach (var current in cursor.Current)
                     {
-                        await callback(@event);
+                        foreach (var @event in current.Filtered(position))
+                        {
+                            yield return @event;
+
+                            taken++;
+
+                            if (taken == take)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (taken == take)
+                        {
+                            break;
+                        }
                     }
-                }, ct);
+                }
             }
         }
 
         private static EventFilter CreateFilter(string? streamFilter, StreamPosition streamPosition)
         {
-            var byPosition = Filtering.ByPosition(streamPosition);
-            var byStream = Filtering.ByStream(streamFilter);
+            var byPosition = FilterExtensions.ByPosition(streamPosition);
+            var byStream = FilterExtensions.ByStream(streamFilter);
 
             if (byStream != null)
             {
@@ -161,11 +199,6 @@ namespace Squidex.Infrastructure.EventSourcing
             }
 
             return byPosition;
-        }
-
-        private static string CreateIndexPath(string property)
-        {
-            return $"Events.Metadata.{property}";
         }
     }
 }

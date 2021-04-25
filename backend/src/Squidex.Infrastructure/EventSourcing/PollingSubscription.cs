@@ -28,12 +28,12 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 try
                 {
-                    await eventStore.QueryAsync(async storedEvent =>
+                    await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, position, ct: ct))
                     {
                         await eventSubscriber.OnEventAsync(this, storedEvent);
 
                         position = storedEvent.EventPosition;
-                    }, streamFilter, position, ct);
+                    }
                 }
                 catch (Exception ex)
                 {

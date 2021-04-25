@@ -37,7 +37,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public indicateLoading?: boolean | null;
 
     @Input()
-    public selectedIds: object;
+    public selectedIds: {};
 
     @Input()
     public showPager?: boolean | null = true;

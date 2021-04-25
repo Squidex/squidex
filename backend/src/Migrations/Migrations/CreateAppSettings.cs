@@ -41,7 +41,7 @@ namespace Migrations.Migrations
         {
             var apps = new Dictionary<NamedId<DomainId>, Dictionary<DomainId, (string Name, string Pattern, string? Message)>>();
 
-            await eventStore.QueryAsync(storedEvent =>
+            await foreach (var storedEvent in eventStore.QueryAllAsync("^app\\-"))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
@@ -80,9 +80,7 @@ namespace Migrations.Migrations
                             }
                     }
                 }
-
-                return Task.CompletedTask;
-            }, "^app\\-");
+            }
 
             var actor = RefToken.Client("Migrator");
 

@@ -114,7 +114,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         private async Task Trigger(TriggerRule command)
         {
-            var @event = SimpleMapper.Map(command, new RuleManuallyTriggered { RuleId = Snapshot.Id, AppId = Snapshot.AppId });
+            var @event = new RuleManuallyTriggered();
+
+            SimpleMapper.Map(command, @event);
+            SimpleMapper.Map(Snapshot, @event);
 
             await ruleEnqueuer.EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
         }

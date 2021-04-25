@@ -5,13 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -19,13 +22,15 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetChangedTriggerHandler : RuleTriggerHandler<AssetChangedTriggerV2, AssetEvent, EnrichedAssetEvent>
+    public sealed class AssetChangedTriggerHandler : IRuleTriggerHandler
     {
         private readonly IScriptEngine scriptEngine;
         private readonly IAssetLoader assetLoader;
         private readonly IAssetRepository assetRepository;
 
-        public override bool CanCreateSnapshotEvents => true;
+        public bool CanCreateSnapshotEvents => true;
+
+        public Type TriggerType => typeof(AssetChangedTriggerV2);
 
         public AssetChangedTriggerHandler(
             IScriptEngine scriptEngine,
@@ -41,9 +46,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetRepository = assetRepository;
         }
 
-        public override async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEvents(AssetChangedTriggerV2 trigger, DomainId appId)
+        public async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
-            await foreach (var asset in assetRepository.StreamAll(appId))
+            await foreach (var asset in assetRepository.StreamAll(context.AppId.Id, ct))
             {
                 var result = new EnrichedAssetEvent
                 {
@@ -53,24 +59,30 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 SimpleMapper.Map(asset, result);
 
                 result.Actor = asset.LastModifiedBy;
-                result.Name = "AssetCreatedFromSnapshot";
+                result.Name = "AssetQueried";
 
                 yield return result;
             }
         }
 
-        protected override async Task<EnrichedAssetEvent?> CreateEnrichedEventAsync(Envelope<AssetEvent> @event)
+        public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
+            if (@event.Payload is not AssetEvent assetEvent)
+            {
+                yield break;
+            }
+
             if (@event.Payload is AssetMoved)
             {
-                return null;
+                yield break;
             }
 
             var result = new EnrichedAssetEvent();
 
             var asset = await assetLoader.GetAsync(
-                @event.Payload.AppId.Id,
-                @event.Payload.AssetId,
+                assetEvent.AppId.Id,
+                assetEvent.AssetId,
                 @event.Headers.EventStreamNumber());
 
             if (asset != null)
@@ -96,13 +108,26 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     break;
             }
 
-            result.Name = $"Asset{result.Type}";
-
-            return result;
+            yield return result;
         }
 
-        protected override bool Trigger(EnrichedAssetEvent @event, AssetChangedTriggerV2 trigger)
+        public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
         {
+            return @event.Payload is AssetEvent;
+        }
+
+        public bool Trigger(EnrichedEvent @event, RuleContext context)
+        {
+            if (context.Rule.Trigger is not AssetChangedTriggerV2 trigger)
+            {
+                return false;
+            }
+
+            if (@event is not EnrichedAssetEvent)
+            {
+                return false;
+            }
+
             if (string.IsNullOrWhiteSpace(trigger.Condition))
             {
                 return true;

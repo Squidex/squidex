@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -68,13 +69,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }, ct);
         }
 
-        public async IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId)
+        public async IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
             var find = Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
 
-            using (var cursor = await find.ToCursorAsync())
+            using (var cursor = await find.ToCursorAsync(ct))
             {
-                while (await cursor.MoveNextAsync())
+                while (await cursor.MoveNextAsync(ct))
                 {
                     foreach (var entity in cursor.Current)
                     {

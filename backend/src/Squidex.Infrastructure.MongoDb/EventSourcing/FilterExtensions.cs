@@ -10,7 +10,7 @@ using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    internal static class Filtering
+    internal static class FilterExtensions
     {
         public static FilterDefinition<MongoEventCommit> ByPosition(StreamPosition streamPosition)
         {
@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, long streamPosition)
+        public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, long streamPosition = EtagVersion.Empty)
         {
             var eventStreamOffset = commit.EventStreamOffset;
 

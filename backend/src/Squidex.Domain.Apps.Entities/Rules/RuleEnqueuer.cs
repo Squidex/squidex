@@ -56,11 +56,21 @@ namespace Squidex.Domain.Apps.Entities.Rules
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
 
-            var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
-
-            foreach (var (job, ex) in jobs)
+            var ruleContext = new RuleContext
             {
-                await ruleEventRepository.EnqueueAsync(job, ex);
+                Rule = rule,
+                RuleId = ruleId,
+                IgnoreStale = false
+            };
+
+            var jobs = ruleService.CreateJobsAsync(@event, ruleContext);
+
+            await foreach (var (job, ex, _) in jobs)
+            {
+                if (job != null)
+                {
+                    await ruleEventRepository.EnqueueAsync(job, ex);
+                }
             }
         }
 

@@ -59,12 +59,12 @@ namespace Squidex.Infrastructure.Commands
 
             await InsertManyAsync<T, TState>(store, async target =>
             {
-                await eventStore.QueryAsync(async storedEvent =>
+                await foreach (var storedEvent in eventStore.QueryAllAsync(filter, ct: ct))
                 {
                     var id = storedEvent.Data.Headers.AggregateId();
 
                     await target(id);
-                }, filter, ct: ct);
+                }
             }, ct);
         }
 

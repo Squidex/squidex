@@ -127,7 +127,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
             return;
         }
 
-        const request = { trigger, action, isEnabled: this.isEnabled };
+        const request: any = { trigger, action, isEnabled: this.isEnabled };
 
         if (this.rule) {
             this.rulesState.update(this.rule, request)

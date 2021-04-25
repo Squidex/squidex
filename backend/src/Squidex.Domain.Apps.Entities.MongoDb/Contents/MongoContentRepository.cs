@@ -55,9 +55,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collectionPublished.InitializeAsync(ct);
         }
 
-        public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds)
+        public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds, CancellationToken ct)
         {
-            return collectionAll.StreamAll(appId, schemaIds);
+            return collectionAll.StreamAll(appId, schemaIds, ct);
         }
 
         public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope)

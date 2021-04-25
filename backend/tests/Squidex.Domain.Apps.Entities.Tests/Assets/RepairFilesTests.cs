@@ -5,8 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Assets;
@@ -107,7 +108,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void SetupEvent(IEvent? @event)
         {
-            var storedEvent = new StoredEvent("stream", "0", -1, new EventData("type", new EnvelopeHeaders(), "payload"));
+            var storedEvent =
+                new StoredEvent("stream", "0", -1,
+                    new EventData("type", new EnvelopeHeaders(), "payload"));
+
+            var storedEvents = new List<StoredEvent>
+            {
+                storedEvent
+            };
 
             if (@event != null)
             {
@@ -120,13 +128,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     .Returns(null);
             }
 
-            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>._, "^asset\\-", null, default))
-                .Invokes(x =>
-                {
-                    var callback = x.GetArgument<Func<StoredEvent, Task>>(0)!;
-
-                    callback(storedEvent).Wait();
-                });
+            A.CallTo(() => eventStore.QueryAllAsync("^asset\\-", null, long.MaxValue, default))
+                .Returns(storedEvents.ToAsyncEnumerable());
         }
     }
 }

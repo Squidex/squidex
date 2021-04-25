@@ -169,6 +169,13 @@ namespace Squidex.Domain.Apps.Entities
             return rules.ToList();
         }
 
+        public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id)
+        {
+            var rules = await GetRulesAsync(appId);
+
+            return rules.Find(x => x.Id == id);
+        }
+
         private static string AppCacheKey(DomainId appId)
         {
             return $"APPS_ID_{appId}";

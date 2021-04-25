@@ -180,7 +180,7 @@ export module Types {
         return false;
     }
 
-    export function mergeInto(target: object, source: object) {
+    export function mergeInto(target: {}, source: {} | undefined | null) {
         if (!Types.isObject(target) || !Types.isObject(source)) {
             return source;
         }

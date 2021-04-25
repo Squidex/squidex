@@ -8,6 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { AnalyticsService, ApiUrlConfig, DateTime, Resource, ResourceLinks, RuleDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesDto, RulesService, Version } from '@app/shared/internal';
+import { SimulatedRuleEventDto, SimulatedRuleEventsDto } from './rules.service';
 
 describe('RulesService', () => {
     const version = new Version('1');
@@ -159,7 +160,7 @@ describe('RulesService', () => {
     it('should make put request to update rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        const dto = {
+        const dto: any = {
             trigger: {
                 param1: 1
             },
@@ -279,7 +280,7 @@ describe('RulesService', () => {
         req.flush({});
     }));
 
-    it('should make get request to get app rule events',
+    it('should make get request to get rule events',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
         let rules: RuleEventsDto;
@@ -304,6 +305,34 @@ describe('RulesService', () => {
             new RuleEventsDto(20, [
                 createRuleEvent(1),
                 createRuleEvent(2)
+            ]));
+    }));
+
+    it('should make get request to get simulated rule events',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+
+        let rules: SimulatedRuleEventsDto;
+
+        rulesService.getSimulatedEvents('my-app', '12').subscribe(result => {
+            rules = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/12/simulate');
+
+        expect(req.request.method).toEqual('GET');
+
+        req.flush({
+            total: 20,
+            items: [
+                simulatedRuleEventResponse(1),
+                simulatedRuleEventResponse(2)
+            ]
+        });
+
+        expect(rules!).toEqual(
+            new SimulatedRuleEventsDto(20, [
+                createSimulatedRuleEvent(1),
+                createSimulatedRuleEvent(2)
             ]));
     }));
 
@@ -345,25 +374,6 @@ describe('RulesService', () => {
         req.flush({});
     }));
 
-    function ruleEventResponse(id: number, suffix = '') {
-        const key = `${id}${suffix}`;
-
-        return {
-            id: `id${id}`,
-            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
-            eventName: `event-name${key}`,
-            nextAttempt: `${id % 1000 + 2000}-11-11T10:10`,
-            jobResult: `Failed${key}`,
-            lastDump: `event-dump${key}`,
-            numCalls: id,
-            description: `event-url${key}`,
-            result: `Failed${key}`,
-            _links: {
-                update: { method: 'PUT', href: `/rules/events/${id}` }
-            }
-        };
-    }
-
     function ruleResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 
@@ -394,25 +404,39 @@ describe('RulesService', () => {
             }
         };
     }
+
+    function ruleEventResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
+        return {
+            id: `id${id}`,
+            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
+            eventName: `event-name${key}`,
+            nextAttempt: `${id % 1000 + 2000}-11-11T10:10`,
+            jobResult: `Failed${key}`,
+            lastDump: `event-dump${key}`,
+            numCalls: id,
+            description: `event-url${key}`,
+            result: `Failed${key}`,
+            _links: {
+                update: { method: 'PUT', href: `/rules/events/${id}` }
+            }
+        };
+    }
+
+    function simulatedRuleEventResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
+        return {
+            eventName: `name${key}`,
+            actionName: `action-name${key}`,
+            actionData: `action-data${key}`,
+            error: `error${key}`,
+            skipReason: `reason${key}`,
+            _links: {}
+        };
+    }
 });
-
-export function createRuleEvent(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/rules/events/${id}` }
-    };
-
-    const key = `${id}${suffix}`;
-
-    return new RuleEventDto(links, `id${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
-        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`),
-        `event-name${key}`,
-        `event-url${key}`,
-        `event-dump${key}`,
-        `Failed${key}`,
-        `Failed${key}`,
-        id);
-}
 
 export function createRule(id: number, suffix = '') {
     const links: ResourceLinks = {
@@ -443,4 +467,33 @@ export function createRule(id: number, suffix = '') {
         id * 3,
         id * 4,
         DateTime.parseISO(`${id % 1000 + 2000}-10-10T10:10:00Z`));
+}
+
+export function createRuleEvent(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/rules/events/${id}` }
+    };
+
+    const key = `${id}${suffix}`;
+
+    return new RuleEventDto(links, `id${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
+        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`),
+        `event-name${key}`,
+        `event-url${key}`,
+        `event-dump${key}`,
+        `Failed${key}`,
+        `Failed${key}`,
+        id);
+}
+
+export function createSimulatedRuleEvent(id: number, suffix = '') {
+    const key = `${id}${suffix}`;
+
+    return new SimulatedRuleEventDto({},
+        `name${key}`,
+        `action-name${key}`,
+        `action-data${key}`,
+        `error${key}`,
+        `reason${key}`);
 }

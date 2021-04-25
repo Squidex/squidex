@@ -14,11 +14,13 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventStore
     {
-        Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count);
+        Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int take = int.MaxValue);
 
         Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0);
 
-        Task QueryAsync(Func<StoredEvent, Task> callback, string? streamFilter = null, string? position = null, CancellationToken ct = default);
+        IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, string? position = null, long take = long.MaxValue, CancellationToken ct = default);
+
+        IAsyncEnumerable<StoredEvent> QueryAllAsync(string? streamFilter = null, string? position = null, long take = long.MaxValue, CancellationToken ct = default);
 
         Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events);
 
@@ -42,7 +44,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             foreach (var streamName in streamNames)
             {
-                result[streamName] = await QueryAsync(streamName);
+                result[streamName] = await QueryAsync(streamName, 0);
             }
 
             return result;

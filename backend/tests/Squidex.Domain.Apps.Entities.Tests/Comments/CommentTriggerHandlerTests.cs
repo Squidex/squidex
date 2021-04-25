@@ -13,6 +13,7 @@ using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -53,18 +54,20 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_create_enriched_events()
         {
+            var ctx = Context();
+
             var user1 = UserMocks.User("1");
             var user2 = UserMocks.User("2");
 
             var users = new List<IUser> { user1, user2 };
             var userIds = users.Select(x => x.Id).ToArray();
 
-            var envelope = Envelope.Create<AppEvent>(new CommentCreated { Mentions = userIds });
+            var @event = new CommentCreated { Mentions = userIds };
 
             A.CallTo(() => userResolver.QueryManyAsync(userIds))
                 .Returns(users.ToDictionary(x => x.Id));
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope);
+            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
 
             Assert.Equal(2, result.Count);
 
@@ -80,15 +83,17 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_not_create_enriched_events_if_users_cannot_be_resolved()
         {
+            var ctx = Context();
+
             var user1 = UserMocks.User("1");
             var user2 = UserMocks.User("2");
 
             var users = new List<IUser> { user1, user2 };
             var userIds = users.Select(x => x.Id).ToArray();
 
-            var envelope = Envelope.Create<AppEvent>(new CommentCreated { Mentions = userIds });
+            var @event = new CommentCreated { Mentions = userIds };
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope);
+            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
 
             Assert.Empty(result);
         }
@@ -96,9 +101,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_not_create_enriched_events_if_mentions_is_null()
         {
-            var envelope = Envelope.Create<AppEvent>(new CommentCreated { Mentions = null });
+            var ctx = Context();
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope);
+            var @event = new CommentCreated { Mentions = null };
+
+            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
 
             Assert.Empty(result);
 
@@ -109,9 +116,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_not_create_enriched_events_if_mentions_is_empty()
         {
-            var envelope = Envelope.Create<AppEvent>(new CommentCreated { Mentions = Array.Empty<string>() });
+            var ctx = Context();
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope);
+            var @event = new CommentCreated { Mentions = Array.Empty<string>() };
+
+            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
 
             Assert.Empty(result);
 
@@ -122,9 +131,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_skip_udated_event()
         {
-            var envelope = Envelope.Create<AppEvent>(new CommentUpdated());
+            var ctx = Context();
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope);
+            var @event = new CommentUpdated();
+
+            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
 
             Assert.Empty(result);
 
@@ -135,9 +146,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public async Task Should_skip_deleted_event()
         {
-            var envelope = Envelope.Create<AppEvent>(new CommentDeleted());
+            var ctx = Context();
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope);
+            var @event = new CommentDeleted();
+
+            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
 
             Assert.Empty(result);
 
@@ -148,9 +161,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public void Should_not_trigger_precheck_if_event_type_not_correct()
         {
-            TestForCondition(string.Empty, trigger =>
+            TestForCondition(string.Empty, ctx =>
             {
-                var result = sut.Trigger(new ContentCreated(), trigger, DomainId.NewGuid());
+                var @event = new ContentCreated();
+
+                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
                 Assert.False(result);
             });
@@ -159,9 +174,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public void Should_trigger_precheck_if_event_type_correct()
         {
-            TestForCondition(string.Empty, trigger =>
+            TestForCondition(string.Empty, ctx =>
             {
-                var result = sut.Trigger(new CommentCreated(), trigger, DomainId.NewGuid());
+                var @event = new CommentCreated();
+
+                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
                 Assert.True(result);
             });
@@ -170,9 +187,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public void Should_not_trigger_check_if_event_type_not_correct()
         {
-            TestForCondition(string.Empty, trigger =>
+            TestForCondition(string.Empty, ctx =>
             {
-                var result = sut.Trigger(new EnrichedContentEvent(), trigger);
+                var @event = new EnrichedContentEvent();
+
+                var result = sut.Trigger(@event, ctx);
 
                 Assert.False(result);
             });
@@ -181,9 +200,11 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public void Should_trigger_check_if_condition_is_empty()
         {
-            TestForCondition(string.Empty, trigger =>
+            TestForCondition(string.Empty, ctx =>
             {
-                var result = sut.Trigger(new EnrichedCommentEvent(), trigger);
+                var @event = new EnrichedCommentEvent();
+
+                var result = sut.Trigger(@event, ctx);
 
                 Assert.True(result);
             });
@@ -192,20 +213,24 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public void Should_trigger_check_if_condition_matchs()
         {
-            TestForCondition("true", trigger =>
+            TestForCondition("true", ctx =>
             {
-                var result = sut.Trigger(new EnrichedCommentEvent(), trigger);
+                var @event = new EnrichedCommentEvent();
+
+                var result = sut.Trigger(new EnrichedCommentEvent(), ctx);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_check_if_condition_does_not_matchs()
+        public void Should_not_trigger_check_if_condition_does_not_match()
         {
-            TestForCondition("false", trigger =>
+            TestForCondition("false", ctx =>
             {
-                var result = sut.Trigger(new EnrichedCommentEvent(), trigger);
+                var @event = new EnrichedCommentEvent();
+
+                var result = sut.Trigger(@event, ctx);
 
                 Assert.False(result);
             });
@@ -214,24 +239,30 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public void Should_trigger_check_if_email_is_correct()
         {
-            TestForRealCondition("event.mentionedUser.email == '1@email.com'", (handler, trigger) =>
+            TestForRealCondition("event.mentionedUser.email == '1@email.com'", (handler, ctx) =>
             {
-                var user = UserMocks.User("1", "1@email.com");
+                var @event = new EnrichedCommentEvent
+                {
+                    MentionedUser = UserMocks.User("1", "1@email.com")
+                };
 
-                var result = handler.Trigger(new EnrichedCommentEvent { MentionedUser = user }, trigger);
+                var result = handler.Trigger(@event, ctx);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_check_if_email_is_correct()
+        public void Should_not_trigger_check_if_email_is_not_correct()
         {
-            TestForRealCondition("event.mentionedUser.email == 'other@squidex.io'", (handler, trigger) =>
+            TestForRealCondition("event.mentionedUser.email == 'other@squidex.io'", (handler, ctx) =>
             {
-                var user = UserMocks.User("1");
+                var @event = new EnrichedCommentEvent
+                {
+                    MentionedUser = UserMocks.User("1", "1@email.com")
+                };
 
-                var result = handler.Trigger(new EnrichedCommentEvent { MentionedUser = user }, trigger);
+                var result = handler.Trigger(@event, ctx);
 
                 Assert.False(result);
             });
@@ -240,11 +271,14 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public void Should_trigger_check_if_text_is_urgent()
         {
-            TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, trigger) =>
+            TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, ctx) =>
             {
-                var text = "Hey man, this is really urgent.";
+                var @event = new EnrichedCommentEvent
+                {
+                    Text = "very_urgent_text"
+                };
 
-                var result = handler.Trigger(new EnrichedCommentEvent { Text = text }, trigger);
+                var result = handler.Trigger(@event, ctx);
 
                 Assert.True(result);
             });
@@ -253,17 +287,20 @@ namespace Squidex.Domain.Apps.Entities.Comments
         [Fact]
         public void Should_not_trigger_check_if_text_is_not_urgent()
         {
-            TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, trigger) =>
+            TestForRealCondition("event.text.indexOf('urgent') >= 0", (handler, ctx) =>
             {
-                var text = "Hey man, just an information for you.";
+                var @event = new EnrichedCommentEvent
+                {
+                    Text = "just_gossip"
+                };
 
-                var result = handler.Trigger(new EnrichedCommentEvent { Text = text }, trigger);
+                var result = handler.Trigger(@event, ctx);
 
                 Assert.False(result);
             });
         }
 
-        private void TestForRealCondition(string condition, Action<IRuleTriggerHandler, CommentTrigger> action)
+        private void TestForRealCondition(string condition, Action<IRuleTriggerHandler, RuleContext> action)
         {
             var trigger = new CommentTrigger
             {
@@ -274,17 +311,17 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             var handler = new CommentTriggerHandler(new JintScriptEngine(memoryCache), userResolver);
 
-            action(handler, trigger);
+            action(handler, Context(trigger));
         }
 
-        private void TestForCondition(string condition, Action<CommentTrigger> action)
+        private void TestForCondition(string condition, Action<RuleContext> action)
         {
             var trigger = new CommentTrigger
             {
                 Condition = condition
             };
 
-            action(trigger);
+            action(Context(trigger));
 
             if (string.IsNullOrWhiteSpace(condition))
             {
@@ -296,6 +333,18 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                     .MustHaveHappened();
             }
+        }
+
+        private static RuleContext Context(RuleTrigger? trigger = null)
+        {
+            trigger ??= new CommentTrigger();
+
+            return new RuleContext
+            {
+                AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+                Rule = new Rule(trigger, A.Fake<RuleAction>()),
+                RuleId = DomainId.NewGuid()
+            };
         }
     }
 }

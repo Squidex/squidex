@@ -31,19 +31,19 @@ export class UIService {
             }));
     }
 
-    public getSharedSettings(appName: string): Observable<object> {
+    public getSharedSettings(appName: string): Observable<{}> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings`);
 
-        return this.http.get<object>(url).pipe(
+        return this.http.get<{}>(url).pipe(
             catchError(() => {
                 return of({});
             }));
     }
 
-    public getUserSettings(appName: string): Observable<object> {
+    public getUserSettings(appName: string): Observable<{}> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings/me`);
 
-        return this.http.get<object>(url).pipe(
+        return this.http.get<{}>(url).pipe(
             catchError(() => {
                 return of({});
             }));

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
@@ -75,16 +76,40 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
+        public async Task Should_not_insert_job_if_null()
+        {
+            var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+
+            var rule = CreateRule();
+
+            var job = new RuleJob
+            {
+                Created = now
+            };
+
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule.RuleDef), default))
+                .Returns(new List<CreatedJob> { new CreatedJob(null) }.ToAsyncEnumerable());
+
+            await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_update_repository_if_enqueing()
         {
             var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
 
             var rule = CreateRule();
 
-            var job = new RuleJob { Created = now };
+            var job = new RuleJob
+            {
+                Created = now
+            };
 
-            A.CallTo(() => ruleService.CreateJobsAsync(rule.RuleDef, rule.Id, @event, true))
-                .Returns(new List<(RuleJob, Exception?)> { (job, null) });
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule.RuleDef), default))
+                .Returns(new List<CreatedJob> { new CreatedJob(job) }.ToAsyncEnumerable());
 
             await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
@@ -93,11 +118,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Should_update_repositories_with_jobs_from_service()
+        public async Task Should_update_repository_with_jobs_from_service()
         {
             var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
 
-            var job1 = new RuleJob { Created = now };
+            var job1 = new RuleJob
+            {
+                Created = now
+            };
 
             SetupRules(@event, job1);
 
@@ -130,11 +158,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
             A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
                 .Returns(new List<IRuleEntity> { rule1, rule2 });
 
-            A.CallTo(() => ruleService.CreateJobsAsync(rule1.RuleDef, rule1.Id, @event, true))
-                .Returns(new List<(RuleJob, Exception?)> { (job1, null) });
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule1.RuleDef), default))
+                .Returns(new List<CreatedJob> { new CreatedJob(job1) }.ToAsyncEnumerable());
 
-            A.CallTo(() => ruleService.CreateJobsAsync(rule2.RuleDef, rule2.Id, @event, true))
-                .Returns(new List<(RuleJob, Exception?)>());
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule2.RuleDef), default))
+                .Returns(new List<CreatedJob>().ToAsyncEnumerable());
         }
 
         private static RuleEntity CreateRule()
