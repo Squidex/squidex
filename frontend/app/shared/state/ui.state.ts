@@ -12,18 +12,20 @@ import { UIService } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
 import { AppsState } from './apps.state';
 
+type Settings = { canCreateApps?: boolean, [key: string]: any };
+
 interface Snapshot {
     // All common settings.
-    settingsCommon: {};
+    settingsCommon: Settings;
 
     // All shared app settings.
-    settingsShared?: {} | null;
+    settingsShared?: Settings | null;
 
     // All user app settings.
-    settingsUser?: {} | null;
+    settingsUser?: Settings | null;
 
     // The merged settings of app and common settings.
-    settings: {};
+    settings: Settings;
 
     // Indicates if the user can read events.
     canReadEvents?: boolean;
@@ -212,7 +214,7 @@ export class UIState extends State<Snapshot> {
     }
 }
 
-function getValue<T>(setting: {} | undefined | null, path: string, defaultValue: T) {
+function getValue<T>(setting: Settings | undefined | null, path: string, defaultValue: T) {
     if (!setting) {
         return defaultValue;
     }
@@ -236,7 +238,7 @@ function getValue<T>(setting: {} | undefined | null, path: string, defaultValue:
     return <T><any>current;
 }
 
-function getContainer(settings: {} | undefined | null, path: string) {
+function getContainer(settings: Settings | undefined | null, path: string) {
     const segments = path.split('.');
 
     let current = { ...settings };

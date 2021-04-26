@@ -26,7 +26,7 @@
                         </div>
                     </ng-container>
 
-                    <ng-container *ngIf="(uiState.settings | async).canCreateApps">
+                    <ng-container *ngIf="(uiState.settings | async)?.canCreateApps">
                         <div class="dropdown-divider"></div>
         
                         <div class="dropdown-button">
