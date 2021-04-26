@@ -55,6 +55,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             Assert.False(sut.CanCreateSnapshotEvents);
         }
 
+        [Fact]
+        public void Should_handle_schema_event()
+        {
+            Assert.True(sut.Handles(new SchemaCreated()));
+        }
+
+        [Fact]
+        public void Should_not_handle_other_event()
+        {
+            Assert.False(sut.Handles(new AppCreated()));
+        }
+
         [Theory]
         [MemberData(nameof(TestEvents))]
         public async Task Should_create_enriched_events(SchemaEvent @event, EnrichedSchemaEventType type)
@@ -71,19 +83,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_if_event_type_not_correct()
-        {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new AppCreated();
-
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
-
-                Assert.False(result);
-            });
-        }
-
-        [Fact]
         public void Should_trigger_precheck_if_event_type_correct()
         {
             TestForCondition(string.Empty, ctx =>
@@ -93,19 +92,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
                 Assert.True(result);
-            });
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_event_type_not_correct()
-        {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new EnrichedContentEvent();
-
-                var result = sut.Trigger(@event, ctx);
-
-                Assert.False(result);
             });
         }
 

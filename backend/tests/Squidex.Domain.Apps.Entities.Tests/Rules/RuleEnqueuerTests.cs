@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             };
 
             A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule.RuleDef), default))
-                .Returns(new List<CreatedJob> { new CreatedJob(null) }.ToAsyncEnumerable());
+                .Returns(new List<JobResult> { new JobResult(null) }.ToAsyncEnumerable());
 
             await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             };
 
             A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule.RuleDef), default))
-                .Returns(new List<CreatedJob> { new CreatedJob(job) }.ToAsyncEnumerable());
+                .Returns(new List<JobResult> { new JobResult(job) }.ToAsyncEnumerable());
 
             await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
@@ -159,10 +159,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 .Returns(new List<IRuleEntity> { rule1, rule2 });
 
             A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule1.RuleDef), default))
-                .Returns(new List<CreatedJob> { new CreatedJob(job1) }.ToAsyncEnumerable());
+                .Returns(new List<JobResult> { new JobResult(job1) }.ToAsyncEnumerable());
 
             A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule2.RuleDef), default))
-                .Returns(new List<CreatedJob>().ToAsyncEnumerable());
+                .Returns(new List<JobResult>().ToAsyncEnumerable());
         }
 
         private static RuleEntity CreateRule()

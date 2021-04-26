@@ -52,6 +52,24 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
+        public void Should_handle_comment_event()
+        {
+            Assert.True(sut.Handles(new CommentCreated()));
+        }
+
+        [Fact]
+        public void Should_not_handle_comment_update_event()
+        {
+            Assert.False(sut.Handles(new CommentUpdated()));
+        }
+
+        [Fact]
+        public void Should_not_handle_other_event()
+        {
+            Assert.False(sut.Handles(new ContentCreated()));
+        }
+
+        [Fact]
         public async Task Should_create_enriched_events()
         {
             var ctx = Context();
@@ -129,49 +147,6 @@ namespace Squidex.Domain.Apps.Entities.Comments
         }
 
         [Fact]
-        public async Task Should_skip_udated_event()
-        {
-            var ctx = Context();
-
-            var @event = new CommentUpdated();
-
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
-
-            Assert.Empty(result);
-
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_skip_deleted_event()
-        {
-            var ctx = Context();
-
-            var @event = new CommentDeleted();
-
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
-
-            Assert.Empty(result);
-
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public void Should_not_trigger_precheck_if_event_type_not_correct()
-        {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new ContentCreated();
-
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
-
-                Assert.False(result);
-            });
-        }
-
-        [Fact]
         public void Should_trigger_precheck_if_event_type_correct()
         {
             TestForCondition(string.Empty, ctx =>
@@ -181,19 +156,6 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
                 Assert.True(result);
-            });
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_event_type_not_correct()
-        {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new EnrichedContentEvent();
-
-                var result = sut.Trigger(@event, ctx);
-
-                Assert.False(result);
             });
         }
 

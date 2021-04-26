@@ -36,8 +36,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return null;
         }
 
-        bool Trigger(Envelope<AppEvent> @event, RuleContext context);
+        bool Trigger(Envelope<AppEvent> @event, RuleContext context)
+        {
+            return true;
+        }
 
-        bool Trigger(EnrichedEvent @event, RuleContext context);
+        bool Trigger(EnrichedEvent @event, RuleContext context)
+        {
+            return true;
+        }
+
+        bool Handles(AppEvent @event);
     }
 }

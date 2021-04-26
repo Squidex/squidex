@@ -17,7 +17,7 @@ namespace Squidex.Translator.Processes
     {
         public static string RelativeName(FileInfo file, DirectoryInfo folder)
         {
-            return file.FullName.Substring(folder.FullName.Length).Replace("\\", "/");
+            return file.FullName[folder.FullName.Length..].Replace("\\", "/");
         }
 
         public static void CheckOtherLocales(TranslationService service)

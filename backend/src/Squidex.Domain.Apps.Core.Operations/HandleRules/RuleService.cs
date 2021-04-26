@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return triggerHandler.CanCreateSnapshotEvents;
         }
 
-        public async IAsyncEnumerable<CreatedJob> CreateSnapshotJobsAsync(RuleContext context,
+        public async IAsyncEnumerable<JobResult> CreateSnapshotJobsAsync(RuleContext context,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
             Guard.NotNull(context.Rule, nameof(context.Rule));
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             await foreach (var enrichedEvent in triggerHandler.CreateSnapshotEventsAsync(context, ct))
             {
-                CreatedJob? job;
+                JobResult? job;
                 try
                 {
                     await eventEnricher.EnrichAsync(enrichedEvent, null);
@@ -126,19 +126,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
                 catch (Exception ex)
                 {
-                    job = new CreatedJob(null, ex);
+                    job = new JobResult(null, ex);
                 }
 
                 yield return job;
             }
         }
 
-        public async IAsyncEnumerable<CreatedJob> CreateJobsAsync(Envelope<IEvent> @event, RuleContext context,
+        public async IAsyncEnumerable<JobResult> CreateJobsAsync(Envelope<IEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
             Guard.NotNull(@event, nameof(@event));
 
-            var jobs = new List<CreatedJob>();
+            var jobs = new List<JobResult>();
 
             await AddJobsAsync(jobs, @event, context, ct);
 
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        private async Task AddJobsAsync(List<CreatedJob> jobs, Envelope<IEvent> @event, RuleContext context, CancellationToken ct)
+        private async Task AddJobsAsync(List<JobResult> jobs, Envelope<IEvent> @event, RuleContext context, CancellationToken ct)
         {
             try
             {
@@ -161,13 +161,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 if (!rule.IsEnabled)
                 {
-                    jobs.Add(new CreatedJob(null, null, SkipReason.Disabled));
+                    jobs.Add(JobResult.Disabled);
                     return;
                 }
 
                 if (@event.Payload is not AppEvent)
                 {
-                    jobs.Add(new CreatedJob(null, null, SkipReason.EventMismatch));
+                    jobs.Add(JobResult.EventMismatch);
                     return;
                 }
 
@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 if (typed.Payload.FromRule)
                 {
-                    jobs.Add(new CreatedJob(null, null, SkipReason.FromRule));
+                    jobs.Add(JobResult.FromRule);
                     return;
                 }
 
@@ -183,13 +183,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 if (!ruleTriggerHandlers.TryGetValue(rule.Trigger.GetType(), out var triggerHandler))
                 {
-                    jobs.Add(new CreatedJob(null, null, SkipReason.NoTrigger));
+                    jobs.Add(JobResult.NoTrigger);
+                    return;
+                }
+
+                if (!triggerHandler.Handles(typed.Payload))
+                {
+                    jobs.Add(JobResult.WrongEventForTrigger);
                     return;
                 }
 
                 if (!ruleActionHandlers.TryGetValue(actionType, out var actionHandler))
                 {
-                    jobs.Add(new CreatedJob(null, null, SkipReason.NoAction));
+                    jobs.Add(JobResult.NoAction);
                     return;
                 }
 
@@ -202,13 +208,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 if (context.IgnoreStale && eventTime.Plus(Constants.StaleTime) < now)
                 {
-                    jobs.Add(new CreatedJob(null, null, SkipReason.TooOld));
+                    jobs.Add(JobResult.TooOld);
                     return;
                 }
 
                 if (!triggerHandler.Trigger(typed, context))
                 {
-                    jobs.Add(new CreatedJob(null, null, SkipReason.ConditionDoesNotMatch));
+                    jobs.Add(JobResult.ConditionDoesNotMatch);
                     return;
                 }
 
@@ -227,7 +233,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         {
                             if (jobs.Count == 0)
                             {
-                                jobs.Add(new CreatedJob(null, null, SkipReason.ConditionDoesNotMatch));
+                                jobs.Add(JobResult.ConditionDoesNotMatch);
                             }
 
                             continue;
@@ -241,7 +247,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     {
                         if (jobs.Count == 0)
                         {
-                            jobs.Add(new CreatedJob(null, null, SkipReason.Failed));
+                            jobs.Add(new JobResult(null, ex, SkipReason.Failed));
                         }
 
                         log.LogError(ex, w => w
@@ -252,7 +258,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
             catch (Exception ex)
             {
-                jobs.Add(new CreatedJob(null, null, SkipReason.Failed));
+                jobs.Add(new JobResult(null, ex, SkipReason.Failed));
 
                 log.LogError(ex, w => w
                     .WriteProperty("action", "createRuleJob")
@@ -260,7 +266,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        private async Task<CreatedJob> CreateJobAsync(IRuleActionHandler actionHandler, EnrichedEvent enrichedEvent, RuleContext context, Instant now)
+        private async Task<JobResult> CreateJobAsync(IRuleActionHandler actionHandler, EnrichedEvent enrichedEvent, RuleContext context, Instant now)
         {
             var actionName = typeNameRegistry.GetName(context.Rule.Action.GetType());
 
@@ -289,13 +295,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 job.ActionName = actionName;
                 job.Description = description;
 
-                return new CreatedJob(job, null);
+                return new JobResult(job, null);
             }
             catch (Exception ex)
             {
                 job.Description = "Failed to create job";
 
-                return new CreatedJob(job, ex);
+                return new JobResult(job, ex);
             }
         }
 
@@ -303,11 +309,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             foreach (var handler in ruleTriggerHandlers.Values)
             {
-                var name = handler.GetName(@event);
-
-                if (!string.IsNullOrWhiteSpace(name))
+                if (handler.Handles(@event))
                 {
-                    return name;
+                    var name = handler.GetName(@event);
+
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        return name;
+                    }
                 }
             }
 

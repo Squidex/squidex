@@ -31,6 +31,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         }
 
         [Fact]
+        public void Should_handle_usage_event()
+        {
+            Assert.True(sut.Handles(new AppUsageExceeded()));
+        }
+
+        [Fact]
+        public void Should_not_handle_other_event()
+        {
+            Assert.False(sut.Handles(new ContentCreated()));
+        }
+
+        [Fact]
         public async Task Should_create_enriched_event()
         {
             var ctx = Context();
@@ -43,18 +55,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
             Assert.Equal(@event.CallsCurrent, enrichedEvent!.CallsCurrent);
             Assert.Equal(@event.CallsLimit, enrichedEvent!.CallsLimit);
-        }
-
-        [Fact]
-        public void Should_not_trigger_precheck_if_event_type_not_correct()
-        {
-            var ctx = Context();
-
-            var @event = new ContentCreated();
-
-            var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
-
-            Assert.False(result);
         }
 
         [Fact]
@@ -79,16 +79,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
             Assert.True(result);
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_event_type_not_correct()
-        {
-            var ctx = Context();
-
-            var result = sut.Trigger(new EnrichedContentEvent(), ctx);
-
-            Assert.False(result);
         }
 
         private static RuleContext Context(RuleTrigger? trigger = null)

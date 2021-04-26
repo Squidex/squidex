@@ -24,6 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         public Type TriggerType => typeof(ManualTrigger);
 
+        public bool Handles(AppEvent appEvent)
+        {
+            return appEvent is RuleManuallyTriggered;
+        }
+
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct)
         {
@@ -38,22 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public string? GetName(AppEvent @event)
         {
-            if (@event is RuleManuallyTriggered)
-            {
-                return "Manual";
-            }
-
-            return null;
-        }
-
-        public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
-        {
-            return @event.Payload is RuleManuallyTriggered;
-        }
-
-        public bool Trigger(EnrichedEvent @event, RuleContext context)
-        {
-            return true;
+            return "Manual";
         }
     }
 }

@@ -32,6 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Users.Tests"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{360C300D-0F7E-439D-A437-714C959E3CAD}"
 	ProjectSection(SolutionItems) = preProject
+		Squidex.ruleset = Squidex.ruleset
 		stylecop.json = stylecop.json
 	EndProjectSection
 EndProject

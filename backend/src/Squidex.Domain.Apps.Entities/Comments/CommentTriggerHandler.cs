@@ -39,13 +39,15 @@ namespace Squidex.Domain.Apps.Entities.Comments
             this.userResolver = userResolver;
         }
 
+        public bool Handles(AppEvent @event)
+        {
+            return @event is CommentCreated;
+        }
+
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct)
         {
-            if (@event.Payload is not CommentCreated commentCreated)
-            {
-                yield break;
-            }
+            var commentCreated = (CommentCreated)@event.Payload;
 
             if (commentCreated.Mentions?.Length > 0)
             {
@@ -70,22 +72,9 @@ namespace Squidex.Domain.Apps.Entities.Comments
             }
         }
 
-        public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
-        {
-            return @event.Payload is CommentsEvent;
-        }
-
         public bool Trigger(EnrichedEvent @event, RuleContext context)
         {
-            if (context.Rule.Trigger is not CommentTrigger trigger)
-            {
-                return false;
-            }
-
-            if (@event is not EnrichedCommentEvent)
-            {
-                return false;
-            }
+            var trigger = (CommentTrigger)context.Rule.Trigger;
 
             if (string.IsNullOrWhiteSpace(trigger.Condition))
             {

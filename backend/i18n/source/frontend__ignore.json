@@ -193,12 +193,12 @@
   "/shared/services/schemas.types.ts": [
     "Invalid properties type"
   ],
+  "/shared/state/appSettings.patterns.forms.ts": [
+    "[A-z0-9]+[A-z0-9\\- ]*[A-z0-9]"
+  ],
   "/shared/state/contents.forms.visitors.ts": [
     "<Json />",
     "yyyy-MM-dd HH:mm:ss"
-  ],
-  "/shared/state/patterns.forms.ts": [
-    "[A-z0-9]+[A-z0-9\\- ]*[A-z0-9]"
   ],
   "/shared/state/query.ts": [
     "ends with",

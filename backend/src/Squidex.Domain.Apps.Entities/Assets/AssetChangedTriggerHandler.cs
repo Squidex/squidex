@@ -46,6 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetRepository = assetRepository;
         }
 
+        public bool Handles(AppEvent @event)
+        {
+            return @event is AssetEvent && @event is not AssetMoved;
+        }
+
         public async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
@@ -68,15 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
-            if (@event.Payload is not AssetEvent assetEvent)
-            {
-                yield break;
-            }
-
-            if (@event.Payload is AssetMoved)
-            {
-                yield break;
-            }
+            var assetEvent = (AssetEvent)@event.Payload;
 
             var result = new EnrichedAssetEvent();
 
@@ -111,22 +108,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             yield return result;
         }
 
-        public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
-        {
-            return @event.Payload is AssetEvent;
-        }
-
         public bool Trigger(EnrichedEvent @event, RuleContext context)
         {
-            if (context.Rule.Trigger is not AssetChangedTriggerV2 trigger)
-            {
-                return false;
-            }
-
-            if (@event is not EnrichedAssetEvent)
-            {
-                return false;
-            }
+            var trigger = (AssetChangedTriggerV2)context.Rule.Trigger;
 
             if (string.IsNullOrWhiteSpace(trigger.Condition))
             {

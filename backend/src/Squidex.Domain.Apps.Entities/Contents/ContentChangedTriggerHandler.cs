@@ -35,6 +35,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Type TriggerType => typeof(ContentChangedTriggerV2);
 
+        public bool Handles(AppEvent appEvent)
+        {
+            return appEvent is ContentEvent;
+        }
+
         public ContentChangedTriggerHandler(
             IScriptEngine scriptEngine,
             IContentLoader contentLoader,
@@ -52,10 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
-            if (context.Rule.Trigger is not ContentChangedTriggerV2 trigger)
-            {
-                yield break;
-            }
+            var trigger = (ContentChangedTriggerV2)context.Rule.Trigger;
 
             var schemaIds =
                 trigger.Schemas?.Count > 0 ?
@@ -81,10 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
-            if (@event.Payload is not ContentEvent contentEvent)
-            {
-                yield break;
-            }
+            var contentEvent = (ContentEvent)@event.Payload;
 
             var result = new EnrichedContentEvent();
 
@@ -153,25 +152,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public string? GetName(AppEvent @event)
         {
-            if (@event is ContentEvent contentEvent)
-            {
-                return $"{@event.GetType().Name}({contentEvent.SchemaId.Name.ToPascalCase()})";
-            }
+            var contentEvent = (ContentEvent)@event;
 
-            return null;
+            return $"{@event.GetType().Name}({contentEvent.SchemaId.Name.ToPascalCase()})";
         }
 
         public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
         {
-            if (context.Rule.Trigger is not ContentChangedTriggerV2 trigger)
-            {
-                return false;
-            }
-
-            if (@event.Payload is not ContentEvent)
-            {
-                return false;
-            }
+            var trigger = (ContentChangedTriggerV2)context.Rule.Trigger;
 
             if (trigger.HandleAll)
             {
@@ -196,15 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public bool Trigger(EnrichedEvent @event, RuleContext context)
         {
-            if (context.Rule.Trigger is not ContentChangedTriggerV2 trigger)
-            {
-                return false;
-            }
-
-            if (@event is not EnrichedContentEvent)
-            {
-                return false;
-            }
+            var trigger = (ContentChangedTriggerV2)context.Rule.Trigger;
 
             if (trigger.HandleAll)
             {

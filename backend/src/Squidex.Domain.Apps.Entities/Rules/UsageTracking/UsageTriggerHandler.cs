@@ -24,13 +24,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         public Type TriggerType => typeof(UsageTrigger);
 
+        public bool Handles(AppEvent appEvent)
+        {
+            return appEvent is AppUsageExceeded;
+        }
+
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct)
         {
-            if (@event.Payload is not AppUsageExceeded usageEvent)
-            {
-                yield break;
-            }
+            var usageEvent = (AppUsageExceeded)@event.Payload;
 
             var result = new EnrichedUsageExceededEvent
             {
@@ -46,22 +48,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
         {
-            if (context.Rule.Trigger is not UsageTrigger trigger)
-            {
-                return false;
-            }
+            var trigger = (UsageTrigger)context.Rule.Trigger;
 
-            if (@event.Payload is not AppUsageExceeded usageEvent)
-            {
-                return false;
-            }
+            var usageEvent = (AppUsageExceeded)@event.Payload;
 
             return usageEvent.CallsLimit >= trigger.Limit;
-        }
-
-        public bool Trigger(EnrichedEvent @event, RuleContext context)
-        {
-            return @event is EnrichedUsageExceededEvent;
         }
     }
 }

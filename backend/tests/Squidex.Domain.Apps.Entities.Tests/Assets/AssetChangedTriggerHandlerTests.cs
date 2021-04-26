@@ -58,6 +58,24 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public void Should_handle_asset_event()
+        {
+            Assert.True(sut.Handles(new AssetCreated()));
+        }
+
+        [Fact]
+        public void Should_not_handle_asset_moved_event()
+        {
+            Assert.False(sut.Handles(new AssetMoved()));
+        }
+
+        [Fact]
+        public void Should_not_handle_other_event()
+        {
+            Assert.False(sut.Handles(new ContentCreated()));
+        }
+
+        [Fact]
         public async Task Should_create_events_from_snapshots()
         {
             var ctx = Context();
@@ -95,57 +113,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var enrichedEvent = result.Single() as EnrichedAssetEvent;
 
             Assert.Equal(type, enrichedEvent!.Type);
-        }
-
-        [Fact]
-        public async Task Should_skip_moved_event()
-        {
-            var ctx = Context();
-
-            var @event = new AssetMoved();
-
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
-
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public void Should_not_trigger_precheck_if_event_type_not_correct()
-        {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new ContentCreated();
-
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
-
-                Assert.False(result);
-            });
-        }
-
-        [Fact]
-        public void Should_trigger_precheck_if_event_type_correct()
-        {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new AssetCreated();
-
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
-
-                Assert.True(result);
-            });
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_event_type_not_correct()
-        {
-            TestForCondition(string.Empty, ctx =>
-            {
-                var @event = new EnrichedContentEvent();
-
-                var result = sut.Trigger(@event, ctx);
-
-                Assert.False(result);
-            });
         }
 
         [Fact]

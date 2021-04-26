@@ -65,6 +65,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public void Should_handle_content_event()
+        {
+            Assert.True(sut.Handles(new ContentCreated()));
+        }
+
+        [Fact]
+        public void Should_not_handle_other_event()
+        {
+            Assert.False(sut.Handles(new AssetMoved()));
+        }
+
+        [Fact]
         public void Should_calculate_name()
         {
             var @event = new ContentCreated { SchemaId = schemaMatch };
@@ -174,19 +186,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_if_event_type_not_correct()
-        {
-            TestForTrigger(handleAll: true, schemaId: null, condition: null, action: ctx =>
-            {
-                var @event = new AssetCreated();
-
-                var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
-
-                Assert.False(result);
-            });
-        }
-
-        [Fact]
         public void Should_not_trigger_precheck_if_trigger_contains_no_schemas()
         {
             TestForTrigger(handleAll: false, schemaId: null, condition: null, action: ctx =>
@@ -233,17 +232,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 var @event = new ContentCreated { SchemaId = schemaMatch };
 
                 var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
-
-                Assert.False(result);
-            });
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_event_type_not_correct()
-        {
-            TestForTrigger(handleAll: true, schemaId: null, condition: null, action: ctx =>
-            {
-                var result = sut.Trigger(new EnrichedAssetEvent(), ctx);
 
                 Assert.False(result);
             });

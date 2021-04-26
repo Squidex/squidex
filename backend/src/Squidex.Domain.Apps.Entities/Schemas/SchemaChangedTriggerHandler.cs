@@ -35,6 +35,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.scriptEngine = scriptEngine;
         }
 
+        public bool Handles(AppEvent appEvent)
+        {
+            return appEvent is SchemaEvent;
+        }
+
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
             [EnumeratorCancellation] CancellationToken ct)
         {
@@ -72,22 +77,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             yield return result;
         }
 
-        public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
-        {
-            return @event.Payload is SchemaEvent;
-        }
-
         public bool Trigger(EnrichedEvent @event, RuleContext context)
         {
-            if (context.Rule.Trigger is not SchemaChangedTrigger trigger)
-            {
-                return false;
-            }
-
-            if (@event is not EnrichedSchemaEvent)
-            {
-                return false;
-            }
+            var trigger = (SchemaChangedTrigger)context.Rule.Trigger;
 
             if (string.IsNullOrWhiteSpace(trigger.Condition))
             {

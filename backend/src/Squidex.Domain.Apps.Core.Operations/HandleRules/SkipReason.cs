@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         FromRule,
         NoAction,
         NoTrigger,
-        TooOld
+        TooOld,
+        WrongEventForTrigger
     }
 }

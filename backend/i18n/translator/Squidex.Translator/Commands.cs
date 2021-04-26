@@ -6,12 +6,16 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CommandDotNet;
 using FluentValidation;
 using FluentValidation.Attributes;
 using Squidex.Translator.Processes;
 using Squidex.Translator.State;
+
+#pragma warning disable CA1822 // Mark members as static
 
 namespace Squidex.Translator
 {
@@ -120,7 +124,19 @@ namespace Squidex.Translator
                     throw new ArgumentException("Folder does not exist.");
                 }
 
-                var locales = new string[] { "en", "nl", "it" };
+                var supportedLocaled = new string[] { "en", "nl", "it" };
+
+                var locales = supportedLocaled;
+
+                if (arguments.Locales != null && arguments.Locales.Any())
+                {
+                    locales = supportedLocaled.Intersect(arguments.Locales).ToArray();
+                }
+
+                if (locales.Length == 0)
+                {
+                    locales = supportedLocaled;
+                }
 
                 var translationsDirectory = new DirectoryInfo(Path.Combine(arguments.Folder, "backend", "i18n"));
                 var translationsService = new TranslationService(translationsDirectory, fileName, locales, arguments.SingleWords);
@@ -140,6 +156,9 @@ namespace Squidex.Translator
 
             [Option(LongName = "report", ShortName = "r")]
             public bool Report { get; set; }
+
+            [Option(LongName = "locale", ShortName = "l")]
+            public IEnumerable<string> Locales { get; set; }
 
             public sealed class Validator : AbstractValidator<TranslateArguments>
             {
