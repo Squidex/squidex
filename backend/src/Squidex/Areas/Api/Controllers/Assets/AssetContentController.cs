@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -60,8 +60,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="idOrSlug">The id or slug of the asset.</param>
-        /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="request">The request parameters.</param>
+        /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <returns>
         /// 200 => Asset found and content or (resized) image returned.
         /// 404 => Asset or app not found.

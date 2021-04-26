@@ -1,7 +1,7 @@
 // ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return Snapshot;
                     });
 
-                case DeleteContent deleteContent when (deleteContent.Permanent):
+                case DeleteContent deleteContent when deleteContent.Permanent:
                     return DeletePermanentAsync(deleteContent, async c =>
                     {
                         var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);

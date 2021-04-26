@@ -11,7 +11,7 @@ namespace Squidex.Shared
 {
     public static class Texts
     {
-        private static ResourceManager resourceManager;
+        private static ResourceManager? resourceManager;
 
         public static ResourceManager ResourceManager
         {

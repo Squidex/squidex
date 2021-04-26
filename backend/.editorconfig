@@ -1,16 +1,101 @@
-﻿[*.cs]
+﻿# NOTE: Requires **VS2019 16.3** or later
 
-# CS8618: Non-nullable field is uninitialized. Consider declaring as nullable.
+# Squidex Rules
+# Description: Squidex Rules
+
+[*.json]
+indent_style = space
+indent_size = 4
+
+[*.cs]
+charset = utf-8-bom
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+
+# FAILING ANALYZERS
+dotnet_diagnostic.RECS0002.severity = none
+dotnet_diagnostic.RECS0117.severity = none
+dotnet_diagnostic.SA0001.severity = none
+dotnet_diagnostic.SA1649.severity = none
+
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = none
+
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 dotnet_diagnostic.CS8618.severity = none
+
+# IDE0063: Use simple 'using' statement
+dotnet_diagnostic.IDE0063.severity = none
+
+# IDE0066: Convert switch statement to expression
+dotnet_diagnostic.IDE0066.severity = none
+
+# IDE0090: Use 'new(...)'
+dotnet_diagnostic.IDE0090.severity = none
+
+# RECS0129: Removes 'internal' modifiers that are not required
+dotnet_diagnostic.RECS0129.severity = none
+
+# RECS0145: Removes 'private' modifiers that are not required
+dotnet_diagnostic.RECS0145.severity = none
+
+# RECS0154: Parameter is never used
+dotnet_diagnostic.RECS0154.severity = none
+
+# SA1009: Closing parenthesis should be spaced correctly
+dotnet_diagnostic.SA1009.severity = none
 
 # SA1011: Closing square brackets should be spaced correctly
 dotnet_diagnostic.SA1011.severity = none
 
-# IDE0066: Convert switch statement to expression
-csharp_style_prefer_switch_expression = false:suggestion
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
 
-# IDE0010: Add missing cases
-dotnet_diagnostic.IDE0010.severity = none
+# SA1111: Closing parenthesis should be on line of last parameter
+dotnet_diagnostic.SA1111.severity = none
 
-# IDE0063: Use simple 'using' statement
-csharp_prefer_simple_using_statement = false:suggestion
+# SA1116: Split parameters should start on line after declaration
+dotnet_diagnostic.SA1116.severity = none
+
+# SA1117: Parameters should be on same line or separate lines
+dotnet_diagnostic.SA1117.severity = none
+
+# SA1118: Parameter should not span multiple lines
+dotnet_diagnostic.SA1118.severity = none
+
+# SA1127: Generic type constraints should be on their own line
+dotnet_diagnostic.SA1127.severity = none
+
+# SA1201: Elements should appear in the correct order
+dotnet_diagnostic.SA1201.severity = none
+
+# SA1202: Elements should be ordered by access
+dotnet_diagnostic.SA1202.severity = none
+
+# SA1204: Static elements should appear before instance elements
+dotnet_diagnostic.SA1204.severity = none
+
+# SA1402: File may only contain a single type
+dotnet_diagnostic.SA1402.severity = none
+
+# SA1413: Use trailing comma in multi-line initializers
+dotnet_diagnostic.SA1413.severity = none
+
+# SA1515: Single-line comment should be preceded by blank line
+dotnet_diagnostic.SA1515.severity = none
+
+# SA1516: Elements should be separated by blank line
+dotnet_diagnostic.SA1516.severity = none
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none
+
+# SA1601: Partial elements should be documented
+dotnet_diagnostic.SA1601.severity = none
+
+# SA1602: Enumeration items should be documented
+dotnet_diagnostic.SA1602.severity = none
+
+# SA1623: Property summary documentation should match accessors
+dotnet_diagnostic.SA1623.severity = none

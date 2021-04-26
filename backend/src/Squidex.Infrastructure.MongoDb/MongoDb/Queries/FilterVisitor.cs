@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
                 return new BsonRegularExpression("null", "i");
             }
 
-            if (value.Length > 3 && (value[0] == '/' && value[^1] == '/' || value[^2] == '/'))
+            if (value.Length > 3 && ((value[0] == '/' && value[^1] == '/') || value[^2] == '/'))
             {
                 if (value[^1] == 'i')
                 {

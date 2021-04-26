@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -22,7 +22,6 @@ namespace Squidex.Web.CommandMiddlewares
     public class EnrichWithSchemaIdCommandMiddlewareTests
     {
         private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
-        private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly HttpContext httpContext = new DefaultHttpContext();

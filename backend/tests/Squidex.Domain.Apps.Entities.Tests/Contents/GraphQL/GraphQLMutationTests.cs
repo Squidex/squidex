@@ -1,6 +1,6 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
-// ================================ ==========================================
+// ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsCreate);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsCreate);
 
             var expected = new
             {
@@ -232,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -265,7 +265,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -340,7 +340,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsUpsert);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsUpsert);
 
             var expected = new
             {
@@ -374,7 +374,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpsert);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpsert);
 
             var expected = new
             {
@@ -450,7 +450,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -483,7 +483,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -560,7 +560,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsChangeStatusOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsChangeStatusOwn);
 
             var expected = new
             {
@@ -594,7 +594,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsChangeStatusOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsChangeStatusOwn);
 
             var expected = new
             {
@@ -628,7 +628,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsChangeStatusOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsChangeStatusOwn);
 
             var expected = new
             {
@@ -704,7 +704,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(CommandResult.Empty(contentId, 13, 12));
 
-            var result = await ExecuteAsync( new ExecutionOptions { Query = query }, Permissions.AppContentsDeleteOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query }, Permissions.AppContentsDeleteOwn);
 
             var expected = new
             {

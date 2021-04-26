@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -24,9 +24,9 @@ namespace Squidex.Infrastructure.TestHelpers
         {
             switch (@event.Payload)
             {
-                case ValueChanged valueChanged when (valueChanged.Value != Unchanged):
+                case ValueChanged valueChanged when valueChanged.Value != Unchanged:
                     return this with { Value = valueChanged.Value };
-                case Deleted when (!IsDeleted):
+                case Deleted when !IsDeleted:
                     return this with { IsDeleted = true };
             }
 

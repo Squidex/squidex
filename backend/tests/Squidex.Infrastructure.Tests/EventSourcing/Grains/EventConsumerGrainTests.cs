@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     {
         public sealed class MyEventConsumerGrain : EventConsumerGrain
         {
-            private IEventSubscriber currentSubscriber;
+            private IEventSubscriber? currentSubscriber;
 
             public MyEventConsumerGrain(
                 EventConsumerFactory eventConsumerFactory,
@@ -35,12 +35,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             public Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
             {
-                return currentSubscriber.OnEventAsync(subscription, storedEvent);
+                return currentSubscriber!.OnEventAsync(subscription, storedEvent);
             }
 
             public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
             {
-                return currentSubscriber.OnErrorAsync(subscription, exception);
+                return currentSubscriber!.OnErrorAsync(subscription, exception);
             }
 
             protected override IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)
