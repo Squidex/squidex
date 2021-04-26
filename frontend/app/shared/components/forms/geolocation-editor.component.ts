@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
@@ -41,6 +41,11 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
+
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
 
     public readonly isGoogleMaps: boolean;
 
@@ -101,13 +106,11 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         }
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled(isDisabled: boolean) {
         if (!this.isGoogleMaps) {
-            this.setDisabledStateOSM(isDisabled);
+            this.updateOSMDisabled(isDisabled);
         } else {
-            this.setDisabledStateGoogle(isDisabled);
+            this.updateGoogleDisabled(isDisabled);
         }
 
         if (isDisabled) {
@@ -117,7 +120,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         }
     }
 
-    private setDisabledStateOSM(isDisabled: boolean): void {
+    private updateOSMDisabled(isDisabled: boolean): void {
         const update: (t: any) => any =
             isDisabled ?
             x => x.disable() :
@@ -136,7 +139,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         }
     }
 
-    private setDisabledStateGoogle(isDisabled: boolean): void {
+    private updateGoogleDisabled(isDisabled: boolean): void {
         const enabled = !isDisabled;
 
         if (this.map) {

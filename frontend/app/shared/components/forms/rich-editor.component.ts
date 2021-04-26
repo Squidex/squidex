@@ -36,6 +36,11 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     @Input()
     public folderId: string;
 
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
 
@@ -198,9 +203,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         }
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled() {
         if (this.tinyEditor && this.tinyEditor.initialized) {
             this.setReadOnly();
         }

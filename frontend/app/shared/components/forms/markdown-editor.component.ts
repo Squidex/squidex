@@ -33,10 +33,14 @@ interface State {
 export class MarkdownEditorComponent extends StatefulControlComponent<State, string> implements AfterViewInit {
     private simplemde: any;
     private value: string;
-    private isDisabled = false;
 
     @Input()
     public folderId?: string;
+
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
@@ -68,16 +72,14 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         }
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
-
+    public onDisabled(isDisabled: boolean) {
         if (this.simplemde) {
             this.simplemde.codemirror.setOption('readOnly', isDisabled);
         }
     }
 
     private showSelector = () => {
-        if (this.isDisabled) {
+        if (this.snapshot.isDisabled) {
             return;
         }
 
@@ -177,7 +179,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
             });
 
             this.simplemde.value(this.value || '');
-            this.simplemde.codemirror.setOption('readOnly', this.isDisabled);
+            this.simplemde.codemirror.setOption('readOnly', this.snapshot.isDisabled);
 
             this.simplemde.codemirror.on('change', () => {
                 const value = this.simplemde.value();
@@ -220,7 +222,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     private uploadFile(doc: any, file: File) {
-        if (this.isDisabled) {
+        if (this.snapshot.isDisabled) {
             return;
         }
 

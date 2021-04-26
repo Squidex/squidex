@@ -7,18 +7,15 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ResourceOwner, Router2State, RuleSimulatorState, SimulatedRuleEventsDto } from '@app/shared';
+import { ResourceOwner, RuleSimulatorState, SimulatedRuleEventDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-simulator-events-page',
     styleUrls: ['./rule-simulator-page.component.scss'],
-    templateUrl: './rule-simulator-page.component.html',
-    providers: [
-        Router2State
-    ]
+    templateUrl: './rule-simulator-page.component.html'
 })
-export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
-    public selectedRuleEvent?: SimulatedRuleEventsDto | null;
+export class RuleSimulatorPageComponent extends ResourceOwner implements OnInit {
+    public selectedRuleEvent?: SimulatedRuleEventDto | null;
 
     constructor(
         private route: ActivatedRoute,
@@ -39,7 +36,11 @@ export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
         this.ruleSimulatorState.load();
     }
 
-    public selectEvent(event: SimulatedRuleEventsDto) {
-        this.selectedRuleEvent = event;
+    public selectEvent(event: SimulatedRuleEventDto) {
+        if (this.selectedRuleEvent === event) {
+            this.selectedRuleEvent = null;
+        } else {
+            this.selectedRuleEvent = event;
+        }
     }
 }

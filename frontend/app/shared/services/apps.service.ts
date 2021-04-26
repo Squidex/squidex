@@ -193,7 +193,7 @@ export class AppsService {
 
                 return appSettings;
             }),
-            pretifyError('i18n:appSettings.loadFailed'));
+            pretifyError('i18n:apps.loadSettingsFailed'));
     }
 
     public putSettings(resource: Resource, dto: UpdateAppSettingsDto, version: Version): Observable<AppSettingsDto> {
@@ -208,7 +208,7 @@ export class AppsService {
             tap(() => {
                 this.analytics.trackEvent('App', 'Updated');
             }),
-            pretifyError('i18n:appSettings.updateFailed'));
+            pretifyError('i18n:apps.updateSettingsFailed'));
     }
 
     public postAppImage(resource: Resource, file: File, version: Version): Observable<number | AppDto> {

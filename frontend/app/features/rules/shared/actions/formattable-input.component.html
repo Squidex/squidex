@@ -3,7 +3,7 @@
         <input class="form-control" ngDefaultControl />
 
         <div class="input-group-apppend">
-            <select class="custom-select" [ngModel]="mode" (ngModelChange)="setMode($event)" [disabled]="isDisabled">
+            <select class="custom-select" [ngModel]="mode" (ngModelChange)="setMode($event)" [disabled]="disabled">
                 <option *ngFor="let supportedMode of modes" [ngValue]="supportedMode">{{supportedMode}}</option>
             </select>
         </div>

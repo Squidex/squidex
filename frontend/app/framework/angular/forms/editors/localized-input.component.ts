@@ -50,6 +50,11 @@ export class LocalizedInputComponent extends StatefulControlComponent<State, { [
     @Input()
     public id: string;
 
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     public dropdown = new ModalModel();
 
     public get currentValue() {

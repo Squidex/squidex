@@ -90,13 +90,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public inputName = 'tag-editor';
 
     @Input()
-    public set suggestions(value: ReadonlyArray<string | TagValue> | undefined | null) {
-        this.suggestionsSorted = getTagValues(value);
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
     }
 
     @Input()
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
+    public set suggestions(value: ReadonlyArray<string | TagValue> | undefined | null) {
+        this.suggestionsSorted = getTagValues(value);
     }
 
     public suggestionsSorted: ReadonlyArray<TagValue> = [];
@@ -184,9 +184,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         this.next({ items });
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled(isDisabled: boolean) {
         if (isDisabled) {
             this.addInput.disable({ emitEvent: false });
         } else {

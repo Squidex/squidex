@@ -59,6 +59,11 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     @Input()
     public url: string;
 
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     public assetsDialog = new DialogModel();
 
     public fullscreen: boolean;
@@ -198,9 +203,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
         this.sendValue();
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled() {
         this.sendDisabled();
     }
 

@@ -10,8 +10,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HelpComponent, RuleMustExistGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AssetChangedTriggerComponent, CommentTriggerComponent, ContentChangedTriggerComponent, GenericActionComponent, RuleComponent, RuleElementComponent, RuleEventBadgeClassPipe, RuleEventsPageComponent, RuleIconComponent, RulesPageComponent, SchemaChangedTriggerComponent, UsageTriggerComponent } from './declarations';
+import { AssetChangedTriggerComponent, CommentTriggerComponent, ContentChangedTriggerComponent, GenericActionComponent, RuleComponent, RuleElementComponent, RuleEventsPageComponent, RuleIconComponent, RuleSimulatorPageComponent, RulesPageComponent, SchemaChangedTriggerComponent, UsageTriggerComponent } from './declarations';
+import { RuleEventComponent } from './pages/events/rule-event.component';
 import { RulePageComponent } from './pages/rule/rule-page.component';
+import { SimulatedRuleEventComponent } from './pages/simulator/simulated-rule-event.component';
 import { FormattableInputComponent } from './shared/actions/formattable-input.component';
 
 const routes: Routes = [
@@ -41,6 +43,10 @@ const routes: Routes = [
                 component: RuleEventsPageComponent
             },
             {
+                path: 'simulator',
+                component: RuleSimulatorPageComponent
+            },
+            {
                 path: 'help',
                 component: HelpComponent,
                 data: {
@@ -65,12 +71,14 @@ const routes: Routes = [
         GenericActionComponent,
         RuleComponent,
         RuleElementComponent,
-        RuleEventBadgeClassPipe,
+        RuleEventComponent,
         RuleEventsPageComponent,
         RuleIconComponent,
         RulePageComponent,
+        RuleSimulatorPageComponent,
         RulesPageComponent,
         SchemaChangedTriggerComponent,
+        SimulatedRuleEventComponent,
         UsageTriggerComponent
     ]
 })

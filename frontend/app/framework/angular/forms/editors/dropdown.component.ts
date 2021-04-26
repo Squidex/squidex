@@ -8,7 +8,7 @@
 // tslint:disable: prefer-for-of
 
 import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, forwardRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, TemplateRef } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { map } from 'rxjs/operators';
 
@@ -39,7 +39,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, ControlValueAccessor, OnChanges, OnInit {
+export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnChanges, OnInit {
     private value: any;
 
     @Input()
@@ -56,6 +56,11 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     @Input()
     public separated?: boolean | null;
+
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
 
     @ContentChildren(TemplateRef)
     public templates: QueryList<any>;
@@ -134,9 +139,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         this.selectIndex(this.getSelectedIndex(obj), false);
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled(isDisabled: boolean) {
         if (isDisabled) {
             this.queryInput.disable({ emitEvent: false });
         } else {

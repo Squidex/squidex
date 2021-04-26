@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StatefulControlComponent, StockPhotoDto, StockPhotoService, thumbnail, Types, value$ } from '@app/shared';
 import { of } from 'rxjs';
@@ -33,6 +33,11 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     public valueControl = new FormControl('');
 
     public stockPhotoThumbnail = value$(this.valueControl).pipe(map(v => thumbnail(v, 400) || v));
@@ -80,9 +85,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
         }
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled(isDisabled: boolean) {
         if (isDisabled) {
             this.stockPhotoSearch.disable({ emitEvent: false });
         } else {

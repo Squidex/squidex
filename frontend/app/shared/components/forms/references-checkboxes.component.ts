@@ -40,6 +40,11 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
     @Input()
     public language: LanguageDto;
 
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     public get isValid() {
         return !!this.schemaId && !!this.language;
     }
@@ -95,9 +100,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         }
     }
 
-    public setDisabledState(isDisabled: boolean) {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled(isDisabled: boolean) {
         if (isDisabled) {
             this.control.disable(NO_EMIT);
         } else if (this.isValid) {

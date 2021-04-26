@@ -1,0 +1,53 @@
+<tr [class.expanded]="expanded">
+    <td class="cell-label">
+        <span class="badge badge-pill badge-{{jobResultClass}}">{{event.jobResult}}</span>
+    </td>
+    <td class="cell-40">
+        <span class="truncate">{{event.eventName}}</span>
+    </td>
+    <td class="cell-60">
+        <span class="truncate">{{event.description}}</span>
+    </td>
+    <td class="cell-time">
+        <small class="item-modified">{{event.created | sqxFromNow}}</small>
+    </td>
+    <td class="cell-actions">
+        <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="expanded" (click)="expandedChange.emit()">
+            <i class="icon-settings"></i>
+        </button>
+    </td>
+</tr>
+<tr *ngIf="expanded">
+    <td colspan="5">
+        <div class="event-header">
+            <h3>{{ 'rules.ruleEvents.lastInvokedLabel' | sqxTranslate }}</h3>
+        </div>
+        
+        <div class="row no-gutters event-stats align-items-center">
+            <div class="col-3">
+                <span class="badge badge-pill badge-{{resultClass}}">{{event.result}}</span>
+            </div>
+            <div class="col-2">
+                {{ 'rules.ruleEvents.numAttemptsLabel' | sqxTranslate }}: {{event.numCalls}}
+            </div>
+            <div class="col-4">
+                {{ 'rules.ruleEvents.nextAttemptLabel' | sqxTranslate }}: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
+            </div>
+            <div class="col-3 text-right">
+                <button type="button" class="btn btn-text-danger btn-sm mr-1" (click)="cancel.emit()" [class.hidden]="!event.nextAttempt">
+                    {{ 'common.cancel' | sqxTranslate }}
+                </button>
+
+                <button type="button" class="btn btn-success btn-sm" (click)="enqueue.emit()">
+                    {{ 'rules.ruleEvents.enqueue' | sqxTranslate }}
+                </button>
+            </div>
+        </div>
+        <div class="row event-dump" *ngIf="event.lastDump">
+            <div class="col-12">
+                <sqx-code-editor [ngModel]="event.lastDump" [disabled]="true" mode="ace/editor/text"></sqx-code-editor>
+            </div>
+        </div>
+    </td>
+</tr>
+<tr class="spacer"></tr>

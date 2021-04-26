@@ -120,6 +120,12 @@ export abstract class StatefulControlComponent<T extends {}, TValue> extends Sta
 
     public setDisabledState(isDisabled: boolean): void {
         this.next({ isDisabled } as any);
+
+        this.onDisabled(this.snapshot.isDisabled);
+    }
+
+    public onDisabled(isDisabled: boolean) {
+        return;
     }
 
     public abstract writeValue(obj: any): void;

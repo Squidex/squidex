@@ -13,9 +13,9 @@ export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormattableInputComponent), multi: true
 };
 
-type TemplateMode = 'Plain' | 'Script' | 'Liquid';
+type TemplateMode = 'Text' | 'Script' | 'Liquid';
 
-const MODES: ReadonlyArray<TemplateMode> = ['Plain', 'Script', 'Liquid'];
+const MODES: ReadonlyArray<TemplateMode> = ['Text', 'Script', 'Liquid'];
 
 @Component({
     selector: 'sqx-formattable-input',
@@ -43,14 +43,16 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
     @ViewChild(CodeEditorComponent)
     public codeEditor: CodeEditorComponent;
 
-    public isDisabled: boolean;
+    public disabled = false;
 
     public get valueAccessor(): ControlValueAccessor {
         return this.codeEditor || this.inputEditor;
     }
 
     public modes = MODES;
-    public mode: TemplateMode = 'Plain';
+    public mode: TemplateMode = 'Text';
+
+    public aceMode = 'ace/editor/text';
 
     public ngAfterViewInit() {
         this.valueAccessor.registerOnChange((value: any) => {
@@ -67,7 +69,7 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
     }
 
     public writeValue(obj: any) {
-        this.mode = 'Plain';
+        let mode: TemplateMode = 'Text';
 
         if (Types.isString(obj)) {
             this.value = obj;
@@ -78,22 +80,28 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
                 if (lower.startsWith('liquid(')) {
                     this.value = obj.substr(7, obj.length - 8);
 
-                    this.mode = 'Liquid';
+                    mode = 'Liquid';
                 } else if (lower.startsWith('script(')) {
                     this.value = obj.substr(7, obj.length - 8);
 
-                    this.mode = 'Script';
+                    mode = 'Script';
                 }
             }
         } else {
             this.value = undefined;
         }
 
+        if (this.mode !== mode) {
+            this.mode = mode;
+
+            this.aceMode = `ace/mode/${mode.toLowerCase()}`;
+        }
+
         this.valueAccessor?.writeValue(this.value);
     }
 
     public setDisabledState(isDisabled: boolean) {
-        this.isDisabled = isDisabled;
+        this.disabled = isDisabled;
 
         this.valueAccessor?.setDisabledState?.(isDisabled);
     }
