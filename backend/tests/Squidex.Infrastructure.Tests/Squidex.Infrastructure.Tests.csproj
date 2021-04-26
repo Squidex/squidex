@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Squidex.Infrastructure</RootNamespace>
     <LangVersion>9.0</LangVersion>
+    <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
@@ -33,10 +34,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  <PropertyGroup>
-    <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>
-    <NeutralLanguage>en</NeutralLanguage>
-  </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>

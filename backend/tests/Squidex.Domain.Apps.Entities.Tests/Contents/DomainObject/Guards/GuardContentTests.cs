@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync(((ContentEntity)context.Content), Status.Archived))
+            A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)context.Content, Status.Archived))
                 .Returns(Task.FromResult<StatusInfo?>(null));
 
             await Assert.ThrowsAsync<ValidationException>(() => context.CheckStatusAsync(Status.Archived));
@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync(((ContentEntity)context.Content), Status.Archived))
+            A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)context.Content, Status.Archived))
                 .Returns(new StatusInfo(Status.Archived, StatusColors.Archived));
 
             await context.CheckStatusAsync(Status.Archived);
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             await context.CheckStatusAsync(Status.Archived);
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync(((ContentEntity)context.Content), Status.Archived))
+            A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)context.Content, Status.Archived))
                 .MustNotHaveHappened();
         }
 
@@ -233,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(((ContentEntity)context.Content), Status.Draft, Status.Archived, context.User))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)context.Content, Status.Draft, Status.Archived, context.User))
                 .Returns(false);
 
             await Assert.ThrowsAsync<ValidationException>(() => context.CheckTransitionAsync(Status.Archived));
@@ -244,7 +244,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(((ContentEntity)context.Content), Status.Draft, Status.Archived, context.User))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)context.Content, Status.Draft, Status.Archived, context.User))
                 .Returns(true);
 
             await context.CheckTransitionAsync(Status.Archived);
@@ -257,7 +257,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             await context.CheckTransitionAsync(Status.Archived);
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(((ContentEntity)context.Content), A<Status>._, A<Status>._, A<ClaimsPrincipal>._))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)context.Content, A<Status>._, A<Status>._, A<ClaimsPrincipal>._))
                 .MustNotHaveHappened();
         }
 
@@ -299,7 +299,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
-            ((ContentEntity)((ContentEntity)context.Content)).CreatedBy = RefToken.User("456");
+            ((ContentEntity)(ContentEntity)context.Content).CreatedBy = RefToken.User("456");
 
             Assert.Throws<DomainForbiddenException>(() => context.MustHavePermission(Permissions.AppContentsDelete));
         }

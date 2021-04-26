@@ -29,12 +29,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private const string FieldRequestMethod = "RequestMethod";
         private const string FieldRequestPath = "RequestPath";
         private const string FieldTimestamp = "Timestamp";
+
         private static readonly CsvConfiguration CsvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             Delimiter = "|",
             LeaveOpen = true,
             LineBreakInQuotedFieldIsBadData = false
         };
+
         private readonly IRequestLogStore requestLogStore;
 
         public DefaultAppLogStore(IRequestLogStore requestLogStore)

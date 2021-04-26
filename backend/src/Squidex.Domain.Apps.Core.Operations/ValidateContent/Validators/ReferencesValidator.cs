@@ -1,7 +1,7 @@
 // ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         isValid = false;
                     }
 
-                    isValid &= (!properties.MustBePublished || status == Status.Published);
+                    isValid &= !properties.MustBePublished || status == Status.Published;
 
                     if (isValid)
                     {

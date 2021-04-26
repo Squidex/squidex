@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                     TrackNotified(appId);
                 }
 
-                isBlocked = isBlocked || plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls;
+                isBlocked = isBlocked || (plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls);
             }
 
             return isBlocked;

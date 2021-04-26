@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -87,8 +87,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Update a workflow.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="request">The new workflow.</param>
         /// <param name="id">The id of the workflow to update.</param>
+        /// <param name="request">The new workflow.</param>
         /// <returns>
         /// 200 => Workflow updated.
         /// 400 => Workflow request not valid.

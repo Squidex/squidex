@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.States
             await persistence.ReadAsync();
 
             Assert.Equal(-1, persistence.Version);
-            Assert.Equal( 0, persistedState.Value);
+            Assert.Equal(0, persistedState.Value);
         }
 
         [Fact]
