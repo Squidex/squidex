@@ -94,9 +94,60 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
+        public void Should_calculate_event_name_from_trigger_handler()
+        {
+            var @event = new ContentCreated();
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event))
+                .Returns(true);
+
+            A.CallTo(() => ruleTriggerHandler.GetName(@event))
+                .Returns("custom-name");
+
+            var name = sut.GetName(@event);
+
+            Assert.Equal("custom-name", name);
+        }
+
+        [Fact]
+        public void Should_calculate_default_name_if_trigger_handler_returns_no_name()
+        {
+            var @event = new ContentCreated();
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event))
+                .Returns(true);
+
+            A.CallTo(() => ruleTriggerHandler.GetName(@event))
+                .Returns(null);
+
+            var name = sut.GetName(@event);
+
+            Assert.Equal("ContentCreated", name);
+
+            A.CallTo(() => ruleTriggerHandler.GetName(@event))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public void Should_calculate_default_name_if_trigger_handler_cannot_not_handle_event()
+        {
+            var @event = new ContentCreated();
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event))
+                .Returns(false);
+
+            var name = sut.GetName(@event);
+
+            Assert.Equal("ContentCreated", name);
+
+            A.CallTo(() => ruleTriggerHandler.GetName(@event))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public void Should_not_run_from_snapshots_if_no_trigger_handler_registered()
         {
-            var result = sut.CanCreateSnapshotEvents(ContextWithInvalidTrigger());
+            var result = sut.CanCreateSnapshotEvents(RuleInvalidTrigger());
 
             Assert.False(result);
         }
@@ -107,7 +158,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
                 .Returns(false);
 
-            var result = sut.CanCreateSnapshotEvents(ContextWithRule());
+            var result = sut.CanCreateSnapshotEvents(Rule());
 
             Assert.False(result);
         }
@@ -118,7 +169,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
                 .Returns(true);
 
-            var result = sut.CanCreateSnapshotEvents(ContextWithRule());
+            var result = sut.CanCreateSnapshotEvents(Rule());
 
             Assert.True(result);
         }
@@ -129,7 +180,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
                 .Returns(false);
 
-            var jobs = await sut.CreateSnapshotJobsAsync(ContextWithRule()).ToListAsync();
+            var jobs = await sut.CreateSnapshotJobsAsync(Rule()).ToListAsync();
 
             Assert.Empty(jobs);
 
@@ -143,7 +194,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
                 .Returns(true);
 
-            var jobs = await sut.CreateSnapshotJobsAsync(ContextWithRule(disable: true)).ToListAsync();
+            var jobs = await sut.CreateSnapshotJobsAsync(Rule(disable: true)).ToListAsync();
 
             Assert.Empty(jobs);
 
@@ -157,7 +208,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
                 .Returns(true);
 
-            var jobs = await sut.CreateSnapshotJobsAsync(ContextWithInvalidTrigger()).ToListAsync();
+            var jobs = await sut.CreateSnapshotJobsAsync(RuleInvalidTrigger()).ToListAsync();
 
             Assert.Empty(jobs);
 
@@ -182,7 +233,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_jobs_from_snapshots()
         {
-            var context = ContextWithRule();
+            var context = Rule();
 
             A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
                 .Returns(true);
@@ -205,7 +256,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_jobs_with_exceptions_from_snapshots()
         {
-            var context = ContextWithRule();
+            var context = Rule();
 
             A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
                 .Returns(true);
@@ -230,7 +281,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new ContentCreated());
 
-            var (_, _, reason) = await sut.CreateJobsAsync(@event, ContextWithRule(disable: true)).SingleAsync();
+            var (_, _, reason) = await sut.CreateJobsAsync(@event, Rule(disable: true)).SingleAsync();
 
             Assert.Equal(SkipReason.Disabled, reason);
 
@@ -243,7 +294,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new InvalidEvent());
 
-            var (_, _, reason) = await sut.CreateJobsAsync(@event, ContextWithRule()).SingleAsync();
+            var (_, _, reason) = await sut.CreateJobsAsync(@event, Rule()).SingleAsync();
 
             Assert.Equal(SkipReason.EventMismatch, reason);
 
@@ -256,9 +307,22 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = Envelope.Create(new ContentCreated());
 
-            var (_, _, reason) = await sut.CreateJobsAsync(@event, ContextWithInvalidTrigger()).SingleAsync();
+            var (_, _, reason) = await sut.CreateJobsAsync(@event, RuleInvalidTrigger()).SingleAsync();
 
             Assert.Equal(SkipReason.NoTrigger, reason);
+
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<Envelope<AppEvent>>._, A<RuleContext>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_create_debug_job_if_trigger_handler_does_not_handle_event()
+        {
+            var @event = Envelope.Create(new ContentCreated());
+
+            var (_, _, reason) = await sut.CreateJobsAsync(@event, Rule()).SingleAsync();
+
+            Assert.Equal(SkipReason.WrongEventForTrigger, reason);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(A<Envelope<AppEvent>>._, A<RuleContext>._))
                 .MustNotHaveHappened();
@@ -268,6 +332,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public async Task Should_create_debug_job_if_no_action_handler_registered()
         {
             var @event = Envelope.Create(new ContentCreated());
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             var (_, _, reason) = await sut.CreateJobsAsync(@event, RuleInvalidAction()).SingleAsync();
 
@@ -284,7 +351,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Envelope.Create(new ContentCreated())
                     .SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
 
-            var (_, _, reason) = await sut.CreateJobsAsync(@event, ContextWithRule(ignoreState: true)).SingleAsync();
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
+
+            var (_, _, reason) = await sut.CreateJobsAsync(@event, Rule(ignoreState: true)).SingleAsync();
 
             Assert.Equal(SkipReason.TooOld, reason);
 
@@ -295,11 +365,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_job_if_too_old_but_stale_events_are_not_ignored()
         {
-            var context = ContextWithRule(ignoreState: false);
+            var context = Rule(ignoreState: false);
 
             var @event =
                 Envelope.Create(new ContentCreated())
                     .SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(A<Envelope<AppEvent>>._, context))
                 .Returns(true);
@@ -318,7 +391,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_debug_job_if_event_created_by_rule()
         {
-            var context = ContextWithRule();
+            var context = Rule();
 
             var @event = Envelope.Create(new ContentCreated { FromRule = true });
 
@@ -336,9 +409,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_debug_job_if_not_triggered_with_precheck()
         {
-            var context = ContextWithRule();
+            var context = Rule();
 
             var @event = Envelope.Create(new ContentCreated());
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(@event), context))
                 .Returns(false);
@@ -354,9 +430,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_debug_job_if_condition_check_failed()
         {
-            var context = ContextWithRule();
+            var context = Rule();
 
             var @event = Envelope.Create(new ContentCreated());
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(@event), context))
                 .Throws(new InvalidOperationException());
@@ -369,9 +448,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_jobs_if_enriched_event_not_created()
         {
-            var context = ContextWithRule();
+            var context = Rule();
 
             var @event = Envelope.Create(new ContentCreated());
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(@event), context))
                 .Returns(true);
@@ -387,11 +469,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_debug_job_if_not_triggered()
         {
-            var context = ContextWithRule();
+            var context = Rule();
 
             var enrichedEvent = new EnrichedContentEvent { AppId = appId };
 
             var @event = Envelope.Create(new ContentCreated());
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(@event), context))
                 .Returns(true);
@@ -412,11 +497,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var now = clock.GetCurrentInstant();
 
-            var context = ContextWithRule();
+            var context = Rule();
 
             var @event =
                 Envelope.Create(new ContentCreated())
                     .SetTimestamp(now);
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(@event), context))
                 .Returns(true);
@@ -434,13 +522,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var now = clock.GetCurrentInstant();
 
-            var context = ContextWithRule();
+            var context = Rule();
 
             var enrichedEvent = new EnrichedContentEvent { AppId = appId };
 
             var @event =
                 Envelope.Create(new ContentCreated())
                     .SetTimestamp(now);
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(@event), context))
                 .Returns(true);
@@ -467,13 +558,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var now = clock.GetCurrentInstant();
 
-            var context = ContextWithRule();
+            var context = Rule();
 
             var enrichedEvent = new EnrichedContentEvent { AppId = appId };
 
             var @event =
                 Envelope.Create(new ContentCreated())
                     .SetTimestamp(now);
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(@event), context))
                 .Returns(true);
@@ -502,7 +596,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var now = clock.GetCurrentInstant();
 
-            var context = ContextWithRule();
+            var context = Rule();
 
             var enrichedEvent1 = new EnrichedContentEvent { AppId = appId };
             var enrichedEvent2 = new EnrichedContentEvent { AppId = appId };
@@ -510,6 +604,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var @event =
                 Envelope.Create(new ContentCreated())
                     .SetTimestamp(now);
+
+            A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(@event), context))
                 .Returns(true);
@@ -608,7 +705,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             };
         }
 
-        private RuleContext ContextWithInvalidTrigger()
+        private RuleContext RuleInvalidTrigger()
         {
             return new RuleContext
             {
@@ -618,7 +715,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             };
         }
 
-        private RuleContext ContextWithRule(bool disable = false, bool ignoreState = true)
+        private RuleContext Rule(bool disable = false, bool ignoreState = true)
         {
             var rule = new Rule(new ContentChangedTriggerV2(), new ValidAction());
 
