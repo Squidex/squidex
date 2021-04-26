@@ -91,11 +91,7 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
             this.value = undefined;
         }
 
-        if (this.mode !== mode) {
-            this.mode = mode;
-
-            this.aceMode = `ace/mode/${mode.toLowerCase()}`;
-        }
+        this.setMode(mode, false);
 
         this.valueAccessor?.writeValue(this.value);
     }
@@ -106,12 +102,22 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
         this.valueAccessor?.setDisabledState?.(isDisabled);
     }
 
-    public setMode(newMode: TemplateMode) {
-        if (newMode !== this.mode) {
-            this.mode = newMode;
+    public setMode(mode: TemplateMode, emit = true) {
+        if (this.mode !== mode) {
+            this.mode = mode;
 
-            this.fnChanged(this.convertValue(this.value));
-            this.fnTouched();
+            if (mode === 'Script') {
+                this.aceMode = 'ace/mode/javascript';
+            } else if (mode === 'Liquid') {
+                this.aceMode = 'ace/mode/liquid';
+            } else {
+                this.aceMode = 'ace/editor/text';
+            }
+
+            if (emit) {
+                this.fnChanged(this.convertValue(this.value));
+                this.fnTouched();
+            }
         }
     }
 

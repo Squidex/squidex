@@ -45,7 +45,7 @@
         </div>
         <div class="row event-dump" *ngIf="event.lastDump">
             <div class="col-12">
-                <sqx-code-editor [ngModel]="event.lastDump" [disabled]="true" mode="ace/editor/text"></sqx-code-editor>
+                <sqx-code-editor [ngModel]="event.lastDump" [disabled]="true" [wordWrap]="true" mode="ace/editor/text"></sqx-code-editor>
             </div>
         </div>
     </td>

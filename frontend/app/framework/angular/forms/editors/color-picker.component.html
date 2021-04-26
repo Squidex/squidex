@@ -1,12 +1,13 @@
 <span class="color-container" #input>
     <ng-container *ngIf="mode === 'Input'; else circle">
         <input class="form-control" type="text"
+            (blur)="blur()"
             [style.background]="snapshot.value"
             [style.color]="snapshot.foreground"
             [placeholder]="placeholder"
             [ngModel]="snapshot.value"
             (ngModelChange)="updateValue($event)"
-            (focus)="focus()" (blur)="blur()" />
+            (focus)="focus()" />
     </ng-container>
 
     <ng-template #circle>

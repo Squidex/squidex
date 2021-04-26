@@ -19,13 +19,13 @@
         <div class="form-group" *ngIf="event.actionData">
             <label>{{ 'rules.actionData' | sqxTranslate }}</label>
                 
-            <sqx-code-editor [ngModel]="data" [disabled]="true" height="auto"></sqx-code-editor>
+            <sqx-code-editor [ngModel]="data" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
         </div>
     
         <div class="form-group" *ngIf="event.error">
             <label>{{ 'common.error' | sqxTranslate }}</label>
                
-            <sqx-code-editor [ngModel]="event.error" [disabled]="true" height="auto"></sqx-code-editor>
+            <sqx-code-editor [ngModel]="event.error" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
         </div>
     </td>
 </tr>

@@ -50,7 +50,10 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public valueMode: 'String' | 'Json' = 'String';
 
     @Input()
-    public height: number | 'auto' = 'auto';
+    public wordWrap: boolean;
+
+    @Input()
+    public height: number | 'auto' | 'full' = 'full';
 
     @Input()
     public set disabled(value: boolean | null | undefined) {
@@ -79,6 +82,10 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
 
         if (changes['height']) {
             this.setHeight();
+        }
+
+        if (changes['wordWrap']) {
+            this.setWordWrap();
         }
     }
 
@@ -139,6 +146,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             this.setValue(this.value);
             this.setMode();
             this.setHeight();
+            this.setWordWrap();
 
             const langTools = ace.require('ace/ext/language_tools');
 
@@ -207,6 +215,12 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
         this.value = newValueText;
     }
 
+    private setWordWrap() {
+        if (this.aceEditor) {
+            this.aceEditor.getSession().setUseWrapMode(this.wordWrap);
+        }
+    }
+
     private setMode() {
         if (this.aceEditor) {
             if (this.valueFile && this.modelist) {
@@ -221,10 +235,18 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
 
     private setHeight() {
         if (this.aceEditor && this.editor?.nativeElement) {
-            if (this.height && this.height !== 'auto') {
-                this.editor.nativeElement.style.height = `${this.height}px`;
-            } else {
-                this.aceEditor.setOptions({ maxLines: Infinity });
+            if (Types.isNumber(this.height)) {
+                const lines = this.height / 15;
+
+                this.aceEditor.setOptions({
+                    minLines: lines,
+                    maxLines: lines
+                });
+            } else if (this.height === 'auto') {
+                this.aceEditor.setOptions({
+                    minLines: 3,
+                    maxLines: 500
+                 });
             }
         }
     }
