@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                 AppId = rule.AppId,
                 Rule = rule.RuleDef,
                 RuleId = rule.Id,
-                IgnoreStale = true
+                IgnoreStale = false
             };
         }
     }

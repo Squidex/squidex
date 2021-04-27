@@ -354,7 +354,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
                 .Returns(true);
 
-            var (_, _, reason) = await sut.CreateJobsAsync(@event, Rule(ignoreState: true)).SingleAsync();
+            var (_, _, reason) = await sut.CreateJobsAsync(@event, Rule(ignoreStale: true)).SingleAsync();
 
             Assert.Equal(SkipReason.TooOld, reason);
 
@@ -365,7 +365,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_job_if_too_old_but_stale_events_are_not_ignored()
         {
-            var context = Rule(ignoreState: false);
+            var context = Rule(ignoreStale: false);
 
             var @event =
                 Envelope.Create(new ContentCreated())
@@ -715,7 +715,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             };
         }
 
-        private RuleContext Rule(bool disable = false, bool ignoreState = true)
+        private RuleContext Rule(bool disable = false, bool ignoreStale = true)
         {
             var rule = new Rule(new ContentChangedTriggerV2(), new ValidAction());
 
@@ -729,7 +729,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 AppId = appId,
                 Rule = rule,
                 RuleId = ruleId,
-                IgnoreStale = ignoreState
+                IgnoreStale = ignoreStale
             };
         }
 
