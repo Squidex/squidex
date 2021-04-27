@@ -103,7 +103,17 @@ namespace Squidex.Infrastructure.Commands
                     snapshot.Version = version;
                     snapshots.Add(snapshot, version, true);
                 }),
-                @event => ApplyEvent(@event, true));
+                @event =>
+                {
+                    if (@event is IMigratedStateEvent<T> migratable)
+                    {
+                        var payload = migratable.Migrate(Snapshot);
+
+                        @event = new Envelope<IEvent>(payload, @event.Headers);
+                    }
+
+                    return ApplyEvent(@event, true);
+                });
         }
 
         public virtual async Task EnsureLoadedAsync(bool silent = false)

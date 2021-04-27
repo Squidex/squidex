@@ -18,7 +18,7 @@ namespace Migrations
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 26;
+        private const int CurrentVersion = 25;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -134,12 +134,6 @@ namespace Migrations
             if (version < 19)
             {
                 yield return serviceProvider.GetRequiredService<PopulateGrainIndexes>();
-            }
-
-            // Version 26: UI Settings.
-            if (version < 26)
-            {
-                yield return serviceProvider.GetRequiredService<CreateAppSettings>();
             }
 
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();

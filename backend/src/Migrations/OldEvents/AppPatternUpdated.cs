@@ -6,15 +6,22 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Migrations.OldEvents
 {
     [EventType(nameof(AppPatternUpdated))]
     [Obsolete("New Event introduced")]
-    public sealed class AppPatternUpdated : AppEvent
+    public sealed class AppPatternUpdated : AppEvent, IMigratedStateEvent<AppDomainObject.State>
     {
         public DomainId PatternId { get; set; }
 
@@ -23,5 +30,27 @@ namespace Migrations.OldEvents
         public string Pattern { get; set; }
 
         public string? Message { get; set; }
+
+        public IEvent Migrate(AppDomainObject.State state)
+        {
+            var newSettings = new AppSettings
+            {
+                Patterns = new List<Pattern>(state.Settings.Patterns)
+                {
+                    new Pattern(Name, Pattern)
+                    {
+                        Message = Message
+                    }
+                }.ToReadOnlyCollection(),
+                Editors = state.Settings.Editors
+            };
+
+            var newEvent = new AppSettingsUpdated
+            {
+                Settings = newSettings
+            };
+
+            return SimpleMapper.Map(this, newEvent);
+        }
     }
 }
