@@ -85,6 +85,18 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
+        public async Task Should_create_old_event()
+        {
+            SetupCreated(new ValueChanged { Value = 10 }, new MultipleByTwiceEvent());
+
+            await sut.EnsureLoadedAsync();
+
+            Assert.Equal(1, sut.Version);
+            Assert.Equal(1, sut.Snapshot.Version);
+            Assert.Equal(20, sut.Snapshot.Value);
+        }
+
+        [Fact]
         public async Task Should_recreate_with_create_command_if_deleted_before()
         {
             sut.Recreate = true;
@@ -450,6 +462,11 @@ namespace Squidex.Infrastructure.Commands
 
         private void SetupCreated(int value)
         {
+            SetupCreated(new ValueChanged { Value = value });
+        }
+
+        private void SetupCreated(params IEvent[] @events)
+        {
             var handleEvent = new HandleEvent(_ => true);
 
             var version = -1;
@@ -457,9 +474,12 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(-2))
                 .Invokes(() =>
                 {
-                    version = 0;
+                    version++;
 
-                    handleEvent(Envelope.Create(new ValueChanged { Value = value }));
+                    foreach (var @event in events)
+                    {
+                        handleEvent(Envelope.Create(@event));
+                    }
                 });
 
             A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))

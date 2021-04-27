@@ -34,7 +34,7 @@
                             </div>
         
                             <div class="col col-icon" *ngIf="currentTrigger">
-                                <sqx-rule-element [type]="currentTrigger.type" [isSmall]="true" [element]="triggerElement"></sqx-rule-element>
+                                <sqx-rule-element [type]="currentTrigger.type" [isSmall]="true" [element]="triggerElement" [disabled]="true"></sqx-rule-element>
                             </div>
 
                             <div class="col text-right" *ngIf="currentTrigger && !rule">
@@ -97,7 +97,7 @@
                             </div>
 
                             <div class="col col-icon" *ngIf="currentAction">
-                                <sqx-rule-element [type]="currentAction.type" [isSmall]="true" [element]="actionElement"></sqx-rule-element>
+                                <sqx-rule-element [type]="currentAction.type" [isSmall]="true" [element]="actionElement" [disabled]="true"></sqx-rule-element>
                             </div>
 
                             <div class="col text-right" *ngIf="currentAction && !rule">

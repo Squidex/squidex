@@ -6,7 +6,8 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { Router2State, RuleEventDto, RuleEventsState } from '@app/shared';
+import { ActivatedRoute } from '@angular/router';
+import { ResourceOwner, Router2State, RuleEventDto, RuleEventsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-events-page',
@@ -16,24 +17,30 @@ import { Router2State, RuleEventDto, RuleEventsState } from '@app/shared';
         Router2State
     ]
 })
-export class RuleEventsPageComponent implements OnInit {
+export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
     public selectedEventId: string | null = null;
 
     constructor(
+        private readonly route: ActivatedRoute,
         public readonly ruleEventsRoute: Router2State,
         public readonly ruleEventsState: RuleEventsState
     ) {
+        super();
     }
 
     public ngOnInit() {
-        const initial =
-            this.ruleEventsRoute.mapTo(this.ruleEventsState)
-                .withPaging('rules', 30)
-                .withString('query')
-                .getInitial();
+        this.own(
+            this.route.queryParams
+                .subscribe(() => {
+                    const initial =
+                        this.ruleEventsRoute.mapTo(this.ruleEventsState)
+                            .withPaging('rules', 30)
+                            .withString('ruleId')
+                            .withString('query')
+                            .getInitial();
 
-        this.ruleEventsState.load(false, initial);
-        this.ruleEventsRoute.unlisten();
+                    this.ruleEventsState.load(false, initial);
+                }));
     }
 
     public reload() {

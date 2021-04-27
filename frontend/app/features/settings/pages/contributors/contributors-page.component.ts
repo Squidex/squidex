@@ -36,7 +36,6 @@ export class ContributorsPageComponent implements OnInit {
                 .getInitial();
 
         this.contributorsState.load(false, initial);
-        this.contributorsRoute.unlisten();
     }
 
     public reload() {

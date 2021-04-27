@@ -26,6 +26,10 @@ const routes: Routes = [
                 component: RuleEventsPageComponent
             },
             {
+                path: 'simulator',
+                component: RuleSimulatorPageComponent
+            },
+            {
                 path: 'help',
                 component: HelpComponent,
                 data: {

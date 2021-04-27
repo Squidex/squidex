@@ -103,6 +103,10 @@
                 <a routerLink="events" [queryParams]="{ ruleId: rule.id }" *ngIf="rule.canTrigger">
                     {{ 'common.logs' | sqxTranslate }}
                 </a>
+                
+                <a routerLink="simulator" [queryParams]="{ ruleId: rule.id }" *ngIf="!isManual" class="ml-1">
+                    {{ 'rules.simulator' | sqxTranslate }}
+                </a>
             </div>
         </div>
     </div>

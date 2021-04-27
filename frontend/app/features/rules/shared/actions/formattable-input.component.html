@@ -1,6 +1,6 @@
 <ng-container *ngIf="type === 'Text'; else textarea">
     <div class="input-group">
-        <input class="form-control" />
+        <input class="form-control" ngDefaultControl />
 
         <div class="input-group-apppend">
             <select class="custom-select" [ngModel]="mode" (ngModelChange)="setMode($event)" [disabled]="disabled">

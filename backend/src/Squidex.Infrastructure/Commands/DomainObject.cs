@@ -105,7 +105,7 @@ namespace Squidex.Infrastructure.Commands
                 }),
                 @event =>
                 {
-                    if (@event is IMigratedStateEvent<T> migratable)
+                    if (@event.Payload is IMigratedStateEvent<T> migratable)
                     {
                         var payload = migratable.Migrate(Snapshot);
 

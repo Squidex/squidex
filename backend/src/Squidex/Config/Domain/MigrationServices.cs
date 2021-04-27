@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -33,9 +33,6 @@ namespace Squidex.Config.Domain
                 .As<IMigration>();
 
             services.AddTransientAs<ConvertEventStoreAppId>()
-                .As<IMigration>();
-
-            services.AddTransientAs<CreateAppSettings>()
                 .As<IMigration>();
 
             services.AddTransientAs<ClearRules>()

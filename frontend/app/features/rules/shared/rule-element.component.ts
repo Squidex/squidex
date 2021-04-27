@@ -23,4 +23,7 @@ export class RuleElementComponent {
 
     @Input()
     public isSmall?: boolean | null = true;
+
+    @Input()
+    public disabled: boolean;
 }

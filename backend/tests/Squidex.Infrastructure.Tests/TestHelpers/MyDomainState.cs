@@ -34,6 +34,17 @@ namespace Squidex.Infrastructure.TestHelpers
         }
     }
 
+    public sealed class MultipleByTwiceEvent : IEvent, IMigratedStateEvent<MyDomainState>
+    {
+        public IEvent Migrate(MyDomainState state)
+        {
+            return new ValueChanged
+            {
+                Value = state.Value * 2
+            };
+        }
+    }
+
     public sealed class ValueChanged : IEvent
     {
         public long Value { get; set; }
