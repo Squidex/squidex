@@ -5,6 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -14,25 +18,41 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
-    public sealed class UsageTriggerHandler : RuleTriggerHandler<UsageTrigger, AppUsageExceeded, EnrichedUsageExceededEvent>
+    public sealed class UsageTriggerHandler : IRuleTriggerHandler
     {
         private const string EventName = "Usage exceeded";
 
-        protected override Task<EnrichedUsageExceededEvent?> CreateEnrichedEventAsync(Envelope<AppUsageExceeded> @event)
+        public Type TriggerType => typeof(UsageTrigger);
+
+        public bool Handles(AppEvent appEvent)
         {
+            return appEvent is AppUsageExceeded;
+        }
+
+        public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+            [EnumeratorCancellation] CancellationToken ct)
+        {
+            var usageEvent = (AppUsageExceeded)@event.Payload;
+
             var result = new EnrichedUsageExceededEvent
             {
-                CallsCurrent = @event.Payload.CallsCurrent,
-                CallsLimit = @event.Payload.CallsLimit,
+                CallsCurrent = usageEvent.CallsCurrent,
+                CallsLimit = usageEvent.CallsLimit,
                 Name = EventName
             };
 
-            return Task.FromResult<EnrichedUsageExceededEvent?>(result);
+            await Task.Yield();
+
+            yield return result;
         }
 
-        protected override bool Trigger(EnrichedUsageExceededEvent @event, UsageTrigger trigger)
+        public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
         {
-            return @event.CallsLimit == trigger.Limit;
+            var trigger = (UsageTrigger)context.Rule.Trigger;
+
+            var usageEvent = (AppUsageExceeded)@event.Payload;
+
+            return usageEvent.CallsLimit >= trigger.Limit;
         }
     }
 }

@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { FieldDto, FloatConverter, NumberFieldPropertiesDto, NUMBER_FIELD_EDITORS, ResourceOwner, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -35,14 +35,7 @@ export class NumberUIComponent extends ResourceOwner implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['fieldForm']) {
-            this.fieldForm.setControl('editor',
-                new FormControl(undefined, Validators.required));
-
-            this.fieldForm.setControl('allowedValues',
-                new FormControl());
-
-            this.fieldForm.setControl('inlineEditable',
-                new FormControl());
+            this.unsubscribeAll();
 
             this.hideAllowedValues =
                 value$<string>(this.fieldForm.controls['editor']).pipe(map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
@@ -64,7 +57,5 @@ export class NumberUIComponent extends ResourceOwner implements OnChanges {
                     }
                 }));
         }
-
-        this.fieldForm.patchValue(this.field.properties);
     }
 }

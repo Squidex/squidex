@@ -19,7 +19,7 @@ export type QueryParams = { [name: string]: string };
 export interface RouteSynchronizer {
     readonly keys: ReadonlyArray<string>;
 
-    parseFromRoute(query: QueryParams): object | undefined;
+    parseFromRoute(query: QueryParams): {} | undefined;
 
     parseFromState(state: any): QueryParams | undefined;
 }
@@ -145,7 +145,7 @@ export class StringKeysSynchronizer implements RouteSynchronizer {
 }
 
 export interface StateSynchronizer {
-    mapTo<T extends object>(state: State<T>): StateSynchronizerMap<T>;
+    mapTo<T extends {}>(state: State<T>): StateSynchronizerMap<T>;
 }
 
 export interface StateSynchronizerMap<T> {
@@ -187,7 +187,7 @@ export class Router2State implements OnDestroy, StateSynchronizer {
         this.unlisten();
     }
 
-    public mapTo<T extends object>(state: State<T>) {
+    public mapTo<T extends {}>(state: State<T>) {
         this.mapper?.unlisten();
         this.mapper = new Router2StateMap<T>(state, this.route, this.router, this.localStore);
 
@@ -195,7 +195,7 @@ export class Router2State implements OnDestroy, StateSynchronizer {
     }
 }
 
-export class Router2StateMap<T extends object> implements StateSynchronizerMap<T> {
+export class Router2StateMap<T extends {}> implements StateSynchronizerMap<T> {
     private readonly syncs: RouteSynchronizer[] = [];
     private lastSyncedQuery: QueryParams;
     private stateSubscription: Subscription;

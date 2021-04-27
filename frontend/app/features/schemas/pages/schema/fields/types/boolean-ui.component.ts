@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { BooleanFieldPropertiesDto, BOOLEAN_FIELD_EDITORS, FieldDto } from '@app/shared';
 
 @Component({
@@ -14,7 +14,7 @@ import { BooleanFieldPropertiesDto, BOOLEAN_FIELD_EDITORS, FieldDto } from '@app
     styleUrls: ['boolean-ui.component.scss'],
     templateUrl: 'boolean-ui.component.html'
 })
-export class BooleanUIComponent implements OnChanges {
+export class BooleanUIComponent {
     @Input()
     public fieldForm: FormGroup;
 
@@ -25,16 +25,4 @@ export class BooleanUIComponent implements OnChanges {
     public properties: BooleanFieldPropertiesDto;
 
     public editors = BOOLEAN_FIELD_EDITORS;
-
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldForm']) {
-            this.fieldForm.setControl('editor',
-                new FormControl(undefined, Validators.required));
-
-            this.fieldForm.setControl('inlineEditable',
-                new FormControl());
-        }
-
-        this.fieldForm.patchValue(this.field.properties);
-    }
 }

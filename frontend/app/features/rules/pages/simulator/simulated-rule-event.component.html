@@ -1,0 +1,32 @@
+<tr [class.expanded]="expanded">
+    <td class="cell-label">
+        <span class="badge badge-pill badge-{{statusClass}}">{{status}}</span>
+    </td>
+    <td class="cell-40">
+        <span class="truncate">{{event.eventName}}</span>
+    </td>
+    <td class="cell-40">
+        <small class="truncate">{{event.skipReason}}</small>
+    </td>
+    <td class="cell-actions">
+        <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="expanded" [disabled]="!event.error && !event.actionData" (click)="expandedChange.emit()">
+            <i class="icon-settings"></i>
+        </button>
+    </td>
+</tr>
+<tr *ngIf="expanded">
+    <td colspan="4">
+        <div class="form-group" *ngIf="event.actionData">
+            <label>{{ 'rules.actionData' | sqxTranslate }}</label>
+                
+            <sqx-code-editor [ngModel]="data" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
+        </div>
+    
+        <div class="form-group" *ngIf="event.error">
+            <label>{{ 'common.error' | sqxTranslate }}</label>
+               
+            <sqx-code-editor [ngModel]="event.error" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
+        </div>
+    </td>
+</tr>
+<tr class="spacer"></tr>

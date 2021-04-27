@@ -38,19 +38,27 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public editor: ElementRef;
 
     @Input()
-    public noBorder?: boolean | null;
+    public borderless?: boolean | null;
 
     @Input()
     public mode = 'ace/mode/javascript';
 
     @Input()
-    public filePath: string;
+    public valueFile: string;
 
     @Input()
     public valueMode: 'String' | 'Json' = 'String';
 
     @Input()
-    public height = 0;
+    public wordWrap: boolean;
+
+    @Input()
+    public height: number | 'auto' | 'full' = 'full';
+
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
 
     @Input()
     public set completion(value: ReadonlyArray<{ name: string, description: string }> | undefined | null) {
@@ -68,8 +76,16 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['filePath'] || changes['mode']) {
+        if (changes['valueFile'] || changes['mode']) {
             this.setMode();
+        }
+
+        if (changes['height']) {
+            this.setHeight();
+        }
+
+        if (changes['wordWrap']) {
+            this.setWordWrap();
         }
     }
 
@@ -95,9 +111,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
         }
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled(isDisabled: boolean) {
         if (this.aceEditor) {
             this.aceEditor.setReadOnly(isDisabled);
         }
@@ -115,10 +129,6 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
                 this.changeValue();
             });
 
-        if (this.height) {
-            this.editor.nativeElement.style.height = `${this.height}px`;
-        }
-
         Promise.all([
             this.resourceLoader.loadLocalScript('dependencies/ace/ace.js'),
             this.resourceLoader.loadLocalScript('dependencies/ace/ext/modelist.js'),
@@ -131,9 +141,12 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             this.aceEditor.setReadOnly(this.snapshot.isDisabled);
             this.aceEditor.setFontSize(14);
 
-            this.setDisabledState(this.snapshot.isDisabled);
+            this.onDisabled(this.snapshot.isDisabled);
+
             this.setValue(this.value);
             this.setMode();
+            this.setHeight();
+            this.setWordWrap();
 
             const langTools = ace.require('ace/ext/language_tools');
 
@@ -202,14 +215,38 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
         this.value = newValueText;
     }
 
+    private setWordWrap() {
+        if (this.aceEditor) {
+            this.aceEditor.getSession().setUseWrapMode(this.wordWrap);
+        }
+    }
+
     private setMode() {
         if (this.aceEditor) {
-            if (this.filePath && this.modelist) {
-                const mode = this.modelist.getModeForPath(this.filePath).mode;
+            if (this.valueFile && this.modelist) {
+                const mode = this.modelist.getModeForPath(this.valueFile).mode;
 
                 this.aceEditor.getSession().setMode(mode);
             } else {
                 this.aceEditor.getSession().setMode(this.mode);
+            }
+        }
+    }
+
+    private setHeight() {
+        if (this.aceEditor && this.editor?.nativeElement) {
+            if (Types.isNumber(this.height)) {
+                const lines = this.height / 15;
+
+                this.aceEditor.setOptions({
+                    minLines: lines,
+                    maxLines: lines
+                });
+            } else if (this.height === 'auto') {
+                this.aceEditor.setOptions({
+                    minLines: 3,
+                    maxLines: 500
+                 });
             }
         }
     }

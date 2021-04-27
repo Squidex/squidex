@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MathHelper, StatefulControlComponent, value$ } from '@app/framework';
 import { AssetPathItem, AssetsService } from '@app/shared/internal';
 import { AppsState } from '@app/shared/state/apps.state';
@@ -30,7 +30,12 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetFolderDropdownComponent extends StatefulControlComponent<State, any> implements OnInit, ControlValueAccessor  {
+export class AssetFolderDropdownComponent extends StatefulControlComponent<State, any> implements OnInit  {
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     public control = new FormControl();
 
     constructor(changeDetector: ChangeDetectorRef,
@@ -60,9 +65,7 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<State
             });
     }
 
-    public setDisabledState(isDisabled: boolean) {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled(isDisabled: boolean) {
         if (isDisabled) {
             this.control.disable({ emitEvent: false });
         } else {

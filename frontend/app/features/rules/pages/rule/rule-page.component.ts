@@ -6,9 +6,11 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ALL_TRIGGERS, Form, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerType } from '@app/shared';
+import { ActionForm, ALL_TRIGGERS, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm } from '@app/shared';
+
+type ComponentState<T> = { type: string; values: any; form: T; };
 
 @Component({
     selector: 'sqx-rule-page',
@@ -21,31 +23,25 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
 
     public rule?: RuleDto | null;
 
-    public formAction?: Form<FormGroup, any>;
-    public formTrigger?: Form<FormGroup, any>;
-
-    public actionProperties?: any;
-    public actionType: string;
-
-    public triggerProperties?: any;
-    public triggerType: string;
+    public currentAction?: ComponentState<ActionForm>;
+    public currentTrigger?: ComponentState<TriggerForm>;
 
     public isEnabled = false;
+    public isEditable = false;
 
     public get actionElement() {
-        return this.supportedActions[this.actionType];
+        return this.supportedActions[this.currentAction?.type || ''];
     }
 
     public get triggerElement() {
-        return this.supportedTriggers[this.triggerType];
+        return this.supportedTriggers[this.currentTrigger?.type || ''];
     }
-
-    public isEditable = false;
 
     constructor(
         public readonly rulesState: RulesState,
         public readonly rulesService: RulesService,
         public readonly schemasState: SchemasState,
+        private readonly formBuilder: FormBuilder,
         private readonly route: ActivatedRoute,
         private readonly router: Router
     ) {
@@ -53,11 +49,11 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.rulesState.load();
-
         this.rulesService.getActions()
             .subscribe(actions => {
                 this.supportedActions = actions;
+
+                this.initFromRule();
             });
 
         this.own(
@@ -65,113 +61,101 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
                 .subscribe(rule => {
                     this.rule = rule;
 
-                    if (rule) {
-                        this.isEditable = rule.canUpdate;
-                        this.isEnabled = rule.isEnabled;
-
-                        this.selectAction(rule.action);
-                        this.selectTrigger(rule.trigger);
-                    } else {
-                        this.isEditable = true;
-                        this.isEnabled = false;
-
-                        this.resetAction();
-                        this.resetTrigger();
-                    }
-
-                    this.formTrigger?.setEnabled(this.isEditable);
+                    this.initFromRule();
                 }));
 
         this.schemasState.loadIfNotLoaded();
     }
 
-    public selectActionType(actionType: string) {
-        this.selectAction({ actionType });
+    private initFromRule() {
+        if (this.rule && this.supportedActions) {
+            this.isEditable = this.rule.canUpdate;
+            this.isEnabled = this.rule.isEnabled;
+
+            this.selectAction(this.rule.actionType, this.rule.action);
+            this.selectTrigger(this.rule.triggerType, this.rule.trigger);
+        } else {
+            this.isEditable = true;
+            this.isEnabled = false;
+
+            this.resetAction();
+            this.resetTrigger();
+        }
+
     }
 
-    public selectTriggerType(triggerType: TriggerType) {
-        this.selectTrigger({ triggerType });
+    public selectAction(type: string, values = {}) {
+        const form = new ActionForm(this.supportedActions[type], type);
+
+        form.setEnabled(this.isEditable);
+        form.load(values);
+
+        this.currentAction = { form, type, values };
+    }
+
+    public selectTrigger(type: string, values = {}) {
+        const form = new TriggerForm(this.formBuilder, type);
+
+        form.setEnabled(this.isEditable);
+        form.load(values);
+
+        this.currentTrigger = { form, type, values };
     }
 
     public resetAction() {
-        this.actionProperties = undefined;
-        this.actionType = undefined!;
-
-        this.formAction = undefined;
+        this.currentAction = undefined;
     }
 
     public resetTrigger() {
-        this.triggerProperties = undefined;
-        this.triggerType = undefined!;
-
-        this.formTrigger = undefined;
-    }
-
-    private selectAction(target: { actionType: string } & any) {
-        const { actionType, ...properties } = target;
-
-        this.actionProperties = properties;
-        this.actionType = actionType;
-
-        this.formAction = new Form<FormGroup, any>(new FormGroup({}));
-        this.formAction.setEnabled(this.isEditable);
-    }
-
-    private selectTrigger(target: { triggerType: string } & any) {
-        const { triggerType, ...properties } = target;
-
-        this.triggerProperties = properties;
-        this.triggerType = triggerType;
-
-        this.formTrigger = new Form<FormGroup, any>(new FormGroup({}));
-        this.formTrigger.setEnabled(this.isEditable);
+        this.currentTrigger = undefined;
     }
 
     public save() {
-        if (!this.isEditable || !this.formAction || !this.formTrigger) {
+        if (!this.isEditable || !this.currentAction || !this.currentTrigger) {
             return;
         }
 
-        const ruleTrigger = this.formTrigger.submit();
-        const ruleAction = this.formAction.submit();
+        const action = this.currentAction.form.submit();
 
-        if (!ruleTrigger || !ruleAction) {
+        if (!action) {
             return;
         }
 
-        const request = {
-            trigger: {
-                triggerType: this.triggerType,
-                ...ruleTrigger
-            },
-            action: {
-                actionType: this.actionType,
-                ...ruleAction
-            },
-            isEnabled: this.isEnabled
-        };
+        const trigger = this.currentTrigger.form.submit();
+
+        if (!trigger || !action) {
+            return;
+        }
+
+        const request: any = { trigger, action, isEnabled: this.isEnabled };
 
         if (this.rule) {
             this.rulesState.update(this.rule, request)
                 .subscribe(() => {
-                    this.formAction?.submitCompleted({ noReset: true });
-                    this.formTrigger?.submitCompleted({ noReset: true });
+                    this.submitCompleted();
                 }, error => {
-                    this.formAction?.submitFailed(error);
-                    this.formTrigger?.submitFailed(error);
+                    this.submitFailed(error);
                 });
         } else {
             this.rulesState.create(request)
                 .subscribe(rule => {
-                    this.formAction?.submitCompleted({ noReset: true });
-                    this.formTrigger?.submitCompleted({ noReset: true });
+                    this.submitCompleted();
 
                     this.router.navigate([rule.id], { relativeTo: this.route.parent, replaceUrl: true });
                 }, error => {
-                    this.formAction?.submitFailed(error);
-                    this.formTrigger?.submitFailed(error);
+                    this.submitFailed(error);
                 });
         }
+    }
+
+    private submitCompleted() {
+        this.currentAction?.form.submitCompleted({ noReset: true });
+        this.currentTrigger?.form.submitCompleted({ noReset: true });
+    }
+
+    private submitFailed(error: any) {
+        this.currentAction?.form?.submitFailed(error);
+        this.currentTrigger?.form?.submitFailed(error);
     }
 
     public back() {

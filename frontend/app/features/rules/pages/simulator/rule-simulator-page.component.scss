@@ -1,0 +1,41 @@
+h3 {
+    margin-bottom: 1rem;
+}
+
+.expanded {
+    border-bottom: 0;
+}
+
+.event {
+    &-stats {
+        font-size: .8rem;
+    }
+
+    &-dump {
+        font-family: monospace;
+        font-size: .8rem;
+        font-weight: normal;
+        height: 20rem;
+        margin-top: 1rem;
+    }
+
+    &-header {
+        & {
+            background: $color-table-footer;
+            border: 0;
+            margin: -.75rem -1.25rem;
+            margin-bottom: 1rem;
+            padding: .75rem 1.25rem;
+            position: relative;
+        }
+
+        &::before {
+            @include caret-top($color-table-footer);
+            @include absolute(-1.1rem, 1.8rem, auto, auto);
+        }
+
+        h3 {
+            margin: 0;
+        }
+    }
+}

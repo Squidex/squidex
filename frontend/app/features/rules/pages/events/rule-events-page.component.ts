@@ -49,7 +49,11 @@ export class RuleEventsPageComponent implements OnInit {
     }
 
     public selectEvent(id: string) {
-        this.selectedEventId = this.selectedEventId !== id ? id : null;
+        if (this.selectedEventId === id) {
+            this.selectedEventId = null;
+        } else {
+            this.selectedEventId = id;
+        }
     }
 
     public trackByRuleEvent(_index: number, ruleEvent: RuleEventDto) {

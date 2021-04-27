@@ -5,33 +5,45 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class ManualTriggerHandler : RuleTriggerHandler<ManualTrigger, RuleManuallyTriggered, EnrichedManualEvent>
+    public sealed class ManualTriggerHandler : IRuleTriggerHandler
     {
-        protected override Task<EnrichedManualEvent?> CreateEnrichedEventAsync(Envelope<RuleManuallyTriggered> @event)
+        public Type TriggerType => typeof(ManualTrigger);
+
+        public bool Handles(AppEvent appEvent)
         {
-            var result = new EnrichedManualEvent
-            {
-                Name = "Manual"
-            };
+            return appEvent is RuleManuallyTriggered;
+        }
+
+        public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+            [EnumeratorCancellation] CancellationToken ct)
+        {
+            var result = new EnrichedManualEvent();
 
             SimpleMapper.Map(@event.Payload, result);
 
-            return Task.FromResult<EnrichedManualEvent?>(result);
+            await Task.Yield();
+
+            yield return result;
         }
 
-        protected override bool Trigger(EnrichedManualEvent @event, ManualTrigger trigger)
+        public string? GetName(AppEvent @event)
         {
-            return true;
+            return "Manual";
         }
     }
 }

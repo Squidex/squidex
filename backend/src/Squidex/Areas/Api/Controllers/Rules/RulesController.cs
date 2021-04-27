@@ -15,6 +15,7 @@ using Microsoft.Net.Http.Headers;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
@@ -32,13 +33,15 @@ namespace Squidex.Areas.Api.Controllers.Rules
     [ApiExplorerSettings(GroupName = nameof(Rules))]
     public sealed class RulesController : ApiController
     {
+        private readonly EventJsonSchemaGenerator eventJsonSchemaGenerator;
+        private readonly IAppProvider appProvider;
+        private readonly IRuleEventRepository ruleEventsRepository;
         private readonly IRuleQueryService ruleQuery;
         private readonly IRuleRunnerService ruleRunnerService;
-        private readonly IRuleEventRepository ruleEventsRepository;
-        private readonly EventJsonSchemaGenerator eventJsonSchemaGenerator;
         private readonly RuleRegistry ruleRegistry;
 
         public RulesController(ICommandBus commandBus,
+            IAppProvider appProvider,
             IRuleEventRepository ruleEventsRepository,
             IRuleQueryService ruleQuery,
             IRuleRunnerService ruleRunnerService,
@@ -46,6 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
             EventJsonSchemaGenerator eventJsonSchemaGenerator)
             : base(commandBus)
         {
+            this.appProvider = appProvider;
             this.ruleEventsRepository = ruleEventsRepository;
             this.ruleQuery = ruleQuery;
             this.ruleRunnerService = ruleRunnerService;
@@ -258,6 +262,36 @@ namespace Squidex.Areas.Api.Controllers.Rules
             await ruleRunnerService.RunAsync(App.Id, id, fromSnapshots);
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Simulate a rule.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the rule to simulate.</param>
+        /// <returns>
+        /// 200 => Rule simulated.
+        /// 404 => Rule or app not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/rules/{id}/simulate/")]
+        [ProducesResponseType(typeof(SimulatedRuleEventsDto), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
+        [ApiCosts(5)]
+        public async Task<IActionResult> Simulate(string app, DomainId id)
+        {
+            var rule = await appProvider.GetRuleAsync(AppId, id);
+
+            if (rule == null)
+            {
+                return NotFound();
+            }
+
+            var simulation = await ruleRunnerService.SimulateAsync(rule, HttpContext.RequestAborted);
+
+            var response = SimulatedRuleEventsDto.FromSimulatedRuleEvents(simulation);
+
+            return Ok(response);
         }
 
         /// <summary>

@@ -7,7 +7,9 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
@@ -20,7 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
     public class UsageTriggerHandlerTests
     {
-        private readonly DomainId ruleId = DomainId.NewGuid();
         private readonly IRuleTriggerHandler sut = new UsageTriggerHandler();
 
         [Fact]
@@ -30,17 +31,40 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_if_event_type_not_correct()
+        public void Should_handle_usage_event()
         {
-            var result = sut.Trigger(new ContentCreated(), new UsageTrigger(), ruleId);
+            Assert.True(sut.Handles(new AppUsageExceeded()));
+        }
 
-            Assert.False(result);
+        [Fact]
+        public void Should_not_handle_other_event()
+        {
+            Assert.False(sut.Handles(new ContentCreated()));
+        }
+
+        [Fact]
+        public async Task Should_create_enriched_event()
+        {
+            var ctx = Context();
+
+            var @event = new AppUsageExceeded { CallsCurrent = 80, CallsLimit = 120 };
+
+            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
+
+            var enrichedEvent = result.Single() as EnrichedUsageExceededEvent;
+
+            Assert.Equal(@event.CallsCurrent, enrichedEvent!.CallsCurrent);
+            Assert.Equal(@event.CallsLimit, enrichedEvent!.CallsLimit);
         }
 
         [Fact]
         public void Should_not_trigger_precheck_if_rule_id_not_matchs()
         {
-            var result = sut.Trigger(new AppUsageExceeded { RuleId = DomainId.NewGuid() }, new UsageTrigger(), ruleId);
+            var ctx = Context();
+
+            var @event = new AppUsageExceeded();
+
+            var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
             Assert.True(result);
         }
@@ -48,30 +72,25 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         [Fact]
         public void Should_trigger_precheck_if_event_type_correct_and_rule_id_matchs()
         {
-            var result = sut.Trigger(new AppUsageExceeded { RuleId = ruleId }, new UsageTrigger(), ruleId);
+            var ctx = Context();
+
+            var @event = new AppUsageExceeded { RuleId = ctx.RuleId };
+
+            var result = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
 
             Assert.True(result);
         }
 
-        [Fact]
-        public void Should_not_trigger_check_if_event_type_not_correct()
+        private static RuleContext Context(RuleTrigger? trigger = null)
         {
-            var result = sut.Trigger(new EnrichedContentEvent(), new UsageTrigger());
+            trigger ??= new UsageTrigger();
 
-            Assert.False(result);
-        }
-
-        [Fact]
-        public async Task Should_create_enriched_event()
-        {
-            var @event = new AppUsageExceeded { CallsCurrent = 80, CallsLimit = 120 };
-
-            var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event));
-
-            var enrichedEvent = result.Single() as EnrichedUsageExceededEvent;
-
-            Assert.Equal(@event.CallsCurrent, enrichedEvent!.CallsCurrent);
-            Assert.Equal(@event.CallsLimit, enrichedEvent!.CallsLimit);
+            return new RuleContext
+            {
+                AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+                Rule = new Rule(trigger, A.Fake<RuleAction>()),
+                RuleId = DomainId.NewGuid()
+            };
         }
     }
 }

@@ -19,12 +19,12 @@
 
     <ng-container content>
         <div class="card mb-2">
-            <div class="card-header">{{ 'patterns.title' | sqxTranslate }}</div>
+            <div class="card-header">{{ 'appSettings.patterns.title' | sqxTranslate }}</div>
 
             <div class="card-body">
                 <div class="content">
                     <div class="mt-4" *ngIf="!isEditable && editForm.patternsControls.length === 0">
-                        {{ 'patterns.empty' | sqxTranslate }}
+                        {{ 'appSettings.patterns.empty' | sqxTranslate }}
                     </div>
 
                     <div class="form-group row no-gutters" *ngFor="let form of editForm.patternsControls; let i = index" [formGroup]="form">
@@ -49,8 +49,8 @@
                         <div class="col-auto">
                             <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
                                 (sqxConfirmClick)="editForm.removePattern(i)"
-                                confirmTitle="i18n:patterns.deleteConfirmTitle"
-                                confirmText="i18n:patterns.deleteConfirmText"
+                                confirmTitle="i18n:appSettings.patterns.deleteConfirmTitle"
+                                confirmText="i18n:appSettings.patterns.deleteConfirmText"
                                 confirmRememberKey="deletePattern">
                                 <i class="icon-bin2"></i>
                             </button>
@@ -81,12 +81,12 @@
         </div>
         
         <div class="card mb-2">
-            <div class="card-header">{{ 'editors.title' | sqxTranslate }}</div>
+            <div class="card-header">{{ 'appSettings.editors.title' | sqxTranslate }}</div>
 
             <div class="card-body">
                 <div class="content">
                     <div class="mt-4" *ngIf="!isEditable && editForm.editorsControls.length === 0">
-                        {{ 'editors.empty' | sqxTranslate }}
+                        {{ 'appSettings.editors.empty' | sqxTranslate }}
                     </div>
 
                     <div class="form-group row no-gutters" *ngFor="let form of editForm.editorsControls; let i = index" [formGroup]="form">
@@ -105,8 +105,8 @@
                         <div class="col-auto">
                             <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
                                 (sqxConfirmClick)="editForm.removeEditor(i)"
-                                confirmTitle="i18n:editors.deleteConfirmTitle"
-                                confirmText="i18n:editors.deleteConfirmText"
+                                confirmTitle="i18n:appSettings.editors.deleteConfirmTitle"
+                                confirmText="i18n:appSettings.editors.deleteConfirmText"
                                 confirmRememberKey="deleteEditor">
                                 <i class="icon-bin2"></i>
                             </button>

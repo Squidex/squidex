@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
 
         public RuleTriggerDto Visit(ContentChangedTriggerV2 trigger)
         {
-            var schemas = trigger.Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedRuleTriggerSchemaDto())).ToArray();
+            var schemas = trigger.Schemas?.Select(ContentChangedRuleTriggerSchemaDto.FromTrigger).ToArray();
 
             return new ContentChangedRuleTriggerDto { Schemas = schemas, HandleAll = trigger.HandleAll };
         }

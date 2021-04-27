@@ -40,6 +40,11 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     @Input()
     public language: LanguageDto;
 
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     public get isValid() {
         return !!this.schemaId && !!this.language;
     }
@@ -95,14 +100,12 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         }
     }
 
-    public setDisabledState(isDisabled: boolean) {
+    public onDisabled(isDisabled: boolean) {
         if (isDisabled) {
             this.control.disable(NO_EMIT);
         } else if (this.isValid) {
             this.control.enable(NO_EMIT);
         }
-
-        super.setDisabledState(isDisabled);
     }
 
     public writeValue(obj: ReadonlyArray<string>) {

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Areas.Api.Controllers.UI
 {

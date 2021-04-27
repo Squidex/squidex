@@ -53,7 +53,7 @@ export class LocalizerService {
         return text;
     }
 
-    private replaceVariables(text: string, args: object): string {
+    private replaceVariables(text: string, args: {}): string {
         text = text.replace(/{[^}]*}/g, (matched: string) => {
             const inner = matched.substr(1, matched.length - 2);
 
@@ -81,7 +81,7 @@ export class LocalizerService {
         return text;
     }
 
-    private getVar(args: object, key: string) {
+    private getVar(args: {}, key: string) {
         let value = args[key];
 
         if (!value) {

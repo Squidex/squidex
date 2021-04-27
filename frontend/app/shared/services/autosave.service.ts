@@ -17,7 +17,7 @@ export class AutoSaveService {
     ) {
     }
 
-    public fetch(key: AutoSaveKey): object | null {
+    public fetch(key: AutoSaveKey): {} | null {
         if (!key) {
             return null;
         }
@@ -33,7 +33,7 @@ export class AutoSaveService {
         return null;
     }
 
-    public set(key: AutoSaveKey, content: object) {
+    public set(key: AutoSaveKey, content: {}) {
         if (!key || !content) {
             return;
         }

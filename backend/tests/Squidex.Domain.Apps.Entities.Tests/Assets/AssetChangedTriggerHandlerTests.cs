@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -29,7 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
-        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly IRuleTriggerHandler sut;
 
         public AssetChangedTriggerHandlerTests()
@@ -52,37 +52,63 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public void Should_return_true_if_asking_for_snapshot_support()
+        {
+            Assert.True(sut.CanCreateSnapshotEvents);
+        }
+
+        [Fact]
+        public void Should_handle_asset_event()
+        {
+            Assert.True(sut.Handles(new AssetCreated()));
+        }
+
+        [Fact]
+        public void Should_not_handle_asset_moved_event()
+        {
+            Assert.False(sut.Handles(new AssetMoved()));
+        }
+
+        [Fact]
+        public void Should_not_handle_other_event()
+        {
+            Assert.False(sut.Handles(new ContentCreated()));
+        }
+
+        [Fact]
         public async Task Should_create_events_from_snapshots()
         {
-            var trigger = new AssetChangedTriggerV2();
+            var ctx = Context();
 
-            A.CallTo(() => assetRepository.StreamAll(appId.Id))
+            A.CallTo(() => assetRepository.StreamAll(ctx.AppId.Id, default))
                 .Returns(new List<AssetEntity>
                 {
                     new AssetEntity(),
                     new AssetEntity()
                 }.ToAsyncEnumerable());
 
-            var result = await sut.CreateSnapshotEvents(trigger, appId.Id).ToListAsync();
+            var result = await sut.CreateSnapshotEventsAsync(ctx, default).ToListAsync();
 
             var typed = result.OfType<EnrichedAssetEvent>().ToList();
 
             Assert.Equal(2, typed.Count);
-            Assert.Equal(2, typed.Count(x => x.Type == EnrichedAssetEventType.Created));
+            Assert.Equal(2, typed.Count(x => x.Type == EnrichedAssetEventType.Created && x.Name == "AssetQueried"));
         }
 
         [Theory]
         [MemberData(nameof(TestEvents))]
         public async Task Should_create_enriched_events(AssetEvent @event, EnrichedAssetEventType type)
         {
-            @event.AppId = appId;
+            var ctx = Context();
+
+            @event.AppId = ctx.AppId;
 
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            A.CallTo(() => assetLoader.GetAsync(appId.Id, @event.AssetId, 12))
+            A.CallTo(() => assetLoader.GetAsync(ctx.AppId.Id, @event.AssetId, 12))
                 .Returns(new AssetEntity());
 
-            var result = await sut.CreateEnrichedEventsAsync(envelope);
+            var result = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
             var enrichedEvent = result.Single() as EnrichedAssetEvent;
 
@@ -90,54 +116,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_skip_moved_event()
-        {
-            var envelope = Envelope.Create<AppEvent>(new AssetMoved());
-
-            var result = await sut.CreateEnrichedEventsAsync(envelope);
-
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public void Should_not_trigger_precheck_if_event_type_not_correct()
-        {
-            TestForCondition(string.Empty, trigger =>
-            {
-                var result = sut.Trigger(new ContentCreated(), trigger, DomainId.NewGuid());
-
-                Assert.False(result);
-            });
-        }
-
-        [Fact]
-        public void Should_trigger_precheck_if_event_type_correct()
-        {
-            TestForCondition(string.Empty, trigger =>
-            {
-                var result = sut.Trigger(new AssetCreated(), trigger, DomainId.NewGuid());
-
-                Assert.True(result);
-            });
-        }
-
-        [Fact]
-        public void Should_not_trigger_check_if_event_type_not_correct()
-        {
-            TestForCondition(string.Empty, trigger =>
-            {
-                var result = sut.Trigger(new EnrichedContentEvent(), trigger);
-
-                Assert.False(result);
-            });
-        }
-
-        [Fact]
         public void Should_trigger_check_if_condition_is_empty()
         {
-            TestForCondition(string.Empty, trigger =>
+            TestForCondition(string.Empty, ctx =>
             {
-                var result = sut.Trigger(new EnrichedAssetEvent(), trigger);
+                var @event = new EnrichedAssetEvent();
+
+                var result = sut.Trigger(@event, ctx);
 
                 Assert.True(result);
             });
@@ -146,9 +131,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public void Should_trigger_check_if_condition_matchs()
         {
-            TestForCondition("true", trigger =>
+            TestForCondition("true", ctx =>
             {
-                var result = sut.Trigger(new EnrichedAssetEvent(), trigger);
+                var @event = new EnrichedAssetEvent();
+
+                var result = sut.Trigger(@event, ctx);
 
                 Assert.True(result);
             });
@@ -157,19 +144,24 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public void Should_not_trigger_check_if_condition_does_not_matchs()
         {
-            TestForCondition("false", trigger =>
+            TestForCondition("false", ctx =>
             {
-                var result = sut.Trigger(new EnrichedAssetEvent(), trigger);
+                var @event = new EnrichedAssetEvent();
+
+                var result = sut.Trigger(@event, ctx);
 
                 Assert.False(result);
             });
         }
 
-        private void TestForCondition(string condition, Action<AssetChangedTriggerV2> action)
+        private void TestForCondition(string condition, Action<RuleContext> action)
         {
-            var trigger = new AssetChangedTriggerV2 { Condition = condition };
+            var trigger = new AssetChangedTriggerV2
+            {
+                Condition = condition
+            };
 
-            action(trigger);
+            action(Context(trigger));
 
             if (string.IsNullOrWhiteSpace(condition))
             {
@@ -181,6 +173,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, condition, default))
                     .MustHaveHappened();
             }
+        }
+
+        private static RuleContext Context(RuleTrigger? trigger = null)
+        {
+            trigger ??= new AssetChangedTriggerV2();
+
+            return new RuleContext
+            {
+                AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+                Rule = new Rule(trigger, A.Fake<RuleAction>()),
+                RuleId = DomainId.NewGuid()
+            };
         }
     }
 }

@@ -7,11 +7,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Rules;
+using System.Linq;
+using System.Threading;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
@@ -20,14 +19,33 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     {
         Type TriggerType { get; }
 
-        bool CanCreateSnapshotEvents { get; }
+        bool CanCreateSnapshotEvents
+        {
+            get => false;
+        }
 
-        IAsyncEnumerable<EnrichedEvent> CreateSnapshotEvents(RuleTrigger trigger, DomainId appId);
+        IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context, CancellationToken ct)
+        {
+            return AsyncEnumerable.Empty<EnrichedEvent>();
+        }
 
-        Task<List<EnrichedEvent>> CreateEnrichedEventsAsync(Envelope<AppEvent> @event);
+        IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context, CancellationToken ct);
 
-        bool Trigger(EnrichedEvent @event, RuleTrigger trigger);
+        string? GetName(AppEvent @event)
+        {
+            return null;
+        }
 
-        bool Trigger(AppEvent @event, RuleTrigger trigger, DomainId ruleId);
+        bool Trigger(Envelope<AppEvent> @event, RuleContext context)
+        {
+            return true;
+        }
+
+        bool Trigger(EnrichedEvent @event, RuleContext context)
+        {
+            return true;
+        }
+
+        bool Handles(AppEvent @event);
     }
 }

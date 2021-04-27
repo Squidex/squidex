@@ -72,7 +72,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleQueryService>()
                 .As<IRuleQueryService>();
 
-            services.AddSingletonAs<GrainRuleRunnerService>()
+            services.AddSingletonAs<DefaultRuleRunnerService>()
                 .As<IRuleRunnerService>();
 
             services.AddSingletonAs<RuleEnricher>()

@@ -405,7 +405,7 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         return null;
     }
 
-    private getValue(value: any, values?: object) {
+    private getValue(value: any, values?: {}) {
         if (values && values.hasOwnProperty(this.partitionKey)) {
             return values[this.partitionKey];
         }

@@ -47,6 +47,11 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     @Input()
     public allowDuplicates?: boolean | null = true;
 
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     public contentCreatorDialog = new DialogModel();
     public contentSelectorDialog = new DialogModel();
 

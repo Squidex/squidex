@@ -49,6 +49,11 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     public mode: 'Array' | 'Single';
 
     @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
+    @Input()
     public set language(value: LanguageDto) {
         this.languageField = value;
 
@@ -120,9 +125,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         }
     }
 
-    public setDisabledState(isDisabled: boolean) {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled(isDisabled: boolean) {
         if (isDisabled) {
             this.control.disable(NO_EMIT);
         } else if (this.isValid) {

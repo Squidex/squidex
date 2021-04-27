@@ -62,6 +62,11 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     @Input()
     public isCompact?: boolean | null;
 
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     @ViewChild('dateInput', { static: false })
     public dateInput: ElementRef<HTMLInputElement>;
 
@@ -125,9 +130,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
         super.callTouched();
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        super.setDisabledState(isDisabled);
-
+    public onDisabled(isDisabled: boolean) {
         if (isDisabled) {
             this.dateControl.disable(NO_EMIT);
             this.timeControl.disable(NO_EMIT);

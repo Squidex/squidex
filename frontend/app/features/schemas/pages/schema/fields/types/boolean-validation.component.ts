@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { BooleanFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@app/shared';
 import { Observable } from 'rxjs';
 
@@ -35,19 +35,8 @@ export class BooleanValidationComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['fieldForm']) {
-            this.fieldForm.setControl('defaultValue',
-                new FormControl());
-
-            this.fieldForm.setControl('defaultValues',
-                new FormControl());
-
-            this.fieldForm.setControl('inlineEditable',
-                new FormControl());
-
             this.showDefaultValue =
                 hasNoValue$(this.fieldForm.controls['isRequired']);
         }
-
-        this.fieldForm.patchValue(this.properties);
     }
 }

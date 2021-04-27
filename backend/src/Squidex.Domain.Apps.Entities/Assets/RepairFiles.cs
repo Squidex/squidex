@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public async Task RepairAsync(CancellationToken ct = default)
         {
-            await eventStore.QueryAsync(async storedEvent =>
+            await foreach (var storedEvent in eventStore.QueryAllAsync("^asset\\-", ct: ct))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                             break;
                     }
                 }
-            }, "^asset\\-", ct: ct);
+            }
         }
 
         private async Task TryRepairAsync(NamedId<DomainId> appId, DomainId id, long fileVersion, CancellationToken ct)

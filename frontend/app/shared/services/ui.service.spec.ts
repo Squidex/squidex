@@ -50,7 +50,7 @@ describe('UIService', () => {
     it('should return default common settings if error occurs',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
-        let settings: object;
+        let settings: {};
 
         uiService.getCommonSettings().subscribe(result => {
             settings = result;
@@ -69,7 +69,7 @@ describe('UIService', () => {
     it('should make get request to get shared settings',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
-        let settings: object;
+        let settings: {};
 
         uiService.getSharedSettings('my-app').subscribe(result => {
             settings = result;
@@ -90,7 +90,7 @@ describe('UIService', () => {
     it('should return default shared settings if error occurs',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
-        let settings: object;
+        let settings: {};
 
         uiService.getSharedSettings('my-app').subscribe(result => {
             settings = result;
@@ -109,7 +109,7 @@ describe('UIService', () => {
     it('should make get request to get user settings',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
-        let settings: object;
+        let settings: {};
 
         uiService.getUserSettings('my-app').subscribe(result => {
             settings = result;
@@ -130,7 +130,7 @@ describe('UIService', () => {
     it('should return default user settings if error occurs',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
-        let settings: object;
+        let settings: {};
 
         uiService.getUserSettings('my-app').subscribe(result => {
             settings = result;

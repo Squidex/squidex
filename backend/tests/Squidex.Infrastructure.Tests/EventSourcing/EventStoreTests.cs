@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
 
             var readEvents1 = await QueryAsync(streamName);
-            var readEvents2 = await QueryWithCallbackAsync(streamName);
+            var readEvents2 = await QueryAllAsync(streamName);
 
             var expected = new[]
             {
@@ -128,7 +128,7 @@ namespace Squidex.Infrastructure.EventSourcing
             });
 
             var readEvents1 = await QueryAsync(streamName);
-            var readEvents2 = await QueryWithCallbackAsync(streamName);
+            var readEvents2 = await QueryAllAsync(streamName);
 
             var expected = new[]
             {
@@ -176,6 +176,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 CreateEventData(2)
             };
 
+            // Append and read in parallel.
             await QueryWithSubscriptionAsync(streamName, async () =>
             {
                 await Sut.AppendAsync(Guid.NewGuid(), streamName, events1);
@@ -187,6 +188,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 CreateEventData(2)
             };
 
+            // Append and read in parallel.
             var readEventsFromPosition = await QueryWithSubscriptionAsync(streamName, async () =>
             {
                 await Sut.AppendAsync(Guid.NewGuid(), streamName, events2);
@@ -228,7 +230,7 @@ namespace Squidex.Infrastructure.EventSourcing
             var firstRead = await QueryAsync(streamName);
 
             var readEvents1 = await QueryAsync(streamName, 1);
-            var readEvents2 = await QueryWithCallbackAsync(streamName, firstRead[0].EventPosition);
+            var readEvents2 = await QueryAllAsync(streamName, firstRead[0].EventPosition);
 
             var expected = new[]
             {
@@ -279,9 +281,9 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Theory]
-        [InlineData(30)]
-        [InlineData(1000)]
-        public async Task Should_read_latest_events(int count)
+        [InlineData(5, 30)]
+        [InlineData(5, 300)]
+        public async Task Should_read_latest_events(int commitSize, int count)
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
@@ -292,29 +294,60 @@ namespace Squidex.Infrastructure.EventSourcing
                 events.Add(CreateEventData(i));
             }
 
-            for (var i = 0; i < events.Count / 2; i++)
+            for (var i = 0; i < events.Count / commitSize; i++)
             {
-                var commit = events.Skip(i * 2).Take(2);
+                var commit = events.Skip(i * commitSize).Take(commitSize);
 
                 await Sut.AppendAsync(Guid.NewGuid(), streamName, commit.ToArray());
             }
 
-            var offset = 25;
+            var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
 
-            var take = count - offset;
+            var takeStep = count / 10;
 
-            var expected1 = events
-                .Skip(offset)
-                .Select((x, i) => new StoredEvent(streamName, "Position", i + offset, events[i + offset]))
-                .ToArray();
+            for (var take = 0; take < count; take += takeStep)
+            {
+                var expected = allExpected.TakeLast(take).ToArray();
 
-            var expected2 = Array.Empty<StoredEvent>();
+                var readEvents = await Sut.QueryLatestAsync(streamName, take);
 
-            var readEvents1 = await Sut.QueryLatestAsync(streamName, take);
-            var readEvents2 = await Sut.QueryLatestAsync(streamName, 0);
+                ShouldBeEquivalentTo(readEvents, expected);
+            }
+        }
 
-            ShouldBeEquivalentTo(readEvents1, expected1);
-            ShouldBeEquivalentTo(readEvents2, expected2);
+        [Theory]
+        [InlineData(5, 30)]
+        [InlineData(5, 300)]
+        public async Task Should_read_reverse(int commitSize, int count)
+        {
+            var streamName = $"test-{Guid.NewGuid()}";
+
+            var events = new List<EventData>();
+
+            for (var i = 0; i < count; i++)
+            {
+                events.Add(CreateEventData(i));
+            }
+
+            for (var i = 0; i < events.Count / commitSize; i++)
+            {
+                var commit = events.Skip(i * commitSize).Take(commitSize);
+
+                await Sut.AppendAsync(Guid.NewGuid(), streamName, commit.ToArray());
+            }
+
+            var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
+
+            var takeStep = count / 10;
+
+            for (var take = 0; take < count; take += takeStep)
+            {
+                var expected = allExpected.Reverse().Take(take).ToArray();
+
+                var readEvents = await Sut.QueryAllReverseAsync(streamName, null, take).ToArrayAsync();
+
+                ShouldBeEquivalentTo(readEvents, expected);
+            }
         }
 
         [Fact]
@@ -347,36 +380,19 @@ namespace Squidex.Infrastructure.EventSourcing
             return new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString());
         }
 
-        private async Task<IReadOnlyList<StoredEvent>?> QueryWithCallbackAsync(string? streamFilter = null, string? position = null)
+        private async Task<IReadOnlyList<StoredEvent>?> QueryAllAsync(string? streamFilter = null, string? position = null)
         {
-            using (var cts = new CancellationTokenSource(30000))
+            var readEvents = new List<StoredEvent>();
+
+            await foreach (var storedEvent in Sut.QueryAllAsync(streamFilter, position))
             {
-                while (!cts.IsCancellationRequested)
-                {
-                    var readEvents = new List<StoredEvent>();
-
-                    await Sut.QueryAsync(x =>
-                    {
-                        readEvents.Add(x);
-
-                        return Task.CompletedTask;
-                    }, streamFilter, position, cts.Token);
-
-                    await Task.Delay(500, cts.Token);
-
-                    if (readEvents.Count > 0)
-                    {
-                        return readEvents;
-                    }
-                }
-
-                cts.Token.ThrowIfCancellationRequested();
-
-                return null;
+                readEvents.Add(storedEvent);
             }
+
+            return readEvents;
         }
 
-        private async Task<IReadOnlyList<StoredEvent>?> QueryWithSubscriptionAsync(string streamFilter, Func<Task>? action = null, bool fromBeginning = false)
+        private async Task<IReadOnlyList<StoredEvent>?> QueryWithSubscriptionAsync(string streamFilter, Func<Task>? subscriptionRunning = null, bool fromBeginning = false)
         {
             var subscriber = new EventSubscriber();
 
@@ -385,9 +401,9 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 subscription = Sut.CreateSubscription(subscriber, streamFilter, fromBeginning ? null : subscriptionPosition);
 
-                if (action != null)
+                if (subscriptionRunning != null)
                 {
-                    await action();
+                    await subscriptionRunning();
                 }
 
                 using (var cts = new CancellationTokenSource(30000))
@@ -396,7 +412,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         subscription.WakeUp();
 
-                        await Task.Delay(500, cts.Token);
+                        await Task.Delay(2000, cts.Token);
 
                         if (subscriber.Events.Count > 0)
                         {
@@ -419,7 +435,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static void ShouldBeEquivalentTo(IEnumerable<StoredEvent>? actual, params StoredEvent[] expected)
         {
-            actual.Should().BeEquivalentTo(expected, opts => opts.Excluding(x => x.EventPosition));
+            actual.Should().BeEquivalentTo(expected, opts => opts.ComparingByMembers<StoredEvent>().Including(x => x.EventStreamNumber));
         }
     }
 }

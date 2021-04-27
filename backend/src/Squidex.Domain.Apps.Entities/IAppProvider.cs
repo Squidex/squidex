@@ -32,5 +32,7 @@ namespace Squidex.Domain.Apps.Entities
         Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId);
 
         Task<List<IRuleEntity>> GetRulesAsync(DomainId appId);
+
+        Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id);
     }
 }

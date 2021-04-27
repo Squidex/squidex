@@ -1,4 +1,4 @@
-<ng-container *ngIf="!triggerForm.controls.handleAll.value">
+<ng-container *ngIf="!triggerForm.form.controls.handleAll.value">
     <table class="table table-middle table-sm table-fixed table-borderless">
         <colgroup>
             <col style="width: 40%" />
@@ -7,12 +7,12 @@
         </colgroup>
 
         <tr>
-            <th>
-                Schema
-            </th>
-            <th>
-                Condition
-            </th>
+            <td>
+                <label>Schema</label>
+            </td>
+            <td>
+                <label>Condition</label>
+            </td>
             <th></th>
         </tr>
 
@@ -22,13 +22,13 @@
             </td>
             <td class="text-center">
                 <input type="text" class="form-control code" placeholder="Optional condition as javascript expression"
-                    [disabled]="triggerForm.disabled"
+                    [disabled]="triggerForm.form.disabled"
                     [ngModelOptions]="{ updateOn: 'blur' }"
                     [ngModel]="triggerSchema.condition" 
                     (ngModelChange)="updateCondition(triggerSchema.schema, $event)" />
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-text-secondary" (click)="removeSchema(triggerSchema)" [disabled]="triggerForm.disabled">
+                <button type="button" class="btn btn-text-secondary" (click)="removeSchema(triggerSchema)" [disabled]="triggerForm.form.disabled">
                     <i class="icon-close"></i>
                 </button>
             </td>
@@ -38,12 +38,12 @@
     <div class="section" *ngIf="schemasToAdd.length > 0">
         <form class="form-inline" (ngSubmit)="addSchema()">
             <div class="form-group mr-1">
-                <select class="custom-select schemas-control" [disabled]="triggerForm.disabled" [(ngModel)]="schemaToAdd" name="schema">
+                <select class="custom-select schemas-control" [disabled]="triggerForm.form.disabled" [(ngModel)]="schemaToAdd" name="schema">
                     <option *ngFor="let schema of schemasToAdd; trackBy: trackBySchema" [ngValue]="schema">{{schema.displayName}}</option>
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-success" [disabled]="triggerForm.disabled">Add Schema</button>
+            <button type="submit" class="btn btn-success" [disabled]="triggerForm.form.disabled">Add Schema</button>
         </form>
     </div>
     
@@ -73,7 +73,7 @@
     </div>
 </ng-container>
 
-<div class="form-group" [formGroup]="triggerForm">
+<div class="form-group" [formGroup]="triggerForm.form">
     <div class="custom-control custom-checkbox">
         <input class="custom-control-input" type="checkbox" id="handleAll" formControlName="handleAll">
         <label class="custom-control-label" for="handleAll">

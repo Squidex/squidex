@@ -45,7 +45,7 @@ export class FieldComponent implements OnChanges {
     public isEditing = false;
     public isEditable?: boolean | null;
 
-    public editForm = new EditFieldForm(this.formBuilder);
+    public editForm: EditFieldForm;
 
     public addFieldDialog = new DialogModel();
 
@@ -60,6 +60,7 @@ export class FieldComponent implements OnChanges {
         if (changes['field']) {
             this.isEditable = this.field.canUpdate;
 
+            this.editForm = new EditFieldForm(this.formBuilder, this.field.properties);
             this.editForm.load(this.field.properties);
         }
     }

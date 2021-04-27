@@ -5,12 +5,25 @@
         </ng-container>
 
         <ng-template #noParent>
-            {{editing ? 'Edit' : 'Add'}} Field
+            {{ 'schemas.addField' | sqxTranslate }}
         </ng-template>
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="!editing; else notEditing">
+        <ng-container *ngIf="editForm; else adding">
+            <form [formGroup]="editForm.form" class="edit-form" (ngSubmit)="save()">
+                <sqx-field-form 
+                    [languages]="(languagesState.isoLanguages | async)!"
+                    [field]="field"
+                    [fieldForm]="editForm.form"
+                    [isEditable]="true" 
+                    [isLocalizable]="isLocalizable"
+                    [settings]="settings">
+                </sqx-field-form>
+            </form>
+        </ng-container>
+
+        <ng-template #adding>
             <form [formGroup]="addFieldForm.form" (ngSubmit)="addField(false)">
                 <sqx-form-error [error]="addFieldForm.error | async"></sqx-form-error>
 
@@ -59,19 +72,6 @@
                     {{ 'schemas.nameWarning' | sqxTranslate }}
                 </sqx-form-alert>
             </form>
-        </ng-container>
-
-        <ng-template #notEditing>
-            <form [formGroup]="editForm.form" class="edit-form" (ngSubmit)="save()">
-                <sqx-field-form 
-                    [languages]="(languagesState.isoLanguages | async)!"
-                    [field]="field"
-                    [fieldForm]="editForm.form"
-                    [isEditable]="true" 
-                    [isLocalizable]="isLocalizable"
-                    [settings]="settings">
-                </sqx-field-form>
-            </form>
         </ng-template>
     </ng-container>
 
@@ -80,7 +80,7 @@
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 
-        <div *ngIf="!editing">
+        <div *ngIf="!editForm">
             <button type="button" class="btn btn-outline-success" (click)="addField(false)">
                 {{ 'schemas.addFieldAndClose' | sqxTranslate }}
             </button>
@@ -94,7 +94,7 @@
             </button>
         </div>
 
-        <div *ngIf="editing">
+        <div *ngIf="editForm">
             <button type="button" class="btn btn-success" (click)="save(true)">
                 {{ 'schemas.saveFieldAndNew' | sqxTranslate }}
             </button>

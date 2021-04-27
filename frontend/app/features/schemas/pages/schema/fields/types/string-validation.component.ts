@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { AppSettingsDto, fadeAnimation, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 
@@ -45,51 +45,17 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     public patternName: string;
     public patternsModal = new ModalModel();
 
-    public showUnique: boolean;
+    public get showUnique() {
+        return Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
+    }
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['field']) {
-            this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
+        if (changes['settings']) {
+            this.setPatternName();
         }
 
         if (changes['fieldForm']) {
-            if (this.showUnique) {
-                this.fieldForm.setControl('isUnique',
-                    new FormControl());
-            }
-
-            this.fieldForm.setControl('maxLength',
-                new FormControl());
-
-            this.fieldForm.setControl('minLength',
-                new FormControl());
-
-            this.fieldForm.setControl('maxWords',
-                new FormControl());
-
-            this.fieldForm.setControl('minWords',
-                new FormControl());
-
-            this.fieldForm.setControl('maxCharacters',
-                new FormControl());
-
-            this.fieldForm.setControl('minCharacters',
-                new FormControl());
-
-            this.fieldForm.setControl('contentType',
-                new FormControl());
-
-            this.fieldForm.setControl('pattern',
-                new FormControl());
-
-            this.fieldForm.setControl('patternMessage',
-                new FormControl());
-
-            this.fieldForm.setControl('defaultValue',
-                new FormControl());
-
-            this.fieldForm.setControl('defaultValues',
-                new FormControl());
+            this.unsubscribeAll();
 
             this.showPatternSuggestions =
                 hasNoValue$(this.fieldForm.controls['pattern']);
@@ -110,10 +76,6 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
                         this.setPatternName();
                     }));
         }
-
-        this.setPatternName();
-
-        this.fieldForm.patchValue(this.field.properties);
     }
 
     public setPattern(pattern: PatternDto) {

@@ -77,6 +77,11 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     @Input()
     public dropdownWidth = '18rem';
 
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     @ContentChild(TemplateRef, { static: false })
     public itemTemplate: TemplateRef<any>;
 
@@ -165,7 +170,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         this.resetState();
     }
 
-    public setDisabledState(isDisabled: boolean): void {
+    public onDisabled(isDisabled: boolean) {
         if (isDisabled) {
             this.resetState();
 

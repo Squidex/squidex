@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -20,11 +22,12 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public sealed class CommentTriggerHandler : RuleTriggerHandler<CommentTrigger, CommentCreated, EnrichedCommentEvent>
+    public sealed class CommentTriggerHandler : IRuleTriggerHandler
     {
-        private static readonly List<EnrichedEvent> EmptyResult = new List<EnrichedEvent>();
         private readonly IScriptEngine scriptEngine;
         private readonly IUserResolver userResolver;
+
+        public Type TriggerType => typeof(CommentTrigger);
 
         public CommentTriggerHandler(IScriptEngine scriptEngine, IUserResolver userResolver)
         {
@@ -36,18 +39,22 @@ namespace Squidex.Domain.Apps.Entities.Comments
             this.userResolver = userResolver;
         }
 
-        public override async Task<List<EnrichedEvent>> CreateEnrichedEventsAsync(Envelope<AppEvent> @event)
+        public bool Handles(AppEvent @event)
         {
-            var commentCreated = @event.Payload as CommentCreated;
+            return @event is CommentCreated;
+        }
 
-            if (commentCreated?.Mentions?.Length > 0)
+        public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+            [EnumeratorCancellation] CancellationToken ct)
+        {
+            var commentCreated = (CommentCreated)@event.Payload;
+
+            if (commentCreated.Mentions?.Length > 0)
             {
                 var users = await userResolver.QueryManyAsync(commentCreated.Mentions);
 
                 if (users.Count > 0)
                 {
-                    var result = new List<EnrichedEvent>();
-
                     foreach (var user in users.Values)
                     {
                         var enrichedEvent = new EnrichedCommentEvent
@@ -59,18 +66,16 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
                         SimpleMapper.Map(commentCreated, enrichedEvent);
 
-                        result.Add(enrichedEvent);
+                        yield return enrichedEvent;
                     }
-
-                    return result;
                 }
             }
-
-            return EmptyResult;
         }
 
-        protected override bool Trigger(EnrichedCommentEvent @event, CommentTrigger trigger)
+        public bool Trigger(EnrichedEvent @event, RuleContext context)
         {
+            var trigger = (CommentTrigger)context.Rule.Trigger;
+
             if (string.IsNullOrWhiteSpace(trigger.Condition))
             {
                 return true;

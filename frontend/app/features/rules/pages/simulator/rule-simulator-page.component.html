@@ -1,0 +1,42 @@
+<sqx-title message="i18n:rules.ruleSimulator.listPageTitle"></sqx-title>
+
+<sqx-panel desiredWidth="*" minWidth="40rem" [grid]="true" closeQueryParamsHandling="">
+    <ng-container title>
+        {{ 'rules.simulator' | sqxTranslate }}
+    </ng-container>
+    
+    <ng-container menu>
+        <button type="button" class="btn btn-text-secondary" (click)="simulate()" title="i18n:rules.simulateTooltip">
+            <i class="icon-play-line"></i> {{ 'rules.simulate' | sqxTranslate }}
+        </button>
+    </ng-container>
+    
+    <ng-container content>
+        <sqx-list-view>
+            <ng-container content>
+                <table class="table table-items table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="cell-label">
+                                <span class="truncate">{{ 'common.status' | sqxTranslate }}</span>
+                            </th>
+                            <th class="cell-40">
+                                <span class="truncate">{{ 'common.event' | sqxTranslate }}</span>
+                            </th>
+                            <th class="cell-40">
+                                <span class="truncate">{{ 'common.skipped' | sqxTranslate }}</span>
+                            </th>
+                            <th class="cell-actions">&nbsp;</th>
+                        </tr>
+                    </thead>
+
+                    <tbody *ngFor="let event of ruleSimulatorState.simulatedRuleEvents | async"
+                        [sqxSimulatedRuleEvent]="event"
+                        [expanded]="event === selectedRuleEvent"
+                        (expandedChange)="selectEvent(event)">
+                    </tbody>
+                </table>
+            </ng-container>
+        </sqx-list-view>
+    </ng-container>
+</sqx-panel>

@@ -8,14 +8,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other)
+        {
+            return source.Count == other.Count && source.Intersect(other).Count() == other.Count;
+        }
+
         public static IEnumerable<IEnumerable<TSource>> Batch<TSource>(this IEnumerable<TSource> source, int size)
         {
             TSource[]? bucket = null;
@@ -48,34 +50,14 @@ namespace Squidex.Infrastructure
             }
         }
 
-        public static async Task<List<T>> ToListAsync<T>(this IAsyncEnumerable<T> source)
-        {
-            var result = new List<T>();
-
-            await foreach (var item in source)
-            {
-                result.Add(item);
-            }
-
-            return result;
-        }
-
-        public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IEnumerable<T> source)
-        {
-            foreach (var item in source)
-            {
-                yield return item;
-            }
-        }
-
-        public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other)
-        {
-            return source.Count == other.Count && source.Intersect(other).Count() == other.Count;
-        }
-
         public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other, IEqualityComparer<T> comparer)
         {
             return source.Count == other.Count && source.Intersect(other, comparer).Count() == other.Count;
+        }
+
+        public static IEnumerable<T> Reverse<T>(this IEnumerable<T> source, bool reverse)
+        {
+            return reverse ? source.Reverse() : source;
         }
 
         public static IResultList<T> SortSet<T, TKey>(this IResultList<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where T : class

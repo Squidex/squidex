@@ -6,9 +6,11 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto, ValidatorsEx } from '@app/shared';
+import { FormGroup } from '@angular/forms';
+import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@app/shared';
 import { Observable } from 'rxjs';
+
+const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
 @Component({
     selector: 'sqx-date-time-validation',
@@ -34,32 +36,15 @@ export class DateTimeValidationComponent implements OnChanges {
     public showDefaultValues: Observable<boolean>;
     public showDefaultValue: Observable<boolean>;
 
-    public calculatedDefaultValues: ReadonlyArray<string> = ['Now', 'Today'];
+    public calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['fieldForm']) {
-            this.fieldForm.setControl('calculatedDefaultValue',
-                new FormControl());
-
-            this.fieldForm.setControl('maxValue',
-                new FormControl(undefined, ValidatorsEx.validDateTime()));
-
-            this.fieldForm.setControl('minValue',
-                new FormControl(undefined, ValidatorsEx.validDateTime()));
-
-            this.fieldForm.setControl('defaultValue',
-                new FormControl());
-
-            this.fieldForm.setControl('defaultValues',
-                new FormControl());
-
             this.showDefaultValues =
                 hasNoValue$(this.fieldForm.controls['isRequired']);
 
             this.showDefaultValue =
                 hasNoValue$(this.fieldForm.controls['calculatedDefaultValue']);
         }
-
-        this.fieldForm.patchValue(this.properties);
     }
 }

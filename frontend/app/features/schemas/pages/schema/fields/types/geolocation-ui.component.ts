@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 
 @Component({
@@ -14,7 +14,7 @@ import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
     styleUrls: ['geolocation-ui.component.scss'],
     templateUrl: 'geolocation-ui.component.html'
 })
-export class GeolocationUIComponent implements OnChanges {
+export class GeolocationUIComponent {
     @Input()
     public fieldForm: FormGroup;
 
@@ -23,13 +23,4 @@ export class GeolocationUIComponent implements OnChanges {
 
     @Input()
     public properties: GeolocationFieldPropertiesDto;
-
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldForm']) {
-            this.fieldForm.setControl('editor',
-                new FormControl(undefined, Validators.required));
-        }
-
-        this.fieldForm.patchValue(this.field.properties);
-    }
 }

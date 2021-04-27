@@ -8,22 +8,24 @@
 import { Injectable } from '@angular/core';
 import { defined, hasAnyLink, State, Types } from '@app/framework';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { UIService, UISettingsDto } from './../services/ui.service';
+import { UIService } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
 import { AppsState } from './apps.state';
 
+type Settings = { canCreateApps?: boolean, [key: string]: any };
+
 interface Snapshot {
     // All common settings.
-    settingsCommon: object & any;
+    settingsCommon: Settings;
 
     // All shared app settings.
-    settingsShared?: object & any;
+    settingsShared?: Settings | null;
 
     // All user app settings.
-    settingsUser?: object & any;
+    settingsUser?: Settings | null;
 
     // The merged settings of app and common settings.
-    settings: object & any;
+    settings: Settings;
 
     // Indicates if the user can read events.
     canReadEvents?: boolean;
@@ -212,7 +214,11 @@ export class UIState extends State<Snapshot> {
     }
 }
 
-function getValue<T>(setting: object & UISettingsDto, path: string, defaultValue: T) {
+function getValue<T>(setting: Settings | undefined | null, path: string, defaultValue: T) {
+    if (!setting) {
+        return defaultValue;
+    }
+
     const segments = path.split('.');
 
     let current = setting;
@@ -232,7 +238,7 @@ function getValue<T>(setting: object & UISettingsDto, path: string, defaultValue
     return <T><any>current;
 }
 
-function getContainer(settings: object, path: string) {
+function getContainer(settings: Settings | undefined | null, path: string) {
     const segments = path.split('.');
 
     let current = { ...settings };

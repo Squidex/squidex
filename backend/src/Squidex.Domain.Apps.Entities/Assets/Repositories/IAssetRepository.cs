@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
@@ -13,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 {
     public interface IAssetRepository
     {
-        IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId);
+        IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId, CancellationToken ct);
 
         Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, Q q);
 

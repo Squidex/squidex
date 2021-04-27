@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private const int MaxWriteAttempts = 20;
         private const int MaxCommitSize = 10;
 
-        public Task DeleteStreamAsync(string streamName)
+        public async Task DeleteStreamAsync(string streamName)
         {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
@@ -34,12 +34,12 @@ namespace Squidex.Infrastructure.EventSourcing
                 PartitionKey = new PartitionKey(streamName)
             };
 
-            return documentClient.QueryAsync(collectionUri, query, commit =>
+            await foreach (var commit in documentClient.QueryAsync(collectionUri, query))
             {
                 var documentUri = UriFactory.CreateDocumentUri(DatabaseId, Constants.Collection, commit.Id.ToString());
 
-                return documentClient.DeleteDocumentAsync(documentUri, deleteOptions);
-            });
+                await documentClient.DeleteDocumentAsync(documentUri, deleteOptions);
+            }
         }
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)

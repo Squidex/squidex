@@ -49,6 +49,11 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     @Input()
     public folderId?: string;
 
+    @Input()
+    public set disabled(value: boolean | null | undefined) {
+        this.setDisabledState(value === true);
+    }
+
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
