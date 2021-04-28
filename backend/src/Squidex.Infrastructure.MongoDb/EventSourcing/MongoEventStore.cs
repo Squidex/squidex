@@ -62,12 +62,12 @@ namespace Squidex.Infrastructure.EventSourcing
                         .Ascending(x => x.Timestamp)),
                 new CreateIndexModel<MongoEventCommit>(
                     Index
-                        .Ascending(x => x.EventStream)
-                        .Ascending(x => x.Timestamp)),
+                        .Ascending(x => x.Timestamp)
+                        .Ascending(x => x.EventStream)),
                 new CreateIndexModel<MongoEventCommit>(
                     Index
-                        .Ascending(x => x.EventStream)
-                        .Descending(x => x.Timestamp)),
+                        .Descending(x => x.Timestamp)
+                        .Ascending(x => x.EventStream)),
                 new CreateIndexModel<MongoEventCommit>(
                     Index
                         .Ascending(x => x.EventStream)

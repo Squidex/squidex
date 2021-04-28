@@ -117,7 +117,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var find =
                 Collection.Find(filterDefinition, options: Batching.Options)
-                    .Limit((int)take).Sort(Sort.Descending(TimestampField));
+                    .Limit((int)take).Sort(Sort.Descending(TimestampField).Ascending(EventStreamField));
 
             var taken = 0;
 
@@ -157,7 +157,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var find =
                 Collection.Find(filterDefinition)
-                    .Limit((int)take).Sort(Sort.Ascending(TimestampField));
+                    .Limit((int)take).Sort(Sort.Ascending(TimestampField).Ascending(EventStreamField));
 
             var taken = 0;
 
