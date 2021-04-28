@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
         [IgnoreDataMember]
         public override long Partition
         {
-            get => MentionedUser.Id.GetHashCode();
+            get => MentionedUser?.Id.GetHashCode() ?? 0;
         }
 
         public bool ShouldSerializeMentionedUser()
