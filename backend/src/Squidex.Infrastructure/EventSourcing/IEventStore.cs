@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using NodaTime;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -18,7 +19,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0);
 
-        IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, string? position = null, long take = long.MaxValue, CancellationToken ct = default);
+        IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, Instant timestamp = default, long take = long.MaxValue, CancellationToken ct = default);
 
         IAsyncEnumerable<StoredEvent> QueryAllAsync(string? streamFilter = null, string? position = null, long take = long.MaxValue, CancellationToken ct = default);
 

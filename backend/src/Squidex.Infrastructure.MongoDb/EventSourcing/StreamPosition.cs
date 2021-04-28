@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using MongoDB.Bson;
+using NodaTime;
 using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -66,6 +67,19 @@ namespace Squidex.Infrastructure.EventSourcing
                         long.Parse(parts[2]),
                         long.Parse(parts[3]));
                 }
+            }
+
+            return Empty;
+        }
+
+        public static implicit operator StreamPosition(Instant timestamp)
+        {
+            if (timestamp != default)
+            {
+                return new StreamPosition(
+                    new BsonTimestamp((int)timestamp.ToUnixTimeSeconds(), 0),
+                    0,
+                    0);
             }
 
             return Empty;

@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using NodaTime;
 using Orleans;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -49,7 +50,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             var result = new List<SimulatedRuleEvent>(MaxSimulatedEvents);
 
-            await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-z]+)\\-{rule.AppId.Id}", null, MaxSimulatedEvents, ct))
+            var fromNow = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7));
+
+            await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-z]+)\\-{rule.AppId.Id}", fromNow, MaxSimulatedEvents, ct))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 

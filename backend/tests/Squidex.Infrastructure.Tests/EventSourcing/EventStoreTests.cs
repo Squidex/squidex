@@ -344,7 +344,7 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var expected = allExpected.Reverse().Take(take).ToArray();
 
-                var readEvents = await Sut.QueryAllReverseAsync(streamName, null, take).ToArrayAsync();
+                var readEvents = await Sut.QueryAllReverseAsync(streamName, default, take).ToArrayAsync();
 
                 ShouldBeEquivalentTo(readEvents, expected);
             }
