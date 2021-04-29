@@ -1,0 +1,117 @@
+.panel2 {
+    & {
+        @include absolute(0, 0, 0, 0);
+        align-items: stretch;
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+    }
+
+    &-header {
+        @include force-height($panel-header);
+        align-items: center;
+        background-color: $color-white;
+        border: 0;
+        border-bottom: 1px solid $color-border;
+        display: flex;
+        justify-content: space-between;
+        padding: $panel-padding;
+        padding-right: 3rem;
+        position: relative;
+
+        h3 {
+            margin: 0;
+
+            & > i {
+                margin-right: .5rem;
+            }
+        }
+    }
+
+    &-sidebar {
+        @include box-shadow-outer(0, 2px, 2px, .1);
+        background-color: $color-white;
+        border: 0;
+        border-right: 1px solid $color-border;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 0;
+        overflow-x: hidden;
+        transition: width .3s ease-in;
+        z-index: 100;
+
+        &.collapsed {
+            & {
+                width: 3rem !important;
+            }
+
+            .panel2-sidebar-title {
+                opacity: 1;
+            }
+
+            .panel2-main {
+                opacity: 0;
+            }
+
+            .panel2-header-inner {
+                opacity: 0;
+            }
+
+            .panel2-header {
+                padding-left: 0;
+                padding-right: 0;
+                width: 3rem !important;
+            }
+
+            .panel2-collapse {
+                transform: rotate(180deg);
+            }
+        }
+    }
+
+    &-sidebar-title {
+        @include absolute(8rem, null, null, 0rem);
+        font-size: 90%;
+        font-weight: normal;
+        opacity: 0;
+        transform: rotate(270deg);
+        transition: opacity .4s ease-in;
+    }
+
+    &-collapse {
+        @include absolute(50%, .5rem, null, null);
+        color: $color-text-decent;
+        font-size: 1.1rem;
+        font-weight: normal;
+        margin-top: -1rem;
+        transition: transform .3s ease-in;
+
+        i {
+            margin: 0;
+        }
+    }
+
+    &-main {
+        overflow-x: hidden;
+        overflow-y: auto;
+        transition: opacity .4s ease-in;
+    }
+
+    &-content {
+        & {
+            align-items: stretch;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            position: relative;
+        }
+
+        & > * {
+            flex-grow: 1;
+        }
+
+        router-outlet {
+            display: none;
+        }
+    }
+}

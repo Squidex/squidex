@@ -1,14 +1,8 @@
 <sqx-title message="i18n:common.settings"></sqx-title>
 
-<sqx-panel theme="dark" desiredWidth="16rem">
-    <ng-container title>
-        <a class="header-link" routerLink="./">
-            {{ 'common.settings' | sqxTranslate }}
-        </a>
-    </ng-container>
-    
-    <ng-container content>
-        <ul class="nav nav-panel nav-dark flex-column" *ngIf="selectedApp | async; let app">
+<sqx-left-panel [title]="'common.settings' | sqxTranslate" icon="settings" width="16rem">
+    <ng-container sidebarContent>
+        <ul class="nav nav-panel flex-column" *ngIf="selectedApp | async; let app">
             <li class="nav-item" *ngIf="app.canReadBackups">
                 <a class="nav-link" routerLink="backups" routerLinkActive="active">
                     {{ 'common.backups' | sqxTranslate }}
@@ -59,6 +53,8 @@
             </li>
         </ul>
     </ng-container>
-</sqx-panel>
 
-<router-outlet></router-outlet>
+    <ng-container content>
+        <router-outlet></router-outlet>
+    </ng-container>
+</sqx-left-panel>
