@@ -106,25 +106,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case ContentDeleted:
                     result.Type = EnrichedContentEventType.Deleted;
                     break;
-
-                case ContentStatusChanged statusChanged:
-                    {
-                        switch (statusChanged.Change)
-                        {
-                            case StatusChange.Published:
-                                result.Type = EnrichedContentEventType.Published;
-                                break;
-                            case StatusChange.Unpublished:
-                                result.Type = EnrichedContentEventType.Unpublished;
-                                break;
-                            default:
-                                result.Type = EnrichedContentEventType.StatusChanged;
-                                break;
-                        }
-
-                        break;
-                    }
-
+                case ContentStatusChanged e when e.Change == StatusChange.Published:
+                    result.Type = EnrichedContentEventType.Published;
+                    break;
+                case ContentStatusChanged e when e.Change == StatusChange.Unpublished:
+                    result.Type = EnrichedContentEventType.Unpublished;
+                    break;
+                case ContentStatusChanged e when e.Change == StatusChange.Change:
+                    result.Type = EnrichedContentEventType.StatusChanged;
+                    break;
                 case ContentUpdated:
                     {
                         result.Type = EnrichedContentEventType.Updated;
@@ -152,9 +142,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public string? GetName(AppEvent @event)
         {
-            var contentEvent = (ContentEvent)@event;
+            switch (@event)
+            {
+                case ContentCreated e:
+                    return $"{e.SchemaId.Name.ToPascalCase()}Created";
+                case ContentDeleted e:
+                    return $"{e.SchemaId.Name.ToPascalCase()}Deleted";
+                case ContentStatusChanged e when e.Change == StatusChange.Published:
+                    return $"{e.SchemaId.Name.ToPascalCase()}Published";
+                case ContentStatusChanged e when e.Change == StatusChange.Unpublished:
+                    return $"{e.SchemaId.Name.ToPascalCase()}Unpublished";
+                case ContentStatusChanged e when e.Change == StatusChange.Change:
+                    return $"{e.SchemaId.Name.ToPascalCase()}StatusChanged";
+                case ContentUpdated e:
+                    return $"{e.SchemaId.Name.ToPascalCase()}Updated";
+            }
 
-            return $"{@event.GetType().Name}({contentEvent.SchemaId.Name.ToPascalCase()})";
+            return null;
         }
 
         public bool Trigger(Envelope<AppEvent> @event, RuleContext context)

@@ -163,6 +163,14 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
+        public void Should_make_query_with_contains_and_invalid_character()
+        {
+            var filter = ClrFilter.Contains("Text", "search(");
+
+            AssertQuery("{ 'Text' : /search\\(/i }", filter);
+        }
+
+        [Fact]
         public void Should_make_query_with_endswith_and_null_value()
         {
             var filter = ClrFilter.EndsWith("Text", null!);
@@ -179,6 +187,14 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
+        public void Should_make_query_with_endswithand_invalid_character()
+        {
+            var filter = ClrFilter.EndsWith("Text", "search(");
+
+            AssertQuery("{ 'Text' : /search\\($/i }", filter);
+        }
+
+        [Fact]
         public void Should_make_query_with_startswith_and_null_value()
         {
             var filter = ClrFilter.StartsWith("Text", null!);
@@ -192,6 +208,14 @@ namespace Squidex.Infrastructure.MongoDb
             var filter = ClrFilter.StartsWith("Text", "search");
 
             AssertQuery("{ 'Text' : /^search/i }", filter);
+        }
+
+        [Fact]
+        public void Should_make_query_with_startswith_and_invalid_character()
+        {
+            var filter = ClrFilter.StartsWith("Text", "search(");
+
+            AssertQuery("{ 'Text' : /^search\\(/i }", filter);
         }
 
         [Fact]

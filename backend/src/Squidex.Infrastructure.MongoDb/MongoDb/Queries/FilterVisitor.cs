@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Queries;
@@ -116,7 +117,9 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 
         private static BsonRegularExpression BuildRegex(CompareFilter<ClrValue> node, Func<string, string> formatter)
         {
-            return new BsonRegularExpression(formatter(node.Value.Value?.ToString() ?? "null"), "i");
+            var value = formatter(Regex.Escape(node.Value.Value?.ToString() ?? "null"));
+
+            return new BsonRegularExpression(value, "i");
         }
     }
 }
