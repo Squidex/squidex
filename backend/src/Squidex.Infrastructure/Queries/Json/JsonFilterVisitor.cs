@@ -7,8 +7,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NJsonSchema;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.Queries.Json
 {
@@ -87,6 +89,11 @@ namespace Squidex.Infrastructure.Queries.Json
                     if (value.IsList && nodeIn.Operator != CompareOperator.In)
                     {
                         args.Errors.Add($"Array value is not allowed for '{nodeIn.Operator}' operator and path '{nodeIn.Path}'.");
+                    }
+
+                    if (nodeIn.Operator == CompareOperator.Matchs && value.Value?.ToString()?.IsValidRegex() != true)
+                    {
+                        args.Errors.Add($"{value} is not a valid regular expression.");
                     }
 
                     result = new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);

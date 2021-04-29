@@ -77,11 +77,51 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public void Should_calculate_name()
+        public void Should_calculate_name_for_created()
         {
             var @event = new ContentCreated { SchemaId = schemaMatch };
 
-            Assert.Equal("ContentCreated(MySchema1)", sut.GetName(@event));
+            Assert.Equal("MySchema1Created", sut.GetName(@event));
+        }
+
+        [Fact]
+        public void Should_calculate_name_for_deleted()
+        {
+            var @event = new ContentDeleted { SchemaId = schemaMatch };
+
+            Assert.Equal("MySchema1Deleted", sut.GetName(@event));
+        }
+
+        [Fact]
+        public void Should_calculate_name_for_updated()
+        {
+            var @event = new ContentUpdated { SchemaId = schemaMatch };
+
+            Assert.Equal("MySchema1Updated", sut.GetName(@event));
+        }
+
+        [Fact]
+        public void Should_calculate_name_for_published()
+        {
+            var @event = new ContentStatusChanged { SchemaId = schemaMatch, Change = StatusChange.Published };
+
+            Assert.Equal("MySchema1Published", sut.GetName(@event));
+        }
+
+        [Fact]
+        public void Should_calculate_name_for_unpublished()
+        {
+            var @event = new ContentStatusChanged { SchemaId = schemaMatch, Change = StatusChange.Unpublished };
+
+            Assert.Equal("MySchema1Unpublished", sut.GetName(@event));
+        }
+
+        [Fact]
+        public void Should_calculate_name_for_status_change()
+        {
+            var @event = new ContentStatusChanged { SchemaId = schemaMatch, Change = StatusChange.Change };
+
+            Assert.Equal("MySchema1StatusChanged", sut.GetName(@event));
         }
 
         [Fact]

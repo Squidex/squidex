@@ -224,6 +224,14 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Fact]
+            public void Should_add_error_if_valid_is_not_a_valid_regex()
+            {
+                var json = new { path = "string", op = "matchs", value = "((" };
+
+                AssertErrors(json, "'((' is not a valid regular expression.");
+            }
+
+            [Fact]
             public void Should_parse_nested_string_filter()
             {
                 var json = new { path = "object.property", op = "in", value = new[] { "Hello" } };
