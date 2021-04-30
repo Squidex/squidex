@@ -5,6 +5,8 @@
         </label>
 
         <div class="col-9">
+            <sqx-control-errors [for]="property.name"></sqx-control-errors>
+
             <ng-container [ngSwitch]="property.editor">
                 <ng-container *ngSwitchCase="'Text'">
                     <sqx-formattable-input [formControlName]="property.name" type="Text" [formattable]="property.isFormattable"></sqx-formattable-input>
