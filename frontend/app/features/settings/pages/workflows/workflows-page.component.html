@@ -24,7 +24,7 @@
                 </ng-container>
             </ng-container>
 
-            <div content>
+            <ng-container>
                 <ng-container *ngIf="schemasSource && workflowsState.workflows | async; let workflows">
                     <div class="table-items-row table-items-row-empty" *ngIf="workflows.length === 0">
                         {{ 'workflows.empty' | sqxTranslate }}
@@ -36,7 +36,7 @@
 
                     <sqx-workflow-add-form *ngIf="workflowsState.canCreate | async"></sqx-workflow-add-form>
                 </ng-container>
-            </div>
+            </ng-container>
         </sqx-list-view>
     </ng-container>
 

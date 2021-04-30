@@ -1,45 +1,27 @@
 <sqx-title message="i18n:contents.schemasPageTitle"></sqx-title>
 
-<sqx-panel theme="dark" [desiredWidth]="width" [showClose]="!isCollapsed" [showSecondHeader]="true">
-    <ng-container title>
-        <ng-container *ngIf="!isCollapsed">
-            {{ 'common.schemas' | sqxTranslate }}
+<sqx-layout layout="left" width="18rem" [white]="true" [padding]="true" [overflow]="true">
+    <ng-container menu>
+        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+
+        <div class="search-form">
+            <input class="form-control" #inputFind [formControl]="schemasFilter" placeholder="{{ 'contents.searchSchemasPlaceholder' | sqxTranslate }}">
+
+            <i class="icon-search"></i>
+        </div>
+    </ng-container>
+
+    <ng-container sidebarContent>
+        <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
+            <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
+                [schemaCategory]="category"
+                [schemasFilter]="schemasFilter.valueChanges | async"
+                [forContent]="true">
+            </sqx-schema-category>
         </ng-container>
     </ng-container>
 
-    <ng-container header>
-        <a class="panel-close btn-collapse" [class.collapsed]="isCollapsed" (click)="toggle()">
-            <i [class.icon-angle-double-left]="!isCollapsed" [class.icon-angle-double-right]="isCollapsed"></i>
-        </a>
+    <ng-container>
+        <router-outlet></router-outlet>
     </ng-container>
-
-    <ng-container secondHeader>
-        <ng-container *ngIf="!isCollapsed">
-            <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-
-            <div class="search-form">
-                <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="{{ 'contents.searchSchemasPlaceholder' | sqxTranslate }}">
-
-                <i class="icon-search"></i>
-            </div>
-        </ng-container>
-    </ng-container>
-
-    <ng-container content>
-        <div [class.hidden]="isCollapsed">
-            <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
-                <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-                    [schemaCategory]="category"
-                    [schemasFilter]="schemasFilter.valueChanges | async"
-                    [forContent]="true">
-                </sqx-schema-category>
-            </ng-container>
-        </div>
-
-        <div class="headline" [class.hidden]="!isCollapsed">
-            {{ 'common.schemas' | sqxTranslate }}
-        </div>
-    </ng-container>
-</sqx-panel>
-
-<router-outlet></router-outlet>
+</sqx-layout>

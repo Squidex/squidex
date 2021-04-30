@@ -2,7 +2,7 @@
 
 <sqx-layout layout="main" title="common.assets" titleIcon="assets">    
     <ng-container menu>
-        <div class="row no-gutters pl-1">
+        <div class="row flex-nowrap no-gutters pl-1">
             <div class="col-auto offset-xl-2">
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
@@ -58,7 +58,7 @@
                 <sqx-asset-path [path]="assetsState.path | async" (navigate)="assetsState.navigate($event.id)"></sqx-asset-path>
             </ng-container>
 
-            <div content>
+            <div>
                 <sqx-assets-list [assetsState]="assetsState" [showPager]="false" [isListView]="isListView"></sqx-assets-list>
             </div>
 

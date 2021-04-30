@@ -2,22 +2,24 @@
 
 <sqx-layout layout="main" title="common.contributors" titleIcon="contributors" width="50rem">
     <ng-container menu>
-        <sqx-notifo topic="apps/{{contributorsState.appId}}/settings/contributors"></sqx-notifo>
+        <div class="d-flex justify-content-end">
+            <sqx-notifo topic="apps/{{contributorsState.appId}}/settings/contributors"></sqx-notifo>
 
-        <button type="button" class="btn btn-text-secondary mr-2" (click)="reload()" title="i18n:contributors.refreshTooltip">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
-        </button>
+            <button type="button" class="btn btn-text-secondary mr-2" (click)="reload()" title="i18n:contributors.refreshTooltip">
+                <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+            </button>
 
-        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+            <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-        <div class="form-inline">
-            <input class="form-control" placeholder="{{ 'contributors.search' | sqxTranslate }}" [ngModel]="contributorsState.query | async" (ngModelChange)="search($event)">
+            <div class="form-inline">
+                <input class="form-control" placeholder="{{ 'contributors.search' | sqxTranslate }}" [ngModel]="contributorsState.query | async" (ngModelChange)="search($event)">
+            </div>
         </div>
     </ng-container>
 
-    <ng-container content>
-        <sqx-list-view [isLoading]="contributorsState.isLoading | async">            
-            <div content>
+    <ng-container>
+        <sqx-list-view innerWidth="50rem" [isLoading]="contributorsState.isLoading | async">            
+            <ng-container>
                 <ng-container *ngIf="rolesState.roles | async; let roles">
                     <ng-container *ngIf="contributorsState.maxContributors | async; let maxContributors">
                         <div class="panel-alert panel-alert-success" *ngIf="maxContributors > 0">
@@ -48,7 +50,7 @@
                         </ng-template>
                     </ng-container>
                 </ng-container>
-            </div>
+            </ng-container>
 
             <ng-container footer>
                 <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)"></sqx-pager>

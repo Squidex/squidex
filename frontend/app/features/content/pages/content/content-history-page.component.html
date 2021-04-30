@@ -1,9 +1,5 @@
-<sqx-panel desiredWidth="20rem" [isBlank]="true" [isLazyLoaded]="false">
-    <ng-container title>
-        {{ 'common.workflow' | sqxTranslate }}
-    </ng-container>
-
-    <ng-container content>
+<sqx-layout layout="simple" title="common.workflow" width="20rem" [white]="true" [padding]="true">
+    <ng-container>
         <div class="section mb-4">
             <label for="id">{{ 'common.id' | sqxTranslate }}</label>
 
@@ -133,6 +129,6 @@
             </sqx-content-event>
         </div>
     </ng-container>
-</sqx-panel>
+</sqx-layout>
 
 <sqx-due-time-selector [disabled]="disableScheduler" #dueTimeSelector></sqx-due-time-selector>

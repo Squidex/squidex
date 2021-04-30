@@ -23,10 +23,10 @@
             </div>
             <div class="col-auto">
                 <ng-container *ngIf="schemaCategory.schemas.length > 0; else noSchemas">
-                    ({{filteredSchemas.length}})
+                    <span class="badge badge-pill badge-light">{{filteredSchemas.length}}</span>
                 </ng-container>
                 <ng-template #noSchemas>
-                    <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit()">
+                    <button type="button" class="btn btn-sm btn-text-danger btn-remove" (click)="remove.emit()">
                         <i class="icon-bin2"></i> 
                     </button>
                 </ng-template>
@@ -34,34 +34,18 @@
         </div>
     </div>
 
-    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
+    <div class="nav nav-light flex-column" *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
         <ng-container *ngIf="!forContent; else simpleMode">
-            <div *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item"
-                [style.height]="getItemHeight()"
-                routerLinkActive="active"
+            <div *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item" [style.height]="getItemHeight()"
                 cdkDrag
                 cdkDragLockAxis="y"
                 [cdkDragData]="schema"
                 (cdkDragStarted)="dragStarted($event)">
 
-                <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+                <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
+                    <i cdkDragHandle class="icon-drag2 drag-handle"></i>
 
-                <a class="nav-link" [routerLink]="schemaRoute(schema)">
-                    <div class="row">
-                        <div class="col-4">
-                            <span class="schema-name schema-name-accent" title="{{schema.displayName}}" titlePosition="top-left">{{schema.displayName}}</span> 
-                        </div>
-                        <div class="col-4">
-                            <span class="schema-user">
-                                <i class="icon-user"></i> {{schema.lastModifiedBy | sqxUserNameRef}}
-                            </span>
-                        </div>
-                        <div class="col-4 schema-modified">
-                            <small class="item-modified">{{schema.lastModified | sqxFromNow}}</small>
-                            
-                            <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
-                        </div>
-                    </div>
+                    <span class="item-published mr-1" [class.unpublished]="!schema.isPublished"></span> {{schema.displayName}}
                 </a>
             </div>
         </ng-container>

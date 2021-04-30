@@ -10,36 +10,34 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view [isLoading]="rolesState.isLoading | async">
-            <div content>
-                <ng-container *ngIf="rolesState.isLoaded | async">
-                    <sqx-role-add-form *ngIf="rolesState.canCreate | async"></sqx-role-add-form>
+        <sqx-list-view innerWidth="50rem" [isLoading]="rolesState.isLoading | async">
+            <ng-container *ngIf="rolesState.isLoaded | async">
+                <sqx-role-add-form *ngIf="rolesState.canCreate | async"></sqx-role-add-form>
 
-                    <ng-container *ngIf="rolesState.defaultRoles| async; let defaultRoles">
-                        <div *ngIf="defaultRoles.length > 0">
-                            <h5 class="mt-4">{{ 'roles.defaultRoles' | sqxTranslate }}</h5>
+                <ng-container *ngIf="rolesState.defaultRoles| async; let defaultRoles">
+                    <div *ngIf="defaultRoles.length > 0">
+                        <h5 class="mt-4">{{ 'roles.defaultRoles' | sqxTranslate }}</h5>
 
-                            <sqx-form-hint>
-                                {{ 'roles.defaultRoles.hint' | sqxTranslate }}
-                            </sqx-form-hint>
+                        <sqx-form-hint>
+                            {{ 'roles.defaultRoles.hint' | sqxTranslate }}
+                        </sqx-form-hint>
 
-                            <sqx-role *ngFor="let role of defaultRoles; trackBy: trackByRole" [role]="role"
-                                [schemas]="(schemasState.schemas | async)!" [allPermissions]="allPermissions">
-                            </sqx-role>
-                        </div>
-                    </ng-container>
-
-                    <ng-container *ngIf="rolesState.customRoles| async; let customRoles">
-                        <div *ngIf="customRoles.length > 0">
-                            <h5 class="mt-4">{{ 'roles.customRoles' | sqxTranslate }}</h5>
-
-                            <sqx-role *ngFor="let role of customRoles; trackBy: trackByRole" [role]="role"
-                                [schemas]="(schemasState.schemas | async)!" [allPermissions]="allPermissions">
-                            </sqx-role>
-                        </div>
-                    </ng-container>
+                        <sqx-role *ngFor="let role of defaultRoles; trackBy: trackByRole" [role]="role"
+                            [schemas]="(schemasState.schemas | async)!" [allPermissions]="allPermissions">
+                        </sqx-role>
+                    </div>
                 </ng-container>
-            </div>
+
+                <ng-container *ngIf="rolesState.customRoles| async; let customRoles">
+                    <div *ngIf="customRoles.length > 0">
+                        <h5 class="mt-4">{{ 'roles.customRoles' | sqxTranslate }}</h5>
+
+                        <sqx-role *ngFor="let role of customRoles; trackBy: trackByRole" [role]="role"
+                            [schemas]="(schemasState.schemas | async)!" [allPermissions]="allPermissions">
+                        </sqx-role>
+                    </div>
+                </ng-container>
+            </ng-container>
         </sqx-list-view>
     </ng-container>
 

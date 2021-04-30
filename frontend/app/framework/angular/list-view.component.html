@@ -1,31 +1,41 @@
 <div class="top-header">
-    <ng-container *ngTemplateOutlet="topHeaderTemplate"></ng-container>
+    <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
+        <ng-container *ngTemplateOutlet="topHeaderTemplate"></ng-container>
+    </div>
 </div>
 
 <ng-container *ngIf="!syncedHeader">
-    <div class="grid-header" [class.loading-indicator]="isLoading" #headerElement>
-        <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
+    <div class="list-header" [class.loading-indicator]="isLoading" #headerElement>
+        <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
+            <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
+        </div>
     </div>
     
-    <div class="grid-content normal" [class.loading-indicator]="isLoading" [class.tabled]="table" #contentElement>
-        <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+    <div class="list-content normal" [class.loading-indicator]="isLoading" #contentElement>
+        <div class="inner normal" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth" [class.tabled]="table">
+            <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+        </div>
     </div>
 </ng-container>
 
 <ng-container *ngIf="syncedHeader">
-    <div class="grid-header synced" [class.loading-indicator]="isLoading" #headerElement>
-        <span class="inner" #header>
+    <div class="list-header synced" [class.loading-indicator]="isLoading" #headerElement>
+        <div class="sync-inner inner" #header>
             <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
-        </span>
+        </div>
     </div>
     
-    <div class="grid-content synced" [class.loading-indicator]="isLoading" [class.tabled]="table" [sqxSyncScrolling]="header">
-        <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+    <div class="list-content synced" [class.loading-indicator]="isLoading" [class.tabled]="table" [sqxSyncScrolling]="header">
+        <div class="inner">
+            <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+        </div>
     </div>
 </ng-container>
 
-<div class="grid-footer" [class.loading-indicator]="isLoading" #footerElement>
-    <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
+<div class="list-footer" [class.loading-indicator]="isLoading" #footerElement>
+    <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
+        <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
+    </div>
 </div>
 
 <div class="loader text-center" *ngIf="isLoading">

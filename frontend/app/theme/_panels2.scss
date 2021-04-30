@@ -53,10 +53,11 @@
         &.left {
             @include box-shadow-outer(1px, 0, 2px, .05);
             background-color: $color-white;
+            border: 0;
             border-right: 1px solid $color-border;
             flex-grow: 0;
             flex-shrink: 1;
-            z-index: 1;
+            z-index: 20;
 
             &.collapsed {
                 & {
@@ -91,9 +92,8 @@
             @include box-shadow-outer(-1px, 0, 2px, .05);
             @include force-width(3.25rem);
             background-color: $color-white;
+            border: 0;
             border-left: 1px solid $color-border;
-            border-right: 1px solid $color-border;
-            margin-left: -1px;
 
             &.collapsed {
                 & {
@@ -112,6 +112,8 @@
         }
 
         &.simple {
+            border: 0;
+            border-left: 1px solid $color-border;
             width: 100%;
         }
 
@@ -128,9 +130,13 @@
         border: 0;
         border-bottom: 1px solid $color-border;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         flex-grow: 1;
         position: relative;
+
+        .btn {
+            white-space: nowrap;
+        }
 
         &-inner {
             align-items: center;
@@ -147,12 +153,15 @@
 
             &.main {
                 border: 0;
-                border-right: 1px solid $color-border;
+                margin-left: auto;
+                margin-right: auto;
             }
         }
 
         h3 {
             margin: 0;
+            margin-right: 4rem;
+            white-space: nowrap;
 
             & > i {
                 margin-right: .5rem;
@@ -182,7 +191,7 @@
         color: $color-text-decent;
         font-size: 1.1rem;
         font-weight: normal;
-        margin-top: -1rem;
+        margin-top: -1.25rem;
         transition: transform .3s ease-in;
 
         i {
@@ -200,9 +209,8 @@
 
         &-inner {
             &.main {
-                border: 0;
-                border-right: 1px solid $color-border;
                 display: flex;
+                flex-grow: 1;
                 flex-direction: column;
                 overflow-y: hidden;
             }
@@ -222,14 +230,14 @@
             &.padded {
                 padding: $panel-padding;
             }
+
+            &.overflow {
+                overflow-y: auto;
+            }
         }
 
         &.menu {
             display: block;
-        }
-
-        &.left {
-            background-color: $color-white;
         }
     }
 
@@ -285,7 +293,7 @@
         }
 
         &.active {
-            background-color: lighten($color-theme-blue-lighter, 30%);
+            background-color: lighten($color-theme-blue-lighter, 25%);
             color: $color-theme-blue;
             cursor: default;
             font-weight: 500;

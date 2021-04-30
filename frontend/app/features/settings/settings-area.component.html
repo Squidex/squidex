@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.settings"></sqx-title>
 
-<sqx-layout layout="left" [title]="'common.settings' | sqxTranslate" icon="settings" width="16rem">
+<sqx-layout layout="left" title="common.settings" titleIcon="settings" width="16rem" [white]="true" [overflow]="true">
     <ng-container sidebarContent>
         <ul class="nav nav-light flex-column" *ngIf="selectedApp | async; let app">
             <li class="nav-item nav-heading" *ngIf="app.canReadClients || app.canReadRoles || app.canReadContributors">

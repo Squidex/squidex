@@ -10,8 +10,8 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view [isLoading]="languagesState.isLoading | async">
-            <div content>
+        <sqx-list-view innerWidth="50rem" [isLoading]="languagesState.isLoading | async">
+            <div>
                 <ng-container *ngIf="(languagesState.isLoaded | async) && (languagesState.languages | async); let languages">
                     <sqx-language-add-form *ngIf="languagesState.canCreate | async" 
                         [newLanguages]="(languagesState.newLanguages | async)!">

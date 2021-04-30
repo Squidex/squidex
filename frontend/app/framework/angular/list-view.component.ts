@@ -41,6 +41,9 @@ export class ListViewComponent extends StatefulComponent<State> implements After
     public syncedHeader?: boolean | null;
 
     @Input()
+    public innerWidth = '100%';
+
+    @Input()
     public table?: boolean | null;
 
     @Input()
@@ -74,12 +77,11 @@ export class ListViewComponent extends StatefulComponent<State> implements After
     public ngAfterViewInit() {
         this.hideWhenEmpty(this.headerElement);
         this.hideWhenEmpty(this.footerElement);
-        this.hideWhenEmpty(this.contentElement);
     }
 
     private hideWhenEmpty(element: ElementRef) {
         if (element && element.nativeElement) {
-            const isEmpty = element.nativeElement.children.length === 0;
+            const isEmpty = element.nativeElement.children[0].children.length === 0;
 
             if (isEmpty) {
                 this.renderer.setStyle(element.nativeElement, 'display', 'none');

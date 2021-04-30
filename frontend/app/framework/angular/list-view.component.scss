@@ -1,38 +1,48 @@
 :host {
+    @include absolute(0, 0, 0, 0);
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     overflow: hidden;
     padding: 0;
-    position: relative;
 }
 
-.grid {
+.inner {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 $panel-padding;
+
+    &.tabled {
+        padding-bottom: .5rem !important;
+        padding-top: .5rem !important;
+    }
+}
+
+.list {
     &-content,
     &-header,
     &-footer {
-        padding: 0 $panel-padding;
         transition: opacity .2s ease;
     }
 
     &-content {
         flex-direction: column;
         flex-grow: 1;
-        padding: $panel-padding;
-
-        &.tabled {
-            padding-bottom: .5rem;
-            padding-top: .5rem;
-        }
 
         &.normal {
+            overflow-x: hidden;
             overflow-y: auto;
+        }
+
+        .inner {
+            &.normal {
+                padding: $panel-padding;
+            }
         }
 
         &.synced {
             overflow-x: auto;
             overflow-y: auto;
-            padding-right: 0;
         }
     }
 
@@ -45,7 +55,7 @@
             overflow-y: hidden;
         }
 
-        .inner {
+        .sync-inner {
             display: table-cell;
         }
 

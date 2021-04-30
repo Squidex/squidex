@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.backups"></sqx-title>
 
-<sqx-layout layout="main" title="common.backups" titleIcon="backups" width="45rem">
+<sqx-layout layout="main" title="common.backups" titleIcon="backups" width="50rem">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary mr-1" (click)="reload()" title="i18n:backups.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -14,25 +14,23 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view [isLoading]="backupsState.isLoading | async">
-            <div content>
-                <div class="alert alert-danger mb-4" *ngIf="backupsState.maxBackupsReached | async">
-                    {{ 'backups.maximumReached' | sqxTranslate }}
-                </div>
-
-                <ng-container *ngIf="(backupsState.isLoaded | async) && (backupsState.backups | async); let backups">
-                    <div class="table-items-row table-items-row-empty" *ngIf="backups.length === 0">
-                        {{ 'backups.empty' | sqxTranslate }}
-        
-                        <button type="button" class="btn btn-success btn-sm ml-2" (click)="start()">
-                            {{ 'backups.start' | sqxTranslate }}
-                        </button>
-                    </div>
-        
-                    <sqx-backup *ngFor="let backup of backups; trackBy: trackByBackup" [backup]="backup">
-                    </sqx-backup>
-                </ng-container>
+        <sqx-list-view innerWidth="50rem" [isLoading]="backupsState.isLoading | async">
+            <div class="alert alert-danger mb-4" *ngIf="backupsState.maxBackupsReached | async">
+                {{ 'backups.maximumReached' | sqxTranslate }}
             </div>
+
+            <ng-container *ngIf="(backupsState.isLoaded | async) && (backupsState.backups | async); let backups">
+                <div class="table-items-row table-items-row-empty" *ngIf="backups.length === 0">
+                    {{ 'backups.empty' | sqxTranslate }}
+    
+                    <button type="button" class="btn btn-success btn-sm ml-2" (click)="start()">
+                        {{ 'backups.start' | sqxTranslate }}
+                    </button>
+                </div>
+    
+                <sqx-backup *ngFor="let backup of backups; trackBy: trackByBackup" [backup]="backup">
+                </sqx-backup>
+            </ng-container>
         </sqx-list-view>
     </ng-container>
 

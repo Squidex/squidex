@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { PanelContainerDirective } from './panel-container.directive';
+import { LayoutContainerDirective } from './layout-container.directive';
 
 @Component({
     selector: 'sqx-layout',
@@ -30,7 +30,13 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     public width: any = '100%';
 
     @Input()
+    public minWidth: string;
+
+    @Input()
     public white = false;
+
+    @Input()
+    public overflow = false;
 
     @Input()
     public hideSidebar = false;
@@ -56,7 +62,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     public isCollapsed = false;
 
     constructor(
-        private readonly container: PanelContainerDirective,
+        private readonly container: LayoutContainerDirective,
         private readonly changeDetector: ChangeDetectorRef
     ) {
     }
@@ -69,6 +75,8 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
 
     public ngAfterViewInit() {
         this.parent?.setChildSize(this.width);
+
+        this.container.invalidate();
     }
 
     public ngOnDestroy() {

@@ -10,7 +10,7 @@
         </div>
     </ng-container>
 
-    <div content>
+    <ng-container>
         <sqx-content-section *ngFor="let section of contentForm.sections; trackBy: trackBySection"
             [(language)]="language"
             [form]="contentForm"
@@ -20,5 +20,5 @@
             [languages]="languages"
             [schema]="schema">
         </sqx-content-section>
-    </div>
+    </ng-container>
 </sqx-list-view>

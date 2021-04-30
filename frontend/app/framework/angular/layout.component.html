@@ -6,13 +6,16 @@
                     <h3 *ngIf="title">
                         <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ title | sqxTranslate }}
                     </h3>
+                    <div>
+                        <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                    </div>
                     <div class="flex-grow-1 text-right">
                         <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
                     </div>
                 </div>
             </div>
             <div class="panel2-main simple">
-                <div class="panel2-main-inner simple" [class.white]="white" [class.padded]="padding">
+                <div class="panel2-main-inner simple" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div> 
             </div>
@@ -26,6 +29,9 @@
                     <h3 *ngIf="title">
                         <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ title | sqxTranslate }}
                     </h3>
+                    <div>
+                        <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                    </div>
                     <div class="flex-grow-1 text-right">
                         <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
                     </div>
@@ -39,7 +45,7 @@
             </div>
 
             <div class="panel2-main left">
-                <div class="panel2-main-inner left">
+                <div class="panel2-main-inner left" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
                     <ng-container *ngTemplateOutlet="sidebarContentTemplate"></ng-container>
                 </div>
             </div>
@@ -51,19 +57,22 @@
     </ng-container>
     
     <ng-container *ngIf="layout === 'main'">
-        <div class="panel2-slice main">
+        <div class="panel2-slice main" [style.minWidth]="minWidth">
             <div class="panel2-header main">
                 <div class="panel2-header-inner main" [style.minWidth]="width" [style.width]="width"> 
                     <h3 *ngIf="title">
                         <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ title | sqxTranslate }}
                     </h3>
+                    <div>
+                        <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                    </div>
                     <div class="flex-grow-1 text-right">
                         <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
                     </div>
                 </div>
             </div>
             <div class="panel2-main main">
-                <div class="panel2-main-inner main" [style.minWidth]="width" [style.width]="width" [class.white]="white" [class.padded]="padding">
+                <div class="panel2-main-inner main" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div> 
             </div>
@@ -81,7 +90,7 @@
             </div>
         </div>
     
-        <div class="panel2-slice right" [class.collapsed]="isCollapsed" [style.width]="childSize" [style.minWidth]="childSize" *ngIf="!hideSidebar">
+        <div class="panel2-slice right" [class.collapsed]="isCollapsed" [style.width]="childSize" [style.minWidth]="childSize">
             <div class="panel2-content-inner right">
                 <ng-container *ngTemplateOutlet="sidebarContentTemplate"></ng-container>
             </div>
@@ -90,6 +99,10 @@
 
     <ng-template #contentTemplate>
         <ng-content></ng-content>
+    </ng-template>
+
+    <ng-template #titleTemplate>
+        <ng-content select="[title]"></ng-content>
     </ng-template>
 
     <ng-template #menuTemplate>

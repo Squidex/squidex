@@ -1,7 +1,7 @@
 <sqx-title [message]="schema.displayName"></sqx-title>
 
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-    <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="!!content" [grid]="true" (close)="back()">
+    <sqx-layout layout="main" minWidth="60rem" [hideSidebar]="!content">
         <ng-container title>
             <a class="btn btn-text" (click)="back()" *ngIf="!schema.isSingleton">
                 <i class="icon-angle-left"></i>
@@ -14,7 +14,7 @@
             </ng-container>
         </ng-container>
         
-        <ng-container header>
+        <ng-container menu>
             <ng-container *ngIf="content">
                 <sqx-title message="i18n:contents.editPageTitle"></sqx-title>
 
@@ -105,7 +105,7 @@
             <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm.error | async"></sqx-form-error>
         </ng-container>
 
-        <ng-container content>
+        <ng-container>
             <ng-container *ngIf="content; else noContentEditor">
                 <ng-container [ngSwitch]="contentTab | async">
                     <ng-container *ngSwitchCase="'references'">
@@ -150,7 +150,7 @@
             </ng-template>
         </ng-container>
 
-        <ng-container sidebar>
+        <ng-container sidebarMenu>
             <div class="panel-nav">
                 <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.workflow" titlePosition="left" #linkHistory>
                     <i class="icon-time"></i>
@@ -169,7 +169,9 @@
                 </sqx-onboarding-tooltip>
             </div>
         </ng-container>
-    </sqx-panel>
-</form>
 
-<router-outlet></router-outlet>
+        <ng-container sidebarContent>
+            <router-outlet></router-outlet>
+        </ng-container>
+    </sqx-layout>
+</form>

@@ -1,16 +1,10 @@
-<sqx-panel desiredWidth="20rem" [isBlank]="true" [isLazyLoaded]="false">
-    <ng-container title>
-        {{ 'common.sidebar' | sqxTranslate }}
-    </ng-container>
-
-    <ng-container content>
-        <sqx-content-extension
-            [url]="url | async"
-            [content]="contentsState.selectedContent | async"
-            [contentSchema]="(schemasState.selectedSchema | async)!">
-        </sqx-content-extension>
-    </ng-container>
-</sqx-panel>
+<sqx-layout title="common.sidebar" width="20rem" [white]="true" [padding]="true" [overflow]="true">
+    <sqx-content-extension
+        [url]="url | async"
+        [content]="contentsState.selectedContent | async"
+        [contentSchema]="(schemasState.selectedSchema | async)!">
+    </sqx-content-extension>
+</sqx-layout>
 
 
 
