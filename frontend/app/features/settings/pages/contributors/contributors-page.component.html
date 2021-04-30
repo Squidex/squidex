@@ -1,10 +1,6 @@
 <sqx-title message="i18n:common.contributors"></sqx-title>
 
-<sqx-layout layout="main" width="50rem">
-    <ng-container title>
-        {{ 'common.contributors' | sqxTranslate }}
-    </ng-container>
-
+<sqx-layout layout="main" title="common.contributors" titleIcon="contributors" width="50rem">
     <ng-container menu>
         <sqx-notifo topic="apps/{{contributorsState.appId}}/settings/contributors"></sqx-notifo>
 
@@ -32,12 +28,6 @@
                         <sqx-contributor-add-form
                             [roles]="roles">
                         </sqx-contributor-add-form>
-    
-                        <div class="import-hint">
-                            <sqx-form-hint class="text-right">
-                                {{ 'contributors.importHintg' | sqxTranslate }} <a class="force" (click)="importDialog.show()">{{ 'contributors.importButton' | sqxTranslate }}</a>
-                            </sqx-form-hint>
-                        </div>
                     </ng-container>
                 </ng-container>
 
@@ -82,9 +72,3 @@
         <router-outlet></router-outlet>
     </ng-container>
 </sqx-layout>
-
-<ng-container *sqxModal="importDialog">
-    <sqx-import-contributors-dialog [roles]="(rolesState.roles | async)!" 
-        (close)="importDialog.hide()">
-    </sqx-import-contributors-dialog>
-</ng-container>

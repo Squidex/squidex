@@ -1,10 +1,6 @@
 <sqx-title message="i18n:common.workflows"></sqx-title>
 
-<sqx-layout layout="main">
-    <ng-container title>
-        {{ 'common.workflows' | sqxTranslate }}
-    </ng-container>
-
+<sqx-layout layout="main" title="common.workflows" titleIcon="worlflow">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:workflows.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}

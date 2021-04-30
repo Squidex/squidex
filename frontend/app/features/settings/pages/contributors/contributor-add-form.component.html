@@ -1,4 +1,6 @@
-<div class="table-items-footer">
+<div class="card card-body mb-4">
+    <h5>{{ 'contributors.add.title' | sqxTranslate }}</h5>
+
     <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
         <div class="row no-gutters">
             <div class="col">
@@ -24,4 +26,16 @@
             </div>
         </div>
     </form>
+
+    <div class="import-hint">
+        <sqx-form-hint>
+            {{ 'contributors.importHintg' | sqxTranslate }} <a class="force" (click)="importDialog.show()">{{ 'contributors.importButton' | sqxTranslate }}</a>
+        </sqx-form-hint>
+    </div>
 </div>
+
+<ng-container *sqxModal="importDialog">
+    <sqx-import-contributors-dialog [roles]="roles" 
+        (close)="importDialog.hide()">
+    </sqx-import-contributors-dialog>
+</ng-container>

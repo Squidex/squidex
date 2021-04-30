@@ -3,15 +3,13 @@
         <div class="panel2-slice simple">
             <div class="panel2-header simple">
                 <div class="panel2-header-inner simple">
-                    <div>
-                        <h3>
-                            <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
-                        </h3>
-                    </div>
-                    <div>
+                    <h3 *ngIf="title">
+                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ title | sqxTranslate }}
+                    </h3>
+                    <div class="flex-grow-1 text-right">
                         <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
                     </div>
-                </div>         
+                </div>
             </div>
             <div class="panel2-main simple">
                 <div class="panel2-main-inner simple" [class.white]="white" [class.padded]="padding">
@@ -25,13 +23,12 @@
         <div class="panel2-slice left" [class.collapsed]="isCollapsed" [style.width]="width">
             <div class="panel2-header left">
                 <div class="panel2-header-inner left">
-                    <ng-container *ngIf="customHeader; else defaultHeader">
-                        <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
-                    </ng-container>
-
-                    <ng-template #defaultHeader>
-                        <h3><i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{title}}</h3>
-                    </ng-template>
+                    <h3 *ngIf="title">
+                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ title | sqxTranslate }}
+                    </h3>
+                    <div class="flex-grow-1 text-right">
+                        <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+                    </div>
                 </div>
 
                 <button class="btn panel2-collapse" (click)="toggle()">
@@ -56,16 +53,14 @@
     <ng-container *ngIf="layout === 'main'">
         <div class="panel2-slice main">
             <div class="panel2-header main">
-                <div class="panel2-header-inner main" [style.minWidth]="width" [style.width]="width">
-                    <div>
-                        <h3>
-                            <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
-                        </h3>
-                    </div>
-                    <div>
+                <div class="panel2-header-inner main" [style.minWidth]="width" [style.width]="width"> 
+                    <h3 *ngIf="title">
+                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ title | sqxTranslate }}
+                    </h3>
+                    <div class="flex-grow-1 text-right">
                         <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
                     </div>
-                </div>         
+                </div>
             </div>
             <div class="panel2-main main">
                 <div class="panel2-main-inner main" [style.minWidth]="width" [style.width]="width" [class.white]="white" [class.padded]="padding">
@@ -95,10 +90,6 @@
 
     <ng-template #contentTemplate>
         <ng-content></ng-content>
-    </ng-template>
-
-    <ng-template #titleTemplate>
-        <ng-content select="[title]"></ng-content>
     </ng-template>
 
     <ng-template #menuTemplate>

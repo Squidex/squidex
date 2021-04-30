@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-body">
-        <h5>Create new Role</h5>
+        <h5>{{ 'roles.add.title' | sqxTranslate }}</h5>
 
         <form [formGroup]="addRoleForm.form" (ngSubmit)="addRole()">
             <div class="row no-gutters">
@@ -23,7 +23,7 @@
         </form>
 
         <sqx-form-hint>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet
+            {{ 'roles.add.description' | sqxTranslate }}
         </sqx-form-hint>
     </div>
 </div>

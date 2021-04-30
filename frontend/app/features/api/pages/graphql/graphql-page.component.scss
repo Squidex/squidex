@@ -1,10 +1,6 @@
 :host ::ng-deep {
     @import '~graphiql/graphiql';
 
-    & {
-        position: relative;
-    }
-
     .graphiql-container {
         & {
             @include absolute(0, 0, 0, 0);

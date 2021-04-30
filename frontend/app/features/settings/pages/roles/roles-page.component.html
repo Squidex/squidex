@@ -1,10 +1,6 @@
 <sqx-title message="i18n:common.roles"></sqx-title>
 
-<sqx-layout layout="main" width="50rem">
-    <ng-container title>
-        {{ 'common.roles' | sqxTranslate }}
-    </ng-container>
-
+<sqx-layout layout="main" title="common.roles" titleIcon="roles" width="50rem">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:roles.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -21,10 +17,10 @@
 
                     <ng-container *ngIf="rolesState.defaultRoles| async; let defaultRoles">
                         <div *ngIf="defaultRoles.length > 0">
-                            <h5 class="mt-4">Default Roles</h5>
+                            <h5 class="mt-4">{{ 'roles.defaultRoles' | sqxTranslate }}</h5>
 
                             <sqx-form-hint>
-                                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet
+                                {{ 'roles.defaultRoles.hint' | sqxTranslate }}
                             </sqx-form-hint>
 
                             <sqx-role *ngFor="let role of defaultRoles; trackBy: trackByRole" [role]="role"
@@ -35,7 +31,7 @@
 
                     <ng-container *ngIf="rolesState.customRoles| async; let customRoles">
                         <div *ngIf="customRoles.length > 0">
-                            <h5 class="mt-4">Custom Roles</h5>
+                            <h5 class="mt-4">{{ 'roles.customRoles' | sqxTranslate }}</h5>
 
                             <sqx-role *ngFor="let role of customRoles; trackBy: trackByRole" [role]="role"
                                 [schemas]="(schemasState.schemas | async)!" [allPermissions]="allPermissions">

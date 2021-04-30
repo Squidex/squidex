@@ -1,33 +1,49 @@
 <div class="top-header">
-    <ng-content select="[topHeader]"></ng-content>
+    <ng-container *ngTemplateOutlet="topHeaderTemplate"></ng-container>
 </div>
 
 <ng-container *ngIf="!syncedHeader">
     <div class="grid-header" [class.loading-indicator]="isLoading" #headerElement>
-        <ng-content select="[header]"></ng-content>
+        <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
     </div>
     
     <div class="grid-content normal" [class.loading-indicator]="isLoading" [class.tabled]="table" #contentElement>
-        <ng-content select="[content]"></ng-content>
+        <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
     </div>
 </ng-container>
 
 <ng-container *ngIf="syncedHeader">
     <div class="grid-header synced" [class.loading-indicator]="isLoading" #headerElement>
         <span class="inner" #header>
-            <ng-content select="[syncedHeader]"></ng-content>
+            <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
         </span>
     </div>
     
     <div class="grid-content synced" [class.loading-indicator]="isLoading" [class.tabled]="table" [sqxSyncScrolling]="header">
-        <ng-content select="[syncedContent]"></ng-content>
+        <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
     </div>
 </ng-container>
 
 <div class="grid-footer" [class.loading-indicator]="isLoading" #footerElement>
-    <ng-content select="[footer]"></ng-content>
+    <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
 </div>
 
 <div class="loader text-center" *ngIf="isLoading">
     <i class="icon-spinner2 spin2"></i>
 </div>
+
+<ng-template #contentTemplate>
+    <ng-content></ng-content>
+</ng-template>
+
+<ng-template #topHeaderTemplate>
+    <ng-content select="[topHeader]"></ng-content>
+</ng-template>
+
+<ng-template #headerTemplate>
+    <ng-content select="[header]"></ng-content>
+</ng-template>
+
+<ng-template #footerTemplate>
+    <ng-content select="[footer]"></ng-content>
+</ng-template>

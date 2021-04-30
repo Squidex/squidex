@@ -1,4 +1,6 @@
-<div class="table-items-footer">
+<div class="card card-body mb-4">
+    <h5>{{ 'clients.add.title' | sqxTranslate }}</h5>
+
     <form [formGroup]="addClientForm.form" (ngSubmit)="addClient()">
         <div class="row no-gutters">
             <div class="col">
@@ -18,4 +20,8 @@
             </div>
         </div>
     </form>
+
+    <sqx-form-hint>
+        {{ 'clients.add.description' | sqxTranslate }}
+    </sqx-form-hint>
 </div>

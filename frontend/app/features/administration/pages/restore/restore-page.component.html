@@ -1,11 +1,7 @@
 <sqx-title message="i18n:backups.restorePageTitle"></sqx-title>
 
-<sqx-panel theme="light" desiredWidth="70rem">
-    <ng-container title>
-        {{ 'backups.restoreTitle' | sqxTranslate }}
-    </ng-container>
-
-    <ng-container content>
+<sqx-layout layout="main" title="backups.restoreTitle" titleIcon="backup" width="70rem">
+    <sqx-list-view>
         <div class="card section" *ngIf="restoreJob | async; let job">
             <div class="card-header">
                 <div class="row no-gutters">
@@ -64,5 +60,5 @@
                 </div>
             </form>
         </div>
-    </ng-container>
-</sqx-panel>
+    </sqx-list-view>
+</sqx-layout>

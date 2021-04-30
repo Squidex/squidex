@@ -1,10 +1,6 @@
 <sqx-title message="i18n:rules.listPageTitle"></sqx-title>
 
-<sqx-layout layout="main" width="50rem">
-    <ng-container title>
-        {{ 'common.rules' | sqxTranslate }}
-    </ng-container>
-
+<sqx-layout layout="main" title="common.rules" titleIcon="rules" width="50rem">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary mr-1" (click)="reload()" title="i18n:rules.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -23,17 +19,15 @@
 
     <ng-container>
         <sqx-list-view [isLoading]="rulesState.isLoading | async">
-            <ng-container topHeader>
-                <div class="panel-alert panel-alert-danger" *ngIf="rulesState.runningRule | async; let runningRule">
+            <div>
+                <div class="alert alert-danger mb-4" *ngIf="rulesState.runningRule | async; let runningRule">
                     <div class="float-right">
                         <a class="force" (click)="cancelRun()">{{ 'common.cancel' | sqxTranslate }}</a>
                     </div>
-
+    
                     {{ 'rules.runningRule' | sqxTranslate: { name: runningRule.name || 'Unnamed Rule' } }}
                 </div>
-            </ng-container>
-
-            <div content>
+    
                 <ng-container *ngIf="supportedActions && supportedTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">
                     <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
                         {{ 'rules.empty' | sqxTranslate }}

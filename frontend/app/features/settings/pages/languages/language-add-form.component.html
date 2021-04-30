@@ -1,4 +1,6 @@
-<div class="table-items-footer">
+<div class="card card-body mb-4">
+    <h5>{{ 'languages.add.title' | sqxTranslate }}</h5>
+
     <form [formGroup]="addLanguageForm.form" (ngSubmit)="addLanguage()">
         <div class="row no-gutters">
             <div class="col">
@@ -13,4 +15,8 @@
             </div>
         </div>
     </form>
+
+    <sqx-form-hint>
+        {{ 'languages.add.description' | sqxTranslate }}
+    </sqx-form-hint>
 </div>

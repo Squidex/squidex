@@ -1,10 +1,6 @@
 <sqx-title message="i18n:assets.listPageTitle"></sqx-title>
 
-<sqx-layout layout="main">
-    <ng-container title>
-        {{ 'common.assets' | sqxTranslate }}
-    </ng-container>
-    
+<sqx-layout layout="main" title="common.assets" titleIcon="assets">    
     <ng-container menu>
         <div class="row no-gutters pl-1">
             <div class="col-auto offset-xl-2">
@@ -14,7 +10,7 @@
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
-            <div class="col pl-1" style="width: 300px">
+            <div class="col pl-1" style="width: 300px;">
                 <div class="row no-gutters search">
                     <div class="col-6">
                         <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"

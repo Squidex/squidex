@@ -128,7 +128,7 @@
         border: 0;
         border-bottom: 1px solid $color-border;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         flex-grow: 1;
         position: relative;
 
@@ -138,8 +138,8 @@
             border: 0;
             border-radius: 0;
             display: flex;
-            justify-content: space-between;
             padding: $panel-padding;
+            width: 100%;
 
             &.left {
                 padding-right: 3rem;

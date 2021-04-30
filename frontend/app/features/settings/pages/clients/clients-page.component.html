@@ -1,10 +1,6 @@
 <sqx-title message="i18n:common.clients"></sqx-title>
 
-<sqx-layout layout="main" width="50rem">
-    <ng-container title>
-        {{ 'common.clients' | sqxTranslate }}
-    </ng-container>
-
+<sqx-layout layout="main" title="common.clients" titleIcon="clients" width="50rem">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:clients.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -15,8 +11,10 @@
     
     <ng-container>
         <sqx-list-view [isLoading]="clientsState.isLoading | async">
-            <div content>
+            <div>
                 <ng-container *ngIf="(clientsState.isLoaded | async) && (clientsState.clients | async); let clients">
+                    <sqx-client-add-form *ngIf="clientsState.canCreate | async"></sqx-client-add-form>
+
                     <div class="table-items-row table-items-row-empty" *ngIf="clients.length === 0">
                         {{ 'clients.empty' | sqxTranslate }}
                     </div>
@@ -27,8 +25,6 @@
                             [clientRoles]="roles">
                         </sqx-client>
                     </ng-container>
-        
-                    <sqx-client-add-form *ngIf="clientsState.canCreate | async"></sqx-client-add-form>
                 </ng-container>
             </div>
         </sqx-list-view>
