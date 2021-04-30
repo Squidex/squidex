@@ -1,7 +1,7 @@
 $background: #fff;
 
 :host ::ng-deep {
-    // sass-lint:disable class-name-format
+    /* stylelint-disable-next-line selector-class-pattern */
     .CodeMirror {
         box-sizing: content-box;
         height: 300px;

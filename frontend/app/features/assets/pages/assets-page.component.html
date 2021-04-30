@@ -1,6 +1,6 @@
 <sqx-title message="i18n:assets.listPageTitle"></sqx-title>
 
-<sqx-panel desiredWidth="*" minWidth="50rem" [showSidebar]="true" [grid]="true" closeQueryParamsHandling="">
+<sqx-layout layout="main">
     <ng-container title>
         {{ 'common.assets' | sqxTranslate }}
     </ng-container>
@@ -56,7 +56,7 @@
         </div>
     </ng-container>
 
-    <ng-container content>
+    <ng-container>
         <sqx-list-view [isLoading]="assetsState.isLoading | async">
             <ng-container header>
                 <sqx-asset-path [path]="assetsState.path | async" (navigate)="assetsState.navigate($event.id)"></sqx-asset-path>
@@ -72,17 +72,19 @@
         </sqx-list-view>
     </ng-container>
 
-    <ng-container sidebar>   
+    <ng-container sidebarMenu>   
         <div class="panel-nav">
             <a class="panel-link" routerLink="filters" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.filters" titlePosition="left">
                 <i class="icon-filter"></i>
             </a>    
         </div> 
     </ng-container>
-</sqx-panel>
+
+    <ng-container sidebarContent>
+        <router-outlet></router-outlet>
+    </ng-container>
+</sqx-layout>
 
 <ng-container *sqxModal="addAssetFolderDialog">
     <sqx-asset-folder-dialog (complete)="addAssetFolderDialog.hide()"></sqx-asset-folder-dialog>
 </ng-container>
-
-<router-outlet></router-outlet>

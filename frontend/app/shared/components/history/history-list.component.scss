@@ -1,3 +1,7 @@
+.user-ref {
+    padding-right: .25rem;
+}
+
 :host ::ng-deep {
     .user-ref {
         font-weight: 500;
@@ -10,10 +14,6 @@
 
 .user-picture {
     margin-top: .25rem;
-}
-
-.user-ref {
-    padding-right: .25rem;
 }
 
 .event {

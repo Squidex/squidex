@@ -1,6 +1,6 @@
 <sqx-title message="i18n:appSettings.title"></sqx-title>
 
-<sqx-panel desiredWidth="55rem">
+<sqx-layout layout="main" width="55rem" [hideSidebar]="true" [padding]="true">
     <ng-container title>
         {{ 'appSettings.title' | sqxTranslate }}
     </ng-container>
@@ -17,10 +17,14 @@
         </button>
     </ng-container>
 
-    <ng-container content>
-        <div class="card mb-2">
-            <div class="card-header">{{ 'appSettings.patterns.title' | sqxTranslate }}</div>
+    <ng-container>
+        <h5>{{ 'appSettings.patterns.title' | sqxTranslate }}</h5>
 
+        <sqx-form-hint>
+            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet
+        </sqx-form-hint>
+
+        <div class="card mb-2">
             <div class="card-body">
                 <div class="content">
                     <div class="mt-4" *ngIf="!isEditable && editForm.patternsControls.length === 0">
@@ -80,9 +84,13 @@
             </div>
         </div>
         
-        <div class="card mb-2">
-            <div class="card-header">{{ 'appSettings.editors.title' | sqxTranslate }}</div>
+        <h5 class="mt-2">{{ 'appSettings.editors.title' | sqxTranslate }}</h5>
 
+        <sqx-form-hint>
+            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet
+        </sqx-form-hint>
+
+        <div class="card mb-2">
             <div class="card-body">
                 <div class="content">
                     <div class="mt-4" *ngIf="!isEditable && editForm.editorsControls.length === 0">
@@ -132,9 +140,9 @@
             </div>
         </div>
 
-        <div class="card mb-2">
-            <div class="card-header">{{ 'common.contents' | sqxTranslate }}</div>
+        <h5 class="mt-2">{{ 'common.contents' | sqxTranslate }}</h5>
 
+        <div class="card mb-2">
             <div class="card-body" [formGroup]="editForm.form">
                 <div class="custom-control custom-checkbox">
                     <input class="custom-control-input" type="checkbox" id="hideScheduler" formControlName="hideScheduler">
@@ -146,4 +154,4 @@
             </div>
         </div>
     </ng-container>
-</sqx-panel>
+</sqx-layout>

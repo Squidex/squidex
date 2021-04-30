@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.contributors"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" [showSidebar]="true" [grid]="true" closeQueryParamsHandling="">
+<sqx-layout layout="main" width="50rem">
     <ng-container title>
         {{ 'common.contributors' | sqxTranslate }}
     </ng-container>
@@ -20,8 +20,8 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-list-view [isLoading]="contributorsState.isLoading | async">
-            <ng-container topHeader>
+        <sqx-list-view [isLoading]="contributorsState.isLoading | async">            
+            <div content>
                 <ng-container *ngIf="rolesState.roles | async; let roles">
                     <ng-container *ngIf="contributorsState.maxContributors | async; let maxContributors">
                         <div class="panel-alert panel-alert-success" *ngIf="maxContributors > 0">
@@ -32,7 +32,7 @@
                         <sqx-contributor-add-form
                             [roles]="roles">
                         </sqx-contributor-add-form>
-
+    
                         <div class="import-hint">
                             <sqx-form-hint class="text-right">
                                 {{ 'contributors.importHintg' | sqxTranslate }} <a class="force" (click)="importDialog.show()">{{ 'contributors.importButton' | sqxTranslate }}</a>
@@ -40,9 +40,7 @@
                         </div>
                     </ng-container>
                 </ng-container>
-            </ng-container>
 
-            <div content>
                 <ng-container *ngIf="contributorsState.contributorsFiltered | async; let contributors">
                     <ng-container *ngIf="rolesState.roles | async; let roles">                        
                         <ng-container *ngIf="contributors.length > 0; else noContributors">
@@ -68,7 +66,7 @@
         </sqx-list-view>
     </ng-container>
 
-    <ng-container sidebar>
+    <ng-container sidebarMenu>
         <div class="panel-nav">
             <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" queryParamsHandling="preserve" title="i18n:common.history" titlePosition="left">
                 <i class="icon-time"></i>
@@ -79,12 +77,14 @@
             </a>
         </div>
     </ng-container>
-</sqx-panel>
+
+    <ng-container sidebarContent>
+        <router-outlet></router-outlet>
+    </ng-container>
+</sqx-layout>
 
 <ng-container *sqxModal="importDialog">
     <sqx-import-contributors-dialog [roles]="(rolesState.roles | async)!" 
         (close)="importDialog.hide()">
     </sqx-import-contributors-dialog>
 </ng-container>
-
-<router-outlet></router-outlet>

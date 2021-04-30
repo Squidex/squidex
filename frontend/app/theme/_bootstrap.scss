@@ -1,7 +1,10 @@
 @import '_mixins';
 @import '_vars';
 
+// Import bootstrap files
 @import './../../node_modules/bootstrap/scss/mixins/_buttons';
+
+/* stylelint-disable no-descending-specificity */
 
 //
 // Bade colors
@@ -44,7 +47,7 @@
     }
 }
 
-// 
+//
 // Alert overrides.
 //
 .alert-success,
@@ -219,6 +222,28 @@ a {
         margin-bottom: 2rem;
     }
 
+    &-item {
+        i {
+            display: none;
+        }
+
+        &::before {
+            color: darken($color-border, 10%);
+        }
+
+        &.done {
+            color: $color-theme-green;
+
+            a {
+                color: $color-theme-green !important;
+            }
+
+            i {
+                display: inline-block;
+            }
+        }
+    }
+
     &.steps {
         & {
             padding: 0;
@@ -260,28 +285,6 @@ a {
 
             &::before {
                 content: none;
-            }
-        }
-    }
-
-    &-item {
-        i {
-            display: none;
-        }
-
-        &::before {
-            color: darken($color-border, 10%);
-        }
-
-        &.done {
-            color: $color-theme-green;
-
-            a {
-                color: $color-theme-green !important;
-            }
-
-            i {
-                display: inline-block;
             }
         }
     }
@@ -709,9 +712,9 @@ $icon-size: 4.5rem;
     border-top-width: 0;
 }
 
-// 
+//
 // Table Helpers
-// 
+//
 .table {
     // Use fixed width for columns.
     &-fixed {

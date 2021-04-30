@@ -1,11 +1,3 @@
-:host ::ng-deep {
-    @import '~cropperjs/dist/cropper';
-
-    img {
-        background-image: $asset-background;
-    }
-}
-
 :host {
     background: $color-dark-black;
     display: flex;
@@ -14,6 +6,14 @@
     height: 100%;
     overflow-x: hidden;
     overflow-y: hidden;
+}
+
+:host ::ng-deep {
+    @import '~cropperjs/dist/cropper';
+
+    img {
+        background-image: $asset-background;
+    }
 }
 
 .editor {

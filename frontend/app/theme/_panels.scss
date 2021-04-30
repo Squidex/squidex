@@ -1,6 +1,8 @@
 @import '_mixins';
 @import '_vars';
 
+/* stylelint-disable no-descending-specificity */
+
 @mixin panel-icon {
     color: $color-border-dark;
     cursor: pointer;
@@ -367,7 +369,6 @@
         }
 
         &:hover {
-
             .sidebar-item-remove {
                 visibility: visible;
             }

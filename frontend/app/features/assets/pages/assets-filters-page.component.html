@@ -1,9 +1,9 @@
-<sqx-panel desiredWidth="20rem" [isBlank]="true" [isLazyLoaded]="false">
+<sqx-layout width="20rem" [white]="true">
     <ng-container title>
         {{ 'common.filters' | sqxTranslate }}
     </ng-container>
 
-    <ng-container content>
+    <ng-container>
         <h3>{{ 'common.tags' | sqxTranslate }}</h3>
 
         <sqx-asset-tags (reset)="resetTags()"
@@ -21,4 +21,4 @@
             (search)="search($event)">
         </sqx-shared-queries>
     </ng-container>
-</sqx-panel>
+</sqx-layout>

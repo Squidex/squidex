@@ -3,6 +3,8 @@ $focus-shadow: rgba(51, 137, 255, .25);
 
 $inner-height: 1.75rem;
 
+/* stylelint-disable no-descending-specificity */
+
 :host {
     text-align: left;
 }
@@ -67,6 +69,12 @@ $inner-height: 1.75rem;
     }
 }
 
+div {
+    &.blank {
+        height: auto;
+    }
+}
+
 .multiline {
     height: auto;
     overflow-x: hidden;
@@ -75,12 +83,6 @@ $inner-height: 1.75rem;
     .item {
         @include truncate;
         display: inline-block;
-    }
-}
-
-div {
-    &.blank {
-        height: auto;
     }
 }
 

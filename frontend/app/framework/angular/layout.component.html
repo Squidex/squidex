@@ -1,0 +1,119 @@
+<div class="panel2">
+    <ng-container *ngIf="layout === 'simple'">
+        <div class="panel2-slice simple">
+            <div class="panel2-header simple">
+                <div class="panel2-header-inner simple">
+                    <div>
+                        <h3>
+                            <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                        </h3>
+                    </div>
+                    <div>
+                        <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+                    </div>
+                </div>         
+            </div>
+            <div class="panel2-main simple">
+                <div class="panel2-main-inner simple" [class.white]="white" [class.padded]="padding">
+                    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+                </div> 
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="layout === 'left'">
+        <div class="panel2-slice left" [class.collapsed]="isCollapsed" [style.width]="width">
+            <div class="panel2-header left">
+                <div class="panel2-header-inner left">
+                    <ng-container *ngIf="customHeader; else defaultHeader">
+                        <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
+                    </ng-container>
+
+                    <ng-template #defaultHeader>
+                        <h3><i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{title}}</h3>
+                    </ng-template>
+                </div>
+
+                <button class="btn panel2-collapse" (click)="toggle()">
+                    <i class="icon-angle-left"></i>
+                </button>
+
+                <div class="panel2-sidebar-title">{{title}}</div>
+            </div>
+
+            <div class="panel2-main left">
+                <div class="panel2-main-inner left">
+                    <ng-container *ngTemplateOutlet="sidebarContentTemplate"></ng-container>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel2-slice main">
+            <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+        </div>
+    </ng-container>
+    
+    <ng-container *ngIf="layout === 'main'">
+        <div class="panel2-slice main">
+            <div class="panel2-header main">
+                <div class="panel2-header-inner main" [style.minWidth]="width" [style.width]="width">
+                    <div>
+                        <h3>
+                            <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                        </h3>
+                    </div>
+                    <div>
+                        <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+                    </div>
+                </div>         
+            </div>
+            <div class="panel2-main main">
+                <div class="panel2-main-inner main" [style.minWidth]="width" [style.width]="width" [class.white]="white" [class.padded]="padding">
+                    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+                </div> 
+            </div>
+        </div>
+
+        <div class="panel2-slice menu" [class.collapsed]="isCollapsed" *ngIf="!hideSidebar">
+            <div class="panel2-header menu">            
+                <button class="btn panel2-collapse" (click)="toggle()">
+                    <i class="icon-angle-right"></i>
+                </button>
+            </div>
+    
+            <div class="panel2-main menu">
+                <ng-container *ngTemplateOutlet="sidebarMenuTemplate"></ng-container>
+            </div>
+        </div>
+    
+        <div class="panel2-slice right" [class.collapsed]="isCollapsed" [style.width]="childSize" [style.minWidth]="childSize" *ngIf="!hideSidebar">
+            <div class="panel2-content-inner right">
+                <ng-container *ngTemplateOutlet="sidebarContentTemplate"></ng-container>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #contentTemplate>
+        <ng-content></ng-content>
+    </ng-template>
+
+    <ng-template #titleTemplate>
+        <ng-content select="[title]"></ng-content>
+    </ng-template>
+
+    <ng-template #menuTemplate>
+        <ng-content select="[menu]"></ng-content>
+    </ng-template>
+
+    <ng-template #headerTemplate>
+        <ng-content select="[header]"></ng-content>
+    </ng-template>
+
+    <ng-template #sidebarMenuTemplate>
+        <ng-content select="[sidebarMenu]"></ng-content>
+    </ng-template>
+
+    <ng-template #sidebarContentTemplate>
+        <ng-content select="[sidebarContent]"></ng-content>
+    </ng-template>
+</div>

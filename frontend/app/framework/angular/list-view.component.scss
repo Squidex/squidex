@@ -7,10 +7,6 @@
     position: relative;
 }
 
-:host(.overflow) {
-    overflow: visible;
-}
-
 .grid {
     &-content,
     &-header,
@@ -81,6 +77,10 @@
             }
         }
     }
+}
+
+:host(.overflow) {
+    overflow: visible;
 }
 
 .loader,

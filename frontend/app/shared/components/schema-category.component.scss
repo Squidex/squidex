@@ -23,6 +23,14 @@ $drag-margin: -8px;
         position: relative;
     }
 
+    .drop-indicator {
+        @include absolute($drag-margin, $drag-margin, $drag-margin, $drag-margin);
+        background: none;
+        border: 2px dashed $color-dark-black;
+        display: none;
+        pointer-events: none;
+    }
+
     &.cdk-drop-list-dragging {
         & {
             border: 0;
@@ -31,14 +39,6 @@ $drag-margin: -8px;
         .drop-indicator {
             display: block;
         }
-    }
-
-    .drop-indicator {
-        @include absolute($drag-margin, $drag-margin, $drag-margin, $drag-margin);
-        background: none;
-        border: 2px dashed $color-dark-black;
-        display: none;
-        pointer-events: none;
     }
 }
 

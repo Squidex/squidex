@@ -3,7 +3,7 @@
 
 //
 // Support for Angular validation states.
-// 
+//
 .form-control {
     &.ng-invalid {
         &.ng-touched,
@@ -192,6 +192,7 @@
     }
 }
 
+/* stylelint-disable */
 //
 // Form group error.
 //
@@ -206,6 +207,7 @@
         margin-bottom: 0;
     }
 }
+/* stylelint-enable */
 
 .col-form-label {
     font-size: 90%;
@@ -232,6 +234,7 @@ label {
         color: $color-text-decent;
     }
 
+    /* stylelint-disable-next-line no-descending-specificity */
     .text-muted {
         font-weight: normal;
     }
@@ -260,8 +263,7 @@ label {
     }
 }
 
-// sass-lint:disable quotes
-$select-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'><path fill='#ccc' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>") !default;;
+$select-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'><path fill='#ccc' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>") !default;
 
 // Dark form control for the dark panel.
 .form-control-dark {

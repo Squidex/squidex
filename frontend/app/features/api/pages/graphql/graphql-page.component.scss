@@ -14,7 +14,7 @@
             box-sizing: content-box;
         }
 
-        // sass-lint:disable class-name-format
+        /* stylelint-disable-next-line selector-class-pattern */
         & .editorWrap {
             overflow: hidden;
         }
@@ -24,6 +24,7 @@
         }
     }
 
+    /* stylelint-disable-next-line selector-class-pattern */
     .CodeMirror-linenumbers {
         min-width: 29px;
     }

@@ -25,8 +25,8 @@ const plugins = {
     OptimizeCSSAssetsPlugin: require("optimize-css-assets-webpack-plugin"),
     // https://github.com/jrparish/tslint-webpack-plugin
     TsLintPlugin: require('tslint-webpack-plugin'),
-    // https://www.npmjs.com/package/sass-lint-webpack
-    SassLintPlugin: require('sass-lint-webpack'),
+    // https://github.com/webpack-contrib/stylelint-webpack-plugin
+    StylelintPlugin : require('stylelint-webpack-plugin'),
     // https://www.npmjs.com/package/webpack-bundle-analyzer
     BundleAnalyzerPlugin: require('webpack-bundle-analyzer').BundleAnalyzerPlugin,
     // https://www.npmjs.com/package/@angular-devkit/build-optimizer
@@ -194,7 +194,9 @@ module.exports = function (env) {
                 }
             }),
 
-            new plugins.SassLintPlugin(),
+            new plugins.StylelintPlugin({
+                files: '**/*.scss'
+            }),
 
             /**
              * Detect circular dependencies in app.

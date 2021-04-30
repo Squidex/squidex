@@ -8,6 +8,7 @@
 // tslint:disable: readonly-array
 
 import { AfterViewInit, Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
+import { LayoutComponent } from './layout.component';
 import { PanelComponent } from './panel.component';
 
 @Directive({
@@ -15,6 +16,7 @@ import { PanelComponent } from './panel.component';
 })
 export class PanelContainerDirective implements AfterViewInit {
     private readonly panels: PanelComponent[] = [];
+    private readonly layouts: LayoutComponent[] = [];
     private isViewInit = false;
     private containerWidth = 0;
 
@@ -33,10 +35,24 @@ export class PanelContainerDirective implements AfterViewInit {
         this.panels.push(panel);
     }
 
+    public pushLayout(layout: LayoutComponent) {
+        this.layouts.push(layout);
+    }
+
     public ngAfterViewInit() {
         this.isViewInit = true;
 
         this.invalidate(true);
+    }
+
+    public peek() {
+        return this.layouts[this.layouts.length - 1];
+    }
+
+    public popLayout() {
+        this.layouts.splice(-1, 1);
+
+        this.invalidate();
     }
 
     public pop() {

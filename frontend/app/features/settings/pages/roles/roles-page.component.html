@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.roles"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" [showSidebar]="true" [grid]="true">
+<sqx-layout layout="main" width="50rem">
     <ng-container title>
         {{ 'common.roles' | sqxTranslate }}
     </ng-container>
@@ -13,21 +13,41 @@
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
     </ng-container>
 
-    <ng-container content>
+    <ng-container>
         <sqx-list-view [isLoading]="rolesState.isLoading | async">
             <div content>
-                <ng-container *ngIf="(rolesState.isLoaded | async) && (rolesState.roles | async); let roles">
-                    <sqx-role *ngFor="let role of roles; trackBy: trackByRole" [role]="role"
-                        [schemas]="(schemasState.schemas | async)!" [allPermissions]="allPermissions">
-                    </sqx-role>
-        
+                <ng-container *ngIf="rolesState.isLoaded | async">
                     <sqx-role-add-form *ngIf="rolesState.canCreate | async"></sqx-role-add-form>
+
+                    <ng-container *ngIf="rolesState.defaultRoles| async; let defaultRoles">
+                        <div *ngIf="defaultRoles.length > 0">
+                            <h5 class="mt-4">Default Roles</h5>
+
+                            <sqx-form-hint>
+                                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet
+                            </sqx-form-hint>
+
+                            <sqx-role *ngFor="let role of defaultRoles; trackBy: trackByRole" [role]="role"
+                                [schemas]="(schemasState.schemas | async)!" [allPermissions]="allPermissions">
+                            </sqx-role>
+                        </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="rolesState.customRoles| async; let customRoles">
+                        <div *ngIf="customRoles.length > 0">
+                            <h5 class="mt-4">Custom Roles</h5>
+
+                            <sqx-role *ngFor="let role of customRoles; trackBy: trackByRole" [role]="role"
+                                [schemas]="(schemasState.schemas | async)!" [allPermissions]="allPermissions">
+                            </sqx-role>
+                        </div>
+                    </ng-container>
                 </ng-container>
             </div>
         </sqx-list-view>
     </ng-container>
 
-    <ng-container sidebar>
+    <ng-container sidebarMenu>
         <div class="panel-nav">
             <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.history" titlePosition="left">
                 <i class="icon-time"></i>
@@ -38,6 +58,8 @@
             </a>
         </div>
     </ng-container>
-</sqx-panel>
 
-<router-outlet></router-outlet>
+    <ng-container sidebarContent>
+        <router-outlet></router-outlet>
+    </ng-container>
+</sqx-layout>

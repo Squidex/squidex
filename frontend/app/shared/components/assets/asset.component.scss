@@ -1,4 +1,4 @@
-// sass-lint:disable single-line-per-selector
+/* stylelint-disable no-descending-specificity */
 
 $list-height: 2.25rem;
 
@@ -33,13 +33,8 @@ $list-height: 2.25rem;
     text-transform: uppercase;
 }
 
-:host(.isListView) {
-    padding: 0;
-}
-
 :host ::ng-deep {
     .form-control {
-
         &.disabled,
         &:disabled {
             background: transparent;
@@ -47,11 +42,16 @@ $list-height: 2.25rem;
     }
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
+:host(.isListView) {
+    padding: 0;
+}
+
 .card {
     & {
         @include overlay-container;
-        border-top-width: 1px;
         border-width: 1px;
+        border-top-width: 1px;
         margin-bottom: 1rem;
         margin-right: .5rem;
         width: $asset-width;
@@ -222,7 +222,11 @@ $list-height: 2.25rem;
             height: $list-height;
         }
 
-        &-name, &-info {
+        &-name {
+            width: 50% !important;
+        }
+
+        &-info {
             width: 50% !important;
         }
 

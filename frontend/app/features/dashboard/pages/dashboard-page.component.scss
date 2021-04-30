@@ -1,3 +1,7 @@
+gridster-item {
+    position: absolute;
+}
+
 .dashboard {
     & {
         @include absolute(0, 0, 0, 0);
@@ -17,17 +21,15 @@
         font-size: 1.4rem;
     }
 
+    /* stylelint-disable */
     gridster {
         background: none;
     }
+    /* stylelint-enable */
 
     gridster-item {
         overflow: visible;
     }
-}
-
-gridster-item {
-    position: absolute;
 }
 
 .btn {
@@ -35,9 +37,11 @@ gridster-item {
 }
 
 :host ::ng-deep {
+    /* stylelint-disable */
     chart {
         @include absolute(0, 1rem, 1rem, 1rem);
     }
+    /* stylelint-enable */
 
     .subtext {
         margin-bottom: 2rem;

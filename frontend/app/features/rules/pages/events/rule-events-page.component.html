@@ -1,6 +1,6 @@
 <sqx-title message="i18n:rules.ruleEvents.listPageTitle"></sqx-title>
 
-<sqx-panel desiredWidth="*" minWidth="40rem" [grid]="true" closeQueryParamsHandling="">
+<sqx-layout width="40rem">
     <ng-container title>
         {{ 'common.events' | sqxTranslate }}
     </ng-container>
@@ -13,7 +13,7 @@
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
     </ng-container>
     
-    <ng-container content>
+    <ng-container>
         <sqx-list-view>
             <ng-container content>
                 <table class="table table-items table-fixed">
@@ -48,6 +48,4 @@
             </ng-container>
         </sqx-list-view>
     </ng-container>
-</sqx-panel>
-
-<router-outlet></router-outlet>
+</sqx-layout>

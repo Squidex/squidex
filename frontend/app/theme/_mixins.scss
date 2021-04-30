@@ -1,4 +1,4 @@
-// sass-lint:disable no-vendor-prefixes, one-declaration-per-line, no-misspelled-properties, no-color-keywords, no-color-literals
+/* stylelint-disable */
 
 @mixin build-icon($color) {
     & {
@@ -26,7 +26,7 @@
         color: $color;
     }
 
-    &:disabled
+    &:disabled,
     &.disabled {
         opacity: .4;
     }
@@ -86,12 +86,12 @@
     max-width: $width;
     min-width: $width;
     // Normal width definition.
-    width:  $width;
+    width: $width;
 }
 
 @mixin force-height($height) {
     // Normal height definition.
-    height:  $height;
+    height: $height;
     // Ensure that we use the minimum height in flex scenarios.
     max-height: $height;
     min-height: $height;

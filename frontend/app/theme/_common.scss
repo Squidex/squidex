@@ -41,13 +41,36 @@ body {
 //
 // Rich editor icon. Must be placed here, because element is not created by angular.
 //
+/* stylelint-disable */
 .mce-i-assets {
     & {
-        font-family: 'icomoon' !important;
+        font-family: 'icomoon' !important; 
     }
 
     &::before {
         content: '\e948';
+    }
+}
+/* stylelint-enable */
+
+.sorting {
+    &,
+    & > * {
+        opacity: .5;
+    }
+}
+
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+.cdk-drop-list-dragging {
+    * {
+        transition: transform 250ms cubic-bezier(0, 0, .2, 1);
+    }
+
+    .cdk-drag-placeholder {
+        transition: none;
     }
 }
 
@@ -65,22 +88,8 @@ body {
     }
 }
 
-.cdk-drag-placeholder {
-    opacity: 0;
-}
-
 .cdk-drag-animating {
     transition: transform 250ms cubic-bezier(0, 0, .2, 1);
-}
-
-.cdk-drop-list-dragging {
-    * {
-        transition: transform 250ms cubic-bezier(0, 0, .2, 1);
-    }
-
-    .cdk-drag-placeholder {
-        transition: none;
-    }
 }
 
 .icon-bold {
@@ -207,14 +216,6 @@ body {
         background: $color-dark-foreground;
     }
 }
-
-.sorting {
-    &,
-    & > * {
-        opacity: .5;
-    }
-}
-
 //
 // Status Icon
 //
@@ -255,7 +256,7 @@ body {
 //
 // ACE
 //
-// sass-lint:disable class-name-format
+/* stylelint-disable-next-line selector-class-pattern */
 .ace_tooltip {
     background: $color-dark-foreground;
     border: 1px solid $color-input;
