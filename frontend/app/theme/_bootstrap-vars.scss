@@ -43,9 +43,9 @@ $card-cap-bg:               $panel-light-background;
 
 $paragraph-margin-bottom:   .5rem;
 
-$modal-backdrop-opacity:    .35;
+$modal-backdrop-opacity:    .5;
 $modal-footer-border-width: 1px;
-$modal-header-border-width: 0;
+$modal-header-border-width: 1px;
 $modal-header-padding:      1rem 1.75rem;
 $modal-inner-padding:       1.75rem;
 $modal-md:                  560px;
@@ -56,3 +56,4 @@ $navbar-dark-color:         $color-dark-foreground;
 $close-font-size:           1rem;
 $close-font-weight:         normal;
 $close-text-shadow:         none;
+$color-color:               $color-text-decent;

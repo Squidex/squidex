@@ -157,9 +157,7 @@
             }
         }
 
-        &.active,
-        &:active,
-        &:hover {
+        %focused {
             color: $color-dark-foreground;
 
             .text-muted {
@@ -167,8 +165,12 @@
             }
         }
 
-        &:active,
         &.active {
+            @extend %focused;
+        }
+
+        &.active {
+            @extend %focused;
             background: $color-theme-blue;
 
             &.separated {
@@ -177,6 +179,7 @@
         }
 
         &:hover {
+            @extend %focused;
             background: $color-theme-blue;
 
             &.separated {
@@ -220,14 +223,17 @@ label {
         font-weight: 500;
     }
 
-    &.form-check-label {
+    %normal-size {
         font-size: 100%;
         font-weight: normal;
     }
 
+    &.form-check-label {
+        @extend %normal-size;
+    }
+
     &.custom-control-label {
-        font-size: 100%;
-        font-weight: normal;
+        @extend %normal-size;
     }
 
     .hint {
@@ -257,31 +263,8 @@ label {
     // Search icon that is placed within the form control.
     .icon-search {
         @include absolute(.75rem, .75rem, auto, auto);
-        color: $color-dark2-focus-foreground;
+        color: $color-input;
         font-size: 1.1rem;
         font-weight: lighter;
-    }
-}
-
-$select-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'><path fill='#ccc' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>") !default;
-
-// Dark form control for the dark panel.
-.form-control-dark {
-    & {
-        @include placeholder-color($color-dark2-placeholder);
-        background-color: $color-dark2-control;
-        border: 1px solid $color-dark2-control;
-        color: darken($color-dark-foreground, 20%);
-        transition: background-color .3s ease;
-    }
-
-    &:focus {
-        background: lighten($color-dark2-control, 2%);
-        border-color: lighten($color-dark2-control, 2%);
-        color: $color-dark2-focus-foreground;
-    }
-
-    &.custom-select {
-        background: $color-dark2-control escape-svg($select-indicator) no-repeat right .75rem center / 8px 10px;
     }
 }

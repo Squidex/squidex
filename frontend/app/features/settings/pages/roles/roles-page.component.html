@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.roles"></sqx-title>
 
-<sqx-layout layout="main" title="common.roles" titleIcon="roles" width="50rem">
+<sqx-layout layout="main" title="common.roles" titleIcon="roles" width="55rem">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:roles.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -10,7 +10,7 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="rolesState.isLoading | async">
+        <sqx-list-view innerWidth="55rem" [isLoading]="rolesState.isLoading | async">
             <ng-container *ngIf="rolesState.isLoaded | async">
                 <sqx-role-add-form *ngIf="rolesState.canCreate | async"></sqx-role-add-form>
 

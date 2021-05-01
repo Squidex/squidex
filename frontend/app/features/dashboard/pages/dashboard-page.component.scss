@@ -76,6 +76,10 @@ gridster-item {
             position: relative;
         }
 
+        &-title {
+            margin-top: 1rem;
+        }
+
         &-history {
             overflow-y: auto;
         }
@@ -84,13 +88,6 @@ gridster-item {
             color: $color-text-decent;
             font-size: .9rem;
             font-weight: normal;
-        }
-
-        &-title {
-            color: $color-title;
-            font-size: 1.2rem;
-            font-weight: lighter;
-            margin-top: 1rem;
         }
 
         &-href {

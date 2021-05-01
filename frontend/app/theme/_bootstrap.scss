@@ -577,7 +577,7 @@ a {
         }
 
         &-secondary2 {
-            @include build-text-button($color-input);
+            @include build-text-button($color-text-decent);
         }
     }
 }
@@ -628,45 +628,15 @@ $icon-size: 4.5rem;
 // Restyle modal dialogs.
 //
 .modal {
-    &-header,
-    &-footer {
-        flex-shrink: 0;
-    }
-
-    &-body {
-        overflow-y: auto;
-    }
-
-    &-header {
-        & {
-            @include border-radius-top(.25rem);
-            background: $color-modal-header-background;
-            border: 0;
-            color: $color-modal-header-foreground;
-        }
-
-        h4 {
-            font-size: 1rem;
-            font-weight: normal;
-            line-height: 2.25rem;
-        }
-
-        .btn-close {
-            & {
-                color: $color-modal-header-foreground;
-            }
-
-            &:hover {
-                color: lighten($color-modal-header-foreground, 15%);
-            }
-        }
-    }
-
     &-content {
         @include box-shadow-outer(0, 8px, 16px, .3);
         border: 0;
         border-radius: .4rem .35rem .35rem .4rem;
         max-height: 100%;
+    }
+
+    .btn-close {
+        color: $color-text-decent;
     }
 
     &-fh {
@@ -695,12 +665,7 @@ $icon-size: 4.5rem;
     }
 
     &-footer {
-        padding-bottom: 1.25rem;
-        padding-top: 1.25rem;
-
-        .clearfix {
-            width: 100%;
-        }
+        padding: $modal-header-padding;
     }
 }
 

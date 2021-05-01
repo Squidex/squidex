@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.backups"></sqx-title>
 
-<sqx-layout layout="main" title="common.backups" titleIcon="backups" width="50rem">
+<sqx-layout layout="main" title="common.backups" titleIcon="backups" width="55rem">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary mr-1" (click)="reload()" title="i18n:backups.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -14,7 +14,7 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="backupsState.isLoading | async">
+        <sqx-list-view innerWidth="55rem" [isLoading]="backupsState.isLoading | async">
             <div class="alert alert-danger mb-4" *ngIf="backupsState.maxBackupsReached | async">
                 {{ 'backups.maximumReached' | sqxTranslate }}
             </div>
