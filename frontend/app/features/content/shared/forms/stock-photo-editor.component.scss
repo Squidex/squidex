@@ -89,10 +89,9 @@ sqx-list-view {
     }
 
     &-user-link {
+        @include text-small;
         @include truncate;
         color: $color-dark-foreground;
-        font-size: 90%;
-        font-weight: normal;
     }
 
     img {

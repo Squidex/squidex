@@ -1,7 +1,7 @@
 <sqx-title message="i18n:backups.restorePageTitle"></sqx-title>
 
 <sqx-layout layout="main" title="backups.restoreTitle" titleIcon="backup" width="70rem">
-    <sqx-list-view>
+    <sqx-list-view innerWidth="70rem">
         <div class="card section" *ngIf="restoreJob | async; let job">
             <div class="card-header">
                 <div class="row no-gutters">
@@ -31,7 +31,7 @@
                     {{row}}
                 </div>
             </div>
-            <div class="card-footer text-muted">
+            <div class="card-footer small text-muted">
                 <div class="row">
                     <div class="col">
                         {{ 'backups.restoreStartedLabel' | sqxTranslate }}: {{job.started | sqxISODate}}

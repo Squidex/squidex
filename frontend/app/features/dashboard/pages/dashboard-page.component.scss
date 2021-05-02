@@ -81,9 +81,8 @@ gridster-item {
         }
 
         &-text {
+            @include text-small;
             color: $color-text-decent;
-            font-size: .9rem;
-            font-weight: normal;
         }
 
         &-href {

@@ -80,9 +80,8 @@ $padding: 1rem;
     }
 
     &-partitioning {
+        @include text-smallest;
         color: $color-text-decent;
-        font-size: .85rem;
-        font-weight: normal;
     }
 
     .tag {

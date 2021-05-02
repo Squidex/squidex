@@ -19,7 +19,6 @@
 }
 
 .label {
-    font-size: .9rem;
-    font-weight: normal;
+    @include text-small;
     line-height: 2.4rem;
 }

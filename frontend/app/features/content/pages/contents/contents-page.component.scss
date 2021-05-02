@@ -10,7 +10,7 @@
 }
 
 .icon-plus {
-    font-size: .8rem;
+    @include text-smallest;
 }
 
 .hidden {

@@ -165,10 +165,9 @@ div {
 
 .btn {
     @include absolute(.25rem, 0, null, null);
+    @include text-small;
     border: 0;
     cursor: pointer;
-    font-size: .9rem;
-    font-weight: normal;
     padding-left: 5px;
     padding-right: 5px;
 }

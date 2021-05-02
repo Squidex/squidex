@@ -14,7 +14,7 @@
     }
 
     &-item {
-        font-size: .85rem;
+        @include text-smallest;
 
         &:hover {
             .text-muted {

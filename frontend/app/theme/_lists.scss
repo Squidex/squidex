@@ -32,10 +32,9 @@
     thead {
         // Small font size for the table header, content is more important!
         th {
+            @include text-smallest;
             border: 0;
             color: $color-table-header;
-            font-size: .8rem;
-            font-weight: normal;
             padding-top: 0;
             vertical-align: middle;
 

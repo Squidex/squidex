@@ -1,7 +1,5 @@
 <div class="top-header">
-    <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
-        <ng-container *ngTemplateOutlet="topHeaderTemplate"></ng-container>
-    </div>
+    <ng-container *ngTemplateOutlet="topHeaderTemplate"></ng-container>
 </div>
 
 <ng-container *ngIf="!syncedHeader">

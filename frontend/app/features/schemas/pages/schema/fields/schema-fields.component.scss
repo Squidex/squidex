@@ -15,6 +15,6 @@
     }
 
     &-text {
-        font-size: .9rem;
+        @include text-small;
     }
 }

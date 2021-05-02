@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav align-items-center">
+<ul class="nav navbar-nav align-items-center flex-nowrap">
     <li class="nav-item dropdown">
         <span class="dropdown-toggle form-control" id="app-name" (click)="appsMenu.toggle()" #button>
             <ng-container *ngIf="appsState.selectedApp | async; let app; else noApp">

@@ -1,5 +1,24 @@
 /* stylelint-disable */
 
+@mixin text-small {
+    font-size: 90%;
+}
+
+@mixin text-small-bold {
+    font-size: 90%;
+    font-weight: 500;
+}
+
+@mixin text-smallest {
+    font-size: 80%;
+}
+
+@mixin text-code {
+    font-family: monospace;
+    font-size: 80%;
+    font-weight: normal;
+}
+
 @mixin build-icon($color) {
     color: $color;
     transition: color .3s ease;

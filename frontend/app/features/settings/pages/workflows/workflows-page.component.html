@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.workflows"></sqx-title>
 
-<sqx-layout layout="main" title="common.workflows" titleIcon="worlflow">
+<sqx-layout layout="main" title="common.workflows" titleIcon="workflow">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:workflows.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -11,14 +11,14 @@
 
     <ng-container>
         <sqx-list-view [isLoading]="workflowsState.isLoading | async">
-            <ng-container topHeader>
+            <ng-container header>
                 <ng-container *ngIf="workflowsState.errors | async; let errors">
-                    <div class="panel-alert panel-alert-danger" *ngIf="errors.length > 1">
+                    <div class="alert alert-danger" *ngIf="errors.length > 1">
                         <ul>
                             <li *ngFor="let error of errors">{{error}}</li>
                         </ul>
                     </div>
-                    <div class="panel-alert panel-alert-danger" *ngIf="errors.length === 1">
+                    <div class="alert alert-danger" *ngIf="errors.length === 1">
                         {{errors[0]}}
                     </div>
                 </ng-container>

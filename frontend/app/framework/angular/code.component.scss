@@ -7,7 +7,7 @@
 
 .code,
 .code-copy {
-    font-size: .8rem;
+    @include text-code;
     min-height: 27px;
     padding-bottom: .25rem;
     padding-top: .25rem;

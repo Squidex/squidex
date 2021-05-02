@@ -23,17 +23,16 @@
 }
 
 .save-search {
+    @include text-smallest;
     color: $color-border-dark !important;
-    cursor: pointer !important;
-    font-size: .9rem;
-    font-weight: normal;
+
+    &:focus {
+        text-decoration: none;
+    }
 }
 
 .expand-search {
     color: $color-border-dark !important;
-    cursor: pointer !important;
-    font-size: .9rem;
-    font-weight: normal;
     padding: 0 .5rem;
 
     &:focus {
@@ -50,8 +49,7 @@
 }
 
 .link {
-    font-size: .8rem;
-    font-weight: normal;
+    @include text-small;
     margin-top: 1.5rem;
 }
 

@@ -30,6 +30,16 @@
     }
 }
 
+//
+// Panel container to enforce horizontal stacking and scrolling.
+//
+.panel-container {
+    @include fixed($size-navbar-height, 0, 0, $size-sidebar-width);
+    @include scrollbars(8px, $color-border-dark);
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
 .panel2 {
     @include absolute(0, 0, 0, 0);
     align-items: stretch;
@@ -237,8 +247,7 @@
 
     &-sidebar-title {
         @include absolute(8rem, null, null, 0);
-        font-size: 90%;
-        font-weight: normal;
+        @include text-smallest;
         opacity: 0;
         transform: rotate(270deg);
         transition: opacity .4s ease-in;
@@ -265,8 +274,7 @@
 }
 
 .nav-light {
-    font-size: .9rem;
-    font-weight: normal;
+    @include text-small;
 
     .nav-link {
         border: 0;

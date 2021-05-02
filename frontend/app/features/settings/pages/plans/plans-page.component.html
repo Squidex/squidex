@@ -12,8 +12,8 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view [isLoading]="plansState.isLoading | async">
-            <ng-container topHeader>
+        <sqx-list-view innerWidth="65rem" [isLoading]="plansState.isLoading | async">
+            <ng-container header>
                 <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
                     <div class="panel-alert panel-alert-danger" *ngIf="(plansState.isOwner | async) === false">
                         {{ 'plans.notPlanOwner' | sqxTranslate }}

@@ -10,7 +10,8 @@
 // Bade colors
 //
 .badge {
-    font-size: .9rem;
+    @include text-small;
+    font-style: normal;
     font-weight: normal;
     padding: .25rem .6rem;
 
@@ -79,12 +80,11 @@
 }
 
 .alert-hint {
+    @include text-small;
     background: lighten($color-theme-blue, 35%);
     border: 1px solid $color-border;
     border-radius: 0;
     color: $color-text;
-    font-size: 90%;
-    font-weight: normal;
 
     .alert-link {
         color: $color-text !important;
@@ -155,9 +155,8 @@ a {
 
         .badge {
             @include absolute(-.25rem, auto, auto, -.375rem);
+            @include text-smallest;
             background: $color-theme-error;
-            font-size: .75rem;
-            font-weight: normal;
             padding: .25rem .5rem;
         }
     }
@@ -334,7 +333,7 @@ a {
 }
 
 .icon-sm {
-    font-size: 70%;
+    @include text-smallest;
 }
 
 //
@@ -405,9 +404,8 @@ a {
         }
 
         .radio-label {
+            @include text-smallest;
             display: block;
-            font-size: .7rem;
-            font-weight: bold;
             line-height: 1.5rem;
             margin-left: -.5rem;
             margin-right: -.5rem;
@@ -524,7 +522,7 @@ $icon-size: 4.5rem;
     }
 
     &-text {
-        font-size: .9rem;
+        @include text-small;
     }
 
     .btn-radio {

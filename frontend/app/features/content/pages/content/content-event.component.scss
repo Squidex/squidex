@@ -9,13 +9,11 @@
 }
 
 .event {
-    font-size: .9rem;
-    font-weight: normal;
+    @include text-small;
     margin-bottom: 1.5rem;
 
     &-created {
-        font-size: .75rem;
-        font-weight: normal;
+        @include text-smallest;
         margin: .25rem 0;
     }
 

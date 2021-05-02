@@ -19,7 +19,7 @@ body {
 
 // Common style for user email.
 .user-email {
-    font-size: .8rem;
+    @include text-smallest;
     font-style: italic;
 }
 
@@ -96,7 +96,7 @@ body {
 // Help texts
 //
 .help {
-    font-size: 90%;
+    @include text-small;
 
     h2,
     h3,
@@ -266,10 +266,10 @@ i {
 
 .sidebar {
     @include absolute($size-navbar-height, null, 0, 0);
+    @include text-small;
     background: $color-theme-blue;
     color: $color-white;
-    font-size: .8rem;
-    font-weight: normal;
+    overflow: hidden;
     width: $size-sidebar-width;
 
     .bottom {

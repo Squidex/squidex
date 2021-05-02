@@ -21,7 +21,7 @@ $icon-size: 4.5rem;
     }
 
     &-text {
-        font-size: .9rem;
+        @include text-small;
     }
 
     &-icon {

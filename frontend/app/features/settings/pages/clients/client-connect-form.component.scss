@@ -1,6 +1,6 @@
 .badge {
     @include circle(1.3rem);
-    font-size: 80%;
+    @include text-smallest;
     margin-right: .25rem;
     padding-left: 0;
     padding-right: 0;
@@ -35,8 +35,7 @@
 
     i {
         @include absolute(1.6rem, 1rem, auto, auto);
+        @include text-smallest;
         color: $color-border;
-        font-size: 1.8rem;
-        font-weight: 300;
     }
 }

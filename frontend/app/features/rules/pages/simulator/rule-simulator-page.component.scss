@@ -8,13 +8,11 @@ h3 {
 
 .event {
     &-stats {
-        font-size: .8rem;
+        @include text-smallest;
     }
 
     &-dump {
-        font-family: monospace;
-        font-size: .8rem;
-        font-weight: normal;
+        @include text-code;
         height: 20rem;
         margin-top: 1rem;
     }

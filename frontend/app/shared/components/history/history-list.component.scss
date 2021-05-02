@@ -17,13 +17,12 @@
 }
 
 .event {
+    @include text-small;
     color: $color-text-decent;
-    font-size: .9rem;
-    font-weight: normal;
     margin-bottom: 1.5rem;
 
     &-created {
-        font-size: .75rem;
+        @include text-smallest;
     }
 
     &-right {

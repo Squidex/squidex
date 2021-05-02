@@ -37,10 +37,10 @@
     // The tooltip rectangle itself.
     @include absolute(null, null, .4rem, 0);
     @include border-radius(2px);
+    @include text-small;
     background: $color-theme-error;
     color: $color-dark-foreground;
-    font-size: .9rem;
-    font-weight: normal;
+    cursor: default;
     padding: .25rem .5rem;
 }
 
@@ -57,9 +57,8 @@
 //
 .form-alert {
     @include border-radius(4px);
+    @include text-small;
     color: $color-dark-foreground;
-    font-size: .9rem;
-    font-weight: normal;
     margin-bottom: .75rem;
     margin-top: .25rem;
     padding: .5rem;
@@ -199,13 +198,12 @@
 /* stylelint-enable */
 
 .col-form-label {
-    font-size: 90%;
+    @include text-small;
 }
 
 label {
+    @include text-small-bold;
     color: $color-title;
-    font-size: 90%;
-    font-weight: 500;
 
     %normal-size {
         font-size: 100%;

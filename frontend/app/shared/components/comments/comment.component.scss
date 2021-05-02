@@ -23,8 +23,7 @@
 }
 
 .comment {
-    font-size: .9rem;
-    font-weight: normal;
+    @include text-small;
     line-height: 1.25rem;
     margin: 0;
     margin-bottom: .75rem;
@@ -35,7 +34,7 @@
     }
 
     &-created {
-        font-size: .75rem;
+        @include text-smallest;
     }
 
     &:hover {

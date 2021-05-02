@@ -17,9 +17,8 @@
     }
 
     &-footer {
+        @include text-small;
         background: $color-theme-secondary;
-        font-size: 90%;
-        font-weight: normal;
     }
 }
 

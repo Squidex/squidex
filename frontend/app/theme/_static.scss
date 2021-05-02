@@ -64,8 +64,7 @@ noscript {
     }
 
     &-footer {
-        font-size: .8rem;
-        font-weight: normal;
+        @include text-smallest;
         margin-top: 2rem;
     }
 

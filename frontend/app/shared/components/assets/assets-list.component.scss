@@ -3,7 +3,7 @@
 }
 
 h5 {
-    font-size: .9rem;
+    @include text-small;
     margin-bottom: .5rem;
     margin-top: 0;
 }
@@ -60,7 +60,7 @@ h5 {
     }
 
     &-or {
-        font-size: .8rem;
+        @include text-smallest;
     }
 
     &-info {

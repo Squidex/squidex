@@ -23,10 +23,9 @@ $list-height: 2.25rem;
 }
 
 @mixin asset-type {
+    @include text-smallest;
     color: $color-dark-foreground;
     cursor: none;
-    font-size: .7rem;
-    font-weight: normal;
     padding: .1rem .25rem;
     text-transform: uppercase;
 }
@@ -107,7 +106,7 @@ $list-height: 2.25rem;
         line-height: 2rem;
 
         i {
-            font-size: 80%;
+            @include text-smallest;
         }
     }
 
@@ -116,7 +115,7 @@ $list-height: 2.25rem;
     }
 
     &-info {
-        font-size: .75rem;
+        @include text-smallest;
     }
 
     &-icon {
@@ -130,8 +129,7 @@ $list-height: 2.25rem;
 
 .overlay {
     @include overlay;
-    font-size: .8rem;
-    font-weight: normal;
+    @include text-smallest;
 
     &-menu {
         @include absolute(1rem, 1rem, auto, auto);
@@ -227,9 +225,8 @@ $list-height: 2.25rem;
         }
 
         &-info {
+            @include text-small;
             color: $color-text-decent;
-            font-size: .9rem;
-            font-weight: normal;
             width: 12rem;
         }
     }
@@ -245,7 +242,6 @@ $list-height: 2.25rem;
 
 .drop-overlay {
     @include overlay;
-    pointer-events: none;
 
     &-text {
         font-size: 1.25rem;

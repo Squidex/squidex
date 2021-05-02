@@ -18,5 +18,5 @@
 </ng-container>
 
 <ng-template #noQuery>
-    <div class="text-muted" *ngIf="canRemove" [innerHTML]="'search.queriesEmpty' | sqxTranslate: { types: types }"></div>
+    <div class="text-muted small" *ngIf="canRemove" [innerHTML]="'search.queriesEmpty' | sqxTranslate: { types: types }"></div>
 </ng-template>

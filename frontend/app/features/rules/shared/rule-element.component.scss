@@ -15,8 +15,6 @@
         @include absolute(0, 0, 0, 3rem);
         @include truncate;
         color: $color-dark-foreground;
-        font-size: 1rem;
-        font-weight: normal;
         line-height: 3rem;
         padding: 0 .8rem;
     }
@@ -39,17 +37,17 @@
     }
 
     &-link {
-        font-size: .8rem;
+        @include text-small;
     }
 
     &-title {
-        font-size: 1rem;
-        font-weight: bold;
+        font-style: normal;
+        font-weight: 500;
         line-height: 1;
     }
 
     &-text {
-        font-size: .8rem;
+        @include text-small;
         margin-bottom: .125rem;
         margin-top: .25rem;
     }
