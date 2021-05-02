@@ -7,16 +7,12 @@
 // Custom list that can either be used with a table or divs.
 //
 .table-items {
-    & {
-        margin-bottom: -.25rem;
-    }
+    margin-bottom: -.25rem;
 
     th,
     td {
         // Unified padding for all table cells.
-        & {
-            padding: .75rem;
-        }
+        padding: .75rem;
 
         // Additional padding for the first column.
         &:first-child {
@@ -62,12 +58,10 @@
 
         tr {
             // Each row is white and a has a border.
-            & {
-                background: $color-table-background;
-                border: 1px solid $color-table-border;
-                border-bottom: 2px solid $color-table-border;
-                margin-bottom: .5rem;
-            }
+            background: $color-table-background;
+            border: 1px solid $color-table-border;
+            border-bottom: 2px solid $color-table-border;
+            margin-bottom: .5rem;
 
             &:focus {
                 outline: none;
@@ -75,11 +69,9 @@
 
             // Blue background and white text when active.
             &.active {
-                & {
-                    background: $color-theme-blue;
-                    border-color: $color-theme-blue;
-                    color: $color-dark-foreground;
-                }
+                background: $color-theme-blue;
+                border-color: $color-theme-blue;
+                color: $color-dark-foreground;
 
                 .btn-text {
                     &,
@@ -96,14 +88,12 @@
     // Use the list style with divs.
     //
     &-row {
-        & {
-            background: $color-table-background;
-            border: 1px solid $color-border;
-            border-bottom-width: 2px;
-            border-top: 0;
-            margin-bottom: .25rem;
-            padding: .75rem 1.25rem;
-        }
+        background: $color-table-background;
+        border: 1px solid $color-border;
+        border-bottom-width: 2px;
+        border-top: 0;
+        margin-bottom: .25rem;
+        padding: .75rem 1.25rem;
 
         // Summary row for expandable rows.
         &-summary {
@@ -122,9 +112,7 @@
 
         // Detail row for expandable rows.
         &-details {
-            & {
-                position: relative;
-            }
+            position: relative;
 
             // Caret that is placed next to the expand button.
             &::before {
@@ -163,12 +151,10 @@
 
     // Edit or expand button.
     &-edit-button {
-        & {
-            color: $color-theme-blue;
-            padding-left: 0;
-            padding-right: 0;
-            width: 2.2rem;
-        }
+        color: $color-theme-blue;
+        padding-left: 0;
+        padding-right: 0;
+        width: 2.2rem;
 
         &:hover {
             color: $color-theme-blue-dark !important;
@@ -259,21 +245,17 @@
 // Lightweight pagination controls.
 //
 .pagination {
-    & {
-        margin-top: 1rem;
-    }
+    margin-top: 1rem;
 
     &-text {
         line-height: 2.2rem;
     }
 
     &-button {
-        & {
-            color: $color-text;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-left: .4rem;
-        }
+        color: $color-text;
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-left: .4rem;
 
         &:hover,
         &.active {

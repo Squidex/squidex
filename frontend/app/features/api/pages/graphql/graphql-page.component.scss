@@ -2,9 +2,7 @@
     @import '~graphiql/graphiql';
 
     .graphiql-container {
-        & {
-            @include absolute(0, 0, 0, 0);
-        }
+        @include absolute(0, 0, 0, 0);
 
         & * {
             box-sizing: content-box;

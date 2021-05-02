@@ -30,13 +30,11 @@
 }
 
 .expand-search {
-    & {
-        color: $color-border-dark !important;
-        cursor: pointer !important;
-        font-size: .9rem;
-        font-weight: normal;
-        padding: 0 .5rem;
-    }
+    color: $color-border-dark !important;
+    cursor: pointer !important;
+    font-size: .9rem;
+    font-weight: normal;
+    padding: 0 .5rem;
 
     &:focus {
         text-decoration: none;

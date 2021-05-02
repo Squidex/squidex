@@ -1,7 +1,5 @@
 .autocomplete-user {
-    & {
-        @include truncate;
-    }
+    @include truncate;
 
     .user-name {
         margin-left: .25rem;

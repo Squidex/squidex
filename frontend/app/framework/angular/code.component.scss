@@ -18,14 +18,12 @@
 }
 
 .code-copy {
-    & {
-        @include absolute(0, 0, auto, auto);
-        background: darken($color-border-dark, 30%);
-        border: 0;
-        color: $color-dark-foreground;
-        padding-left: .375rem;
-        padding-right: .375rem;
-    }
+    @include absolute(0, 0, auto, auto);
+    background: darken($color-border-dark, 30%);
+    border: 0;
+    color: $color-dark-foreground;
+    padding-left: .375rem;
+    padding-right: .375rem;
 
     &:focus {
         background: darken($color-border-dark, 40%);

@@ -31,9 +31,7 @@
 :host(.ng-invalid) {
     &.ng-dirty {
         .form-control {
-            & {
-                border-color: $color-theme-error;
-            }
+            border-color: $color-theme-error;
 
             &:hover,
             &:focus {

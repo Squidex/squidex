@@ -28,23 +28,22 @@ h3 {
     }
 }
 
+%default-color {
+    color: $color-dark-foreground;
+}
+
 .restore {
     &-status {
-        & {
-            @include circle-icon($circle-size);
-            background: $color-border;
-        }
-
-        &-failed,
-        &-success {
-            color: $color-dark-foreground;
-        }
+        @include circle-icon($circle-size);
+        background: $color-border;
 
         &-failed {
+            @extend %default-color;
             background: $color-theme-error;
         }
 
         &-success {
+            @extend %default-color;
             background: $color-theme-green;
         }
     }

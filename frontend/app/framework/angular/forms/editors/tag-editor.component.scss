@@ -14,14 +14,12 @@ $inner-height: 1.75rem;
 }
 
 .form-control {
-    & {
-        cursor: text;
-        padding: .25rem;
-        padding-bottom: 0;
-        position: relative;
-        text-align: left;
-        text-decoration: none;
-    }
+    cursor: text;
+    padding: .25rem;
+    padding-bottom: 0;
+    position: relative;
+    text-align: left;
+    text-decoration: none;
 
     &.suggested {
         padding-right: 2rem;
@@ -87,13 +85,11 @@ div {
 }
 
 .blank {
-    & {
-        @include placeholder-color($color-input-placeholder);
-        background: transparent;
-        border: 0;
-        border-radius: 0;
-        padding: 0;
-    }
+    @include placeholder-color($color-input-placeholder);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
 
     &:focus,
     &.focus {
@@ -135,22 +131,20 @@ div {
 }
 
 .item {
-    & {
-        background: $color-input;
-        border: 0;
-        border-radius: 3px;
-        color: $color-text;
-        cursor: default;
-        display: inline-block;
-        height: $inner-height;
-        margin-bottom: .25rem;
-        margin-right: 2px;
-        padding: 1px .5rem;
-        padding-right: 1.5rem;
-        position: relative;
-        vertical-align: top;
-        white-space: nowrap;
-    }
+    background: $color-input;
+    border: 0;
+    border-radius: 3px;
+    color: $color-text;
+    cursor: default;
+    display: inline-block;
+    height: $inner-height;
+    margin-bottom: .25rem;
+    margin-right: 2px;
+    padding: 1px .5rem;
+    padding-right: 1.5rem;
+    position: relative;
+    vertical-align: top;
+    white-space: nowrap;
 
     .icon-close {
         @include absolute(.6125rem, .5rem);

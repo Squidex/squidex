@@ -20,13 +20,11 @@
 }
 
 @mixin overlay {
-    & {
-        @include absolute(0, 0, 0, 0);
-        color: $color-dark-foreground;
-        display: flex;
-        opacity: 0;
-        transition: opacity .4s ease;
-    }
+    @include absolute(0, 0, 0, 0);
+    color: $color-dark-foreground;
+    display: flex;
+    opacity: 0;
+    transition: opacity .4s ease;
 
     &-background {
         @include absolute(0, 0, 0, 0);
@@ -36,9 +34,7 @@
 }
 
 .upload-button {
-    & {
-        margin-top: 1rem;
-    }
+    margin-top: 1rem;
 
     input {
         @include hidden;
@@ -46,10 +42,8 @@
 }
 
 .drop-overlay {
-    & {
-        @include overlay;
-        pointer-events: none;
-    }
+    @include overlay;
+    pointer-events: none;
 
     &-text {
         font-size: 1.25rem;

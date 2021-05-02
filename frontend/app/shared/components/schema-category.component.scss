@@ -5,9 +5,7 @@ $drag-margin: -8px;
 }
 
 .btn {
-    & {
-        width: 2rem;
-    }
+    width: 2rem;
 
     &:focus {
         border-color: transparent;
@@ -19,9 +17,7 @@ $drag-margin: -8px;
 }
 
 .droppable {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     .drop-indicator {
         @include absolute($drag-margin, $drag-margin, $drag-margin, $drag-margin);
@@ -32,9 +28,7 @@ $drag-margin: -8px;
     }
 
     &.cdk-drop-list-dragging {
-        & {
-            border: 0;
-        }
+        border: 0;
 
         .drop-indicator {
             display: block;
@@ -77,9 +71,7 @@ $drag-margin: -8px;
 }
 
 .nav-item {
-    & {
-        @include truncate;
-    }
+    @include truncate;
 
     .drag-handle {
         margin-right: .5rem;

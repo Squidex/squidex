@@ -3,9 +3,7 @@ gridster-item {
 }
 
 .dashboard {
-    & {
-        @include absolute(0, 0, 0, 0);
-    }
+    @include absolute(0, 0, 0, 0);
 
     &-summary {
         @include absolute(2rem, null, null, 2rem);
@@ -48,9 +46,7 @@ gridster-item {
     }
 
     .card {
-        & {
-            @include absolute(0, 0, 0, 0);
-        }
+        @include absolute(0, 0, 0, 0);
 
         &-image {
             text-align: center;
@@ -98,9 +94,7 @@ gridster-item {
     }
 
     .aggregation {
-        & {
-            text-align: center;
-        }
+        text-align: center;
 
         &-label {
             color: $color-text-decent;

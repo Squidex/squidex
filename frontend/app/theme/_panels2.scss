@@ -31,13 +31,11 @@
 }
 
 .panel2 {
-    & {
-        @include absolute(0, 0, 0, 0);
-        align-items: stretch;
-        display: flex;
-        flex-direction: row;
-        flex-grow: 1;
-    }
+    @include absolute(0, 0, 0, 0);
+    align-items: stretch;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
 
     &-slice {
         align-items: stretch;
@@ -60,9 +58,7 @@
             z-index: 20;
 
             &.collapsed {
-                & {
-                    width: 3.25rem !important;
-                }
+                width: 3.25rem !important;
 
                 .panel2-sidebar-title {
                     opacity: 1;
@@ -96,9 +92,7 @@
             border-left: 1px solid $color-border;
 
             &.collapsed {
-                & {
-                    width: 3rem !important;
-                }
+                width: 3rem !important;
 
                 .panel2-collapse {
                     transform: rotate(180deg);
@@ -252,12 +246,10 @@
 }
 
 .panel-link {
-    & {
-        @include panel-icon;
-        border-bottom: 1px solid transparent;
-        border-top: 1px solid transparent;
-        display: block;
-    }
+    @include panel-icon;
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    display: block;
 
     &:hover {
         color: $color-theme-blue-dark;
@@ -273,11 +265,8 @@
 }
 
 .nav-light {
-    & {
-        font-size: .9rem;
-        font-weight: normal;
-        margin: 1rem;
-    }
+    font-size: .9rem;
+    font-weight: normal;
 
     .nav-link {
         border: 0;

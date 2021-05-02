@@ -65,12 +65,10 @@ p {
 
 .onboarding {
     &-enter-leave {
-        & {
-            @include force-width(28rem);
-            margin: 4rem auto 0;
-            text-align: center;
-            text-decoration: none;
-        }
+        @include force-width(28rem);
+        margin: 4rem auto 0;
+        text-align: center;
+        text-decoration: none;
 
         p {
             margin: 2rem 0;

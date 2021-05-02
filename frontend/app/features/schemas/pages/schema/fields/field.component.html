@@ -20,7 +20,7 @@
                     <span class="field-partitioning ml-2" *ngIf="field['isLocalizable']">{{ 'schemas.field.localizableMarker' | sqxTranslate }}</span>
                 </span>
             </div>
-            <div class="col col-tags">
+            <div class="col col-tags flex-nowrap">
                 <div class="float-right">
                     <span class="ml-1 badge badge-pill badge-danger"  *ngIf="field.isLocked">
                         {{ 'schemas.field.lockedMarker' | sqxTranslate }}
@@ -35,7 +35,7 @@
                     </span>
                 </div>
             </div>
-            <div class="col col-options">
+            <div class="col col-options flex-nowrap">
                 <div class="float-right">
                     <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>

@@ -1,8 +1,6 @@
 :host ::ng-deep {
     .color-picker {
-        & {
-            border-color: $color-border;
-        }
+        border-color: $color-border;
 
         .hex-text {
             .box {

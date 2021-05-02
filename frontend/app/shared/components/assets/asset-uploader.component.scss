@@ -15,11 +15,9 @@
 }
 
 .uploads {
-    & {
-        background: none;
-        border: 2px solid transparent;
-        min-height: 2rem;
-    }
+    background: none;
+    border: 2px solid transparent;
+    min-height: 2rem;
 
     &-empty {
         line-height: 1.8rem;
@@ -27,11 +25,10 @@
 }
 
 .upload {
-    & {
-        @include force-height(2rem);
-        line-height: 2rem;
-        margin-bottom: .5rem;
-    }
+    @include force-height(2rem);
+    line-height: 2rem;
+    margin: 0;
+    margin-bottom: .5rem;
 
     &:last-child {
         margin: 0;
@@ -47,9 +44,7 @@
 $circle-size: 1.6rem;
 
 .upload-status {
-    & {
-        @include circle-icon(1.6rem);
-    }
+    @include circle-icon(1.6rem);
 
     &-running {
         background: $color-border;

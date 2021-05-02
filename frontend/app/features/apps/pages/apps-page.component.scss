@@ -15,15 +15,17 @@
     overflow-y: auto;
 }
 
+%no-decoration {
+    text-decoration: none;
+}
+
 :host ::ng-deep {
     .card {
-        & {
-            @include hover-visible('.deeplinks', inline);
-            display: inline-block;
-            margin-bottom: 1rem;
-            margin-right: 1rem;
-            width: 20rem;
-        }
+        @include hover-visible('.deeplinks', inline);
+        display: inline-block;
+        margin-bottom: 1rem;
+        margin-right: 1rem;
+        width: 20rem;
 
         &-links {
             margin-top: .5rem;
@@ -71,22 +73,20 @@
         }
 
         &-href {
-            & {
-                cursor: pointer;
-            }
+            cursor: pointer;
 
             &:hover {
+                @extend %no-decoration;
                 @include box-shadow-outer(0, 3px, 16px, .2);
             }
 
             &:focus {
+                @extend %no-decoration;
                 outline: none;
             }
 
-            &:hover,
-            &:focus,
             &:active {
-                text-decoration: none;
+                @extend %no-decoration;
             }
         }
     }

@@ -18,14 +18,13 @@
     }
 }
 
-.list {
-    &-content,
-    &-header,
-    &-footer {
-        transition: opacity .2s ease;
-    }
+%transition-opacity {
+    transition: opacity .2s ease;
+}
 
+.list {
     &-content {
+        @extend %transition-opacity;
         flex-direction: column;
         flex-grow: 1;
 
@@ -47,13 +46,12 @@
     }
 
     &-header {
-        & {
-            border: 0;
-            border-bottom: 1px solid $color-border;
-            flex-shrink: 0;
-            overflow-x: hidden;
-            overflow-y: hidden;
-        }
+        @extend %transition-opacity;
+        border: 0;
+        border-bottom: 1px solid $color-border;
+        flex-shrink: 0;
+        overflow-x: hidden;
+        overflow-y: hidden;
 
         .sync-inner {
             display: table-cell;
@@ -75,11 +73,10 @@
     }
 
     &-footer {
-        & {
-            border: 0;
-            border-top: 1px solid $color-border;
-            flex-shrink: 0;
-        }
+        @extend %transition-opacity;
+        border: 0;
+        border-top: 1px solid $color-border;
+        flex-shrink: 0;
 
         ::ng-deep {
             .pagination {
@@ -93,15 +90,16 @@
     overflow: visible;
 }
 
-.loader,
-.loading-indicator {
+%disabled {
     pointer-events: none;
 }
 
 .loading-indicator {
+    @extend %disabled;
     opacity: .5;
 }
 
 .loader {
     @include absolute(20%, 0, auto, 0);
+    @extend %disabled;
 }

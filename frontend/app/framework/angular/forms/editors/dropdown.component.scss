@@ -1,9 +1,7 @@
 $color-input-disabled: #eef1f4;
 
 .custom-select {
-    & {
-        cursor: default;
-    }
+    cursor: default;
 
     &[readonly] {
         background-color: $color-input-background;
@@ -31,9 +29,7 @@ $color-input-disabled: #eef1f4;
 }
 
 .selection {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     .control-dropdown-item {
         @include absolute(0, 1.75rem, 0, 0);

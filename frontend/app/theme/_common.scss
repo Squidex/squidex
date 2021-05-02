@@ -3,11 +3,9 @@
 
 body {
     // Default body with padding for fixed navbar and sidebar.
-    & {
-        background: $color-background;
-        padding-left: 0;
-        padding-top: $size-navbar-height;
-    }
+    background: $color-background;
+    padding-left: 0;
+    padding-top: $size-navbar-height;
 
     // White body for login and profile page.
     &.white {
@@ -43,9 +41,7 @@ body {
 //
 /* stylelint-disable */
 .mce-i-assets {
-    & {
-        font-family: 'icomoon' !important; 
-    }
+    font-family: 'icomoon' !important; 
 
     &::before {
         content: '\e948';
@@ -100,9 +96,7 @@ body {
 // Help texts
 //
 .help {
-    & {
-        font-size: 90%;
-    }
+    font-size: 90%;
 
     h2,
     h3,
@@ -115,9 +109,7 @@ body {
 // Profile picture in circle
 //
 .user-picture {
-    & {
-        @include circle(2rem);
-    }
+    @include circle(2rem);
 
     &:not([src]) {
         opacity: 0;
@@ -132,12 +124,10 @@ body {
 // Green or red circle if element is published or unpublished
 //
 .item-published {
-    & {
-        @include circle(.5rem);
-        background: $color-theme-green;
-        border: 0;
-        margin-left: .4rem;
-    }
+    @include circle(.5rem);
+    background: $color-theme-green;
+    border: 0;
+    margin-left: .4rem;
 
     &.unpublished {
         background: $color-theme-error;
@@ -152,11 +142,9 @@ body {
 // Landing page with loading spinner.
 //
 .landing-page {
-    & {
-        margin: 8rem auto;
-        max-width: 32rem;
-        text-align: center;
-    }
+    margin: 8rem auto;
+    max-width: 32rem;
+    text-align: center;
 
     h1 {
         margin-top: 2.5rem;
@@ -181,24 +169,20 @@ body {
 // Drop area for drag and drop features.
 //
 .drop-container {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     .drop-area {
-        & {
-            @include absolute(30px, 30px, 30px, 30px);
-            @include border-radius;
-            align-content: center;
-            align-items: center;
-            border: 2px dashed $color-border;
-            color: darken($color-border, 30%);
-            display: none;
-            font-size: 1.2rem;
-            font-weight: normal;
-            justify-content: center;
-            z-index: 10;
-        }
+        @include absolute(30px, 30px, 30px, 30px);
+        @include border-radius;
+        align-content: center;
+        align-items: center;
+        border: 2px dashed $color-border;
+        color: darken($color-border, 30%);
+        display: none;
+        font-size: 1.2rem;
+        font-weight: normal;
+        justify-content: center;
+        z-index: 10;
 
         &.dragging {
             display: flex;
@@ -220,13 +204,11 @@ body {
 // Status Icon
 //
 .status-icon {
-    & {
-        @include circle-icon(2rem);
-        background: $color-border;
-        border: 0;
-        color: $color-dark-foreground;
-        display: inline-block;
-    }
+    @include circle-icon(2rem);
+    background: $color-border;
+    border: 0;
+    color: $color-dark-foreground;
+    display: inline-block;
 
     &-sm {
         @include circle-icon(1.6rem);
@@ -271,6 +253,60 @@ body {
     }
 }
 
+// Spinning icons.
+i {
+    &.spin {
+        display: inline-block;
+    }
+
+    &.spin2 {
+        display: inline-block;
+    }
+}
+
+.sidebar {
+    @include absolute($size-navbar-height, null, 0, 0);
+    background: $color-theme-blue;
+    color: $color-white;
+    font-size: .8rem;
+    font-weight: normal;
+    width: $size-sidebar-width;
+
+    .bottom {
+        @include absolute(null, 0, 0, 0);
+    }
+
+    .nav-item {
+        max-width: 100%;
+    }
+
+    .nav-link {
+        background: $color-theme-blue;
+        color: $color-white !important;
+        cursor: pointer;
+        padding: 1rem 0;
+        transition: background-color .3s ease;
+        text-align: center;
+
+        &:hover {
+            background: $color-theme-blue-darker;
+        }
+
+        &.active {
+            background: $color-theme-blue-darker;
+        }
+
+        i {
+            font-size: 1.1rem;
+        }
+    }
+
+    .nav-text {
+        @include truncate;
+        margin-top: .8rem;
+    }
+}
+
 //
 // Animations
 //
@@ -280,16 +316,6 @@ body {
 
 .spin2 {
     animation: spin2 1s infinite linear;
-}
-
-i {
-    &.spin {
-        display: inline-block;
-    }
-
-    &.spin2 {
-        display: inline-block;
-    }
 }
 
 @keyframes spin2 {

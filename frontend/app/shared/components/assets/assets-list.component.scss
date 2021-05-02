@@ -15,13 +15,11 @@ h5 {
 }
 
 .folder-container {
-    & {
-        height: $asset-folder-height;
-        margin-bottom: 1rem;
-        margin-right: .5rem;
-        position: relative;
-        width: $asset-width;
-    }
+    height: $asset-folder-height;
+    margin-bottom: 1rem;
+    margin-right: .5rem;
+    position: relative;
+    width: $asset-width;
 
     &-over {
         @include absolute(-6px, -6px, -6px, -6px);
@@ -39,15 +37,13 @@ h5 {
 }
 
 .file-drop {
-    & {
-        background: transparent;
-        border: 2px dashed $color-border;
-        margin-bottom: 1rem;
-        margin-right: 0;
-        padding: 1rem;
-        text-align: center;
-        transition: border-color .4s ease;
-    }
+    background: transparent;
+    border: 2px dashed $color-border;
+    margin-bottom: 1rem;
+    margin-right: 0;
+    padding: 1rem;
+    text-align: center;
+    transition: border-color .4s ease;
 
     &.drag {
         border-color: darken($color-border, 10%);

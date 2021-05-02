@@ -10,11 +10,9 @@
 // Bade colors
 //
 .badge {
-    & {
-        font-size: .9rem;
-        font-weight: normal;
-        padding: .25rem .6rem;
-    }
+    font-size: .9rem;
+    font-weight: normal;
+    padding: .25rem .6rem;
 
     &-primary {
         background: $color-badge-primary-background;
@@ -54,9 +52,7 @@
 .alert-warning,
 .alert-info,
 .alert-danger {
-    & {
-        border: 0;
-    }
+    border: 0;
 
     .alert-link {
         color: $color-dark-foreground !important;
@@ -66,11 +62,9 @@
     }
 
     .close {
-        & {
-            font-size: 1.6rem;
-            font-weight: 400;
-            padding-top: .25rem;
-        }
+        font-size: 1.6rem;
+        font-weight: 400;
+        padding-top: .25rem;
 
         &:hover,
         &:focus {
@@ -122,9 +116,7 @@ a {
     }
 
     &.force {
-        & {
-            color: $color-theme-blue !important;
-        }
+        color: $color-theme-blue !important;
 
         &:hover {
             color: inherit;
@@ -134,22 +126,23 @@ a {
     }
 }
 
+.nav-item {
+    max-width: 100%;
+}
+
 .navbar-nav {
     .nav-link {
         cursor: pointer;
     }
 
     .nav-icon {
-        & {
-            line-height: 2rem;
-            margin-left: .5rem;
-            margin-right: 0;
-            position: relative;
-            vertical-align: middle;
-        }
+        line-height: 2rem;
+        margin-left: .5rem;
+        margin-right: 0;
+        position: relative;
+        vertical-align: middle;
 
         .nav-link {
-            color: $color-dark-foreground;
             padding-bottom: 0;
             padding-top: 0;
 
@@ -175,19 +168,15 @@ a {
 //
 .dropdown-menu {
     // White dropdown menu without border and shadow.
-    & {
-        @include box-shadow-outer(0, 3px, 16px, .2);
-        background: $panel-light-background;
-        border: 0;
-        z-index: 1200;
-    }
+    @include box-shadow-outer(0, 3px, 16px, .2);
+    background: $panel-light-background;
+    border: 0;
+    z-index: 1200;
 
     a {
         // Special style for menu item to delete something.
         &.dropdown-item-delete {
-            & {
-                color: $color-theme-error;
-            }
+            color: $color-theme-error;
 
             &:hover {
                 color: $color-theme-error-dark;
@@ -216,11 +205,7 @@ a {
 // Breadcrump
 //
 .breadcrumb {
-    & {
-        background: none;
-        border: 1px solid $color-border;
-        margin-bottom: 2rem;
-    }
+    border: 1px solid $color-border;
 
     &-item {
         i {
@@ -245,22 +230,20 @@ a {
     }
 
     &.steps {
-        & {
-            padding: 0;
-        }
+        border: 1px solid $color-border;
+        border-radius: 2px;
+        padding: 0;
 
         .breadcrumb-item {
-            & {
-                background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" width="7" height="20"%3e%3cpath d="M0 0l7 10-7 10" fill="none" stroke="%23e4e7e9" stroke-width=".5"/%3e%3c/svg%3e');
-                background-position-x: right;
-                background-repeat: no-repeat;
-                background-size: contain;
-                color: $color-text-decent;
-                padding: .75rem 2rem .75rem 1rem;
+            background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" width="7" height="20"%3e%3cpath d="M0 0l7 10-7 10" fill="none" stroke="%23e4e7e9" stroke-width=".5"/%3e%3c/svg%3e');
+            background-position-x: right;
+            background-repeat: no-repeat;
+            background-size: contain;
+            color: $color-text-decent;
+            padding: .75rem 2rem .75rem 1rem;
 
-                a {
-                    color: $color-text-decent !important;
-                }
+            a {
+                color: $color-text-decent !important;
             }
 
             &.active {
@@ -305,65 +288,18 @@ a {
 }
 
 //
-// Dark vertical menu for dark panels.
-//
-.nav-dark {
-    & {
-        background: $color-dark2-background;
-    }
-
-    .nav-item + .nav-item {
-        margin: 0;
-    }
-
-    &-bordered {
-        .nav-link {
-            border-bottom: 1px solid $color-dark2-separator;
-        }
-
-        .nav-item {
-            &:last-child {
-                .nav-link {
-                    // Keep border between two items, not after last item.
-                    border: 0;
-                }
-            }
-        }
-    }
-
-    .nav-link {
-        & {
-            color: $color-dark2-foreground;
-        }
-
-        &:hover,
-        &.active {
-            color: $color-dark1-focus-foreground;
-        }
-
-        &.active {
-            background: $color-dark2-active-background;
-        }
-    }
-}
-
-//
 // Tab control navigation.
 //
 .nav-tabs2 {
-    & {
-        @include absolute(auto, auto, 0, 1.25rem);
-    }
+    @include absolute(auto, auto, 0, 1.25rem);
 
     & .nav-link {
-        & {
-            border-bottom: .25rem solid transparent;
-            color: $color-text;
-            cursor: pointer;
-            margin: 0 1rem;
-            padding: 1rem 0;
-            text-align: center;
-        }
+        border-bottom: .25rem solid transparent;
+        color: $color-text;
+        cursor: pointer;
+        margin: 0 1rem;
+        padding: 1rem 0;
+        text-align: center;
 
         &.active {
             font-weight: bold;
@@ -441,10 +377,7 @@ a {
 
     &-twitter {
         @include button-variant($color-extern-twitter, $color-extern-twitter);
-
-        & {
-            color: $color-dark-foreground;
-        }
+        color: $color-dark-foreground;
 
         &:hover,
         &:focus {
@@ -456,18 +389,16 @@ a {
 
     // Special radio button.
     &-radio {
-        & {
-            @include border-radius;
-            background: transparent;
-            border: 1px solid $color-border;
-            color: $color-text-decent;
-            cursor: pointer;
-            font-size: 1.5rem;
-            font-weight: normal;
-            margin-right: .5rem;
-            text-align: center;
-            width: 4.5rem;
-        }
+        @include border-radius;
+        background: transparent;
+        border: 1px solid $color-border;
+        color: $color-text-decent;
+        cursor: pointer;
+        font-size: 1.5rem;
+        font-weight: normal;
+        margin-right: .5rem;
+        text-align: center;
+        width: 4.5rem;
 
         i {
             color: $color-border-dark;
@@ -487,11 +418,9 @@ a {
         }
 
         &.active {
-            & {
-                background: none;
-                border-color: $color-theme-blue;
-                color: $color-theme-blue;
-            }
+            background: none;
+            border-color: $color-theme-blue;
+            color: $color-theme-blue;
 
             i {
                 color: $color-theme-blue;
@@ -518,10 +447,8 @@ a {
     // Special button groups
     &-group {
         .btn-toggle {
-            & {
-                background: $color-dark-foreground;
-                border: 1px solid $color-input;
-            }
+            background: $color-dark-foreground;
+            border: 1px solid $color-input;
 
             &.btn-primary {
                 @include build-toggle-button($color-theme-blue, $color-badge-primary-background);
@@ -588,9 +515,7 @@ $icon-size: 4.5rem;
 // Type icons, for example for apps or schemas
 //
 .type {
-    & {
-        margin-bottom: .5rem;
-    }
+    margin-bottom: .5rem;
 
     &-title {
         font-weight: bold;
@@ -603,12 +528,10 @@ $icon-size: 4.5rem;
     }
 
     .btn-radio {
-        & {
-            font-size: 1.75rem;
-            font-weight: normal;
-            height: $icon-size;
-            line-height: $icon-size;
-        }
+        font-size: 1.75rem;
+        font-weight: normal;
+        height: $icon-size;
+        line-height: $icon-size;
 
         i {
             color: $color-theme-blue;
@@ -652,10 +575,8 @@ $icon-size: 4.5rem;
     }
 
     &-dialog {
-        & {
-            @include absolute(0, 0, 0, 0);
-            z-index: 1100;
-        }
+        @include absolute(0, 0, 0, 0);
+        z-index: 1100;
     }
 
     &-tabs {

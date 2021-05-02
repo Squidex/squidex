@@ -19,23 +19,19 @@ $toggle-button-size: $toggle-height - .25rem;
     }
 
     &-container {
-        & {
-            @include border-radius($toggle-height * .5);
-            @include box-shadow-outer;
-            background: lighten($color-border, 6%);
-            border: 0;
-            height: $toggle-height;
-            margin: 0;
-            margin-bottom: -3px;
-            position: relative;
-            transition: background-color .3s ease;
-            width: $toggle-width;
-        }
+        @include border-radius($toggle-height * .5);
+        @include box-shadow-outer;
+        background: lighten($color-border, 6%);
+        border: 0;
+        height: $toggle-height;
+        margin: 0;
+        margin-bottom: -3px;
+        position: relative;
+        transition: background-color .3s ease;
+        width: $toggle-width;
 
         &.checked {
-            & {
-                background: $color-theme-green-dark;
-            }
+            background: $color-theme-green-dark;
 
             .toggle-button {
                 left: $toggle-height * .5;
@@ -43,9 +39,7 @@ $toggle-button-size: $toggle-height - .25rem;
         }
 
         &.unchecked {
-            & {
-                background: $color-theme-error;
-            }
+            background: $color-theme-error;
 
             .toggle-button {
                 left: $toggle-width - $toggle-height * .5;

@@ -1,7 +1,5 @@
 .root {
-    & {
-        cursor: pointer;
-    }
+    cursor: pointer;
 
     &.disabled {
         cursor: default;
@@ -9,11 +7,9 @@
 }
 
 .small {
-    & {
-        height: 3rem;
-        position: relative;
-        transition: background-color .4s ease;
-    }
+    @include force-height(3rem);
+    position: relative;
+    transition: background-color .4s ease;
 
     &-text {
         @include absolute(0, 0, 0, 3rem);
@@ -36,9 +32,7 @@
 }
 
 .large {
-    & {
-        @include force-height(100px);
-    }
+    @include force-height(100px);
 
     &.editable {
         cursor: pointer;

@@ -5,7 +5,8 @@
 
 .navbar-brand {
     @include absolute(0, null, 0, 0);
-    background: $color-theme-blue-dark;
+    background: $color-theme-blue;
+    color: $color-white !important;
     cursor: pointer;
     font-size: 1.8rem;
     font-weight: normal;

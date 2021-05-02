@@ -215,7 +215,7 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="4">
                     <ng-container *ngIf="asset | sqxPreviewable; else video">
-                        <ngx-doc-viewer [url]="asset | sqxAssetPreviewUrl" [style]="{}" viewer="google" style="width:100%;height:50vh;"></ngx-doc-viewer>
+                        <ngx-doc-viewer [url]="asset | sqxAssetPreviewUrl" [style]="{}" viewer="google" style="width: 100%; height: 50vh;"></ngx-doc-viewer>
                     </ng-container>
 
                     <ng-template #video>

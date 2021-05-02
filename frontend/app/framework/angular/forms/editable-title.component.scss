@@ -1,8 +1,6 @@
 .title {
-    & {
-        @include hover-visible('.title-edit', inline);
-        position: relative;
-    }
+    @include hover-visible('.title-edit', inline);
+    position: relative;
 
     &-edit {
         @include absolute(0, 0, null, null);

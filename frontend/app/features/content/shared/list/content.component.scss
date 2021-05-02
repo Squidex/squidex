@@ -1,7 +1,5 @@
 .inline-edit {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     .edit-menu {
         @include absolute(.75rem, auto, auto, .25rem);

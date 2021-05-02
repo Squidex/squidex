@@ -14,9 +14,7 @@
 }
 
 .user-row {
-    & {
-        position: relative;
-    }
+    position: relative;
 }
 
 .col-text {
@@ -25,14 +23,12 @@
 }
 
 .comment {
-    & {
-        font-size: .9rem;
-        font-weight: normal;
-        line-height: 1.25rem;
-        margin: 0;
-        margin-bottom: .75rem;
-        position: relative;
-    }
+    font-size: .9rem;
+    font-weight: normal;
+    line-height: 1.25rem;
+    margin: 0;
+    margin-bottom: .75rem;
+    position: relative;
 
     &-message {
         margin-bottom: .375rem;

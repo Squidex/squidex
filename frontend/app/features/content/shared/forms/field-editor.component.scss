@@ -1,7 +1,5 @@
 .field {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     &-required {
         color: $color-theme-error;
@@ -23,9 +21,7 @@
 }
 
 .ui {
-    & {
-        margin-bottom: 1rem;
-    }
+    margin-bottom: 1rem;
 
     &-separator {
         border-bottom: 1px solid darken($color-border, 5%);

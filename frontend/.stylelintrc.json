@@ -4,6 +4,7 @@
         "stylelint-scss"
     ],
     "rules": {
+        "at-rule-empty-line-before": null,
         "at-rule-no-unknown": null,
         "selector-class-pattern": "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$",
         "declaration-empty-line-before": null,

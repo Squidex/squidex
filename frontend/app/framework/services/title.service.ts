@@ -8,6 +8,7 @@
 // tslint:disable: readonly-array
 
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { LocalizerService } from './localizer.service';
 
 export class TitlesConfig {
@@ -19,9 +20,15 @@ export class TitlesConfig {
     }
 }
 
+export type Title = { route?: any; name: string };
+
 @Injectable()
 export class TitleService {
-    private readonly stack: any[] = [];
+    private readonly path$ = new BehaviorSubject<ReadonlyArray<Title>>([]);
+
+    public get pathChanges(): Observable<ReadonlyArray<Title>> {
+        return this.path$;
+    }
 
     constructor(
         private readonly titles: TitlesConfig,
@@ -33,36 +40,45 @@ export class TitleService {
             this.titles.separator
         );
 
-        this.updateTitle();
+        this.path$.subscribe(value => {
+            this.updateTitle(value);
+        });
     }
 
-    public push(value: any, previous?: any) {
+    public push(value: string, previous?: string, route?: any) {
         if (value) {
-            const lastIndex = this.stack.length - 1;
+            const clone = [...this.path$.value];
 
-            if (previous && this.stack[lastIndex] === previous) {
-                this.stack[lastIndex] = value;
+            const lastIndex = clone.length - 1;
+            const localized = this.localizer.getOrKey(value);
+
+            if (previous && clone[lastIndex].name === previous) {
+                clone[lastIndex] = { name: localized, route };
             } else {
-                this.stack.push(value);
+                clone.push({ name: localized, route });
             }
 
-            this.updateTitle();
+            this.path$.next(clone);
         }
     }
 
     public pop() {
-        this.stack.pop();
+        const clone = [...this.path$.value];
 
-        this.updateTitle();
+        clone.pop();
+
+        this.path$.next(clone);
     }
 
-    private updateTitle() {
+    private updateTitle(path: ReadonlyArray<Title>) {
         const { prefix, separator, suffix } = this.titles;
 
         let title = '';
 
-        if (this.stack.length > 0) {
-            title = this.stack.map(x => this.localizer.getOrKey(x)).join(separator || ' | ');
+        const cleaned = path.map(x => x.name).filter(x => !!x);
+
+        if (cleaned.length > 0) {
+            title = cleaned.join(separator || ' | ');
         }
 
         if (title) {

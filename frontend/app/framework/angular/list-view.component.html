@@ -25,8 +25,8 @@
         </div>
     </div>
     
-    <div class="list-content synced" [class.loading-indicator]="isLoading" [class.tabled]="table" [sqxSyncScrolling]="header">
-        <div class="inner">
+    <div class="list-content synced" [class.loading-indicator]="isLoading" [sqxSyncScrolling]="header">
+        <div class="inner" [class.tabled]="table">
             <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
         </div>
     </div>

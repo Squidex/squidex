@@ -1,9 +1,7 @@
 .plan {
-    & {
-        margin: .5rem;
-        max-width: 20rem;
-        min-width: 13rem;
-    }
+    margin: .5rem;
+    max-width: 20rem;
+    min-width: 13rem;
 
     &-price {
         color: $color-theme-blue;

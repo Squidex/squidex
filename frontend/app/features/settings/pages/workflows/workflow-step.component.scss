@@ -30,11 +30,9 @@
     }
 
     .transition {
-        & {
-            line-height: 2.2rem;
-            margin-bottom: .5rem;
-            margin-top: .25rem;
-        }
+        line-height: 2.2rem;
+        margin-bottom: .5rem;
+        margin-top: .25rem;
 
         &-to {
             line-height: 1.2rem;
@@ -45,10 +43,9 @@
 }
 
 .step {
-    & {
-        border-bottom: 1px solid $color-border;
-        margin-bottom: 1.5rem;
-    }
+    border: 0;
+    border-bottom: 1px solid $color-border;
+    margin-bottom: 1.5rem;
 
     &-inner {
         padding-left: 2.4rem;
@@ -64,14 +61,12 @@
 }
 
 .btn-initial {
-    & {
-        line-height: 1.6rem;
-        padding-left: 0;
-        padding-right: 0;
-        text-align: center;
-        visibility: hidden;
-        width: 2rem;
-    }
+    line-height: 1.6rem;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+    visibility: hidden;
+    width: 2rem;
 
     &:disabled {
         opacity: 1;
@@ -83,11 +78,9 @@
 }
 
 .transition-prevent-updates {
-    & {
-        margin-bottom: 1rem;
-        margin-top: .25rem;
-        min-height: 2.5rem;
-    }
+    margin-bottom: 1rem;
+    margin-top: .25rem;
+    min-height: 2.5rem;
 
     &-to {
         line-height: 1.2rem;

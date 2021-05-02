@@ -1,10 +1,8 @@
 .notification-container {
-    & {
-        @include force-width(30rem);
-        @include fixed;
-        margin: .625rem;
-        z-index: 100000;
-    }
+    @include force-width(30rem);
+    @include fixed;
+    margin: .625rem;
+    z-index: 100000;
 
     .alert {
         max-height: 20rem;
@@ -58,14 +56,12 @@
 $caret-size: 6px;
 
 .tooltip2 {
-    & {
-        background: $color-tooltip;
-        color: $color-dark-foreground;
-        font-size: .9rem;
-        font-weight: normal;
-        padding: .5rem;
-        white-space: nowrap;
-    }
+    background: $color-tooltip;
+    color: $color-dark-foreground;
+    font-size: .9rem;
+    font-weight: normal;
+    padding: .5rem;
+    white-space: nowrap;
 
     &-left {
         &::after {
