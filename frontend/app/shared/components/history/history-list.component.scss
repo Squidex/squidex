@@ -18,7 +18,6 @@
 
 .event {
     @include text-small;
-    color: $color-text-decent;
     margin-bottom: 1.5rem;
 
     &-created {

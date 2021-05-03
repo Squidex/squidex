@@ -1,21 +1,21 @@
 /* stylelint-disable */
 
 @mixin text-small {
-    font-size: 90%;
+    font-size: .9rem;
 }
 
 @mixin text-small-bold {
-    font-size: 90%;
+    font-size: .9rem;
     font-weight: 500;
 }
 
 @mixin text-smallest {
-    font-size: 80%;
+    font-size: .8rem;
 }
 
 @mixin text-code {
     font-family: monospace;
-    font-size: 80%;
+    font-size: .8rem;
     font-weight: normal;
 }
 

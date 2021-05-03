@@ -3,8 +3,8 @@
         <div class="panel2-slice simple">
             <div class="panel2-header simple">
                 <div class="panel2-header-inner simple">
-                    <h3 *ngIf="title">
-                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ title | sqxTranslate }}
+                    <h3 *ngIf="titleText">
+                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
                     </h3>
                     <div>
                         <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
@@ -26,8 +26,8 @@
         <div class="panel2-slice left" [class.collapsed]="isCollapsed" [style.width]="width">
             <div class="panel2-header left">
                 <div class="panel2-header-inner left">
-                    <h3 *ngIf="title">
-                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ title | sqxTranslate }}
+                    <h3 *ngIf="titleText">
+                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
                     </h3>
                     <div>
                         <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
@@ -41,7 +41,7 @@
                     <i class="icon-angle-left"></i>
                 </button>
 
-                <div class="panel2-sidebar-title">{{title}}</div>
+                <div class="panel2-sidebar-title">{{titleText}}</div>
             </div>
 
             <div class="panel2-main left">
@@ -60,8 +60,8 @@
         <div class="panel2-slice main" [style.minWidth]="minWidth">
             <div class="panel2-header main">
                 <div class="panel2-header-inner main" [style.minWidth]="width" [style.width]="width"> 
-                    <h3 *ngIf="title">
-                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ title | sqxTranslate }}
+                    <h3 *ngIf="titleText">
+                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
                     </h3>
                     <div>
                         <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>

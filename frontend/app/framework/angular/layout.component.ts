@@ -18,7 +18,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     private parent?: LayoutComponent;
 
     @Input()
-    public title: string;
+    public titleText: string;
 
     @Input()
     public titleIcon: string;

@@ -599,6 +599,10 @@ $icon-size: 4.5rem;
 //
 // Table Helpers
 //
+th {
+    font-weight: normal;
+}
+
 .table {
     // Use fixed width for columns.
     &-fixed {
