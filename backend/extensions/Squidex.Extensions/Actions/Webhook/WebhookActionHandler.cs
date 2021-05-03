@@ -45,7 +45,7 @@ namespace Squidex.Extensions.Actions.Webhook
                     requestBody = ToEnvelopeJson(@event);
                 }
 
-                requestSignature = $"{requestBody}{action.SharedSecret}".Sha256Base64();
+                requestSignature = $"{requestBody}{action.SharedSecret}".ToSha256Base64();
             }
 
             var ruleDescription = $"Send event to webhook '{requestUrl}'";

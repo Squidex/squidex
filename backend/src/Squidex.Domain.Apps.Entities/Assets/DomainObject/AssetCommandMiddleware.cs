@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var steamHash = hashStream.GetHashStringAndReset();
 
-            return $"{steamHash}{file.FileName}{file.FileSize}".Sha256Base64();
+            return $"{steamHash}{file.FileName}{file.FileSize}".ToSha256Base64();
         }
 
         private async Task EnrichWithMetadataAsync(UploadAssetCommand command)
