@@ -30,9 +30,9 @@ namespace Squidex.Translator.Processes
                 Console.WriteLine("Checking {0}", locale);
 
                 var notTranslated = mainTranslations.Keys.Except(texts.Keys).ToList();
-                var notUsed = texts.Keys.Except(mainTranslations.Keys).ToList();
+                var notRequired = texts.Keys.Except(mainTranslations.Keys).ToList();
 
-                if (notTranslated.Count > 0 || notUsed.Count > 0)
+                if (notTranslated.Count > 0 || notRequired.Count > 0)
                 {
                     if (notTranslated.Count > 0)
                     {
@@ -46,12 +46,12 @@ namespace Squidex.Translator.Processes
                         }
                     }
 
-                    if (notUsed.Count > 0)
+                    if (notRequired.Count > 0)
                     {
                         Console.WriteLine();
                         Console.WriteLine("Translations not used:");
 
-                        foreach (var key in notUsed.OrderBy(x => x))
+                        foreach (var key in notRequired.OrderBy(x => x))
                         {
                             Console.Write(" * ");
                             Console.WriteLine(key);
