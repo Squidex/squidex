@@ -479,7 +479,7 @@
     <value>{count} Reference(s)</value>
   </data>
   <data name="contents.referenced" xml:space="preserve">
-    <value>Content is referenced by another content and cannot be deleted.</value>
+    <value>Content is referenced by another content and cannot be deleted or unpublished.</value>
   </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>Singleton content cannot be updated.</value>

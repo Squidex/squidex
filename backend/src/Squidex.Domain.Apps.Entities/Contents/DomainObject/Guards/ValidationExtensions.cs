@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             if (hasReferrer)
             {
-                throw new DomainException(T.Get("contents.referenced", "OBJECT_REFERENCED"));
+                throw new DomainException(T.Get("contents.referenced"), "OBJECT_REFERENCED");
             }
         }
 

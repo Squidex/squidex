@@ -143,7 +143,7 @@ export class ContentsService {
     public getContents(appName: string, schemaName: string, q?: ContentQueryDto): Observable<ContentsDto> {
         const { ids, maxLength } = q || {};
 
-        const { fullQuery, queryOdataParts, queryObj } = buildQuery(q);
+        const { fullQuery, odataParts: queryOdataParts, queryObj } = buildQuery(q);
 
         if (fullQuery.length > (maxLength || 2000)) {
             const body: any = {};
@@ -348,7 +348,7 @@ function buildQuery(q?: ContentQueryDto) {
     const { ids, query, skip, take } = q || {};
 
     const queryParts: string[] = [];
-    const queryOdataParts: string[] = [];
+    const odataParts: string[] = [];
 
     let queryObj: Query | undefined;
 
@@ -357,14 +357,14 @@ function buildQuery(q?: ContentQueryDto) {
     } else {
 
         if (query && query.fullText && query.fullText.indexOf('$') >= 0) {
-            queryOdataParts.push(`${query.fullText.trim()}`);
+            odataParts.push(`${query.fullText.trim()}`);
 
             if (take && take > 0) {
-                queryOdataParts.push(`$top=${take}`);
+                odataParts.push(`$top=${take}`);
             }
 
             if (skip && skip > 0) {
-                queryOdataParts.push(`$skip=${skip}`);
+                odataParts.push(`$skip=${skip}`);
             }
         } else {
             queryObj = { ...query };
@@ -381,8 +381,9 @@ function buildQuery(q?: ContentQueryDto) {
         }
     }
 
-    const fullQuery = [...queryParts, ...queryOdataParts].join('&');
-    return { fullQuery, queryOdataParts, queryObj };
+    const fullQuery = [...queryParts, ...odataParts].join('&');
+
+    return { fullQuery, odataParts, queryObj };
 }
 
 function parseContent(response: any) {
@@ -423,5 +424,6 @@ function parseError(response: any) {
     return new ErrorDto(
         response.statusCode,
         response.message,
+        response.errorCode,
         response.details);
 }
