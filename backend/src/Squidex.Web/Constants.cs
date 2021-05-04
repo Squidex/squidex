@@ -38,7 +38,7 @@ namespace Squidex.Web
 
         public static readonly string InternalClientId = "squidex-internal";
 
-        public static readonly string InternalClientSecret = "squidex-internal".Sha256Base64();
+        public static readonly string InternalClientSecret = "squidex-internal".ToSha256Base64();
 
         public static readonly string IdentityServerPrefix = "/identity-server";
     }

@@ -185,6 +185,40 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
+        public void Should_compute_sha256_hash()
+        {
+            const string script = @"
+                return sha256(value);
+            ";
+
+            var vars = new ScriptVars
+            {
+                ["value"] = "HelloWorld"
+            };
+
+            var result = sut.Execute(vars, script).ToString();
+
+            Assert.Equal("HelloWorld".ToSha256(), result);
+        }
+
+        [Fact]
+        public void Should_compute_md5_hash()
+        {
+            const string script = @"
+                return md5(value);
+            ";
+
+            var vars = new ScriptVars
+            {
+                ["value"] = "HelloWorld"
+            };
+
+            var result = sut.Execute(vars, script).ToString();
+
+            Assert.Equal("HelloWorld".ToMD5(), result);
+        }
+
+        [Fact]
         public async Task Should_throw_validation_exception_if_calling_reject()
         {
             const string script = @"

@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
                     sb.Append(';');
                 }
 
-                return sb.ToString().Sha256Base64();
+                return sb.ToString().ToSha256Base64();
             }
             finally
             {
