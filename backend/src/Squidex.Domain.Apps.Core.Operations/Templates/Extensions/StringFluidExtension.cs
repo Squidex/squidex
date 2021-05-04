@@ -8,6 +8,7 @@
 using Fluid;
 using Fluid.Values;
 using Newtonsoft.Json;
+using Squidex.Infrastructure;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Templates.Extensions
@@ -51,11 +52,23 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
             return FluidValue.Create(input.ToStringValue().Trim());
         };
 
+        private static readonly FilterDelegate MD5 = (input, arguments, context) =>
+        {
+            return FluidValue.Create(input.ToStringValue().ToMD5());
+        };
+
+        private static readonly FilterDelegate Sha256 = (input, arguments, context) =>
+        {
+            return FluidValue.Create(input.ToStringValue().ToSha256());
+        };
+
         public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
         {
+            TemplateContext.GlobalFilters.AddFilter("escape", Escape);
             TemplateContext.GlobalFilters.AddFilter("html2text", Html2Text);
             TemplateContext.GlobalFilters.AddFilter("markdown2text", Markdown2Text);
-            TemplateContext.GlobalFilters.AddFilter("escape", Escape);
+            TemplateContext.GlobalFilters.AddFilter("md5", MD5);
+            TemplateContext.GlobalFilters.AddFilter("sha256", Sha256);
             TemplateContext.GlobalFilters.AddFilter("slugify", Slugify);
             TemplateContext.GlobalFilters.AddFilter("trim", Trim);
         }

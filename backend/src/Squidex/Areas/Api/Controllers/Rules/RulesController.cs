@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public IActionResult GetActions()
         {
-            var etag = string.Concat(ruleRegistry.Actions.Select(x => x.Key)).Sha256Base64();
+            var etag = string.Concat(ruleRegistry.Actions.Select(x => x.Key)).ToSha256Base64();
 
             var response = Deferred.Response(() =>
             {
