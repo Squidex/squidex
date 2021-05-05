@@ -354,10 +354,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                                 return of([]);
                             }
                         }),
-                        map(results2 => {
-                            const nonRetried = results.filter(x => !isReferrerError(x.error));
+                        map(retried => {
+                            const nonRetried = results.filter(x => !retried.find(y => y.contentId === x.contentId));
 
-                            return [...nonRetried, ...results2];
+                            return [...nonRetried, ...retried];
                         })
                     );
                 } else {
