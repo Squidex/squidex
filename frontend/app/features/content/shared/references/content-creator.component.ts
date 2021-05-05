@@ -21,6 +21,12 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
 
     @Input()
+    public initialData: any;
+
+    @Input()
+    public schemaName: string;
+
+    @Input()
     public schemaIds: ReadonlyArray<string>;
 
     @Input()
@@ -52,7 +58,9 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
             this.schemas = this.schemas.filter(x => this.schemaIds.indexOf(x.id) >= 0);
         }
 
-        this.selectSchema(this.schemas[0]);
+        const selectedSchema = this.schemas.find(x => x.name === this.schemaName) || this.schemas[0];
+
+        this.selectSchema(selectedSchema);
     }
 
     public selectSchema(selected: string | SchemaDto) {
@@ -67,6 +75,12 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
 
                     this.contentsState.schema = schema;
                     this.contentForm = new EditContentForm(this.languages, this.schema, { user: this.formContext.user });
+
+                    if (this.initialData) {
+                        this.contentForm.load(this.initialData, true);
+
+                        this.initialData = null;
+                    }
 
                     this.changeDetector.markForCheck();
                 }

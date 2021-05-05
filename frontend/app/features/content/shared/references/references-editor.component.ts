@@ -52,6 +52,8 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
         this.setDisabledState(value === true);
     }
 
+    public clonedContent?: ContentDto;
+
     public contentCreatorDialog = new DialogModel();
     public contentSelectorDialog = new DialogModel();
 
@@ -112,6 +114,12 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
 
             this.updateValue();
         }
+    }
+
+    public createContent(clone?: ContentDto) {
+        this.clonedContent = clone;
+
+        this.contentCreatorDialog.show();
     }
 
     private updateValue() {

@@ -20,6 +20,9 @@ export class ReferenceItemComponent implements OnChanges {
     @Output()
     public delete = new EventEmitter();
 
+    @Output()
+    public clone = new EventEmitter();
+
     @Input()
     public language: AppLanguageDto;
 

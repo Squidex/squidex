@@ -31,6 +31,10 @@
             </button>
 
             <div class="reference-menu">
+                <button class="btn btn-text-secondary" title="{{ 'common.clone' | sqxTranslate }}" (click)="clone.emit()">
+                    <i class="icon-copy"></i>
+                </button>
+
                 <a class="btn btn-text-secondary" target="_blank" [routerLink]="['../..', content.schemaName, content.id]">
                     <i class="icon-pencil"></i>
                 </a>
