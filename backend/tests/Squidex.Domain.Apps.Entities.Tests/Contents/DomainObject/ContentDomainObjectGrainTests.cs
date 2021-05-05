@@ -10,7 +10,6 @@ using FakeItEasy;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
 
-#pragma warning disable RECS0026 // Possible unassigned object created by 'new'
 #pragma warning disable CA1806 // Do not ignore method results
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject

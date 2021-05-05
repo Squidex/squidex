@@ -78,7 +78,6 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             serializerSettings.Converters.Add(new TodayConverter());
 
             var serializer = new NewtonsoftJsonSerializer(serializerSettings);
-
             var serialized = serializer.Deserialize<Instant>(serializer.Serialize(value, true))!;
 
             Assert.Equal(value, serialized);

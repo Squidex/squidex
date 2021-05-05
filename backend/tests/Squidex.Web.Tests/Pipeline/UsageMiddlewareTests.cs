@@ -16,8 +16,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
 using Xunit;
 
-#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
-
 namespace Squidex.Web.Pipeline
 {
     public class UsageMiddlewareTests

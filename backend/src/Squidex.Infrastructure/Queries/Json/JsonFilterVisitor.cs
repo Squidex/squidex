@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using NJsonSchema;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
