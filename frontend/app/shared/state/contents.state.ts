@@ -341,9 +341,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     private bulkWithRetry(contents: ReadonlyArray<ContentDto>, job: Partial<BulkUpdateJobDto>, confirmTitle: string, confirmText: string, confirmKey: string): Observable<ReadonlyArray<BulkResultDto>> {
         return this.bulkMany(contents, true, job).pipe(
             switchMap(results => {
-                const failed = contents.filter(x => isReferrerError(results.find(r => r.contentId === x.id)?.error));
+                const referrerFailures = results.filter(x => isReferrerError(x.error));
 
-                if (failed.length > 0) {
+                if (referrerFailures.length > 0) {
+                    const failed = contents.filter(x => referrerFailures.find(r => r.contentId === x.id));
+
                     return this.dialogs.confirm(confirmTitle, confirmText, confirmKey).pipe(
                         switchMap(confirmed => {
                             if (confirmed) {
@@ -353,7 +355,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                             }
                         }),
                         map(results2 => {
-                            return [...results, ...results2];
+                            const nonRetried = results.filter(x => !isReferrerError(x.error));
+
+                            return [...nonRetried, ...results2];
                         })
                     );
                 } else {

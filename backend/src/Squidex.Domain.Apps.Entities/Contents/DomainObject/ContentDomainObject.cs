@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -265,11 +265,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 await operation.CheckTransitionAsync(c.Status);
             }
 
-            if (c.CheckReferrers && Snapshot.IsPublished())
-            {
-                await operation.CheckReferrersAsync();
-            }
-
             if (!c.DoNotScript)
             {
                 var newData = await operation.ExecuteChangeScriptAsync(c.Status, GetChange(c.Status));
@@ -289,6 +284,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         Update(c, newData);
                     }
                 }
+            }
+
+            if (c.CheckReferrers && Snapshot.IsPublished())
+            {
+                await operation.CheckReferrersAsync();
             }
 
             if (!c.DoNotValidate && c.Status == Status.Published && operation.SchemaDef.Properties.ValidateOnPublish)
@@ -374,14 +374,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             operation.MustHavePermission(Permissions.AppContentsDeleteOwn);
             operation.MustNotDeleteSingleton();
 
-            if (c.CheckReferrers)
-            {
-                await operation.CheckReferrersAsync();
-            }
-
             if (!c.DoNotScript)
             {
                 await operation.ExecuteDeleteScriptAsync();
+            }
+
+            if (c.CheckReferrers)
+            {
+                await operation.CheckReferrersAsync();
             }
 
             Delete(c);
