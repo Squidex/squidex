@@ -108,14 +108,8 @@ export class EditorDto {
     }
 }
 
-export type UpdatePatternDto =
-    Readonly<{ name: string, regex: string, message?: string }>;
-
-export type UpdateEditorDto =
-    Readonly<{ name: string, regex: string, message?: string }>;
-
 export type UpdateAppSettingsDto =
-    Readonly<{ patterns: readonly UpdatePatternDto[], editors: readonly UpdateEditorDto[], hideScheduler?: boolean }>;
+    Readonly<{ patterns: ReadonlyArray<PatternDto>, editors: ReadonlyArray<EditorDto>, hideScheduler?: boolean }>;
 
 export type CreateAppDto =
     Readonly<{ name: string; template?: string; }>;

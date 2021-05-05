@@ -36,13 +36,13 @@ export type AppLanguagesDto =
     Versioned<AppLanguagesPayload>;
 
 export type AppLanguagesPayload =
-    Readonly<{ items: readonly AppLanguageDto[], canCreate: boolean } & Resource>;
+    Readonly<{ items: ReadonlyArray<AppLanguageDto>, canCreate: boolean } & Resource>;
 
 export type AddAppLanguageDto =
     Readonly<{ language: string }>;
 
 export type UpdateAppLanguageDto =
-    Readonly<{ isMaster?: boolean, isOptional?: boolean, falback?: readonly string[] }>;
+    Readonly<{ isMaster?: boolean, isOptional?: boolean, falback?: ReadonlyArray<string> }>;
 
 @Injectable()
 export class AppLanguagesService {

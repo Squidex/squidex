@@ -39,7 +39,7 @@ export type RolesDto =
     Versioned<RolesPayload>;
 
 export type RolesPayload =
-    Readonly<{ items: readonly RoleDto[]; canCreate: boolean; } & Resource>;
+    Readonly<{ items: ReadonlyArray<RoleDto>; canCreate: boolean; } & Resource>;
 
 export type CreateRoleDto =
     Readonly<{ name: string; }>;

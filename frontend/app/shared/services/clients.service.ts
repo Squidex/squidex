@@ -46,7 +46,7 @@ export type ClientsDto =
     Versioned<ClientsPayload>;
 
 export type ClientsPayload =
-    Readonly<{ items: readonly ClientDto[], canCreate: boolean } & Resource>;
+    Readonly<{ items: ReadonlyArray<ClientDto>, canCreate: boolean } & Resource>;
 
 export type CreateClientDto =
     Readonly<{ id: string }>;

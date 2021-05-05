@@ -328,10 +328,10 @@ export type FieldRule = { field: string, action: FieldRuleAction, condition: str
 export type SchemaCompletions = ReadonlyArray<{ name: string, description: string }>;
 
 export type SchemasDto =
-    Readonly<{ items: readonly SchemaDto[]; canCreate: boolean } & Resource>;
+    Readonly<{ items: ReadonlyArray<SchemaDto>; canCreate: boolean } & Resource>;
 
 export type AddFieldDto =
-    Readonly<{ name: string;  partitioning?: string; properties: FieldPropertiesDto }>;
+    Readonly<{ name: string; partitioning?: string; properties: FieldPropertiesDto }>;
 
 export type UpdateUIFields =
     Readonly<{ fieldsInLists?: Tags; fieldsInReferences?: Tags; }>;

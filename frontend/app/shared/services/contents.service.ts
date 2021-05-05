@@ -123,7 +123,7 @@ export type ContentData =
     Readonly<{ [fieldName: string ]: ContentFieldData }>;
 
 export type BulkUpdateDto =
-    Readonly<{ jobs: readonly BulkUpdateJobDto[], doNotScript?: boolean, checkReferrers?: boolean }>;
+    Readonly<{ jobs: ReadonlyArray<BulkUpdateJobDto>, doNotScript?: boolean, checkReferrers?: boolean }>;
 
 export type BulkUpdateJobDto =
     Readonly<{ id: string; type: BulkUpdateType; status?: string; schema?: string; dueTime?: string | null; expectedVersion?: number }>;
