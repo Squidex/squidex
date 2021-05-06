@@ -306,7 +306,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate)
             {
-                await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
+                await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
             }
 
             if (!c.DoNotValidateWorkflow)
