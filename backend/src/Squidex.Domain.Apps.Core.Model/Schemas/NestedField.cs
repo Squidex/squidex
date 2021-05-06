@@ -6,128 +6,97 @@
 // ==========================================================================
 
 using System.Diagnostics.Contracts;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class NestedField : Cloneable<NestedField>, INestedField
+    public abstract class NestedField : FieldBase<NestedField>, INestedField
     {
-        private readonly long fieldId;
-        private readonly string fieldName;
-        private bool isDisabled;
-        private bool isHidden;
-        private bool isLocked;
+        public bool IsLocked { get; private set; }
 
-        public long Id
-        {
-            get => fieldId;
-        }
+        public bool IsHidden { get; private set; }
 
-        public string Name
-        {
-            get => fieldName;
-        }
-
-        public bool IsLocked
-        {
-            get => isLocked;
-        }
-
-        public bool IsHidden
-        {
-            get => isHidden;
-        }
-
-        public bool IsDisabled
-        {
-            get => isDisabled;
-        }
+        public bool IsDisabled { get; private set; }
 
         public abstract FieldProperties RawProperties { get; }
 
         protected NestedField(long id, string name, IFieldSettings? settings = null)
+            : base(id, name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.GreaterThan(id, 0, nameof(id));
-
-            fieldId = id;
-            fieldName = name;
-
             if (settings != null)
             {
-                isLocked = settings.IsLocked;
-                isHidden = settings.IsHidden;
-                isDisabled = settings.IsDisabled;
+                IsLocked = settings.IsLocked;
+                IsHidden = settings.IsHidden;
+                IsDisabled = settings.IsDisabled;
             }
         }
 
         [Pure]
         public NestedField Lock()
         {
-            if (isLocked)
+            if (IsLocked)
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.isLocked = true;
+                clone.IsLocked = true;
             });
         }
 
         [Pure]
         public NestedField Hide()
         {
-            if (isHidden)
+            if (IsHidden)
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.isHidden = true;
+                clone.IsHidden = true;
             });
         }
 
         [Pure]
         public NestedField Show()
         {
-            if (!isHidden)
+            if (!IsHidden)
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.isHidden = false;
+                clone.IsHidden = false;
             });
         }
 
         [Pure]
         public NestedField Disable()
         {
-            if (isDisabled)
+            if (IsDisabled)
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.isDisabled = true;
+                clone.IsDisabled = true;
             });
         }
 
         [Pure]
         public NestedField Enable()
         {
-            if (!isDisabled)
+            if (!IsDisabled)
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.isDisabled = false;
+                clone.IsDisabled = false;
             });
         }
 

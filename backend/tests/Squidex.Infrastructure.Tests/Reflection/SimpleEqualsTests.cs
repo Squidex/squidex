@@ -190,8 +190,8 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_compare_equal_collections()
         {
-            var listA_1 = ReadOnlyCollection.Create("a");
-            var listA_2 = ReadOnlyCollection.Create("a");
+            var listA_1 = ImmutableList.Create("a");
+            var listA_2 = ImmutableList.Create("a");
 
             Assert.True(SimpleEquals.IsEquals(listA_1, listA_1));
             Assert.True(SimpleEquals.IsEquals(listA_1, listA_2));
@@ -200,9 +200,9 @@ namespace Squidex.Infrastructure.Reflection
         [Fact]
         public void Should_compare_non_equal_collections()
         {
-            var listA_1 = ReadOnlyCollection.Create("a");
-            var listB_1 = ReadOnlyCollection.Create("b");
-            var listC_1 = ReadOnlyCollection.Create("b");
+            var listA_1 = ImmutableList.Create("a");
+            var listB_1 = ImmutableList.Create("b");
+            var listC_1 = ImmutableList.Create("b");
 
             Assert.False(SimpleEquals.IsEquals(listA_1, listB_1));
             Assert.False(SimpleEquals.IsEquals(listA_1, listC_1));

@@ -34,8 +34,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public SchemaBuilder WithLabel(string? label)
         {
-            command.Properties ??= new SchemaProperties();
-            command.Properties.Label = label;
+            if (command.Properties == null)
+            {
+                command.Properties = new SchemaProperties { Label = label };
+            }
+            else
+            {
+                command.Properties = command.Properties with { Label = label };
+            }
 
             return this;
         }

@@ -6,38 +6,32 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
-#pragma warning disable IDE0051 // Remove unused private members
-
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class Workflow : Named
+    public sealed class Workflow
     {
         private const string DefaultName = "Unnamed";
-
-        public static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
 
         public static readonly Workflow Default = CreateDefault();
         public static readonly Workflow Empty = new Workflow(default, null);
 
-        [IgnoreDuringEquals]
-        public IReadOnlyDictionary<Status, WorkflowStep> Steps { get; } = EmptySteps;
-
-        public ReadOnlyCollection<DomainId> SchemaIds { get; } = ReadOnlyCollection.Empty<DomainId>();
-
         public Status Initial { get; }
+
+        public ImmutableDictionary<Status, WorkflowStep> Steps { get; } = ImmutableDictionary.Empty<Status, WorkflowStep>();
+
+        public ImmutableList<DomainId> SchemaIds { get; } = ImmutableList.Empty<DomainId>();
+
+        public string Name { get; }
 
         public Workflow(
             Status initial,
-            IReadOnlyDictionary<Status, WorkflowStep>? steps = null,
-            IReadOnlyList<DomainId>? schemaIds = null,
+            ImmutableDictionary<Status, WorkflowStep>? steps = null,
+            ImmutableList<DomainId>? schemaIds = null,
             string? name = null)
-            : base(name.Or(DefaultName))
         {
             Initial = initial;
 
@@ -48,21 +42,24 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             if (schemaIds != null)
             {
-                SchemaIds = schemaIds.ToReadOnlyCollection();
+                SchemaIds = schemaIds;
             }
+
+            Name = name.Or(DefaultName);
         }
 
         public static Workflow CreateDefault(string? name = null)
         {
             return new Workflow(
-                Status.Draft, new Dictionary<Status, WorkflowStep>
+                Status.Draft,
+                new Dictionary<Status, WorkflowStep>
                 {
                     [Status.Archived] =
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Draft] = WorkflowTransition.Always
-                            },
+                            }.ToImmutableDictionary(),
                             StatusColors.Archived, NoUpdate.Always),
                     [Status.Draft] =
                         new WorkflowStep(
@@ -70,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                             {
                                 [Status.Archived] = WorkflowTransition.Always,
                                 [Status.Published] = WorkflowTransition.Always
-                            },
+                            }.ToImmutableDictionary(),
                             StatusColors.Draft),
                     [Status.Published] =
                         new WorkflowStep(
@@ -78,9 +75,9 @@ namespace Squidex.Domain.Apps.Core.Contents
                             {
                                 [Status.Archived] = WorkflowTransition.Always,
                                 [Status.Draft] = WorkflowTransition.Always
-                            },
+                            }.ToImmutableDictionary(),
                             StatusColors.Published)
-                }, null, name);
+                }.ToImmutableDictionary(), null, name);
         }
 
         public IEnumerable<(Status Status, WorkflowStep Step, WorkflowTransition Transition)> GetTransitions(Status status)
@@ -127,18 +124,6 @@ namespace Squidex.Domain.Apps.Core.Contents
         public (Status Key, WorkflowStep) GetInitialStep()
         {
             return (Initial, Steps[Initial]);
-        }
-
-        [CustomEqualsInternal]
-        private bool CustomEquals(Workflow other)
-        {
-            return Steps.EqualsDictionary(other.Steps);
-        }
-
-        [CustomGetHashCode]
-        private int CustomHashCode()
-        {
-            return Steps.DictionaryHashCode();
         }
     }
 }

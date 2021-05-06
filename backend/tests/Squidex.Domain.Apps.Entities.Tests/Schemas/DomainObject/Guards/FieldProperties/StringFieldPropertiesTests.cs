@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards.FieldProperti
         [InlineData(StringFieldEditor.TextArea)]
         public void Should_add_error_if_inline_editing_is_not_allowed_for_editor(StringFieldEditor editor)
         {
-            var sut = new StringFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ReadOnlyCollection.Create("Value") };
+            var sut = new StringFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ImmutableList.Create("Value") };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards.FieldProperti
         [InlineData(StringFieldEditor.Slug)]
         public void Should_not_add_error_if_inline_editing_is_allowed_for_editor(StringFieldEditor editor)
         {
-            var sut = new StringFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ReadOnlyCollection.Create("Value") };
+            var sut = new StringFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ImmutableList.Create("Value") };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 

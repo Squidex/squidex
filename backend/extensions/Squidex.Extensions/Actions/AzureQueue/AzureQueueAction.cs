@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -21,7 +21,7 @@ namespace Squidex.Extensions.Actions.AzureQueue
         Display = "Send to Azure Queue",
         Description = "Send an event to azure queue storage.",
         ReadMore = "https://azure.microsoft.com/en-us/services/storage/queues/")]
-    public sealed class AzureQueueAction : RuleAction
+    public sealed record AzureQueueAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Connection", Description = "The connection string to the storage account.")]

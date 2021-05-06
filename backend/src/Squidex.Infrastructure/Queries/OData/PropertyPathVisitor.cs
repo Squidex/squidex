@@ -19,9 +19,9 @@ namespace Squidex.Infrastructure.Queries.OData
         {
         }
 
-        public static ImmutableList<string> Visit(QueryNode node)
+        public static PropertyPath Visit(QueryNode node)
         {
-            return node.Accept(Instance);
+            return new PropertyPath(node.Accept(Instance));
         }
 
         public override ImmutableList<string> Visit(ConvertNode nodeIn)

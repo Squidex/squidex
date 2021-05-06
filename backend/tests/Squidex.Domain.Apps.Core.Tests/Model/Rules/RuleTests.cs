@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
 
         private readonly Rule rule_0 = new Rule(new ContentChangedTriggerV2(), new TestAction1());
 
-        public sealed class OtherTrigger : RuleTrigger
+        public sealed record OtherTrigger : RuleTrigger
         {
             public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
             {
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             }
         }
 
-        public sealed class MigratedTrigger : RuleTrigger, IMigrated<RuleTrigger>
+        public sealed record MigratedTrigger : RuleTrigger, IMigrated<RuleTrigger>
         {
             public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
             {
@@ -53,13 +53,13 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         }
 
         [TypeName(nameof(TestAction1))]
-        public sealed class TestAction1 : RuleAction
+        public sealed record TestAction1 : RuleAction
         {
             public string Property { get; set; }
         }
 
         [TypeName(nameof(TestAction2))]
-        public sealed class TestAction2 : RuleAction
+        public sealed record TestAction2 : RuleAction
         {
             public string Property { get; set; }
         }
@@ -183,13 +183,6 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             var serialized = rule_X.SerializeAndDeserialize();
 
             Assert.IsType<OtherTrigger>(serialized.Trigger);
-        }
-
-        [Theory]
-        [MemberData(nameof(Triggers))]
-        public void Should_freeze_triggers(RuleTrigger trigger)
-        {
-            TestUtils.TestFreeze(trigger);
         }
     }
 }

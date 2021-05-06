@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaFieldRulesConfigured { FieldRules = new FieldRules(FieldRule.Disable("field1")) })
+                    CreateEvent(new SchemaFieldRulesConfigured { FieldRules = FieldRules.Create(FieldRule.Disable("field1")) })
                 );
         }
 
@@ -184,7 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var command = new ConfigureUIFields
             {
-                FieldsInLists = new FieldNames(fieldName)
+                FieldsInLists = FieldNames.Create(fieldName)
             };
 
             await ExecuteCreateAsync();
@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var command = new ConfigureUIFields
             {
-                FieldsInReferences = new FieldNames(fieldName)
+                FieldsInReferences = FieldNames.Create(fieldName)
             };
 
             await ExecuteCreateAsync();

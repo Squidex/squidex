@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public Roles Remove(string name)
         {
-            return Create(inner.Without(name));
+            return Create(inner.RemoveKey(name));
         }
 
         [Pure]
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newRole = Role.Create(name);
 
-            return Create(inner.With(name, newRole));
+            return Create(inner.Set(name, newRole));
         }
 
         [Pure]
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newRole = role.Update(permissions, properties);
 
-            return Create(inner.With(name, newRole));
+            return Create(inner.Set(name, newRole));
         }
 
         public static bool IsDefault(string role)

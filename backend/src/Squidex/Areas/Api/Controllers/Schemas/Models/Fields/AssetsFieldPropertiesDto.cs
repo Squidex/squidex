@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -22,12 +22,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The language specific default value as a list of asset ids.
         /// </summary>
-        public LocalizedValue<string[]?> DefaultValues { get; set; }
+        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; set; }
 
         /// <summary>
         /// The default value as a list of asset ids.
         /// </summary>
-        public string[]? DefaultValue { get; set; }
+        public ImmutableList<string>? DefaultValue { get; set; }
 
         /// <summary>
         /// The initial id to the folder.
@@ -107,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed file extensions.
         /// </summary>
-        public ReadOnlyCollection<string>? AllowedExtensions { get; set; }
+        public ImmutableList<string>? AllowedExtensions { get; set; }
 
         /// <summary>
         /// True, if duplicate values are allowed.

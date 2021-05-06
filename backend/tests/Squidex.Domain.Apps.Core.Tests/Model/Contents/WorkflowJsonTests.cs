@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents
@@ -22,16 +23,18 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         public void Should_serialize_and_deserialize()
         {
             var workflow = new Workflow(
-                Status.Draft, new Dictionary<Status, WorkflowStep>
+                Status.Draft,
+                new Dictionary<Status, WorkflowStep>
                 {
                     [Status.Draft] = new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Published] = WorkflowTransition.When("Expression", "Role1", "Role2")
-                        },
+                        }.ToImmutableDictionary(),
                         "#00ff00",
                         NoUpdate.When("Expression", "Role1", "Role2"))
-                }, new List<DomainId> { DomainId.NewGuid() }, "MyName");
+                }.ToImmutableDictionary(),
+                ImmutableList.Create(DomainId.NewGuid()), "MyName");
 
             var serialized = workflow.SerializeAndDeserialize();
 

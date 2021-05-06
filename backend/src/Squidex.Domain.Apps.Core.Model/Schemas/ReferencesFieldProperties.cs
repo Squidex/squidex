@@ -5,52 +5,50 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class ReferencesFieldProperties : FieldProperties
+    public sealed record ReferencesFieldProperties : FieldProperties
     {
-        public LocalizedValue<string[]?> DefaultValues { get; set; }
+        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; init; }
 
-        public string[]? DefaultValue { get; set; }
+        public ImmutableList<string>? DefaultValue { get; init; }
 
-        public int? MinItems { get; set; }
+        public int? MinItems { get; init; }
 
-        public int? MaxItems { get; set; }
+        public int? MaxItems { get; init; }
 
-        public bool ResolveReference { get; set; }
+        public bool ResolveReference { get; init; }
 
-        public bool AllowDuplicates { get; set; }
+        public bool AllowDuplicates { get; init; }
 
-        public bool MustBePublished { get; set; }
+        public bool MustBePublished { get; init; }
 
-        public ReferencesFieldEditor Editor { get; set; }
+        public ReferencesFieldEditor Editor { get; init; }
 
         public DomainId SchemaId
         {
-            get
-            {
-                return SchemaIds?.FirstOrDefault() ?? default;
-            }
-            set
+            init
             {
                 if (value != default)
                 {
-                    SchemaIds = new ReadOnlyCollection<DomainId>(new List<DomainId> { value });
+                    SchemaIds = ImmutableList.Create(value);
                 }
                 else
                 {
                     SchemaIds = null;
                 }
             }
+            get
+            {
+                return SchemaIds?.FirstOrDefault() ?? default;
+            }
         }
 
-        public ReadOnlyCollection<DomainId>? SchemaIds { get; set; }
+        public ImmutableList<DomainId>? SchemaIds { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
-    public abstract class RuleAction : Freezable
+    public abstract record RuleAction
     {
         public IEnumerable<ValidationError> Validate()
         {

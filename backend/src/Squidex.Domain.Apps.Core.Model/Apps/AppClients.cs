@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            return Without<AppClients>(id);
+            return RemoveKey<AppClients>(id);
         }
 
         [Pure]
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 Role = role.Or(Role.Editor)
             };
 
-            return With<AppClients>(id, newClient);
+            return Set<AppClients>(id, newClient);
         }
 
         [Pure]
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 newClient = newClient with { ApiTrafficLimit = apiTrafficLimit.Value };
             }
 
-            return With<AppClients>(id, newClient);
+            return Set<AppClients>(id, newClient);
         }
     }
 }

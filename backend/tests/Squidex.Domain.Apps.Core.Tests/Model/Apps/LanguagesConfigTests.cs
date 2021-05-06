@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -114,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                     [Language.EN] = new LanguageConfig(),
                     [Language.DE] = new LanguageConfig(),
                     [Language.ES] = new LanguageConfig(true),
-                    [Language.IT] = new LanguageConfig(true, Language.ES)
+                    [Language.IT] = new LanguageConfig(true, ImmutableList.Create(Language.ES))
                 });
 
             Assert.Equal(Language.DE, config.Master);
@@ -246,7 +247,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                 new Dictionary<string, LanguageConfig>
                 {
                     [Language.EN] = new LanguageConfig(),
-                    [Language.IT] = new LanguageConfig(true, Language.EN)
+                    [Language.IT] = new LanguageConfig(true, ImmutableList.Create(Language.EN))
                 });
 
             Assert.Equal(Language.EN, config_2.Master);
@@ -263,7 +264,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                 new Dictionary<string, LanguageConfig>
                 {
                     [Language.EN] = new LanguageConfig(),
-                    [Language.IT] = new LanguageConfig(true, Language.EN)
+                    [Language.IT] = new LanguageConfig(true, ImmutableList.Create(Language.EN))
                 });
 
             Assert.Equal(Language.EN, config_2.Master);

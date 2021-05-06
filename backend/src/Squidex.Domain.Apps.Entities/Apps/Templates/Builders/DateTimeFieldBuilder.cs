@@ -19,7 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public DateTimeFieldBuilder AsDateTime()
         {
-            Properties<DateTimeFieldProperties>().Editor = DateTimeFieldEditor.DateTime;
+            Properties<DateTimeFieldProperties>(p => p with
+            {
+                Editor = DateTimeFieldEditor.DateTime,
+                EditorUrl = null
+            });
 
             return this;
         }

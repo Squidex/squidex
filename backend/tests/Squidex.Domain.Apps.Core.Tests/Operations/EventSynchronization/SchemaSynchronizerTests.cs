@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
-                new SchemaUIFieldsConfigured { FieldsInLists = new FieldNames("2", "1") }
+                new SchemaUIFieldsConfigured { FieldsInLists = FieldNames.Create("2", "1") }
             );
         }
 
@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
-                new SchemaUIFieldsConfigured { FieldsInReferences = new FieldNames("2", "1") }
+                new SchemaUIFieldsConfigured { FieldsInReferences = FieldNames.Create("2", "1") }
             );
         }
 
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
-                new SchemaFieldRulesConfigured { FieldRules = new FieldRules(FieldRule.Hide("1")) }
+                new SchemaFieldRulesConfigured { FieldRules = FieldRules.Create(FieldRule.Hide("1")) }
             );
         }
 

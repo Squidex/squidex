@@ -5,39 +5,36 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    [Equals(DoNotAddEqualityOperators = true)]
     public sealed class LanguageConfig
     {
         public static readonly LanguageConfig Default = new LanguageConfig();
 
-        private readonly Language[] fallbacks;
-
         public bool IsOptional { get; }
 
-        public IEnumerable<Language> Fallbacks
-        {
-            get => fallbacks;
-        }
+        public ImmutableList<Language> Fallbacks { get; } = ImmutableList.Empty<Language>();
 
-        public LanguageConfig(bool isOptional = false, params Language[]? fallbacks)
+        public LanguageConfig(bool isOptional = false, ImmutableList<Language>? fallback = null)
         {
             IsOptional = isOptional;
 
-            this.fallbacks = fallbacks ?? Array.Empty<Language>();
+            if (fallback != null)
+            {
+                Fallbacks = fallback;
+            }
         }
 
         internal LanguageConfig Cleanup(string self, IReadOnlyDictionary<string, LanguageConfig> allowed)
         {
-            if (fallbacks.Any(x => x.Iso2Code == self) || fallbacks.Any(x => !allowed.ContainsKey(x)))
+            if (Fallbacks.Any(x => x.Iso2Code == self) || Fallbacks.Any(x => !allowed.ContainsKey(x)))
             {
-                var cleaned = Fallbacks.Where(x => x.Iso2Code != self && allowed.ContainsKey(x.Iso2Code)).ToArray();
+                var cleaned = Fallbacks.Where(x => x.Iso2Code != self && allowed.ContainsKey(x.Iso2Code)).ToImmutableList();
 
                 return new LanguageConfig(IsOptional, cleaned);
             }

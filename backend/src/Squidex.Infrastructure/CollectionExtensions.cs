@@ -222,6 +222,39 @@ namespace Squidex.Infrastructure
             return !dictionary.Except(other, comparer).Any();
         }
 
+        public static bool EqualsList<T>(this IReadOnlyList<T> list, IReadOnlyList<T>? other)
+        {
+            return EqualsList(list, other, EqualityComparer<T>.Default);
+        }
+
+        public static bool EqualsList<T>(this IReadOnlyList<T> list, IReadOnlyList<T>? other, IEqualityComparer<T> comparer)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(list, other))
+            {
+                return true;
+            }
+
+            if (list.Count != other.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < list.Count; i++)
+            {
+                if (!comparer.Equals(list[i], other[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary) where TKey : notnull
         {
             return dictionary.ToDictionary(x => x.Key, x => x.Value);

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -105,7 +105,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             this.name = name;
 
             this.properties = properties ?? new SchemaProperties();
-            this.properties.Freeze();
 
             this.isSingleton = isSingleton;
         }
@@ -133,7 +132,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return Clone(clone =>
             {
                 clone.properties = newProperties;
-                clone.Properties.Freeze();
             });
         }
 
@@ -150,7 +148,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return Clone(clone =>
             {
                 clone.scripts = newScripts;
-                clone.scripts.Freeze();
             });
         }
 

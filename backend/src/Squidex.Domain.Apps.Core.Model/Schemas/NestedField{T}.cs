@@ -13,22 +13,17 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public class NestedField<T> : NestedField, IField<T> where T : FieldProperties, new()
     {
-        private T properties;
-
-        public T Properties
-        {
-            get => properties;
-        }
+        public T Properties { get; private set; }
 
         public override FieldProperties RawProperties
         {
-            get => properties;
+            get => Properties;
         }
 
         public NestedField(long id, string name, T? properties = null, IFieldSettings? settings = null)
             : base(id, name, settings)
         {
-            SetProperties(properties ?? new T());
+            Properties = properties ?? new T();
         }
 
         [Pure]
@@ -36,23 +31,15 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var typedProperties = ValidateProperties(newProperties);
 
-            typedProperties.Freeze();
-
-            if (properties.Equals(typedProperties))
+            if (Properties.Equals(typedProperties))
             {
                 return this;
             }
 
             return Clone<NestedField<T>>(clone =>
             {
-                clone.SetProperties(typedProperties);
+                clone.Properties = typedProperties;
             });
-        }
-
-        private void SetProperties(T newProperties)
-        {
-            properties = newProperties;
-            properties.Freeze();
         }
 
         private static T ValidateProperties(FieldProperties newProperties)
@@ -69,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public override TResult Accept<TResult, TArgs>(IFieldVisitor<TResult, TArgs> visitor, TArgs args)
         {
-            return properties.Accept(visitor, this, args);
+            return Properties.Accept(visitor, this, args);
         }
     }
 }

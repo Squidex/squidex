@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -60,8 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty
                 .Add(id1, "workflow1")
                 .Add(id2, "workflow2")
-                .Update(id1, new Workflow(default, null, new List<DomainId> { schemaId.Id }))
-                .Update(id2, new Workflow(default, null, new List<DomainId> { schemaId.Id }));
+                .Update(id1, new Workflow(default, null, ImmutableList.Create(schemaId.Id)))
+                .Update(id2, new Workflow(default, null, ImmutableList.Create(schemaId.Id)));
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
@@ -79,8 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty
                 .Add(id1, "workflow1")
                 .Add(id2, "workflow2")
-                .Update(id1, new Workflow(default, null, new List<DomainId> { oldSchemaId }))
-                .Update(id2, new Workflow(default, null, new List<DomainId> { oldSchemaId }));
+                .Update(id1, new Workflow(default, null, ImmutableList.Create(oldSchemaId)))
+                .Update(id2, new Workflow(default, null, ImmutableList.Create(oldSchemaId)));
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
@@ -96,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty
                 .Add(id1, "workflow1")
                 .Add(id2, "workflow2")
-                .Update(id1, new Workflow(default, null, new List<DomainId> { schemaId.Id }));
+                .Update(id1, new Workflow(default, null, ImmutableList.Create(schemaId.Id)));
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 

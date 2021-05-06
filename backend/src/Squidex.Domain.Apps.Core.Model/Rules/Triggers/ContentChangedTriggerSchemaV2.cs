@@ -9,10 +9,10 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
-    public sealed class ContentChangedTriggerSchemaV2 : Freezable
+    public sealed record ContentChangedTriggerSchemaV2
     {
-        public DomainId SchemaId { get; set; }
+        public DomainId SchemaId { get; init; }
 
-        public string? Condition { get; set; }
+        public string? Condition { get; init; }
     }
 }

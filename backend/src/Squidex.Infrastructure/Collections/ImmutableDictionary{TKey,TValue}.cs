@@ -5,16 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Collections
 {
-    public class ImmutableDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> where TKey : notnull
+    public class ImmutableDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IEquatable<ImmutableDictionary<TKey, TValue>> where TKey : notnull
     {
         private static readonly Dictionary<TKey, TValue> EmptyInner = new Dictionary<TKey, TValue>();
-        private Dictionary<TKey, TValue> inner;
+        private IDictionary<TKey, TValue> inner;
 
         public TValue this[TKey key]
         {
@@ -49,19 +50,19 @@ namespace Squidex.Infrastructure.Collections
         {
         }
 
-        public ImmutableDictionary(Dictionary<TKey, TValue> inner)
+        public ImmutableDictionary(IDictionary<TKey, TValue> inner)
         {
             Guard.NotNull(inner, nameof(inner));
 
             this.inner = inner;
         }
 
-        public ImmutableDictionary<TKey, TValue> With(TKey key, TValue value, IEqualityComparer<TValue>? valueComparer = null)
+        public ImmutableDictionary<TKey, TValue> Set(TKey key, TValue value, IEqualityComparer<TValue>? valueComparer = null)
         {
-            return With<ImmutableDictionary<TKey, TValue>>(key, value, valueComparer);
+            return Set<ImmutableDictionary<TKey, TValue>>(key, value, valueComparer);
         }
 
-        public TArray With<TArray>(TKey key, TValue value, IEqualityComparer<TValue>? valueComparer = null) where TArray : ImmutableDictionary<TKey, TValue>
+        public TArray Set<TArray>(TKey key, TValue value, IEqualityComparer<TValue>? valueComparer = null) where TArray : ImmutableDictionary<TKey, TValue>
         {
             if (!TryGetValue(key, out var found) || !IsEqual(value, found, valueComparer))
             {
@@ -83,12 +84,12 @@ namespace Squidex.Infrastructure.Collections
             return comparer.Equals(lhs, rhs);
         }
 
-        public ImmutableDictionary<TKey, TValue> Without(TKey key)
+        public ImmutableDictionary<TKey, TValue> RemoveKey(TKey key)
         {
-            return Without<ImmutableDictionary<TKey, TValue>>(key);
+            return RemoveKey<ImmutableDictionary<TKey, TValue>>(key);
         }
 
-        public TArray Without<TArray>(TKey key) where TArray : ImmutableDictionary<TKey, TValue>
+        public TArray RemoveKey<TArray>(TKey key) where TArray : ImmutableDictionary<TKey, TValue>
         {
             if (!inner.ContainsKey(key))
             {
@@ -144,6 +145,21 @@ namespace Squidex.Infrastructure.Collections
         private static IEnumerable<TItem> GetEnumerable<TItem>(IEnumerable<TItem> collection)
         {
             return collection;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as ImmutableDictionary<TKey, TValue>);
+        }
+
+        public bool Equals(ImmutableDictionary<TKey, TValue>? other)
+        {
+            return this.EqualsDictionary(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.DictionaryHashCode();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Squidex.Extensions.Actions.Webhook
         Display = "Send webhook",
         Description = "Invoke HTTP endpoints on a target system.",
         ReadMore = "https://en.wikipedia.org/wiki/Webhook")]
-    public sealed class WebhookAction : RuleAction
+    public sealed record WebhookAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Url", Description = "The url to the webhook.")]
