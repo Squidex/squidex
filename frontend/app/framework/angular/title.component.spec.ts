@@ -22,12 +22,16 @@ describe('TitleComponent', () => {
     it('should set title in service', () => {
         titleComponent.message = 'title1';
 
+        expect().nothing();
+
         titleService.verify(x => x.push('title1', undefined), Times.once());
     });
 
     it('should replace title in title service', () => {
         titleComponent.message = 'title1';
         titleComponent.message = 'title2';
+
+        expect().nothing();
 
         titleService.verify(x => x.push('title2', 'title1'), Times.once());
     });
@@ -36,12 +40,16 @@ describe('TitleComponent', () => {
         titleComponent.message = 'title1';
         titleComponent.ngOnDestroy();
 
+        expect().nothing();
+
         titleService.verify(x => x.pop(), Times.once());
     });
 
     it('should not remove title on destroy if not set before', () => {
         titleComponent.message = undefined!;
         titleComponent.ngOnDestroy();
+
+        expect().nothing();
 
         titleService.verify(x => x.pop(), Times.never());
     });
