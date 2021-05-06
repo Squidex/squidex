@@ -287,12 +287,6 @@ describe('DateTimeField', () => {
         expect(FieldFormatter.format(dateField, '2017-12-12T00:00:00Z')).toBe('12/12/2017');
     });
 
-    it('should format to date time', () => {
-        const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime' }) });
-
-        expect(FieldFormatter.format(field2, '2017-12-12T16:00:00Z')).toBe('12/12/2017, 4:00:00 PM');
-    });
-
     it('should return default from properties value', () => {
         const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', defaultValue: '2017-10-12T16:00:00Z' }) });
 
@@ -316,6 +310,14 @@ describe('DateTimeField', () => {
 
         expect(FieldDefaultValue.get(field2, 'iv', now)).toEqual('2017-10-12T16:30:10Z');
     });
+
+    if (isUtc()) {
+        it('should format to date time', () => {
+            const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime' }) });
+
+            expect(FieldFormatter.format(field2, '2017-12-12T16:00:00Z')).toBe('12/12/2017, 4:00:00 PM');
+        });
+    }
 });
 
 describe('GeolocationField', () => {
@@ -497,3 +499,7 @@ describe('StringField', () => {
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 });
+
+function isUtc() {
+    return new Date().getTimezoneOffset() === 0;
+}

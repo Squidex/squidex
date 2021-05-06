@@ -32,7 +32,7 @@ module.exports = function (config) {
         /**
          * Use a mocha style console reporter, html reporter and the code coverage reporter.
          */
-        reporters: ['mocha', 'html', 'coverage-istanbul'],
+        reporters: ['kjhtml', 'mocha', 'coverage-istanbul'],
 
         htmlReporter: {
             useCompactStyle: true,

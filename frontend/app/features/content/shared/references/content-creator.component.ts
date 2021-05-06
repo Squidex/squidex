@@ -24,7 +24,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     public initialData: any;
 
     @Input()
-    public schemaName: string;
+    public schemaName?: string | null;
 
     @Input()
     public schemaIds: ReadonlyArray<string>;
