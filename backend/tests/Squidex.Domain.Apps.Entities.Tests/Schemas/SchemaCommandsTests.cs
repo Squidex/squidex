@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 IsPublished = true,
                 Properties = new SchemaProperties { Hints = "MyHints" },
+                FieldsInLists = new FieldNames("meta.id", "myString"),
+                FieldsInReferences = new FieldNames("myString"),
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -38,8 +40,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         Partitioning = "language"
                     }
                 },
-                FieldsInLists = new FieldNames("meta.id", "myString"),
-                FieldsInReferences = new FieldNames("myString"),
                 Scripts = new SchemaScripts
                 {
                     Change = "change-script"
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     })
                     .Publish();
 
-            var actual = command.BuildSchema("my-schema", false);
+            var actual = command.BuildSchema("my-schema", SchemaType.Default);
 
             actual.Should().BeEquivalentTo(expected);
         }

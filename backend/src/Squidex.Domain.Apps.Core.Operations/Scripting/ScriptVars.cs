@@ -11,8 +11,6 @@ using System.Security.Claims;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-
 namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class ScriptVars : ScriptContext
@@ -71,6 +69,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             set => SetValue(value);
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         public ContentData? DataOld
         {
             get => GetValue<ContentData?>();
@@ -90,6 +89,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 SetValue(value);
             }
         }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         [Obsolete("Use dataOld")]
         public ContentData? OldData

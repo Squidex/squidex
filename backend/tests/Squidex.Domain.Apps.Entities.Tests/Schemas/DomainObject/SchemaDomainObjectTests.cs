@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var properties = new SchemaProperties();
 
-            var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, IsSingleton = true };
+            var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Type = SchemaType.Singleton };
 
             var result = await PublishAsync(command);
 
@@ -64,12 +64,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
             Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
-            Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
-            Assert.True(sut.Snapshot.SchemaDef.IsSingleton);
+            Assert.Equal(SchemaType.Singleton, sut.Snapshot.SchemaDef.Type);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, command.IsSingleton) })
+                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, command.Type) })
                 );
         }
 

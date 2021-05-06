@@ -33,9 +33,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         Dictionary<string, string>? PreviewUrls { get; set; }
 
-        Schema ToSchema(string name, bool isSingleton)
+        Schema ToSchema(string name, SchemaType type)
         {
-            var schema = new Schema(name, Properties, isSingleton);
+            var schema = new Schema(name, Properties, type);
 
             if (IsPublished)
             {

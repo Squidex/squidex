@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var ctx = ContextWithPermission();
 
-            var schema1 = CreateSchema("schemaA1", false);
+            var schema1 = CreateSchema("schemaA1", SchemaType.Default);
 
             A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
                 .Returns(new List<ISchemaEntity> { schema1 });
@@ -61,9 +61,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var ctx = ContextWithPermission(permission.Id);
 
-            var schema1 = CreateSchema("schemaA1", false);
-            var schema2 = CreateSchema("schemaA2", false);
-            var schema3 = CreateSchema("schemaB2", false);
+            var schema1 = CreateSchema("schemaA1", SchemaType.Default);
+            var schema2 = CreateSchema("schemaA2", SchemaType.Default);
+            var schema3 = CreateSchema("schemaB2", SchemaType.Default);
 
             A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
                 .Returns(new List<ISchemaEntity> { schema1, schema2, schema3 });
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var ctx = ContextWithPermission(permission.Id);
 
-            var schema1 = CreateSchema("schemaA1", true);
+            var schema1 = CreateSchema("schemaA1", SchemaType.Singleton);
 
             A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
                 .Returns(new List<ISchemaEntity> { schema1 });
@@ -112,9 +112,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     .Add("schemaA1 Content", SearchResultType.Content, "schemaA1-content-url", "schemaA1"));
         }
 
-        private ISchemaEntity CreateSchema(string name, bool isSingleton)
+        private ISchemaEntity CreateSchema(string name, SchemaType type)
         {
-            return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), name), new Schema(name, null, isSingleton));
+            var schemaDef = new Schema(name, null, type);
+
+            return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), name), schemaDef);
         }
 
         private Context ContextWithPermission(string? permission = null)

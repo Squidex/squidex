@@ -82,6 +82,11 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return None.Value;
         }
 
+        public None Visit(IField<ComponentsFieldProperties> field, Args args)
+        {
+            return None.Value;
+        }
+
         public None Visit(IField<DateTimeFieldProperties> field, Args args)
         {
             return None.Value;

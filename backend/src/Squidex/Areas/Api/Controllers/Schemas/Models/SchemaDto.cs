@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -41,9 +43,17 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public SchemaPropertiesDto Properties { get; set; } = new SchemaPropertiesDto();
 
         /// <summary>
+        /// The type of the schema.
+        /// </summary>
+        [Obsolete("Use Type property.")]
+        public SchemaType Type { get; set; }
+
+        /// <summary>
         /// Indicates if the schema is a singleton.
         /// </summary>
-        public bool IsSingleton { get; set; }
+#pragma warning disable CS0618 // Type or member is obsolete
+        public bool IsSingleton => Type == SchemaType.Singleton;
+#pragma warning restore CS0618 // Type or member is obsolete
 
         /// <summary>
         /// Indicates if the schema is published.

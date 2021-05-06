@@ -45,6 +45,21 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return field.RawProperties.Label.Or(field.TypeName());
         }
 
+        public static bool IsSingleton(this Schema schema)
+        {
+            return schema.Type == SchemaType.Singleton;
+        }
+
+        public static bool IsDefault(this Schema schema)
+        {
+            return schema.Type == SchemaType.Default;
+        }
+
+        public static bool IsComponent(this Schema schema)
+        {
+            return schema.Type == SchemaType.Component;
+        }
+
         public static string TypeName(this Schema schema)
         {
             return schema.Name.ToPascalCase();

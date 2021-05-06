@@ -6,54 +6,42 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Squidex.Domain.Apps.Core
 {
-    public sealed class InvariantPartitioning : IFieldPartitioning
+    public sealed class NonePartitioning : IFieldPartitioning
     {
-        public static readonly InvariantPartitioning Instance = new InvariantPartitioning();
-        public static readonly string Key = "iv";
-        public static readonly string Name = "Invariant";
-        public static readonly string Description = "invariant value";
+        public static readonly NonePartitioning Instance = new NonePartitioning();
 
         public string Master
         {
-            get => Key;
+            get => string.Empty;
         }
 
         public IEnumerable<string> AllKeys
         {
-            get { yield return Key; }
+            get => Enumerable.Empty<string>();
         }
 
         public string? GetName(string key)
         {
-            if (Contains(key))
-            {
-                return Name;
-            }
-
             return null;
         }
 
         public IEnumerable<string> GetPriorities(string key)
         {
-            if (Contains(key))
-            {
-                yield return Key;
-            }
-
-            yield break;
+            return Enumerable.Empty<string>();
         }
 
         public bool Contains(string key)
         {
-            return Equals(Key, key);
+            return false;
         }
 
         public bool IsMaster(string key)
         {
-            return Contains(key);
+            return false;
         }
 
         public bool IsOptional(string key)
@@ -63,7 +51,7 @@ namespace Squidex.Domain.Apps.Core
 
         public override string ToString()
         {
-            return Description;
+            return "invariant value";
         }
     }
 }

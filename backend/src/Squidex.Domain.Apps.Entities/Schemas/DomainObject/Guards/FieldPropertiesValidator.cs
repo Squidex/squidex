@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -89,6 +89,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                 yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
             }
+        }
+
+        public IEnumerable<ValidationError> Visit(ComponentsFieldProperties properties, None args)
+        {
+            yield break;
         }
 
         public IEnumerable<ValidationError> Visit(DateTimeFieldProperties properties, None args)

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public bool IsPublished { get; set; }
 
-        public bool IsSingleton { get; set; }
+        public SchemaType Type { get; set; }
 
         public SchemaField[]? Fields { get; set; }
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
         {
             IUpsertCommand self = this;
 
-            return self.ToSchema(Name, IsSingleton);
+            return self.ToSchema(Name, Type);
         }
     }
 }

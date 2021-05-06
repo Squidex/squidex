@@ -457,7 +457,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         public void Should_serialize_and_deserialize_schema()
         {
             var schemaSource =
-                TestUtils.MixedSchema(true)
+                TestUtils.MixedSchema(SchemaType.Singleton)
                     .ChangeCategory("Category")
                     .SetFieldRules(FieldRule.Hide("2"))
                     .SetFieldsInLists("field2")

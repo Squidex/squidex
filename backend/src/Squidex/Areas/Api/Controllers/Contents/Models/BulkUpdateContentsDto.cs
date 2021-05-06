@@ -12,8 +12,6 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
     public sealed class BulkUpdateContentsDto
@@ -61,6 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             result.Jobs = Jobs?.Select(x => x.ToJob())?.ToArray();
 
+#pragma warning disable CS0618 // Type or member is obsolete
             if (result.Jobs != null && Publish)
             {
                 foreach (var job in result.Jobs)
@@ -71,6 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                     }
                 }
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             return result;
         }

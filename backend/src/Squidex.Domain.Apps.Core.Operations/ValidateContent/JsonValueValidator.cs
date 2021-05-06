@@ -55,34 +55,23 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return IsValidStringList(args.Value);
         }
 
-        public bool Visit(IField<ReferencesFieldProperties> field, Args args)
-        {
-            return IsValidStringList(args.Value);
-        }
-
-        public bool Visit(IField<TagsFieldProperties> field, Args args)
-        {
-            return IsValidStringList(args.Value);
-        }
-
         public bool Visit(IField<BooleanFieldProperties> field, Args args)
         {
             return args.Value is JsonBoolean;
         }
 
-        public bool Visit(IField<NumberFieldProperties> field, Args args)
+        public bool Visit(IField<ComponentsFieldProperties> field, Args args)
         {
-            return args.Value is JsonNumber;
-        }
+            var value = args.Value;
 
-        public bool Visit(IField<StringFieldProperties> field, Args args)
-        {
-            return args.Value is JsonString;
-        }
-
-        public bool Visit(IField<UIFieldProperties> field, Args args)
-        {
-            return true;
+            if (field.Properties.Multiple)
+            {
+                return IsValidComponentList(value);
+            }
+            else
+            {
+                return IsValidComponent(value);
+            }
         }
 
         public bool Visit(IField<DateTimeFieldProperties> field, Args args)
@@ -105,6 +94,31 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         }
 
         public bool Visit(IField<JsonFieldProperties> field, Args args)
+        {
+            return true;
+        }
+
+        public bool Visit(IField<NumberFieldProperties> field, Args args)
+        {
+            return args.Value is JsonNumber;
+        }
+
+        public bool Visit(IField<ReferencesFieldProperties> field, Args args)
+        {
+            return IsValidStringList(args.Value);
+        }
+
+        public bool Visit(IField<StringFieldProperties> field, Args args)
+        {
+            return args.Value is JsonString;
+        }
+
+        public bool Visit(IField<TagsFieldProperties> field, Args args)
+        {
+            return IsValidStringList(args.Value);
+        }
+
+        public bool Visit(IField<UIFieldProperties> field, Args args)
         {
             return true;
         }
@@ -143,6 +157,39 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
 
             return false;
+        }
+
+        private static bool IsValidComponentList(IJsonValue value)
+        {
+            if (value is JsonArray array)
+            {
+                foreach (var item in array)
+                {
+                    if (!IsValidComponent(item))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsValidComponent(IJsonValue value)
+        {
+            if (value is not JsonObject obj)
+            {
+                return false;
+            }
+
+            if (!obj.TryGetValue<JsonString>("$type", out var type))
+            {
+                return false;
+            }
+
+            return !string.IsNullOrWhiteSpace(type.Value);
         }
     }
 }

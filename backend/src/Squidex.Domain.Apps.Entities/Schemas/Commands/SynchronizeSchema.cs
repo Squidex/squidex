@@ -36,11 +36,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public Dictionary<string, string>? PreviewUrls { get; set; }
 
-        public Schema BuildSchema(string name, bool isSingleton)
+        public Schema BuildSchema(string name, SchemaType type)
         {
             IUpsertCommand self = this;
 
-            return self.ToSchema(name, isSingleton);
+            return self.ToSchema(name, type);
         }
     }
 }

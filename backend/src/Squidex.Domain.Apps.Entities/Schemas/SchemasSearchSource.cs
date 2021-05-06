@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private void AddContentsUrl(SearchResults result, NamedId<DomainId> appId, ISchemaEntity schema, NamedId<DomainId> schemaId, string name)
         {
-            if (schema.SchemaDef.IsSingleton)
+            if (schema.SchemaDef.IsSingleton())
             {
                 var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
 

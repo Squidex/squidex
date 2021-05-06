@@ -81,6 +81,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
+        public IEnumerable<IValidator> Visit(IField<ComponentsFieldProperties> field, Args args)
+        {
+            var properties = field.Properties;
+
+            var isRequired = IsRequired(properties, args.Context);
+
+            if (isRequired)
+            {
+                yield return new RequiredValidator();
+            }
+        }
+
         public IEnumerable<IValidator> Visit(IField<DateTimeFieldProperties> field, Args args)
         {
             var properties = field.Properties;

@@ -33,7 +33,7 @@ namespace Migrations.OldEvents
 
         public IEvent Migrate()
         {
-            var schema = new Schema(Name, Properties, Singleton);
+            var schema = new Schema(Name, Properties, Singleton ? SchemaType.Singleton : SchemaType.Default);
 
             if (Publish)
             {

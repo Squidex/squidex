@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 Mocks.Schema(appId, schemaId, new Schema(schemaId.Name));
 
             singletonSchema =
-                Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, isSingleton: true));
+                Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, type: SchemaType.Singleton));
         }
 
         [Fact]

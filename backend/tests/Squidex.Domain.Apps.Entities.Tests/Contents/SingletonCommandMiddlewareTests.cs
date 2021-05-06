@@ -8,6 +8,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Commands;
@@ -23,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_create_content_if_singleton_schema_is_created()
         {
-            var command = new CreateSchema { IsSingleton = true, Name = "my-schema" };
+            var command = new CreateSchema { Type = SchemaType.Singleton, Name = "my-schema" };
 
             var context =
                 new CommandContext(command, commandBus)
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_not_create_content_if_non_singleton_schema_is_created()
         {
-            var command = new CreateSchema { IsSingleton = false };
+            var command = new CreateSchema { Type = SchemaType.Default };
 
             var context =
                 new CommandContext(command, commandBus)
@@ -53,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_not_create_content_if_singleton_schema_not_created()
         {
-            var command = new CreateSchema { IsSingleton = true };
+            var command = new CreateSchema { Type = SchemaType.Singleton };
 
             var context =
                 new CommandContext(command, commandBus);

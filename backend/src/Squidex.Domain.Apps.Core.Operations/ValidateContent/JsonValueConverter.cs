@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -134,6 +134,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 default:
                     return (value, null);
             }
+        }
+
+        public (object? Result, JsonError? Error) Visit(IField<ComponentsFieldProperties> field, Args args)
+        {
+            return (args.Value, null);
         }
 
         public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field, Args args)

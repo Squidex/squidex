@@ -120,6 +120,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return (AllTypes.Boolean, JsonBoolean, null);
         }
 
+        public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<ComponentsFieldProperties> field, FieldInfo args)
+        {
+            return default;
+        }
+
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
         {
             return (AllTypes.DateTime, JsonDateTime, null);

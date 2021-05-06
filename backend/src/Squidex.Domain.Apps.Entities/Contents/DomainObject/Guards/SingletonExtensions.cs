@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
@@ -15,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
     {
         public static void MustNotCreateSingleton(this OperationContext context)
         {
-            if (context.SchemaDef.IsSingleton && context.ContentId != context.Schema.Id)
+            if (context.SchemaDef.IsSingleton() && context.ContentId != context.Schema.Id)
             {
                 throw new DomainException(T.Get("contents.singletonNotCreatable"));
             }
@@ -23,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static void MustNotChangeSingleton(this OperationContext context, Status status)
         {
-            if (context.SchemaDef.IsSingleton && (context.Content.NewStatus == null || status != Status.Published))
+            if (context.SchemaDef.IsSingleton() && (context.Content.NewStatus == null || status != Status.Published))
             {
                 throw new DomainException(T.Get("contents.singletonNotChangeable"));
             }
@@ -31,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static void MustNotDeleteSingleton(this OperationContext context)
         {
-            if (context.SchemaDef.IsSingleton)
+            if (context.SchemaDef.IsSingleton())
             {
                 throw new DomainException(T.Get("contents.singletonNotDeletable"));
             }

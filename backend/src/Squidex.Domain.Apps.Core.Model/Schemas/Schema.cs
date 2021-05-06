@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         private static readonly Dictionary<string, string> EmptyPreviewUrls = new Dictionary<string, string>();
         private readonly string name;
-        private readonly bool isSingleton;
+        private readonly SchemaType type;
         private string category;
         private FieldNames fieldsInLists = FieldNames.Empty;
         private FieldNames fieldsInReferences = FieldNames.Empty;
@@ -43,9 +43,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get => isPublished;
         }
 
-        public bool IsSingleton
+        public SchemaType Type
         {
-            get => isSingleton;
+            get => type;
         }
 
         public IReadOnlyList<RootField> Fields
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get => properties;
         }
 
-        public Schema(string name, SchemaProperties? properties = null, bool isSingleton = false)
+        public Schema(string name, SchemaProperties? properties = null, SchemaType type = SchemaType.Singleton)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
@@ -107,11 +107,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             this.properties = properties ?? new SchemaProperties();
             this.properties.Freeze();
 
-            this.isSingleton = isSingleton;
+            this.type = type;
         }
 
-        public Schema(string name, RootField[] fields, SchemaProperties properties, bool isPublished, bool isSingleton = false)
-            : this(name, properties, isSingleton)
+        public Schema(string name, RootField[] fields, SchemaProperties properties, bool isPublished, SchemaType type = SchemaType.Singleton)
+            : this(name, properties, type)
         {
             Guard.NotNull(fields, nameof(fields));
 

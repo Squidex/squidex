@@ -74,6 +74,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return SchemaBuilder.BooleanProperty();
         }
 
+        public JsonSchemaProperty? Visit(IField<ComponentsFieldProperties> field, Args args)
+        {
+            return null;
+        }
+
         public JsonSchemaProperty? Visit(IField<DateTimeFieldProperties> field, Args args)
         {
             return SchemaBuilder.DateTimeProperty();

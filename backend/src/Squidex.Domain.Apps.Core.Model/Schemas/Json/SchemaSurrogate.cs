@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -22,6 +22,8 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public bool IsSingleton { get; set; }
 
         public bool IsPublished { get; set; }
+
+        public SchemaType Type { get; set; }
 
         public SchemaProperties Properties { get; set; }
 
@@ -81,7 +83,14 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         {
             var fields = Fields?.Select(f => f.ToField()).ToArray() ?? Array.Empty<RootField>();
 
-            var schema = new Schema(Name, fields, Properties, IsPublished, IsSingleton);
+            var type = Type;
+
+            if (IsSingleton)
+            {
+                type = SchemaType.Singleton;
+            }
+
+            var schema = new Schema(Name, fields, Properties, IsPublished, type);
 
             if (!string.IsNullOrWhiteSpace(Category))
             {
